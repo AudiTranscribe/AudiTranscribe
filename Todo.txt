@@ -2,3 +2,6 @@ Todo:
     - Add Launch4j capability to generate JAR files (or .exe files)
     - Switch from STFT to CQT/VQT
     - Update README.md
+
+Fixme:
+    - Spectrogram image seems to have artifacts
