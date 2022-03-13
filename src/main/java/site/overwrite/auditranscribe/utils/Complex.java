@@ -2,7 +2,7 @@
  * Complex.java
  *
  * Created on 2022-02-12
- * Updated on 2022-03-10
+ * Updated on 2022-03-13
  *
  * Description: Contains the complex number class.
  */
@@ -36,7 +36,7 @@ public class Complex {
     /**
      * Getter method to get the real part of the <code>Complex</code> object.
      *
-     * @return Double representing the real part.
+     * @return Real part of the complex number.
      */
     public double re() {
         return re;
@@ -45,7 +45,7 @@ public class Complex {
     /**
      * Getter method to get the imaginary part of the <code>Complex</code> object.
      *
-     * @return Double representing the imaginary part.
+     * @return Real part of the complex number.
      */
     public double im() {
         return im;
@@ -55,7 +55,7 @@ public class Complex {
 
     /**
      * Generates a string representation of the complex number.
-     * Note: we use "j" for the imaginary unit to follow Python's convention of complex numbers.
+     * Note: we use "j" for the imaginary unit to follow Python's convention.
      *
      * @return String representation of the complex number.
      */
@@ -153,7 +153,8 @@ public class Complex {
     }
 
     /**
-     * Returns the difference of this complex number with another complex number, i.e. (this - other).
+     * Returns the difference of this complex number with another complex number,
+     * i.e. (this - other).
      *
      * @param other The other complex number.
      * @return A <code>Complex</code> object representing the resulting complex number.
@@ -194,7 +195,7 @@ public class Complex {
     }
 
     /**
-     * Returns the reciprocal of this complex number in algebraic form.
+     * Returns the reciprocal of this complex number.
      *
      * @return A <code>Complex</code> object representing the reciprocal of this complex number.
      */
@@ -204,10 +205,11 @@ public class Complex {
     }
 
     /**
-     * Returns the complex number representing this complex number divided by <code>other</code>.
+     * Returns the complex number representing this complex number divided by the real number
+     * <code>other</code>.
      *
-     * @param other The other number.
-     * @return A <code>Complex</code> object.
+     * @param other The real number to divide by.
+     * @return A <code>Complex</code> object representing the resulting complex number.
      */
     public Complex divides(double other) {
         return this.scale(1.0 / other);
@@ -217,7 +219,7 @@ public class Complex {
      * Returns the complex number representing this complex number divided by <code>other</code>.
      *
      * @param other The other complex number.
-     * @return A <code>Complex</code> object.
+     * @return A <code>Complex</code> object representing the resulting complex number.
      */
     public Complex divides(Complex other) {
         // Check if `other` is completely real
@@ -225,14 +227,14 @@ public class Complex {
             return this.divides(other.re);
         }
 
-        // If not, do standard division
+        // If not, do standard complex division
         return this.times(other.reciprocal());
     }
 
     // Static methods
 
     /**
-     * A static function that returns the sum <code>a + b</code> where <code>a</code> and
+     * A static method that returns the sum <code>a + b</code> where <code>a</code> and
      * <code>b</code> are complex numbers.
      *
      * @param a The first complex number.
@@ -246,7 +248,7 @@ public class Complex {
     }
 
     /**
-     * A static function that returns the sum <code>a - b</code> where <code>a</code> and
+     * A static method that returns the sum <code>a - b</code> where <code>a</code> and
      * <code>b</code> are complex numbers.
      *
      * @param a The first complex number.
@@ -260,7 +262,7 @@ public class Complex {
     }
 
     /**
-     * A static function that returns the product <code>a * b</code> where <code>a</code> and
+     * A static method that returns the product <code>a * b</code> where <code>a</code> and
      * <code>b</code> are complex numbers.
      *
      * @param a The first complex number.
@@ -274,7 +276,7 @@ public class Complex {
     }
 
     /**
-     * A static function that returns the value of <code>a / b</code> where <code>a</code> and
+     * A static method that returns the value of <code>a / b</code> where <code>a</code> and
      * <code>b</code> are complex numbers.
      *
      * @param a The first complex number.
@@ -282,12 +284,13 @@ public class Complex {
      * @return A <code>Complex</code> object representing the value of <code>a / b</code>.
      */
     public static Complex divides(Complex a, Complex b) {
-        // Separately compute numerator and denominator
+        // Compute numerator and denominator separately
         double numeratorReal = a.re * b.re + a.im * b.im;
         double numeratorImag = b.re * a.im - a.re * b.im;
-        double denominator = 1 / (b.re * b.re + b.im * b.im);  // Purely real
 
-        // Combine into one set of real and imaginary parts
+        double denominator = 1 / (b.re * b.re + b.im * b.im);  // Note that denominator is purely real
+
+        // Combine numerator and denominator into the final real and imaginary parts
         double real = numeratorReal * denominator;
         double imag = numeratorImag * denominator;
 
@@ -298,8 +301,9 @@ public class Complex {
     /**
      * Compute the value of e^<code>z</code> where e is Euler's number and <code>z</code> is the
      * complex number.
+     *
      * @param z Complex exponent.
-     * @return  Value of e^<code>z</code>
+     * @return Value of e^<code>z</code>
      */
     public static Complex exp(Complex z) {
         // Get the modulus of the final answer

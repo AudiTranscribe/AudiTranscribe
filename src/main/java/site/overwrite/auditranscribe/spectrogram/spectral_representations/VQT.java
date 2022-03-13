@@ -35,7 +35,6 @@ import java.util.List;
  */
 public class VQT {
     // Constants
-    static final double BW_BEST = 0.9475937167399596;
     static final double BW_FASTEST = 0.85;
 
     // Public methods
@@ -50,16 +49,32 @@ public class VQT {
      * @param numBins       Number of frequency bins, starting at <code>fmin</code>.
      * @param binsPerOctave Number of bins per octave.
      * @param isCQT         Whether this is a CQT or not.
-     * @param gamma         Bandwidth offset for determining filter lengths. If <code>gamma = 0</code>, produces the constant-Q transform.
+     * @param gamma         Bandwidth offset for determining filter lengths. If
+     *                      <code>gamma = 0</code>, produces the Constant-Q Transform (CQT).
      * @param window        Window specification for the basis filters.
      * @return Variable-Q value each frequency at each time.
+     * @throws InvalidParameterException If number of frequency bins is negative or zero.
+     * @throws InvalidParameterException If number of bins per octave is negative or zero.
+     * @throws InvalidParameterException If number of bins is not a multiple of the number of bins per octave.
      * @throws InvalidParameterException If the maximum number of frequency bins results in
      *                                   exceeding the Nyquist frequency.
      */
     public static Complex[][] vqt(double[] y, double sr, int hopLength, double fmin, int numBins, int binsPerOctave, boolean isCQT, double gamma, Window window) {
-        // Compute number of octaves that we are processing and the number of filters
+        // Validate parameters
+        if (numBins <= 0) {
+            throw new InvalidParameterException("Number of frequency bins cannot be negative or zero.");
+        }
+
+        if (binsPerOctave <= 0) {
+            throw new InvalidParameterException("Number of bins per octave cannot be negative or zero");
+        }
+
+        if (numBins % binsPerOctave != 0) {
+            throw new InvalidParameterException("Number of bins is not a multiple of the number of bins per octave.");
+        }
+
+        // Compute number of octaves that we are processing
         int numOctaves = getNumOctaves(numBins, binsPerOctave);
-        int numFilters = Math.min(binsPerOctave, numBins);  // Todo: wouldn't this always be `binsPerOctave`?
 
         // Get the VQT frequency bins
         double[] freqs = getFreqBins(numBins, binsPerOctave, fmin);
@@ -114,12 +129,12 @@ public class VQT {
 
         if (filter != Filter.KAISER_FAST) {
             // Get the frequencies of the top octave
-            double[] freqsOct = new double[numFilters];
-            System.arraycopy(freqs, numBins - numFilters, freqsOct, 0, numFilters);
+            double[] freqsOct = new double[binsPerOctave];
+            System.arraycopy(freqs, numBins - binsPerOctave, freqsOct, 0, binsPerOctave);
 
             // Do the top octave before resampling to allow for fast resampling
             Triple<Complex[][], Integer, double[]> fftFilterResponse = vqtFilterFFT(
-                    srNew, freqsOct, 1, 1, window, isCQT, gamma, alpha
+                    srNew, freqsOct, window, isCQT, gamma, alpha
             );
             Complex[][] fftBasis = fftFilterResponse.getLeft();
             int numFFT = fftFilterResponse.getMiddle();
@@ -137,24 +152,23 @@ public class VQT {
         double mySR = srNew;
         int myHopLength = hopLengthNew;
 
-        for (int i = startingOctave; i < numOctaves; i++) {  // This starts from the HIGHEST frequencies and goes down
+        for (int octave = startingOctave; octave < numOctaves; octave++) {  // Starts from the HIGHEST frequencies
             // Get the frequencies of the current octave
             // Fixme: This may be incorrect with early downsampling
-            double[] freqsOct = new double[numFilters];
-            System.arraycopy(freqs, numBins - numFilters * (i + 1), freqsOct, 0, numFilters);
+            double[] freqsOct = new double[binsPerOctave];
+            System.arraycopy(freqs, numBins - binsPerOctave * (octave + 1), freqsOct, 0, binsPerOctave);
 
             // Get the FFT basis and the `numFFT` for this octave
             Triple<Complex[][], Integer, double[]> fftFilterResponse = vqtFilterFFT(
-                    mySR, freqsOct, 1, 1, window, isCQT, gamma, alpha
+                    mySR, freqsOct, window, isCQT, gamma, alpha
             );
             Complex[][] fftBasis = fftFilterResponse.getLeft();
             int numFFT = fftFilterResponse.getMiddle();
 
             // Re-scale the filters to compensate for downsampling
-            // Todo: rename variables in this terrible code
-            for (int j = 0; j < fftBasis.length; j++) {
-                for (int k = 0; k < fftBasis[0].length; k++) {
-                    fftBasis[j][k] = fftBasis[j][k].scale(Math.sqrt(srNew / mySR));
+            for (int i = 0; i < fftBasis.length; i++) {
+                for (int j = 0; j < fftBasis[0].length; j++) {
+                    fftBasis[i][j] = fftBasis[i][j].scale(Math.sqrt(srNew / mySR));
                 }
             }
 
@@ -169,9 +183,10 @@ public class VQT {
             }
         }
 
-        // Convert list to array
+        // Convert the VQT responses list to an array
         // Todo: try and do this at the start
-        Complex[][][] vqtResponsesArray = new Complex[numOctaves][vqtResponses.get(0).length][vqtResponses.get(0)[0].length];
+        int[] shape = new int[]{numOctaves, vqtResponses.get(0).length, vqtResponses.get(0)[0].length};
+        Complex[][][] vqtResponsesArray = new Complex[shape[0]][shape[1]][shape[2]];
         vqtResponses.toArray(vqtResponsesArray);
 
         // Trim and stack the array
@@ -187,7 +202,7 @@ public class VQT {
         for (int i = 0; i < numBins; i++) {
             double scaleFactor = Math.sqrt(lengths[i]);
 
-            for (int j = 0; j < V[0].length; j++) {  // Todo: find a way to calculate `V[0].length` explictly
+            for (int j = 0; j < shape[2]; j++) {
                 V[i][j] = V[i][j].divides(scaleFactor);
             }
         }
@@ -233,7 +248,6 @@ public class VQT {
 
     /**
      * Perform early downsampling on the audio samples.
-     * Todo document
      *
      * @param y            Audio time series.
      * @param sr           Sample rate of the audio.
@@ -242,13 +256,17 @@ public class VQT {
      * @param numOctaves   Number of octaves to consider
      * @param nyquist      Nyquist frequency value.
      * @param filterCutoff Highest frequency value before cutoff begins.
-     * @return Three values. First is the downsampled audio time series. Second is the new sample rate. Third is the new hop length.
-     * @throws InvalidParameterException If The input signal length is too short for a <code>numOctaves</code>-octave VQT.
+     * @return Three values. First is the downsampled audio time series. Second is the new sample
+     * rate. Third is the new hop length.
+     * @throws InvalidParameterException If The input signal length is too short for a
+     *                                   <code>numOctaves</code>-octave VQT.
      */
 
-    private static Triple<double[], Double, Integer> earlyDownsample(double[] y, double sr, int hopLength, Filter filter, int numOctaves, double nyquist, double filterCutoff) {
+    private static Triple<double[], Double, Integer> earlyDownsample(
+            double[] y, double sr, int hopLength, Filter filter, int numOctaves, double nyquist, double filterCutoff
+    ) {
         // Compute the number of early downsampling operations
-        int downsampleCount1 = Math.max(0, ((int) (Math.ceil(OtherMath.log2(BW_FASTEST * nyquist / filterCutoff)) - 1)) - 1);
+        int downsampleCount1 = Math.max(0, (int) Math.ceil(OtherMath.log2(BW_FASTEST * nyquist / filterCutoff)) - 2);
         int downsampleCount2 = Math.max(0, OtherMath.numTwoFactors(hopLength) - numOctaves + 1);
 
         int downsampleCount = Math.min(downsampleCount1, downsampleCount2);
@@ -257,7 +275,6 @@ public class VQT {
         double[] yNew;
 
         if (downsampleCount > 0 && filter == Filter.KAISER_FAST) {
-            System.out.println("!!! PERFORMING DOWNSAMPING !!!");
             // Compute how much to downsample by
             int downsampleFactor = (int) Math.pow(2, downsampleCount);
 
@@ -287,22 +304,22 @@ public class VQT {
     /**
      * Generate the frequency domain variable-Q filter basis.
      *
-     * @param sr          Sample rate.
-     * @param freqs       Centre frequencies of the frequency bins.
-     * @param filterScale Scale factor for the filters.
-     * @param norm        p-value for the LP norm.
-     * @param window      Window function to use.
-     * @param gamma       Gamma value.
-     * @param isCQT       Whether this is a CQT or not.
-     * @param alpha       Alpha value.
+     * @param sr     Sample rate.
+     * @param freqs  Centre frequencies of the frequency bins.
+     * @param window Window function to use.
+     * @param isCQT  Whether this is a CQT or not.
+     * @param gamma  Gamma value.
+     * @param alpha  Alpha value.
      * @return Triplet of values. First value is a 2D array of complex coefficients, representing
      * the FFT basis. Second value is an integer, representing the number of FFT frequency bins.
      * Third value is a double array, representing the filters' lengths.
      */
-    private static Triple<Complex[][], Integer, double[]> vqtFilterFFT(double sr, double[] freqs, double filterScale, double norm, Window window, boolean isCQT, double gamma, double alpha) {
+    private static Triple<Complex[][], Integer, double[]> vqtFilterFFT(
+            double sr, double[] freqs, Window window, boolean isCQT, double gamma, double alpha
+    ) {
         // Get the frequency and lengths of the wavelet basis
         Pair<Complex[][], double[]> waveletBasisResponse = Windowing.computeWaveletBasis(
-                freqs, sr, window, filterScale, true, norm, isCQT, gamma, alpha
+                freqs, sr, window, 1, true, 1, isCQT, gamma, alpha
         );
         Complex[][] basis = waveletBasisResponse.getKey();
         double[] lengths = waveletBasisResponse.getValue();
@@ -363,7 +380,7 @@ public class VQT {
 
         // Copy per-octave data into output array
         int end = numBins;
-        for (Complex[][] response : vqtResponses) {  // Note: the FIRST element is that of the HIGHEST FREQUENCY bins
+        for (Complex[][] response : vqtResponses) {  // Note: FIRST element represents the HIGHEST FREQUENCY bins
             // By default, take the whole octave
             int numOctaves = response.length;
 

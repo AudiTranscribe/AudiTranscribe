@@ -15,9 +15,6 @@ import java.security.InvalidParameterException;
  * Miscellaneous mathematical functions.
  */
 public class OtherMath {
-    // Attributes
-    public static double TINY = 1E-19;  // See discussion on https://stackoverflow.com/a/43542567
-
     // Methods
 
     /**
@@ -65,9 +62,10 @@ public class OtherMath {
 
     /**
      * Rounds the float <code>x</code> to <code>dp</code> decimal places.
-     * @param x     The float.
-     * @param dp    Number of decimal places to round to.
-     * @return  Rounded float.
+     *
+     * @param x  The float.
+     * @param dp Number of decimal places to round to.
+     * @return Rounded float.
      */
     public static float round(float x, int dp) {
         return (float) round((double) x, dp);
@@ -75,9 +73,10 @@ public class OtherMath {
 
     /**
      * Rounds the double <code>x</code> to <code>dp</code> decimal places.
-     * @param x     The double.
-     * @param dp    Number of decimal places to round to.
-     * @return  Rounded double.
+     *
+     * @param x  The double.
+     * @param dp Number of decimal places to round to.
+     * @return Rounded double.
      */
     public static double round(double x, int dp) {
         return Math.round(x * Math.pow(10, dp)) / Math.pow(10, dp);
@@ -86,6 +85,7 @@ public class OtherMath {
     /**
      * Matrix multiply two complex numbered matrices.
      * Todo: see if can make this more efficient.
+     *
      * @param A The first matrix.
      * @param B The second matrix.
      * @return The multiplied matrix.
@@ -124,8 +124,9 @@ public class OtherMath {
 
     /**
      * Computes the Euclidian norm of the given array.
+     *
      * @param array Array of numbers.
-     * @return  Euclidian norm of the array.
+     * @return Euclidian norm of the array.
      */
     public static double norm(double[] array) {
         double norm = 0;

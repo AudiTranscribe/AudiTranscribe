@@ -2,7 +2,7 @@
  * ComplexTest.java
  *
  * Created on 2022-03-09
- * Updated on 2022-03-09
+ * Updated on 2022-03-13
  *
  * Description: Test `Complex.java`.
  */
@@ -220,7 +220,7 @@ class ComplexTest {
         assertEquals(new Complex(0, 1), Complex.exp(new Complex(0, Math.PI / 2)).roundNicely(3));
         assertEquals(new Complex(-1, 0), Complex.exp(new Complex(0, Math.PI)).roundNicely(3));
         assertEquals(new Complex(0, -1), Complex.exp(new Complex(0, 3 * Math.PI / 2)).roundNicely(3));
-        assertEquals(new Complex(0, 1), Complex.exp(new Complex(0, 2 * Math.PI)).roundNicely(3));
+        assertEquals(new Complex(1, 0), Complex.exp(new Complex(0, 2 * Math.PI)).roundNicely(3));
 
         assertEquals(new Complex(0, 2), Complex.exp(new Complex(Math.log(2), Math.PI / 2)).roundNicely(3));
         assertEquals(new Complex(0, -2), Complex.exp(new Complex(Math.log(2), -Math.PI / 2)).roundNicely(3));

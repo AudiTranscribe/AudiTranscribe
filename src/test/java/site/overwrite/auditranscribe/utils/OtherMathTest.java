@@ -87,8 +87,8 @@ class OtherMathTest {
 
     @Test
     void norm() {
-        assertEquals(5., OtherMath.norm(new double[] {3, 4}), 0.01);
-        assertEquals(19.105, OtherMath.norm(new double[] {10, 11, 12}), 0.001);
-        assertEquals(16.882, OtherMath.norm(new double[] {1, 2, 3, 4, 5, 6, 7, 8, 9}), 0.001);
+        assertEquals(5., OtherMath.norm(new double[]{3, 4}), 0.01);
+        assertEquals(19.105, OtherMath.norm(new double[]{10, 11, 12}), 0.001);
+        assertEquals(16.882, OtherMath.norm(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9}), 0.001);
     }
 }

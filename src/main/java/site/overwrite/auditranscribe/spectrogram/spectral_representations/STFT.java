@@ -15,7 +15,17 @@ import site.overwrite.auditranscribe.utils.Complex;
 
 public class STFT {
     // Public methods
-    public static Complex[][] stft(double[] y, int numFFT, int hopLength, Window window) {
+
+    /**
+     * Computes the Short-Time Fourier Transform (STFT) of the input array <code>x</code>.
+     *
+     * @param x         The complex array <code>x</code> representing the data source.
+     * @param numFFT    Number of bins to use for the Fast Fourier Transform (FFT).
+     * @param hopLength Number of samples between successive columns.
+     * @param window    Windowing function.
+     * @return Complex-valued matrix of STFT coefficients.
+     */
+    public static Complex[][] stft(double[] x, int numFFT, int hopLength, Window window) {
         // Get the FFT window
         double[] fftWindow = window.window.generateWindow(numFFT, false);
 
@@ -23,17 +33,17 @@ public class STFT {
         fftWindow = ArrayAdjustment.padCenter(fftWindow, numFFT);
 
         // Pad the time series so that frames are centered
-        double[] yHat = ArrayAdjustment.padCenter(y, y.length + numFFT);
+        double[] xHat = ArrayAdjustment.padCenter(x, x.length + numFFT);
 
         // Window the time series
-        double[][] yFrames = ArrayAdjustment.frame(yHat, numFFT, hopLength, true);
-        int innerArrayLength = yFrames[0].length;
+        double[][] xFrames = ArrayAdjustment.frame(xHat, numFFT, hopLength, true);
+        int innerArrayLength = xFrames[0].length;
 
         // Now generate the windowed frames
         Complex[][] windowedFrames = new Complex[numFFT][innerArrayLength];
         for (int i = 0; i < numFFT; i++) {
             for (int j = 0; j < innerArrayLength; j++) {
-                windowedFrames[i][j] = new Complex(yFrames[i][j] * fftWindow[i], 0);
+                windowedFrames[i][j] = new Complex(xFrames[i][j] * fftWindow[i], 0);
             }
         }
 
@@ -58,7 +68,6 @@ public class STFT {
                 stftMatrix[i][j] = stftMatrixTransposed[j][i];
             }
         }
-
 
         // Return the final STFT matrix
         return stftMatrix;

@@ -2,7 +2,7 @@
  * OnesWindow.java
  *
  * Created on 2022-03-11
- * Updated on 2022-03-11
+ * Updated on 2022-03-13
  *
  * Description: Class that encapsulates the Ones window function.
  */
@@ -10,8 +10,7 @@
 package site.overwrite.auditranscribe.audio.windows;
 
 /**
- * Ones window.
- *
+ * Ones window.<br>
  * Basically a window that only contains ones.
  */
 public class OnesWindow extends AbstractWindow {

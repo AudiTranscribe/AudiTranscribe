@@ -2,7 +2,7 @@
  * Filter.java
  *
  * Created on 2022-03-07
- * Updated on 2022-03-10
+ * Updated on 2022-03-13
  *
  * Description: Abstract class `Filter` for wavelet filters.
  */
@@ -23,17 +23,12 @@ public abstract class AbstractFilter {
     private int precision;
     private double rolloff;
 
-    /**
-     * Constructor for the filter.
-     * This defines all the attributes needed for the filter to work within this method.
-     */
-    public AbstractFilter() {}
-
     // Public methods
 
     /**
      * Gets the right wing of the interpolation filter.
-     * @return  The right wing of the interpolation filter.
+     *
+     * @return The right wing of the interpolation filter.
      */
     public double[] getHalfWin() {
         // Create a copy of the original
@@ -46,7 +41,8 @@ public abstract class AbstractFilter {
 
     /**
      * Gets the precision of the filter.
-     * @return  The number of samples between zero-crossings of the filter.
+     *
+     * @return The number of samples between zero-crossings of the filter.
      */
     public int getPrecision() {
         return precision;
@@ -54,7 +50,8 @@ public abstract class AbstractFilter {
 
     /**
      * Gets the rolloff factor of the filter.
-     * @return  The roll-off frequency of the filter as a fraction of the Nyquist frequency.
+     *
+     * @return The roll-off frequency of the filter as a fraction of the Nyquist frequency.
      */
     public double getRolloff() {
         return rolloff;
@@ -65,7 +62,9 @@ public abstract class AbstractFilter {
 
     /**
      * Define all the attributes of this filter.
-     * @param dataFilePath  Path (from resources directory) to the JSON data file that contains this data.
+     *
+     * @param dataFilePath Path (from resources directory) to the JSON data file that contains this
+     *                     data.
      */
     public void defineAttributes(String dataFilePath) {
         // Assert the file path entered is not empty
@@ -74,7 +73,7 @@ public abstract class AbstractFilter {
         // Create the GSON loader object
         Gson gson = new Gson();
 
-        try (Reader reader = new FileReader(Constants.RESOURCES_DIRECTORY + dataFilePath)){
+        try (Reader reader = new FileReader(Constants.RESOURCES_DIRECTORY + dataFilePath)) {
             // Try loading the filter data
             FilterData filterData = gson.fromJson(reader, FilterData.class);
 
@@ -83,7 +82,7 @@ public abstract class AbstractFilter {
             precision = filterData.precision;
             rolloff = filterData.rolloff;
 
-        } catch (IOException e ) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

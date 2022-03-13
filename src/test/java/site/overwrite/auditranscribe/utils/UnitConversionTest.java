@@ -24,10 +24,10 @@ class UnitConversionTest {
     @Test
     void noteToNoteNumber() {
         // Basic tests
-        assertEquals(0, UnitConversion.noteToNoteNumber("C0"));
-        assertEquals(57, UnitConversion.noteToNoteNumber("A4"));
-        assertEquals(60, UnitConversion.noteToNoteNumber("C5"));
-        assertEquals(108, UnitConversion.noteToNoteNumber("C9"));
+        assertEquals(0, UnitConversion.noteToNoteNumber("c0"));
+        assertEquals(57, UnitConversion.noteToNoteNumber("a4"));
+        assertEquals(60, UnitConversion.noteToNoteNumber("c5"));
+        assertEquals(108, UnitConversion.noteToNoteNumber("c9"));
 
         // Full key tests
         assertEquals(48, UnitConversion.noteToNoteNumber("C4"));

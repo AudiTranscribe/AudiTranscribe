@@ -2,7 +2,7 @@
  * Audio.java
  *
  * Created on 2022-02-13
- * Updated on 2022-03-11
+ * Updated on 2022-03-13
  *
  * Description: Audio class that handles the messiness of audio sample processing.
  */
@@ -17,8 +17,6 @@ import javax.sound.sampled.AudioSystem;
 import java.io.File;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
-
-import site.overwrite.auditranscribe.utils.OtherMath;
 
 /**
  * Class to encapsulate audio data and functions.
@@ -58,25 +56,6 @@ public class Audio {
 
         // Generate audio samples
         generateSamples();
-    }
-
-    /**
-     * Initialises an <code>Audio</code> object based on the audio samples.
-     *
-     * @param samples Audio samples.
-     * @param format  Audio format of the audio samples.
-     * @param sr      Sample rate of the samples.
-     */
-    public Audio(double[] samples, AudioFormat format, double sr) {
-        // There is no audio file, so set it to null
-        audioFile = null;
-
-        // Set the audio format and the sample rate
-        audioFormat = format;
-        sampleRate = sr;
-
-        // Now set the samples of the audio object
-        setSamples(samples);
     }
 
     // Getter/Setter methods
@@ -138,21 +117,6 @@ public class Audio {
     }
 
     /**
-     * Setter method that returns the samples of the audio.
-     * <b>Warning: This should never be called unless you know what you are doing.</b>
-     *
-     * @param samples New samples of the audio object.
-     */
-    public void setSamples(double[] samples) {
-        // Set `audioSamples`
-        audioSamples = samples;
-        numSamples = samples.length;
-
-        // Remove stereo samples if they are there
-        generateMonoSamplesFromStereo();
-    }
-
-    /**
      * Getter method for the number of MONO samples in the audio object.<br>
      *
      * @return Number of MONO samples.
@@ -181,9 +145,12 @@ public class Audio {
      * @param resType Resampling type, also known as the filter window's name.
      * @param scale   Whether to scale the final sample array.
      * @return Array representing the resampled signal.
-     * @throws InvalidParameterException If either <code>srOrig</code> or <code>srFinal</code> is not positive.
-     * @throws InvalidParameterException If the input signal length is too short to be resampled to the desired sample rate.
-     * @implNote Core algorithm is taken from <a href="https://github.com/bmcfee/resampy/blob/ccb85575403663e17697bcde8e25765b022a9e0f/resampy/core.py">Resampy</a>
+     * @throws InvalidParameterException If either <code>srOrig</code> or <code>srFinal</code> is
+     *                                   not positive.
+     * @throws InvalidParameterException If the input signal length is too short to be resampled to
+     *                                   the desired sample rate.
+     * @implNote Core algorithm is taken from
+     * <a href="https://github.com/bmcfee/resampy/blob/ccb8557/resampy/core.py">Resampy</a>.
      */
     public static double[] resample(double[] x, double srOrig, double srFinal, Filter resType, boolean scale) {
         // Validate sample rates
@@ -195,7 +162,11 @@ public class Audio {
 
         // Calculate final array length and check if it is okay
         int finalLength = (int) (sampleRatio * x.length);
-        if (finalLength < 1) throw new InvalidParameterException("Input signal length of " + x.length + " too small to resample from " + srOrig + " to " + srFinal);
+        if (finalLength < 1) {
+            throw new InvalidParameterException(
+                    "Input signal length of " + x.length + " too small to resample from " + srOrig + " to " + srFinal
+            );
+        }
 
         // Generate output array in storage
         double[] y = new double[finalLength];
@@ -303,7 +274,18 @@ public class Audio {
             e.printStackTrace();
         } finally {
             // Remove stereo samples if they are there
-            generateMonoSamplesFromStereo();
+            if (audioFormat.getChannels() == 2) {  // Stereo
+                // Calculate the number of mono samples there are
+                numMonoSamples = numSamples / 2;
+
+                // Fill in the mono audio samples array
+                monoAudioSamples = new double[numMonoSamples];
+
+                for (int i = 0; i < numMonoSamples; i++) {
+                    // Take average of left and right channels' samples
+                    monoAudioSamples[i] = (audioSamples[i * 2] + audioSamples[i * 2 + 1]) / 2;
+                }
+            }
 
             // Close the audio stream
             if (audioStream != null) {
@@ -312,24 +294,6 @@ public class Audio {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }
-        }
-    }
-
-    /**
-     * Helper method that generates the MONO samples from the stereo samples.
-     */
-    private void generateMonoSamplesFromStereo() {
-        if (audioFormat.getChannels() == 2) {  // Stereo
-            // Calculate the number of mono samples there are
-            numMonoSamples = numSamples / 2;
-
-            // Fill in the mono audio samples array
-            monoAudioSamples = new double[numMonoSamples];
-
-            for (int i = 0; i < numMonoSamples; i++) {
-                // Take average of left and right channels' samples
-                monoAudioSamples[i] = (audioSamples[i * 2] + audioSamples[i * 2 + 1]) / 2;
             }
         }
     }
@@ -355,8 +319,8 @@ public class Audio {
      *                      <code>DEF_BUFFER_SAMPLE_SZ * audioFormat.getChannels()</code> float
      *                      data.
      * @param numValidBytes Number of valid bytes in the <code>bytes</code> array.
-     * @see <a href="https://github.com/stefanGT44/AudioVisualizer-RealTime-Spectrogram/blob/b109db9003f0a3af5270df0613bd0bc7b770eab2/src/app/Player.java">Original implementation on GitHub</a>.
-     * This code was largely adapted from that source.
+     * @see <a href="https://github.com/stefanGT44/AudioVisualizer-RealTime-Spectrogram/blob/b109db9/src/app/Player.java">
+     * Original implementation on GitHub</a>.This code was largely adapted from that source.
      */
     private void unpack(byte[] bytes, long[] transfer, float[] samples, int numValidBytes) {
         if (audioFormat.getEncoding() != AudioFormat.Encoding.PCM_SIGNED
@@ -468,10 +432,11 @@ public class Audio {
      * @param interpWin    Interpolation window, based off the selected <code>resType</code>.
      * @param interpDeltas Deltas between consecutive elements in <code>interpWin</code>.
      * @param precision    Precision constant.
-     * @implNote Taken from <a href="https://github.com/bmcfee/resampy/blob/ccb85575403663e17697bcde8e25765b022a9e0f/resampy/interpn.py">Resampy's Source Code</a>.
-     * Todo: test the speed of this method in Java; this may become the bottleneck for the VQT algorithm
+     * @implNote See <a href="https://github.com/bmcfee/resampy/blob/ccb8557/resampy/interpn.py">
+     * Resampy's Source Code</a> for the original implementation of this function in Python.
      */
-    private static void resampleF(double[] x, double[] y, double sampleRatio, double[] interpWin, double[] interpDeltas, int precision) {
+    private static void resampleF(double[] x, double[] y, double sampleRatio, double[] interpWin, double[] interpDeltas,
+                                  int precision) {
         // Define constants that will be needed later
         double scale = Math.min(sampleRatio, 1.0);
         double timeIncrement = 1. / sampleRatio;

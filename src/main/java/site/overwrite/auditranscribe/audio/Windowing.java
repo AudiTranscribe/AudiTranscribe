@@ -2,7 +2,7 @@
  * Windowing.java
  *
  * Created on 2022-02-13
- * Updated on 2022-03-11
+ * Updated on 2022-03-13
  *
  * Description: Class to implement audio windowing functions.
  */
@@ -10,14 +10,12 @@
 package site.overwrite.auditranscribe.audio;
 
 import javafx.util.Pair;
-import site.overwrite.auditranscribe.audio.windows.AbstractWindow;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.Helpers;
 import site.overwrite.auditranscribe.utils.ArrayAdjustment;
 import site.overwrite.auditranscribe.utils.Complex;
 import site.overwrite.auditranscribe.utils.OtherMath;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -43,7 +41,10 @@ public class Windowing {
      * paper</a> by Glasberg, Brian R., and Brian CJ Moore. "Derivation of auditory filter shapes
      * from notched-noise data." Hearing research 47.1-2 (1990): 103-138.
      */
-    public static Pair<double[], Double> computeWaveletLengths(double[] freqs, double sr, Window window, boolean isCQT, double gammaValue, double fallbackAlpha, double filterScale) {
+    public static Pair<double[], Double> computeWaveletLengths(
+            double[] freqs, double sr, Window window, boolean isCQT, double gammaValue, double fallbackAlpha,
+            double filterScale
+    ) {
         // Check the number of frequencies provided
         int numFreqs = freqs.length;
         double[] alphas = new double[numFreqs];
@@ -133,12 +134,16 @@ public class Windowing {
      * @param alpha       Alpha value.
      * @return Pair of values. First value is a 2D array of the filter. Second value is the lengths
      * of each of the filters.
-     * @implNote Taken from <a href="https://librosa.org/doc/0.9.1/_modules/librosa/filters.html#wavelet">Librosa's Implementation</a>.
+     * @implNote From <a href="https://librosa.org/doc/0.9.1/_modules/librosa/filters.html#wavelet">
+     * Librosa's Implementation</a>. This code is a Java version of that code.
      * @see <a href="https://www.sciencedirect.com/science/article/abs/pii/037859559090170T">This
      * paper</a> by Glasberg, Brian R., and Brian CJ Moore. "Derivation of auditory filter shapes
      * from notched-noise data." Hearing research 47.1-2 (1990): 103-138.
      */
-    public static Pair<Complex[][], double[]> computeWaveletBasis(double[] freqs, double sr, Window window, double filterScale, boolean padFFT, double norm, boolean isCQT, double gamma, double alpha) {
+    public static Pair<Complex[][], double[]> computeWaveletBasis(
+            double[] freqs, double sr, Window window, double filterScale, boolean padFFT, double norm, boolean isCQT,
+            double gamma, double alpha
+    ) {
         // Pass-through parameters to get the filter lengths
         Pair<double[], Double> waveletLengthsResult = computeWaveletLengths(
                 freqs,
@@ -256,92 +261,5 @@ public class Windowing {
 //
 //        // Return the windowed samples
 //        return windowedSamples;
-//    }
-
-    // Private methods
-
-    /**
-     * Helper method to apply the window function to the audio samples.
-     * Note that this is an in-place method, i.e. it modifies the <code>samples</code> array that is
-     * passed into the method.
-     *
-     * @param samples         Array containing audio samples.
-     * @param numValidSamples Number of valid samples that can be windowed.
-     * @param numChannels     Number of channels in the audio file.
-     * @param abstractWindow          Window to apply.
-     */
-    // Todo: see if can remove `numChannels` (since we know that the samples is mono)
-    private static void applyWindow(float[] samples, int numValidSamples, int numChannels, AbstractWindow abstractWindow) {
-        // Generate the window array
-        double[] windowArray = abstractWindow.generateWindow(samples.length, false);
-
-        // Apply window to samples
-        for (int ch = 0, k, i; ch < numChannels; ch++) {
-            for (i = ch, k = 0; i < numValidSamples; i += numChannels) {
-                samples[i] = samples[i] * (float) windowArray[k];
-            }
-        }
-    }
-
-//    /**
-//     * Helper method to apply the sine window function to the audio samples.<br>
-//     * Note that this is an in-place method, i.e. it modifies the <code>samples</code> array that is
-//     * passed into the method.
-//     *
-//     * @param samples         Array containing audio samples.
-//     * @param numValidSamples Number of valid samples that can be windowed.
-//     * @param numChannels     Number of channels in the audio file.
-//     * @see <a href="https://en.wikipedia.org/wiki/Window_function#Sine_window">This article</a>
-//     * about the sine window function.
-//     */
-//    // Todo: see if can remove `numChannels` (since we know that the samples is mono)
-//    private static void sineWindow(float[] samples, int numValidSamples, int numChannels) {
-//        int sampleLen = numValidSamples / numChannels;
-//
-//        for (int ch = 0, k, i; ch < numChannels; ch++) {
-//            for (i = ch, k = 0; i < numValidSamples; i += numChannels) {
-//                samples[i] *= Math.sin(Math.PI * k++ / (sampleLen - 1));
-//            }
-//        }
-//    }
-//
-//    /**
-//     * Helper method to apply the Hann window function to the audio samples.<br>
-//     * Note that this is an in-place method, i.e. it modifies the <code>samples</code> array that is
-//     * passed into the method.
-//     *
-//     * @param samples         Array containing audio samples.
-//     * @param numValidSamples Number of valid samples that can be windowed.
-//     * @param numChannels     Number of channels in the audio file.
-//     * @see <a href="https://en.wikipedia.org/wiki/Window_function#Hann_and_Hamming_windows">This article</a>
-//     * about the Hann window function.
-//     */
-//    // Todo: see if can remove `numChannels` (since we know that the samples is mono)
-//    private static void hannWindow(float[] samples, int numValidSamples, int numChannels) {
-//        for (int ch = 0, k, i; ch < numChannels; ch++) {
-//            for (i = ch, k = 0; i < numValidSamples; i += numChannels) {
-//                samples[i] = (float) (samples[i] * 0.5 * (1 - Math.cos(2.0 * Math.PI * k++ / samples.length)));
-//            }
-//        }
-//    }
-//
-//    /**
-//     * Helper method to apply the Hamming window function to the audio samples.<br>
-//     * Note that this is an in-place method, i.e. it modifies the <code>samples</code> array that is
-//     * passed into the method.
-//     *
-//     * @param samples         Array containing audio samples.
-//     * @param numValidSamples Number of valid samples that can be windowed.
-//     * @param numChannels     Number of channels in the audio file.
-//     * @see <a href="https://en.wikipedia.org/wiki/Window_function#Hann_and_Hamming_windows">This article</a>
-//     * about the Hamming window function.
-//     */
-//    // Todo: see if can remove `numChannels` (since we know that the samples is mono)
-//    private static void hammingWindow(float[] samples, int numValidSamples, int numChannels) {
-//        for (int ch = 0, k, i; ch < numChannels; ch++) {
-//            for (i = ch, k = 0; i < numValidSamples; i += numChannels) {
-//                samples[i] = (float) (samples[i] * (0.54 - 0.46 * Math.cos(2.0 * Math.PI * k++ / samples.length)));
-//            }
-//        }
 //    }
 }

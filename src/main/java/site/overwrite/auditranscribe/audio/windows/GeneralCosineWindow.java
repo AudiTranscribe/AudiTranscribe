@@ -2,7 +2,7 @@
  * GeneralCosineWindow.java
  *
  * Created on 2022-03-12
- * Updated on 2022-03-12
+ * Updated on 2022-03-13
  *
  * Description: Class that encapsulates the General Cosine Window function.
  */
@@ -11,6 +11,7 @@ package site.overwrite.auditranscribe.audio.windows;
 
 /**
  * General Cosine Window.
+ *
  * @see <a href="https://en.wikipedia.org/wiki/Window_function#Cosine-sum_windows">This article</a>
  * about the General Cosine Window.
  */

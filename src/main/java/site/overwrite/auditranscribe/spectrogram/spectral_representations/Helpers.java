@@ -2,7 +2,7 @@
  * Helpers.java
  *
  * Created on 2022-03-07
- * Updated on 2022-03-11
+ * Updated on 2022-03-13
  *
  * Description: Helper methods for the spectral representation functions.
  */
@@ -12,6 +12,7 @@ package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 public class Helpers {
     /**
      * Computes the alpha coefficient.
+     *
      * @param binsPerOctave Number of frequency bins per octave.
      * @return The alpha coefficient.
      * @implNote Implementation of this method is from the paper by Glasberg, Brian R., and Brian

@@ -2,7 +2,7 @@
  * ArrayAdjustment.java
  *
  * Created on 2022-02-16
- * Updated on 2022-03-06
+ * Updated on 2022-03-13
  *
  * Description: Utilities to adjust arrays to fit the required context.
  */
@@ -20,7 +20,8 @@ public class ArrayAdjustment {
      * @param p     The p value of the LP norm.
      * @return The normalised complex array.
      * @throws IllegalArgumentException If <code>p</code> is negative.
-     * @see <a href="https://en.wikipedia.org/wiki/Lp_space#The_p-norm_in_finite_dimensions">L<sup>p</sup> Norm</a>
+     * @see <a href="https://en.wikipedia.org/wiki/Lp_space#The_p-norm_in_finite_dimensions">
+     * L<sup>p</sup>-Norm</a>
      */
     public static Complex[] normalise(Complex[] array, double p) {
         // Check that `p` is strictly non-negative
@@ -32,7 +33,7 @@ public class ArrayAdjustment {
         int numElem = array.length;
 
         // Set threshold to be the smallest non-zero number supported
-        double threshold = OtherMath.TINY;
+        double threshold = Double.MIN_VALUE;
 
         // Get the magnitudes of the data in `array`
         double[] magnitudes = new double[numElem];
@@ -185,10 +186,10 @@ public class ArrayAdjustment {
      * <code>[[1, 2, 3], [3, 4, 5], [5, 6, 7], [7, 8, 9], [9, 10, 11]]</code> if not (that is,
      * framed horizontally).
      *
-     * @param array       Array to frame.
-     * @param frameLength Length of the frame.
-     * @param hopLength   Number of steps to advance between frames.
-     * @param verticalFraming   If true, will frame vertically. Otherwise will frame horizontally.
+     * @param array           Array to frame.
+     * @param frameLength     Length of the frame.
+     * @param hopLength       Number of steps to advance between frames.
+     * @param verticalFraming If true, will frame vertically. Otherwise will frame horizontally.
      * @return Framed view of <code>array</code>.
      * @implNote See <a href="https://stackoverflow.com/a/38163917">this StackOverflow answer</a>
      * for implementation details in Python.
@@ -208,7 +209,8 @@ public class ArrayAdjustment {
         // Fill in the array
         int length = array.length;
 
-        for (int index = 0, endFrameIndex = 0; endFrameIndex < length; index++, endFrameIndex += hopLength) {  // Iterate through the `framed` array
+        for (int index = 0, endFrameIndex = 0; endFrameIndex < length;
+             index++, endFrameIndex += hopLength) {  // Iterate through the `framed` array
             for (int i = 0; i < frameLength; i++) {  // Iterate through the frame
                 // Validate the value of `i`
                 if (i + endFrameIndex < length && index < finalArrayLength) {
@@ -225,38 +227,38 @@ public class ArrayAdjustment {
         return framed;
     }
 
-    /**
-     * Slice a data array into (overlapping) frames.
-     *
-     * @param array       Array to frame.
-     * @param frameLength Length of the frame.
-     * @param hopLength   Number of steps to advance between frames.
-     * @return Framed view of <code>array</code>.
-     * @implNote See <a href="https://stackoverflow.com/a/38163917">this StackOverflow answer</a>
-     * for implementation details in Python.
-     */
-    public static double[][] frameOld(double[] array, int frameLength, int hopLength) {
-        // Calculate the length of the framed array
-        int finalArrayLength = (int) Math.ceil((double) array.length / hopLength);
-
-        // Create the blank array to store the framed data in
-        double[][] framed = new double[finalArrayLength][frameLength];
-
-        // Fill in the array
-        int length = array.length;
-
-        for (int index = 0, endFrameIndex = 0; endFrameIndex < length; index++, endFrameIndex += hopLength) {  // Iterate through the `framed` array
-            for (int i = 0; i < frameLength; i++) {  // Iterate through the frame
-                // Validate the value of `i`
-                if (i + endFrameIndex < length) {
-                    framed[index][i] = array[i + endFrameIndex];
-                }
-            }
-        }
-
-        // Return the `framed` array
-        return framed;
-    }
+//    /**
+//     * Slice a data array into (overlapping) frames.
+//     *
+//     * @param array       Array to frame.
+//     * @param frameLength Length of the frame.
+//     * @param hopLength   Number of steps to advance between frames.
+//     * @return Framed view of <code>array</code>.
+//     * @implNote See <a href="https://stackoverflow.com/a/38163917">this StackOverflow answer</a>
+//     * for implementation details in Python.
+//     */
+//    public static double[][] frameOld(double[] array, int frameLength, int hopLength) {
+//        // Calculate the length of the framed array
+//        int finalArrayLength = (int) Math.ceil((double) array.length / hopLength);
+//
+//        // Create the blank array to store the framed data in
+//        double[][] framed = new double[finalArrayLength][frameLength];
+//
+//        // Fill in the array
+//        int length = array.length;
+//
+//        for (int index = 0, endFrameIndex = 0; endFrameIndex < length; index++, endFrameIndex += hopLength) {  // Iterate through the `framed` array
+//            for (int i = 0; i < frameLength; i++) {  // Iterate through the frame
+//                // Validate the value of `i`
+//                if (i + endFrameIndex < length) {
+//                    framed[index][i] = array[i + endFrameIndex];
+//                }
+//            }
+//        }
+//
+//        // Return the `framed` array
+//        return framed;
+//    }
 
 //
 //    /**

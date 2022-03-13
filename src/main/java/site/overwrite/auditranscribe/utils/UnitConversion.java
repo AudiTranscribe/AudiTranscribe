@@ -2,7 +2,7 @@
  * UnitConversion.java
  *
  * Created on 2022-03-12
- * Updated on 2022-03-12
+ * Updated on 2022-03-13
  *
  * Description: Unit conversion utilities.
  */
@@ -26,8 +26,9 @@ public class UnitConversion {
 
     /**
      * Convert one or more note names to frequency.
-     * @param note  Note name.
-     * @return  Frequency of that note.
+     *
+     * @param note Note name.
+     * @return Frequency of that note.
      */
     public static double noteToFreq(String note) {
         return noteNumberToFreq(noteToNoteNumber(note));
@@ -37,13 +38,15 @@ public class UnitConversion {
      * Converts a spelled note to the note number.<br>
      * Note that the note number for C0 is 0 and subsequent note numbers are given by their offset
      * from C0. For example, A4 has note number 57 as it is 57 notes away from C0.
-     * @param note  Note string. Notes may be spelled out with optional accidentals or octave
-     *              numbers. The leading note name is case-insensitive. Sharps are indicated with
-     *              <code>#</code> or <code>♯</code>, flats may be indicated with <code>!</code>,
-     *              <code>b</code>, or <code>♭</code>.
-     * @return  Note number for the given note.
-     * @throws InvalidParameterException    If the note format is incorrect.
-     * @implNote Todo: find a way to incorporate double sharp and double flat
+     *
+     * @param note Note string. Notes may be spelled out with optional accidentals or octave
+     *             numbers. The leading note name is case-insensitive. Sharps are indicated with
+     *             <code>#</code> or <code>♯</code>, flats may be indicated with <code>!</code>,
+     *             <code>b</code>, or <code>♭</code>.
+     * @return Note number for the given note.
+     * @throws InvalidParameterException If the note format is incorrect.
+     * @implNote Double sharp and double flat are not currently supported.
+     * Todo: find a way to incorporate double sharp and double flat
      */
     public static int noteToNoteNumber(String note) {
         // Define constants
@@ -99,8 +102,9 @@ public class UnitConversion {
 
     /**
      * Converts the note number to a frequency.
+     *
      * @param noteNumber The note number. Note that a note number of 0 means the key C0.
-     * @return  Frequency of the note with that note number. The returned frequency assumes that the
+     * @return Frequency of the note with that note number. The returned frequency assumes that the
      * notes have been tuned to A440.
      */
     public static double noteNumberToFreq(int noteNumber) {

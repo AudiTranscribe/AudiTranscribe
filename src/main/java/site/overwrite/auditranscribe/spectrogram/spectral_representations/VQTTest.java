@@ -28,15 +28,16 @@ public class VQTTest {
 
         // Perform VQT
         Complex[][] vqtMatrix = VQT.vqt(
-                samples, audio.getSampleRate(), 512, UnitConversion.noteToFreq("C1"), 168, 24, false, 0, Window.HANN_WINDOW
+                samples, audio.getSampleRate(), 512, UnitConversion.noteToFreq("C1"),
+                168, 24, false, 0, Window.HANN_WINDOW
         );
-        System.out.println(vqtMatrix.length + " " + vqtMatrix[0].length);
+        System.out.println("VQT Shape: (" + vqtMatrix.length + ", " + vqtMatrix[0].length + ")");
 
-        // Print out the matrix
+        // Write the VQT matrix to a file
         try {
             FileWriter myWriter = new FileWriter("VQT_data.txt");
             myWriter.write("[");
-            for (Complex[] subarray: vqtMatrix) {
+            for (Complex[] subarray : vqtMatrix) {
                 myWriter.write(Arrays.toString(subarray) + ",");
             }
             myWriter.write("]");
