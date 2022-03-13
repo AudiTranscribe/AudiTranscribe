@@ -2,7 +2,7 @@
  * FFT.java
  *
  * Created on 2022-02-12
- * Updated on 2022-02-20
+ * Updated on 2022-03-12
  *
  * Description: Class that implements the Fast Fourier Transform (FFT) algorithm.
  *
@@ -10,7 +10,7 @@
  *  - Adapted from https://github.com/stefanGT44/AudioVisualizer-RealTime-Spectrogram/blob/master/src/app/FFT.java
  */
 
-package site.overwrite.auditranscribe.spectrogram;
+package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
 import site.overwrite.auditranscribe.utils.Complex;
 
@@ -30,9 +30,8 @@ public class FFT {
      * @param x The complex array <code>x</code> representing the data source.
      * @return An array of <code>Complex</code> objects representing the FFT of the data source.
      * @throws RuntimeException If the length of <code>x</code> is not a power of 2.
-     * @implNote The array returned has length <code>N / 2 + 1</code>, following the convention of
-     * <a href="https://numpy.org/doc/1.22/reference/generated/numpy.fft.rfft.html">the
-     * Numpy implementation</a> of the FFT algorithm.
+     * @implNote The array returned has length <code>N / 2 + 1</code>, so that only the non-negative
+     * frequencies are returned.
      */
     public static Complex[] fft(Complex[] x) {
         // Compute radix-2 Cooley-Turkey FFT

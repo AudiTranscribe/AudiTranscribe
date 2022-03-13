@@ -13,7 +13,7 @@ def wrappped_window(n, window_spec):
 
     window = librosa.filters.get_window(window_spec, n_min)  # Use custom implementation of windows in Java
 
-    if len(window) < n_max:
+    if len(window) < n_max:  # This MAY get called only if `n` is a float
         window = np.pad(window, [(0, n_max - len(window))], mode="constant")  # Todo: implement this
 
     window[n_min:] = 0.0
@@ -26,7 +26,7 @@ def window_bandwidth(window):
     WINDOW_BANDWIDTHS = {
         "bart": 1.3334961334912805,
         "barthann": 1.4560255965133932,
-        "bartlett": 1.3334961334912805,
+        "bartlett": 1.333496133491805,
         "bkh": 2.0045975283585014,
         "black": 1.7269681554262326,
         "blackharr": 2.0045975283585014,
@@ -175,8 +175,10 @@ def compute_wavelet_basis(freqs, sr=22050, window="hann", filter_scale=1, pad_ff
     for ilen, freq in zip(lengths, freqs):
         # Build the filter
         # (Note: length will be `ceil(ilen)`)
+        temp = np.arange(-ilen // 2, ilen // 2, dtype=float) * 1j * 2 * np.pi * freq / sr  # Note: `j` is the imaginary unit
+ 
         sig = np.exp(  # Can use `Complex.exp` in Java
-            np.arange(-ilen // 2, ilen // 2, dtype=float) * 1j * 2 * np.pi * freq / sr  # Note: `j` is the imaginary unit
+            temp
         )
 
         # Apply the windowing function

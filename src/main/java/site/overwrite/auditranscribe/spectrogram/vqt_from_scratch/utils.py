@@ -3,12 +3,11 @@ import numpy as np
 
 
 # FUNCTIONS
-def normalize(s, norm):
+def normalize(s, p):
     """
-    Normalizes `s`.
+    Normalizes `s` such that the LP norm (of a given `p`) of `s` is 1.
     
     Assumes `s` is a 1d array.
-    Todo: verify that `s` is a 1d array
     """
 
     # Set threshold to be the smallest non-zero number supported
@@ -18,27 +17,22 @@ def normalize(s, norm):
     mag = np.array([abs(x) for x in s])
 
     # Compute `length` and `fill_norm`
-    if norm == 0:
-        # length = np.sum(mag > 0, axis=0, keepdims=True) ** (1.0 / norm)  # Todo: convert this into java-compatible form
-        length = np.sum(mag, axis=0, keepdims=True) ** (1.0 / norm)  # Is this the same as above? Todo: convert this into java-compatible form
-        fill_norm = 1
-    elif norm < 0:
-        raise ParameterError(f"Unsupported norm: {norm}")
+    if p == 0:
+        length = np.sum(mag, axis=0, keepdims=True)  # Is this the same as above? Todo: convert this into java-compatible form
+
+    elif p < 0:
+        raise ParameterError(f"Unsupported p: {p}")
     else:
-        length = np.sum(mag ** norm, axis=0, keepdims=True) ** (1.0 / norm)  # Todo: convert this into java-compatible form
-        fill_norm = mag.shape[0] ** (-1.0 / norm)  # Axis is zero
+        length = np.sum(mag ** p, axis=0, keepdims=True) ** (1.0 / p)  # Todo: convert this into java-compatible form
 
-    # Get the indices where the index is below the threshold
-    small_idx = []
-    for i in range(len(length)):
-        if length[i] < threshold:
-            small_idx.append(i)
+    length = length[0]  # Make it a float and not an array
 
-    # Normalise the signal, but leave small indices un-normalized
-    s_norm = np.empty_like(s)   # What is the Java-equivilant of this?
+    # Ensure that the length is at least the threshold
+    if length < threshold:
+        length = 1.0
 
-    for index in small_idx:
-        length[index] = 1.0
+    # Normalise the signal
+    s_norm = np.empty_like(s)   # What is the Java-equivalent of this?
 
     for i in range(len(s)):
         s_norm[i] = s[i] / length
@@ -91,6 +85,9 @@ def fix_length(data, size):
         # Fill in the first `n` entries
         for i in range(n):
             output_data[i] = data[i]
+
+    else:
+        output_data = data
 
     # Return the output data
     return np.array(output_data)  # May not be needed in Java

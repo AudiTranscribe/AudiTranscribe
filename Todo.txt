@@ -1,6 +1,7 @@
 Todo:
     - Add Launch4j capability to generate JAR files (or .exe files)
-    - Switch from STFT to CQT/VQT
+    - Fix spectrogram generation code
+        - Fix magnitude to 'packet' conversion
     - Update README.md
     - Validate audio length
 

@@ -2,18 +2,23 @@
  * Audio.java
  *
  * Created on 2022-02-13
- * Updated on 2022-02-20
+ * Updated on 2022-03-11
  *
  * Description: Audio class that handles the messiness of audio sample processing.
  */
 
 package site.overwrite.auditranscribe.audio;
 
+import site.overwrite.auditranscribe.utils.ArrayAdjustment;
+
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import java.io.File;
+import java.security.InvalidParameterException;
 import java.util.Arrays;
+
+import site.overwrite.auditranscribe.utils.OtherMath;
 
 /**
  * Class to encapsulate audio data and functions.
@@ -23,14 +28,16 @@ public class Audio {
 
     private final File audioFile;
     private AudioFormat audioFormat;
-    private float sampleRate;
+    private double sampleRate;
     private double duration;
 
     private int numSamples;
-    private float[] audioSamples;
+    private double[] audioSamples;
 
     private int numMonoSamples;
-    private float[] monoAudioSamples;
+    private double[] monoAudioSamples;
+
+    // Object creation methods
 
     /**
      * Initialises an <code>Audio</code> object based on the audio file.
@@ -51,6 +58,25 @@ public class Audio {
 
         // Generate audio samples
         generateSamples();
+    }
+
+    /**
+     * Initialises an <code>Audio</code> object based on the audio samples.
+     *
+     * @param samples Audio samples.
+     * @param format  Audio format of the audio samples.
+     * @param sr      Sample rate of the samples.
+     */
+    public Audio(double[] samples, AudioFormat format, double sr) {
+        // There is no audio file, so set it to null
+        audioFile = null;
+
+        // Set the audio format and the sample rate
+        audioFormat = format;
+        sampleRate = sr;
+
+        // Now set the samples of the audio object
+        setSamples(samples);
     }
 
     // Getter/Setter methods
@@ -78,7 +104,7 @@ public class Audio {
      *
      * @return Float of the number of samples per second.
      */
-    public float getSampleRate() {
+    public double getSampleRate() {
         return sampleRate;
     }
 
@@ -107,8 +133,23 @@ public class Audio {
      *
      * @return Samples of the audio object.
      */
-    public float[] getSamples() {
+    public double[] getSamples() {
         return audioSamples;
+    }
+
+    /**
+     * Setter method that returns the samples of the audio.
+     * <b>Warning: This should never be called unless you know what you are doing.</b>
+     *
+     * @param samples New samples of the audio object.
+     */
+    public void setSamples(double[] samples) {
+        // Set `audioSamples`
+        audioSamples = samples;
+        numSamples = samples.length;
+
+        // Remove stereo samples if they are there
+        generateMonoSamplesFromStereo();
     }
 
     /**
@@ -125,8 +166,77 @@ public class Audio {
      *
      * @return MONO samples of the audio object.
      */
-    public float[] getMonoSamples() {
+    public double[] getMonoSamples() {
         return monoAudioSamples;
+    }
+
+    // Public methods
+
+    /**
+     * Resample a signal <code>x</code> from <code>srOrig</code> to <code>srFinal</code>.
+     *
+     * @param x       Original signal that needs to be resampled.
+     * @param srOrig  Original sample rate of the signal.
+     * @param srFinal Sample rate of the final signal.
+     * @param resType Resampling type, also known as the filter window's name.
+     * @param scale   Whether to scale the final sample array.
+     * @return Array representing the resampled signal.
+     * @throws InvalidParameterException If either <code>srOrig</code> or <code>srFinal</code> is not positive.
+     * @throws InvalidParameterException If the input signal length is too short to be resampled to the desired sample rate.
+     * @implNote Core algorithm is taken from <a href="https://github.com/bmcfee/resampy/blob/ccb85575403663e17697bcde8e25765b022a9e0f/resampy/core.py">Resampy</a>
+     */
+    public static double[] resample(double[] x, double srOrig, double srFinal, Filter resType, boolean scale) {
+        // Validate sample rates
+        if (srOrig <= 0) throw new InvalidParameterException("Invalid original sample rate " + srOrig);
+        if (srFinal <= 0) throw new InvalidParameterException("Invalid final sample rate " + srFinal);
+
+        // Calculate sample ratio
+        double sampleRatio = srFinal / srOrig;
+
+        // Calculate final array length and check if it is okay
+        int finalLength = (int) (sampleRatio * x.length);
+        if (finalLength < 1) throw new InvalidParameterException("Input signal length of " + x.length + " too small to resample from " + srOrig + " to " + srFinal);
+
+        // Generate output array in storage
+        double[] y = new double[finalLength];
+
+        // Get the interpolation window and precision of the specified `resType`
+        double[] interpWin = resType.filter.getHalfWin();
+        int precision = resType.filter.getPrecision();
+
+        int interpWinLen = interpWin.length;
+
+        // Treat the interpolation window
+        if (sampleRatio < 1) {
+            // Multiply every element in the window by `sampleRatio`
+            for (int i = 0; i < interpWinLen; i++) {
+                interpWin[i] *= sampleRatio;
+            }
+        }
+
+        // Calculate interpolation deltas
+        double[] interpDeltas = new double[interpWinLen];
+
+        for (int i = 0; i < interpWinLen - 1; i++) {
+            interpDeltas[i] = interpWin[i + 1] - interpWin[i];
+        }
+
+        // Run resampling
+        resampleF(x, y, sampleRatio, interpWin, interpDeltas, precision);
+
+        // Fix the length of the samples array
+        int correctNumSamples = (int) Math.ceil(sampleRatio * x.length);
+        double[] yHat = ArrayAdjustment.fixLength(y, correctNumSamples);
+
+        // Handle rescaling
+        if (scale) {
+            for (int i = 0; i < correctNumSamples; i++) {
+                yHat[i] /= Math.sqrt(sampleRatio);
+            }
+        }
+
+        // Return the resampled array
+        return yHat;
     }
 
     // Private methods
@@ -155,8 +265,8 @@ public class Audio {
             int numSamplesPerBuffer = SAMPLES_BUFFER_SIZE * audioFormat.getChannels();
             int numBuffers = (int) Math.ceil((float) numSamples / numSamplesPerBuffer);
 
-            // Update the size of the `audioSamples` array
-            audioSamples = new float[numBuffers * numSamplesPerBuffer];
+            // Create a `finalSamples` array to store the samples
+            float[] finalSamples = new float[numBuffers * numSamplesPerBuffer];
 
             // Define helper arrays
             float[] samples = new float[numSamplesPerBuffer];
@@ -172,31 +282,28 @@ public class Audio {
 
                 // Add it to the master list of samples
                 if (numBytesRead / bytesPerSample >= 0) {
-                    System.arraycopy(samples, 0, audioSamples, cycleNum * numSamplesPerBuffer,
+                    System.arraycopy(samples, 0, finalSamples, cycleNum * numSamplesPerBuffer,
                             numBytesRead / bytesPerSample);
                 }
 
                 cycleNum++;
             }
 
-            // Shorten the `audioSamples` array to fit the required size
-            audioSamples = Arrays.copyOf(audioSamples, numSamples);
+            // Shorten the `finalSamples` array to fit the required size
+            finalSamples = Arrays.copyOf(finalSamples, numSamples);
+
+            // Convert everything to double and place it into `audioSamples`
+            audioSamples = new double[numSamples];
+
+            for (int i = 0; i < numSamples; i++) {
+                audioSamples[i] = finalSamples[i];
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             // Remove stereo samples if they are there
-            if (audioFormat.getChannels() == 2) {  // Stereo
-                // Calculate the number of mono samples there are
-                numMonoSamples = numSamples / 2;
-
-                // Fill in the mono audio samples array
-                monoAudioSamples = new float[numMonoSamples];
-
-                for (int i = 0; i < numMonoSamples; i++) {
-                    // Take average of left and right channels' samples
-                    monoAudioSamples[i] = (audioSamples[i * 2] + audioSamples[i * 2 + 1]) / 2;
-                }
-            }
+            generateMonoSamplesFromStereo();
 
             // Close the audio stream
             if (audioStream != null) {
@@ -205,6 +312,24 @@ public class Audio {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }
+        }
+    }
+
+    /**
+     * Helper method that generates the MONO samples from the stereo samples.
+     */
+    private void generateMonoSamplesFromStereo() {
+        if (audioFormat.getChannels() == 2) {  // Stereo
+            // Calculate the number of mono samples there are
+            numMonoSamples = numSamples / 2;
+
+            // Fill in the mono audio samples array
+            monoAudioSamples = new double[numMonoSamples];
+
+            for (int i = 0; i < numMonoSamples; i++) {
+                // Take average of left and right channels' samples
+                monoAudioSamples[i] = (audioSamples[i * 2] + audioSamples[i * 2 + 1]) / 2;
             }
         }
     }
@@ -330,6 +455,80 @@ public class Audio {
         // Finally, normalise range to [-1f, 1f]
         for (int i = 0; i < transfer.length; i++) {
             samples[i] = (float) transfer[i] / (float) fullScale;
+        }
+    }
+
+    /**
+     * Helper method that resamples the audio samples array <code>x</code> and places it into the
+     * final array <code>y</code>.
+     *
+     * @param x            Initial array of audio samples.
+     * @param y            Final array to store resampled samples.
+     * @param sampleRatio  The ratio between the initial and final sample rates.
+     * @param interpWin    Interpolation window, based off the selected <code>resType</code>.
+     * @param interpDeltas Deltas between consecutive elements in <code>interpWin</code>.
+     * @param precision    Precision constant.
+     * @implNote Taken from <a href="https://github.com/bmcfee/resampy/blob/ccb85575403663e17697bcde8e25765b022a9e0f/resampy/interpn.py">Resampy's Source Code</a>.
+     * Todo: test the speed of this method in Java; this may become the bottleneck for the VQT algorithm
+     */
+    private static void resampleF(double[] x, double[] y, double sampleRatio, double[] interpWin, double[] interpDeltas, int precision) {
+        // Define constants that will be needed later
+        double scale = Math.min(sampleRatio, 1.0);
+        double timeIncrement = 1. / sampleRatio;
+        int indexStep = (int) (scale * precision);
+
+        int nWin = interpWin.length;
+        int nOrig = x.length;
+        int nOut = y.length;
+
+        // Define 'loop variables'
+        int n, offset;
+        double timeRegister = 0.;
+        double frac, indexFrac, eta, weight;
+
+        // Start resampling process
+        for (int t = 0; t < nOut; t++) {
+            // Grab the top bits as an index to the input buffer
+            n = (int) timeRegister;
+
+            // Grab the fractional component of the time index
+            frac = scale * (timeRegister - n);
+
+            // Offset into the filter
+            indexFrac = frac * precision;
+            offset = (int) indexFrac;
+
+            // Interpolation factor
+            eta = indexFrac - offset;
+
+            // Compute the left wing of the filter response
+            int iMax = Math.min(n + 1, (nWin - offset) / indexStep);
+
+            for (int i = 0; i < iMax; i++) {
+                weight = interpWin[offset + i * indexStep] + eta * interpDeltas[offset + i * indexStep];
+                y[t] += weight * x[n - i];
+            }
+
+            // Invert P
+            frac = scale - frac;
+
+            // Offset into the filter
+            indexFrac = frac * precision;
+            offset = (int) indexFrac;
+
+            // Interpolation factor
+            eta = indexFrac - offset;
+
+            // Compute the right wing of the filter response
+            int kMax = Math.min(nOrig - n - 1, (nWin - offset) / indexStep);
+
+            for (int k = 0; k < kMax; k++) {
+                weight = interpWin[offset + k * indexStep] + eta * interpDeltas[offset + k * indexStep];
+                y[t] += weight * x[n + k + 1];
+            }
+
+            // Increment the time register
+            timeRegister += timeIncrement;
         }
     }
 }

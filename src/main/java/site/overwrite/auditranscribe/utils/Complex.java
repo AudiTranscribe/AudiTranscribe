@@ -2,7 +2,7 @@
  * Complex.java
  *
  * Created on 2022-02-12
- * Updated on 2022-02-20
+ * Updated on 2022-03-10
  *
  * Description: Contains the complex number class.
  */
@@ -16,8 +16,8 @@ import java.util.Objects;
  */
 public class Complex {
     // Attributes
-    private final double re;  // Real part of the complex number
-    private final double im;  // Imaginary part of the complex number
+    private double re;  // Real part of the complex number
+    private double im;  // Imaginary part of the complex number
 
     // Standard methods
 
@@ -34,7 +34,7 @@ public class Complex {
     }
 
     /**
-     * Getter method to get the real part of the `Complex` object.
+     * Getter method to get the real part of the <code>Complex</code> object.
      *
      * @return Double representing the real part.
      */
@@ -43,7 +43,7 @@ public class Complex {
     }
 
     /**
-     * Getter method to get the imaginary part of the `Complex` object.
+     * Getter method to get the imaginary part of the <code>Complex</code> object.
      *
      * @return Double representing the imaginary part.
      */
@@ -55,6 +55,7 @@ public class Complex {
 
     /**
      * Generates a string representation of the complex number.
+     * Note: we use "j" for the imaginary unit to follow Python's convention of complex numbers.
      *
      * @return String representation of the complex number.
      */
@@ -66,7 +67,7 @@ public class Complex {
     }
 
     /**
-     * Generates a hash code for this object
+     * Generates a hash code for this object.
      *
      * @return Integer representing the hash of this complex number.
      */
@@ -78,13 +79,33 @@ public class Complex {
      * Checks if this complex number is equivalent to the other object.
      *
      * @param x The other object to compare to.
-     * @return Boolean representing whether this complex number is equal to `x` or not.
+     * @return Boolean representing whether this complex number is equal to <code>x</code> or not.
      */
     public boolean equals(Object x) {
         if (x == null) return false;
         if (this.getClass() != x.getClass()) return false;
         Complex that = (Complex) x;
         return (this.re == that.re) && (this.im == that.im);
+    }
+
+    // Assertion methods
+
+    /**
+     * Method that checks if the complex number is purely real.
+     *
+     * @return Boolean whether the complex number is purely real.
+     */
+    public boolean isPurelyReal() {
+        return im == 0;
+    }
+
+    /**
+     * Method that checks if the complex number is purely imaginary.
+     *
+     * @return Boolean whether the complex number is purely imaginary.
+     */
+    public boolean isPurelyImaginary() {
+        return re == 0;
     }
 
     // Polar/Exponential/Trigonometric form methods
@@ -112,7 +133,7 @@ public class Complex {
     /**
      * Returns the conjugate of this complex number.
      *
-     * @return A `Complex` object representing the conjugate of this complex number.
+     * @return A <code>Complex</code> object representing the conjugate of this complex number.
      */
     public Complex conjugate() {
         return new Complex(re, -im);
@@ -122,7 +143,7 @@ public class Complex {
      * Returns the sum of this complex number with another complex number.
      *
      * @param other The other complex number.
-     * @return A `Complex` object representing the resulting complex number.
+     * @return A <code>Complex</code> object representing the resulting complex number.
      */
     public Complex plus(Complex other) {
         Complex self = this;
@@ -135,7 +156,7 @@ public class Complex {
      * Returns the difference of this complex number with another complex number, i.e. (this - other).
      *
      * @param other The other complex number.
-     * @return A `Complex` object representing the resulting complex number.
+     * @return A <code>Complex</code> object representing the resulting complex number.
      */
     public Complex minus(Complex other) {
         Complex a = this;
@@ -145,10 +166,11 @@ public class Complex {
     }
 
     /**
-     * Returns the scaled version of this complex number when scaled by the real number `alpha`.
+     * Returns the scaled version of this complex number when scaled by the real number
+     * <code>alpha</code>.
      *
      * @param alpha The scale factor.
-     * @return A `Complex` object representing the resulting complex number.
+     * @return A <code>Complex</code> object representing the resulting complex number.
      */
     public Complex scale(double alpha) {
         return new Complex(alpha * re, alpha * im);
@@ -158,7 +180,7 @@ public class Complex {
      * Returns the product of this complex number with another complex number.
      *
      * @param other The other complex number.
-     * @return A `Complex` object representing the resulting complex number.
+     * @return A <code>Complex</code> object representing the resulting complex number.
      */
     public Complex times(Complex other) {
         // Check if the other complex number is purely real
@@ -174,7 +196,7 @@ public class Complex {
     /**
      * Returns the reciprocal of this complex number in algebraic form.
      *
-     * @return A `Complex` object representing the reciprocal of this complex number.
+     * @return A <code>Complex</code> object representing the reciprocal of this complex number.
      */
     public Complex reciprocal() {
         double scale = re * re + im * im;
@@ -182,21 +204,40 @@ public class Complex {
     }
 
     /**
-     * Returns the complex number representing `this` divided by `other`.
+     * Returns the complex number representing this complex number divided by <code>other</code>.
      *
-     * @param other The other complex number.
-     * @return A `Complex` object.
+     * @param other The other number.
+     * @return A <code>Complex</code> object.
      */
-    public Complex divides(Complex other) {
-        return this.times(other.reciprocal());
+    public Complex divides(double other) {
+        return this.scale(1.0 / other);
     }
 
     /**
-     * A static function that returns the sum `a + b` where `a` and `b` are complex numbers.
+     * Returns the complex number representing this complex number divided by <code>other</code>.
+     *
+     * @param other The other complex number.
+     * @return A <code>Complex</code> object.
+     */
+    public Complex divides(Complex other) {
+        // Check if `other` is completely real
+        if (other.isPurelyReal()) {
+            return this.divides(other.re);
+        }
+
+        // If not, do standard division
+        return this.times(other.reciprocal());
+    }
+
+    // Static methods
+
+    /**
+     * A static function that returns the sum <code>a + b</code> where <code>a</code> and
+     * <code>b</code> are complex numbers.
      *
      * @param a The first complex number.
      * @param b The second complex number.
-     * @return A `Complex` object representing the sum `a + b`.
+     * @return A <code>Complex</code> object representing the sum <code>a + b</code>.
      */
     public static Complex plus(Complex a, Complex b) {
         double real = a.re + b.re;
@@ -205,11 +246,12 @@ public class Complex {
     }
 
     /**
-     * A static function that returns the sum `a - b` where `a` and `b` are complex numbers.
+     * A static function that returns the sum <code>a - b</code> where <code>a</code> and
+     * <code>b</code> are complex numbers.
      *
      * @param a The first complex number.
      * @param b The second complex number.
-     * @return A `Complex` object representing the sum `a - b`.
+     * @return A <code>Complex</code> object representing the sum <code>a - b</code>.
      */
     public static Complex minus(Complex a, Complex b) {
         double real = a.re - b.re;
@@ -218,11 +260,12 @@ public class Complex {
     }
 
     /**
-     * A static function that returns the product `a * b` where `a` and `b` are complex numbers.
+     * A static function that returns the product <code>a * b</code> where <code>a</code> and
+     * <code>b</code> are complex numbers.
      *
      * @param a The first complex number.
      * @param b The second complex number.
-     * @return A `Complex` object representing the product `a * b`.
+     * @return A <code>Complex</code> object representing the product <code>a * b</code>.
      */
     public static Complex times(Complex a, Complex b) {
         double real = a.re * b.re - a.im * b.im;
@@ -231,11 +274,12 @@ public class Complex {
     }
 
     /**
-     * A static function that returns the value of `a / b` where `a` and `b` are complex numbers.
+     * A static function that returns the value of <code>a / b</code> where <code>a</code> and
+     * <code>b</code> are complex numbers.
      *
      * @param a The first complex number.
      * @param b The second complex number.
-     * @return A `Complex` object representing the value of `a / b`.
+     * @return A <code>Complex</code> object representing the value of <code>a / b</code>.
      */
     public static Complex divides(Complex a, Complex b) {
         // Separately compute numerator and denominator
@@ -249,5 +293,38 @@ public class Complex {
 
         // Return the new complex number
         return new Complex(real, imag);
+    }
+
+    /**
+     * Compute the value of e^<code>z</code> where e is Euler's number and <code>z</code> is the
+     * complex number.
+     * @param z Complex exponent.
+     * @return  Value of e^<code>z</code>
+     */
+    public static Complex exp(Complex z) {
+        // Get the modulus of the final answer
+        double mod = Math.exp(z.re());
+
+        // Get the 'complex' part of the final answer
+        Complex complexPart = new Complex(Math.cos(z.im()), Math.sin(z.im()));
+
+        // Return the final answer
+        return complexPart.scale(mod);
+    }
+
+    // 'Treatment' Methods
+
+    /**
+     * Rounds both the real and imaginary part of this complex number nicely to a certain number
+     * of decimal places, <code>dp</code>.
+     *
+     * @param dp Number of decimal places to round to.
+     * @return This <code>Complex</code> object.
+     */
+    public Complex roundNicely(int dp) {
+        re = OtherMath.round(re, dp);
+        im = OtherMath.round(im, dp);
+
+        return this;
     }
 }

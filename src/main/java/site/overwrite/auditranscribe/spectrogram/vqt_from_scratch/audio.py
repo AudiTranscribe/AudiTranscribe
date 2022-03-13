@@ -58,6 +58,7 @@ def resample(x, sr_orig, sr_new, res_type="kaiser_best", scale=False):  # To be 
     x_2d = x.swapaxes(0, -1).reshape((x.shape[-1], -1))  # NOTE: Any changes made here WILL BE REFLECTED IN `x`!
     y_2d = y.swapaxes(0, -1).reshape((y.shape[-1], -1))  # NOTE: Any changes made here WILL BE REFLECTED IN `y`!
 
+
     # Run resampling
     resample_f(x_2d, y_2d, sample_ratio, interp_win, interp_delta, precision)
 
@@ -67,10 +68,10 @@ def resample(x, sr_orig, sr_new, res_type="kaiser_best", scale=False):  # To be 
 
     # Handle rescaling
     if scale:
-        y /= np.sqrt(sample_ratio)  # Basically divide everything in `y` by that
+        y_hat /= np.sqrt(sample_ratio)  # Basically divide everything in `y` by that
 
     # Return the resampled array
-    return y
+    return y_hat
 
 
 @numba.jit(nopython=True, nogil=True)  # TODO: This makes this function SO MUCH FASTER. How to make it work in Java?

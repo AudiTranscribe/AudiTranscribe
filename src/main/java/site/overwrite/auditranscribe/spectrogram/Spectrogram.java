@@ -12,9 +12,9 @@ package site.overwrite.auditranscribe.spectrogram;
 import javafx.scene.image.WritableImage;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowType;
-import site.overwrite.auditranscribe.audio.Windows;
+import site.overwrite.auditranscribe.spectrogram.spectral_representations.FFT;
 import site.overwrite.auditranscribe.utils.Complex;
-import site.overwrite.auditranscribe.utils.MiscMath;
+import site.overwrite.auditranscribe.utils.OtherMath;
 
 import javax.sound.sampled.AudioFormat;
 import java.security.InvalidParameterException;
@@ -113,16 +113,18 @@ public class Spectrogram {
      */
     private float[][] generateWindowedSamples(WindowType windowType) {
         // Check if the frame length is a power of 2
-        if (!MiscMath.isInteger(MiscMath.log2(frameLength))) {
+        if (!OtherMath.isInteger(OtherMath.log2(frameLength))) {
             throw new RuntimeException("The frame length has to be a power of 2.");
         }
 
         // Get the audio object's samples
-        float[] samples = audio.getMonoSamples();
+        double[] samples = audio.getMonoSamples();
         AudioFormat format = audio.getAudioFormat();
 
         // Generate and return windowed samples
-        return Windows.generateWindowedSamples(samples, numSamples, frameLength, hopLength, windowType, format);
+        // todo fix
+        return new float[1][1];
+//        return Windowing.generateWindowedSamples(samples, numSamples, frameLength, hopLength, windowType, format);
     }
 
     /**
@@ -188,7 +190,7 @@ public class Spectrogram {
      */
     private void calculateBins() {
         // Get the sample rate of the audio object
-        float sampleRate = audio.getSampleRate();
+        double sampleRate = audio.getSampleRate();
 
         // Calculate the size of the `frequencyBins` array
         numFrequencyBins = frameLength / 2 + 1;

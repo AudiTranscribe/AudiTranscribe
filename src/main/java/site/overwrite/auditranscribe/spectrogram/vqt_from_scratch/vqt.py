@@ -1,8 +1,3 @@
-"""
-FIXME:
-UserWarning: n_fft=2048 is too small for input signal of length=XXX
-"""
-
 # IMPORTS
 import numpy as np  # Ideally we shouldn't rely on many methods from Numpy as they aren't available in Java
 import librosa
@@ -36,9 +31,6 @@ class VQT:  # In java we can implement this as a static class
 
     # Public methods
     def vqt(self, y, sr, hop_length=512, fmin=None, n_bins=168, bins_per_octave=24, gamma=None, window="hann"):  # Can be made static in Java
-        # Todo: do we assume these?
-        pad_mode = "constant"
-
         # Compute number of octaves that we are processing and the number of filters
         n_octaves = self.get_num_octaves(n_bins, bins_per_octave)
         n_filters = min(bins_per_octave, n_bins)  # What is a 'filter'??? Todo: wouldn't this always be `bins_per_octave`?
@@ -83,11 +75,11 @@ class VQT:  # In java we can implement this as a static class
             resample_type = "kaiser_fast"
         else:
             resample_type = "kaiser_best"
-
+    
         y, sr, hop_length = self.early_downsample(y, sr, hop_length, resample_type, n_octaves, nyquist_freq, filter_cutoff)
 
         # Define VQT response array
-        vqt_resp = []  # Todo: determine exact length of this array
+        vqt_resp = []  # Has length `n_octaves`; todo: find the 'internal' shape
 
         # Skip this block for now
         # (Todo: update this comment; this really isn't that descriptive)
@@ -108,7 +100,6 @@ class VQT:  # In java we can implement this as a static class
                 freqs_top,
                 1,  # Filter scale is 1
                 1,  # Norm is 1
-                0.01,  # Sparsity is 0.01
                 window=window,
                 gamma=gamma,
                 dtype=dtype,
@@ -117,7 +108,7 @@ class VQT:  # In java we can implement this as a static class
 
             # Compute the VQT filter response and append it to the stack
             vqt_resp.append(
-                self.vqt_response(y, n_fft, hop_length, fft_basis, pad_mode, dtype=dtype)
+                self.vqt_response(y, n_fft, hop_length, fft_basis, dtype=dtype)
             )
 
             oct_start = 1
@@ -128,16 +119,6 @@ class VQT:  # In java we can implement this as a static class
         my_y, my_sr, my_hop = y, sr, hop_length  # Todo: rename variables
 
         for i in range(oct_start, n_octaves):  # This starts from the HIGHEST frequencies and goes down
-            # # Slice out the current octave of filters
-            # if i == 0:
-            #     sl = slice(-n_filters, None)  # Todo: find out what `slice` does
-            # else:
-            #     sl = slice(-n_filters * (i + 1), -n_filters * i)
-
-            # # Get the frequencies of the current octave
-            # # Fixme: This may be incorrect with early downsampling
-            # freqs_oct = freqs[sl]
-
             # Get the frequencies of the current octave
             # Fixme: This may be incorrect with early downsampling
             freqs_oct = [0] * n_filters  # In Java do smth like `double[] freqs_oct = new double[n_filters]`
@@ -151,7 +132,6 @@ class VQT:  # In java we can implement this as a static class
                 freqs_oct,
                 1,  # Filter scale is 1
                 1,  # Norm is 1
-                0.01,  # Sparsity is 0.01
                 window=window,
                 gamma=gamma,
                 dtype=dtype,
@@ -161,21 +141,19 @@ class VQT:  # In java we can implement this as a static class
             # Re-scale the filters to compensate for downsampling
             fft_basis[:] *= np.sqrt(sr / my_sr)
 
-            # # Java implementation
-            # for i in range(len(fft_basis)):
-            #     fft_basis[i] *= np.sqrt(sr / my_sr)
-
             # Compute the VQT filter response and append to the stack
+            vqtresponse = self.vqt_response(my_y, n_fft, my_hop, fft_basis, dtype=dtype)  # Possible error here
+
             vqt_resp.append(
-                self.vqt_response(my_y, n_fft, my_hop, fft_basis, pad_mode, dtype=dtype)
+                vqtresponse
             )
 
-            # Update variables
+            #  Update variables
             if my_hop % 2 == 0:
                 my_hop //= 2
                 my_sr /= 2.0
                 my_y = resample(
-                    my_y, sr_orig=2, sr_new=1, res_type=resample_type, scale=True
+                    my_y, sr_orig=2, sr_new=1, res_type="kaiser_fast", scale=True
                 )
 
         V = self.trim_stack(vqt_resp, n_bins, dtype)
@@ -189,10 +167,6 @@ class VQT:  # In java we can implement this as a static class
             gamma_value=gamma,
             fallback_alpha=alpha,
         )
-
-        # # Reshape lengths to match V shape
-        # lengths = util.expand_to(lengths, ndim=V.ndim, axes=-2)
-        # V /= np.sqrt(lengths)
 
         # Scale `V` back to normal
         for i in range(V.shape[0]):
@@ -247,20 +221,18 @@ class VQT:  # In java we can implement this as a static class
             new_sr = sr / float(downsample_factor)
 
             # Downsample audio sample
-            y = resample(y, sr_orig=sr, sr_new=new_sr, res_type=res_type)
+            y = resample(y, sr_orig=sr, sr_new=new_sr, res_type=res_type, scale=True)
             sr = new_sr
 
         return y, sr, hop_length
 
     @staticmethod
-    def vqt_filter_fft(sr, freqs, filter_scale, norm, sparsity, window="hann", gamma=0.0, dtype=np.complex64, alpha=None):  # Todo: change name; this is a bad name
+    def vqt_filter_fft(sr, freqs, filter_scale, norm, window="hann", gamma=0.0, dtype=np.complex64, alpha=None):  # Todo: change name; this is a bad name
         """
         Generate the frequency domain variable-Q filter basis.
 
         Todo: update description
         """
-
-        hop_length=None
 
         # Get the frequency and lengths of the wavelet basis
         basis, lengths = compute_wavelet_basis(
@@ -285,19 +257,14 @@ class VQT:  # In java we can implement this as a static class
                 basis[i][j] = basis[i][j] * normalisation_factor
 
         # FFT and retain only the non-negative frequencies
-        """
-        Todo:
-        How to handle
-        1. The `axis` parameter?
-        2. The "non-negative frequencies" part?
-        """
-        fft_basis = np.fft.fft(basis, n=n_fft, axis=1)[:, : (n_fft // 2) + 1]
+        fft_basis = np.fft.fft(basis, n=n_fft, axis=1)
+        fft_basis = fft_basis[:, : (n_fft // 2) + 1]
 
         # Return required data
         return fft_basis, n_fft, lengths
 
     @staticmethod
-    def vqt_response(y, n_fft, hop_length, fft_basis, mode, dtype=None):
+    def vqt_response(y, n_fft, hop_length, fft_basis, dtype=None):
         """
         Compute the filter response with a target STFT hop.
 
@@ -315,11 +282,11 @@ class VQT:  # In java we can implement this as a static class
         """
 
         D = librosa.stft(
-            y, n_fft=n_fft, hop_length=hop_length, window="ones", pad_mode=mode, dtype=dtype
+            y, n_fft=n_fft, hop_length=hop_length, window="ones", pad_mode="constant", dtype=dtype
         )
 
         # Define the output matrix
-        output_flat = fft_basis.dot(D)  # Todo: support dot product
+        output_flat = fft_basis.dot(D)  # This is matrix multiplication; todo: support it
 
         # Output
         return output_flat
@@ -339,11 +306,6 @@ class VQT:  # In java we can implement this as a static class
         # Get maximum column
         # (Todo: find out why they use `min` instead of `max`)
         max_col = min(c_i.shape[-1] for c_i in cqt_resp)
-
-        # # Generate the output shape of the VQT matrix
-        # shape = list(cqt_resp[0].shape)  # Grab any leading dimensions; Todo: are there any leading dimensions???
-        # shape[-2] = n_bins
-        # shape[-1] = max_col
 
         # Generate the output shape of the VQT matrix
         shape = (n_bins, max_col)
