@@ -202,7 +202,7 @@ class VQT:  # In java we can implement this as a static class
     def early_downsample(y, sr, hop_length, res_type, n_octaves, nyquist, filter_cutoff):
         # Compute the number of early downsampling operations
         # (Note: all numpy operations here can be replaced by `Math` class)
-        downsample_count1 = max(0, int(np.ceil(np.log2(BW_FASTEST * nyquist / filter_cutoff)) - 1) - 1)
+        downsample_count1 = max(0, int(np.ceil(np.log2(BW_FASTEST * nyquist / filter_cutoff))) - 2)
         downsample_count2 = max(0, num_two_factors(hop_length) - n_octaves + 1)
 
         downsample_count = min(downsample_count1, downsample_count2)

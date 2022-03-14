@@ -2,7 +2,7 @@
  * Spectrogram.java
  *
  * Created on 2022-02-12
- * Updated on 2022-02-22
+ * Updated on 2022-03-15
  *
  * Description: Spectrogram class.
  */
@@ -11,29 +11,37 @@ package site.overwrite.auditranscribe.spectrogram;
 
 import javafx.scene.image.WritableImage;
 import site.overwrite.auditranscribe.audio.Audio;
-import site.overwrite.auditranscribe.audio.WindowType;
-import site.overwrite.auditranscribe.spectrogram.spectral_representations.FFT;
+import site.overwrite.auditranscribe.audio.Window;
+import site.overwrite.auditranscribe.plotting.Plotter;
+import site.overwrite.auditranscribe.spectrogram.spectral_representations.VQT;
 import site.overwrite.auditranscribe.utils.Complex;
-import site.overwrite.auditranscribe.utils.OtherMath;
+import site.overwrite.auditranscribe.utils.UnitConversion;
 
-import javax.sound.sampled.AudioFormat;
 import java.security.InvalidParameterException;
 
 /**
  * Spectrogram class to handle spectrogram creation.
  */
 public class Spectrogram {
+    // Constants
+    final int BINS_PER_OCTAVE = 24;
+    final int NUM_FREQ_BINS = 240;
+    final double INTENSITY_PRECISION = 0.001;
+
+    final double MINIMUM_FREQUENCY = UnitConversion.noteToFreq("C0");
+
+    final boolean IS_CQT = false;
+    final double GAMMA = 0;  // If not `IS_CQT` and `GAMMA` is 0 then gamma will be determined automatically
+
     // Attributes
-    private final Audio audio;
-    private final int numSamples;
+    private final double[] samples;
+    private final double sampleRate;
 
-    public final int height;
     public final int width;
+    public final int height;
 
-    private final int frameLength;
     private final int hopLength;
 
-    public int numFrequencyBins;
     public double[] frequencyBins;
 
     /**
@@ -42,33 +50,23 @@ public class Spectrogram {
      * @param audioObj       The audio object.
      * @param numPxPerSecond Number of pixels of the spectrogram dedicated to each second of audio
      * @param imageHeight    Height of the spectrogram.
-     * @param frameLength    Length of the frame.
-     * @param hopLength      Number of steps to advance between frames.
+     * @param hopLength      Number of samples between successive columns.
      * @throws InvalidParameterException If the image height is too large.
      */
-    // Todo: use pixels per frequency bin?
-    public Spectrogram(Audio audioObj, int numPxPerSecond, int imageHeight, int frameLength, int hopLength) {
-        // Assert that the `imageHeight` is low enough
-        if (frameLength / 2 + 1 < imageHeight) {
-            throw new InvalidParameterException("The image height is too large for the frame length " +
-                    "(needs to be lower than " + (frameLength / 2 + 1) + ")");
-        }
-
+    public Spectrogram(Audio audioObj, int numPxPerSecond, int imageHeight, int hopLength) {
         // Update attributes
-        audio = audioObj;
-        height = imageHeight;
-
-        this.frameLength = frameLength;
+        sampleRate = audioObj.getSampleRate();
         this.hopLength = hopLength;
 
-        // Calculate the width of the image
+        // Set the width and height of the image
         width = (int) (audioObj.getDuration() * numPxPerSecond);
+        height = imageHeight;
 
-        // Get the number of mono samples
-        numSamples = audioObj.getNumMonoSamples();
+        // Get the mono samples
+        samples = audioObj.getMonoSamples();
 
-        // Calculate frequency bins
-        calculateBins();
+        // Get the frequency bins
+        frequencyBins = VQT.getFreqBins(NUM_FREQ_BINS, BINS_PER_OCTAVE, MINIMUM_FREQUENCY);
     }
 
     // Public methods
@@ -76,26 +74,20 @@ public class Spectrogram {
     /**
      * Generates the spectrogram image for the given audio samples.
      *
-     * @param windowType  The window function to use.
+     * @param window      The window function to use
      * @param colourScale The colour scale to use for the spectrogram.
      * @return The spectrogram image.
      */
-    public WritableImage generateSpectrogram(WindowType windowType, ColourScale colourScale) {
-        // Generate windowed samples
-        float[][] windowedSamples = generateWindowedSamples(windowType);
+    public WritableImage generateSpectrogram(Window window, ColourScale colourScale) {
+        // Perform VQT on the samples
+        Complex[][] VQTMatrix = VQT.vqt(samples, sampleRate, hopLength, MINIMUM_FREQUENCY, NUM_FREQ_BINS,
+                BINS_PER_OCTAVE, IS_CQT, GAMMA, window);
 
-        // Get the number of windows
-        int numWindows = windowedSamples.length;
-
-        // Generate FFT magnitudes
-        double[][] magnitudes = new double[numWindows][height];
-
-        for (int i = 0; i < numWindows; i++) {
-            magnitudes[i] = processFFTOnWindow(windowedSamples[i]);
-        }
+        // Compute the magnitudes
+        double[][] magnitudes = calculateMagnitudes(VQTMatrix);
 
         // Plot spectrogram data
-        Plotter plotter = new Plotter(colourScale, 0.001);  // Todo: make `intensityPrecision` variable instead of constant
+        Plotter plotter = new Plotter(colourScale, INTENSITY_PRECISION);
         plotter.plot(magnitudes, width, height);
 
         // Return the writable image
@@ -105,101 +97,42 @@ public class Spectrogram {
     // Private methods
 
     /**
-     * Helper function that generates the windowed samples of the audio object.
+     * Helper method that calculates the decibel magnitudes of the spectral matrix.
      *
-     * @param windowType The window function to use.
-     * @return Windowed samples.
-     * @throws RuntimeException if <code>frameLength</code> is <b>not</b> a power of 2.
+     * @param spectralMatrix The matrix containing the spectral data.
+     * @return Matrix containing decibel data.
      */
-    private float[][] generateWindowedSamples(WindowType windowType) {
-        // Check if the frame length is a power of 2
-        if (!OtherMath.isInteger(OtherMath.log2(frameLength))) {
-            throw new RuntimeException("The frame length has to be a power of 2.");
-        }
+    private double[][] calculateMagnitudes(Complex[][] spectralMatrix) {
+        // Get dimensions of the spectral matrix
+        int numRows = spectralMatrix.length;
+        int numCols = spectralMatrix[0].length;
 
-        // Get the audio object's samples
-        double[] samples = audio.getMonoSamples();
-        AudioFormat format = audio.getAudioFormat();
+        // Get the modulus of every complex number
+        double[][] moduli = new double[numRows][numCols];
+        double maxModulus = -Double.MAX_VALUE;
 
-        // Generate and return windowed samples
-        // todo fix
-        return new float[1][1];
-//        return Windowing.generateWindowedSamples(samples, numSamples, frameLength, hopLength, windowType, format);
-    }
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numCols; j++) {
+                // Get current element's modulus
+                double modulus = spectralMatrix[i][j].abs();
 
-    /**
-     * Run the FFT on the specified window.
-     *
-     * @param samplesInWindow Array of samples that are in the window to be processed.
-     * @return Array of magnitudes for generation of the spectrogram.
-     */
-    private double[] processFFTOnWindow(float[] samplesInWindow) {
-        // Convert the floats to complex numbers
-        Complex[] data = new Complex[samplesInWindow.length];
-        for (int i = 0; i < samplesInWindow.length; i++) {
-            data[i] = new Complex(samplesInWindow[i], 0);
-        }
+                // Set the element at that index
+                moduli[i][j] = modulus;
 
-        // Run the FFT on the data
-        Complex[] niz = FFT.fft(data);
-
-        // Generate the magnitude value for the appropriate height
-        double numFreqBinsPerHeight = (double) numFrequencyBins / height;
-        double[] magnitudes = new double[height];
-        double max = Integer.MIN_VALUE, min = Integer.MAX_VALUE;
-
-        for (int i = 0; i < height; i++) {
-            // Calculate the start and end indices for the search
-            int numBinsToConsider = (int) Math.ceil(numFreqBinsPerHeight);
-            int startIndex = (int) Math.floor(i * numFreqBinsPerHeight);
-            int endIndex = startIndex + numBinsToConsider - 1;
-            double maxModulus = Integer.MIN_VALUE;
-
-            for (int j = startIndex; j <= endIndex; j++) {
-                // Compute the modulus of the complex number
-                double modulus = niz[j].abs();
-
-                // Compare the current modulus with the maximum modulus
-                if (modulus > maxModulus) maxModulus = modulus;
-            }
-
-            // Convert to decibel
-            if (maxModulus == 0) magnitudes[i] = 0;
-            else magnitudes[i] = 10 * Math.log10(maxModulus);  // Todo: use more accurate decibel computation
-
-            // Update min and max
-            if (magnitudes[i] > max) max = magnitudes[i];
-            if (magnitudes[i] < min) min = magnitudes[i];
-        }
-
-        if (min < 0) {
-            min = Math.abs(min);
-            for (int i = 0; i < height; i++) {
-                magnitudes[i] += min;
+                // Update `maxModulus`
+                if (maxModulus < modulus) maxModulus = modulus;
             }
         }
 
+        // Now convert all moduli into decibel numbers
+        double[][] magnitudes = new double[numRows][numCols];
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numCols; j++) {
+                magnitudes[i][j] = UnitConversion.amplitudeToDecibel(moduli[i][j], maxModulus);
+            }
+        }
+
+        // Return the magnitudes array
         return magnitudes;
-    }
-
-    /**
-     * Calculate the FFT frequency bins.
-     *
-     * @implNote Adapted from <a href="http://librosa.org/doc/main/_modules/librosa/core/convert.html#fft_frequencies">
-     * this Python code</a> from the Librosa library.
-     */
-    private void calculateBins() {
-        // Get the sample rate of the audio object
-        double sampleRate = audio.getSampleRate();
-
-        // Calculate the size of the `frequencyBins` array
-        numFrequencyBins = frameLength / 2 + 1;
-
-        // Generate the frequency bins array
-        frequencyBins = new double[numFrequencyBins];
-
-        for (int i = 0; i < numFrequencyBins; i++) {
-            frequencyBins[i] = i * (double) (sampleRate / frameLength);
-        }
     }
 }

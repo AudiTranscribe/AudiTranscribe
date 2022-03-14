@@ -2,7 +2,7 @@
  * UnitConversion.java
  *
  * Created on 2022-03-12
- * Updated on 2022-03-13
+ * Updated on 2022-03-14
  *
  * Description: Unit conversion utilities.
  */
@@ -109,5 +109,43 @@ public class UnitConversion {
      */
     public static double noteNumberToFreq(int noteNumber) {
         return 440 * Math.pow(2, (noteNumber - 57.) / 12);
+    }
+
+    // Magnitude Scaling - Unit Conversion
+    /**
+     * Convert a power value (amplitude squared) to decibel (dB) units.
+     * @param power     Input power.
+     * @param refVal    Value such that the amplitude <code>abs(power)</code> is scaled relative to
+     *                  <code>refVal</code> using the formula
+     *                  <code>10 * log10(power / refVal)</code>.
+     * @return  Decibel value for the given power.
+     * @implNote See
+     * <a href="https://librosa.org/doc/main/_modules/librosa/core/spectrum.html#power_to_db">
+     *     Librosa's Implementation</a> of this function.
+     */
+    public static double powerToDecibel(double power, double refVal) {
+        // Calculate decibel
+        double logSpec = 10 * Math.log10(Math.max(Double.MIN_VALUE, power));
+        logSpec -= 10 * Math.log10(Math.max(Double.MIN_VALUE, refVal));
+
+        // Return it
+        return logSpec;
+    }
+
+    /**
+     * Convert an amplitude spectrogram to dB-scaled spectrogram.<br>
+     * This is equivalent to <code>powerToDecibel(Math.pow(amplitude, 2))</code>, but is provided
+     * for convenience.
+     * @param amplitude Input amplitude.
+     * @param refVal    Value such that the amplitude <code>abs(power)</code> is scaled relative to
+     *                  <code>refVal</code> using the formula
+     *                  <code>20 * log10(power / refVal)</code>.
+     * @return  Decibel value for the given amplitude.
+     * @implNote See
+     * <a href="https://librosa.org/doc/main/_modules/librosa/core/spectrum.html#amplitude_to_db">
+     *     Librosa's Implementation</a> of this function.
+     */
+    public static double amplitudeToDecibel(double amplitude, double refVal) {
+        return powerToDecibel(Math.pow(amplitude, 2), Math.pow(refVal, 2));
     }
 }

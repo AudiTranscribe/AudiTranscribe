@@ -10,7 +10,7 @@
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
 import org.junit.jupiter.api.Test;
-import site.overwrite.auditranscribe.utils.OtherMath;
+import site.overwrite.auditranscribe.utils.MathUtils;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,6 +18,6 @@ class HelpersTest {
     @Test
     void computeAlpha() {
         assertEquals(0.6, Helpers.computeAlpha(1));
-        assertEquals(OtherMath.round((double) 1 / 3, 6), OtherMath.round(Helpers.computeAlpha(2), 6));
+        assertEquals(MathUtils.round((double) 1 / 3, 6), MathUtils.round(Helpers.computeAlpha(2), 6));
     }
 }

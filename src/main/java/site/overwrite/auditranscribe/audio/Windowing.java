@@ -11,9 +11,9 @@ package site.overwrite.auditranscribe.audio;
 
 import javafx.util.Pair;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.Helpers;
-import site.overwrite.auditranscribe.utils.ArrayAdjustment;
+import site.overwrite.auditranscribe.utils.ArrayUtils;
 import site.overwrite.auditranscribe.utils.Complex;
-import site.overwrite.auditranscribe.utils.OtherMath;
+import site.overwrite.auditranscribe.utils.MathUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +53,7 @@ public class Windowing {
             // Compute the log2 of the provided frequencies
             double[] logFreqs = new double[numFreqs];
             for (int i = 0; i < numFreqs; i++) {
-                logFreqs[i] = OtherMath.log2(freqs[i]);
+                logFreqs[i] = MathUtils.log2(freqs[i]);
             }
 
             // Approximate the local octave resolution
@@ -186,7 +186,7 @@ public class Windowing {
             }
 
             // Normalise
-            sig = ArrayAdjustment.normalise(sig, norm);
+            sig = ArrayUtils.lpNormalise(sig, norm);
 
             // Append the signal to the `filters` list
             filters.add(sig);
@@ -199,7 +199,7 @@ public class Windowing {
         // Update the maximum length
         int maxLen;
         if (padFFT) {
-            maxLen = (int) Math.pow(2, Math.ceil(OtherMath.log2(maxLenDouble)));
+            maxLen = (int) Math.pow(2, Math.ceil(MathUtils.log2(maxLenDouble)));
         } else {
             maxLen = (int) Math.ceil(maxLenDouble);
         }
@@ -207,7 +207,7 @@ public class Windowing {
         // Pad and stack
         Complex[][] filtersFinal = new Complex[numLengths][maxLen];
         for (int i = 0; i < numLengths; i++) {
-            filtersFinal[i] = ArrayAdjustment.padCenter(filters.get(i), maxLen);
+            filtersFinal[i] = ArrayUtils.padCenter(filters.get(i), maxLen);
         }
 
         // Return needed data
@@ -230,7 +230,7 @@ public class Windowing {
 //    public static float[][] generateWindowedSamples(float[] samples, int numSamples, int frameLength, int hopLength,
 //                                                    Window window, AudioFormat audioFormat) {
 //        // Generate the frames of the sample
-//        float[][] frames = ArrayAdjustment.frameOld(samples, frameLength, hopLength);
+//        float[][] frames = ArrayUtils.frameOld(samples, frameLength, hopLength);
 //
 //        // Get the number of windows and number of channels
 //        int numWindows = frames.length;

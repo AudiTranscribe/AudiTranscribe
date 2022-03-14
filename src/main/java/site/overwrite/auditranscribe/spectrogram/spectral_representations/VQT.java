@@ -16,8 +16,9 @@ import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.Filter;
 import site.overwrite.auditranscribe.audio.Windowing;
 import site.overwrite.auditranscribe.audio.Window;
+import site.overwrite.auditranscribe.utils.ArrayUtils;
 import site.overwrite.auditranscribe.utils.Complex;
-import site.overwrite.auditranscribe.utils.OtherMath;
+import site.overwrite.auditranscribe.utils.MathUtils;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
@@ -266,8 +267,8 @@ public class VQT {
             double[] y, double sr, int hopLength, Filter filter, int numOctaves, double nyquist, double filterCutoff
     ) {
         // Compute the number of early downsampling operations
-        int downsampleCount1 = Math.max(0, (int) Math.ceil(OtherMath.log2(BW_FASTEST * nyquist / filterCutoff)) - 2);
-        int downsampleCount2 = Math.max(0, OtherMath.numTwoFactors(hopLength) - numOctaves + 1);
+        int downsampleCount1 = Math.max(0, (int) Math.ceil(MathUtils.log2(BW_FASTEST * nyquist / filterCutoff)) - 2);
+        int downsampleCount2 = Math.max(0, MathUtils.numTwoFactors(hopLength) - numOctaves + 1);
 
         int downsampleCount = Math.min(downsampleCount1, downsampleCount2);
 
@@ -361,7 +362,7 @@ public class VQT {
         Complex[][] D = STFT.stft(y, numFFT, hopLength, Window.ONES_WINDOW);
 
         // Matrix multiply `fftBasis` with `D` and return the result
-        return OtherMath.matmul(fftBasis, D);
+        return ArrayUtils.matmul(fftBasis, D);
     }
 
     /**

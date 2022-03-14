@@ -326,8 +326,8 @@ public class Complex {
      * @return This <code>Complex</code> object.
      */
     public Complex roundNicely(int dp) {
-        re = OtherMath.round(re, dp);
-        im = OtherMath.round(im, dp);
+        re = MathUtils.round(re, dp);
+        im = MathUtils.round(im, dp);
 
         return this;
     }

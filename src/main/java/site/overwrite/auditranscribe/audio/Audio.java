@@ -9,7 +9,7 @@
 
 package site.overwrite.auditranscribe.audio;
 
-import site.overwrite.auditranscribe.utils.ArrayAdjustment;
+import site.overwrite.auditranscribe.utils.ArrayUtils;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -197,7 +197,7 @@ public class Audio {
 
         // Fix the length of the samples array
         int correctNumSamples = (int) Math.ceil(sampleRatio * x.length);
-        double[] yHat = ArrayAdjustment.fixLength(y, correctNumSamples);
+        double[] yHat = ArrayUtils.fixLength(y, correctNumSamples);
 
         // Handle rescaling
         if (scale) {

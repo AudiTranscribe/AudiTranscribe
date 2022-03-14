@@ -10,7 +10,7 @@
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
 import site.overwrite.auditranscribe.audio.Window;
-import site.overwrite.auditranscribe.utils.ArrayAdjustment;
+import site.overwrite.auditranscribe.utils.ArrayUtils;
 import site.overwrite.auditranscribe.utils.Complex;
 
 public class STFT {
@@ -30,13 +30,13 @@ public class STFT {
         double[] fftWindow = window.window.generateWindow(numFFT, false);
 
         // Pad the window out to `numFFT` size
-        fftWindow = ArrayAdjustment.padCenter(fftWindow, numFFT);
+        fftWindow = ArrayUtils.padCenter(fftWindow, numFFT);
 
         // Pad the time series so that frames are centered
-        double[] xHat = ArrayAdjustment.padCenter(x, x.length + numFFT);
+        double[] xHat = ArrayUtils.padCenter(x, x.length + numFFT);
 
         // Window the time series
-        double[][] xFrames = ArrayAdjustment.frame(xHat, numFFT, hopLength, true);
+        double[][] xFrames = ArrayUtils.frame(xHat, numFFT, hopLength, true);
         int innerArrayLength = xFrames[0].length;
 
         // Now generate the windowed frames
@@ -48,12 +48,13 @@ public class STFT {
         }
 
         // Transpose the windowed frames
-        Complex[][] windowedFramesTransposed = new Complex[innerArrayLength][numFFT];
-        for (int i = 0; i < innerArrayLength; i++) {
-            for (int j = 0; j < numFFT; j++) {
-                windowedFramesTransposed[i][j] = windowedFrames[j][i];
-            }
-        }
+//        Complex[][] windowedFramesTransposed = new Complex[innerArrayLength][numFFT];
+//        for (int i = 0; i < innerArrayLength; i++) {
+//            for (int j = 0; j < numFFT; j++) {
+//                windowedFramesTransposed[i][j] = windowedFrames[j][i];
+//            }
+//        }
+        Complex[][] windowedFramesTransposed = ArrayUtils.transpose(windowedFrames);
 
         // Generate the transposed STFT matrix
         Complex[][] stftMatrixTransposed = new Complex[innerArrayLength][1 + numFFT / 2];
@@ -61,15 +62,15 @@ public class STFT {
             stftMatrixTransposed[i] = FFT.fft(windowedFramesTransposed[i]);
         }
 
-        // Transpose the transposed matrix to get the desired result
-        Complex[][] stftMatrix = new Complex[1 + numFFT / 2][innerArrayLength];
-        for (int i = 0; i < 1 + numFFT / 2; i++) {
-            for (int j = 0; j < innerArrayLength; j++) {
-                stftMatrix[i][j] = stftMatrixTransposed[j][i];
-            }
-        }
+//        // Transpose the transposed matrix to get the desired result
+//        Complex[][] stftMatrix = new Complex[1 + numFFT / 2][innerArrayLength];
+//        for (int i = 0; i < 1 + numFFT / 2; i++) {
+//            for (int j = 0; j < innerArrayLength; j++) {
+//                stftMatrix[i][j] = stftMatrixTransposed[j][i];
+//            }
+//        }
 
         // Return the final STFT matrix
-        return stftMatrix;
+        return ArrayUtils.transpose(stftMatrixTransposed);
     }
 }

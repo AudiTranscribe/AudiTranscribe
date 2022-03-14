@@ -93,10 +93,10 @@ class ComplexTest {
         assertEquals(5, (new Complex(3, -4)).abs());
         assertEquals(5, (new Complex(-3, -4)).abs());
 
-        assertEquals(5.8105, OtherMath.round((new Complex(1.234, 5.678)).abs(), 4));
-        assertEquals(5.8105, OtherMath.round((new Complex(-1.234, 5.678)).abs(), 4));
-        assertEquals(5.8105, OtherMath.round((new Complex(1.234, -5.678)).abs(), 4));
-        assertEquals(5.8105, OtherMath.round((new Complex(-1.234, -5.678)).abs(), 4));
+        assertEquals(5.8105, MathUtils.round((new Complex(1.234, 5.678)).abs(), 4));
+        assertEquals(5.8105, MathUtils.round((new Complex(-1.234, 5.678)).abs(), 4));
+        assertEquals(5.8105, MathUtils.round((new Complex(1.234, -5.678)).abs(), 4));
+        assertEquals(5.8105, MathUtils.round((new Complex(-1.234, -5.678)).abs(), 4));
     }
 
     @Test
@@ -113,10 +113,10 @@ class ComplexTest {
         assertEquals(Math.PI, (new Complex(-1, 0)).phase());
         assertEquals(Math.PI, (new Complex(-12.34, 0)).phase());
 
-        assertEquals(0.6435, OtherMath.round((new Complex(4, 3)).phase(), 4));
-        assertEquals(-0.6435, OtherMath.round((new Complex(4, -3)).phase(), 4));
-        assertEquals(2.4981, OtherMath.round((new Complex(-4, 3)).phase(), 4));
-        assertEquals(-2.4981, OtherMath.round((new Complex(-4, -3)).phase(), 4));
+        assertEquals(0.6435, MathUtils.round((new Complex(4, 3)).phase(), 4));
+        assertEquals(-0.6435, MathUtils.round((new Complex(4, -3)).phase(), 4));
+        assertEquals(2.4981, MathUtils.round((new Complex(-4, 3)).phase(), 4));
+        assertEquals(-2.4981, MathUtils.round((new Complex(-4, -3)).phase(), 4));
     }
 
     @Test

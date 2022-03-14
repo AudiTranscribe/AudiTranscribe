@@ -1,5 +1,7 @@
 Todo:
     - Add Launch4j capability to generate JAR files (or .exe files)
+    - Implement CQT (based off of VQT)
+    - Possibly allow for bicubic interpolation
     - Fix spectrogram generation code
         - Fix magnitude to 'packet' conversion
     - Update README.md

@@ -1,18 +1,20 @@
 /*
- * ArrayAdjustment.java
+ * ArrayUtils.java
  *
  * Created on 2022-02-16
- * Updated on 2022-03-13
+ * Updated on 2022-03-14
  *
- * Description: Utilities to adjust arrays to fit the required context.
+ * Description: Array utilities to modify and change arrays.
  */
 
 package site.overwrite.auditranscribe.utils;
 
+import java.security.InvalidParameterException;
+
 /**
- * Array adjustment utils.
+ * Array utilities.
  */
-public class ArrayAdjustment {
+public class ArrayUtils {
     /**
      * Normalises the elements in the given array such that the LP norm is 1.
      *
@@ -23,7 +25,7 @@ public class ArrayAdjustment {
      * @see <a href="https://en.wikipedia.org/wiki/Lp_space#The_p-norm_in_finite_dimensions">
      * L<sup>p</sup>-Norm</a>
      */
-    public static Complex[] normalise(Complex[] array, double p) {
+    public static Complex[] lpNormalise(Complex[] array, double p) {
         // Check that `p` is strictly non-negative
         if (p < 0) {
             throw new IllegalArgumentException("Unsupported p value: " + p);
@@ -178,6 +180,53 @@ public class ArrayAdjustment {
     }
 
     /**
+     * Find the index where an element should be inserted to maintain order in a sorted array.<br>
+     *
+     * Find the index into a <b>sorted</b> array <code>array</code> such that, if the
+     * <code>value</code> was inserted <b>before</b> the index, the order of elements in
+     * <code>array</code> would be preserved.
+     *
+     * @param array The array of <b>sorted</b> elements. <b>No checks are in place to assert that
+     *              this array is sorted</b>.
+     * @param value The value to insert into <code>array</code>.
+     * @return  Index to insert <code>value</code> into <code>array</code> to maintain order.
+     * @implNote Taken from <a href="https://tinyurl.com/NumSharpSearchSorted">NumSharp's
+     * Implementation</a> of the <code>searchSorted</code> method in C#. See also
+     * <a href="https://tinyurl.com/2p9499dy">NumPy's Documentation</a> on how the function works.
+     */
+    public static int searchSorted(double[] array, double value) {
+        // Get the length of the array
+        int n = array.length;
+
+        // Perform 'trivial' checks
+        if (value <= array[0]) return 0;  // If the value is smaller than or equals minimum, return smallest index
+        if (value > array[n - 1]) return n;  // If the value is larger than maximum, return next index after largest
+
+        // Define left, right, and middle pointers
+        int left = 0;
+        int right = n - 1;
+        int middle;
+
+        // Perform iterative binary search
+        while (left < right) {
+            // Calculate middle
+            middle = (left + right) / 2;
+
+            // Compare 'middle' value with the target value
+            if (array[middle] < value) {
+                left = middle + 1;
+            } else if (array[middle] == value) {
+                return middle;
+            } else {
+                right = middle;
+            }
+        }
+
+        // Return left pointer
+        return left;
+    }
+
+    /**
      * Slice a data array into (overlapping) frames.<br>
      * This means an array <code>[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]</code> with
      * <code>frameLength = 3</code> and <code>hopLength = 2</code> will be framed into
@@ -225,6 +274,111 @@ public class ArrayAdjustment {
 
         // Return the `framed` array
         return framed;
+    }
+
+    /**
+     * Transpose a 2D <code>Complex</code> array.
+     * @param array Array of <code>Complex</code> objects to transpose.
+     * @return  Transposed array.
+     */
+    public static Complex[][] transpose(Complex[][] array) {
+        // Get the dimensions of the original array
+        int x = array.length;
+        int y = array[0].length;
+
+        // Create the new array
+        Complex[][] transposed = new Complex[y][x];
+
+        // Run the transposition process
+        transpositionProcess(x, y, array, transposed);
+
+        // Return the transposed array
+        return transposed;
+    }
+
+    /**
+     * Transpose a 2D array of doubles.
+     * @param array Array of doubles to transpose.
+     * @return  Transposed array.
+     */
+    public static double[][] transpose(double[][] array) {
+        // Get the dimensions of the original array
+        int X = array.length;
+        int Y = array[0].length;
+
+        // Convert `double` to `Double`
+        Double[][] newArray = new Double[X][Y];
+        for (int x = 0; x < X; x++) {
+            for (int y = 0; y < Y; y++) {
+                newArray[x][y] = array[x][y];
+            }
+        }
+
+        // Create the new array
+        Double[][] transposed = new Double[Y][X];
+
+        // Run the transposition process
+        transpositionProcess(X, Y, newArray, transposed);
+
+        // Convert `Double` to `double`
+        double[][] transposedNew = new double[Y][X];
+        for (int y = 0; y < Y; y++) {
+            for (int x = 0; x < X; x++) {
+                transposedNew[y][x] = transposed[y][x];
+            }
+        }
+
+        // Return the transposed array
+        return transposedNew;
+    }
+
+    /**
+     * Matrix multiply two complex numbered matrices.
+     * Todo: see if can make this more efficient.
+     *
+     * @param A The first matrix.
+     * @param B The second matrix.
+     * @return The multiplied matrix.
+     * @throws InvalidParameterException If the matrix sizes are not suitable for multiplication.
+     * @see <a href="https://en.wikipedia.org/wiki/Matrix_multiplication_algorithm">This article</a>
+     * on the naiive implementation on the Matrix Multiplication algorithm.
+     */
+    public static Complex[][] matmul(Complex[][] A, Complex[][] B) {
+        // Check if the matrices can be multiplied
+        if (A[0].length != B.length) {
+            throw new InvalidParameterException("Matrix sizes not suitable for multiplication");
+        }
+
+        // Otherwise, perform matrix multiplication
+        int n = A.length;
+        int m = A[0].length;
+        int p = B[0].length;
+
+        Complex[][] output = new Complex[A.length][B[0].length];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < p; j++) {
+                // Calculate the value of the current element
+                Complex currElem = new Complex(0, 0);
+                for (int k = 0; k < m; k++) {
+                    currElem = currElem.plus(Complex.times(A[i][k], B[k][j]));
+                }
+
+                // Set the current element to the output matrix
+                output[i][j] = currElem;
+            }
+        }
+
+        // Return the output
+        return output;
+    }
+
+    // Private methods
+    private static <T> void transpositionProcess(int X, int Y, T[][] originalArray, T[][] finalArray) {
+        for (int y = 0; y < Y; y++) {
+            for (int x = 0; x < X; x++) {
+                finalArray[y][x] = originalArray[x][y];
+            }
+        }
     }
 
 //    /**

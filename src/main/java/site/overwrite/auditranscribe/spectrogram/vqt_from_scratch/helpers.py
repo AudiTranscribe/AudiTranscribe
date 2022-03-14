@@ -19,7 +19,7 @@ def get_filter(filter_):
     return np.array(filter_data["halfwin"], dtype=np.float32), filter_data["perc"], filter_data["rolloff"]
 
 
-def num_two_factors(x):  # Now in `OtherMath`
+def num_two_factors(x):  # Now in `MathUtils`
     """
     Return how many times integer x can be evenly divided by 2.
     Returns 0 for non-positive integers.
