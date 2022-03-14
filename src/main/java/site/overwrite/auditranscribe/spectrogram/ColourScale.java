@@ -2,13 +2,17 @@
  * ColourScale.java
  *
  * Created on 2022-02-20
- * Updated on 2022-03-13
+ * Updated on 2022-03-15
  *
  * Description: Enum that contains some colour scales for the spectrogram.
  */
 
 package site.overwrite.auditranscribe.spectrogram;
 
+/**
+ * Colour scale enum.<br>
+ * Contains some suggested colour scales for use in the spectrogram.
+ */
 public enum ColourScale {
     // Enum values
     BLUES(new int[]{

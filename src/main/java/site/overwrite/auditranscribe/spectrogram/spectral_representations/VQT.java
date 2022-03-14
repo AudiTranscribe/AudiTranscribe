@@ -2,7 +2,7 @@
  * VQT.java
  *
  * Created on 2022-03-11
- * Updated on 2022-03-13
+ * Updated on 2022-03-15
  *
  * Description: Class that implements the Variable Q-Transform (VQT) algorithm.
  */
@@ -14,8 +14,8 @@ import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.Filter;
-import site.overwrite.auditranscribe.audio.Windowing;
 import site.overwrite.auditranscribe.audio.Window;
+import site.overwrite.auditranscribe.spectrogram.Wavelet;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
 import site.overwrite.auditranscribe.utils.Complex;
 import site.overwrite.auditranscribe.utils.MathUtils;
@@ -56,11 +56,15 @@ public class VQT {
      * @return Variable-Q value each frequency at each time.
      * @throws InvalidParameterException If number of frequency bins is negative or zero.
      * @throws InvalidParameterException If number of bins per octave is negative or zero.
-     * @throws InvalidParameterException If number of bins is not a multiple of the number of bins per octave.
-     * @throws InvalidParameterException If the maximum number of frequency bins results in
-     *                                   exceeding the Nyquist frequency.
+     * @throws InvalidParameterException If number of bins is not a multiple of the number of bins
+     *                                   per octave.
+     * @throws InvalidParameterException If the current number of frequency bins results in the
+     *                                   highest frequency exceeding the Nyquist frequency.
      */
-    public static Complex[][] vqt(double[] y, double sr, int hopLength, double fmin, int numBins, int binsPerOctave, boolean isCQT, double gamma, Window window) {
+    public static Complex[][] vqt(
+            double[] y, double sr, int hopLength, double fmin, int numBins, int binsPerOctave, boolean isCQT,
+            double gamma, Window window
+    ) {
         // Validate parameters
         if (numBins <= 0) {
             throw new InvalidParameterException("Number of frequency bins cannot be negative or zero.");
@@ -88,10 +92,10 @@ public class VQT {
         double highestFrequency = freqsTop[binsPerOctave - 1];
 
         // Calculate the relative difference in frequency between any two consecutive bands, alpha
-        double alpha = Helpers.computeAlpha(binsPerOctave);
+        double alpha = SpectralHelpers.computeAlpha(binsPerOctave);
 
         // Compute filter cutoff
-        Pair<double[], Double> waveletLengthsResponse = Windowing.computeWaveletLengths(
+        Pair<double[], Double> waveletLengthsResponse = Wavelet.computeWaveletLengths(
                 freqs, sr, window, isCQT, gamma, alpha, 1.
         );
         double filterCutoff = waveletLengthsResponse.getValue();
@@ -194,9 +198,7 @@ public class VQT {
         Complex[][] V = trimAndStack(vqtResponsesArray, numBins);
 
         // Recompute lengths here because early downsampling may have changed our sampling rate
-        waveletLengthsResponse = Windowing.computeWaveletLengths(
-                freqs, srNew, window, isCQT, gamma, alpha, 1.
-        );
+        waveletLengthsResponse = Wavelet.computeWaveletLengths(freqs, srNew, window, isCQT, gamma, alpha, 1.);
         double[] lengths = waveletLengthsResponse.getKey();
 
         // Scale `V` back to normal
@@ -319,7 +321,7 @@ public class VQT {
             double sr, double[] freqs, Window window, boolean isCQT, double gamma, double alpha
     ) {
         // Get the frequency and lengths of the wavelet basis
-        Pair<Complex[][], double[]> waveletBasisResponse = Windowing.computeWaveletBasis(
+        Pair<Complex[][], double[]> waveletBasisResponse = Wavelet.computeWaveletBasis(
                 freqs, sr, window, 1, true, 1, isCQT, gamma, alpha
         );
         Complex[][] basis = waveletBasisResponse.getKey();
@@ -349,13 +351,13 @@ public class VQT {
     }
 
     /**
-     * Compute the filter response with a target STFT hop.
+     * Compute the VQT filter response with a target STFT hop.
      *
      * @param y         Array of samples.
      * @param numFFT    Number of bins to use in the FFT.
      * @param hopLength Step size between each hop.
      * @param fftBasis  Basis to use for the FFT.
-     * @return Filter response with a target STFT hop.
+     * @return VQT filter response.
      */
     private static Complex[][] vqtResponse(double[] y, int numFFT, int hopLength, Complex[][] fftBasis) {
         // Get the STFT matrix
@@ -381,7 +383,7 @@ public class VQT {
 
         // Copy per-octave data into output array
         int end = numBins;
-        for (Complex[][] response : vqtResponses) {  // Note: FIRST element represents the HIGHEST FREQUENCY bins
+        for (Complex[][] response : vqtResponses) {  // Note: FIRST element represents the HIGHEST FREQUENCY bin
             // By default, take the whole octave
             int numOctaves = response.length;
 

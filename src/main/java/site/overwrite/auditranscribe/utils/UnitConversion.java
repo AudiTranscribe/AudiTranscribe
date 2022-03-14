@@ -2,13 +2,12 @@
  * UnitConversion.java
  *
  * Created on 2022-03-12
- * Updated on 2022-03-14
+ * Updated on 2022-03-15
  *
- * Description: Unit conversion utilities.
+ * Description: Unit conversion methods.
  */
 
 package site.overwrite.auditranscribe.utils;
-
 
 import java.security.InvalidParameterException;
 import java.util.Map;
@@ -19,7 +18,7 @@ import java.util.regex.Pattern;
 import static java.util.Map.entry;
 
 /**
- * Unit conversion utilities.
+ * Unit conversion methods.
  */
 public class UnitConversion {
     // Notes conversion
@@ -70,7 +69,9 @@ public class UnitConversion {
                 entry("♮", 0)
         );
 
-        final Pattern NOTE_PATTERN = Pattern.compile("^(?<note>[A-Ga-g])(?<accidental>[#♯b!♭♮]*)(?<octave>[+-]?\\d+)?$");
+        final Pattern NOTE_PATTERN = Pattern.compile(
+                "^(?<note>[A-Ga-g])(?<accidental>[#♯b!♭♮]*)(?<octave>[+-]?\\d+)?$"
+        );
 
         // Attempt to match the `note` string to the pattern
         Matcher matcher = NOTE_PATTERN.matcher(note);
@@ -112,16 +113,18 @@ public class UnitConversion {
     }
 
     // Magnitude Scaling - Unit Conversion
+
     /**
      * Convert a power value (amplitude squared) to decibel (dB) units.
-     * @param power     Input power.
-     * @param refVal    Value such that the amplitude <code>abs(power)</code> is scaled relative to
-     *                  <code>refVal</code> using the formula
-     *                  <code>10 * log10(power / refVal)</code>.
-     * @return  Decibel value for the given power.
+     *
+     * @param power  Input power.
+     * @param refVal Value such that the amplitude <code>abs(power)</code> is scaled relative to
+     *               <code>refVal</code> using the formula
+     *               <code>10 * log10(power / refVal)</code>.
+     * @return Decibel value for the given power.
      * @implNote See
      * <a href="https://librosa.org/doc/main/_modules/librosa/core/spectrum.html#power_to_db">
-     *     Librosa's Implementation</a> of this function.
+     * Librosa's Implementation</a> of this function.
      */
     public static double powerToDecibel(double power, double refVal) {
         // Calculate decibel
@@ -136,16 +139,17 @@ public class UnitConversion {
      * Convert an amplitude spectrogram to dB-scaled spectrogram.<br>
      * This is equivalent to <code>powerToDecibel(Math.pow(amplitude, 2))</code>, but is provided
      * for convenience.
+     *
      * @param amplitude Input amplitude.
      * @param refVal    Value such that the amplitude <code>abs(power)</code> is scaled relative to
      *                  <code>refVal</code> using the formula
      *                  <code>20 * log10(power / refVal)</code>.
-     * @return  Decibel value for the given amplitude.
+     * @return Decibel value for the given amplitude.
      * @implNote See
      * <a href="https://librosa.org/doc/main/_modules/librosa/core/spectrum.html#amplitude_to_db">
-     *     Librosa's Implementation</a> of this function.
+     * Librosa's Implementation</a> of this function.
      */
     public static double amplitudeToDecibel(double amplitude, double refVal) {
-        return powerToDecibel(Math.pow(amplitude, 2), Math.pow(refVal, 2));
+        return powerToDecibel(amplitude * amplitude, refVal * refVal);
     }
 }

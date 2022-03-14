@@ -2,9 +2,9 @@
  * Audio.java
  *
  * Created on 2022-02-13
- * Updated on 2022-03-13
+ * Updated on 2022-03-15
  *
- * Description: Audio class that handles the messiness of audio sample processing.
+ * Description: Class that handles audio processing.
  */
 
 package site.overwrite.auditranscribe.audio;
@@ -19,11 +19,13 @@ import java.security.InvalidParameterException;
 import java.util.Arrays;
 
 /**
- * Class to encapsulate audio data and functions.
+ * Audio class that handles audio processing.
  */
 public class Audio {
+    // Constants
     public static final int SAMPLES_BUFFER_SIZE = 1024;  // In bits
 
+    // Attributes
     private final File audioFile;
     private AudioFormat audioFormat;
     private double sampleRate;
@@ -34,8 +36,6 @@ public class Audio {
 
     private int numMonoSamples;
     private double[] monoAudioSamples;
-
-    // Object creation methods
 
     /**
      * Initialises an <code>Audio</code> object based on the audio file.
@@ -213,6 +213,81 @@ public class Audio {
     // Private methods
 
     /**
+     * Helper method that resamples the audio samples array <code>x</code> and places it into the
+     * final array <code>y</code>.
+     *
+     * @param x            Initial array of audio samples.
+     * @param y            Final array to store resampled samples.
+     * @param sampleRatio  The ratio between the initial and final sample rates.
+     * @param interpWin    Interpolation window, based off the selected <code>resType</code>.
+     * @param interpDeltas Deltas between consecutive elements in <code>interpWin</code>.
+     * @param precision    Precision constant.
+     * @implNote See <a href="https://github.com/bmcfee/resampy/blob/ccb8557/resampy/interpn.py">
+     * Resampy's Source Code</a> for the original implementation of this function in Python.
+     */
+    private static void resampleF(double[] x, double[] y, double sampleRatio, double[] interpWin, double[] interpDeltas,
+                                  int precision) {
+        // Define constants that will be needed later
+        double scale = Math.min(sampleRatio, 1.0);
+        double timeIncrement = 1. / sampleRatio;
+        int indexStep = (int) (scale * precision);
+
+        int nWin = interpWin.length;
+        int nOrig = x.length;
+        int nOut = y.length;
+
+        // Define 'loop variables'
+        int n, offset;
+        double timeRegister = 0.;
+        double frac, indexFrac, eta, weight;
+
+        // Start resampling process
+        for (int t = 0; t < nOut; t++) {
+            // Grab the top bits as an index to the input buffer
+            n = (int) timeRegister;
+
+            // Grab the fractional component of the time index
+            frac = scale * (timeRegister - n);
+
+            // Offset into the filter
+            indexFrac = frac * precision;
+            offset = (int) indexFrac;
+
+            // Interpolation factor
+            eta = indexFrac - offset;
+
+            // Compute the left wing of the filter response
+            int iMax = Math.min(n + 1, (nWin - offset) / indexStep);
+
+            for (int i = 0; i < iMax; i++) {
+                weight = interpWin[offset + i * indexStep] + eta * interpDeltas[offset + i * indexStep];
+                y[t] += weight * x[n - i];
+            }
+
+            // Invert P
+            frac = scale - frac;
+
+            // Offset into the filter
+            indexFrac = frac * precision;
+            offset = (int) indexFrac;
+
+            // Interpolation factor
+            eta = indexFrac - offset;
+
+            // Compute the right wing of the filter response
+            int kMax = Math.min(nOrig - n - 1, (nWin - offset) / indexStep);
+
+            for (int k = 0; k < kMax; k++) {
+                weight = interpWin[offset + k * indexStep] + eta * interpDeltas[offset + k * indexStep];
+                y[t] += weight * x[n + k + 1];
+            }
+
+            // Increment the time register
+            timeRegister += timeIncrement;
+        }
+    }
+
+    /**
      * Generates the samples' data from the audio file.
      */
     private void generateSamples() {
@@ -249,7 +324,7 @@ public class Audio {
             int cycleNum = 0;  // Number of times we read from the audio stream
             while ((numBytesRead = audioStream.read(bytes)) != -1) {  // Todo: is this needed?
                 // Unpack the bytes into samples
-                unpack(bytes, transfer, samples, numBytesRead);
+                unpack(samples, transfer, bytes, numBytesRead);
 
                 // Add it to the master list of samples
                 if (numBytesRead / bytesPerSample >= 0) {
@@ -311,18 +386,18 @@ public class Audio {
     /**
      * Unpacks the set of bytes from a file into audio sample data.
      *
-     * @param bytes         Array of bytes that is read in from the audio file. Fixed in length at
-     *                      <code>samples.length * normalBytes</code> bytes.
+     * @param samples       (Initially) empty array that stores the samples. Fixed in length at
+     *                      <code>SAMPLES_BUFFER_SIZE * audioFormat.getChannels()</code> float
+     *                      data.
      * @param transfer      (Initially) empty array that helps move data within the function. Fixed
      *                      in length at <code>samples.length</code> long data.
-     * @param samples       (Initially) empty array that stores the samples. Fixed in length at
-     *                      <code>DEF_BUFFER_SAMPLE_SZ * audioFormat.getChannels()</code> float
-     *                      data.
+     * @param bytes         Array of bytes that is read in from the audio file. Fixed in length at
+     *                      <code>samples.length * bytesPerSample</code> bytes.
      * @param numValidBytes Number of valid bytes in the <code>bytes</code> array.
-     * @see <a href="https://github.com/stefanGT44/AudioVisualizer-RealTime-Spectrogram/blob/b109db9/src/app/Player.java">
-     * Original implementation on GitHub</a>.This code was largely adapted from that source.
+     * @see <a href="https://tinyurl.com/stefanSpectrogramOriginal">Original implementation on
+     * GitHub</a>. This code was largely adapted from that source.
      */
-    private void unpack(byte[] bytes, long[] transfer, float[] samples, int numValidBytes) {
+    private void unpack(float[] samples, long[] transfer, byte[] bytes, int numValidBytes) {
         if (audioFormat.getEncoding() != AudioFormat.Encoding.PCM_SIGNED
                 && audioFormat.getEncoding() != AudioFormat.Encoding.PCM_UNSIGNED) {
             // `samples` is already good; no need to process
@@ -419,81 +494,6 @@ public class Audio {
         // Finally, normalise range to [-1f, 1f]
         for (int i = 0; i < transfer.length; i++) {
             samples[i] = (float) transfer[i] / (float) fullScale;
-        }
-    }
-
-    /**
-     * Helper method that resamples the audio samples array <code>x</code> and places it into the
-     * final array <code>y</code>.
-     *
-     * @param x            Initial array of audio samples.
-     * @param y            Final array to store resampled samples.
-     * @param sampleRatio  The ratio between the initial and final sample rates.
-     * @param interpWin    Interpolation window, based off the selected <code>resType</code>.
-     * @param interpDeltas Deltas between consecutive elements in <code>interpWin</code>.
-     * @param precision    Precision constant.
-     * @implNote See <a href="https://github.com/bmcfee/resampy/blob/ccb8557/resampy/interpn.py">
-     * Resampy's Source Code</a> for the original implementation of this function in Python.
-     */
-    private static void resampleF(double[] x, double[] y, double sampleRatio, double[] interpWin, double[] interpDeltas,
-                                  int precision) {
-        // Define constants that will be needed later
-        double scale = Math.min(sampleRatio, 1.0);
-        double timeIncrement = 1. / sampleRatio;
-        int indexStep = (int) (scale * precision);
-
-        int nWin = interpWin.length;
-        int nOrig = x.length;
-        int nOut = y.length;
-
-        // Define 'loop variables'
-        int n, offset;
-        double timeRegister = 0.;
-        double frac, indexFrac, eta, weight;
-
-        // Start resampling process
-        for (int t = 0; t < nOut; t++) {
-            // Grab the top bits as an index to the input buffer
-            n = (int) timeRegister;
-
-            // Grab the fractional component of the time index
-            frac = scale * (timeRegister - n);
-
-            // Offset into the filter
-            indexFrac = frac * precision;
-            offset = (int) indexFrac;
-
-            // Interpolation factor
-            eta = indexFrac - offset;
-
-            // Compute the left wing of the filter response
-            int iMax = Math.min(n + 1, (nWin - offset) / indexStep);
-
-            for (int i = 0; i < iMax; i++) {
-                weight = interpWin[offset + i * indexStep] + eta * interpDeltas[offset + i * indexStep];
-                y[t] += weight * x[n - i];
-            }
-
-            // Invert P
-            frac = scale - frac;
-
-            // Offset into the filter
-            indexFrac = frac * precision;
-            offset = (int) indexFrac;
-
-            // Interpolation factor
-            eta = indexFrac - offset;
-
-            // Compute the right wing of the filter response
-            int kMax = Math.min(nOrig - n - 1, (nWin - offset) / indexStep);
-
-            for (int k = 0; k < kMax; k++) {
-                weight = interpWin[offset + k * indexStep] + eta * interpDeltas[offset + k * indexStep];
-                y[t] += weight * x[n + k + 1];
-            }
-
-            // Increment the time register
-            timeRegister += timeIncrement;
         }
     }
 }

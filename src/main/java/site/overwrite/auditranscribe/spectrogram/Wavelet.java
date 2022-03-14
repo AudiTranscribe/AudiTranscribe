@@ -1,16 +1,17 @@
 /*
- * Windowing.java
+ * Wavelet.java
  *
  * Created on 2022-02-13
- * Updated on 2022-03-13
+ * Updated on 2022-03-15
  *
  * Description: Class to implement audio windowing functions.
  */
 
-package site.overwrite.auditranscribe.audio;
+package site.overwrite.auditranscribe.spectrogram;
 
 import javafx.util.Pair;
-import site.overwrite.auditranscribe.spectrogram.spectral_representations.Helpers;
+import site.overwrite.auditranscribe.audio.Window;
+import site.overwrite.auditranscribe.spectrogram.spectral_representations.SpectralHelpers;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
 import site.overwrite.auditranscribe.utils.Complex;
 import site.overwrite.auditranscribe.utils.MathUtils;
@@ -21,7 +22,7 @@ import java.util.List;
 /**
  * Class to implement audio windowing functions.
  */
-public class Windowing {
+public class Wavelet {
     // Public methods
 
     /**
@@ -68,7 +69,7 @@ public class Windowing {
 
             // Calculate alphas for each frequency bin
             for (int i = 0; i < numFreqs; i++) {
-                alphas[i] = Helpers.computeAlpha(bpo[i]);
+                alphas[i] = SpectralHelpers.computeAlpha(bpo[i]);
             }
         } else {
             alphas = new double[]{fallbackAlpha};
@@ -125,7 +126,7 @@ public class Windowing {
      *
      * @param freqs       Array containing the centers of all the frequency bins.
      * @param sr          Sample rate.
-     * @param window      Windowing function to use.
+     * @param window      Wavelet function to use.
      * @param filterScale Scaling factor for the filter.
      * @param padFFT      Whether to pad in preparation for FFT.
      * @param norm        p-value for the LP norm.
@@ -213,53 +214,4 @@ public class Windowing {
         // Return needed data
         return new Pair<>(filtersFinal, lengths);
     }
-
-//    /**
-//     * Converts the samples in the <code>samples</code> array into windowed samples.
-//     *
-//     * @param samples     Array containing audio samples.
-//     * @param numSamples  Number of elements in the <code>samples</code> array.
-//     * @param frameLength Length of the frame.
-//     * @param hopLength   Number of steps to advance between frames.
-//     * @param window      The window function to use.
-//     * @param audioFormat Format of the audio file.
-//     * @return 2D array of windowed samples of shape (<code>ceil(numSamples/hopLength)</code>,
-//     * <code>frameLength</code>).
-//     */
-//    // Todo: remove?
-//    public static float[][] generateWindowedSamples(float[] samples, int numSamples, int frameLength, int hopLength,
-//                                                    Window window, AudioFormat audioFormat) {
-//        // Generate the frames of the sample
-//        float[][] frames = ArrayUtils.frameOld(samples, frameLength, hopLength);
-//
-//        // Get the number of windows and number of channels
-//        int numWindows = frames.length;
-//        int numChannels = audioFormat.getChannels();
-//
-//        // Apply window function to the samples
-//        float[][] windowedSamples = new float[numWindows][frameLength];
-//
-//        for (int windowNum = 0; windowNum < numWindows; windowNum++) {
-//            // Determine the number of valid samples
-//            int numValidSamples;
-//
-//            if (windowNum != numWindows - 1) {
-//                numValidSamples = frameLength;
-//            } else {
-//                numValidSamples = frameLength - (numSamples % frameLength);  // Final frame length
-//            }
-//
-//            // Get a copy of the samples that need to be windowed
-//            float[] tempSamples = Arrays.copyOf(frames[windowNum], frameLength);
-//
-//            // Apply window function on those samples
-//            applyWindow(tempSamples, numValidSamples, numChannels, window);
-//
-//            // Insert these samples into the `windowedSamples` array
-//            windowedSamples[windowNum] = tempSamples;
-//        }
-//
-//        // Return the windowed samples
-//        return windowedSamples;
-//    }
 }

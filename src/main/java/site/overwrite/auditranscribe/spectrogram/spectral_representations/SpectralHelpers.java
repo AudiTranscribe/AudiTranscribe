@@ -1,15 +1,18 @@
 /*
- * Helpers.java
+ * SpectralHelpers.java
  *
  * Created on 2022-03-07
- * Updated on 2022-03-13
+ * Updated on 2022-03-15
  *
  * Description: Helper methods for the spectral representation functions.
  */
 
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
-public class Helpers {
+/**
+ * Spectral representation helper functions.
+ */
+public class SpectralHelpers {
     /**
      * Computes the alpha coefficient.
      *

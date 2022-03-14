@@ -2,9 +2,9 @@
  * Complex.java
  *
  * Created on 2022-02-12
- * Updated on 2022-03-13
+ * Updated on 2022-03-15
  *
- * Description: Contains the complex number class.
+ * Description: Complex number class.
  */
 
 package site.overwrite.auditranscribe.utils;
@@ -12,14 +12,13 @@ package site.overwrite.auditranscribe.utils;
 import java.util.Objects;
 
 /**
- * Complex number class.
+ * Complex number class.<br>
+ * Class that helps create complex numbers and perform operations on them.
  */
 public class Complex {
     // Attributes
     private double re;  // Real part of the complex number
     private double im;  // Imaginary part of the complex number
-
-    // Standard methods
 
     /**
      * Creates a complex number with real part <code>real</code> and imaginary part
@@ -32,6 +31,8 @@ public class Complex {
         re = real;
         im = imag;
     }
+
+    // Standard methods
 
     /**
      * Getter method to get the real part of the <code>Complex</code> object.
@@ -185,7 +186,7 @@ public class Complex {
      */
     public Complex times(Complex other) {
         // Check if the other complex number is purely real
-        if (other.im() == 0) return this.scale(other.re());
+        if (other.isPurelyReal()) return this.scale(other.re);
 
         // Otherwise, perform complex number multiplication
         Complex a = this;
@@ -222,10 +223,8 @@ public class Complex {
      * @return A <code>Complex</code> object representing the resulting complex number.
      */
     public Complex divides(Complex other) {
-        // Check if `other` is completely real
-        if (other.isPurelyReal()) {
-            return this.divides(other.re);
-        }
+        // Check if the other complex number is purely real
+        if (other.isPurelyReal()) return this.divides(other.re);
 
         // If not, do standard complex division
         return this.times(other.reciprocal());
@@ -307,10 +306,10 @@ public class Complex {
      */
     public static Complex exp(Complex z) {
         // Get the modulus of the final answer
-        double mod = Math.exp(z.re());
+        double mod = Math.exp(z.re);
 
         // Get the 'complex' part of the final answer
-        Complex complexPart = new Complex(Math.cos(z.im()), Math.sin(z.im()));
+        Complex complexPart = new Complex(Math.cos(z.im), Math.sin(z.im));
 
         // Return the final answer
         return complexPart.scale(mod);

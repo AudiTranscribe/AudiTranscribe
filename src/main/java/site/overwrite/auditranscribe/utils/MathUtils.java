@@ -2,9 +2,9 @@
  * MathUtils.java
  *
  * Created on 2022-02-15
- * Updated on 2022-03-14
+ * Updated on 2022-03-15
  *
- * Description: Useful mathematical utilities.
+ * Description: Class containing useful mathematical utility functions.
  */
 
 package site.overwrite.auditranscribe.utils;
@@ -12,7 +12,7 @@ package site.overwrite.auditranscribe.utils;
 import java.security.InvalidParameterException;
 
 /**
- * Miscellaneous mathematical functions.
+ * Class containing useful mathematical utility functions.
  */
 public class MathUtils {
     // Arithmetic-Related methods

@@ -2,9 +2,9 @@
  * Plotter.java
  *
  * Created on 2022-02-18
- * Updated on 2022-03-14
+ * Updated on 2022-03-15
  *
- * Description: Class that helps generate the image.
+ * Description: Class that contains plotting functions.
  */
 
 package site.overwrite.auditranscribe.plotting;
@@ -19,7 +19,8 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
 /**
- * Plotting class for spectrogram-like data.
+ * Class that contains plotting functions.<br>
+ * This is a class that helps generate an image, given spectrogram magnitude data.
  */
 public class Plotter {
     private final double inverseIntensityPrecision;
@@ -84,8 +85,8 @@ public class Plotter {
         /*
          * Note on terminology used here:
          * - A packet represents the magnitude data for one pixel.
-         * - The packet does NOT contain the RGB values for the pixel. It only contains a `double` value representing
-         *   the (average) value of the magnitudes of its constituent windows.
+         * - A packet does NOT contain the RGB values for a pixel. It only contains a `double` value
+         *   representing the relative 'intensity' that should be shown on the pixel.
          */
 
         double[][] packets = Interpolation.bilinear(spectrogramMagnitudes, imgHeight, imgWidth);
@@ -133,8 +134,7 @@ public class Plotter {
         // Define the colourmap array
         colourMap = new int[numDifferentColours];
 
-        // Calculate the number of increments between each successive defined colour in the
-        // colour scale
+        // Calculate the number of increments between each successive defined colour in the colour scale
         int amount = numDifferentColours / (colourScale.colours.length - 1) + 1;
 
         // Generate the colourmap
@@ -142,8 +142,7 @@ public class Plotter {
         int colour1 = 0, colour2 = 0;
 
         for (int i = 0; i < numDifferentColours; i++) {
-            // Check if the current height is one where the colour is strictly defined by the
-            // colour scale
+            // Check if the current height is one where the colour is strictly defined by the colour scale
             if (i % amount == 0 && colourIndex < colourScale.colours.length - 1) {
                 // Update the in-between colours
                 colour1 = colourScale.colours[colourIndex];

@@ -2,12 +2,11 @@
  * FFT.java
  *
  * Created on 2022-02-12
- * Updated on 2022-03-12
+ * Updated on 2022-03-15
  *
  * Description: Class that implements the Fast Fourier Transform (FFT) algorithm.
  *
- * Note:
- *  - Adapted from https://github.com/stefanGT44/AudioVisualizer-RealTime-Spectrogram/blob/master/src/app/FFT.java
+ * Adapted from https://github.com/stefanGT44/AudioVisualizer-RealTime-Spectrogram/blob/master/src/app/FFT.java
  */
 
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
@@ -17,8 +16,10 @@ import site.overwrite.auditranscribe.utils.Complex;
 import java.util.Arrays;
 
 /**
- * Class that implements static FFT methods.
- * Reference: https://en.wikipedia.org/wiki/Fast_Fourier_transform
+ * Class that implements the Fast Fourier Transform (FFT) algorithm.
+ *
+ * @see <a href="https://en.wikipedia.org/wiki/Fast_Fourier_transform">This Wikipedia Article</a>
+ * about the FFT.
  */
 public class FFT {
     // Public methods
@@ -34,7 +35,7 @@ public class FFT {
      * frequencies are returned.
      */
     public static Complex[] fft(Complex[] x) {
-        // Compute radix-2 Cooley-Turkey FFT
+        // Compute Radix-2 Cooley-Tukey FFT
         Complex[] tempMatrix = fft_helper(x);
 
         // Keep only the first `n / 2 + 1` elements
@@ -65,7 +66,7 @@ public class FFT {
         // Assert that the length is AT LEAST a multiple of 2
         // (We'll be able to catch non-powers of two in subsequent recursive calls)
         if (length % 2 != 0) {
-            throw new RuntimeException("The length of the array is not a power of 2");
+            throw new RuntimeException("The length of the array is not a power of 2.");
         }
 
         // Compute FFT of even terms
@@ -84,11 +85,10 @@ public class FFT {
         // Combine even and odd terms together
         Complex[] y = new Complex[length];
         for (int k = 0; k < length / 2; k++) {
-            // Compute w = exp(−2πi/N k)
-            double kth = -2 * k * Math.PI / length;
-            Complex wk = new Complex(Math.cos(kth), Math.sin(kth));
+            // Compute w = exp(−2kπi/N)
+            Complex wk = Complex.exp(new Complex(0, -2 * k * Math.PI / length));
 
-            // Set values for `y[k]` and `y[k+length/2]`
+            // Set values for `y[k]` and `y[k + length/2]`
             y[k] = p[k].plus(wk.times(q[k]));
             y[k + length / 2] = p[k].minus(wk.times(q[k]));
         }

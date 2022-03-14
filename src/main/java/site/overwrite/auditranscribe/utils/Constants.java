@@ -2,14 +2,17 @@
  * Constants.java
  *
  * Created on 2022-03-07
- * Updated on 2022-03-07
+ * Updated on 2022-03-15
  *
- * Description: Useful constants to have.
+ * Description: Class that contains useful constants.
  */
 
 package site.overwrite.auditranscribe.utils;
 
+/**
+ * Class that contains useful constants.
+ */
 public class Constants {
     // File traversal
-    public static String RESOURCES_DIRECTORY = "src/main/resources/site/overwrite/auditranscribe/";
+    public static final String RESOURCES_DIRECTORY = "src/main/resources/site/overwrite/auditranscribe/";
 }

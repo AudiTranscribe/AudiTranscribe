@@ -1,10 +1,10 @@
 /*
- * HelpersTest.java
+ * SpectralHelpersTest.java
  *
  * Created on 2022-03-09
  * Updated on 2022-03-13
  *
- * Description: Test `Helpers.java`.
+ * Description: Test `SpectralHelpers.java`.
  */
 
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
@@ -14,10 +14,10 @@ import site.overwrite.auditranscribe.utils.MathUtils;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class HelpersTest {
+class SpectralHelpersTest {
     @Test
     void computeAlpha() {
-        assertEquals(0.6, Helpers.computeAlpha(1));
-        assertEquals(MathUtils.round((double) 1 / 3, 6), MathUtils.round(Helpers.computeAlpha(2), 6));
+        assertEquals(0.6, SpectralHelpers.computeAlpha(1));
+        assertEquals(MathUtils.round((double) 1 / 3, 6), MathUtils.round(SpectralHelpers.computeAlpha(2), 6));
     }
 }

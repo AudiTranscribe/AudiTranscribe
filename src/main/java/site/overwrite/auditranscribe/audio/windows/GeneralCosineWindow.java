@@ -4,16 +4,16 @@
  * Created on 2022-03-12
  * Updated on 2022-03-13
  *
- * Description: Class that encapsulates the General Cosine Window function.
+ * Description: Class that encapsulates the General Cosine window function.
  */
 
 package site.overwrite.auditranscribe.audio.windows;
 
 /**
- * General Cosine Window.
+ * General Cosine window.
  *
  * @see <a href="https://en.wikipedia.org/wiki/Window_function#Cosine-sum_windows">This article</a>
- * about the General Cosine Window.
+ * about the General Cosine window.
  */
 public abstract class GeneralCosineWindow extends AbstractWindow {
     // Attributes

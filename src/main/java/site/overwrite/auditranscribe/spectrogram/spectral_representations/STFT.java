@@ -2,7 +2,7 @@
  * STFT.java
  *
  * Created on 2022-03-10
- * Updated on 2022-03-13
+ * Updated on 2022-03-15
  *
  * Description: Class that implements the Short-Time Fourier Transform (STFT) algorithm.
  */
@@ -13,6 +13,12 @@ import site.overwrite.auditranscribe.audio.Window;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
 import site.overwrite.auditranscribe.utils.Complex;
 
+/**
+ * Class that implements the Short-Time Fourier Transform (STFT) algorithm.
+ *
+ * @see <a href="https://en.wikipedia.org/wiki/Short-time_Fourier_transform">This Wikipedia
+ * Article</a> about the STFT.
+ */
 public class STFT {
     // Public methods
 
@@ -48,12 +54,6 @@ public class STFT {
         }
 
         // Transpose the windowed frames
-//        Complex[][] windowedFramesTransposed = new Complex[innerArrayLength][numFFT];
-//        for (int i = 0; i < innerArrayLength; i++) {
-//            for (int j = 0; j < numFFT; j++) {
-//                windowedFramesTransposed[i][j] = windowedFrames[j][i];
-//            }
-//        }
         Complex[][] windowedFramesTransposed = ArrayUtils.transpose(windowedFrames);
 
         // Generate the transposed STFT matrix
@@ -62,15 +62,7 @@ public class STFT {
             stftMatrixTransposed[i] = FFT.fft(windowedFramesTransposed[i]);
         }
 
-//        // Transpose the transposed matrix to get the desired result
-//        Complex[][] stftMatrix = new Complex[1 + numFFT / 2][innerArrayLength];
-//        for (int i = 0; i < 1 + numFFT / 2; i++) {
-//            for (int j = 0; j < innerArrayLength; j++) {
-//                stftMatrix[i][j] = stftMatrixTransposed[j][i];
-//            }
-//        }
-
-        // Return the final STFT matrix
+        // Transpose the transposed matrix and return it
         return ArrayUtils.transpose(stftMatrixTransposed);
     }
 }

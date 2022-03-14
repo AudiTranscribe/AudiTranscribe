@@ -1,14 +1,13 @@
 /*
- * Filter.java
+ * AbstractFilter.java
  *
  * Created on 2022-03-07
- * Updated on 2022-03-13
+ * Updated on 2022-03-15
  *
- * Description: Abstract class `Filter` for wavelet filters.
+ * Description: `AbstractFilter` class for resampling filters.
  */
 
 package site.overwrite.auditranscribe.audio.filters;
-
 
 import com.google.gson.Gson;
 import site.overwrite.auditranscribe.utils.Constants;
@@ -17,6 +16,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 
+/**
+ * Abstract resampling filter class.
+ */
 public abstract class AbstractFilter {
     // Attributes
     private double[] halfWin;
@@ -63,8 +65,8 @@ public abstract class AbstractFilter {
     /**
      * Define all the attributes of this filter.
      *
-     * @param dataFilePath Path (from resources directory) to the JSON data file that contains this
-     *                     data.
+     * @param dataFilePath Path (with reference to the resources directory) to the JSON data file
+     *                     that contains this data.
      */
     public void defineAttributes(String dataFilePath) {
         // Assert the file path entered is not empty

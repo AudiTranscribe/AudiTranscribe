@@ -1,8 +1,8 @@
 /*
- * Window.java
+ * AbstractWindow.java
  *
  * Created on 2022-03-11
- * Updated on 2022-03-11
+ * Updated on 2022-03-15
  *
  * Description: Abstract window class that implements most methods needed by window classes.
  */
@@ -16,7 +16,7 @@ import javafx.util.Pair;
  */
 public abstract class AbstractWindow {
     // Attributes
-    double bandwidth;  // Bandwidth can be found here: http://librosa.org/doc/main/_modules/librosa/filters.html
+    double bandwidth;  // Bandwidths can be found here: http://librosa.org/doc/main/_modules/librosa/filters.html
 
     // Getter/Setter Methods
 

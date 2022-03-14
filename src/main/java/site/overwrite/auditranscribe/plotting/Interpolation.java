@@ -2,9 +2,9 @@
  * Interpolation.java
  *
  * Created on 2022-03-14
- * Updated on 2022-03-14
+ * Updated on 2022-03-15
  *
- * Description: Interpolation functions.
+ * Description: Class containing interpolation functions.
  */
 
 package site.overwrite.auditranscribe.plotting;
@@ -14,22 +14,24 @@ import site.overwrite.auditranscribe.utils.ArrayUtils;
 import java.security.InvalidParameterException;
 
 /**
- * Interpolation functions.
+ * Class containing interpolation functions.
  */
 public class Interpolation {
     // Public methods
 
     /**
-     * Interpolate the array <code>array</code> to have new shape <code>(newX, newY)</code>.
+     * Interpolate the array <code>array</code> to have new shape <code>(lengthXNew,
+     * lengthYNew)</code> bilinearly.
      *
      * @param array      Original array of values.
-     * @param lengthXNew New first dimension value.
-     * @param lengthYNew New second dimension value.
+     * @param lengthXNew New number of subarrays present in the 2D array.
+     * @param lengthYNew New length of one subarray.
      * @return Interpolated version of the array.
      * @throws InvalidParameterException If the new lengths specified are shorter than the original
      *                                   lengths.
+     * @implNote <a href="https://en.wikipedia.org/wiki/Bilinear_interpolation#Computation">This
+     * Wikipedia Article</a> on the Bilinear Interpolation's implementation
      */
-    // Todo: rename parameters
     public static double[][] bilinear(double[][] array, int lengthXNew, int lengthYNew) {
         // Get the current `lengthX` and `lengthY`
         int lengthX = array.length;
@@ -47,7 +49,7 @@ public class Interpolation {
         }
 
         // Calculate ratio of the new lengths to the old lengths
-        double xRatio = (double) (lengthX - 1) / (lengthXNew - 1);  // Final index of new must equal final index of old
+        double xRatio = (double) (lengthX - 1) / (lengthXNew - 1);
         double yRatio = (double) (lengthY - 1) / (lengthYNew - 1);
 
         // Create arrays to use in the helper function
@@ -71,7 +73,7 @@ public class Interpolation {
     // Private methods
 
     /**
-     * Helper method to run Bilinear interpolation.
+     * Helper method to perform the bilinear interpolation.
      *
      * @param X    Array of x values.
      * @param Y    Array of y values.
@@ -148,7 +150,6 @@ public class Interpolation {
         }
 
         // Return the output
-        // Todo: do we need to transpose this?
         return ZNew;
     }
 }
