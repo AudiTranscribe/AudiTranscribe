@@ -33,7 +33,7 @@ public class SpectrogramViewController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         // Get the audio file
         try {
-            Audio audio = new Audio("audioFiles/Choice.wav");
+            Audio audio = new Audio("audioFiles/Increments.wav");
 
             // Generate spectrogram
             Spectrogram spectrogram = new Spectrogram(audio, 25, 512, 1024);

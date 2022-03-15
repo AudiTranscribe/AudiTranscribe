@@ -31,15 +31,6 @@ public class FileUtils {
     }
 
     /**
-     * Gets the corrected file path that can work even when the project is compiled.
-     * @param originalFilePath  Original file path.
-     * @return Corrected file path.
-     */
-    public static String getCorrectedFilePath(String originalFilePath) {
-        return getFileURL(originalFilePath).getPath();
-    }
-
-    /**
      * Gets the input stream of a file.
      * @param filePath   Path to the file.
      * @return Input stream of the file.

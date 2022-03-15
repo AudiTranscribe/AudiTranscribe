@@ -19,6 +19,8 @@ import site.overwrite.auditranscribe.utils.Complex;
 import site.overwrite.auditranscribe.utils.UnitConversion;
 
 import java.security.InvalidParameterException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Spectrogram class to handle spectrogram creation.
@@ -44,6 +46,8 @@ public class Spectrogram {
     private final int hopLength;
 
     public double[] frequencyBins;
+
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     /**
      * Creates a spectrogram object.
@@ -81,6 +85,7 @@ public class Spectrogram {
      */
     public WritableImage generateSpectrogram(Window window, ColourScale colourScale) {
         // Perform the spectrogram transform on the samples
+        logger.log(Level.FINE, "Starting spectral matrix generation");
         Complex[][] QTMatrix;
         if (IS_CQT) {
             QTMatrix = CQT.cqt(
@@ -93,13 +98,16 @@ public class Spectrogram {
         }
 
         // Compute the magnitudes
+        logger.log(Level.FINE, "Calculating magnitudes");
         double[][] magnitudes = calculateMagnitudes(QTMatrix);
 
         // Plot spectrogram data
+        logger.log(Level.FINE, "Plotting data");
         Plotter plotter = new Plotter(colourScale, INTENSITY_PRECISION);
         plotter.plot(magnitudes, width, height);
 
         // Return the writable image
+        logger.log(Level.FINE, "Returning image");
         return plotter.getImage();
     }
 
