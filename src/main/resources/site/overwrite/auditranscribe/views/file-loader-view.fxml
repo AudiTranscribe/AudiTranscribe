@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="site.overwrite.auditranscribe.views.FileLoaderViewController">
+   <children>
+      <Button fx:id="openFileButton" layoutX="258.0" layoutY="187.0" mnemonicParsing="false" text="Open a file..." AnchorPane.bottomAnchor="187.0" AnchorPane.leftAnchor="258.0" AnchorPane.rightAnchor="258.5" AnchorPane.topAnchor="187.0" />
+   </children>
+</AnchorPane>

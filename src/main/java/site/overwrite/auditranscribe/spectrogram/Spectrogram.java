@@ -13,6 +13,7 @@ import javafx.scene.image.WritableImage;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.Window;
 import site.overwrite.auditranscribe.plotting.Plotter;
+import site.overwrite.auditranscribe.spectrogram.spectral_representations.CQT;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.VQT;
 import site.overwrite.auditranscribe.utils.Complex;
 import site.overwrite.auditranscribe.utils.UnitConversion;
@@ -79,12 +80,20 @@ public class Spectrogram {
      * @return The spectrogram image.
      */
     public WritableImage generateSpectrogram(Window window, ColourScale colourScale) {
-        // Perform VQT on the samples
-        Complex[][] VQTMatrix = VQT.vqt(samples, sampleRate, hopLength, MINIMUM_FREQUENCY, NUM_FREQ_BINS,
-                BINS_PER_OCTAVE, IS_CQT, GAMMA, window);
+        // Perform the spectrogram transform on the samples
+        Complex[][] QTMatrix;
+        if (IS_CQT) {
+            QTMatrix = CQT.cqt(
+                    samples, sampleRate, hopLength, MINIMUM_FREQUENCY, NUM_FREQ_BINS, BINS_PER_OCTAVE, window
+            );
+        } else {
+            QTMatrix = VQT.vqt(
+                    samples, sampleRate, hopLength, MINIMUM_FREQUENCY, NUM_FREQ_BINS, BINS_PER_OCTAVE, GAMMA, window
+            );
+        }
 
         // Compute the magnitudes
-        double[][] magnitudes = calculateMagnitudes(VQTMatrix);
+        double[][] magnitudes = calculateMagnitudes(QTMatrix);
 
         // Plot spectrogram data
         Plotter plotter = new Plotter(colourScale, INTENSITY_PRECISION);

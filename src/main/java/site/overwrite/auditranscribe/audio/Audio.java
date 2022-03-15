@@ -10,11 +10,15 @@
 package site.overwrite.auditranscribe.audio;
 
 import site.overwrite.auditranscribe.utils.ArrayUtils;
+import site.overwrite.auditranscribe.utils.FileUtils;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
-import java.io.File;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
 
@@ -26,9 +30,9 @@ public class Audio {
     public static final int SAMPLES_BUFFER_SIZE = 1024;  // In bits
 
     // Attributes
-    private final File audioFile;
-    private AudioFormat audioFormat;
-    private double sampleRate;
+    private final AudioInputStream audioStream;
+    private final AudioFormat audioFormat;
+    private final double sampleRate;
     private double duration;
 
     private int numSamples;
@@ -38,36 +42,26 @@ public class Audio {
     private double[] monoAudioSamples;
 
     /**
-     * Initialises an <code>Audio</code> object based on the audio file.
+     * Initialises an <code>Audio</code> object based on a file's input stream.
      *
-     * @param filePath Path to the audio file.
+     * @param filePath Input stream of a file.
+     * @throws IOException                   If there was a problem reading in the audio stream.
+     * @throws UnsupportedAudioFileException If there was a problem reading in the audio file.
      */
-    public Audio(String filePath) {
-        // Open the file as a `File` object
-        audioFile = new File(filePath);
+    public Audio(String filePath) throws UnsupportedAudioFileException, IOException {
+        // Attempt to convert the input stream into an audio input stream
+        InputStream bufferedIn = new BufferedInputStream(FileUtils.getInputStream(filePath));
+        audioStream = AudioSystem.getAudioInputStream(bufferedIn);
 
         // Get the audio file's audio format and audio file's sample rate
-        try {
-            audioFormat = AudioSystem.getAudioFileFormat(audioFile).getFormat();
-            sampleRate = audioFormat.getSampleRate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        audioFormat = audioStream.getFormat();
+        sampleRate = audioFormat.getSampleRate();
 
         // Generate audio samples
         generateSamples();
     }
 
     // Getter/Setter methods
-
-    /**
-     * Getter method that returns the audio file object.
-     *
-     * @return The `File` object of the audio file.
-     */
-    public File getAudioFile() {
-        return audioFile;
-    }
 
     /**
      * Getter method that returns the audio format of the audio object.
@@ -291,13 +285,7 @@ public class Audio {
      * Generates the samples' data from the audio file.
      */
     private void generateSamples() {
-        AudioInputStream audioStream = null;  // To store the input stream from the audio file
-
-        // Carefully read data from file
         try {
-            // Get the audio input stream
-            audioStream = AudioSystem.getAudioInputStream(audioFile);
-
             // Get the number of bytes that corresponds to each sample
             final int bytesPerSample = numBytesForNumBits(audioFormat.getSampleSizeInBits());
 
@@ -322,7 +310,7 @@ public class Audio {
             // Get samples
             int numBytesRead;
             int cycleNum = 0;  // Number of times we read from the audio stream
-            while ((numBytesRead = audioStream.read(bytes)) != -1) {  // Todo: is this needed?
+            while ((numBytesRead = audioStream.read(bytes)) != -1) {
                 // Unpack the bytes into samples
                 unpack(samples, transfer, bytes, numBytesRead);
 

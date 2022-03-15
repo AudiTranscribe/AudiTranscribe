@@ -22,7 +22,7 @@ import site.overwrite.auditranscribe.spectrogram.Spectrogram;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class SpectrogramViewController  implements Initializable {
+public class SpectrogramViewController implements Initializable {
     @FXML
     private AnchorPane spectrogramPlane;
 
@@ -32,20 +32,24 @@ public class SpectrogramViewController  implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Get the audio file
-        Audio audio = new Audio("audioFiles/Choice.wav");
+        try {
+            Audio audio = new Audio("audioFiles/Choice.wav");
 
-        // Generate spectrogram
-        Spectrogram spectrogram = new Spectrogram(audio, 25, 512, 1024);
-        WritableImage spectrogramImage = spectrogram.generateSpectrogram(Window.HANN_WINDOW, ColourScale.VIRIDIS);
-        System.out.println("Width is " + spectrogram.width);
+            // Generate spectrogram
+            Spectrogram spectrogram = new Spectrogram(audio, 25, 512, 1024);
+            WritableImage spectrogramImage = spectrogram.generateSpectrogram(Window.HANN_WINDOW, ColourScale.VIRIDIS);
+            System.out.println("Width is " + spectrogram.width);
 
-        // Update spectrogram plane width and height
-        spectrogramPlane.setPrefWidth(spectrogram.width);
-        spectrogramPlane.setPrefHeight(spectrogram.height);
+            // Update spectrogram plane width and height
+            spectrogramPlane.setPrefWidth(spectrogram.width);
+            spectrogramPlane.setPrefHeight(spectrogram.height);
 
-        // Set image on the spectrogram area
-        spectrogramArea.setFitHeight(spectrogram.height);
-        spectrogramArea.setFitWidth(spectrogram.width);
-        spectrogramArea.setImage(spectrogramImage);
+            // Set image on the spectrogram area
+            spectrogramArea.setFitHeight(spectrogram.height);
+            spectrogramArea.setFitWidth(spectrogram.width);
+            spectrogramArea.setImage(spectrogramImage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

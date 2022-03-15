@@ -2,7 +2,7 @@
  * MainApplication.java
  *
  * Created on 2022-02-09
- * Updated on 2022-02-12
+ * Updated on 2022-03-15
  *
  * Description: Contains the main application class.
  */
@@ -13,6 +13,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import site.overwrite.auditranscribe.utils.FileUtils;
 
 import java.io.IOException;
 
@@ -22,7 +23,7 @@ public class MainApplication extends Application {
         System.out.println("Start");
 
 //        // Load the FXML file into the scene
-//        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("views/main-view.fxml"));
+//        FXMLLoader fxmlLoader = new FXMLLoader(FileUtils.getFile("views/main-view.fxml"));
 //        Scene scene = new Scene(fxmlLoader.load());
 //
 //        // Set stage title and scene
@@ -32,13 +33,18 @@ public class MainApplication extends Application {
 //        // More stage config
 //        // Todo: make it not resizable?
 //        stage.setMaximized(true);
-////        stage.setFullScreen(true);
+//        // stage.setFullScreen(true);
 
-        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("views/spectrogram-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(FileUtils.getFileURL("views/spectrogram-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("Spectrogram");
         stage.setScene(scene);
         stage.setMaximized(true);
+
+//        FXMLLoader fxmlLoader = new FXMLLoader(FileUtils.getFileURL("views/file-loader-view.fxml"));
+//        Scene scene = new Scene(fxmlLoader.load());
+//        stage.setTitle("File Loader");
+//        stage.setScene(scene);
 
         // Show the stage
         stage.show();

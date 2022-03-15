@@ -12,6 +12,7 @@ module site.overwrite.auditranscribe {
     requires commons.exec;
     requires com.google.gson;
     requires org.apache.commons.lang3;
+    requires java.logging;
 
     exports site.overwrite.auditranscribe;
     exports site.overwrite.auditranscribe.views;

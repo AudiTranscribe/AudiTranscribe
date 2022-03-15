@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * VQT class that contains VQT methods.
+ * VQT class that contains Variable-Q Transform methods.
  *
  * @implNote Adapted largely from
  * <a href="https://librosa.org/doc/main/_modules/librosa/core/constantq.html#vqt">Librosa's
@@ -49,9 +49,38 @@ public class VQT {
      * @param fmin          Minimum frequency.
      * @param numBins       Number of frequency bins, starting at <code>fmin</code>.
      * @param binsPerOctave Number of bins per octave.
+     * @param gamma         Bandwidth offset for determining filter lengths. <code>gamma = 0</code>
+     *                      means that the gamma value will be derived automatically.
+     * @param window        Window specification for the basis filters.
+     * @return Variable-Q value each frequency at each time.
+     * @throws InvalidParameterException If number of frequency bins is negative or zero.
+     * @throws InvalidParameterException If number of bins per octave is negative or zero.
+     * @throws InvalidParameterException If number of bins is not a multiple of the number of bins
+     *                                   per octave.
+     * @throws InvalidParameterException If the current number of frequency bins results in the
+     *                                   highest frequency exceeding the Nyquist frequency.
+     */
+    public static Complex[][] vqt(
+            double[] y, double sr, int hopLength, double fmin, int numBins, int binsPerOctave, double gamma,
+            Window window
+    ) {
+        return vqt(y, sr, hopLength, fmin, numBins, binsPerOctave, false, gamma, window);
+    }
+
+    /**
+     * Variable-Q Transform function.
+     *
+     * @param y             Audio time series.
+     * @param sr            Sample rate of the audio.
+     * @param hopLength     Number of samples between successive VQT columns.
+     * @param fmin          Minimum frequency.
+     * @param numBins       Number of frequency bins, starting at <code>fmin</code>.
+     * @param binsPerOctave Number of bins per octave.
      * @param isCQT         Whether this is a CQT or not.
-     * @param gamma         Bandwidth offset for determining filter lengths. If
-     *                      <code>gamma = 0</code>, produces the Constant-Q Transform (CQT).
+     * @param gamma         Bandwidth offset for determining filter lengths. If <code>isCQT</code>is
+     *                      true and <code>gamma = 0</code>, produces the Constant-Q Transform
+     *                      (CQT). Otherwise, <code>gamma = 0</code> means that the gamma value will
+     *                      be derived automatically.
      * @param window        Window specification for the basis filters.
      * @return Variable-Q value each frequency at each time.
      * @throws InvalidParameterException If number of frequency bins is negative or zero.

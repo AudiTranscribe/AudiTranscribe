@@ -17,6 +17,6 @@ package site.overwrite.auditranscribe.audio.filters;
  */
 public class KaiserBest extends AbstractFilter {
     public KaiserBest() {
-        defineAttributes("filter_data_json/kaiser_best.json");
+        defineAttributes("filter-data/kaiser-best.json");
     }
 }

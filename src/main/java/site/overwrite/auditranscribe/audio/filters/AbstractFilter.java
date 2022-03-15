@@ -10,10 +10,10 @@
 package site.overwrite.auditranscribe.audio.filters;
 
 import com.google.gson.Gson;
-import site.overwrite.auditranscribe.utils.Constants;
+import site.overwrite.auditranscribe.utils.FileUtils;
 
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Reader;
 
 /**
@@ -75,7 +75,7 @@ public abstract class AbstractFilter {
         // Create the GSON loader object
         Gson gson = new Gson();
 
-        try (Reader reader = new FileReader(Constants.RESOURCES_DIRECTORY + dataFilePath)) {
+        try (Reader reader = new InputStreamReader(FileUtils.getInputStream(dataFilePath))) {
             // Try loading the filter data
             FilterData filterData = gson.fromJson(reader, FilterData.class);
 
