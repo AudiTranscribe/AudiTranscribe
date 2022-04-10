@@ -9,7 +9,9 @@
 
 package site.overwrite.auditranscribe.utils;
 
+import java.lang.reflect.Array;
 import java.security.InvalidParameterException;
+import java.util.Arrays;
 
 /**
  * Array utilities.
@@ -135,6 +137,87 @@ public class ArrayUtils {
         // Fill in the output array
         double[] output = new double[size];
         System.arraycopy(array, 0, output, lpad, n);
+
+        // Return the output array
+        return output;
+    }
+
+    /**
+     * Pad an array <code>array</code> to length <code>size</code> by centering the pre-existing
+     * elements in <code>array</code> and using mode "reflect" to handle padding.
+     *
+     * @param array The array to pad.
+     * @param size  The size to make the array.
+     * @return Padded array where the length is now <code>size</code>.
+     * @throws IllegalArgumentException If <code>size</code> is negative.
+     * @implNote See <a href="https://numpy.org/doc/stable/reference/generated/numpy.pad.html">
+     *     Numpy's implementation</a> of this function.
+     * @see <a href="https://stackoverflow.com/a/51780171">This StackOverflow answer</a> on how to
+     *      visualise the "reflect" mode of the padding operation.
+     */
+    public static double[] padCenterReflect(double[] array, int size) {
+        // Verify that `size` is positive
+        if (size <= 0) {
+            throw new IllegalArgumentException("Invalid size " + size);
+        }
+
+        // Get length of the array
+        int n = array.length;
+
+        // If `n` is `size` just return the array
+        if (n == size) {
+            return array;
+        }
+
+        // Calculate left and right padding
+        int lpad = (size - n) / 2;
+        int rpad = size - n - lpad;
+
+        // Fill the output array
+        double[] output = new double[size];
+        System.arraycopy(array, 0, output, lpad, n);  // Copy center elements
+
+        int reflectedElemIndex = 0;
+        int changeInVal = n == 1 ? 0 : 1;  // Don't add anything if there is only 1 element
+        for (int i = 0; i < lpad; i++) {  // Left padding
+            // Handle reflected element index calculation
+            if (reflectedElemIndex + changeInVal >= n) {
+                changeInVal = -1;
+            }
+
+            if (reflectedElemIndex + changeInVal < 0) {
+                changeInVal = 1;
+            }
+
+            reflectedElemIndex += changeInVal;
+
+            // Get the position to place this element
+            int placementIndex = lpad - i - 1;  // We start from the back of the section to be padded
+
+            // Place the element
+            output[placementIndex] = array[reflectedElemIndex];
+        }
+
+        reflectedElemIndex = n - 1;  // Start from the end
+        changeInVal = n == 1 ? 0 : -1;  // Don't add anything if there is only 1 element
+        for (int i = 0; i < rpad; i++) {  // Right padding
+            // Handle reflected element index calculation
+            if (reflectedElemIndex + changeInVal >= n) {
+                changeInVal = -1;
+            }
+
+            if (reflectedElemIndex + changeInVal < 0) {
+                changeInVal = 1;
+            }
+
+            reflectedElemIndex += changeInVal;
+
+            // Get the position to place this element
+            int placementIndex = size - rpad + i;
+
+            // Place the element
+            output[placementIndex] = array[reflectedElemIndex];
+        }
 
         // Return the output array
         return output;

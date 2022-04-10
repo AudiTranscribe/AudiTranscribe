@@ -2,7 +2,7 @@
  * STFT.java
  *
  * Created on 2022-03-10
- * Updated on 2022-03-15
+ * Updated on 2022-04-10
  *
  * Description: Class that implements the Short-Time Fourier Transform (STFT) algorithm.
  */
@@ -39,7 +39,7 @@ public class STFT {
         fftWindow = ArrayUtils.padCenter(fftWindow, numFFT);
 
         // Pad the time series so that frames are centered
-        double[] xHat = ArrayUtils.padCenter(x, x.length + numFFT);
+        double[] xHat = ArrayUtils.padCenterReflect(x, x.length + numFFT);
 
         // Window the time series
         double[][] xFrames = ArrayUtils.frame(xHat, numFFT, hopLength, true);
@@ -49,7 +49,7 @@ public class STFT {
         Complex[][] windowedFrames = new Complex[numFFT][innerArrayLength];
         for (int i = 0; i < numFFT; i++) {
             for (int j = 0; j < innerArrayLength; j++) {
-                windowedFrames[i][j] = new Complex(xFrames[i][j] * fftWindow[i], 0);
+                windowedFrames[i][j] = new Complex(xFrames[i][j] * fftWindow[i]);
             }
         }
 

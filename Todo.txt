@@ -3,3 +3,9 @@ Todo:
     - Possibly allow for bicubic interpolation
     - Update README.md
     - Validate audio length
+    - Implement file saving
+        - We would probably save the spectrogram data as that takes the longest to generate
+
+Fixme:
+    - Spectrogram seems to be very noisy...
+        - NOT problem with audio sample processing, FFT, STFT, or VQT

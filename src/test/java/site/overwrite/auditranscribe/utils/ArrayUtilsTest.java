@@ -2,7 +2,7 @@
  * ArrayUtilsTest.java
  *
  * Created on 2022-03-12
- * Updated on 2022-03-14
+ * Updated on 2022-04-10
  *
  * Description: Test `ArrayUtils.java`.
  */
@@ -14,6 +14,36 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ArrayUtilsTest {
+    @Test
+    void padCenter() {
+        // Define the arrays
+        double[] array1 = {1, 2, 3, 4};
+        double[] array2 = {1, 2, 3};
+        double[] array3 = {5, 6};
+        double[] array4 = {7};
+
+        // Run tests
+        assertArrayEquals(new double[]{0, 0, 1, 2, 3, 4, 0, 0}, ArrayUtils.padCenter(array1, 8));
+        assertArrayEquals(new double[]{0, 0, 0, 1, 2, 3, 0, 0, 0}, ArrayUtils.padCenter(array2, 9));
+        assertArrayEquals(new double[]{0, 0, 0, 0, 5, 6, 0, 0, 0, 0}, ArrayUtils.padCenter(array3, 10));
+        assertArrayEquals(new double[]{0, 0, 0, 7, 0, 0, 0}, ArrayUtils.padCenter(array4, 7));
+    }
+
+    @Test
+    void padCenterReflect() {
+        // Define the arrays
+        double[] array1 = {1, 2, 3, 4};
+        double[] array2 = {1, 2, 3};
+        double[] array3 = {5, 6};
+        double[] array4 = {7};
+
+        // Run tests
+        assertArrayEquals(new double[]{3, 2, 1, 2, 3, 4, 3, 2}, ArrayUtils.padCenterReflect(array1, 8));
+        assertArrayEquals(new double[]{2, 3, 2, 1, 2, 3, 2, 1, 2}, ArrayUtils.padCenterReflect(array2, 9));
+        assertArrayEquals(new double[]{5, 6, 5, 6, 5, 6, 5, 6, 5, 6}, ArrayUtils.padCenterReflect(array3, 10));
+        assertArrayEquals(new double[]{7, 7, 7, 7, 7, 7, 7}, ArrayUtils.padCenterReflect(array4, 7));
+    }
+
     @Test
     void searchSorted() {
         // Define searching arrays

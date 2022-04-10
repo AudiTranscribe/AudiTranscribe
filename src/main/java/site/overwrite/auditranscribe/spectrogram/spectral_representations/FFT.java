@@ -2,7 +2,7 @@
  * FFT.java
  *
  * Created on 2022-02-12
- * Updated on 2022-03-15
+ * Updated on 2022-04-10
  *
  * Description: Class that implements the Fast Fourier Transform (FFT) algorithm.
  *
@@ -36,7 +36,7 @@ public class FFT {
      */
     public static Complex[] fft(Complex[] x) {
         // Compute Radix-2 Cooley-Tukey FFT
-        Complex[] tempMatrix = fft_helper(x);
+        Complex[] tempMatrix = fftHelper(x);
 
         // Keep only the first `n / 2 + 1` elements
         int finalLength = x.length / 2 + 1;
@@ -56,7 +56,7 @@ public class FFT {
      * @see <a href="https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm">Radix-2
      * Cooley-Tukey Algorithm</a>, which was the algorithm used to generate the FFT.
      */
-    private static Complex[] fft_helper(Complex[] x) {
+    private static Complex[] fftHelper(Complex[] x) {
         // Get length of input array
         int length = x.length;
 
@@ -74,13 +74,13 @@ public class FFT {
         for (int k = 0; k < length / 2; k++) {
             terms[k] = x[2 * k];
         }
-        Complex[] p = fft_helper(terms);
+        Complex[] p = fftHelper(terms);
 
         // Compute FFT of odd terms
         for (int k = 0; k < length / 2; k++) {
             terms[k] = x[2 * k + 1];  // We reuse the above array
         }
-        Complex[] q = fft_helper(terms);
+        Complex[] q = fftHelper(terms);
 
         // Combine even and odd terms together
         Complex[] y = new Complex[length];

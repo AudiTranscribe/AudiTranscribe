@@ -32,6 +32,16 @@ public class Complex {
         im = imag;
     }
 
+    /**
+     * Creates a complex number with real part <code>real</code> and imaginary part 0.
+     *
+     * @param real The real part of the complex number.
+     */
+    public Complex(double real) {
+        re = real;
+        im = 0;
+    }
+
     // Standard methods
 
     /**

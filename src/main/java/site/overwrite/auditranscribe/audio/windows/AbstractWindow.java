@@ -41,13 +41,13 @@ public abstract class AbstractWindow {
     public double[] generateWindow(int length, boolean symmetric) {
         // Check if we need to extend the window
         Pair<Integer, Boolean> extendResponse = extend(length, symmetric);
-        length = extendResponse.getKey();
+        int newLength = extendResponse.getKey();
         boolean truncateNeeded = extendResponse.getValue();
 
         // Generate the window
-        double[] window = new double[length];
+        double[] window = new double[newLength];
         for (int i = 0; i < length; i++) {
-            window[i] = windowFunc(i + 1, length);
+            window[i] = windowFunc(i, length);
         }
 
         // Return the (possibly) truncated window

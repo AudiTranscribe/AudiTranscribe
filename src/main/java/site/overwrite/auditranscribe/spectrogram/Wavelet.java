@@ -2,7 +2,7 @@
  * Wavelet.java
  *
  * Created on 2022-02-13
- * Updated on 2022-03-15
+ * Updated on 2022-04-10
  *
  * Description: Class to implement audio windowing functions.
  */
@@ -172,9 +172,10 @@ public class Wavelet {
 
             // Build the filter
             Complex[] sig = new Complex[signalLength];
+
             for (int j = 0; j < signalLength; j++) {
                 // Calculate current 'index' value
-                double indexVal = ((double) j / signalLength - 1) * (upperBound - lowerBound) + lowerBound;
+                int indexVal = j + lowerBound;
 
                 // Compute current signal value
                 sig[j] = Complex.exp(new Complex(0, indexVal * (2 * Math.PI * freq / sr)));

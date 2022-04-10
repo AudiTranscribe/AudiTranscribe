@@ -29,8 +29,6 @@ out/
 *.iws
 
 # Others
-src/main/resources/site/overwrite/auditranscribe/audioFiles
-
 .DS_Store
 Updating Legacy JAR With Module-Info.txt
 VQT_data.txt

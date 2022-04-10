@@ -2,7 +2,7 @@
  * Audio.java
  *
  * Created on 2022-02-13
- * Updated on 2022-03-15
+ * Updated on 2022-04-10
  *
  * Description: Class that handles audio processing.
  */
@@ -222,7 +222,7 @@ public class Audio {
     private static void resampleF(double[] x, double[] y, double sampleRatio, double[] interpWin, double[] interpDeltas,
                                   int precision) {
         // Define constants that will be needed later
-        double scale = Math.min(sampleRatio, 1.0);
+        double scale = Math.min(sampleRatio, 1.);
         double timeIncrement = 1. / sampleRatio;
         int indexStep = (int) (scale * precision);
 
@@ -232,7 +232,7 @@ public class Audio {
 
         // Define 'loop variables'
         int n, offset;
-        double timeRegister = 0.;
+        double timeRegister = 0;
         double frac, indexFrac, eta, weight;
 
         // Start resampling process
@@ -269,11 +269,11 @@ public class Audio {
             eta = indexFrac - offset;
 
             // Compute the right wing of the filter response
-            int kMax = Math.min(nOrig - n - 1, (nWin - offset) / indexStep);
+            int jMax = Math.min(nOrig - n - 1, (nWin - offset) / indexStep);
 
-            for (int k = 0; k < kMax; k++) {
-                weight = interpWin[offset + k * indexStep] + eta * interpDeltas[offset + k * indexStep];
-                y[t] += weight * x[n + k + 1];
+            for (int j = 0; j < jMax; j++) {
+                weight = interpWin[offset + j * indexStep] + eta * interpDeltas[offset + j * indexStep];
+                y[t] += weight * x[n + j + 1];
             }
 
             // Increment the time register

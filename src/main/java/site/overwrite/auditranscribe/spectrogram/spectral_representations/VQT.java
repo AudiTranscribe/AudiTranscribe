@@ -2,7 +2,7 @@
  * VQT.java
  *
  * Created on 2022-03-11
- * Updated on 2022-03-15
+ * Updated on 2022-04-10
  *
  * Description: Class that implements the Variable Q-Transform (VQT) algorithm.
  */
@@ -161,7 +161,7 @@ public class VQT {
         // Handle first octave specially if the filter type is NOT `KAISER_FAST`
         int startingOctave = 0;
 
-        if (filter != Filter.KAISER_FAST) {
+        if (filter != Filter.KAISER_FAST) {  // Todo: we haven't exactly debugged this code block
             // Get the frequencies of the top octave
             double[] freqsOct = new double[binsPerOctave];
             System.arraycopy(freqs, numBins - binsPerOctave, freqsOct, 0, binsPerOctave);
@@ -318,7 +318,7 @@ public class VQT {
                 );
             }
 
-            // Downsample `hop_length` and the sample rate
+            // Downsample hop length and the sample rate
             hopLength /= downsampleFactor;
             double newSr = sr / downsampleFactor;
 

@@ -2,7 +2,7 @@
  * UnitConversionTest.java
  *
  * Created on 2022-03-12
- * Updated on 2022-03-14
+ * Updated on 2022-04-10
  *
  * Description: Test `UnitConversion.java`.
  */
@@ -67,6 +67,16 @@ class UnitConversionTest {
         assertEquals(15804.266, UnitConversion.noteNumberToFreq(119), 0.001);  // B9
     }
 
+    @Test
+    void noteNumberToNote() {
+        assertEquals("C0", UnitConversion.noteNumberToNote(0));
+        assertEquals("D#3", UnitConversion.noteNumberToNote(39));
+        assertEquals("E5", UnitConversion.noteNumberToNote(64));
+        assertEquals("A#7", UnitConversion.noteNumberToNote(94));
+        assertEquals("B9", UnitConversion.noteNumberToNote(119));
+    }
+
+
     // Magnitude Scaling - Unit Conversion
     @Test
     void powerToDecibel() {
@@ -92,5 +102,22 @@ class UnitConversionTest {
         assertEquals(-15.563, UnitConversion.amplitudeToDecibel(2, 12), 0.001);
         assertEquals(6.021, UnitConversion.amplitudeToDecibel(10, 5), 0.001);
         assertEquals(5.194, UnitConversion.amplitudeToDecibel(12.345, 6.789), 0.001);
+    }
+
+    // Graphics Units Conversion
+    @Test
+    void pxToPt() {
+        assertEquals(15, UnitConversion.pxToPt(20), 0.001);
+        assertEquals(51.25, UnitConversion.pxToPt(68.3333333333), 0.001);
+        assertEquals(0, UnitConversion.pxToPt(0), 0.001);
+        assertEquals(164.25, UnitConversion.pxToPt(219), 0.001);
+    }
+
+    @Test
+    void ptToPx() {
+        assertEquals(20, UnitConversion.ptToPx(15), 0.001);
+        assertEquals(68.333, UnitConversion.ptToPx(51.25), 0.001);
+        assertEquals(0, UnitConversion.ptToPx(0), 0.001);
+        assertEquals(219, UnitConversion.ptToPx(164.25), 0.001);
     }
 }

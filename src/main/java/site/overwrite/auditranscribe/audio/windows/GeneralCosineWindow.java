@@ -2,7 +2,7 @@
  * GeneralCosineWindow.java
  *
  * Created on 2022-03-12
- * Updated on 2022-03-13
+ * Updated on 2022-04-10
  *
  * Description: Class that encapsulates the General Cosine window function.
  */
@@ -39,11 +39,8 @@ public abstract class GeneralCosineWindow extends AbstractWindow {
             double sign = 1;
             if (i % 2 == 1) sign = -1;
 
-            // Get the `a` value
-            double a = aCoefficients[i];
-
             // Compute the window value proper
-            winVal += sign * a * Math.cos(2 * Math.PI * i * k / length);
+            winVal += sign * aCoefficients[i] * Math.cos(2 * Math.PI * i * k / length);
         }
 
         // Return the window value
