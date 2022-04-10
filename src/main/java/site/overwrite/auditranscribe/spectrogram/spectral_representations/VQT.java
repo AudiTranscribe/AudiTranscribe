@@ -207,7 +207,8 @@ public class VQT {
             }
 
             // Compute the VQT filter response and append to the list
-            vqtResponses.add(vqtResponse(myY, numFFT, myHopLength, fftBasis));
+            Complex[][] response = vqtResponse(myY, numFFT, myHopLength, fftBasis);
+            vqtResponses.add(response);
 
             // Update variables
             if (myHopLength % 2 == 0) {
@@ -313,8 +314,7 @@ public class VQT {
             // Check if the signal can actually be downsampled
             if (y.length < downsampleFactor) {
                 throw new InvalidParameterException(
-                        "Input signal length of " + y.length + " is too short for " + numOctaves +
-                                "-octave VQT"
+                    "Input signal length of " + y.length + " is too short for " + numOctaves + "-octave VQT"
                 );
             }
 
@@ -391,6 +391,7 @@ public class VQT {
     private static Complex[][] vqtResponse(double[] y, int numFFT, int hopLength, Complex[][] fftBasis) {
         // Get the STFT matrix
         Complex[][] D = STFT.stft(y, numFFT, hopLength, Window.ONES_WINDOW);
+        System.out.println(fftBasis.length + " " + fftBasis[0].length + " " + D.length + " " + D[0].length);
 
         // Matrix multiply `fftBasis` with `D` and return the result
         return ArrayUtils.matmul(fftBasis, D);
@@ -404,11 +405,16 @@ public class VQT {
      * @return Trimmed and stacked array of VQT responses.
      */
     private static Complex[][] trimAndStack(Complex[][][] vqtResponses, int numBins) {
-        // Get the number of columns in the output matrix
-        int numCol = vqtResponses[0][0].length;
+        // Get the maximum permitted number columns
+        // (We take the minimum to avoid weird index errors later when processing magnitudes)
+        int maxPermittedNumCol = Integer.MAX_VALUE;
+
+        for (Complex[][] vqtResponse: vqtResponses) {
+            maxPermittedNumCol = Math.min(vqtResponse[0].length, maxPermittedNumCol);
+        }
 
         // Generate output VQT matrix
-        Complex[][] vqtOut = new Complex[numBins][numCol];
+        Complex[][] vqtOut = new Complex[numBins][maxPermittedNumCol];
 
         // Copy per-octave data into output array
         int end = numBins;
@@ -418,9 +424,13 @@ public class VQT {
 
             // If the whole octave is more than we can fit, take the highest bins from `response`
             if (end < numOctaves) {
-                System.arraycopy(response, numOctaves - end, vqtOut, 0, end);
+                for (int i = 0; i < end; i++) {
+                    System.arraycopy(response[numOctaves - end + i], 0, vqtOut[i], 0, maxPermittedNumCol);
+                }
             } else {
-                System.arraycopy(response, 0, vqtOut, end - numOctaves, numOctaves);
+                for (int i = 0; i < numOctaves; i++) {
+                    System.arraycopy(response[i], 0, vqtOut[end - numOctaves + i], 0, maxPermittedNumCol);
+                }
             }
 
             end -= numOctaves;
