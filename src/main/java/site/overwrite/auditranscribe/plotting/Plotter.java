@@ -2,7 +2,7 @@
  * Plotter.java
  *
  * Created on 2022-02-18
- * Updated on 2022-03-15
+ * Updated on 2022-04-10
  *
  * Description: Class that contains plotting functions.
  */
@@ -17,6 +17,8 @@ import site.overwrite.auditranscribe.utils.MathUtils;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class that contains plotting functions.<br>
@@ -30,6 +32,8 @@ public class Plotter {
     private int[] colourMap;
 
     private BufferedImage bufferedImage;
+
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     /**
      * Creates a plotter object.
@@ -48,6 +52,7 @@ public class Plotter {
 
         // Generate the colourmap
         generateColourMap();
+        logger.log(Level.FINE, "Colourmap generated");
     }
 
     // Getter/setter methods
@@ -91,10 +96,11 @@ public class Plotter {
 
         double[][] packets = Interpolation.bilinear(spectrogramMagnitudes, imgHeight, imgWidth);
         packets = ArrayUtils.transpose(packets);  // Make dimensions (width, height) instead of (height, width)
+        logger.log(Level.FINE, "Image packets generated");
 
         // Get min and max of packet values
-        double minPacketVal = Integer.MAX_VALUE;
-        double maxPacketVal = Integer.MIN_VALUE;
+        double minPacketVal = Double.MAX_VALUE;
+        double maxPacketVal = -Double.MAX_VALUE;
 
         for (double[] row : packets) {
             for (double packet : row) {
@@ -109,6 +115,7 @@ public class Plotter {
                 packets[w][h] = MathUtils.normalise(packets[w][h], minPacketVal, maxPacketVal);
             }
         }
+        logger.log(Level.FINE, "Image packets normalised");
 
         // Finally, modify the image according to the packet specifications
         for (int w = 0; w < imgWidth; w++) {
@@ -120,6 +127,7 @@ public class Plotter {
                 pixels[h * imgWidth + w] = colourMap[numDifferentColours - intensity - 1];  // Reverse intensity order
             }
         }
+        logger.log(Level.FINE, "Image pixels set");
     }
 
     // Private methods

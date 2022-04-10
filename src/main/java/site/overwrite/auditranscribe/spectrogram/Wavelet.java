@@ -100,7 +100,7 @@ public class Wavelet {
         }
 
         // Find frequency cutoff
-        double freqCutoff = Double.MIN_VALUE;
+        double freqCutoff = -Double.MAX_VALUE;
         double bandwidth = window.window.getBandwidth();
 
         for (int i = 0; i < numFreqs; i++) {

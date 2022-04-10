@@ -7,5 +7,4 @@ Todo:
         - We would probably save the spectrogram data as that takes the longest to generate
 
 Fixme:
-    - Spectrogram seems to be very noisy...
-        - NOT problem with audio sample processing, FFT, STFT, or VQT
+    - 'Beam' of the A440 note is too wide

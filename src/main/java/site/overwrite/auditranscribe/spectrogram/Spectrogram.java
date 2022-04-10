@@ -31,6 +31,8 @@ public class Spectrogram {
     final int NUM_FREQ_BINS = 240;  // Should be a multiple of `BINS_PER_OCTAVE`
     final double INTENSITY_PRECISION = 0.001;
 
+    final double TOP_DB = 80;
+
     final boolean IS_CQT = false;
     final double GAMMA = 0;  // If not `IS_CQT` and `GAMMA` is 0 then gamma will be determined automatically
 
@@ -161,10 +163,26 @@ public class Spectrogram {
         }
 
         // Now convert all moduli into decibel numbers
+        double maxDB = -Double.MAX_VALUE;
+
         double[][] magnitudes = new double[numRows][numCols];
         for (int i = 0; i < numRows; i++) {
             for (int j = 0; j < numCols; j++) {
-                magnitudes[i][j] = UnitConversion.amplitudeToDecibel(moduli[i][j], maxModulus);
+                // Get the decibel value for this amplitude
+                double dbVal = UnitConversion.amplitudeToDecibel(moduli[i][j], maxModulus);
+
+                // Add it into the magnitudes array
+                magnitudes[i][j] = dbVal;
+
+                // Update maximum decibel value as needed
+                if (maxDB < dbVal) maxDB = dbVal;
+            }
+        }
+
+        // Now fix the decibel values
+        for (int i = 0; i < numRows; i++) {
+            for (int j = 0; j < numCols; j++) {
+                magnitudes[i][j] = Math.max(magnitudes[i][j], maxDB - TOP_DB);
             }
         }
 

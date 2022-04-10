@@ -348,6 +348,10 @@ public class Audio {
                     // Take average of left and right channels' samples
                     monoAudioSamples[i] = (audioSamples[i * 2] + audioSamples[i * 2 + 1]) / 2;
                 }
+            } else {  // Mono
+                // Fill in the mono audio samples array
+                monoAudioSamples = new double[numSamples];
+                System.arraycopy(audioSamples, 0, monoAudioSamples, 0, numSamples);
             }
 
             // Close the audio stream

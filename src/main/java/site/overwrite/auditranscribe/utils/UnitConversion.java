@@ -2,7 +2,7 @@
  * UnitConversion.java
  *
  * Created on 2022-03-12
- * Updated on 2022-03-15
+ * Updated on 2022-04-09
  *
  * Description: Unit conversion methods.
  */
@@ -21,6 +21,9 @@ import static java.util.Map.entry;
  * Unit conversion methods.
  */
 public class UnitConversion {
+    // Constants
+    static final double A_MIN = 1e-10;  // Minimum amplitude for `powerToDB`
+
     // Notes conversion
 
     /**
@@ -45,8 +48,8 @@ public class UnitConversion {
      * @return Note number for the given note.
      * @throws InvalidParameterException If the note format is incorrect.
      * @implNote Double sharp and double flat are not currently supported.
-     * Todo: find a way to incorporate double sharp and double flat
      */
+    // Todo: find a way to incorporate double sharp and double flat
     public static int noteToNoteNumber(String note) {
         // Define constants
         final Map<String, Integer> PITCH_MAP = Map.ofEntries(
@@ -109,7 +112,32 @@ public class UnitConversion {
      * notes have been tuned to A440.
      */
     public static double noteNumberToFreq(int noteNumber) {
-        return 440 * Math.pow(2, (noteNumber - 57.) / 12);
+        return 440 * Math.pow(2, (noteNumber - 57d) / 12);
+    }
+
+    /**
+     * Converts a note number to its spelled note.<br>
+     * Note that the note number for C0 is 0 and subsequent note numbers are given by their offset
+     * from C0. For example, A4 has note number 57 as it is 57 notes away from C0.
+     *
+     * @param noteNumber Note number for the given note.
+     * @return  Note string. Note that all notes with accidentals will be changed to those with
+     *          SHARPS (#) only.
+     */
+    // Todo: incorporate correct note conversion with scale/key consideration (i.e. add flats as well)
+    public static String noteNumberToNote(int noteNumber) {
+        // Constant array of pitch/offset strings
+        final String[] keyStrings = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+
+        // Compute the octave and the key value
+        int octave = Math.floorDiv(noteNumber, 12);  // Note that C0 has note number 0, C1 is 12, C2 is 24 etc.
+        int key = noteNumber % 12;  // 0 = C, 1 = C#, 2 = D, 3 = D# etc.
+
+        // Get the pitch/offset string
+        String keyString = keyStrings[key];
+
+        // Return the full string
+        return keyString + octave;  // Example: C0, D#3, E5 etc.
     }
 
     // Magnitude Scaling - Unit Conversion
@@ -127,9 +155,12 @@ public class UnitConversion {
      * Librosa's Implementation</a> of this function.
      */
     public static double powerToDecibel(double power, double refVal) {
+        // Treat the reference value
+        refVal = Math.abs(refVal);
+
         // Calculate decibel
-        double logSpec = 10 * Math.log10(Math.max(Double.MIN_VALUE, power));
-        logSpec -= 10 * Math.log10(Math.max(Double.MIN_VALUE, refVal));
+        double logSpec = 10 * Math.log10(Math.max(A_MIN, power));
+        logSpec -= 10 * Math.log10(Math.max(A_MIN, refVal));
 
         // Return it
         return logSpec;
@@ -151,5 +182,25 @@ public class UnitConversion {
      */
     public static double amplitudeToDecibel(double amplitude, double refVal) {
         return powerToDecibel(amplitude * amplitude, refVal * refVal);
+    }
+
+    // Graphics Units Conversion
+
+    /**
+     * Function that converts pixels to points.
+     * @param px    Number of pixels.
+     * @return  Point value.
+     */
+    public static double pxToPt(double px) {
+        return 0.75 * px;
+    }
+
+    /**
+     * Function that converts points to pixels.
+     * @param pt    Number of points.
+     * @return  Pixel value.
+     */
+    public static double ptToPx(double pt) {
+        return (4./3) * pt;
     }
 }

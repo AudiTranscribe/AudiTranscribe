@@ -54,7 +54,7 @@ public class NoteStuffAdder {
 
             // Make the label centred
             noteLabel.setPrefWidth(width);
-            noteLabel.setAlignment(Pos.CENTER);
+            noteLabel.setAlignment(Pos.BASELINE_CENTER);  // Todo: check if positioning is correct
 
             // Add the label to the plane
             notePane.getChildren().add(noteLabel);
