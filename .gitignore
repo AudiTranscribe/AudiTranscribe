@@ -29,6 +29,8 @@ out/
 *.iws
 
 # Others
+[Tt]est-*
+
 .DS_Store
 Updating Legacy JAR With Module-Info.txt
 VQT_data.txt
