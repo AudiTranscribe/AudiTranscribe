@@ -61,7 +61,7 @@ public class SpectrogramViewController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         // Get the audio file
         try {
-            Audio audio = new Audio("testing-audio-files/Tones.wav");
+            Audio audio = new Audio("testing-audio-files/LevelsOfC.wav");
 
             // Generate spectrogram
             Spectrogram spectrogram = new Spectrogram(audio, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER, BINS_PER_OCTAVE,120, 72, 1024);
@@ -102,8 +102,9 @@ public class SpectrogramViewController implements Initializable {
             spectrogramImage.setFitWidth(finalHeight);
             spectrogramImage.setImage(image);
 
-            // Add note labels
+            // Add note labels and lines
             NoteStuffAdder.addNoteLabels(notePane, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER);
+            NoteStuffAdder.addNoteLines(spectrogramPaneAnchor, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER);
 
             // Resize image pane
             spectrogramImage.setFitWidth(finalWidth);

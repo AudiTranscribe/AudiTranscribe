@@ -2,7 +2,7 @@
  * InterpolationTest.java
  *
  * Created on 2022-03-14
- * Updated on 2022-03-14
+ * Updated on 2022-04-13
  *
  * Description: Test `Interpolation.java`.
  */
@@ -14,6 +14,69 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class InterpolationTest {
+    @Test
+    void nearestNeighbour() {
+        // Define arrays
+        double[][] A = new double[][]{
+                {1, 1, 1},
+                {1, 1, 1}
+        };
+        double[][] B = new double[][]{
+                {2, 2, 2},
+                {2, 2, 2}
+        };
+        double[][] C = new double[][]{
+                {3, 4},
+                {5, 6}
+        };
+        double[][] D = new double[][]{
+                {1, 2},
+                {3, 4}
+        };
+        double[][] E = new double[][]{
+                {1, 2, 3},
+                {4, 5, 6}
+        };
+
+        double[][] interpA = new double[][]{
+                {1, 1, 1, 1, 1, 1, 1},
+                {1, 1, 1, 1, 1, 1, 1},
+                {1, 1, 1, 1, 1, 1, 1}
+        };
+        double[][] interpB = new double[][]{
+                {2, 2, 2, 2},
+                {2, 2, 2, 2},
+                {2, 2, 2, 2},
+                {2, 2, 2, 2}
+        };
+        double[][] interpC = new double[][]{
+                {3, 3, 4},
+                {3, 3, 4},
+                {5, 5, 6}
+        };
+        double[][] interpD = new double[][]{
+                {1, 1, 1, 2, 2},
+                {1, 1, 1, 2, 2},
+                {1, 1, 1, 2, 2},
+                {3, 3, 3, 4, 4},
+                {3, 3, 3, 4, 4},
+        };
+        double[][] interpE = new double[][]{
+                {1, 1, 2, 2, 3},
+                {1, 1, 2, 2, 3},
+                {1, 1, 2, 2, 3},
+                {4, 4, 5, 5, 6},
+                {4, 4, 5, 5, 6}
+        };
+
+        // Assertions
+        assertArrayEquals(interpA, Interpolation.interpolate(A, 3, 7, InterpolationMethod.NEAREST_NEIGHBOUR));
+        assertArrayEquals(interpB, Interpolation.interpolate(B, 4, 4, InterpolationMethod.NEAREST_NEIGHBOUR));
+        assertArrayEquals(interpC, Interpolation.interpolate(C, 3, 3, InterpolationMethod.NEAREST_NEIGHBOUR));
+        assertArrayEquals(interpD, Interpolation.interpolate(D, 5, 5, InterpolationMethod.NEAREST_NEIGHBOUR));
+        assertArrayEquals(interpE, Interpolation.interpolate(E, 5, 5, InterpolationMethod.NEAREST_NEIGHBOUR));
+    }
+
     @Test
     void bilinear() {
         // Define arrays
@@ -70,10 +133,11 @@ class InterpolationTest {
                 {4, 4.5, 5, 5.5, 6}
         };
 
-        assertArrayEquals(interpA, Interpolation.bilinear(A, 3, 7));
-        assertArrayEquals(interpB, Interpolation.bilinear(B, 4, 4));
-        assertArrayEquals(interpC, Interpolation.bilinear(C, 3, 3));
-        assertArrayEquals(interpD, Interpolation.bilinear(D, 5, 5));
-        assertArrayEquals(interpE, Interpolation.bilinear(E, 5, 5));
+        // Assertions
+        assertArrayEquals(interpA, Interpolation.interpolate(A, 3, 7, InterpolationMethod.BILINEAR));
+        assertArrayEquals(interpB, Interpolation.interpolate(B, 4, 4, InterpolationMethod.BILINEAR));
+        assertArrayEquals(interpC, Interpolation.interpolate(C, 3, 3, InterpolationMethod.BILINEAR));
+        assertArrayEquals(interpD, Interpolation.interpolate(D, 5, 5, InterpolationMethod.BILINEAR));
+        assertArrayEquals(interpE, Interpolation.interpolate(E, 5, 5, InterpolationMethod.BILINEAR));
     }
 }

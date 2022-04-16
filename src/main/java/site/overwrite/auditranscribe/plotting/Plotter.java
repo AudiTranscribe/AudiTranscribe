@@ -2,7 +2,7 @@
  * Plotter.java
  *
  * Created on 2022-02-18
- * Updated on 2022-04-13
+ * Updated on 2022-04-16
  *
  * Description: Class that contains plotting functions.
  */
@@ -25,6 +25,9 @@ import java.util.logging.Logger;
  * This is a class that helps generate an image, given spectrogram magnitude data.
  */
 public class Plotter {
+    // Constants
+    public final InterpolationMethod interpolationMethod = InterpolationMethod.BILINEAR;
+
     // Attributes
     private final double inverseIntensityPrecision;
 
@@ -95,6 +98,7 @@ public class Plotter {
          * - A packet does NOT contain the RGB values for a pixel. It only contains a `double` value
          *   representing the relative 'intensity' that should be shown on the pixel.
          */
+        double[][] packets = Interpolation.interpolate(spectrogramMagnitudes, imgHeight, imgWidth, interpolationMethod);
         packets = ArrayUtils.transpose(packets);  // Make dimensions (width, height) instead of (height, width)
         logger.log(Level.FINE, "Image packets generated");
 
