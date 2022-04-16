@@ -2,7 +2,7 @@
  * ArrayUtilsTest.java
  *
  * Created on 2022-03-12
- * Updated on 2022-04-10
+ * Updated on 2022-04-13
  *
  * Description: Test `ArrayUtils.java`.
  */
@@ -120,7 +120,7 @@ class ArrayUtilsTest {
     }
 
     @Test
-    void matmul() {
+    void matmulComplex() {
         // Define matrices
         Complex[][] A = new Complex[][]{
                 {new Complex(1, 0), new Complex(0, -1)},
@@ -136,7 +136,7 @@ class ArrayUtilsTest {
                 {new Complex(-3, 0), new Complex(-3, 0)}
         };
 
-        // Matrix multiplication results
+        // Expected matrix multiplication results
         Complex[][] X = new Complex[][]{
                 {new Complex(2, 0), new Complex(0, 0)},
                 {new Complex(0, 0), new Complex(2, 0)}
@@ -151,9 +151,66 @@ class ArrayUtilsTest {
                 {new Complex(-3, -3), new Complex(-6, -6), new Complex(-3, -3)}
         };
 
+        // Actual matrix multiplication results
+        Complex[][] AA = ArrayUtils.matmul(A, A);
+        Complex[][] BC = ArrayUtils.matmul(B, C);
+        Complex[][] CB = ArrayUtils.matmul(C, B);
+
         // Assertions
-        assertArrayEquals(X, ArrayUtils.matmul(A, A));
-        assertArrayEquals(Y, ArrayUtils.matmul(B, C));
-        assertArrayEquals(Z, ArrayUtils.matmul(C, B));
+        assertArrayEquals(X, AA);
+        assertArrayEquals(Y, BC);
+        assertArrayEquals(Z, CB);
+    }
+
+    @Test
+    void matmulDouble() {
+        // Define matrices
+        double[][] A = {
+                {1, 2, 3},
+                {4, 5, 6},
+                {7, 8, 9}
+        };
+        double[][] B = {
+                {10, 11, 12},
+                {13, 14, 15}
+        };
+        double[][] C = {
+                {0.1, 0.2},
+                {0.3, 0.4},
+                {0.5, 0.6}
+        };
+
+        // Expected matrix multiplication results
+        double[][] X = {
+                {30, 36, 42},
+                {66, 81, 96},
+                {102, 126, 150}
+        };
+        double[][] Y = {
+                {10.3, 13.6},
+                {13, 17.2}
+        };
+        double[][] Z = {
+                {3.6, 3.9, 4.2},
+                {8.2, 8.9, 9.6},
+                {12.8, 13.9, 15}
+        };
+
+        // Actual matrix multiplication results
+        double[][] AA = ArrayUtils.matmul(A, A);
+        double[][] BC = ArrayUtils.matmul(B, C);
+        double[][] CB = ArrayUtils.matmul(C, B);
+
+        // Assertions
+        assertArrayEquals(X[0], AA[0], 0.001);
+        assertArrayEquals(X[1], AA[1], 0.001);
+        assertArrayEquals(X[2], AA[2], 0.001);
+
+        assertArrayEquals(Y[0], BC[0], 0.001);
+        assertArrayEquals(Y[1], BC[1], 0.001);
+
+        assertArrayEquals(Z[0], CB[0], 0.001);
+        assertArrayEquals(Z[1], CB[1], 0.001);
+        assertArrayEquals(Z[2], CB[2], 0.001);
     }
 }

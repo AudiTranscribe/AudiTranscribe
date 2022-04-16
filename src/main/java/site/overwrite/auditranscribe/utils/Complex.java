@@ -16,6 +16,11 @@ import java.util.Objects;
  * Class that helps create complex numbers and perform operations on them.
  */
 public class Complex {
+    // Useful constants
+    public static final Complex ZERO = new Complex(0, 0);
+    public static final Complex ONE = new Complex(1, 0);
+    public static final Complex IMAG_UNIT = new Complex(0, 1);
+
     // Attributes
     private double re;  // Real part of the complex number
     private double im;  // Imaginary part of the complex number

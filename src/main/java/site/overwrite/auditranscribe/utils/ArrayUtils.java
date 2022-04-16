@@ -2,16 +2,14 @@
  * ArrayUtils.java
  *
  * Created on 2022-02-16
- * Updated on 2022-03-15
+ * Updated on 2022-04-15
  *
  * Description: Array utilities to modify and change arrays.
  */
 
 package site.overwrite.auditranscribe.utils;
 
-import java.lang.reflect.Array;
 import java.security.InvalidParameterException;
-import java.util.Arrays;
 
 /**
  * Array utilities.
@@ -230,16 +228,16 @@ public class ArrayUtils {
      * @param array The array to pad.
      * @param size  The size to make the array.
      * @return Padded array where the length is now <code>size</code>.
-     * @throws IllegalArgumentException If <code>size</code> is negative.
+     * @throws IllegalArgumentException If <code>size</code> is smaller than the input size.
      */
     public static Complex[] padCenter(Complex[] array, int size) {
-        // Assert `size` is non-negative
-        if (size < 0) {
-            throw new IllegalArgumentException("Invalid size " + size);
-        }
-
         // Get length of the array
         int n = array.length;
+
+        // Assert that the length of the data at least the desired size
+        if (size < n) {
+            throw new IllegalArgumentException("Target size (" + size + ") must be at least input size (" + n + ")");
+        }
 
         // If `n` is `size` just return the array
         if (n == size) {
@@ -252,7 +250,7 @@ public class ArrayUtils {
         // Fill in the output array
         Complex[] output = new Complex[size];
         for (int i = 0; i < size; i++) {
-            output[i] = new Complex(0, 0);
+            output[i] = Complex.ZERO;
         }
 
         // Copy the existing array into the array
@@ -452,6 +450,46 @@ public class ArrayUtils {
                 Complex currElem = new Complex(0, 0);
                 for (int k = 0; k < m; k++) {
                     currElem = currElem.plus(Complex.times(A[i][k], B[k][j]));
+                }
+
+                // Set the current element to the output matrix
+                output[i][j] = currElem;
+            }
+        }
+
+        // Return the output
+        return output;
+    }
+
+    /**
+     * Matrix multiply two real-numbered matrices.
+     * Todo: see if can make this more efficient.
+     *
+     * @param A The first matrix.
+     * @param B The second matrix.
+     * @return The multiplied matrix.
+     * @throws InvalidParameterException If the matrix sizes are not suitable for multiplication.
+     * @see <a href="https://en.wikipedia.org/wiki/Matrix_multiplication_algorithm">This article</a>
+     * on the naiive implementation on the Matrix Multiplication algorithm.
+     */
+    public static double[][] matmul(double[][] A, double[][] B) {
+        // Check if the matrices can be multiplied
+        if (A[0].length != B.length) {
+            throw new InvalidParameterException("Matrix sizes not suitable for multiplication");
+        }
+
+        // Otherwise, perform matrix multiplication
+        int n = A.length;
+        int m = A[0].length;
+        int p = B[0].length;
+
+        double[][] output = new double[A.length][B[0].length];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < p; j++) {
+                // Calculate the value of the current element
+                double currElem = 0;
+                for (int k = 0; k < m; k++) {
+                    currElem += A[i][k] * B[k][j];
                 }
 
                 // Set the current element to the output matrix

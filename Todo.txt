@@ -5,6 +5,3 @@ Todo:
     - Validate audio length
     - Implement file saving
         - We would probably save the spectrogram data as that takes the longest to generate
-
-Fixme:
-    - 'Beam' of the A440 note is too wide

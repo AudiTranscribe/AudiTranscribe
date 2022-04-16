@@ -2,7 +2,7 @@
  * AbstractWindow.java
  *
  * Created on 2022-03-11
- * Updated on 2022-03-15
+ * Updated on 2022-04-15
  *
  * Description: Abstract window class that implements most methods needed by window classes.
  */
@@ -39,6 +39,14 @@ public abstract class AbstractWindow {
      * @return The window array.
      */
     public double[] generateWindow(int length, boolean symmetric) {
+        // Check if the length is valid
+        if (lengthGuard(length)) {
+            // Special case: return only ones
+            double[] specialCaseArray = new double[length];
+            if (length == 1) specialCaseArray[0] = 1;
+            return specialCaseArray;
+        }
+
         // Check if we need to extend the window
         Pair<Integer, Boolean> extendResponse = extend(length, symmetric);
         int newLength = extendResponse.getKey();
@@ -46,8 +54,8 @@ public abstract class AbstractWindow {
 
         // Generate the window
         double[] window = new double[newLength];
-        for (int i = 0; i < length; i++) {
-            window[i] = windowFunc(i, length);
+        for (int n = 0; n < newLength; n++) {
+            window[n] = windowFunc(n, newLength);
         }
 
         // Return the (possibly) truncated window
@@ -65,6 +73,19 @@ public abstract class AbstractWindow {
      */
     double windowFunc(int k, int length) {
         return 0;
+    }
+
+    /**
+     * Helper function to handle small or incorrect window lengths.
+     * @return  A boolean whether the length is smaller than or equal to 1.
+     * @throws NegativeArraySizeException If the length is negative.
+     */
+    boolean lengthGuard(int length) throws NegativeArraySizeException {
+        if (length < 0) {
+            throw new NegativeArraySizeException("Window length must be a non-negative integer");
+        } else {
+            return (length <= 1);
+        }
     }
 
     /**

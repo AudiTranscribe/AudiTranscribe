@@ -2,7 +2,7 @@
  * FFT.java
  *
  * Created on 2022-02-12
- * Updated on 2022-04-10
+ * Updated on 2022-04-16
  *
  * Description: Class that implements the Fast Fourier Transform (FFT) algorithm.
  *
@@ -23,6 +23,31 @@ import java.util.Arrays;
  */
 public class FFT {
     // Public methods
+
+    /**
+     * Computes the FFT of the input array <code>x</code>.<br>
+     * This assumes that the length of the input array, say <code>N</code>, is a power of 2.
+     *
+     * @param x The real-number array <code>x</code> representing the data source.
+     * @return An array of <code>Complex</code> objects representing the FFT of the data source.
+     * @throws RuntimeException If the length of <code>x</code> is not a power of 2.
+     * @implNote The array returned has length <code>N / 2 + 1</code>, so that only the non-negative
+     * frequencies are returned.
+     */
+    public static Complex[] fft(double[] x) {
+        // Get the length of the array `x`
+        int n = x.length;
+
+        // Convert `x` into a complex number array
+        Complex[] z = new Complex[n];
+
+        for (int i = 0; i < n; i++) {
+            z[i] = new Complex(x[i]);
+        }
+
+        // Now run the FFT on this complex number array
+        return fft(z);
+    }
 
     /**
      * Computes the FFT of the input array <code>x</code>.<br>

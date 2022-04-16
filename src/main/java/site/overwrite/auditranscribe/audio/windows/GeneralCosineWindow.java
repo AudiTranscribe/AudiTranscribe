@@ -2,7 +2,7 @@
  * GeneralCosineWindow.java
  *
  * Created on 2022-03-12
- * Updated on 2022-04-10
+ * Updated on 2022-04-15
  *
  * Description: Class that encapsulates the General Cosine window function.
  */
@@ -22,25 +22,28 @@ public abstract class GeneralCosineWindow extends AbstractWindow {
     // Protected methods
 
     /**
-     * Method that generates the window value for a specific index <code>k</code>.
+     * Method that generates the window value for a specific index <code>n</code>.
      *
-     * @param k      Index of the window. Note that this is 1-indexed.
+     * @param n      Index of the window. Note that this is 1-indexed.
      * @param length Total length of the window.
-     * @return Double representing the window value at index <code>k</code>.
+     * @return Double representing the window value at index <code>n</code>.
      */
-    double windowFunc(int k, int length) {
+    double windowFunc(int n, int length) {
         // Get the number of `a` coefficients
         int numACoefficients = aCoefficients.length;
 
-        // Calculate the window value at index `k`
+        // Calculate the window value at index `n`
         double winVal = 0;
-        for (int i = 0; i < numACoefficients; i++) {
-            // Determine the sign
-            double sign = 1;
-            if (i % 2 == 1) sign = -1;
+        for (int k = 0; k < numACoefficients; k++) {
+            // Determine the change in window value
+            double changeInValue = aCoefficients[k] * Math.cos(2 * Math.PI * k * n / (length - 1));
 
-            // Compute the window value proper
-            winVal += sign * aCoefficients[i] * Math.cos(2 * Math.PI * i * k / length);
+            // Determine whether to add or subtract from the window value
+            if (k % 2 == 0) {
+                winVal += changeInValue;
+            } else {
+                winVal -= changeInValue;
+            }
         }
 
         // Return the window value

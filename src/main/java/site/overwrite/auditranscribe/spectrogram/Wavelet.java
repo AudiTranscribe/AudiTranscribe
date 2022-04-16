@@ -2,7 +2,7 @@
  * Wavelet.java
  *
  * Created on 2022-02-13
- * Updated on 2022-04-10
+ * Updated on 2022-04-16
  *
  * Description: Class to implement audio windowing functions.
  */
@@ -32,10 +32,10 @@ public class Wavelet {
      * @param freqs         Array containing the centers of all the frequency bins.
      * @param sr            Sample rate.
      * @param window        Window function to use.
+     * @param filterScale   Scaling factor for the filter.
      * @param isCQT         Whether this is a CQT or not.
      * @param gammaValue    Default gamma value to use.
      * @param fallbackAlpha Fallback alpha value if the alpha value cannot be calculated.
-     * @param filterScale   Scaling factor for the filter.
      * @return Pair of values. First value represents the wavelet lengths. Second value represents
      * frequency cutoff.
      * @see <a href="https://www.sciencedirect.com/science/article/abs/pii/037859559090170T">This
@@ -43,8 +43,7 @@ public class Wavelet {
      * from notched-noise data." Hearing research 47.1-2 (1990): 103-138.
      */
     public static Pair<double[], Double> computeWaveletLengths(
-            double[] freqs, double sr, Window window, boolean isCQT, double gammaValue, double fallbackAlpha,
-            double filterScale
+            double[] freqs, double sr, Window window, double filterScale, boolean isCQT, double gammaValue, double fallbackAlpha
     ) {
         // Check the number of frequencies provided
         int numFreqs = freqs.length;
@@ -60,11 +59,11 @@ public class Wavelet {
             // Approximate the local octave resolution
             double[] bpo = new double[numFreqs];
 
-            bpo[0] = 1 / (logFreqs[1] - logFreqs[0]);  // First element case
-            bpo[numFreqs - 1] = 1 / (logFreqs[numFreqs - 1] - logFreqs[numFreqs - 2]);  // Last element case
+            bpo[0] = 1. / (logFreqs[1] - logFreqs[0]);  // First element case
+            bpo[numFreqs - 1] = 1. / (logFreqs[numFreqs - 1] - logFreqs[numFreqs - 2]);  // Last element case
 
             for (int i = 1; i < numFreqs - 1; i++) {  // Intermediate elements case
-                bpo[i] = 2 / (logFreqs[i + 1] - logFreqs[i - 1]);
+                bpo[i] = 2. / (logFreqs[i + 1] - logFreqs[i - 1]);
             }
 
             // Calculate alphas for each frequency bin
@@ -104,7 +103,7 @@ public class Wavelet {
         double bandwidth = window.window.getBandwidth();
 
         for (int i = 0; i < numFreqs; i++) {
-            double possibleCutoff = freqs[i] * (1 + 0.5 * bandwidth / Q[i]) + 0.5 * gammas[i];
+            double possibleCutoff = freqs[i] * (1. + 0.5 * bandwidth / Q[i]) + 0.5 * gammas[i];
             freqCutoff = Math.max(possibleCutoff, freqCutoff);
         }
 
@@ -150,10 +149,10 @@ public class Wavelet {
                 freqs,
                 sr,
                 window,
+                filterScale,
                 isCQT,
                 gamma,
-                alpha,
-                filterScale
+                alpha
         );
         double[] lengths = waveletLengthsResult.getKey();
         int numLengths = lengths.length;

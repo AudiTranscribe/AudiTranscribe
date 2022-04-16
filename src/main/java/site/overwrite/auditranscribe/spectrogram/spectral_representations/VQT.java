@@ -2,7 +2,7 @@
  * VQT.java
  *
  * Created on 2022-03-11
- * Updated on 2022-04-10
+ * Updated on 2022-04-16
  *
  * Description: Class that implements the Variable Q-Transform (VQT) algorithm.
  */
@@ -23,6 +23,8 @@ import site.overwrite.auditranscribe.utils.MathUtils;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * VQT class that contains Variable-Q Transform methods.
@@ -37,6 +39,9 @@ import java.util.List;
 public class VQT {
     // Constants
     static final double BW_FASTEST = 0.85;
+
+    // Attributes
+    static final Logger logger = Logger.getLogger(VQT.class.getName());
 
     // Public methods
 
@@ -125,7 +130,7 @@ public class VQT {
 
         // Compute filter cutoff
         Pair<double[], Double> waveletLengthsResponse = Wavelet.computeWaveletLengths(
-                freqs, sr, window, isCQT, gamma, alpha, 1.
+                freqs, sr, window, 1., isCQT, gamma, alpha
         );
         double filterCutoff = waveletLengthsResponse.getValue();
 
@@ -151,12 +156,12 @@ public class VQT {
         Triple<double[], Double, Integer> earlyDownsampleResponse = earlyDownsample(
                 y, sr, hopLength, filter, numOctaves, nyquistFrequency, filterCutoff
         );
-        double[] yNew = earlyDownsampleResponse.getLeft();
-        double srNew = earlyDownsampleResponse.getMiddle();
-        int hopLengthNew = earlyDownsampleResponse.getRight();
+        y = earlyDownsampleResponse.getLeft();
+        sr = earlyDownsampleResponse.getMiddle();
+        hopLength = earlyDownsampleResponse.getRight();
 
         // Define VQT response array
-        List<Complex[][]> vqtResponses = new ArrayList<>();  // Todo: can we get a fixed size array?
+        List<Complex[][]> vqtResponses = new ArrayList<>();
 
         // Handle first octave specially if the filter type is NOT `KAISER_FAST`
         int startingOctave = 0;
@@ -168,13 +173,13 @@ public class VQT {
 
             // Do the top octave before resampling to allow for fast resampling
             Triple<Complex[][], Integer, double[]> fftFilterResponse = vqtFilterFFT(
-                    srNew, freqsOct, window, isCQT, gamma, alpha
+                    sr, freqsOct, window, isCQT, gamma, alpha
             );
             Complex[][] fftBasis = fftFilterResponse.getLeft();
             int numFFT = fftFilterResponse.getMiddle();
 
             // Compute the VQT filter response and append it to the list
-            vqtResponses.add(vqtResponse(yNew, numFFT, hopLengthNew, fftBasis));
+            vqtResponses.add(vqtResponse(y, numFFT, hopLength, fftBasis));
 
             // Update values
             startingOctave = 1;
@@ -182,13 +187,12 @@ public class VQT {
         }
 
         // Iterate down the octaves
-        double[] myY = yNew;
-        double mySR = srNew;
-        int myHopLength = hopLengthNew;
+        double[] myY = y;
+        double mySR = sr;
+        int myHopLength = hopLength;
 
         for (int octave = startingOctave; octave < numOctaves; octave++) {  // Starts from the HIGHEST frequencies
             // Get the frequencies of the current octave
-            // Fixme: This may be incorrect with early downsampling
             double[] freqsOct = new double[binsPerOctave];
             System.arraycopy(freqs, numBins - binsPerOctave * (octave + 1), freqsOct, 0, binsPerOctave);
 
@@ -202,7 +206,7 @@ public class VQT {
             // Re-scale the filters to compensate for downsampling
             for (int i = 0; i < fftBasis.length; i++) {
                 for (int j = 0; j < fftBasis[0].length; j++) {
-                    fftBasis[i][j] = fftBasis[i][j].scale(Math.sqrt(srNew / mySR));
+                    fftBasis[i][j] = fftBasis[i][j].scale(Math.sqrt(sr / mySR));
                 }
             }
 
@@ -218,29 +222,27 @@ public class VQT {
             }
         }
 
-        // Convert the VQT responses list to an array
-        // Todo: try and do this at the start
-        int[] shape = new int[]{numOctaves, vqtResponses.get(0).length, vqtResponses.get(0)[0].length};
-        Complex[][][] vqtResponsesArray = new Complex[shape[0]][shape[1]][shape[2]];
-        vqtResponses.toArray(vqtResponsesArray);
+        // Trim and stack the VQT responses
+        Complex[][] V = trimAndStack(vqtResponses, numBins);
 
-        // Trim and stack the array
-        Complex[][] V = trimAndStack(vqtResponsesArray, numBins);
+        // Get the maximum column size
+        int maxCol = V[0].length;
 
         // Recompute lengths here because early downsampling may have changed our sampling rate
-        waveletLengthsResponse = Wavelet.computeWaveletLengths(freqs, srNew, window, isCQT, gamma, alpha, 1.);
+        waveletLengthsResponse = Wavelet.computeWaveletLengths(freqs, sr, window, 1., isCQT, gamma, alpha);
         double[] lengths = waveletLengthsResponse.getKey();
 
         // Scale `V` back to normal
         for (int i = 0; i < numBins; i++) {
             double scaleFactor = Math.sqrt(lengths[i]);
 
-            for (int j = 0; j < shape[2]; j++) {
+            for (int j = 0; j < maxCol; j++) {
                 V[i][j] = V[i][j].divides(scaleFactor);
             }
         }
 
         // Return VQT matrix
+        logger.log(Level.FINE, "VQT Matrix generated; has shape (" + V.length + ", " + V[0].length + ")");
         return V;
     }
 
@@ -255,12 +257,12 @@ public class VQT {
     public static double[] getFreqBins(int numBins, int binsPerOctave, double fmin) {
         double[] frequencies = new double[numBins];
 
-        for (int i = 0; i < numBins; i++) {
+        for (double i = 0; i < numBins; i++) {
             // Calculate the frequency of the current frequency bin
-            double freq = fmin * Math.pow(2, (double) i / binsPerOctave);
+            double freq = fmin * Math.pow(2, i / binsPerOctave);
 
             // Append it to the list of frequencies
-            frequencies[i] = freq;
+            frequencies[(int) i] = freq;
         }
 
         return frequencies;
@@ -362,7 +364,7 @@ public class VQT {
 
         // Re-normalize bases with respect to the FFT window length
         for (int i = 0; i < fftWindowLength; i++) {
-            double normalisationFactor = lengths[i] / (double) numFFT;
+            double normalisationFactor = lengths[i] / numFFT;
 
             for (int j = 0; j < numFFT; j++) {
                 basis[i][j] = basis[i][j].scale(normalisationFactor);
@@ -391,7 +393,6 @@ public class VQT {
     private static Complex[][] vqtResponse(double[] y, int numFFT, int hopLength, Complex[][] fftBasis) {
         // Get the STFT matrix
         Complex[][] D = STFT.stft(y, numFFT, hopLength, Window.ONES_WINDOW);
-        System.out.println(fftBasis.length + " " + fftBasis[0].length + " " + D.length + " " + D[0].length);
 
         // Matrix multiply `fftBasis` with `D` and return the result
         return ArrayUtils.matmul(fftBasis, D);
@@ -404,7 +405,7 @@ public class VQT {
      * @param numBins      Number of bins for the VQT.
      * @return Trimmed and stacked array of VQT responses.
      */
-    private static Complex[][] trimAndStack(Complex[][][] vqtResponses, int numBins) {
+    private static Complex[][] trimAndStack(List<Complex[][]> vqtResponses, int numBins) {
         // Get the maximum permitted number columns
         // (We take the minimum to avoid weird index errors later when processing magnitudes)
         int maxPermittedNumCol = Integer.MAX_VALUE;

@@ -2,7 +2,7 @@
  * Plotter.java
  *
  * Created on 2022-02-18
- * Updated on 2022-04-10
+ * Updated on 2022-04-13
  *
  * Description: Class that contains plotting functions.
  */
@@ -25,6 +25,7 @@ import java.util.logging.Logger;
  * This is a class that helps generate an image, given spectrogram magnitude data.
  */
 public class Plotter {
+    // Attributes
     private final double inverseIntensityPrecision;
 
     private int numDifferentColours;
@@ -35,6 +36,7 @@ public class Plotter {
 
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
+    // Constructor
     /**
      * Creates a plotter object.
      *
@@ -93,8 +95,6 @@ public class Plotter {
          * - A packet does NOT contain the RGB values for a pixel. It only contains a `double` value
          *   representing the relative 'intensity' that should be shown on the pixel.
          */
-
-        double[][] packets = Interpolation.bilinear(spectrogramMagnitudes, imgHeight, imgWidth);
         packets = ArrayUtils.transpose(packets);  // Make dimensions (width, height) instead of (height, width)
         logger.log(Level.FINE, "Image packets generated");
 
@@ -118,8 +118,8 @@ public class Plotter {
         logger.log(Level.FINE, "Image packets normalised");
 
         // Finally, modify the image according to the packet specifications
-        for (int w = 0; w < imgWidth; w++) {
-            for (int h = 0; h < imgHeight; h++) {
+        for (int h = 0; h < imgHeight; h++) {
+            for (int w = 0; w < imgWidth; w++) {
                 // Calculate intensity of the frequency bin at that spot
                 int intensity = (int) Math.ceil(packets[w][imgHeight - h - 1] * inverseIntensityPrecision);
 
