@@ -2,7 +2,7 @@
  * MainApplication.java
  *
  * Created on 2022-02-09
- * Updated on 2022-03-15
+ * Updated on 2022-04-16
  *
  * Description: Contains the main application class.
  */
@@ -23,7 +23,7 @@ public class MainApplication extends Application {
         System.out.println("Start");
 
 //        // Load the FXML file into the scene
-//        FXMLLoader fxmlLoader = new FXMLLoader(FileUtils.getFile("views/main-view.fxml"));
+//        FXMLLoader fxmlLoader = new FXMLLoader(FileUtils.getFile("views/fxml/main-view.fxml"));
 //        Scene scene = new Scene(fxmlLoader.load());
 //
 //        // Set stage title and scene
@@ -35,13 +35,14 @@ public class MainApplication extends Application {
 //        stage.setMaximized(true);
 //        // stage.setFullScreen(true);
 
-        FXMLLoader fxmlLoader = new FXMLLoader(FileUtils.getFileURL("views/spectrogram-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(FileUtils.getFileURL("views/fxml/spectrogram-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("Spectrogram");
         stage.setScene(scene);
         stage.setMaximized(true);
+        stage.setFullScreen(true);
 
-//        FXMLLoader fxmlLoader = new FXMLLoader(FileUtils.getFileURL("views/file-loader-view.fxml"));
+//        FXMLLoader fxmlLoader = new FXMLLoader(FileUtils.getFileURL("views/fxml/file-loader-view.fxml"));
 //        Scene scene = new Scene(fxmlLoader.load());
 //        stage.setTitle("File Loader");
 //        stage.setScene(scene);

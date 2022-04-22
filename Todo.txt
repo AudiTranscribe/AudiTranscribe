@@ -1,7 +1,10 @@
 Todo:
     - Add JPackage capability
-    - Possibly allow for bicubic interpolation
     - Update README.md
-    - Validate audio length
+    - BPM Selection and Estimation
+        - Before estimation is implemented, allow user to select BPM and show beats lines updating
+    - Menu GUI
+    - Allow audio to play alongside spectrogram
     - Implement file saving
         - We would probably save the spectrogram data as that takes the longest to generate
+    - Add licence/credits for ionicons
