@@ -2,7 +2,7 @@
  * FileUtils.java
  *
  * Created on 2022-03-15
- * Updated on 2022-03-15
+ * Updated on 2022-04-23
  *
  * Description: File utilities.
  */
@@ -28,6 +28,16 @@ public class FileUtils {
      */
     public static URL getFileURL(String filePath) {
         return MainApplication.class.getResource(filePath);
+    }
+
+    /**
+     * Gets a file with respect to the root resource path.
+     *
+     * @param filePath  Path to the file.
+     * @return  A string representing the absolute path to the file.
+     */
+    public static String getFilePath(String filePath) {
+        return getFileURL(filePath).toString();
     }
 
     /**

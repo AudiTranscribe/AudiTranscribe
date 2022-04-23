@@ -9,13 +9,15 @@
 
 package site.overwrite.auditranscribe.utils;
 
+import javafx.scene.input.KeyEvent;
+
 import java.util.Objects;
 
 /**
  * Utilities to assist with validating data.
  */
 public class ValidationUtils {
-    // Public methods
+    // Main validation utilities
 
     /**
      * Validates that the entered string is non-empty.
@@ -165,5 +167,20 @@ public class ValidationUtils {
      */
     public static boolean isInRange(double num, double min, double max) {
         return min <= num && num <= max;
+    }
+
+    // FXML validation utilities
+
+    /**
+     * Validates whether the event is a "key pressed" event that involves a digit being entered.
+     * @param event Event to check.
+     * @return  A boolean: <code>true</code> if it is a digit being entered, and <code>false</code>
+     * otherwise.
+     */
+    public static boolean isEnteredCharDigit(KeyEvent event) {
+        return switch (event.getCode()) {
+            case DIGIT0, DIGIT1, DIGIT2, DIGIT3, DIGIT4, DIGIT5, DIGIT6, DIGIT7, DIGIT8, DIGIT9 -> true;
+            default -> false;
+        };
     }
 }

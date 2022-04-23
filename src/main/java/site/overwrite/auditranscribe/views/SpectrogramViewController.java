@@ -22,10 +22,11 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.shape.Line;
 import javafx.util.Pair;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.Window;
-import site.overwrite.auditranscribe.plotting.NoteStuffAdder;
+import site.overwrite.auditranscribe.plotting.SpectrogramStuffHandler;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
 import site.overwrite.auditranscribe.spectrogram.Spectrogram;
 import site.overwrite.auditranscribe.utils.StyleUtils;
@@ -53,14 +54,15 @@ public class SpectrogramViewController implements Initializable {
             // Compound time signatures
             entry("6/8", 8),
             entry("9/8", 8),
-            entry("12/8",8)
+            entry("12/8", 8)
     );  // See https://en.wikipedia.org/wiki/Time_signature#Characteristics
 
     final Pair<Integer, Integer> BPM_RANGE = new Pair<>(1, 512);  // In the format [min, max]
+    final Pair<Double, Double> OFFSET_RANGE = new Pair<>(-5., 5.);  // In the format [min, max]
 
-    // Attributes
     final double SPECTROGRAM_ZOOM_SCALE_X = 2;
     final double SPECTROGRAM_ZOOM_SCALE_Y = 5;
+    final int PX_PER_SECOND = 120;
     final int BINS_PER_OCTAVE = 60;
 
     final int MIN_NOTE_NUMBER = 0;  // C0
@@ -68,7 +70,19 @@ public class SpectrogramViewController implements Initializable {
 
     final int UPDATE_SCROLLBAR_INTERVAL = 5;  // In milliseconds
 
+    // Attributes
     private final Logger logger = Logger.getLogger(this.getClass().getName());
+
+    private double finalWidth;
+    private double finalHeight;
+    private double audioDuration;
+
+    private String key = "C";
+    private int bpm = 120;
+    private int beatsPerBar = 4;
+    private double offset = 0.;
+
+    private Line[] beatLines;
 
     // FXML Elements
     // Top HBox
@@ -82,7 +96,7 @@ public class SpectrogramViewController implements Initializable {
     private ChoiceBox<String> musicKeyChoice, timeSignatureChoice;
 
     @FXML
-    private TextField BPMField, offsetSecondsField;
+    private TextField bpmField, offsetField;
 
     // Mid-view
     @FXML
@@ -97,45 +111,105 @@ public class SpectrogramViewController implements Initializable {
     @FXML
     private ImageView spectrogramImage;
 
-    // FXML Methods
-    @FXML
-    protected void onFinishedEditingBPMField() {
-        // Get the string from the BPM field
-        String bpmFieldValue = BPMField.getText();
-
+    // Validation methods
+    boolean validateBPMField(String bpmFieldValue) {
         // Check if the `bpmFieldValue` is empty
         if (ValidationUtils.isEmpty(bpmFieldValue)) {
-            BPMField.setStyle(StyleUtils.ERROR_BORDER);
+            bpmField.setStyle(StyleUtils.ERROR_BORDER);
             logger.log(Level.INFO, "Validation: BPM field empty");
-            return;
+            return false;
         }
 
         // Ensure that the `bpmFieldValue` is an integer
         if (!ValidationUtils.isStringInteger(bpmFieldValue)) {
-            BPMField.setStyle(StyleUtils.ERROR_FIELD);
+            bpmField.setStyle(StyleUtils.ERROR_FIELD);
             logger.log(Level.INFO, "Validation: BPM field not an integer");
-            return;
+            return false;
         }
 
         // Ensure that the BPM value lies within the accepted range
         int bpmValue = Integer.parseInt(bpmFieldValue);
 
         if (!ValidationUtils.isInRange(bpmValue, BPM_RANGE.getKey(), BPM_RANGE.getValue())) {
-            BPMField.setStyle(StyleUtils.ERROR_FIELD);
+            bpmField.setStyle(StyleUtils.ERROR_FIELD);
             logger.log(Level.INFO, "Validation: BPM field value out of range");
-            return;
+            return false;
         }
 
         // All checks passed; reset field style
-        logger.log(Level.INFO, "BPM field value updated to " + bpmFieldValue);
-        BPMField.setStyle(null);
+        logger.log(Level.FINE, "BPM field value updated to " + bpmFieldValue);
+        bpmField.setStyle(null);
+        return true;
+    }
 
-        // Todo: update BPM stuff
+    boolean validateOffsetField(String offsetFieldValue) {
+        // Check if the `offsetFieldValue` is empty
+        if (ValidationUtils.isEmpty(offsetFieldValue)) {
+            offsetField.setStyle(StyleUtils.ERROR_BORDER);
+            logger.log(Level.INFO, "Validation: Offset field empty");
+            return false;
+        }
+
+        // Ensure that the `offsetFieldValue` is a double
+        if (!ValidationUtils.isStringDouble(offsetFieldValue)) {
+            offsetField.setStyle(StyleUtils.ERROR_FIELD);
+            logger.log(Level.INFO, "Validation: Offset field not a double");
+            return false;
+        }
+
+        // Ensure that the BPM value lies within the accepted range
+        double offsetValue = Double.parseDouble(offsetFieldValue);
+
+        if (!ValidationUtils.isInRange(offsetValue, OFFSET_RANGE.getKey(), OFFSET_RANGE.getValue())) {
+            offsetField.setStyle(StyleUtils.ERROR_FIELD);
+            logger.log(Level.INFO, "Validation: Offset field value out of range");
+            return false;
+        }
+
+        // All checks passed; reset field style
+        logger.log(Level.FINE, "Offset field value updated to " + offsetFieldValue);
+        offsetField.setStyle(null);
+        return true;
+    }
+
+    // FXML Methods
+    @FXML
+    protected void onFinishedEditingBPMField() {
+        // Remove any leading zeros
+        bpmField.setText(bpmField.getText().replaceFirst("^0+(?!$)", ""));
+
+        // Get the processed string from the BPM field
+        String bpmFieldValue = bpmField.getText();
+
+        // Run validation on the BPM field text
+        if (!validateBPMField(bpmFieldValue)) return;
+
+        // Convert the field value into the new BPM value
+        int newBPM = Integer.parseInt(bpmFieldValue);
+
+        // Update the beat lines
+        beatLines = SpectrogramStuffHandler.updateBeatLines(
+                spectrogramPaneAnchor, beatLines, audioDuration, bpm, newBPM, offset, offset, finalHeight, beatsPerBar,
+                PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+        );
+
+        // Update the BPM value
+        bpm = newBPM;
     }
 
     @FXML
-    protected void onFinishedEditingMusicKeyField() {
-        // Todo: add
+    protected void onFinishedEditingOffsetField() {
+        // Remove any leading zeros, except when there is one zero followed by a decimal point which we will keep
+        offsetField.setText(offsetField.getText().replaceFirst("^0{2,}(?!$)", "0"));
+
+        // Get the string from the offset field
+        String offsetFieldValue = offsetField.getText();
+
+        // Run validation on the offset field text
+        if (!validateOffsetField(offsetFieldValue)) return;
+
+        // Todo: update offset stuff
+        System.out.println("Update offset stuff");
     }
 
     // Initialization function
@@ -145,13 +219,18 @@ public class SpectrogramViewController implements Initializable {
         try {
             Audio audio = new Audio("testing-audio-files/A440.wav");
 
+            // Update audio duration attribute
+            audioDuration = audio.getDuration();
+
             // Generate spectrogram
-            Spectrogram spectrogram = new Spectrogram(audio, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER, BINS_PER_OCTAVE, 120, 72, 1024);
+            Spectrogram spectrogram = new Spectrogram(
+                    audio, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER, BINS_PER_OCTAVE, PX_PER_SECOND, 72, 1024
+            );
             WritableImage image = spectrogram.generateSpectrogram(Window.HANN_WINDOW, ColourScale.VIRIDIS);
 
             // Get the final width and height
-            double finalWidth = image.getWidth() * SPECTROGRAM_ZOOM_SCALE_X;
-            double finalHeight = image.getHeight() * SPECTROGRAM_ZOOM_SCALE_Y;
+            finalWidth = image.getWidth() * SPECTROGRAM_ZOOM_SCALE_X;
+            finalHeight = image.getHeight() * SPECTROGRAM_ZOOM_SCALE_Y;
 
             // Fix panes' properties
             leftPane.setFitToWidth(true);
@@ -184,21 +263,60 @@ public class SpectrogramViewController implements Initializable {
                 musicKeyChoice.getItems().add(musicKey);
             }
 
-            for (String key: TIME_SIGNATURE_TO_BEATS_PER_BAR.keySet()) {
+            for (String key : TIME_SIGNATURE_TO_BEATS_PER_BAR.keySet()) {
                 timeSignatureChoice.getItems().add(key);
             }
 
             musicKeyChoice.setValue("C");
             timeSignatureChoice.setValue("4/4");
 
+            // Set methods on text fields
+            bpmField.textProperty().addListener((observable, oldValue, newValue) -> {
+                // Remove/prevent entering of non-digit characters
+                if (!newValue.matches("\\d*")) {
+                    bpmField.setText(newValue.replaceAll("\\D+", ""));
+                }
+
+                // Validate what was entered inside the BPM field
+                validateBPMField(bpmField.getText());
+            });  // See https://stackoverflow.com/a/30796829
+
+            offsetField.textProperty().addListener((observable, oldValue, newValue) -> {
+                // Remove/prevent entering of non-digit characters (except for the decimal point and a minus sign)
+                if (!newValue.matches("[\\d.-]*")) {
+                    offsetField.setText(newValue.replaceAll("[^\\d.-]+", ""));
+                }
+
+                // Validate what was entered inside the offset field
+                validateOffsetField(offsetField.getText());
+            });
+
+            bpmField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+                if (!newValue) {  // Lost focus
+                    onFinishedEditingBPMField();
+                }
+            });
+
+            offsetField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+                if (!newValue) {  // Lost focus
+                    onFinishedEditingOffsetField();
+                }
+            });
+
             // Set image on the spectrogram area
             spectrogramImage.setFitHeight(finalWidth);
             spectrogramImage.setFitWidth(finalHeight);
             spectrogramImage.setImage(image);
 
-            // Add note labels and lines
-            NoteStuffAdder.addNoteLabels(notePane, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER);
-            NoteStuffAdder.addNoteLines(spectrogramPaneAnchor, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER);
+            // Add note labels and note lines
+            SpectrogramStuffHandler.addNoteLabels(notePane, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER);
+            SpectrogramStuffHandler.addNoteLines(spectrogramPaneAnchor, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER);
+
+            // Generate the beat lines and update the attribute
+            beatLines = SpectrogramStuffHandler.getBeatLines(
+                    bpm, beatsPerBar, PX_PER_SECOND, finalHeight, audioDuration, offset, SPECTROGRAM_ZOOM_SCALE_X
+            );
+            SpectrogramStuffHandler.addBeatLines(spectrogramPaneAnchor, beatLines);
 
             // Resize image pane
             spectrogramImage.setFitWidth(finalWidth);

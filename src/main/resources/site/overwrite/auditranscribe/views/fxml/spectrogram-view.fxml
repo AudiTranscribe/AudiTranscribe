@@ -21,7 +21,7 @@
                <children>
                   <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0" HBox.hgrow="SOMETIMES">
                      <children>
-                        <Button fx:id="newProjectButton" contentDisplay="CENTER" mnemonicParsing="false" stylesheets="@../css/spectrogram-view.css">
+                        <Button fx:id="newProjectButton" contentDisplay="CENTER" mnemonicParsing="false" stylesheets="@../css/buttons.css">
                            <graphic>
                               <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -30,7 +30,7 @@
                               </ImageView>
                            </graphic>
                         </Button>
-                        <Button fx:id="openProjectButton" contentDisplay="CENTER" layoutX="20.0" layoutY="18.0" mnemonicParsing="false" stylesheets="@../css/spectrogram-view.css">
+                        <Button fx:id="openProjectButton" contentDisplay="CENTER" layoutX="20.0" layoutY="18.0" mnemonicParsing="false" stylesheets="@../css/buttons.css">
                            <graphic>
                               <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -39,7 +39,7 @@
                               </ImageView>
                            </graphic>
                         </Button>
-                        <Button fx:id="saveProjectButton" contentDisplay="CENTER" layoutX="72.0" layoutY="18.0" mnemonicParsing="false" stylesheets="@../css/spectrogram-view.css">
+                        <Button fx:id="saveProjectButton" contentDisplay="CENTER" layoutX="72.0" layoutY="18.0" mnemonicParsing="false" stylesheets="@../css/buttons.css">
                            <graphic>
                               <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -59,9 +59,9 @@
                      </padding>
                      <children>
                         <ChoiceBox fx:id="musicKeyChoice" prefWidth="150.0" />
-                        <TextField fx:id="BPMField" onAction="#onFinishedEditingBPMField" onMouseExited="#onFinishedEditingBPMField" promptText="BPM" text="120" />
+                        <TextField fx:id="bpmField" onAction="#onFinishedEditingBPMField" promptText="BPM" text="120" />
                         <ChoiceBox fx:id="timeSignatureChoice" prefWidth="150.0" />
-                        <TextField fx:id="offsetSecondsField" onMouseExited="#onFinishedEditingMusicKeyField" promptText="Offset Seconds" text="0.00" />
+                        <TextField fx:id="offsetField" onAction="#onFinishedEditingOffsetField" promptText="Offset Seconds" text="0.00" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER_LEFT" layoutX="323.0" layoutY="10.0" prefHeight="100.0" prefWidth="200.0" spacing="10.0" HBox.hgrow="ALWAYS">
