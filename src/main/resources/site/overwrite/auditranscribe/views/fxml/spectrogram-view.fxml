@@ -61,7 +61,7 @@
                         <ChoiceBox fx:id="musicKeyChoice" prefWidth="150.0" />
                         <TextField fx:id="bpmField" onAction="#onFinishedEditingBPMField" promptText="BPM" text="120" />
                         <ChoiceBox fx:id="timeSignatureChoice" prefWidth="150.0" />
-                        <TextField fx:id="offsetField" onAction="#onFinishedEditingOffsetField" promptText="Offset Seconds" text="0.00" />
+                        <TextField fx:id="offsetField" onAction="#onFinishedEditingOffsetField" promptText="Offset Seconds" text="0.0" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER_LEFT" layoutX="323.0" layoutY="10.0" prefHeight="100.0" prefWidth="200.0" spacing="10.0" HBox.hgrow="ALWAYS">

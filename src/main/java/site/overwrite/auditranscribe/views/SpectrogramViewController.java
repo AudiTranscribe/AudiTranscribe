@@ -56,6 +56,7 @@ public class SpectrogramViewController implements Initializable {
             entry("9/8", 8),
             entry("12/8", 8)
     );  // See https://en.wikipedia.org/wiki/Time_signature#Characteristics
+    final String[] TIME_SIGNATURES = {"4/4", "2/2", "2/4", "3/4", "3/8", "6/8", "9/8", "12/8"};
 
     final Pair<Integer, Integer> BPM_RANGE = new Pair<>(1, 512);  // In the format [min, max]
     final Pair<Double, Double> OFFSET_RANGE = new Pair<>(-5., 5.);  // In the format [min, max]
@@ -175,9 +176,6 @@ public class SpectrogramViewController implements Initializable {
     // FXML Methods
     @FXML
     protected void onFinishedEditingBPMField() {
-        // Remove any leading zeros
-        bpmField.setText(bpmField.getText().replaceFirst("^0+(?!$)", ""));
-
         // Get the processed string from the BPM field
         String bpmFieldValue = bpmField.getText();
 
@@ -193,23 +191,39 @@ public class SpectrogramViewController implements Initializable {
                 PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
         );
 
+        // Todo: add beat labels
+
         // Update the BPM value
         bpm = newBPM;
+
+        // Set the field text to the new BPM value
+        bpmField.setText(newBPM + "");  // `newBPM` is the BPM but with no leading zeros
     }
 
     @FXML
     protected void onFinishedEditingOffsetField() {
-        // Remove any leading zeros, except when there is one zero followed by a decimal point which we will keep
-        offsetField.setText(offsetField.getText().replaceFirst("^0{2,}(?!$)", "0"));
-
         // Get the string from the offset field
         String offsetFieldValue = offsetField.getText();
 
         // Run validation on the offset field text
         if (!validateOffsetField(offsetFieldValue)) return;
 
-        // Todo: update offset stuff
-        System.out.println("Update offset stuff");
+        // Convert the field value into the new offset
+        double newOffset = Double.parseDouble(offsetFieldValue);
+
+        // Update the beat lines
+        beatLines = SpectrogramStuffHandler.updateBeatLines(
+                spectrogramPaneAnchor, beatLines, audioDuration, bpm, bpm, offset, newOffset, finalHeight, beatsPerBar,
+                PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+        );
+
+        // Todo: add beat labels
+
+        // Update the offset value
+        offset = newOffset;
+
+        // Set the field text to the new offset value
+        offsetField.setText(newOffset + "");  // `newOffset` is the offset but with no leading nor trailing zeros
     }
 
     // Initialization function
@@ -263,8 +277,8 @@ public class SpectrogramViewController implements Initializable {
                 musicKeyChoice.getItems().add(musicKey);
             }
 
-            for (String key : TIME_SIGNATURE_TO_BEATS_PER_BAR.keySet()) {
-                timeSignatureChoice.getItems().add(key);
+            for (String timeSignature : TIME_SIGNATURES) {
+                timeSignatureChoice.getItems().add(timeSignature);
             }
 
             musicKeyChoice.setValue("C");

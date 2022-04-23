@@ -179,15 +179,15 @@ public class SpectrogramStuffHandler {
             Pane spectrogramPane, Line[] lines, double duration, int oldBPM, int newBPM, double oldOffset,
             double newOffset, double height, int beatsPerBar, int pxPerSecond, double zoomScaleX
     ) {
-        // Return prematurely if `oldBPM` is the same as `newBPM`
-        if (oldBPM == newBPM) return lines;  // Nothing to update
+        // Return prematurely if the olds equal the news
+        if (oldBPM == newBPM && oldOffset == newOffset) return lines;  // Nothing to update
 
         // Calculate the new seconds per beat (SPB)
         double newSPB = secondsPerBeat(newBPM);
 
         // Calculate the difference between the number of beats needed
         int oldNumBeats = lines.length - 1;
-        int newNumBeats = (int) Math.ceil(newBPM / 60. * duration);
+        int newNumBeats = (int) Math.ceil(newBPM / 60. * (duration + Math.abs(newOffset)));
         int deltaNumBeats = newNumBeats - oldNumBeats;
 
         // Create a new array with the new beat lines
@@ -223,7 +223,9 @@ public class SpectrogramStuffHandler {
         if (deltaNumBeats > 0) {
             for (int beatNum = numCopiedBeatLines; beatNum <= newNumBeats; beatNum++) {
                 // Generate the beat line
-                Line beatLine = generateBeatLine(beatNum, beatsPerBar, pxPerSecond, height, zoomScaleX, newSPB, newOffset);
+                Line beatLine = generateBeatLine(
+                        beatNum, beatsPerBar, pxPerSecond, height, zoomScaleX, newSPB, newOffset
+                );
 
                 // Add line to array
                 newLines[beatNum] = beatLine;
