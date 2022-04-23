@@ -9,8 +9,6 @@
 
 package site.overwrite.auditranscribe.views;
 
-import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -258,19 +256,7 @@ public class SpectrogramViewController implements Initializable {
             spectrogramPaneAnchor.setPrefHeight(finalHeight);
 
             // Set note pane scrolling
-            Task<Void> notePaneScrollingTask = new Task<>() {
-                @Override
-                public Void call() throws Exception {
-                    while (true) {  // Fixme: `while` statement cannot complete without throwing an exception
-                        Platform.runLater(() -> leftPane.setVvalue(spectrogramPane.getVvalue()));
-                        Thread.sleep(UPDATE_SCROLLBAR_INTERVAL);  // Fixme: Call to `Thread.sleep()` in a loop, probably busy-waiting
-                    }
-                }
-            };
-
-            Thread notePaneScrollingThread = new Thread(notePaneScrollingTask);
-            notePaneScrollingThread.setDaemon(true);
-            notePaneScrollingThread.start();
+            leftPane.vvalueProperty().bindBidirectional(spectrogramPane.vvalueProperty());
 
             // Set the choice boxes' choices
             for (String musicKey : MUSIC_KEYS) {
