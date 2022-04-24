@@ -2,7 +2,7 @@
  * SpectrogramViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-04-23
+ * Updated on 2022-04-24
  *
  * Description: Contains the spectrogram view's controller class.
  */
@@ -20,6 +20,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Line;
 import javafx.util.Pair;
 import site.overwrite.auditranscribe.audio.Audio;
@@ -67,8 +68,6 @@ public class SpectrogramViewController implements Initializable {
     final int MIN_NOTE_NUMBER = 0;  // C0
     final int MAX_NOTE_NUMBER = 119;  // B9
 
-    final int UPDATE_SCROLLBAR_INTERVAL = 5;  // In milliseconds
-
     // Attributes
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -82,6 +81,7 @@ public class SpectrogramViewController implements Initializable {
     private double offset = 0.;
 
     private Line[] beatLines;
+    private StackPane[] barNumberEllipses;
 
     // FXML Elements
     // Top HBox
@@ -99,13 +99,13 @@ public class SpectrogramViewController implements Initializable {
 
     // Mid-view
     @FXML
-    private ScrollPane leftPane, spectrogramPane;
+    private ScrollPane leftPane, spectrogramPane, bottomPane;
 
     @FXML
-    private AnchorPane leftPaneAnchor, spectrogramPaneAnchor;
+    private AnchorPane leftPaneAnchor, spectrogramPaneAnchor, bottomPaneAnchor;
 
     @FXML
-    private Pane notePane;
+    private Pane notePane, barNumberPane;
 
     @FXML
     private ImageView spectrogramImage;
@@ -229,7 +229,8 @@ public class SpectrogramViewController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         // Get the audio file
         try {
-            Audio audio = new Audio("testing-audio-files/A440.wav");
+//            Audio audio = new Audio("testing-audio-files/A440.wav");
+            Audio audio = new Audio("testing-audio-files/Melancholy.wav");
 
             // Update audio duration attribute
             audioDuration = audio.getDuration();
@@ -251,12 +252,12 @@ public class SpectrogramViewController implements Initializable {
             spectrogramPaneAnchor.setPrefWidth(finalWidth);
             spectrogramPaneAnchor.setPrefHeight(finalHeight);
 
-            // Update spectrogram plane width and height
-            spectrogramPaneAnchor.setPrefWidth(finalWidth);
-            spectrogramPaneAnchor.setPrefHeight(finalHeight);
+            bottomPane.setFitToHeight(true);
+            bottomPaneAnchor.setPrefWidth(finalWidth);
 
-            // Set note pane scrolling
+            // Set scrolling for panes
             leftPane.vvalueProperty().bindBidirectional(spectrogramPane.vvalueProperty());
+            bottomPane.hvalueProperty().bindBidirectional(spectrogramPane.hvalueProperty());
 
             // Set the choice boxes' choices
             for (String musicKey : MUSIC_KEYS) {
@@ -312,15 +313,23 @@ public class SpectrogramViewController implements Initializable {
             SpectrogramStuffHandler.addNoteLabels(notePane, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER);
             SpectrogramStuffHandler.addNoteLines(spectrogramPaneAnchor, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER);
 
-            // Generate the beat lines and update the attribute
+            // Add the beat lines and bar number ellipses
             beatLines = SpectrogramStuffHandler.getBeatLines(
                     bpm, beatsPerBar, PX_PER_SECOND, finalHeight, audioDuration, offset, SPECTROGRAM_ZOOM_SCALE_X
             );
             SpectrogramStuffHandler.addBeatLines(spectrogramPaneAnchor, beatLines);
 
+            barNumberEllipses = SpectrogramStuffHandler.getBarNumberEllipses(
+                    bpm, beatsPerBar, PX_PER_SECOND, barNumberPane.getHeight(), audioDuration, offset, SPECTROGRAM_ZOOM_SCALE_X
+            );
+            SpectrogramStuffHandler.addBarNumberEllipses(barNumberPane, barNumberEllipses);
+
             // Resize image pane
             spectrogramImage.setFitWidth(finalWidth);
             spectrogramImage.setFitHeight(finalHeight);
+
+            // Show the spectrogram from the middle
+            spectrogramPane.setVvalue(0.5);
 
         } catch (Exception e) {
             e.printStackTrace();
