@@ -2,7 +2,7 @@
  * SpectrogramStuffHandler.java
  *
  * Created on 2022-03-20
- * Updated on 2022-04-24
+ * Updated on 2022-04-25
  *
  * Description: Class that adds the notes' stuff to the spectrogram area.
  */
@@ -222,10 +222,9 @@ public class SpectrogramStuffHandler {
                 spectrogramPane.getChildren().add(newLines[beatNum]);
             } catch (Exception ignored) {
             }
-
         }
 
-        // Add more lines if needed
+        // Add/remove lines if needed
         if (deltaNumBeats > 0) {
             for (int beatNum = numCopiedBeatLines; beatNum <= newNumBeats; beatNum++) {
                 // Generate the beat line
@@ -238,7 +237,6 @@ public class SpectrogramStuffHandler {
                 spectrogramPane.getChildren().add(beatLine);
             }
 
-            // Remove old lines if needed
         } else {
             for (int beatNum = newNumBeats; beatNum <= oldNumBeats; beatNum++) {
                 spectrogramPane.getChildren().remove(lines[beatNum]);
@@ -278,31 +276,8 @@ public class SpectrogramStuffHandler {
         StackPane[] stackPanes = new StackPane[numBars + 1];
 
         for (int barNum = 0; barNum <= numBars; barNum++) {
-            // Calculate position to place the ellipse
-            double pos = (offset + barNum * spb * beatsPerBar) * pxPerSecond * zoomScaleX;
-
-            // Create the ellipse
-            Ellipse ellipse = new Ellipse(BAR_NUMBER_ELLIPSE_RADIUS_Y * zoomScaleX, BAR_NUMBER_ELLIPSE_RADIUS_Y);
-
-            // Format the ellipse
-            ellipse.setFill(Color.TRANSPARENT);
-            ellipse.setStroke(BAR_NUMBER_ELLIPSE_COLOUR);
-            ellipse.setStrokeType(StrokeType.CENTERED);
-            ellipse.setStrokeWidth(BAR_NUMBER_ELLIPSE_THICKNESS);
-
-            // Create the bar number text that will go inside the ellipse
-            Text barNumText = new Text(Integer.toString(barNum));
-            barNumText.setFont(LABEL_FONT);
-            barNumText.setFill(LABEL_COLOUR);
-            barNumText.setBoundsType(TextBoundsType.VISUAL);
-
-            // Create the `StackPane` that will contain both these things
-            StackPane stackPane = new StackPane();
-            stackPane.getChildren().addAll(ellipse, barNumText);
-
-            // Move the `StackPane` correctly
-            stackPane.setTranslateX(pos - BAR_NUMBER_ELLIPSE_RADIUS_Y * zoomScaleX);
-            stackPane.setTranslateY(height / 2);
+            // Generate the ellipse
+            StackPane stackPane = generateEllipse(barNum, beatsPerBar, pxPerSecond, height, zoomScaleX, spb, offset);
 
             // Add the stack pane to the array of all stack panes
             stackPanes[barNum] = stackPane;
@@ -322,7 +297,91 @@ public class SpectrogramStuffHandler {
         barNumberPane.getChildren().addAll(ellipses);
     }
 
-    // Todo add updating of ellipses
+    /**
+     * Method that updates the existing ellipses, and adds/removes as necessary.
+     *
+     * @param barNumberPane Bar number pane.
+     * @param ellipses      Original bar number ellipses.
+     * @param duration      Duration of the audio.
+     * @param oldBPM        Old value for the BPM.
+     * @param newBPM        New value for the BPM.
+     * @param oldOffset     Old offset value.
+     * @param newOffset     New offset value.
+     * @param height        Spectrogram pane height.
+     * @param beatsPerBar   Number of beats per bar.
+     * @param pxPerSecond   Number of pixels dedicated per second.
+     * @param zoomScaleX    Zoom scaling for the X direction.
+     * @return Array of <code>Line</code> objects, representing the <b>new</b> beat lines that are
+     * shown.
+     */
+    // Todo: handle change in beats per bar
+    // Fixme; doesnt work
+    public static StackPane[] updateBarNumberEllipses(
+            Pane barNumberPane, StackPane[] ellipses, double duration, int oldBPM, int newBPM, double oldOffset,
+            double newOffset, double height, int beatsPerBar, int pxPerSecond, double zoomScaleX
+    ) {
+        // Return prematurely if the olds equal the news
+        if (oldBPM == newBPM && oldOffset == newOffset) return ellipses;  // Nothing to update
+
+        // Calculate the new seconds per beat (SPB)
+        double newSPB = secondsPerBeat(newBPM);
+
+        // Calculate the difference between the number of beats needed
+        int oldNumBars = ellipses.length - 1;
+
+        int newNumBars = (int) Math.floor(Math.ceil(newBPM / 60. * (duration + Math.abs(newOffset))) / beatsPerBar) + 1;
+        int deltaNumBars = newNumBars - oldNumBars;
+
+        // Create a new array with the new ellipses
+        StackPane[] newEllipses = new StackPane[newNumBars + 1];
+
+        if (deltaNumBars > 0) {  // Need to add ellipses
+            // Array copy old beat lines into the new lines
+            System.arraycopy(ellipses, 0, newEllipses, 0, oldNumBars + 1);
+        } else {  // Need to remove ellipses
+            // Limit the number of lines that are copied
+            System.arraycopy(ellipses, 0, newEllipses, 0, newNumBars + 1);
+        }
+
+        // Update existing ellipses
+        int numCopiedEllipses = Math.min(oldNumBars, newNumBars) + 1;
+
+        for (int barNum = 0; barNum < numCopiedEllipses; barNum++) {
+            // Calculate position to place the ellipse
+            double pos = (newOffset + barNum * newSPB * beatsPerBar) * pxPerSecond * zoomScaleX;
+
+            // Update ellipse position
+            newEllipses[barNum].setTranslateX(pos - BAR_NUMBER_ELLIPSE_RADIUS_Y * zoomScaleX);
+
+            // Try and add again
+            try {
+                barNumberPane.getChildren().add(newEllipses[barNum]);
+            } catch (Exception ignored) {
+            }
+        }
+
+        // Add/remove ellipses if needed
+        if (deltaNumBars > 0) {
+            for (int barNum = numCopiedEllipses; barNum <= newNumBars; barNum++) {
+                // Generate the ellipse
+                StackPane stackPane = generateEllipse(
+                        barNum, beatsPerBar, pxPerSecond, height, zoomScaleX, newSPB, newOffset
+                );
+
+                // Add ellipse to array
+                newEllipses[barNum] = stackPane;
+                barNumberPane.getChildren().add(stackPane);
+            }
+
+        } else {
+            for (int barNum = newNumBars; barNum <= oldNumBars; barNum++) {
+                barNumberPane.getChildren().remove(ellipses[barNum]);
+            }
+        }
+
+        // Return the new generated ellipses
+        return newEllipses;
+    }
 
 
     // Private methods
@@ -377,5 +436,52 @@ public class SpectrogramStuffHandler {
 
         // Return the line
         return beatLine;
+    }
+
+    /**
+     * Helper method that generates an ellipse.<br>
+     * Note that this generates a <code>StackPane</code> instead of an <code>Ellipse</code> to
+     * support adding text on the ellipse.
+     *
+     * @param barNum      Bar number.
+     * @param beatsPerBar Number of beats per bar.
+     * @param pxPerSecond Number of pixels dedicated per second.
+     * @param height      Spectrogram height.
+     * @param zoomScaleX  Zoom scaling for the X direction.
+     * @param spb         Seconds per beat.
+     * @param offset      Number of seconds to wait before the actual audio <em>starts</em>.
+     * @return A <code>StackPane</code> object representing the ellipse.
+     */
+    static StackPane generateEllipse(
+            int barNum, int beatsPerBar, int pxPerSecond, double height, double zoomScaleX, double spb, double offset
+    ) {
+        // Calculate position to place the ellipse
+        double pos = (offset + barNum * spb * beatsPerBar) * pxPerSecond * zoomScaleX;
+
+        // Create the ellipse
+        Ellipse ellipse = new Ellipse(BAR_NUMBER_ELLIPSE_RADIUS_Y * zoomScaleX, BAR_NUMBER_ELLIPSE_RADIUS_Y);
+
+        // Format the ellipse
+        ellipse.setFill(Color.TRANSPARENT);
+        ellipse.setStroke(BAR_NUMBER_ELLIPSE_COLOUR);
+        ellipse.setStrokeType(StrokeType.CENTERED);
+        ellipse.setStrokeWidth(BAR_NUMBER_ELLIPSE_THICKNESS);
+
+        // Create the bar number text that will go inside the ellipse
+        Text barNumText = new Text(Integer.toString(barNum));
+        barNumText.setFont(LABEL_FONT);
+        barNumText.setFill(LABEL_COLOUR);
+        barNumText.setBoundsType(TextBoundsType.VISUAL);
+
+        // Create the `StackPane` that will contain both these things
+        StackPane stackPane = new StackPane();
+        stackPane.getChildren().addAll(ellipse, barNumText);
+
+        // Move the `StackPane` correctly
+        stackPane.setTranslateX(pos - BAR_NUMBER_ELLIPSE_RADIUS_Y * zoomScaleX);
+        stackPane.setTranslateY(height / 2 - BAR_NUMBER_ELLIPSE_RADIUS_Y);
+
+        // Return the generated ellipse
+        return stackPane;
     }
 }

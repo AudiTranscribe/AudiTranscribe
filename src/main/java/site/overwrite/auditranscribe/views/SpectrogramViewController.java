@@ -2,7 +2,7 @@
  * SpectrogramViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-04-24
+ * Updated on 2022-04-25
  *
  * Description: Contains the spectrogram view's controller class.
  */
@@ -189,7 +189,11 @@ public class SpectrogramViewController implements Initializable {
                 PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
         );
 
-        // Todo: add beat labels
+        // Update the bar number ellipses
+        barNumberEllipses = SpectrogramStuffHandler.updateBarNumberEllipses(
+                barNumberPane, barNumberEllipses, audioDuration, bpm, newBPM, offset, offset, barNumberPane.getPrefHeight(),
+                beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+        );
 
         // Update the BPM value
         bpm = newBPM;
@@ -215,7 +219,11 @@ public class SpectrogramViewController implements Initializable {
                 PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
         );
 
-        // Todo: add beat labels
+        // Update the bar number ellipses
+        barNumberEllipses = SpectrogramStuffHandler.updateBarNumberEllipses(
+                barNumberPane, barNumberEllipses, audioDuration, bpm, bpm, offset, newOffset, barNumberPane.getPrefHeight(),
+                beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+        );
 
         // Update the offset value
         offset = newOffset;
@@ -320,7 +328,8 @@ public class SpectrogramViewController implements Initializable {
             SpectrogramStuffHandler.addBeatLines(spectrogramPaneAnchor, beatLines);
 
             barNumberEllipses = SpectrogramStuffHandler.getBarNumberEllipses(
-                    bpm, beatsPerBar, PX_PER_SECOND, barNumberPane.getHeight(), audioDuration, offset, SPECTROGRAM_ZOOM_SCALE_X
+                    bpm, beatsPerBar, PX_PER_SECOND, barNumberPane.getPrefHeight(), audioDuration, offset,
+                    SPECTROGRAM_ZOOM_SCALE_X
             );
             SpectrogramStuffHandler.addBarNumberEllipses(barNumberPane, barNumberEllipses);
 
