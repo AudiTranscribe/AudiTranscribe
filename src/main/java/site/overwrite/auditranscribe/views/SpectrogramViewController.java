@@ -186,14 +186,14 @@ public class SpectrogramViewController implements Initializable {
         // Update the beat lines
         beatLines = SpectrogramStuffHandler.updateBeatLines(
                 spectrogramPaneAnchor, beatLines, audioDuration, bpm, newBPM, offset, offset, finalHeight, beatsPerBar,
-                PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+                beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
         );
 
         // Update the bar number ellipses
         barNumberEllipses = SpectrogramStuffHandler.updateBarNumberEllipses(
-                barNumberPane, barNumberEllipses, audioDuration, bpm, newBPM, offset, offset, barNumberPane.getPrefHeight(),
-                beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
-        );
+                barNumberPane, barNumberEllipses, audioDuration, bpm, newBPM, offset, offset,
+                barNumberPane.getPrefHeight(), beatsPerBar, beatsPerBar, PX_PER_SECOND,
+                SPECTROGRAM_ZOOM_SCALE_X);
 
         // Update the BPM value
         bpm = newBPM;
@@ -216,13 +216,13 @@ public class SpectrogramViewController implements Initializable {
         // Update the beat lines
         beatLines = SpectrogramStuffHandler.updateBeatLines(
                 spectrogramPaneAnchor, beatLines, audioDuration, bpm, bpm, offset, newOffset, finalHeight, beatsPerBar,
-                PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+                beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
         );
 
         // Update the bar number ellipses
         barNumberEllipses = SpectrogramStuffHandler.updateBarNumberEllipses(
-                barNumberPane, barNumberEllipses, audioDuration, bpm, bpm, offset, newOffset, barNumberPane.getPrefHeight(),
-                beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+                barNumberPane, barNumberEllipses, audioDuration, bpm, bpm, offset, newOffset,
+                barNumberPane.getPrefHeight(), beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
         );
 
         // Update the offset value
@@ -310,6 +310,29 @@ public class SpectrogramViewController implements Initializable {
                 if (!newValue) {  // Lost focus
                     onFinishedEditingOffsetField();
                 }
+            });
+
+            // Set methods on choice box fields
+            timeSignatureChoice.getSelectionModel().selectedItemProperty().addListener((observable, oldValue,
+                                                                                        newValue) -> {
+                // Get the old and new beats per bar
+                int oldBeatsPerBar = TIME_SIGNATURE_TO_BEATS_PER_BAR.get(oldValue);
+                int newBeatsPerBar = TIME_SIGNATURE_TO_BEATS_PER_BAR.get(newValue);
+
+                // Update the beat lines and bar number ellipses
+                beatLines = SpectrogramStuffHandler.updateBeatLines(
+                        spectrogramPaneAnchor, beatLines, audioDuration, bpm, bpm, offset, offset, finalHeight,
+                        oldBeatsPerBar, newBeatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+                );
+
+                barNumberEllipses = SpectrogramStuffHandler.updateBarNumberEllipses(
+                        barNumberPane, barNumberEllipses, audioDuration, bpm, bpm, offset, offset,
+                        barNumberPane.getPrefHeight(), oldBeatsPerBar, newBeatsPerBar, PX_PER_SECOND,
+                        SPECTROGRAM_ZOOM_SCALE_X
+                );
+
+                // Update the beats per bar
+                beatsPerBar = newBeatsPerBar;
             });
 
             // Set image on the spectrogram area

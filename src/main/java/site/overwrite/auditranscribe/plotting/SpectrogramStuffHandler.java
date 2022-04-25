@@ -37,7 +37,7 @@ public class SpectrogramStuffHandler {
 
     static final Color NOTE_LINE_COLOUR = new Color(1, 1, 1, 0.5);  // Todo: work with themes
     static final Color BEAT_LINE_COLOUR = new Color(1, 1, 1, 0.5);  // Todo: work with themes
-    static final Color BAR_LINE_COLOR = new Color(0, 1, 0, 0.5);  // Todo: work with themes
+    static final Color BAR_LINE_COLOUR = new Color(0, 1, 0, 0.5);  // Todo: work with themes
     static final Color BAR_NUMBER_ELLIPSE_COLOUR = new Color(0, 0, 0, 1);  // Todo: work with themes
 
     // Public methods
@@ -173,19 +173,19 @@ public class SpectrogramStuffHandler {
      * @param oldOffset       Old offset value.
      * @param newOffset       New offset value.
      * @param height          Spectrogram pane height.
-     * @param beatsPerBar     Number of beats per bar.
+     * @param oldBeatsPerBar  Old number of beats per bar.
+     * @param newBeatsPerBar  New number of beats per bar.
      * @param pxPerSecond     Number of pixels dedicated per second.
      * @param zoomScaleX      Zoom scaling for the X direction.
      * @return Array of <code>Line</code> objects, representing the <b>new</b> beat lines that are
      * shown.
      */
-    // Todo: handle change in beats per bar
     public static Line[] updateBeatLines(
             Pane spectrogramPane, Line[] lines, double duration, int oldBPM, int newBPM, double oldOffset,
-            double newOffset, double height, int beatsPerBar, int pxPerSecond, double zoomScaleX
+            double newOffset, double height, int oldBeatsPerBar, int newBeatsPerBar, int pxPerSecond, double zoomScaleX
     ) {
-        // Return prematurely if the olds equal the news
-        if (oldBPM == newBPM && oldOffset == newOffset) return lines;  // Nothing to update
+        // Return prematurely if the olds equal the news (b/c nothing to update)
+        if (oldBPM == newBPM && oldOffset == newOffset && oldBeatsPerBar == newBeatsPerBar) return lines;
 
         // Calculate the new seconds per beat (SPB)
         double newSPB = secondsPerBeat(newBPM);
@@ -217,6 +217,9 @@ public class SpectrogramStuffHandler {
             newLines[beatNum].setStartX(pos);
             newLines[beatNum].setEndX(pos);
 
+            // Determine new line colour
+            newLines[beatNum].setStroke(beatNum % newBeatsPerBar != 0 ? BEAT_LINE_COLOUR : BAR_LINE_COLOUR);
+
             // Try and add again
             try {
                 spectrogramPane.getChildren().add(newLines[beatNum]);
@@ -229,7 +232,7 @@ public class SpectrogramStuffHandler {
             for (int beatNum = numCopiedBeatLines; beatNum <= newNumBeats; beatNum++) {
                 // Generate the beat line
                 Line beatLine = generateBeatLine(
-                        beatNum, beatsPerBar, pxPerSecond, height, zoomScaleX, newSPB, newOffset
+                        beatNum, newBeatsPerBar, pxPerSecond, height, zoomScaleX, newSPB, newOffset
                 );
 
                 // Add line to array
@@ -246,7 +249,6 @@ public class SpectrogramStuffHandler {
         // Return the new lines
         return newLines;
     }
-
 
     /**
      * Method that returns the ellipses to be drawn on the canvas.<br>
@@ -300,28 +302,27 @@ public class SpectrogramStuffHandler {
     /**
      * Method that updates the existing ellipses, and adds/removes as necessary.
      *
-     * @param barNumberPane Bar number pane.
-     * @param ellipses      Original bar number ellipses.
-     * @param duration      Duration of the audio.
-     * @param oldBPM        Old value for the BPM.
-     * @param newBPM        New value for the BPM.
-     * @param oldOffset     Old offset value.
-     * @param newOffset     New offset value.
-     * @param height        Spectrogram pane height.
-     * @param beatsPerBar   Number of beats per bar.
-     * @param pxPerSecond   Number of pixels dedicated per second.
-     * @param zoomScaleX    Zoom scaling for the X direction.
+     * @param barNumberPane  Bar number pane.
+     * @param ellipses       Original bar number ellipses.
+     * @param duration       Duration of the audio.
+     * @param oldBPM         Old value for the BPM.
+     * @param newBPM         New value for the BPM.
+     * @param oldOffset      Old offset value.
+     * @param newOffset      New offset value.
+     * @param height         Spectrogram pane height.
+     * @param oldBeatsPerBar Old number of beats per bar.
+     * @param newBeatsPerBar New number of beats per bar.
+     * @param pxPerSecond    Number of pixels dedicated per second.
+     * @param zoomScaleX     Zoom scaling for the X direction.
      * @return Array of <code>Line</code> objects, representing the <b>new</b> beat lines that are
      * shown.
      */
-    // Todo: handle change in beats per bar
-    // Fixme; doesnt work
     public static StackPane[] updateBarNumberEllipses(
             Pane barNumberPane, StackPane[] ellipses, double duration, int oldBPM, int newBPM, double oldOffset,
-            double newOffset, double height, int beatsPerBar, int pxPerSecond, double zoomScaleX
+            double newOffset, double height, int oldBeatsPerBar, int newBeatsPerBar, int pxPerSecond, double zoomScaleX
     ) {
-        // Return prematurely if the olds equal the news
-        if (oldBPM == newBPM && oldOffset == newOffset) return ellipses;  // Nothing to update
+        // Return prematurely if the olds equal the news (b/c nothing to update)
+        if (oldBPM == newBPM && oldOffset == newOffset && oldBeatsPerBar == newBeatsPerBar) return ellipses;
 
         // Calculate the new seconds per beat (SPB)
         double newSPB = secondsPerBeat(newBPM);
@@ -329,7 +330,9 @@ public class SpectrogramStuffHandler {
         // Calculate the difference between the number of beats needed
         int oldNumBars = ellipses.length - 1;
 
-        int newNumBars = (int) Math.floor(Math.ceil(newBPM / 60. * (duration + Math.abs(newOffset))) / beatsPerBar) + 1;
+        double newAbsOffset = Math.abs(newOffset);
+        int newNumBars = (int) Math.floor(Math.ceil(newBPM / 60. * (duration + newAbsOffset)) / newBeatsPerBar) + 1;
+
         int deltaNumBars = newNumBars - oldNumBars;
 
         // Create a new array with the new ellipses
@@ -348,7 +351,7 @@ public class SpectrogramStuffHandler {
 
         for (int barNum = 0; barNum < numCopiedEllipses; barNum++) {
             // Calculate position to place the ellipse
-            double pos = (newOffset + barNum * newSPB * beatsPerBar) * pxPerSecond * zoomScaleX;
+            double pos = (newOffset + barNum * newSPB * newBeatsPerBar) * pxPerSecond * zoomScaleX;
 
             // Update ellipse position
             newEllipses[barNum].setTranslateX(pos - BAR_NUMBER_ELLIPSE_RADIUS_Y * zoomScaleX);
@@ -365,7 +368,7 @@ public class SpectrogramStuffHandler {
             for (int barNum = numCopiedEllipses; barNum <= newNumBars; barNum++) {
                 // Generate the ellipse
                 StackPane stackPane = generateEllipse(
-                        barNum, beatsPerBar, pxPerSecond, height, zoomScaleX, newSPB, newOffset
+                        barNum, newBeatsPerBar, pxPerSecond, height, zoomScaleX, newSPB, newOffset
                 );
 
                 // Add ellipse to array
@@ -431,7 +434,7 @@ public class SpectrogramStuffHandler {
 
         // Format the line
         beatLine.setFill(null);
-        beatLine.setStroke(beatNum % beatsPerBar != 0 ? BEAT_LINE_COLOUR : BAR_LINE_COLOR);
+        beatLine.setStroke(beatNum % beatsPerBar != 0 ? BEAT_LINE_COLOUR : BAR_LINE_COLOUR);
         beatLine.setStrokeWidth(BEAT_LINE_WIDTH);
 
         // Return the line
