@@ -2,7 +2,7 @@
  * UnitConversion.java
  *
  * Created on 2022-03-12
- * Updated on 2022-04-09
+ * Updated on 2022-04-27
  *
  * Description: Unit conversion methods.
  */
@@ -121,8 +121,8 @@ public class UnitConversion {
      * from C0. For example, A4 has note number 57 as it is 57 notes away from C0.
      *
      * @param noteNumber Note number for the given note.
-     * @return  Note string. Note that all notes with accidentals will be changed to those with
-     *          SHARPS (#) only.
+     * @return Note string. Note that all notes with accidentals will be changed to those with
+     * SHARPS (# or ♯) only.
      */
     // Todo: incorporate correct note conversion with scale/key consideration (i.e. add flats as well)
     public static String noteNumberToNote(int noteNumber) {
@@ -188,8 +188,9 @@ public class UnitConversion {
 
     /**
      * Function that converts pixels to points.
-     * @param px    Number of pixels.
-     * @return  Point value.
+     *
+     * @param px Number of pixels.
+     * @return Point value.
      */
     public static double pxToPt(double px) {
         return 0.75 * px;
@@ -197,10 +198,46 @@ public class UnitConversion {
 
     /**
      * Function that converts points to pixels.
-     * @param pt    Number of points.
-     * @return  Pixel value.
+     *
+     * @param pt Number of points.
+     * @return Pixel value.
      */
     public static double ptToPx(double pt) {
-        return (4./3) * pt;
+        return (4. / 3) * pt;
+    }
+
+    // Other unit conversions
+
+    /**
+     * Converts the number of seconds into a properly formatted time string.
+     *
+     * @param numSeconds Number of seconds.
+     * @return A string of the form "MM:SS".
+     */
+    public static String secondsToTimeString(double numSeconds) {
+        // Truncate any decimal places
+        int truncSeconds = (int) Math.floor(numSeconds);
+
+        // Compute the number of minutes and seconds
+        int minutes = truncSeconds / 60;  // Integer division
+        int seconds = truncSeconds % 60;
+
+        // Pad the minutes and seconds with needed zeros
+        String minuteStr;
+        if (minutes < 10) {
+            minuteStr = "0" + minutes;
+        } else {
+            minuteStr = "" + minutes;
+        }
+
+        String secondsStr;
+        if (seconds < 10) {
+            secondsStr = "0" + seconds;
+        } else {
+            secondsStr = "" + seconds;
+        }
+
+        // Return the final string
+        return minuteStr + ":" + secondsStr;
     }
 }

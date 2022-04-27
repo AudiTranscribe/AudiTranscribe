@@ -2,16 +2,19 @@
  * SpectrogramViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-04-26
+ * Updated on 2022-04-27
  *
  * Description: Contains the spectrogram view's controller class.
  */
 
 package site.overwrite.auditranscribe.views;
 
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
@@ -25,6 +28,8 @@ import site.overwrite.auditranscribe.audio.Window;
 import site.overwrite.auditranscribe.plotting.SpectrogramStuffHandler;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
 import site.overwrite.auditranscribe.spectrogram.Spectrogram;
+import site.overwrite.auditranscribe.utils.FileUtils;
+import site.overwrite.auditranscribe.utils.UnitConversion;
 
 import java.net.URL;
 import java.util.Map;
@@ -56,14 +61,19 @@ public class SpectrogramViewController implements Initializable {
 
     final double SPECTROGRAM_ZOOM_SCALE_X = 2;
     final double SPECTROGRAM_ZOOM_SCALE_Y = 5;
+
     final int PX_PER_SECOND = 120;
     final int BINS_PER_OCTAVE = 60;
+    final int SPECTROGRAM_HOP_LENGTH = 1024;  // Needs to be a power of 2
+    final double NUM_PX_PER_OCTAVE = 72;
 
     final int MIN_NOTE_NUMBER = 0;  // C0
     final int MAX_NOTE_NUMBER = 119;  // B9
 
     // Attributes
     private final Logger logger = Logger.getLogger(this.getClass().getName());
+
+    private Audio audio;
 
     private double finalWidth;
     private double finalHeight;
@@ -73,6 +83,7 @@ public class SpectrogramViewController implements Initializable {
     private int bpm = 120;
     private int beatsPerBar = 4;
     private double offset = 0.;
+    private boolean isPaused = true;
 
     private Line[] beatLines;
     private StackPane[] barNumberEllipses;
@@ -106,6 +117,39 @@ public class SpectrogramViewController implements Initializable {
 
     @FXML
     private ImageView spectrogramImage;
+
+    // Bottom HBox
+    @FXML
+    private Label currTimeLabel, totalTimeLabel;
+
+    @FXML
+    private Button playButton, stopButton, playSkipBackButton, playSkipForwardButton, scrollButton, volumeButton;
+
+    @FXML
+    private ImageView playButtonImage;
+
+    @FXML
+    private Slider volumeSlider;
+
+    // Helper methods
+    protected boolean togglePaused(boolean isPaused) {
+        if (isPaused) {
+            // Change the icon of the play button from the play icon to the paused icon
+            playButtonImage.setImage(new Image(FileUtils.getFilePath("images/icons/PNGs/pause.png")));
+
+            // Unpause the audio (i.e. play the audio)
+            audio.playAudio();
+        } else {
+            // Change the icon of the play button from the paused icon to the play icon
+            playButtonImage.setImage(new Image(FileUtils.getFilePath("images/icons/PNGs/play.png")));
+
+            // Pause the audio
+            audio.pauseAudio();
+        }
+
+        // Return the toggled version of the `isPaused` flag
+        return !isPaused;
+    }
 
     // FXML Methods
     protected void updateBPMValue(int newBPM) {
@@ -147,15 +191,17 @@ public class SpectrogramViewController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         // Get the audio file
         try {
-            Audio audio = new Audio("testing-audio-files/A440.wav");
-//            Audio audio = new Audio("testing-audio-files/Melancholy.wav");
+            audio = new Audio("testing-audio-files/A440.wav");
+//            audio = new Audio("testing-audio-files/Melancholy.wav");
 
-            // Update audio duration attribute
+            // Update audio duration attribute and label
             audioDuration = audio.getDuration();
+            totalTimeLabel.setText(UnitConversion.secondsToTimeString(audioDuration));
 
             // Generate spectrogram
             Spectrogram spectrogram = new Spectrogram(
-                    audio, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER, BINS_PER_OCTAVE, PX_PER_SECOND, 72, 1024
+                    audio, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER, BINS_PER_OCTAVE, PX_PER_SECOND, NUM_PX_PER_OCTAVE,
+                    SPECTROGRAM_HOP_LENGTH
             );
             WritableImage image = spectrogram.generateSpectrogram(Window.HANN_WINDOW, ColourScale.VIRIDIS);
 
@@ -235,6 +281,45 @@ public class SpectrogramViewController implements Initializable {
                 // Update the beats per bar
                 beatsPerBar = newBeatsPerBar;
             });
+
+            // Add methods to buttons
+            playButton.setOnAction(event -> isPaused = togglePaused(isPaused));
+            stopButton.setOnAction(event -> {
+                audio.stopAudio();
+                isPaused = togglePaused(false);
+            });
+            playSkipBackButton.setOnAction(event -> audio.setAudioPlaybackTime(0));
+            playSkipForwardButton.setOnAction(event -> audio.setAudioPlaybackTime(audioDuration));
+
+            // Constantly update the current playback time
+            Task<Void> updatePlaybackTimeTask = new Task<>() {
+                @Override
+                public Void call() throws Exception {
+                    while (true) {  // Fixme: `while` statement cannot complete without throwing an exception
+                        // Get the current time
+                        double currTime = audio.getCurrAudioTime();
+
+                        // Update the current time label
+                        Platform.runLater(() -> currTimeLabel.setText(UnitConversion.secondsToTimeString(currTime)));
+
+                        // Check if the current time has exceeded
+                        if (currTime >= audioDuration) {  // Fixme: why does this not work?
+                            // Reset the audio
+                            audio.stopAudio();
+
+                            // Pause the audio
+                            isPaused = togglePaused(false);
+                        }
+
+                        // Wait for 50 ms
+                        Thread.sleep(50);  // Fixme: Call to `Thread.sleep()` in a loop, probably busy-waiting
+                    }
+                }
+            };
+
+            Thread updatePlaybackTimeThread = new Thread(updatePlaybackTimeTask);
+            updatePlaybackTimeThread.setDaemon(true);
+            updatePlaybackTimeThread.start();
 
             // Set image on the spectrogram area
             spectrogramImage.setFitHeight(finalWidth);

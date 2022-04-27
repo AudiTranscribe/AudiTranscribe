@@ -2,15 +2,19 @@
  * Audio.java
  *
  * Created on 2022-02-13
- * Updated on 2022-04-10
+ * Updated on 2022-04-27
  *
  * Description: Class that handles audio processing.
  */
 
 package site.overwrite.auditranscribe.audio;
 
+import javafx.util.Duration;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
 import site.overwrite.auditranscribe.utils.FileUtils;
+
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.Media;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -41,8 +45,10 @@ public class Audio {
     private int numMonoSamples;
     private double[] monoAudioSamples;
 
+    private final MediaPlayer mediaPlayer;
+
     /**
-     * Initialises an <code>Audio</code> object based on a file's input stream.
+     * Initializes an <code>Audio</code> object based on a file's input stream.
      *
      * @param filePath Input stream of a file.
      * @throws IOException                   If there was a problem reading in the audio stream.
@@ -57,20 +63,14 @@ public class Audio {
         audioFormat = audioStream.getFormat();
         sampleRate = audioFormat.getSampleRate();
 
+        // Get the media player for the audio file
+        mediaPlayer = new MediaPlayer(new Media(FileUtils.getFilePath(filePath)));
+
         // Generate audio samples
         generateSamples();
     }
 
     // Getter/Setter methods
-
-    /**
-     * Getter method that returns the audio format of the audio object.
-     *
-     * @return Audio format object.
-     */
-    public AudioFormat getAudioFormat() {
-        return audioFormat;
-    }
 
     /**
      * Getter method that returns the sample rate of the audio file.
@@ -126,6 +126,47 @@ public class Audio {
      */
     public double[] getMonoSamples() {
         return monoAudioSamples;
+    }
+
+    // Audio methods
+
+    /**
+     * Method that plays the audio.
+     */
+    public void playAudio() {
+        mediaPlayer.play();
+    }
+
+    /**
+     * Method that pauses the current audio that is playing.
+     */
+    public void pauseAudio() {
+        mediaPlayer.pause();
+    }
+
+    /**
+     * Method that stops the audio.
+     */
+    public void stopAudio() {
+        mediaPlayer.stop();
+    }
+
+    /**
+     * Set the current audio's playback time to <code>playbackTime</code> <b>seconds</b>.
+     *
+     * @param playbackTime The playback time in seconds.
+     */
+    public void setAudioPlaybackTime(double playbackTime) {
+        mediaPlayer.seek(new Duration(playbackTime * 1000));
+    }
+
+    /**
+     * Method that gets the current audio time in <b>seconds</b>.
+     *
+     * @return Returns the current audio time in <b>seconds</b>.
+     */
+    public double getCurrAudioTime() {
+        return mediaPlayer.getCurrentTime().toSeconds();
     }
 
     // Public methods
@@ -434,7 +475,7 @@ public class Audio {
             }
         }
 
-        // Calculate scaling factor to normalise the samples to the interval [-1f, 1f]
+        // Calculate scaling factor to normalize the samples to the interval [-1f, 1f]
         final long fullScale = (long) Math.pow(2.0, bitsPerSample - 1);
 
         // The OR is not quite enough to convert; signage needs to be corrected
