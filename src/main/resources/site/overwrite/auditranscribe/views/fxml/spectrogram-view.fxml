@@ -198,14 +198,14 @@
                      <children>
                         <Button fx:id="volumeButton" contentDisplay="CENTER" mnemonicParsing="false" stylesheets="@../css/buttons.css">
                            <graphic>
-                              <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="volumeButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../images/icons/PNGs/volume-medium.png" />
+                                    <Image url="@../../images/icons/PNGs/volume-high.png" />
                                  </image>
                               </ImageView>
                            </graphic>
                         </Button>
-                        <Slider fx:id="volumeSlider" />
+                        <Slider fx:id="volumeSlider" max="1.0" value="0.5" />
                      </children>
                      <padding>
                         <Insets left="10.0" right="10.0" />

@@ -2,7 +2,7 @@
  * Audio.java
  *
  * Created on 2022-02-13
- * Updated on 2022-04-27
+ * Updated on 2022-04-28
  *
  * Description: Class that handles audio processing.
  */
@@ -169,6 +169,16 @@ public class Audio {
         return mediaPlayer.getCurrentTime().toSeconds();
     }
 
+    /**
+     * Method that sets the volume to the volume provided.
+     *
+     * @param volume Volume value. This value should be in the interval [0, 1] where 0 means
+     *               silent and 1 means full volume.
+     */
+    public void setPlaybackVolume(double volume) {
+        mediaPlayer.setVolume(volume);
+    }
+
     // Public methods
 
     /**
@@ -333,9 +343,6 @@ public class Audio {
             // Get the total number of samples
             numSamples = audioStream.available() / bytesPerSample;
 
-            // Calculate the duration of the audio
-            duration = numSamples / sampleRate;
-
             // Calculate the number of samples needed for each window
             int numSamplesPerBuffer = SAMPLES_BUFFER_SIZE * audioFormat.getChannels();
             int numBuffers = (int) Math.ceil((float) numSamples / numSamplesPerBuffer);
@@ -391,9 +398,13 @@ public class Audio {
                 }
             } else {  // Mono
                 // Fill in the mono audio samples array
+                numMonoSamples = numSamples;
                 monoAudioSamples = new double[numSamples];
                 System.arraycopy(audioSamples, 0, monoAudioSamples, 0, numSamples);
             }
+
+            // Calculate the duration of the audio
+            duration = numMonoSamples / sampleRate;
 
             // Close the audio stream
             if (audioStream != null) {

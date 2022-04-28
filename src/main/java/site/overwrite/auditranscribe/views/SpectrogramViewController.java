@@ -2,7 +2,7 @@
  * SpectrogramViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-04-27
+ * Updated on 2022-04-28
  *
  * Description: Contains the spectrogram view's controller class.
  */
@@ -84,6 +84,8 @@ public class SpectrogramViewController implements Initializable {
     private int beatsPerBar = 4;
     private double offset = 0.;
     private boolean isPaused = true;
+    private double volume = 0.5;
+    private boolean isMuted = false;
 
     private Line[] beatLines;
     private StackPane[] barNumberEllipses;
@@ -126,7 +128,7 @@ public class SpectrogramViewController implements Initializable {
     private Button playButton, stopButton, playSkipBackButton, playSkipForwardButton, scrollButton, volumeButton;
 
     @FXML
-    private ImageView playButtonImage;
+    private ImageView playButtonImage, volumeButtonImage;
 
     @FXML
     private Slider volumeSlider;
@@ -197,6 +199,9 @@ public class SpectrogramViewController implements Initializable {
             // Update audio duration attribute and label
             audioDuration = audio.getDuration();
             totalTimeLabel.setText(UnitConversion.secondsToTimeString(audioDuration));
+
+            // Set initial volume
+            audio.setPlaybackVolume(volume);
 
             // Generate spectrogram
             Spectrogram spectrogram = new Spectrogram(
@@ -283,13 +288,52 @@ public class SpectrogramViewController implements Initializable {
             });
 
             // Add methods to buttons
-            playButton.setOnAction(event -> isPaused = togglePaused(isPaused));
+            playButton.setOnAction(event -> {
+                if (audio.getCurrAudioTime() == audioDuration) {
+                    audio.setAudioPlaybackTime(0);
+                }
+                isPaused = togglePaused(isPaused);
+            });
             stopButton.setOnAction(event -> {
                 audio.stopAudio();
                 isPaused = togglePaused(false);
             });
             playSkipBackButton.setOnAction(event -> audio.setAudioPlaybackTime(0));
             playSkipForwardButton.setOnAction(event -> audio.setAudioPlaybackTime(audioDuration));
+
+            volumeButton.setOnAction(event -> {
+                if (isMuted) {
+                    // Change the icon of the volume button from mute to non-mute
+                    volumeButtonImage.setImage(new Image(FileUtils.getFilePath("images/icons/PNGs/volume-high.png")));
+
+                    // Unmute the audio by setting the volume back to the value before the mute
+                    audio.setPlaybackVolume(volume);
+                } else {
+                    // Change the icon of the volume button from non-mute to mute
+                    volumeButtonImage.setImage(new Image(FileUtils.getFilePath("images/icons/PNGs/volume-mute.png")));
+
+                    // Mute the audio by setting the volume to zero
+                    audio.setPlaybackVolume(0);
+                }
+
+                // Toggle the `isMuted` flag
+                isMuted = !isMuted;
+            });
+
+            // Set method on the volume slider
+            volumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+                // Update the volume value
+                volume = newValue.doubleValue();
+
+                // Change the icon of the volume button from mute to non-mute
+                if (isMuted) {
+                    volumeButtonImage.setImage(new Image(FileUtils.getFilePath("images/icons/PNGs/volume-high.png")));
+                    isMuted = false;
+                }
+
+                // Update audio volume
+                audio.setPlaybackVolume(volume);
+            });
 
             // Constantly update the current playback time
             Task<Void> updatePlaybackTimeTask = new Task<>() {
@@ -303,12 +347,11 @@ public class SpectrogramViewController implements Initializable {
                         Platform.runLater(() -> currTimeLabel.setText(UnitConversion.secondsToTimeString(currTime)));
 
                         // Check if the current time has exceeded
-                        if (currTime >= audioDuration) {  // Fixme: why does this not work?
-                            // Reset the audio
-                            audio.stopAudio();
-
+                        if (currTime >= audioDuration) {
                             // Pause the audio
-                            isPaused = togglePaused(false);
+                            if (!isPaused) {
+                                isPaused = togglePaused(false);
+                            }
                         }
 
                         // Wait for 50 ms

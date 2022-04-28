@@ -9,3 +9,4 @@ Todo:
     - Implement file saving
         - We would probably save the spectrogram data as that takes the longest to generate
     - Add licence/credits for ionicons
+    - Add keyboard shortcuts
