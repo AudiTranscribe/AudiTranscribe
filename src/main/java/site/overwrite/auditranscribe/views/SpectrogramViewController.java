@@ -2,7 +2,7 @@
  * SpectrogramViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-04-28
+ * Updated on 2022-04-30
  *
  * Description: Contains the spectrogram view's controller class.
  */
@@ -10,7 +10,6 @@
 package site.overwrite.auditranscribe.views;
 
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -18,7 +17,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Line;
@@ -34,6 +32,7 @@ import site.overwrite.auditranscribe.utils.UnitConversion;
 import java.net.URL;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.*;
 import java.util.logging.Logger;
 
 import static java.util.Map.entry;
@@ -70,6 +69,8 @@ public class SpectrogramViewController implements Initializable {
     final int MIN_NOTE_NUMBER = 0;  // C0
     final int MAX_NOTE_NUMBER = 119;  // B9
 
+    final int UPDATE_PLAYBACK_SCHEDULER_PERIOD = 50;  // In milliseconds
+
     // Attributes
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -92,9 +93,6 @@ public class SpectrogramViewController implements Initializable {
 
     // FXML Elements
     // Top HBox
-    @FXML
-    private HBox topHBox;
-
     @FXML
     private Button newProjectButton, openProjectButton, saveProjectButton;
 
@@ -153,7 +151,7 @@ public class SpectrogramViewController implements Initializable {
         return !isPaused;
     }
 
-    // FXML Methods
+    // Value updating methods
     protected void updateBPMValue(int newBPM) {
         // Update the beat lines
         beatLines = SpectrogramStuffHandler.updateBeatLines(
@@ -336,33 +334,26 @@ public class SpectrogramViewController implements Initializable {
             });
 
             // Constantly update the current playback time
-            Task<Void> updatePlaybackTimeTask = new Task<>() {
-                @Override
-                public Void call() throws Exception {
-                    while (true) {  // Fixme: `while` statement cannot complete without throwing an exception
-                        // Get the current time
-                        double currTime = audio.getCurrAudioTime();
+            ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(0, runnable -> {
+                Thread thread = Executors.defaultThreadFactory().newThread(runnable);
+                thread.setDaemon(true);  // Make it so that it can shut down gracefully by placing it in background
+                return thread;
+            });
+            scheduler.scheduleAtFixedRate(() -> {
+                // Get the current time
+                double currTime = audio.getCurrAudioTime();
 
-                        // Update the current time label
-                        Platform.runLater(() -> currTimeLabel.setText(UnitConversion.secondsToTimeString(currTime)));
+                // Update the current time label
+                Platform.runLater(() -> currTimeLabel.setText(UnitConversion.secondsToTimeString(currTime)));
 
-                        // Check if the current time has exceeded
-                        if (currTime >= audioDuration) {
-                            // Pause the audio
-                            if (!isPaused) {
-                                isPaused = togglePaused(false);
-                            }
-                        }
-
-                        // Wait for 50 ms
-                        Thread.sleep(50);  // Fixme: Call to `Thread.sleep()` in a loop, probably busy-waiting
+                // Check if the current time has exceeded
+                if (currTime >= audioDuration) {
+                    // Pause the audio
+                    if (!isPaused) {
+                        isPaused = togglePaused(false);
                     }
                 }
-            };
-
-            Thread updatePlaybackTimeThread = new Thread(updatePlaybackTimeTask);
-            updatePlaybackTimeThread.setDaemon(true);
-            updatePlaybackTimeThread.start();
+            }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);
 
             // Set image on the spectrogram area
             spectrogramImage.setFitHeight(finalWidth);

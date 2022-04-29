@@ -5,8 +5,11 @@ Todo:
         - Before estimation is implemented, allow user to select BPM and show beats lines updating
     - Menu GUI
     - Allow audio to play alongside spectrogram
-        - Fix the audio stopping protocol when the audio ends
     - Implement file saving
         - We would probably save the spectrogram data as that takes the longest to generate
     - Add licence/credits for ionicons
     - Add keyboard shortcuts
+
+Fixme:
+    - Fix weird interactions between playback buttons:
+        - "Stop -> Skip Forwards -> Play" should play from beginning immediately, but instead nothing plays
