@@ -5,6 +5,7 @@ Todo:
         - Before estimation is implemented, allow user to select BPM and show beats lines updating
     - Menu GUI
     - Allow audio to play alongside spectrogram
+    - Allow other audio types (e.g. mp3) to be input into the program
     - Implement file saving
         - We would probably save the spectrogram data as that takes the longest to generate
     - Add licence/credits for ionicons

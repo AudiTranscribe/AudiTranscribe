@@ -239,6 +239,7 @@ public class SpectrogramViewController implements Initializable {
         try {
 //            Audio audio = new Audio("testing-audio-files/A440.wav");
             Audio audio = new Audio("testing-audio-files/Melancholy.wav");
+//            audio = new Audio("testing-audio-files/A440.mp3");
 
             // Update audio duration attribute
             audioDuration = audio.getDuration();
