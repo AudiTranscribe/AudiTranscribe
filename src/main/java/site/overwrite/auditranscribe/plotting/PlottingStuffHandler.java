@@ -57,7 +57,10 @@ public class PlottingStuffHandler {
      * @param fancySharps   Whether <em>fancier sharps</em> (i.e. ♯ instead of #) should be used for
      *                      the note labels.
      */
-    public static Label[] addNoteLabels(Pane notePane, Label[] noteLabels, String musicKey, double height, int minNoteNumber, int maxNoteNumber, boolean fancySharps) {
+    public static Label[] addNoteLabels(
+            Pane notePane, Label[] noteLabels, String musicKey, double height, int minNoteNumber,
+            int maxNoteNumber, boolean fancySharps
+    ) {
         // Get the width of the note pane
         double width = notePane.getPrefWidth();
 
@@ -159,7 +162,7 @@ public class PlottingStuffHandler {
      * @return Array of <code>Line</code> objects, representing the lines to be added.
      */
     public static Line[] getBeatLines(
-            int bpm, int beatsPerBar, int pxPerSecond, double height, double duration, double offset,
+            double bpm, int beatsPerBar, int pxPerSecond, double height, double duration, double offset,
             double zoomScaleX
     ) {
         // Calculate the number of beats and the number of seconds per beat
@@ -210,7 +213,7 @@ public class PlottingStuffHandler {
      * shown.
      */
     public static Line[] updateBeatLines(
-            Pane spectrogramPane, Line[] lines, double duration, int oldBPM, int newBPM, double oldOffset,
+            Pane spectrogramPane, Line[] lines, double duration, double oldBPM, double newBPM, double oldOffset,
             double newOffset, double height, int oldBeatsPerBar, int newBeatsPerBar, int pxPerSecond, double zoomScaleX
     ) {
         // Return prematurely if the olds equal the news (b/c nothing to update)
@@ -295,7 +298,7 @@ public class PlottingStuffHandler {
      * @return Array of <code>StackPane</code>s, representing the generated ellipses.
      */
     public static StackPane[] getBarNumberEllipses(
-            int bpm, int beatsPerBar, int pxPerSecond, double height, double duration, double offset, double zoomScaleX
+            double bpm, int beatsPerBar, int pxPerSecond, double height, double duration, double offset, double zoomScaleX
     ) {
         // Calculate the number of bars
         double spb = secondsPerBeat(bpm);
@@ -347,7 +350,7 @@ public class PlottingStuffHandler {
      * shown.
      */
     public static StackPane[] updateBarNumberEllipses(
-            Pane barNumberPane, StackPane[] ellipses, double duration, int oldBPM, int newBPM, double oldOffset,
+            Pane barNumberPane, StackPane[] ellipses, double duration, double oldBPM, double newBPM, double oldOffset,
             double newOffset, double height, int oldBeatsPerBar, int newBeatsPerBar, int pxPerSecond, double zoomScaleX
     ) {
         // Return prematurely if the olds equal the news (b/c nothing to update)
@@ -436,7 +439,7 @@ public class PlottingStuffHandler {
      * @param bpm Beats per minute.
      * @return Seconds per beat.
      */
-    static double secondsPerBeat(int bpm) {
+    static double secondsPerBeat(double bpm) {
         return 1. / (bpm / 60.);  // BPM / 60 = Beats per second, so 1 / Beats Per Second = Seconds per Beat
     }
 

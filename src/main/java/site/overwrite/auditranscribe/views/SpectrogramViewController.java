@@ -76,8 +76,8 @@ public class SpectrogramViewController implements Initializable {
 
     // File-Savable Attributes
     private String key = "C";
-    private int bpm = 120;
     private int beatsPerBar = 4;
+    private double bpm = 120;
     private double offset = 0.;
     private boolean isPaused = true;
     private double volume = 0.5;
@@ -111,10 +111,7 @@ public class SpectrogramViewController implements Initializable {
     private ChoiceBox<String> musicKeyChoice, timeSignatureChoice;
 
     @FXML
-    private Spinner<Integer> bpmSpinner;
-
-    @FXML
-    private Spinner<Double> offsetSpinner;
+    private Spinner<Double> bpmSpinner, offsetSpinner;
 
     // Mid-view
     @FXML
@@ -163,7 +160,7 @@ public class SpectrogramViewController implements Initializable {
     }
 
     // Value updating methods
-    protected void updateBPMValue(int newBPM) {
+    protected void updateBPMValue(double newBPM) {
         // Update the beat lines
         beatLines = PlottingStuffHandler.updateBeatLines(
                 spectrogramPaneAnchor, beatLines, audioDuration, bpm, newBPM, offset, offset, finalHeight, beatsPerBar,
@@ -238,9 +235,9 @@ public class SpectrogramViewController implements Initializable {
             bottomPane.hvalueProperty().bindBidirectional(spectrogramPane.hvalueProperty());
 
             // Update spinners' ranges
-            SpinnerValueFactory.IntegerSpinnerValueFactory bpmSpinnerFactory =
-                    new SpinnerValueFactory.IntegerSpinnerValueFactory(
-                            BPM_RANGE.getKey(), BPM_RANGE.getValue(), 120, 1
+            SpinnerValueFactory.DoubleSpinnerValueFactory bpmSpinnerFactory =
+                    new SpinnerValueFactory.DoubleSpinnerValueFactory(
+                            BPM_RANGE.getKey(), BPM_RANGE.getValue(), 120, 0.1
                     );
             SpinnerValueFactory.DoubleSpinnerValueFactory offsetSpinnerFactory =
                     new SpinnerValueFactory.DoubleSpinnerValueFactory(
@@ -325,7 +322,6 @@ public class SpectrogramViewController implements Initializable {
                 audio.setAudioPlaybackTime(0);
 
                 // Update the previous times
-//                prevAudioTime = 0;
                 prevSeekTime = 0;
 
                 // Update the last seek time
@@ -341,7 +337,6 @@ public class SpectrogramViewController implements Initializable {
                 audio.setAudioPlaybackTime(audioDuration);
 
                 // Update the previous times
-//                prevAudioTime = audioDuration;
                 prevSeekTime = audioDuration;
 
                 // Update the last seek time
