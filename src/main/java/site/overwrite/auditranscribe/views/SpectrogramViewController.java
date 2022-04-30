@@ -27,6 +27,7 @@ import site.overwrite.auditranscribe.plotting.PlottingStuffHandler;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
 import site.overwrite.auditranscribe.spectrogram.Spectrogram;
 import site.overwrite.auditranscribe.utils.FileUtils;
+import site.overwrite.auditranscribe.utils.MiscUtils;
 import site.overwrite.auditranscribe.utils.UnitConversion;
 
 import java.net.URL;
@@ -73,7 +74,17 @@ public class SpectrogramViewController implements Initializable {
 
     final boolean USE_FANCY_SHARPS_FOR_NOTE_LABELS = true;
 
-    // Attributes
+    // File-Savable Attributes
+    private String key = "C";
+    private int bpm = 120;
+    private int beatsPerBar = 4;
+    private double offset = 0.;
+    private boolean isPaused = true;
+    private double volume = 0.5;
+    private boolean isMuted = false;
+    private double currTime = 0;
+
+    // Other attributes
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     private Audio audio;
@@ -82,13 +93,10 @@ public class SpectrogramViewController implements Initializable {
     private double finalHeight;
     private double audioDuration;
 
-    private String key = "C";
-    private int bpm = 120;
-    private int beatsPerBar = 4;
-    private double offset = 0.;
-    private boolean isPaused = true;
-    private double volume = 0.5;
-    private boolean isMuted = false;
+    private double lastSeekTimestamp = 0;  // Last time that the user triggered a seek command
+    private double lastAudioTimeUpdateTimestamp = 0;  // Last time that the audio time was updated
+    private double prevSeekTime = 0;
+    private double prevAudioTime = 0;
 
     private Label[] noteLabels;
     private Line[] beatLines;
@@ -301,17 +309,44 @@ public class SpectrogramViewController implements Initializable {
 
             // Add methods to buttons
             playButton.setOnAction(event -> {
-                if (audio.getCurrAudioTime() == audioDuration) {
+                if (currTime == audioDuration) {
                     audio.setAudioPlaybackTime(0);
                 }
                 isPaused = togglePaused(isPaused);
             });
+
             stopButton.setOnAction(event -> {
                 audio.stopAudio();
                 isPaused = togglePaused(false);
             });
-            playSkipBackButton.setOnAction(event -> audio.setAudioPlaybackTime(0));
-            playSkipForwardButton.setOnAction(event -> audio.setAudioPlaybackTime(audioDuration));
+
+            playSkipBackButton.setOnAction(event -> {
+                // Set the playback time
+                audio.setAudioPlaybackTime(0);
+
+                // Update the previous times
+//                prevAudioTime = 0;
+                prevSeekTime = 0;
+
+                // Update the last seek time
+                lastSeekTimestamp = MiscUtils.getUnixTimestamp();
+
+                // Pause the audio
+                // (We need to do this here because the program will not handle the pausing later)
+                isPaused = togglePaused(false);
+            });
+
+            playSkipForwardButton.setOnAction(event -> {
+                // Set the playback time
+                audio.setAudioPlaybackTime(audioDuration);
+
+                // Update the previous times
+//                prevAudioTime = audioDuration;
+                prevSeekTime = audioDuration;
+
+                // Update the last seek time
+                lastSeekTimestamp = MiscUtils.getUnixTimestamp();
+            });
 
             volumeButton.setOnAction(event -> {
                 if (isMuted) {
@@ -354,18 +389,28 @@ public class SpectrogramViewController implements Initializable {
                 return thread;
             });
             scheduler.scheduleAtFixedRate(() -> {
-                // Get the current time
-                double currTime = audio.getCurrAudioTime();
+                // Get the current audio time
+                double audioTime = audio.getCurrAudioTime();
+
+                // Check if the audio time was updated
+                if (audioTime != prevAudioTime) {
+                    prevAudioTime = audioTime;
+                    lastAudioTimeUpdateTimestamp = MiscUtils.getUnixTimestamp();
+                }
+
+                // Determine which time to use as the `currTime`
+                if (lastAudioTimeUpdateTimestamp > lastSeekTimestamp) {
+                    currTime = prevAudioTime;
+                } else {
+                    currTime = prevSeekTime;
+                }
 
                 // Update the current time label
                 Platform.runLater(() -> currTimeLabel.setText(UnitConversion.secondsToTimeString(currTime)));
 
-                // Check if the current time has exceeded
-                if (currTime >= audioDuration) {
-                    // Pause the audio
-                    if (!isPaused) {
-                        isPaused = togglePaused(false);
-                    }
+                // Check if the current time has exceeded and is not paused
+                if (currTime >= audioDuration && !isPaused) {
+                    isPaused = togglePaused(false);  // Pause the audio
                 }
             }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);
 
@@ -393,7 +438,8 @@ public class SpectrogramViewController implements Initializable {
             );
             PlottingStuffHandler.addBarNumberEllipses(barNumberPane, barNumberEllipses);
 
-            // Resize image pane
+            // Resize spectrogram image pane
+            // (We do this at the end to ensure that the image is properly placed)
             spectrogramImage.setFitWidth(finalWidth);
             spectrogramImage.setFitHeight(finalHeight);
 

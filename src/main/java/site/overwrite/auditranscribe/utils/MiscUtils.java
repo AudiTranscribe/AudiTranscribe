@@ -9,6 +9,7 @@
 
 package site.overwrite.auditranscribe.utils;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -48,5 +49,28 @@ public class MiscUtils {
 
         // Convert to a hash set and return
         return new HashSet<>(Arrays.asList(noteOffsets));
+    }
+
+    // Time utils
+
+    /**
+     * Gets the number of seconds from the Java epoch of 1970-01-01T00:00:00Z.<br>
+     * The epoch second count is a simple incrementing count of seconds where second 0 is
+     * 1970-01-01T00:00:00Z (i.e. Unix Epoch).
+     *
+     * @return Double representing the number of seconds. Decimal part is the fractional second
+     * part.
+     * @implNote The fractional part cannot be fully trusted; precision may only be accurate up to
+     * 10 milliseconds (i.e. up to 0.01 s).
+     */
+    public static double getUnixTimestamp() {
+        // Get both the current epoch second and the nanosecond part
+        Instant now = Instant.now();  // Get current time
+
+        long epochSecond = now.getEpochSecond();
+        int epochNanoseconds = now.getNano();
+
+        // Combine into a single double object and return
+        return Double.parseDouble(epochSecond + "." + epochNanoseconds);
     }
 }
