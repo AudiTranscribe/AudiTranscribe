@@ -4,7 +4,7 @@
  * Created on 2022-02-13
  * Updated on 2022-04-30
  *
- * Description: Class that handles audio processing.
+ * Description: Class that handles audio processing and audio playback.
  */
 
 package site.overwrite.auditranscribe.audio;
@@ -29,7 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Audio class that handles audio processing.
+ * Audio class that handles audio processing and audio playback.
  */
 public class Audio {
     // Constants
@@ -104,38 +104,38 @@ public class Audio {
     }
 
     /**
-     * Getter method for the RAW number of samples in the audio object.<br>
-     * See {@link #getNumMonoSamples()} to get the number of MONO samples.
+     * Getter method for the total number of samples in the audio object.<br>
+     * See {@link #getNumMonoSamples()} to get the number of <b>mono</b> samples.
      *
-     * @return Number of samples.
+     * @return Total number of samples.
      */
     public int getNumSamples() {
         return numSamples;
     }
 
     /**
-     * Getter method that returns the samples of the audio.
-     * See {@link #getMonoSamples()} to get the MONO samples.
+     * Getter method that returns all the samples of the audio object.<br>
+     * See {@link #getMonoSamples()} to get the <b>mono</b>samples.
      *
-     * @return Samples of the audio object.
+     * @return All the samples of the audio object.
      */
     public double[] getSamples() {
         return audioSamples;
     }
 
     /**
-     * Getter method for the number of MONO samples in the audio object.<br>
+     * Getter method for the number of <b>mono</b> samples in the audio object.
      *
-     * @return Number of MONO samples.
+     * @return Number of <b>mono</b> samples.
      */
     public int getNumMonoSamples() {
         return numMonoSamples;
     }
 
     /**
-     * Getter method that returns the MONO samples of the audio.
+     * Getter method that returns the <b>mono</b> samples of the audio object.
      *
-     * @return MONO samples of the audio object.
+     * @return The <b>mono</b> samples of the audio object.
      */
     public double[] getMonoSamples() {
         return monoAudioSamples;
@@ -283,8 +283,10 @@ public class Audio {
      * @implNote See <a href="https://github.com/bmcfee/resampy/blob/ccb8557/resampy/interpn.py">
      * Resampy's Source Code</a> for the original implementation of this function in Python.
      */
-    private static void resampleF(double[] x, double[] y, double sampleRatio, double[] interpWin, double[] interpDeltas,
-                                  int precision) {
+    private static void resampleF(
+            double[] x, double[] y, double sampleRatio, double[] interpWin,
+            double[] interpDeltas, int precision
+    ) {
         // Define constants that will be needed later
         double scale = Math.min(sampleRatio, 1.);
         double timeIncrement = 1. / sampleRatio;
@@ -346,7 +348,7 @@ public class Audio {
     }
 
     /**
-     * Generates the samples' data from the audio file.
+     * Generates the audio sample data from the provided audio file.
      */
     private void generateSamples() {
         try {
@@ -431,17 +433,19 @@ public class Audio {
     }
 
     /**
-     * Returns the number of bytes that are needed to store the number of bits
+     * Returns the minimum number of bytes that are needed to fully store the number of bits
+     * specified.
      *
      * @param numBits Number of bits to store.
-     * @return Number of bytes needed to store the number of bits.
+     * @return Required number of bytes.
      */
     private static int numBytesForNumBits(int numBits) {
         return numBits + 7 >> 3;
     }
 
     /**
-     * Unpacks the set of bytes from a file into audio sample data.
+     * Unpacks the set of bytes from a file (the array <code>bytes</code>) into audio sample data
+     * (into the array <code>samples</code>).
      *
      * @param samples       (Initially) empty array that stores the samples. Fixed in length at
      *                      <code>SAMPLES_BUFFER_SIZE * audioFormat.getChannels()</code> float
@@ -466,18 +470,16 @@ public class Audio {
         final int bytesPerSample = numBytesForNumBits(bitsPerSample);
 
         /*
-         * This isn't the most DRY way to do this, but it's more efficient. The helper array
-         * `transfer` allows the logic to be split up without being too repetitive.
+         * This isn't the most DRY way to do this, but it's more efficient. The helper array `transfer` allows the logic
+         * to be split up without being too repetitive.
          *
-         * There are two loops converting bytes to raw long samples. Integral primitives in Java get
-         * sign extended when they are promoted to a larger type, so the `& 0xffL` mask keeps them
-         * intact.
+         * There are two loops converting bytes to raw long samples. Integral primitives in Java get sign extended when
+         * they are promoted to a larger type, so the `& 0xffL` mask keeps them intact.
          */
 
         if (audioFormat.isBigEndian()) {
             for (int i = 0, k = 0, b; i < numValidBytes; i += bytesPerSample, k++) {
-                // Reset the current element's value to zero, so what was originally in `transfer`
-                // doesn't matter
+                // Reset the current element's value to zero, so what was originally in `transfer` doesn't matter
                 transfer[k] = 0L;
 
                 // Update transfer
@@ -488,8 +490,7 @@ public class Audio {
             }
         } else {
             for (int i = 0, k = 0, b; i < numValidBytes; i += bytesPerSample, k++) {
-                // Reset the current element's value to zero, so what was originally in `transfer`
-                // doesn't matter
+                // Reset the current element's value to zero, so what was originally in `transfer` doesn't matter
                 transfer[k] = 0L;
 
                 // Update transfer
@@ -507,22 +508,19 @@ public class Audio {
             /*
              * If the samples were signed, they must be extended to the 64-bit long.
              *
-             * The arithmetic right shift in Java will fill the left bits with 1's if the Most
-             * Significant Bit (MSB) is set, so sign extend by first shifting left so that if the
-             * sample is supposed to be negative, it will shift the sign bit in to the 64-bit MSB
-             * then shift back and fill with 1's.
+             * The arithmetic right shift in Java will fill the left bits with 1's if the Most Significant Bit (MSB) is
+             * set, so sign extend by first shifting left so that if the sample is supposed to be negative, it will
+             * shift the sign bit in to the 64-bit MSB then shift back and fill with 1's.
              *
-             * As an example, imagining these were 4-bit samples originally and the destination is
-             * 8-bit, if we have a hypothetical sample -5 that ought to be negative, the left shift
-             * looks like this:
+             * As an example, imagining these were 4-bit samples originally and the destination is 8-bit, if we have a
+             * hypothetical sample -5 that ought to be negative, the left shift looks like this:
              *
              *    00001011
              * <<  (8 - 4)
              * ===========
              *    10110000
              *
-             * (Except the destination is 64-bit and the original bit depth from the file could be
-             * anything.)
+             * (Except the destination is 64-bit and the original bit depth from the file could be anything.)
              *
              * And the right shift now fills with 1's:
              *
@@ -539,8 +537,8 @@ public class Audio {
             }
         } else {
             /*
-             * Unsigned samples are easier since they will be read correctly in to the long.
-             * So just sign them: subtract 2^(bits - 1) so the center is 0.
+             * Unsigned samples are easier since they will be read correctly in to the long. So just sign them:
+             * subtract `Math.pow(2., bitsPerSample - 1)` so the center is 0.
              */
 
             for (int i = 0; i < transfer.length; i++) {
