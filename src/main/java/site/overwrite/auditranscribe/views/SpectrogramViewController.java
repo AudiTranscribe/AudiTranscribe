@@ -153,12 +153,13 @@ public class SpectrogramViewController implements Initializable {
     }
 
     protected void seekToTime(double seekTime) {
-        // Set the playback time
-        audio.setAudioPlaybackTime(seekTime);
-
         // Update the start time of the audio
         // (Do this so that when the player resumes out of a stop state it will start here)
         audio.setAudioStartTime(seekTime);
+
+        // Set the playback time
+        // (We do this after updating start time to avoid pesky seeking issues)
+        audio.setAudioPlaybackTime(seekTime);
 
         // Update the current time label
         currTimeLabel.setText(UnitConversion.secondsToTimeString(seekTime));
