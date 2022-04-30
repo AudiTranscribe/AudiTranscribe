@@ -2,7 +2,7 @@
  * SpectrogramViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-04-25
+ * Updated on 2022-04-26
  *
  * Description: Contains the spectrogram view's controller class.
  */
@@ -11,10 +11,7 @@ package site.overwrite.auditranscribe.views;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
@@ -28,13 +25,10 @@ import site.overwrite.auditranscribe.audio.Window;
 import site.overwrite.auditranscribe.plotting.SpectrogramStuffHandler;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
 import site.overwrite.auditranscribe.spectrogram.Spectrogram;
-import site.overwrite.auditranscribe.utils.StyleUtils;
-import site.overwrite.auditranscribe.utils.ValidationUtils;
 
 import java.net.URL;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.util.Map.entry;
@@ -95,7 +89,10 @@ public class SpectrogramViewController implements Initializable {
     private ChoiceBox<String> musicKeyChoice, timeSignatureChoice;
 
     @FXML
-    private TextField bpmField, offsetField;
+    private Spinner<Integer> bpmSpinner;
+
+    @FXML
+    private Spinner<Double> offsetSpinner;
 
     // Mid-view
     @FXML
@@ -110,79 +107,8 @@ public class SpectrogramViewController implements Initializable {
     @FXML
     private ImageView spectrogramImage;
 
-    // Validation methods
-    boolean validateBPMField(String bpmFieldValue) {
-        // Check if the `bpmFieldValue` is empty
-        if (ValidationUtils.isEmpty(bpmFieldValue)) {
-            bpmField.setStyle(StyleUtils.ERROR_BORDER);
-            logger.log(Level.INFO, "Validation: BPM field empty");
-            return false;
-        }
-
-        // Ensure that the `bpmFieldValue` is an integer
-        if (!ValidationUtils.isStringInteger(bpmFieldValue)) {
-            bpmField.setStyle(StyleUtils.ERROR_FIELD);
-            logger.log(Level.INFO, "Validation: BPM field not an integer");
-            return false;
-        }
-
-        // Ensure that the BPM value lies within the accepted range
-        int bpmValue = Integer.parseInt(bpmFieldValue);
-
-        if (!ValidationUtils.isInRange(bpmValue, BPM_RANGE.getKey(), BPM_RANGE.getValue())) {
-            bpmField.setStyle(StyleUtils.ERROR_FIELD);
-            logger.log(Level.INFO, "Validation: BPM field value out of range");
-            return false;
-        }
-
-        // All checks passed; reset field style
-        logger.log(Level.FINE, "BPM field value updated to " + bpmFieldValue);
-        bpmField.setStyle(null);
-        return true;
-    }
-
-    boolean validateOffsetField(String offsetFieldValue) {
-        // Check if the `offsetFieldValue` is empty
-        if (ValidationUtils.isEmpty(offsetFieldValue)) {
-            offsetField.setStyle(StyleUtils.ERROR_BORDER);
-            logger.log(Level.INFO, "Validation: Offset field empty");
-            return false;
-        }
-
-        // Ensure that the `offsetFieldValue` is a double
-        if (!ValidationUtils.isStringDouble(offsetFieldValue)) {
-            offsetField.setStyle(StyleUtils.ERROR_FIELD);
-            logger.log(Level.INFO, "Validation: Offset field not a double");
-            return false;
-        }
-
-        // Ensure that the BPM value lies within the accepted range
-        double offsetValue = Double.parseDouble(offsetFieldValue);
-
-        if (!ValidationUtils.isInRange(offsetValue, OFFSET_RANGE.getKey(), OFFSET_RANGE.getValue())) {
-            offsetField.setStyle(StyleUtils.ERROR_FIELD);
-            logger.log(Level.INFO, "Validation: Offset field value out of range");
-            return false;
-        }
-
-        // All checks passed; reset field style
-        logger.log(Level.FINE, "Offset field value updated to " + offsetFieldValue);
-        offsetField.setStyle(null);
-        return true;
-    }
-
     // FXML Methods
-    @FXML
-    protected void onFinishedEditingBPMField() {
-        // Get the processed string from the BPM field
-        String bpmFieldValue = bpmField.getText();
-
-        // Run validation on the BPM field text
-        if (!validateBPMField(bpmFieldValue)) return;
-
-        // Convert the field value into the new BPM value
-        int newBPM = Integer.parseInt(bpmFieldValue);
-
+    protected void updateBPMValue(int newBPM) {
         // Update the beat lines
         beatLines = SpectrogramStuffHandler.updateBeatLines(
                 spectrogramPaneAnchor, beatLines, audioDuration, bpm, newBPM, offset, offset, finalHeight, beatsPerBar,
@@ -197,22 +123,9 @@ public class SpectrogramViewController implements Initializable {
 
         // Update the BPM value
         bpm = newBPM;
-
-        // Set the field text to the new BPM value
-        bpmField.setText(newBPM + "");  // `newBPM` is the BPM but with no leading zeros
     }
 
-    @FXML
-    protected void onFinishedEditingOffsetField() {
-        // Get the string from the offset field
-        String offsetFieldValue = offsetField.getText();
-
-        // Run validation on the offset field text
-        if (!validateOffsetField(offsetFieldValue)) return;
-
-        // Convert the field value into the new offset
-        double newOffset = Double.parseDouble(offsetFieldValue);
-
+    protected void updateOffsetValue(double newOffset) {
         // Update the beat lines
         beatLines = SpectrogramStuffHandler.updateBeatLines(
                 spectrogramPaneAnchor, beatLines, audioDuration, bpm, bpm, offset, newOffset, finalHeight, beatsPerBar,
@@ -227,9 +140,6 @@ public class SpectrogramViewController implements Initializable {
 
         // Update the offset value
         offset = newOffset;
-
-        // Set the field text to the new offset value
-        offsetField.setText(newOffset + "");  // `newOffset` is the offset but with no leading nor trailing zeros
     }
 
     // Initialization function
@@ -268,48 +178,39 @@ public class SpectrogramViewController implements Initializable {
             leftPane.vvalueProperty().bindBidirectional(spectrogramPane.vvalueProperty());
             bottomPane.hvalueProperty().bindBidirectional(spectrogramPane.hvalueProperty());
 
-            // Set the choice boxes' choices
-            for (String musicKey : MUSIC_KEYS) {
-                musicKeyChoice.getItems().add(musicKey);
-            }
+            // Update spinners' ranges
+            SpinnerValueFactory.IntegerSpinnerValueFactory bpmSpinnerFactory =
+                    new SpinnerValueFactory.IntegerSpinnerValueFactory(
+                            BPM_RANGE.getKey(), BPM_RANGE.getValue(), 120, 1
+                    );
+            SpinnerValueFactory.DoubleSpinnerValueFactory offsetSpinnerFactory =
+                    new SpinnerValueFactory.DoubleSpinnerValueFactory(
+                            OFFSET_RANGE.getKey(), OFFSET_RANGE.getValue(), 0, 0.01
+                    );
 
-            for (String timeSignature : TIME_SIGNATURES) {
-                timeSignatureChoice.getItems().add(timeSignature);
-            }
+            bpmSpinner.setValueFactory(bpmSpinnerFactory);
+            offsetSpinner.setValueFactory(offsetSpinnerFactory);
+
+            // Set the choice boxes' choices
+            for (String musicKey : MUSIC_KEYS) musicKeyChoice.getItems().add(musicKey);
+            for (String timeSignature : TIME_SIGNATURES) timeSignatureChoice.getItems().add(timeSignature);
 
             musicKeyChoice.setValue("C");
             timeSignatureChoice.setValue("4/4");
 
-            // Set methods on text fields
-            bpmField.textProperty().addListener((observable, oldValue, newValue) -> {
-                // Remove/prevent entering of non-digit characters
-                if (!newValue.matches("\\d*")) {
-                    bpmField.setText(newValue.replaceAll("\\D+", ""));
-                }
+            // Set methods on spinners
+            bpmSpinner.valueProperty().addListener((observable, oldValue, newValue) -> updateBPMValue(newValue));
+            offsetSpinner.valueProperty().addListener(((observable, oldValue, newValue) -> updateOffsetValue(newValue)));
 
-                // Validate what was entered inside the BPM field
-                validateBPMField(bpmField.getText());
-            });  // See https://stackoverflow.com/a/30796829
-
-            offsetField.textProperty().addListener((observable, oldValue, newValue) -> {
-                // Remove/prevent entering of non-digit characters (except for the decimal point and a minus sign)
-                if (!newValue.matches("[\\d.-]*")) {
-                    offsetField.setText(newValue.replaceAll("[^\\d.-]+", ""));
-                }
-
-                // Validate what was entered inside the offset field
-                validateOffsetField(offsetField.getText());
-            });
-
-            bpmField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            bpmSpinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
                 if (!newValue) {  // Lost focus
-                    onFinishedEditingBPMField();
+                    updateBPMValue(bpmSpinner.getValue());
                 }
             });
 
-            offsetField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            offsetSpinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
                 if (!newValue) {  // Lost focus
-                    onFinishedEditingOffsetField();
+                    updateOffsetValue(offsetSpinner.getValue());
                 }
             });
 
