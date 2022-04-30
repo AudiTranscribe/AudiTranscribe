@@ -1,8 +1,8 @@
 /*
- * SpectrogramStuffHandler.java
+ * PlottingStuffHandler.java
  *
  * Created on 2022-03-20
- * Updated on 2022-04-25
+ * Updated on 2022-04-30
  *
  * Description: Class that adds the notes' stuff to the spectrogram area.
  */
@@ -19,12 +19,15 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.*;
 import javafx.scene.text.Font;
+import site.overwrite.auditranscribe.utils.MiscUtils;
 import site.overwrite.auditranscribe.utils.UnitConversion;
+
+import java.util.HashSet;
 
 /**
  * Class that adds the notes' stuff to the spectrogram area.
  */
-public class SpectrogramStuffHandler {
+public class PlottingStuffHandler {
     // Attributes
     // Todo: move to `Spectrogram` class?
     static final Font LABEL_FONT = Font.font("Arial", FontWeight.BOLD, FontPosture.REGULAR, 16);
@@ -46,18 +49,33 @@ public class SpectrogramStuffHandler {
      * Method that adds the note labels to the note pane.
      *
      * @param notePane      Note pane.
+     * @param noteLabels    Note label array.
+     * @param musicKey      Key for the music piece.
      * @param height        (Final) height of the note pane.
      * @param minNoteNumber Minimum note number.
      * @param maxNoteNumber Maximum note number.
+     * @param fancySharps   Whether <em>fancier sharps</em> (i.e. ♯ instead of #) should be used for
+     *                      the note labels.
      */
-    public static void addNoteLabels(Pane notePane, double height, int minNoteNumber, int maxNoteNumber) {
+    public static Label[] addNoteLabels(Pane notePane, Label[] noteLabels, String musicKey, double height, int minNoteNumber, int maxNoteNumber, boolean fancySharps) {
         // Get the width of the note pane
         double width = notePane.getPrefWidth();
 
-        // Place the notes onto the pane
+        // Get the note offsets that are in the key
+        HashSet<Integer> noteOffsets = MiscUtils.getNotesInKey(musicKey);
+
+        // Check if there are existing note labels
+        if (noteLabels != null) {
+            // Remove the note labels from the pane
+            notePane.getChildren().removeAll(noteLabels);
+        }
+
+        // Update the note labels
+        Label[] newNoteLabels = new Label[maxNoteNumber - minNoteNumber + 1];
+
         for (int i = minNoteNumber; i <= maxNoteNumber; i++) {
             // Get the note's text
-            String note = UnitConversion.noteNumberToNote(i);
+            String note = UnitConversion.noteNumberToNote(i, fancySharps);
 
             // Calculate the height to move the pointer to
             double placementHeight = PlottingHelpers.noteNumToHeight(i, minNoteNumber, maxNoteNumber, height);
@@ -67,6 +85,11 @@ public class SpectrogramStuffHandler {
             noteLabel.setFont(LABEL_FONT);
             noteLabel.setTextFill(Color.BLACK);
 
+            // Check if this note is one of the notes in the key
+            if (noteOffsets.contains(i % 12)) {
+                noteLabel.setUnderline(true);
+            }
+
             // Position the label correctly
             noteLabel.setTranslateY(placementHeight - 0.675 * LABEL_FONT.getSize());  // Magical 0.675 constant
 
@@ -74,9 +97,15 @@ public class SpectrogramStuffHandler {
             noteLabel.setPrefWidth(width);
             noteLabel.setAlignment(Pos.TOP_CENTER);
 
-            // Add the label to the plane
-            notePane.getChildren().add(noteLabel);
+            // Add the label to the new note label array
+            newNoteLabels[i - minNoteNumber] = noteLabel;
         }
+
+        // Place the notes onto the pane
+        notePane.getChildren().addAll(newNoteLabels);
+
+        // Return the new note labels
+        return newNoteLabels;
     }
 
     /**

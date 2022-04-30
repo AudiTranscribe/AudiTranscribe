@@ -2,7 +2,7 @@
  * UnitConversionTest.java
  *
  * Created on 2022-03-12
- * Updated on 2022-04-10
+ * Updated on 2022-04-30
  *
  * Description: Test `UnitConversion.java`.
  */
@@ -69,11 +69,17 @@ class UnitConversionTest {
 
     @Test
     void noteNumberToNote() {
-        assertEquals("C0", UnitConversion.noteNumberToNote(0));
-        assertEquals("D#3", UnitConversion.noteNumberToNote(39));
-        assertEquals("E5", UnitConversion.noteNumberToNote(64));
-        assertEquals("A#7", UnitConversion.noteNumberToNote(94));
-        assertEquals("B9", UnitConversion.noteNumberToNote(119));
+        assertEquals("C0", UnitConversion.noteNumberToNote(0, false));
+        assertEquals("D#3", UnitConversion.noteNumberToNote(39, false));
+        assertEquals("E5", UnitConversion.noteNumberToNote(64, false));
+        assertEquals("A#7", UnitConversion.noteNumberToNote(94, false));
+        assertEquals("B9", UnitConversion.noteNumberToNote(119, false));
+
+        assertEquals("C0", UnitConversion.noteNumberToNote(0, true));
+        assertEquals("D♯3", UnitConversion.noteNumberToNote(39, true));
+        assertEquals("E5", UnitConversion.noteNumberToNote(64, true));
+        assertEquals("A♯7", UnitConversion.noteNumberToNote(94, true));
+        assertEquals("B9", UnitConversion.noteNumberToNote(119, true));
     }
 
 

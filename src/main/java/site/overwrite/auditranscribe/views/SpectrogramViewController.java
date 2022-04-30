@@ -23,7 +23,7 @@ import javafx.scene.shape.Line;
 import javafx.util.Pair;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.Window;
-import site.overwrite.auditranscribe.plotting.SpectrogramStuffHandler;
+import site.overwrite.auditranscribe.plotting.PlottingStuffHandler;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
 import site.overwrite.auditranscribe.spectrogram.Spectrogram;
 import site.overwrite.auditranscribe.utils.FileUtils;
@@ -71,6 +71,8 @@ public class SpectrogramViewController implements Initializable {
 
     final int UPDATE_PLAYBACK_SCHEDULER_PERIOD = 50;  // In milliseconds
 
+    final boolean USE_FANCY_SHARPS_FOR_NOTE_LABELS = true;
+
     // Attributes
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -88,6 +90,7 @@ public class SpectrogramViewController implements Initializable {
     private double volume = 0.5;
     private boolean isMuted = false;
 
+    private Label[] noteLabels;
     private Line[] beatLines;
     private StackPane[] barNumberEllipses;
 
@@ -154,16 +157,16 @@ public class SpectrogramViewController implements Initializable {
     // Value updating methods
     protected void updateBPMValue(int newBPM) {
         // Update the beat lines
-        beatLines = SpectrogramStuffHandler.updateBeatLines(
+        beatLines = PlottingStuffHandler.updateBeatLines(
                 spectrogramPaneAnchor, beatLines, audioDuration, bpm, newBPM, offset, offset, finalHeight, beatsPerBar,
                 beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
         );
 
         // Update the bar number ellipses
-        barNumberEllipses = SpectrogramStuffHandler.updateBarNumberEllipses(
+        barNumberEllipses = PlottingStuffHandler.updateBarNumberEllipses(
                 barNumberPane, barNumberEllipses, audioDuration, bpm, newBPM, offset, offset,
-                barNumberPane.getPrefHeight(), beatsPerBar, beatsPerBar, PX_PER_SECOND,
-                SPECTROGRAM_ZOOM_SCALE_X);
+                barNumberPane.getPrefHeight(), beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+        );
 
         // Update the BPM value
         bpm = newBPM;
@@ -171,13 +174,13 @@ public class SpectrogramViewController implements Initializable {
 
     protected void updateOffsetValue(double newOffset) {
         // Update the beat lines
-        beatLines = SpectrogramStuffHandler.updateBeatLines(
+        beatLines = PlottingStuffHandler.updateBeatLines(
                 spectrogramPaneAnchor, beatLines, audioDuration, bpm, bpm, offset, newOffset, finalHeight, beatsPerBar,
                 beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
         );
 
         // Update the bar number ellipses
-        barNumberEllipses = SpectrogramStuffHandler.updateBarNumberEllipses(
+        barNumberEllipses = PlottingStuffHandler.updateBarNumberEllipses(
                 barNumberPane, barNumberEllipses, audioDuration, bpm, bpm, offset, newOffset,
                 barNumberPane.getPrefHeight(), beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
         );
@@ -263,27 +266,38 @@ public class SpectrogramViewController implements Initializable {
             });
 
             // Set methods on choice box fields
-            timeSignatureChoice.getSelectionModel().selectedItemProperty().addListener((observable, oldValue,
-                                                                                        newValue) -> {
-                // Get the old and new beats per bar
-                int oldBeatsPerBar = TIME_SIGNATURE_TO_BEATS_PER_BAR.get(oldValue);
-                int newBeatsPerBar = TIME_SIGNATURE_TO_BEATS_PER_BAR.get(newValue);
-
-                // Update the beat lines and bar number ellipses
-                beatLines = SpectrogramStuffHandler.updateBeatLines(
-                        spectrogramPaneAnchor, beatLines, audioDuration, bpm, bpm, offset, offset, finalHeight,
-                        oldBeatsPerBar, newBeatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+            musicKeyChoice.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                // Update note pane and note labels
+                noteLabels = PlottingStuffHandler.addNoteLabels(
+                        notePane, noteLabels, newValue, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER,
+                        USE_FANCY_SHARPS_FOR_NOTE_LABELS
                 );
 
-                barNumberEllipses = SpectrogramStuffHandler.updateBarNumberEllipses(
-                        barNumberPane, barNumberEllipses, audioDuration, bpm, bpm, offset, offset,
-                        barNumberPane.getPrefHeight(), oldBeatsPerBar, newBeatsPerBar, PX_PER_SECOND,
-                        SPECTROGRAM_ZOOM_SCALE_X
-                );
-
-                // Update the beats per bar
-                beatsPerBar = newBeatsPerBar;
+                // Update the music key value
+                key = newValue;
             });
+
+            timeSignatureChoice.getSelectionModel().selectedItemProperty()
+                    .addListener((observable, oldValue, newValue) -> {
+                        // Get the old and new beats per bar
+                        int oldBeatsPerBar = TIME_SIGNATURE_TO_BEATS_PER_BAR.get(oldValue);
+                        int newBeatsPerBar = TIME_SIGNATURE_TO_BEATS_PER_BAR.get(newValue);
+
+                        // Update the beat lines and bar number ellipses
+                        beatLines = PlottingStuffHandler.updateBeatLines(
+                                spectrogramPaneAnchor, beatLines, audioDuration, bpm, bpm, offset, offset, finalHeight,
+                                oldBeatsPerBar, newBeatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+                        );
+
+                        barNumberEllipses = PlottingStuffHandler.updateBarNumberEllipses(
+                                barNumberPane, barNumberEllipses, audioDuration, bpm, bpm, offset, offset,
+                                barNumberPane.getPrefHeight(), oldBeatsPerBar, newBeatsPerBar, PX_PER_SECOND,
+                                SPECTROGRAM_ZOOM_SCALE_X
+                        );
+
+                        // Update the beats per bar
+                        beatsPerBar = newBeatsPerBar;
+                    });
 
             // Add methods to buttons
             playButton.setOnAction(event -> {
@@ -361,20 +375,23 @@ public class SpectrogramViewController implements Initializable {
             spectrogramImage.setImage(image);
 
             // Add note labels and note lines
-            SpectrogramStuffHandler.addNoteLabels(notePane, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER);
-            SpectrogramStuffHandler.addNoteLines(spectrogramPaneAnchor, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER);
+            noteLabels = PlottingStuffHandler.addNoteLabels(
+                    notePane, noteLabels, key, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER,
+                    USE_FANCY_SHARPS_FOR_NOTE_LABELS
+            );
+            PlottingStuffHandler.addNoteLines(spectrogramPaneAnchor, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER);
 
             // Add the beat lines and bar number ellipses
-            beatLines = SpectrogramStuffHandler.getBeatLines(
+            beatLines = PlottingStuffHandler.getBeatLines(
                     bpm, beatsPerBar, PX_PER_SECOND, finalHeight, audioDuration, offset, SPECTROGRAM_ZOOM_SCALE_X
             );
-            SpectrogramStuffHandler.addBeatLines(spectrogramPaneAnchor, beatLines);
+            PlottingStuffHandler.addBeatLines(spectrogramPaneAnchor, beatLines);
 
-            barNumberEllipses = SpectrogramStuffHandler.getBarNumberEllipses(
+            barNumberEllipses = PlottingStuffHandler.getBarNumberEllipses(
                     bpm, beatsPerBar, PX_PER_SECOND, barNumberPane.getPrefHeight(), audioDuration, offset,
                     SPECTROGRAM_ZOOM_SCALE_X
             );
-            SpectrogramStuffHandler.addBarNumberEllipses(barNumberPane, barNumberEllipses);
+            PlottingStuffHandler.addBarNumberEllipses(barNumberPane, barNumberEllipses);
 
             // Resize image pane
             spectrogramImage.setFitWidth(finalWidth);

@@ -2,7 +2,7 @@
  * UnitConversion.java
  *
  * Created on 2022-03-12
- * Updated on 2022-04-27
+ * Updated on 2022-04-30
  *
  * Description: Unit conversion methods.
  */
@@ -120,24 +120,30 @@ public class UnitConversion {
      * Note that the note number for C0 is 0 and subsequent note numbers are given by their offset
      * from C0. For example, A4 has note number 57 as it is 57 notes away from C0.
      *
-     * @param noteNumber Note number for the given note.
+     * @param noteNumber  Note number for the given note.
+     * @param fancySharps Whether <em>fancier sharps</em> (i.e. ♯ instead of #) should be used.
      * @return Note string. Note that all notes with accidentals will be changed to those with
-     * SHARPS (# or ♯) only.
+     * <b>sharps (# or ♯) only</b>.
      */
     // Todo: incorporate correct note conversion with scale/key consideration (i.e. add flats as well)
-    public static String noteNumberToNote(int noteNumber) {
-        // Constant array of pitch/offset strings
-        final String[] keyStrings = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+    public static String noteNumberToNote(int noteNumber, boolean fancySharps) {
+        // Constant array of note strings
+        String[] noteStrings;
+        if (fancySharps) {
+            noteStrings = new String[]{"C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"};
+        } else {
+            noteStrings = new String[]{"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+        }
 
         // Compute the octave and the key value
         int octave = Math.floorDiv(noteNumber, 12);  // Note that C0 has note number 0, C1 is 12, C2 is 24 etc.
         int key = noteNumber % 12;  // 0 = C, 1 = C#, 2 = D, 3 = D# etc.
 
         // Get the pitch/offset string
-        String keyString = keyStrings[key];
+        String noteString = noteStrings[key];
 
         // Return the full string
-        return keyString + octave;  // Example: C0, D#3, E5 etc.
+        return noteString + octave;  // Example: C0, D#3, E5 etc.
     }
 
     // Magnitude Scaling - Unit Conversion

@@ -2,7 +2,7 @@
  * Audio.java
  *
  * Created on 2022-02-13
- * Updated on 2022-04-28
+ * Updated on 2022-04-30
  *
  * Description: Class that handles audio processing.
  */
@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Audio class that handles audio processing.
@@ -47,6 +49,8 @@ public class Audio {
 
     private final MediaPlayer mediaPlayer;
 
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
+
     /**
      * Initializes an <code>Audio</code> object based on a file's input stream.
      *
@@ -64,7 +68,16 @@ public class Audio {
         sampleRate = audioFormat.getSampleRate();
 
         // Get the media player for the audio file
-        mediaPlayer = new MediaPlayer(new Media(FileUtils.getFilePath(filePath)));
+        MediaPlayer tempMediaPlayer;
+
+        try {
+            tempMediaPlayer = new MediaPlayer(new Media(FileUtils.getFilePath(filePath)));
+        } catch (IllegalStateException e) {
+            tempMediaPlayer = null;
+            logger.log(Level.WARNING, "JavaFX Toolkit not initialized. Audio playback will not work.");
+        }
+
+        mediaPlayer = tempMediaPlayer;
 
         // Generate audio samples
         generateSamples();
