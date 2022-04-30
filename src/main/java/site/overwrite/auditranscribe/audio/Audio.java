@@ -2,7 +2,7 @@
  * Audio.java
  *
  * Created on 2022-02-13
- * Updated on 2022-04-30
+ * Updated on 2022-05-01
  *
  * Description: Class that handles audio processing and audio playback.
  */
@@ -171,6 +171,15 @@ public class Audio {
      */
     public void setAudioPlaybackTime(double playbackTime) {
         mediaPlayer.seek(new Duration(playbackTime * 1000));
+    }
+
+    /**
+     * Set the current audio's starting time to <code>startTime</code> <b>seconds</b>.
+     *
+     * @param startTime The start time of the audio in seconds.
+     */
+    public void setAudioStartTime(double startTime) {
+        mediaPlayer.setStartTime(new Duration(startTime * 1000));
     }
 
     /**

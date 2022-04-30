@@ -1,0 +1,8 @@
+/* PROGRESS PANES */
+.clickable-progress-pane {
+    -fx-background-color: rgba(0, 0, 0, 0);
+}
+
+.coloured-progress-pane {
+    -fx-background-color: rgba(0, 256, 0, 0.5);
+}

@@ -2,7 +2,7 @@
  * SpectrogramViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-04-30
+ * Updated on 2022-05-01
  *
  * Description: Contains the spectrogram view's controller class.
  */
@@ -27,7 +27,6 @@ import site.overwrite.auditranscribe.plotting.PlottingStuffHandler;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
 import site.overwrite.auditranscribe.spectrogram.Spectrogram;
 import site.overwrite.auditranscribe.utils.FileUtils;
-import site.overwrite.auditranscribe.utils.MiscUtils;
 import site.overwrite.auditranscribe.utils.UnitConversion;
 
 import java.net.URL;
@@ -70,7 +69,7 @@ public class SpectrogramViewController implements Initializable {
     final int MIN_NOTE_NUMBER = 0;  // C0
     final int MAX_NOTE_NUMBER = 119;  // B9
 
-    final int UPDATE_PLAYBACK_SCHEDULER_PERIOD = 50;  // In milliseconds
+    final long UPDATE_PLAYBACK_SCHEDULER_PERIOD = 50000;  // In microseconds
 
     final boolean USE_FANCY_SHARPS_FOR_NOTE_LABELS = true;
 
@@ -89,14 +88,8 @@ public class SpectrogramViewController implements Initializable {
 
     private Audio audio;
 
-    private double finalWidth;
     private double finalHeight;
     private double audioDuration;
-
-    private double lastSeekTimestamp = 0;  // Last time that the user triggered a seek command
-    private double lastAudioTimeUpdateTimestamp = 0;  // Last time that the audio time was updated
-    private double prevSeekTime = 0;
-    private double prevAudioTime = 0;
 
     private Label[] noteLabels;
     private Line[] beatLines;
@@ -121,7 +114,7 @@ public class SpectrogramViewController implements Initializable {
     private AnchorPane leftPaneAnchor, spectrogramPaneAnchor, bottomPaneAnchor;
 
     @FXML
-    private Pane notePane, barNumberPane;
+    private Pane notePane, barNumberPane, clickableProgressPane, colouredProgressPane;
 
     @FXML
     private ImageView spectrogramImage;
@@ -157,6 +150,21 @@ public class SpectrogramViewController implements Initializable {
 
         // Return the toggled version of the `isPaused` flag
         return !isPaused;
+    }
+
+    protected void seekToTime(double seekTime) {
+        // Set the playback time
+        audio.setAudioPlaybackTime(seekTime);
+
+        // Update the start time of the audio
+        // (Do this so that when the player resumes out of a stop state it will start here)
+        audio.setAudioStartTime(seekTime);
+
+        // Update the current time label
+        currTimeLabel.setText(UnitConversion.secondsToTimeString(seekTime));
+
+        // Update coloured progress pane
+        colouredProgressPane.setPrefWidth(seekTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X);
     }
 
     // Value updating methods
@@ -199,8 +207,7 @@ public class SpectrogramViewController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         // Get the audio file
         try {
-            audio = new Audio("testing-audio-files/A440.wav");
-//            audio = new Audio("testing-audio-files/Melancholy.wav");
+            audio = new Audio("testing-audio-files/RisingPitch.wav");
 
             // Update audio duration attribute and label
             audioDuration = audio.getDuration();
@@ -217,7 +224,7 @@ public class SpectrogramViewController implements Initializable {
             WritableImage image = spectrogram.generateSpectrogram(Window.HANN_WINDOW, ColourScale.VIRIDIS);
 
             // Get the final width and height
-            finalWidth = image.getWidth() * SPECTROGRAM_ZOOM_SCALE_X;
+            double finalWidth = image.getWidth() * SPECTROGRAM_ZOOM_SCALE_X;
             finalHeight = image.getHeight() * SPECTROGRAM_ZOOM_SCALE_Y;
 
             // Fix panes' properties
@@ -229,6 +236,9 @@ public class SpectrogramViewController implements Initializable {
 
             bottomPane.setFitToHeight(true);
             bottomPaneAnchor.setPrefWidth(finalWidth);
+
+            clickableProgressPane.setPrefWidth(finalWidth);
+            colouredProgressPane.setPrefWidth(0);
 
             // Set scrolling for panes
             leftPane.vvalueProperty().bindBidirectional(spectrogramPane.vvalueProperty());
@@ -313,34 +323,27 @@ public class SpectrogramViewController implements Initializable {
             });
 
             stopButton.setOnAction(event -> {
+                // First stop the audio
                 audio.stopAudio();
+
+                // Then update the timings shown on the GUI
+                seekToTime(0);
+
+                // Finally, toggle the paused flag
                 isPaused = togglePaused(false);
             });
 
             playSkipBackButton.setOnAction(event -> {
-                // Set the playback time
-                audio.setAudioPlaybackTime(0);
-
-                // Update the previous times
-                prevSeekTime = 0;
-
-                // Update the last seek time
-                lastSeekTimestamp = MiscUtils.getUnixTimestamp();
+                // Seek to the start of the audio
+                seekToTime(0);
 
                 // Pause the audio
-                // (We need to do this here because the program will not handle the pausing later)
                 isPaused = togglePaused(false);
             });
 
             playSkipForwardButton.setOnAction(event -> {
-                // Set the playback time
-                audio.setAudioPlaybackTime(audioDuration);
-
-                // Update the previous times
-                prevSeekTime = audioDuration;
-
-                // Update the last seek time
-                lastSeekTimestamp = MiscUtils.getUnixTimestamp();
+                // Seek to the end of the audio
+                seekToTime(audioDuration);
             });
 
             volumeButton.setOnAction(event -> {
@@ -377,6 +380,25 @@ public class SpectrogramViewController implements Initializable {
                 audio.setPlaybackVolume(volume);
             });
 
+            // Set clickable progress pane method
+            clickableProgressPane.setOnMouseClicked(event -> {
+                // Ensure that the click is within the pane
+                double clickX = event.getX();
+                double clickY = event.getY();
+
+                if (clickX >= clickableProgressPane.getBoundsInParent().getMinX() &&
+                        clickX <= clickableProgressPane.getBoundsInParent().getMaxX() &&
+                        clickY >= clickableProgressPane.getBoundsInParent().getMinY() &&
+                        clickY <= clickableProgressPane.getBoundsInParent().getMaxY()
+                ) {
+                    // Convert the click position to seek time
+                    double seekTime = clickX / SPECTROGRAM_ZOOM_SCALE_X / PX_PER_SECOND;
+
+                    // Seek to that time
+                    seekToTime(seekTime);
+                }
+            });
+
             // Constantly update the current playback time
             ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(0, runnable -> {
                 Thread thread = Executors.defaultThreadFactory().newThread(runnable);
@@ -384,30 +406,31 @@ public class SpectrogramViewController implements Initializable {
                 return thread;
             });
             scheduler.scheduleAtFixedRate(() -> {
-                // Get the current audio time
-                double audioTime = audio.getCurrAudioTime();
+                if (!isPaused) {
+                    // Get the current audio time
+                    currTime = audio.getCurrAudioTime();
 
-                // Check if the audio time was updated
-                if (audioTime != prevAudioTime) {
-                    prevAudioTime = audioTime;
-                    lastAudioTimeUpdateTimestamp = MiscUtils.getUnixTimestamp();
+                    // Update the current time label
+                    Platform.runLater(() -> currTimeLabel.setText(UnitConversion.secondsToTimeString(currTime)));
+
+                    // Update coloured progress pane
+                    colouredProgressPane.setPrefWidth(currTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X);
+
+                    // Check if the current time has exceeded and is not paused
+                    if (currTime >= audioDuration) {
+                        // Pause the audio
+                        isPaused = togglePaused(false);
+
+                        // Specially update the start time to 0
+                        // (Because the `seekToTime` method would have set it to the end, which is not what we want)
+                        audio.setAudioStartTime(0);
+
+                        // We need to do this so that the status is set to paused
+                        audio.stopAudio();
+                        audio.pauseAudio();
+                    }
                 }
-
-                // Determine which time to use as the `currTime`
-                if (lastAudioTimeUpdateTimestamp > lastSeekTimestamp) {
-                    currTime = prevAudioTime;
-                } else {
-                    currTime = prevSeekTime;
-                }
-
-                // Update the current time label
-                Platform.runLater(() -> currTimeLabel.setText(UnitConversion.secondsToTimeString(currTime)));
-
-                // Check if the current time has exceeded and is not paused
-                if (currTime >= audioDuration && !isPaused) {
-                    isPaused = togglePaused(false);  // Pause the audio
-                }
-            }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);
+            }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MICROSECONDS);
 
             // Set image on the spectrogram area
             spectrogramImage.setFitHeight(finalWidth);
