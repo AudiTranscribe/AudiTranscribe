@@ -10,6 +10,7 @@
 package site.overwrite.auditranscribe.io;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.security.InvalidParameterException;
 
 /**
@@ -17,6 +18,16 @@ import java.security.InvalidParameterException;
  */
 public class IOConverters {
     // Public methods
+
+    /**
+     * Method that converts the integer <code>x</code> into an array of 4 bytes.
+     *
+     * @param x Integer to convert.
+     * @return Array of four bytes, representing the integer.
+     */
+    public static byte[] intToBytes(int x) {
+        return ByteBuffer.allocate(4).order(ByteOrder.BIG_ENDIAN).putInt(x).array();
+    }
 
     /**
      * Method that converts the double <code>x</code> into an array of 8 bytes.
@@ -59,6 +70,20 @@ public class IOConverters {
      */
     public static byte[] stringToBytes(String str) {
         return str.getBytes();
+    }
+
+    /**
+     * Method that converts an array of 4 bytes into an integer.
+     *
+     * @param bytes Byte array to convert into an integer.
+     * @return Integer represented by the 4 bytes.
+     */
+    public static int bytesToInt(byte[] bytes) {
+        // Assert that there are exactly 4 bytes to convert
+        if (bytes.length != 4) throw new InvalidParameterException("There must be exactly 4 bytes in the bytes array.");
+
+        // Convert the bytes array to the integer
+        return ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN).getInt();
     }
 
     /**

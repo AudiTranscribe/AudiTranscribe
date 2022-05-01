@@ -17,6 +17,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class IOConvertersTest {
     @Test
+    void intToBytes() {
+        assertArrayEquals(HexFormat.of().parseHex("00000000"), IOConverters.intToBytes(0));
+        assertArrayEquals(HexFormat.of().parseHex("000004d2"), IOConverters.intToBytes(1234));
+        assertArrayEquals(HexFormat.of().parseHex("499602d2"), IOConverters.intToBytes(1234567890));
+        assertArrayEquals(HexFormat.of().parseHex("7fffffff"), IOConverters.intToBytes(2147483647));
+        assertArrayEquals(HexFormat.of().parseHex("b669fd2e"), IOConverters.intToBytes(-1234567890));
+        assertArrayEquals(HexFormat.of().parseHex("80000001"), IOConverters.intToBytes(-2147483647));
+    }
+
+    @Test
     void doubleToBytes() {
         assertArrayEquals(HexFormat.of().parseHex("40505b851eb851ec"), IOConverters.doubleToBytes(65.43));
         assertArrayEquals(HexFormat.of().parseHex("c05edccccccccccd"), IOConverters.doubleToBytes(-123.45));
@@ -37,6 +47,16 @@ class IOConvertersTest {
     @Test
     void stringToBytes() {
         assertArrayEquals(new byte[]{(byte) 0x41, (byte) 0x7a, (byte) 0x20, (byte) 0x3f, (byte) 0x35}, IOConverters.stringToBytes("Az ?5"));
+    }
+
+    @Test
+    void bytesToInt() {
+        assertEquals(0, IOConverters.bytesToInt(HexFormat.of().parseHex("00000000")));
+        assertEquals(1234, IOConverters.bytesToInt(HexFormat.of().parseHex("000004d2")));
+        assertEquals(1234567890, IOConverters.bytesToInt(HexFormat.of().parseHex("499602d2")));
+        assertEquals(2147483647, IOConverters.bytesToInt(HexFormat.of().parseHex("7fffffff")));
+        assertEquals(-1234567890, IOConverters.bytesToInt(HexFormat.of().parseHex("b669fd2e")));
+        assertEquals(-2147483647, IOConverters.bytesToInt(HexFormat.of().parseHex("80000001")));
     }
 
     @Test
