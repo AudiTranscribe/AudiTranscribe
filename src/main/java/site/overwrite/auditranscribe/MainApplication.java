@@ -2,7 +2,7 @@
  * MainApplication.java
  *
  * Created on 2022-02-09
- * Updated on 2022-04-23
+ * Updated on 2022-05-01
  *
  * Description: Contains the main application class.
  */
@@ -20,8 +20,6 @@ import java.io.IOException;
 public class MainApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        System.out.println("Start");
-
 //        // Load the FXML file into the scene
 //        FXMLLoader fxmlLoader = new FXMLLoader(FileUtils.getFile("views/fxml/main-view.fxml"));
 //        Scene scene = new Scene(fxmlLoader.load());
@@ -37,7 +35,6 @@ public class MainApplication extends Application {
 
         FXMLLoader fxmlLoader = new FXMLLoader(FileUtils.getFileURL("views/fxml/spectrogram-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
-//        scene.getStylesheets().add(FileUtils.getFilePath("views/css/dark-mode.css"));  // Todo: handle theme switching
         stage.setTitle("Spectrogram");
         stage.setScene(scene);
         stage.setMaximized(true);

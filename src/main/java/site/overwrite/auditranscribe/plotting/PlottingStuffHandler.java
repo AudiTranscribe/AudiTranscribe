@@ -1,8 +1,8 @@
 /*
- * SpectrogramStuffHandler.java
+ * PlottingStuffHandler.java
  *
  * Created on 2022-03-20
- * Updated on 2022-04-25
+ * Updated on 2022-05-01
  *
  * Description: Class that adds the notes' stuff to the spectrogram area.
  */
@@ -18,27 +18,17 @@ import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.*;
-import javafx.scene.text.Font;
+import site.overwrite.auditranscribe.utils.MiscUtils;
 import site.overwrite.auditranscribe.utils.UnitConversion;
+
+import java.util.HashSet;
 
 /**
  * Class that adds the notes' stuff to the spectrogram area.
  */
-public class SpectrogramStuffHandler {
+public class PlottingStuffHandler {
     // Attributes
-    // Todo: move to `Spectrogram` class?
-    static final Font LABEL_FONT = Font.font("Arial", FontWeight.BOLD, FontPosture.REGULAR, 16);
-    static final Color LABEL_COLOUR = new Color(0, 0, 0, 1);  // Todo: work with themes
-
-    static final double NOTE_LINE_WIDTH = 2;
-    static final double BEAT_LINE_WIDTH = 5;  // This will be the same as the bar line width
-    static final double BAR_NUMBER_ELLIPSE_THICKNESS = 1.25;
     static final double BAR_NUMBER_ELLIPSE_RADIUS_Y = 16;
-
-    static final Color NOTE_LINE_COLOUR = new Color(1, 1, 1, 0.5);  // Todo: work with themes
-    static final Color BEAT_LINE_COLOUR = new Color(1, 1, 1, 0.5);  // Todo: work with themes
-    static final Color BAR_LINE_COLOUR = new Color(0, 1, 0, 0.5);  // Todo: work with themes
-    static final Color BAR_NUMBER_ELLIPSE_COLOUR = new Color(0, 0, 0, 1);  // Todo: work with themes
 
     // Public methods
 
@@ -46,37 +36,67 @@ public class SpectrogramStuffHandler {
      * Method that adds the note labels to the note pane.
      *
      * @param notePane      Note pane.
+     * @param noteLabels    Note label array.
+     * @param musicKey      Key for the music piece.
      * @param height        (Final) height of the note pane.
      * @param minNoteNumber Minimum note number.
      * @param maxNoteNumber Maximum note number.
+     * @param fancySharps   Whether <em>fancier sharps</em> (i.e. ♯ instead of #) should be used for
+     *                      the note labels.
      */
-    public static void addNoteLabels(Pane notePane, double height, int minNoteNumber, int maxNoteNumber) {
+    public static Label[] addNoteLabels(
+            Pane notePane, Label[] noteLabels, String musicKey, double height, int minNoteNumber,
+            int maxNoteNumber, boolean fancySharps
+    ) {
         // Get the width of the note pane
         double width = notePane.getPrefWidth();
 
-        // Place the notes onto the pane
+        // Get the note offsets that are in the key
+        HashSet<Integer> noteOffsets = MiscUtils.getNotesInKey(musicKey);
+
+        // Check if there are existing note labels
+        if (noteLabels != null) {
+            // Remove the note labels from the pane
+            notePane.getChildren().removeAll(noteLabels);
+        }
+
+        // Update the note labels
+        Label[] newNoteLabels = new Label[maxNoteNumber - minNoteNumber + 1];
+
         for (int i = minNoteNumber; i <= maxNoteNumber; i++) {
             // Get the note's text
-            String note = UnitConversion.noteNumberToNote(i);
+            String note = UnitConversion.noteNumberToNote(i, fancySharps);
 
             // Calculate the height to move the pointer to
             double placementHeight = PlottingHelpers.noteNumToHeight(i, minNoteNumber, maxNoteNumber, height);
 
             // Create the label
             Label noteLabel = new Label(note);
-            noteLabel.setFont(LABEL_FONT);
-            noteLabel.setTextFill(Color.BLACK);
+
+            // Add CSS style class
+            noteLabel.getStyleClass().add("display-label");
+
+            // Check if this note is one of the notes in the key
+            if (noteOffsets.contains(i % 12)) {
+                noteLabel.setUnderline(true);
+            }
 
             // Position the label correctly
-            noteLabel.setTranslateY(placementHeight - 0.675 * LABEL_FONT.getSize());  // Magical 0.675 constant
+            noteLabel.setTranslateY(placementHeight - 0.675 * noteLabel.getFont().getSize());  // Magical 0.675 constant
 
             // Make the label centred
             noteLabel.setPrefWidth(width);
             noteLabel.setAlignment(Pos.TOP_CENTER);
 
-            // Add the label to the plane
-            notePane.getChildren().add(noteLabel);
+            // Add the label to the new note label array
+            newNoteLabels[i - minNoteNumber] = noteLabel;
         }
+
+        // Place the notes onto the pane
+        notePane.getChildren().addAll(newNoteLabels);
+
+        // Return the new note labels
+        return newNoteLabels;
     }
 
     /**
@@ -100,17 +120,16 @@ public class SpectrogramStuffHandler {
             // Create the line
             Line noteLine = new Line(0, placementHeight, width, placementHeight);
 
+            // Add CSS style class
+            noteLine.getStyleClass().add("note-line");
+
             // Set the line dashed format
             if (i % 12 != 0) {  // Not a C note
-                noteLine.getStrokeDashArray().addAll(10d, 6d);  // Todo: make this a constant
+//                noteLine.getStrokeDashArray().addAll(10d, 6d);  // Todo: make this a constant
             } else {  // A C note
-                noteLine.getStrokeDashArray().addAll(1d);
+//                noteLine.getStrokeDashArray().addAll(1d);
+                noteLine.getStyleClass().add("note-line-c");
             }
-
-            // Format the line
-            noteLine.setFill(null);
-            noteLine.setStroke(NOTE_LINE_COLOUR);
-            noteLine.setStrokeWidth(NOTE_LINE_WIDTH);
 
             // Add the line to the spectrogram
             spectrogramPane.getChildren().add(noteLine);
@@ -130,7 +149,7 @@ public class SpectrogramStuffHandler {
      * @return Array of <code>Line</code> objects, representing the lines to be added.
      */
     public static Line[] getBeatLines(
-            int bpm, int beatsPerBar, int pxPerSecond, double height, double duration, double offset,
+            double bpm, int beatsPerBar, int pxPerSecond, double height, double duration, double offset,
             double zoomScaleX
     ) {
         // Calculate the number of beats and the number of seconds per beat
@@ -181,7 +200,7 @@ public class SpectrogramStuffHandler {
      * shown.
      */
     public static Line[] updateBeatLines(
-            Pane spectrogramPane, Line[] lines, double duration, int oldBPM, int newBPM, double oldOffset,
+            Pane spectrogramPane, Line[] lines, double duration, double oldBPM, double newBPM, double oldOffset,
             double newOffset, double height, int oldBeatsPerBar, int newBeatsPerBar, int pxPerSecond, double zoomScaleX
     ) {
         // Return prematurely if the olds equal the news (b/c nothing to update)
@@ -217,8 +236,11 @@ public class SpectrogramStuffHandler {
             newLines[beatNum].setStartX(pos);
             newLines[beatNum].setEndX(pos);
 
-            // Determine new line colour
-            newLines[beatNum].setStroke(beatNum % newBeatsPerBar != 0 ? BEAT_LINE_COLOUR : BAR_LINE_COLOUR);
+            // Remove existing CSS class
+            newLines[beatNum].getStyleClass().clear();
+
+            // Add correct CSS class
+            newLines[beatNum].getStyleClass().add(beatNum % newBeatsPerBar != 0 ? "beat-line" : "bar-line");
 
             // Try and add again
             try {
@@ -266,7 +288,7 @@ public class SpectrogramStuffHandler {
      * @return Array of <code>StackPane</code>s, representing the generated ellipses.
      */
     public static StackPane[] getBarNumberEllipses(
-            int bpm, int beatsPerBar, int pxPerSecond, double height, double duration, double offset, double zoomScaleX
+            double bpm, int beatsPerBar, int pxPerSecond, double height, double duration, double offset, double zoomScaleX
     ) {
         // Calculate the number of bars
         double spb = secondsPerBeat(bpm);
@@ -318,7 +340,7 @@ public class SpectrogramStuffHandler {
      * shown.
      */
     public static StackPane[] updateBarNumberEllipses(
-            Pane barNumberPane, StackPane[] ellipses, double duration, int oldBPM, int newBPM, double oldOffset,
+            Pane barNumberPane, StackPane[] ellipses, double duration, double oldBPM, double newBPM, double oldOffset,
             double newOffset, double height, int oldBeatsPerBar, int newBeatsPerBar, int pxPerSecond, double zoomScaleX
     ) {
         // Return prematurely if the olds equal the news (b/c nothing to update)
@@ -386,6 +408,34 @@ public class SpectrogramStuffHandler {
         return newEllipses;
     }
 
+    /**
+     * Method that creates a new playhead line.
+     *
+     * @param height Height of the pane that the playhead line should be placed on.
+     * @return A <code>Line</code> object, representing the playhead line.
+     */
+    public static Line createPlayheadLine(double height) {
+        // Create the playhead line object
+        Line playheadLine = new Line(0, 0, 0, height);
+
+        // Add CSS style class
+        playheadLine.getStyleClass().add("playhead-line");
+
+        // Return the playhead line
+        return playheadLine;
+    }
+
+    /**
+     * Method that moves the playhead line to the new horizontal position.
+     *
+     * @param playheadLine Playhead line to update.
+     * @param newXPos      New horizontal position to move the line to.
+     */
+    public static void updatePlayheadLine(Line playheadLine, double newXPos) {
+        playheadLine.setStartX(newXPos);
+        playheadLine.setEndX(newXPos);
+    }
+
 
     // Private methods
 
@@ -407,7 +457,7 @@ public class SpectrogramStuffHandler {
      * @param bpm Beats per minute.
      * @return Seconds per beat.
      */
-    static double secondsPerBeat(int bpm) {
+    static double secondsPerBeat(double bpm) {
         return 1. / (bpm / 60.);  // BPM / 60 = Beats per second, so 1 / Beats Per Second = Seconds per Beat
     }
 
@@ -432,10 +482,8 @@ public class SpectrogramStuffHandler {
         // Create the line
         Line beatLine = new Line(pos, 0, pos, height);
 
-        // Format the line
-        beatLine.setFill(null);
-        beatLine.setStroke(beatNum % beatsPerBar != 0 ? BEAT_LINE_COLOUR : BAR_LINE_COLOUR);
-        beatLine.setStrokeWidth(BEAT_LINE_WIDTH);
+        // Add correct CSS class
+        beatLine.getStyleClass().add(beatNum % beatsPerBar != 0 ? "beat-line" : "bar-line");
 
         // Return the line
         return beatLine;
@@ -464,17 +512,19 @@ public class SpectrogramStuffHandler {
         // Create the ellipse
         Ellipse ellipse = new Ellipse(BAR_NUMBER_ELLIPSE_RADIUS_Y * zoomScaleX, BAR_NUMBER_ELLIPSE_RADIUS_Y);
 
-        // Format the ellipse
+        // Add CSS style class to the ellipse
+        ellipse.getStyleClass().add("bar-number-ellipse");
+
+        // Continue formatting the ellipse
         ellipse.setFill(Color.TRANSPARENT);
-        ellipse.setStroke(BAR_NUMBER_ELLIPSE_COLOUR);
         ellipse.setStrokeType(StrokeType.CENTERED);
-        ellipse.setStrokeWidth(BAR_NUMBER_ELLIPSE_THICKNESS);
 
         // Create the bar number text that will go inside the ellipse
         Text barNumText = new Text(Integer.toString(barNum));
-        barNumText.setFont(LABEL_FONT);
-        barNumText.setFill(LABEL_COLOUR);
         barNumText.setBoundsType(TextBoundsType.VISUAL);
+
+        // Add CSS style class to the bar number text
+        barNumText.getStyleClass().add("display-label");
 
         // Create the `StackPane` that will contain both these things
         StackPane stackPane = new StackPane();
