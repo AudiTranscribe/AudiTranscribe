@@ -237,7 +237,7 @@ public class PlottingStuffHandler {
             newLines[beatNum].setEndX(pos);
 
             // Remove existing CSS class
-            newLines[beatNum].getStyleClass().removeAll();
+            newLines[beatNum].getStyleClass().clear();
 
             // Add correct CSS class
             newLines[beatNum].getStyleClass().add(beatNum % newBeatsPerBar != 0 ? "beat-line" : "bar-line");
