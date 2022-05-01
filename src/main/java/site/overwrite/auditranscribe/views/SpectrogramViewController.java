@@ -77,10 +77,11 @@ public class SpectrogramViewController implements Initializable {
 
     // File-Savable Attributes
     private int keyIndex = 0;  // Index of the key chosen, according to the `MUSIC_KEYS` array
+    private int timeSignatureIndex = 0;
     private double bpm = 120;
-    private int beatsPerBar = 4;
     private double offset = 0.;
     private double volume = 0.5;
+    private double audioDuration = 0;  // Will be updated upon scene initialization
     private double currTime = 0;
 
     // Other attributes
@@ -89,12 +90,12 @@ public class SpectrogramViewController implements Initializable {
     private Audio audio;
 
     private String key = "C";
+    private int beatsPerBar = 4;
     private boolean isPaused = true;
     private boolean isMuted = false;
     private boolean scrollToPlayhead = false;
 
     private double finalHeight;
-    private double audioDuration;
 
     private Label[] noteLabels;
     private Line[] beatLines;
@@ -340,6 +341,9 @@ public class SpectrogramViewController implements Initializable {
                                 barNumberPane.getPrefHeight(), oldBeatsPerBar, newBeatsPerBar, PX_PER_SECOND,
                                 SPECTROGRAM_ZOOM_SCALE_X
                         );
+
+                        // Update the time signature index
+                        timeSignatureIndex = ArrayUtils.findIndex(TIME_SIGNATURES, newValue);
 
                         // Update the beats per bar
                         beatsPerBar = newBeatsPerBar;
