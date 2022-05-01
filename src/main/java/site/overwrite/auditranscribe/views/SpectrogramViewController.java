@@ -94,6 +94,7 @@ public class SpectrogramViewController implements Initializable {
     private Label[] noteLabels;
     private Line[] beatLines;
     private StackPane[] barNumberEllipses;
+    private Line playheadLine;
 
     // FXML Elements
     // Top HBox
@@ -164,8 +165,11 @@ public class SpectrogramViewController implements Initializable {
         // Update the current time label
         currTimeLabel.setText(UnitConversion.secondsToTimeString(seekTime));
 
-        // Update coloured progress pane
-        colouredProgressPane.setPrefWidth(seekTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X);
+        // Update coloured progress pane and playhead line
+        double newXPos = seekTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X;
+
+        colouredProgressPane.setPrefWidth(newXPos);
+        PlottingStuffHandler.updatePlayheadLine(playheadLine, newXPos);
     }
 
     // Value updating methods
@@ -244,6 +248,10 @@ public class SpectrogramViewController implements Initializable {
             // Set scrolling for panes
             leftPane.vvalueProperty().bindBidirectional(spectrogramPane.vvalueProperty());
             bottomPane.hvalueProperty().bindBidirectional(spectrogramPane.hvalueProperty());
+
+            // Add the playhead line
+            playheadLine = PlottingStuffHandler.createPlayheadLine(finalHeight);
+            spectrogramPaneAnchor.getChildren().add(playheadLine);
 
             // Update spinners' ranges
             SpinnerValueFactory.DoubleSpinnerValueFactory bpmSpinnerFactory =
@@ -414,8 +422,10 @@ public class SpectrogramViewController implements Initializable {
                     // Update the current time label
                     Platform.runLater(() -> currTimeLabel.setText(UnitConversion.secondsToTimeString(currTime)));
 
-                    // Update coloured progress pane
-                    colouredProgressPane.setPrefWidth(currTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X);
+                    // Update coloured progress pane and playhead line
+                    double newPosX = currTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X;
+                    colouredProgressPane.setPrefWidth(newPosX);
+                    PlottingStuffHandler.updatePlayheadLine(playheadLine, newPosX);
 
                     // Check if the current time has exceeded and is not paused
                     if (currTime >= audioDuration) {

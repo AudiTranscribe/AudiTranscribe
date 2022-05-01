@@ -2,7 +2,7 @@
  * PlottingStuffHandler.java
  *
  * Created on 2022-03-20
- * Updated on 2022-04-30
+ * Updated on 2022-05-01
  *
  * Description: Class that adds the notes' stuff to the spectrogram area.
  */
@@ -37,6 +37,7 @@ public class PlottingStuffHandler {
     static final double BEAT_LINE_WIDTH = 5;  // This will be the same as the bar line width
     static final double BAR_NUMBER_ELLIPSE_THICKNESS = 1.25;
     static final double BAR_NUMBER_ELLIPSE_RADIUS_Y = 16;
+    static final double PLAYHEAD_LINE_STROKE_WIDTH = 5;
 
     static final Color NOTE_LINE_COLOUR = new Color(1, 1, 1, 0.5);  // Todo: work with themes
     static final Color BEAT_LINE_COLOUR = new Color(1, 1, 1, 0.5);  // Todo: work with themes
@@ -416,6 +417,37 @@ public class PlottingStuffHandler {
 
         // Return the new generated ellipses
         return newEllipses;
+    }
+
+    /**
+     * Method that creates a new playhead line.
+     *
+     * @param height Height of the pane that the playhead line should be placed on.
+     * @return A <code>Line</code> object, representing the playhead line.
+     */
+    public static Line createPlayheadLine(double height) {
+        // Create the playhead line object
+        Line playheadLine = new Line(0, 0, 0, height);
+
+        // Add styling via a CSS class
+        playheadLine.getStyleClass().add("playhead-line");
+
+        // Set playhead line stroke width
+        playheadLine.setStrokeWidth(PLAYHEAD_LINE_STROKE_WIDTH);
+
+        // Return the playhead line
+        return playheadLine;
+    }
+
+    /**
+     * Method that moves the playhead line to the new horizontal position.
+     *
+     * @param playheadLine Playhead line to update.
+     * @param newXPos      New horizontal position to move the line to.
+     */
+    public static void updatePlayheadLine(Line playheadLine, double newXPos) {
+        playheadLine.setStartX(newXPos);
+        playheadLine.setEndX(newXPos);
     }
 
 

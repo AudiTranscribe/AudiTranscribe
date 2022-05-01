@@ -4,5 +4,10 @@
 }
 
 .coloured-progress-pane {
-    -fx-background-color: rgba(0, 256, 0, 0.5);
+    -fx-background-color: rgba(0, 191, 255, 0.5);
+}
+
+/* LINES */
+.playhead-line {
+    -fx-stroke: rgb(0, 191, 255);
 }
