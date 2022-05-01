@@ -26,6 +26,7 @@ import site.overwrite.auditranscribe.audio.Window;
 import site.overwrite.auditranscribe.plotting.PlottingStuffHandler;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
 import site.overwrite.auditranscribe.spectrogram.Spectrogram;
+import site.overwrite.auditranscribe.utils.ArrayUtils;
 import site.overwrite.auditranscribe.utils.FileUtils;
 import site.overwrite.auditranscribe.utils.UnitConversion;
 
@@ -75,20 +76,22 @@ public class SpectrogramViewController implements Initializable {
     final boolean USE_FANCY_SHARPS_FOR_NOTE_LABELS = true;
 
     // File-Savable Attributes
-    private String key = "C";
-    private int beatsPerBar = 4;
+    private int keyIndex = 0;  // Index of the key chosen, according to the `MUSIC_KEYS` array
     private double bpm = 120;
+    private int beatsPerBar = 4;
     private double offset = 0.;
-    private boolean isPaused = true;
     private double volume = 0.5;
-    private boolean isMuted = false;
     private double currTime = 0;
-    private boolean scrollToPlayhead = false;
 
     // Other attributes
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     private Audio audio;
+
+    private String key = "C";
+    private boolean isPaused = true;
+    private boolean isMuted = false;
+    private boolean scrollToPlayhead = false;
 
     private double finalHeight;
     private double audioDuration;
@@ -313,8 +316,9 @@ public class SpectrogramViewController implements Initializable {
                         USE_FANCY_SHARPS_FOR_NOTE_LABELS
                 );
 
-                // Update the music key value
+                // Update the music key value and music key index
                 key = newValue;
+                keyIndex = ArrayUtils.findIndex(MUSIC_KEYS, newValue);
             });
 
             timeSignatureChoice.getSelectionModel().selectedItemProperty()

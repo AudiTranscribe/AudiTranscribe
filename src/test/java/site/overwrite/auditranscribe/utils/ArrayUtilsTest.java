@@ -2,7 +2,7 @@
  * ArrayUtilsTest.java
  *
  * Created on 2022-03-12
- * Updated on 2022-04-13
+ * Updated on 2022-05-01
  *
  * Description: Test `ArrayUtils.java`.
  */
@@ -11,9 +11,45 @@ package site.overwrite.auditranscribe.utils;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.NoSuchElementException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class ArrayUtilsTest {
+    @Test
+    void findIndex() {
+        // Define the arrays
+        Double[] array1 = {1., 2., 3.4, 5.6};
+        String[] array2 = {"Hello", "World", "world", "hello", "!"};
+        Integer[] array3 = {7, 8, 9};
+        Double[] array4 = {0., 0., 0., 1., 1., 2.};
+
+        // Run tests
+        assertEquals(0, ArrayUtils.findIndex(array1, 1.));
+        assertEquals(1, ArrayUtils.findIndex(array1, 2.));
+        assertEquals(2, ArrayUtils.findIndex(array1, 3.4));
+        assertEquals(3, ArrayUtils.findIndex(array1, 5.6));
+
+        assertEquals(0, ArrayUtils.findIndex(array2, "Hello"));
+        assertEquals(1, ArrayUtils.findIndex(array2, "World"));
+        assertEquals(2, ArrayUtils.findIndex(array2, "world"));
+        assertEquals(3, ArrayUtils.findIndex(array2, "hello"));
+        assertEquals(4, ArrayUtils.findIndex(array2, "!"));
+
+        assertEquals(0, ArrayUtils.findIndex(array3, 7));
+        assertEquals(1, ArrayUtils.findIndex(array3, 8));
+        assertEquals(2, ArrayUtils.findIndex(array3, 9));
+
+        assertEquals(0, ArrayUtils.findIndex(array4, 0.));
+        assertEquals(3, ArrayUtils.findIndex(array4, 1.));
+        assertEquals(5, ArrayUtils.findIndex(array4, 2.));
+
+        assertThrowsExactly(NoSuchElementException.class, () -> ArrayUtils.findIndex(array1, 1337.));
+        assertThrowsExactly(NoSuchElementException.class, () -> ArrayUtils.findIndex(array2, 1337.));
+        assertThrowsExactly(NoSuchElementException.class, () -> ArrayUtils.findIndex(array3, 1337.));
+        assertThrowsExactly(NoSuchElementException.class, () -> ArrayUtils.findIndex(array4, 1337.));
+    }
+
     @Test
     void padCenter() {
         // Define the arrays

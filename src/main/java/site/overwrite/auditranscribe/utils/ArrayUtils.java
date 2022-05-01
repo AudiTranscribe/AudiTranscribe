@@ -2,19 +2,49 @@
  * ArrayUtils.java
  *
  * Created on 2022-02-16
- * Updated on 2022-04-15
+ * Updated on 2022-05-01
  *
- * Description: Array utilities to modify and change arrays.
+ * Description: Array utilities to modify, change, and search within arrays.
  */
 
 package site.overwrite.auditranscribe.utils;
 
 import java.security.InvalidParameterException;
+import java.util.NoSuchElementException;
 
 /**
- * Array utilities.
+ * Array utilities to modify, change, and search within arrays.
  */
 public class ArrayUtils {
+    // Public methods
+
+    /**
+     * Method that finds the index of an element in an array using linear search.<br>
+     * If there are multiple copies of the same element, this will return the <b>earliest occurring
+     * index</b> of that element.
+     *
+     * @param array Array of items.
+     * @param elem  Element to get the index of.
+     * @param <T>   Type parameter of the array.
+     * @return Integer representing the index of the element in the array.
+     * @throws NoSuchElementException If the element <code>elem</code> does not appear in the
+     *                                array <code>array</code>.
+     */
+    public static <T> int findIndex(T[] array, T elem) {
+        // Get the length of the array
+        int n = array.length;
+
+        // Try and find the index
+        for (int i = 0; i < n; i++) {
+            if (array[i].equals(elem)) {
+                return i;
+            }
+        }
+
+        // If reached here then the element does not exist
+        throw new NoSuchElementException("Element " + elem + " does not exist in the array.");
+    }
+
     /**
      * Normalises the elements in the given array such that the LP norm is 1.
      *
@@ -62,7 +92,7 @@ public class ArrayUtils {
 
         // Ensure that the LP Norm is at least the threshold
         if (lpNorm < threshold) {
-            lpNorm = threshold;  // Todo: in Python, this is 1. Does this still work if set to `threshold`?
+            lpNorm = threshold;
         }
 
         // Normalise the array
@@ -149,9 +179,9 @@ public class ArrayUtils {
      * @return Padded array where the length is now <code>size</code>.
      * @throws IllegalArgumentException If <code>size</code> is negative.
      * @implNote See <a href="https://numpy.org/doc/stable/reference/generated/numpy.pad.html">
-     *     Numpy's implementation</a> of this function.
+     * Numpy's implementation</a> of this function.
      * @see <a href="https://stackoverflow.com/a/51780171">This StackOverflow answer</a> on how to
-     *      visualise the "reflect" mode of the padding operation.
+     * visualise the "reflect" mode of the padding operation.
      */
     public static double[] padCenterReflect(double[] array, int size) {
         // Verify that `size` is positive
