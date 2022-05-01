@@ -149,7 +149,8 @@ Section 5. GUI Data Section
 The GUI data section corresponds to the following lines in the example file given.
 
     0x00000003
-    0x00000B09
+    0x0000000B
+    0x00000009
     0x00029300 0x29394010
     0x00000001 0x03918939
     0x00000004 0x0812BA23
@@ -159,19 +160,20 @@ The GUI data section corresponds to the following lines in the example file give
 
 - The first 4 bytes `0x00000003` correspond to the section ID. The GUI data section *has the section
   ID 3*.
-- The next 3 bytes, `0x00000B`, correspond to the music key index. This will be the index of the
+- The next 4 bytes, `0x0000000B`, correspond to the music key index. This will be the index of the
   music key in the dropdown menu shown in the application.
-- The following byte, `09`, is the time signature index. This will be the index of the time
-  signature in the dropdown menu shown in the application.
+- The following 4 bytes, `0x00000009`, is the time signature index. This will be the index of the
+  time signature in the dropdown menu shown in the application.
 - The 8 bytes `0x00029300 0x29394010` represent the beats per minute (BPM) (which is a double).
 - The following 8 bytes `0x00000001 0x03918939` represent the offset seconds (which is a double).
 - The next 8 bytes `0x00000004 0x0812BA23` represent the playback volume (which is a double).
 - The next 4 bytes `0x00012345` correspond to the number of bytes needed to store the original audio
   file's name.
 - The proceeding `0x00012345` bytes is the original audio file's name.
-- The next 4 bytes, `0x000493E0`, is the total duration of the audio file *in milliseconds*.
-- The next 4 bytes, `0x00018324`, is the current time when playing the audio file *in milliseconds*.
-  That is, this is when the playback of the audio file will continue.
+- The next 4 bytes, `0x000493E0`, is the total duration of the audio file *in milliseconds* as an
+  integer.
+- The next 4 bytes, `0x00018324`, is the current time when playing the audio file *in milliseconds*
+  as an integer. That is, this is when the playback of the audio file will continue.
 - The final 4 bytes correspond to the end-of-section delimiter, `0xE05E05E5`.
 
 =====
