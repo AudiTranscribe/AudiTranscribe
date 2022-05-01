@@ -188,9 +188,9 @@
                         </Button>
                         <Button fx:id="scrollButton" contentDisplay="CENTER" mnemonicParsing="false">
                            <graphic>
-                              <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fx:id="scrollButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../images/icons/PNGs/footsteps.png" />
+                                    <Image url="@../../images/icons/PNGs/footsteps-outline.png" />
                                  </image>
                               </ImageView>
                            </graphic>

@@ -3,7 +3,6 @@ Todo:
     - Update README.md
     - BPM Selection and Estimation
     - Menu GUI
-    - Allow audio to play alongside spectrogram
     - Implement file saving
         - We would probably save the spectrogram data as that takes the longest to generate
     - Add licence/credits for ionicons

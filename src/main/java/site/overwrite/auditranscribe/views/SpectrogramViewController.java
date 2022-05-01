@@ -83,6 +83,7 @@ public class SpectrogramViewController implements Initializable {
     private double volume = 0.5;
     private boolean isMuted = false;
     private double currTime = 0;
+    private boolean scrollToPlayhead = false;
 
     // Other attributes
     private final Logger logger = Logger.getLogger(this.getClass().getName());
@@ -132,7 +133,7 @@ public class SpectrogramViewController implements Initializable {
     private Button playButton, stopButton, playSkipBackButton, playSkipForwardButton, scrollButton, volumeButton;
 
     @FXML
-    private ImageView playButtonImage, volumeButtonImage;
+    private ImageView playButtonImage, volumeButtonImage, scrollButtonImage;
 
     @FXML
     private Slider volumeSlider;
@@ -405,6 +406,22 @@ public class SpectrogramViewController implements Initializable {
                 logger.log(Level.FINE, "Pressed volume toggle button (muted is now " + isMuted + ")");
             });
 
+            scrollButton.setOnAction(event -> {
+                if (scrollToPlayhead) {
+                    // Change the icon of the scroll button from filled to non-filled
+                    scrollButtonImage.setImage(new Image(FileUtils.getFilePath("images/icons/PNGs/footsteps-outline.png")));
+
+                } else {
+                    // Change the icon of the scroll button from non-filled to filled
+                    scrollButtonImage.setImage(new Image(FileUtils.getFilePath("images/icons/PNGs/footsteps-filled.png")));
+                }
+
+                // Toggle the `scrollToPlayhead` flag
+                scrollToPlayhead = !scrollToPlayhead;
+
+                logger.log(Level.FINE, "Pressed scroll toggle button (scroll is now " + scrollToPlayhead + ")");
+            });
+
             // Set method on the volume slider
             volumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
                 // Update the volume value
@@ -441,13 +458,14 @@ public class SpectrogramViewController implements Initializable {
                 }
             });
 
-            // Constantly update the current playback time
+            // Create a constantly-executing service
             ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(0, runnable -> {
                 Thread thread = Executors.defaultThreadFactory().newThread(runnable);
                 thread.setDaemon(true);  // Make it so that it can shut down gracefully by placing it in background
                 return thread;
             });
             scheduler.scheduleAtFixedRate(() -> {
+                // Nothing really changes if the audio is paused
                 if (!isPaused) {
                     // Get the current audio time
                     currTime = audio.getCurrAudioTime();
@@ -473,6 +491,28 @@ public class SpectrogramViewController implements Initializable {
                         // We need to do this so that the status is set to paused
                         audio.stopAudio();
                         audio.pauseAudio();
+                    }
+
+                    // Update scrolling
+                    if (scrollToPlayhead) {
+                        // Get the 'half width' of the spectrogram area
+                        double spectrogramAreaHalfWidth = spectrogramPane.getWidth() / 2;
+
+                        // Set the H-value of the spectrogram pane
+                        if (newPosX <= spectrogramAreaHalfWidth) {
+                            // If the `newPosX` is within the first 'half width' of the initial screen, do not scroll
+                            spectrogramPane.setHvalue(0);
+
+                        } else if (newPosX >= finalWidth - spectrogramAreaHalfWidth) {
+                            // If the `newPoxX` is within the last 'half width' of the entire spectrogram area, keep the
+                            // scrolling to the end
+                            spectrogramPane.setHvalue(1);
+                        } else {
+                            // Otherwise, update the H-value accordingly so that the view is centered on the playhead
+                            spectrogramPane.setHvalue(
+                                    (newPosX - spectrogramAreaHalfWidth) / (finalWidth - 2 * spectrogramAreaHalfWidth)
+                            );
+                        }
                     }
                 }
             }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);
