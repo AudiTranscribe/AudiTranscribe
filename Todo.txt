@@ -8,6 +8,3 @@ Todo:
         - We would probably save the spectrogram data as that takes the longest to generate
     - Add licence/credits for ionicons
     - Add keyboard shortcuts
-
-Fixme:
-    - Seek to end issue is back

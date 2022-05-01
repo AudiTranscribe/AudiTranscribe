@@ -360,6 +360,10 @@ public class SpectrogramViewController implements Initializable {
             playSkipForwardButton.setOnAction(event -> {
                 // Seek to the end of the audio
                 seekToTime(audioDuration);
+
+                // Force the audio to play at the end
+                // (This is to avoid a nasty seek to end issue where user needs to click on play button twice)
+                isPaused = togglePaused(true);
             });
 
             volumeButton.setOnAction(event -> {
