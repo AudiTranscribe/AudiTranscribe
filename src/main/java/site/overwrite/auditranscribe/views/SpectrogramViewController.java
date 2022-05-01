@@ -97,6 +97,9 @@ public class SpectrogramViewController implements Initializable {
     private Line playheadLine;
 
     // FXML Elements
+    @FXML
+    private AnchorPane mainPane;
+
     // Top HBox
     @FXML
     private Button newProjectButton, openProjectButton, saveProjectButton;
@@ -210,6 +213,10 @@ public class SpectrogramViewController implements Initializable {
     // Initialization function
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Add CSS stylesheets to the scene
+        mainPane.getStylesheets().add(FileUtils.getFilePath("views/css/base.css"));
+        mainPane.getStylesheets().add(FileUtils.getFilePath("views/css/light-mode.css"));  // Todo: add theme support
+
         // Get the audio file
         try {
             audio = new Audio("testing-audio-files/RisingPitch.wav");

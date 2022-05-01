@@ -37,8 +37,6 @@ public class MainApplication extends Application {
 
         FXMLLoader fxmlLoader = new FXMLLoader(FileUtils.getFileURL("views/fxml/spectrogram-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
-//        scene.getStylesheets().add(FileUtils.getFilePath("views/css/dark-mode.css"));  // Todo: handle theme switching
-        scene.getStylesheets().add(FileUtils.getFilePath("views/css/playback.css"));
         stage.setTitle("Spectrogram");
         stage.setScene(scene);
         stage.setMaximized(true);

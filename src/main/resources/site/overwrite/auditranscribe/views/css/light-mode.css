@@ -1,0 +1,47 @@
+/* LABELS */
+.display-label {
+    -fx-font-family: "Arial";
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-text-fill: #000000ff;
+}
+
+/* SPECTROGRAM */
+.note-line {
+    -fx-stroke: #ffffff80;
+    -fx-stroke-width: 2px;
+    -fx-stroke-dash-array: 10 6;
+}
+
+.note-line-c {
+    -fx-stroke-dash-array: 1;
+}
+
+.beat-line {
+    -fx-stroke: #ffffff80;
+    -fx-stroke-width: 5px;
+}
+
+.bar-line {
+    -fx-stroke: #00ff0080;
+    -fx-stroke-width: 5px;
+}
+
+.bar-number-ellipse {
+    -fx-stroke: #000000ff;
+    -fx-stroke-width: 1.25;
+}
+
+/* PLAYBACK */
+.clickable-progress-pane {
+    -fx-background-color: #00000000;
+}
+
+.coloured-progress-pane {
+    -fx-background-color: #00bfff80;
+}
+
+.playhead-line {
+    -fx-stroke: #00bfff;
+    -fx-stroke-width: 5px;
+}

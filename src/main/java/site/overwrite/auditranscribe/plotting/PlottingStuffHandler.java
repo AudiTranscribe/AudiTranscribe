@@ -18,7 +18,6 @@ import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.*;
-import javafx.scene.text.Font;
 import site.overwrite.auditranscribe.utils.MiscUtils;
 import site.overwrite.auditranscribe.utils.UnitConversion;
 
@@ -29,20 +28,7 @@ import java.util.HashSet;
  */
 public class PlottingStuffHandler {
     // Attributes
-    // Todo: move to `Spectrogram` class?
-    static final Font LABEL_FONT = Font.font("Arial", FontWeight.BOLD, FontPosture.REGULAR, 16);
-    static final Color LABEL_COLOUR = new Color(0, 0, 0, 1);  // Todo: work with themes
-
-    static final double NOTE_LINE_WIDTH = 2;
-    static final double BEAT_LINE_WIDTH = 5;  // This will be the same as the bar line width
-    static final double BAR_NUMBER_ELLIPSE_THICKNESS = 1.25;
     static final double BAR_NUMBER_ELLIPSE_RADIUS_Y = 16;
-    static final double PLAYHEAD_LINE_STROKE_WIDTH = 5;
-
-    static final Color NOTE_LINE_COLOUR = new Color(1, 1, 1, 0.5);  // Todo: work with themes
-    static final Color BEAT_LINE_COLOUR = new Color(1, 1, 1, 0.5);  // Todo: work with themes
-    static final Color BAR_LINE_COLOUR = new Color(0, 1, 0, 0.5);  // Todo: work with themes
-    static final Color BAR_NUMBER_ELLIPSE_COLOUR = new Color(0, 0, 0, 1);  // Todo: work with themes
 
     // Public methods
 
@@ -86,8 +72,9 @@ public class PlottingStuffHandler {
 
             // Create the label
             Label noteLabel = new Label(note);
-            noteLabel.setFont(LABEL_FONT);
-            noteLabel.setTextFill(Color.BLACK);
+
+            // Add CSS style class
+            noteLabel.getStyleClass().add("display-label");
 
             // Check if this note is one of the notes in the key
             if (noteOffsets.contains(i % 12)) {
@@ -95,7 +82,7 @@ public class PlottingStuffHandler {
             }
 
             // Position the label correctly
-            noteLabel.setTranslateY(placementHeight - 0.675 * LABEL_FONT.getSize());  // Magical 0.675 constant
+            noteLabel.setTranslateY(placementHeight - 0.675 * noteLabel.getFont().getSize());  // Magical 0.675 constant
 
             // Make the label centred
             noteLabel.setPrefWidth(width);
@@ -133,17 +120,16 @@ public class PlottingStuffHandler {
             // Create the line
             Line noteLine = new Line(0, placementHeight, width, placementHeight);
 
+            // Add CSS style class
+            noteLine.getStyleClass().add("note-line");
+
             // Set the line dashed format
             if (i % 12 != 0) {  // Not a C note
-                noteLine.getStrokeDashArray().addAll(10d, 6d);  // Todo: make this a constant
+//                noteLine.getStrokeDashArray().addAll(10d, 6d);  // Todo: make this a constant
             } else {  // A C note
-                noteLine.getStrokeDashArray().addAll(1d);
+//                noteLine.getStrokeDashArray().addAll(1d);
+                noteLine.getStyleClass().add("note-line-c");
             }
-
-            // Format the line
-            noteLine.setFill(null);
-            noteLine.setStroke(NOTE_LINE_COLOUR);
-            noteLine.setStrokeWidth(NOTE_LINE_WIDTH);
 
             // Add the line to the spectrogram
             spectrogramPane.getChildren().add(noteLine);
@@ -250,8 +236,11 @@ public class PlottingStuffHandler {
             newLines[beatNum].setStartX(pos);
             newLines[beatNum].setEndX(pos);
 
-            // Determine new line colour
-            newLines[beatNum].setStroke(beatNum % newBeatsPerBar != 0 ? BEAT_LINE_COLOUR : BAR_LINE_COLOUR);
+            // Remove existing CSS class
+            newLines[beatNum].getStyleClass().removeAll();
+
+            // Add correct CSS class
+            newLines[beatNum].getStyleClass().add(beatNum % newBeatsPerBar != 0 ? "beat-line" : "bar-line");
 
             // Try and add again
             try {
@@ -429,11 +418,8 @@ public class PlottingStuffHandler {
         // Create the playhead line object
         Line playheadLine = new Line(0, 0, 0, height);
 
-        // Add styling via a CSS class
+        // Add CSS style class
         playheadLine.getStyleClass().add("playhead-line");
-
-        // Set playhead line stroke width
-        playheadLine.setStrokeWidth(PLAYHEAD_LINE_STROKE_WIDTH);
 
         // Return the playhead line
         return playheadLine;
@@ -496,10 +482,8 @@ public class PlottingStuffHandler {
         // Create the line
         Line beatLine = new Line(pos, 0, pos, height);
 
-        // Format the line
-        beatLine.setFill(null);
-        beatLine.setStroke(beatNum % beatsPerBar != 0 ? BEAT_LINE_COLOUR : BAR_LINE_COLOUR);
-        beatLine.setStrokeWidth(BEAT_LINE_WIDTH);
+        // Add correct CSS class
+        beatLine.getStyleClass().add(beatNum % beatsPerBar != 0 ? "beat-line" : "bar-line");
 
         // Return the line
         return beatLine;
@@ -528,17 +512,19 @@ public class PlottingStuffHandler {
         // Create the ellipse
         Ellipse ellipse = new Ellipse(BAR_NUMBER_ELLIPSE_RADIUS_Y * zoomScaleX, BAR_NUMBER_ELLIPSE_RADIUS_Y);
 
-        // Format the ellipse
+        // Add CSS style class to the ellipse
+        ellipse.getStyleClass().add("bar-number-ellipse");
+
+        // Continue formatting the ellipse
         ellipse.setFill(Color.TRANSPARENT);
-        ellipse.setStroke(BAR_NUMBER_ELLIPSE_COLOUR);
         ellipse.setStrokeType(StrokeType.CENTERED);
-        ellipse.setStrokeWidth(BAR_NUMBER_ELLIPSE_THICKNESS);
 
         // Create the bar number text that will go inside the ellipse
         Text barNumText = new Text(Integer.toString(barNum));
-        barNumText.setFont(LABEL_FONT);
-        barNumText.setFill(LABEL_COLOUR);
         barNumText.setBoundsType(TextBoundsType.VISUAL);
+
+        // Add CSS style class to the bar number text
+        barNumText.getStyleClass().add("display-label");
 
         // Create the `StackPane` that will contain both these things
         StackPane stackPane = new StackPane();
