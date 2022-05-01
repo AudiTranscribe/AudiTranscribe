@@ -20,8 +20,6 @@ import java.io.IOException;
 public class MainApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        System.out.println("Start");
-
 //        // Load the FXML file into the scene
 //        FXMLLoader fxmlLoader = new FXMLLoader(FileUtils.getFile("views/fxml/main-view.fxml"));
 //        Scene scene = new Scene(fxmlLoader.load());

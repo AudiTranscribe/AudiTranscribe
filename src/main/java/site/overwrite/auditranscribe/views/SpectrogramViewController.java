@@ -33,6 +33,7 @@ import java.net.URL;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static java.util.Map.entry;
@@ -69,7 +70,7 @@ public class SpectrogramViewController implements Initializable {
     final int MIN_NOTE_NUMBER = 0;  // C0
     final int MAX_NOTE_NUMBER = 119;  // B9
 
-    final long UPDATE_PLAYBACK_SCHEDULER_PERIOD = 50000;  // In microseconds
+    final long UPDATE_PLAYBACK_SCHEDULER_PERIOD = 50;  // In milliseconds
 
     final boolean USE_FANCY_SHARPS_FOR_NOTE_LABELS = true;
 
@@ -153,6 +154,7 @@ public class SpectrogramViewController implements Initializable {
         }
 
         // Return the toggled version of the `isPaused` flag
+        logger.log(Level.FINE, "Toggled pause state from " + isPaused + " to " + !isPaused);
         return !isPaused;
     }
 
@@ -173,6 +175,8 @@ public class SpectrogramViewController implements Initializable {
 
         colouredProgressPane.setPrefWidth(newXPos);
         PlottingStuffHandler.updatePlayheadLine(playheadLine, newXPos);
+
+        logger.log(Level.FINE, "Seeked to " + seekTime + " seconds");
     }
 
     // Value updating methods
@@ -190,6 +194,7 @@ public class SpectrogramViewController implements Initializable {
         );
 
         // Update the BPM value
+        logger.log(Level.FINE, "Updated BPM value from " + bpm + " to " + newBPM);
         bpm = newBPM;
     }
 
@@ -207,6 +212,7 @@ public class SpectrogramViewController implements Initializable {
         );
 
         // Update the offset value
+        logger.log(Level.FINE, "Updated offset value from " + offset + " to " + newOffset);
         offset = newOffset;
     }
 
@@ -217,11 +223,11 @@ public class SpectrogramViewController implements Initializable {
         mainPane.getStylesheets().add(FileUtils.getFilePath("views/css/base.css"));
         mainPane.getStylesheets().add(FileUtils.getFilePath("views/css/light-mode.css"));  // Todo: add theme support
 
-        // Get the audio file
         try {
+            // Get the audio file
             audio = new Audio("testing-audio-files/RisingPitch.wav");
 
-            // Update audio duration attribute and label
+            // Update audio duration attribute and total time label
             audioDuration = audio.getDuration();
             totalTimeLabel.setText(UnitConversion.secondsToTimeString(audioDuration));
 
@@ -298,6 +304,8 @@ public class SpectrogramViewController implements Initializable {
 
             // Set methods on choice box fields
             musicKeyChoice.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                logger.log(Level.FINE, "Changed music key from " + oldValue + " to " + newValue);
+
                 // Update note pane and note labels
                 noteLabels = PlottingStuffHandler.addNoteLabels(
                         notePane, noteLabels, newValue, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER,
@@ -310,6 +318,8 @@ public class SpectrogramViewController implements Initializable {
 
             timeSignatureChoice.getSelectionModel().selectedItemProperty()
                     .addListener((observable, oldValue, newValue) -> {
+                        logger.log(Level.FINE, "Changed time signature from " + oldValue + " to " + newValue);
+
                         // Get the old and new beats per bar
                         int oldBeatsPerBar = TIME_SIGNATURE_TO_BEATS_PER_BAR.get(oldValue);
                         int newBeatsPerBar = TIME_SIGNATURE_TO_BEATS_PER_BAR.get(newValue);
@@ -332,6 +342,8 @@ public class SpectrogramViewController implements Initializable {
 
             // Add methods to buttons
             playButton.setOnAction(event -> {
+                logger.log(Level.FINE, "Pressed play button");
+
                 if (currTime == audioDuration) {
                     audio.setAudioPlaybackTime(0);
                 }
@@ -339,6 +351,8 @@ public class SpectrogramViewController implements Initializable {
             });
 
             stopButton.setOnAction(event -> {
+                logger.log(Level.FINE, "Pressed stop button");
+
                 // First stop the audio
                 audio.stopAudio();
 
@@ -350,6 +364,8 @@ public class SpectrogramViewController implements Initializable {
             });
 
             playSkipBackButton.setOnAction(event -> {
+                logger.log(Level.FINE, "Pressed skip back button");
+
                 // Seek to the start of the audio
                 seekToTime(0);
 
@@ -358,6 +374,8 @@ public class SpectrogramViewController implements Initializable {
             });
 
             playSkipForwardButton.setOnAction(event -> {
+                logger.log(Level.FINE, "Pressed skip forward button");
+
                 // Seek to the end of the audio
                 seekToTime(audioDuration);
 
@@ -383,6 +401,8 @@ public class SpectrogramViewController implements Initializable {
 
                 // Toggle the `isMuted` flag
                 isMuted = !isMuted;
+
+                logger.log(Level.FINE, "Pressed volume toggle button (muted is now " + isMuted + ")");
             });
 
             // Set method on the volume slider
@@ -398,6 +418,8 @@ public class SpectrogramViewController implements Initializable {
 
                 // Update audio volume
                 audio.setPlaybackVolume(volume);
+
+                logger.log(Level.FINE, "Changed volume from " + oldValue + " to " + newValue);
             });
 
             // Set clickable progress pane method
@@ -440,6 +462,7 @@ public class SpectrogramViewController implements Initializable {
 
                     // Check if the current time has exceeded and is not paused
                     if (currTime >= audioDuration) {
+                        logger.log(Level.FINE, "Playback reached end of audio, will start from beginning upon play");
                         // Pause the audio
                         isPaused = togglePaused(false);
 
@@ -452,7 +475,7 @@ public class SpectrogramViewController implements Initializable {
                         audio.pauseAudio();
                     }
                 }
-            }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MICROSECONDS);
+            }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);
 
             // Set image on the spectrogram area
             spectrogramImage.setFitHeight(finalWidth);
@@ -485,6 +508,8 @@ public class SpectrogramViewController implements Initializable {
 
             // Show the spectrogram from the middle
             spectrogramPane.setVvalue(0.5);
+
+            logger.log(Level.INFO, "Spectrogram view ready");
 
         } catch (Exception e) {
             e.printStackTrace();
