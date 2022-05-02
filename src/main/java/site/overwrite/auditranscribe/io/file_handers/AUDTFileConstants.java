@@ -2,7 +2,7 @@
  * AUDTFileConstants.java
  *
  * Created on 2022-05-01
- * Updated on 2022-05-01
+ * Updated on 2022-05-02
  *
  * Description: Constants that are needed when processing the AudiTranscribe file format.
  */
@@ -20,6 +20,12 @@ public class AUDTFileConstants {
             (byte) 0x53, (byte) 0x43, (byte) 0x52, (byte) 0x49,
             (byte) 0x42, (byte) 0x45, (byte) 0x0a, (byte) 0x0a,
             (byte) 0xad, (byte) 0x75, (byte) 0xc1, (byte) 0xbe
+    };
+    public static final byte[] AUDT_SECTION_DELIMITER = new byte[] {
+            (byte) 0xe0, (byte) 0x5e, (byte) 0x05, (byte) 0xe5
+    };
+    public static final byte[] AUDT_END_OF_FILE_DELIMITER = new byte[] {
+            (byte) 0xe0, (byte) 0xfe, (byte) 0x0f, (byte) 0xef
     };
 
     public static final int FILE_VERSION_NUMBER = 1;

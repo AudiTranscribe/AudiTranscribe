@@ -2,7 +2,7 @@
  * AUDTFileWriter.java
  *
  * Created on 2022-05-01
- * Updated on 2022-05-01
+ * Updated on 2022-05-02
  *
  * Description: Class that handles the writing of the AudiTranscribe (AUDT) file.
  */
@@ -10,6 +10,7 @@
 package site.overwrite.auditranscribe.io.file_handers;
 
 import site.overwrite.auditranscribe.io.IOConverters;
+import site.overwrite.auditranscribe.io.data_encapsulators.GUIDataObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +26,7 @@ public class AUDTFileWriter {
     /**
      * Initialization method to make an <code>AUDTFileWriter</code> object.
      *
-     * @param filename File name of the AUDT file (excluding extension).
+     * @param filename File name of the AUDT file, <b>excluding extension</b>.
      */
     public AUDTFileWriter(String filename) {
         // Update attributes
@@ -43,6 +44,9 @@ public class AUDTFileWriter {
      * @throws IOException If something went wrong when writing to file.
      */
     public void writeBytesToFile() throws IOException {
+        // Write the EOF delimiter at the end of the file
+        writeEOFDelimiter();
+
         // Now convert the `Byte` list into a `byte` array
         int numBytes = bytes.size();  // We shouldn't have more than 2,147,483,647 bytes (i.e. ~2GB)
         byte[] byteArray = new byte[numBytes];
@@ -58,30 +62,19 @@ public class AUDTFileWriter {
     /**
      * Method that writes the GUI data (<b>section number 3</b>) to file.
      *
-     * @param musicKeyIndex      The index of the music key in the dropdown menu shown in the
-     *                           application.
-     * @param timeSignatureIndex The index of the time signature in the dropdown menu shown in the application.
-     * @param bpm                Number of beats per minute.
-     * @param offsetSeconds      Number of seconds offset from the start of the audio.
-     * @param playbackVolume     Volume to play back at.
-     * @param audioFileName      Name of the audio file.
-     * @param totalDurationInMS  Total duration of the audio in <b>milliseconds</b>.
-     * @param currTimeInMS       Current playback time of the audio in <b>milliseconds</b>.
+     * @param guiDataObj Data object that holds all the GUI data.
      */
-    public void writeGUIData(
-            int musicKeyIndex, int timeSignatureIndex, double bpm, double offsetSeconds, double playbackVolume,
-            String audioFileName, int totalDurationInMS, int currTimeInMS
-    ) {
+    public void writeGUIData(GUIDataObject guiDataObj) {
         writeSectionID(3);
-        writeInteger(musicKeyIndex);
-        writeInteger(timeSignatureIndex);
-        writeDouble(bpm);
-        writeDouble(offsetSeconds);
-        writeDouble(playbackVolume);
-        writeString(audioFileName);
-        writeInteger(totalDurationInMS);
-        writeInteger(currTimeInMS);
-        writeSectionDelimiter();
+        writeInteger(guiDataObj.musicKeyIndex);
+        writeInteger(guiDataObj.timeSignatureIndex);
+        writeDouble(guiDataObj.bpm);
+        writeDouble(guiDataObj.offsetSeconds);
+        writeDouble(guiDataObj.playbackVolume);
+        writeString(guiDataObj.audioFileName);
+        writeInteger(guiDataObj.totalDurationInMS);
+        writeInteger(guiDataObj.currTimeInMS);
+        writeEOSDelimiter();
     }
 
     // Private methods
@@ -100,18 +93,8 @@ public class AUDTFileWriter {
         FileHandlersHelpers.addBytesIntoBytesList(bytes, fileVersionBytes);
         FileHandlersHelpers.addBytesIntoBytesList(bytes, lz4VersionBytes);
 
-        // Write the section delimiter
-        writeSectionDelimiter();
-    }
-
-    /**
-     * Helper method that writes the section delimiter.
-     */
-    private void writeSectionDelimiter() {
-        bytes.add((byte) 0xe0);
-        bytes.add((byte) 0x5e);
-        bytes.add((byte) 0x05);
-        bytes.add((byte) 0xe5);
+        // Write the end-of-section delimiter
+        writeEOSDelimiter();
     }
 
     /**
@@ -157,5 +140,19 @@ public class AUDTFileWriter {
     private void writeSectionID(int sectionID) {
         // This is just a special case of writing an integer
         writeInteger(sectionID);
+    }
+
+    /**
+     * Helper method that writes the end-of-section delimiter.
+     */
+    private void writeEOSDelimiter() {
+        FileHandlersHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_SECTION_DELIMITER);
+    }
+
+    /**
+     * Helper method that writes the end-of-file delimiter.
+     */
+    private void writeEOFDelimiter() {
+        FileHandlersHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_END_OF_FILE_DELIMITER);
     }
 }
