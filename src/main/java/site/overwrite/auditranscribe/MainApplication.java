@@ -33,12 +33,18 @@ public class MainApplication extends Application {
 //        stage.setMaximized(true);
 //        // stage.setFullScreen(true);
 
-        FXMLLoader fxmlLoader = new FXMLLoader(FileUtils.getFileURL("views/fxml/spectrogram-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(FileUtils.getFileURL("views/fxml/main-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
-        stage.setTitle("Spectrogram");
+        stage.setTitle("Welcome to AudiTranscribe");
         stage.setScene(scene);
-        stage.setMaximized(true);
-        stage.setFullScreen(true);
+        stage.setResizable(false);
+
+//        FXMLLoader fxmlLoader = new FXMLLoader(FileUtils.getFileURL("views/fxml/spectrogram-view.fxml"));
+//        Scene scene = new Scene(fxmlLoader.load());
+//        stage.setTitle("Spectrogram");
+//        stage.setScene(scene);
+//        stage.setMaximized(true);
+//        stage.setFullScreen(true);
 
 //        FXMLLoader fxmlLoader = new FXMLLoader(FileUtils.getFileURL("views/fxml/file-loader-view.fxml"));
 //        Scene scene = new Scene(fxmlLoader.load());
