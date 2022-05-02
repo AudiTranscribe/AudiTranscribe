@@ -2,7 +2,7 @@
  * Audio.java
  *
  * Created on 2022-02-13
- * Updated on 2022-05-01
+ * Updated on 2022-05-02
  *
  * Description: Class that handles audio processing and audio playback.
  */
@@ -11,7 +11,6 @@ package site.overwrite.auditranscribe.audio;
 
 import javafx.util.Duration;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
-import site.overwrite.auditranscribe.utils.FileUtils;
 
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.Media;
@@ -20,9 +19,7 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -54,13 +51,13 @@ public class Audio {
     /**
      * Initializes an <code>Audio</code> object based on a file's input stream.
      *
-     * @param filePath Input stream of a file.
+     * @param file File object, representing the audio file.
      * @throws IOException                   If there was a problem reading in the audio stream.
      * @throws UnsupportedAudioFileException If there was a problem reading in the audio file.
      */
-    public Audio(String filePath) throws UnsupportedAudioFileException, IOException {
+    public Audio(File file) throws UnsupportedAudioFileException, IOException {
         // Attempt to convert the input stream into an audio input stream
-        InputStream bufferedIn = new BufferedInputStream(FileUtils.getInputStream(filePath));
+        InputStream bufferedIn = new BufferedInputStream(new FileInputStream(file));
         audioStream = AudioSystem.getAudioInputStream(bufferedIn);
 
         // Get the audio file's audio format and audio file's sample rate
@@ -71,7 +68,7 @@ public class Audio {
         MediaPlayer tempMediaPlayer;
 
         try {
-            tempMediaPlayer = new MediaPlayer(new Media(FileUtils.getFilePath(filePath)));
+            tempMediaPlayer = new MediaPlayer(new Media(file.toURI().toString()));
         } catch (IllegalStateException e) {
             tempMediaPlayer = null;
             logger.log(Level.WARNING, "JavaFX Toolkit not initialized. Audio playback will not work.");

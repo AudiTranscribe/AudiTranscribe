@@ -2,7 +2,7 @@
  * MainApplication.java
  *
  * Created on 2022-02-09
- * Updated on 2022-05-01
+ * Updated on 2022-05-02
  *
  * Description: Contains the main application class.
  */
@@ -10,10 +10,9 @@
 package site.overwrite.auditranscribe;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import site.overwrite.auditranscribe.utils.FileUtils;
+import site.overwrite.auditranscribe.views.ApplicationScenes;
 
 import java.io.IOException;
 
@@ -33,18 +32,17 @@ public class MainApplication extends Application {
 //        stage.setMaximized(true);
 //        // stage.setFullScreen(true);
 
-        FXMLLoader fxmlLoader = new FXMLLoader(FileUtils.getFileURL("views/fxml/main-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load());
-        stage.setTitle("Welcome to AudiTranscribe");
-        stage.setScene(scene);
-        stage.setResizable(false);
-
-//        FXMLLoader fxmlLoader = new FXMLLoader(FileUtils.getFileURL("views/fxml/spectrogram-view.fxml"));
+//        FXMLLoader fxmlLoader = new FXMLLoader(FileUtils.getFileURL("views/fxml/main-view.fxml"));
 //        Scene scene = new Scene(fxmlLoader.load());
-//        stage.setTitle("Spectrogram");
+//        stage.setTitle("Welcome to AudiTranscribe");
 //        stage.setScene(scene);
-//        stage.setMaximized(true);
-//        stage.setFullScreen(true);
+//        stage.setResizable(false);
+
+        Scene scene = ApplicationScenes.SPECTROGRAM_SCENE.scene;
+        stage.setTitle("Spectrogram");
+        stage.setScene(scene);
+        stage.setMaximized(true);
+        stage.setFullScreen(true);
 
 //        FXMLLoader fxmlLoader = new FXMLLoader(FileUtils.getFileURL("views/fxml/file-loader-view.fxml"));
 //        Scene scene = new Scene(fxmlLoader.load());

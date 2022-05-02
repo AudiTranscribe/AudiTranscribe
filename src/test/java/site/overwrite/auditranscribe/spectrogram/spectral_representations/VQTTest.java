@@ -14,9 +14,11 @@ import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.Window;
 import site.overwrite.auditranscribe.utils.Complex;
+import site.overwrite.auditranscribe.utils.FileUtils;
 import site.overwrite.auditranscribe.utils.MathUtils;
 import site.overwrite.auditranscribe.utils.UnitConversion;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.util.Arrays;
 
@@ -32,7 +34,7 @@ class VQTTest {
         // Run the test
         try {
             // Get the audio file
-            Audio audio = new Audio("testing-audio-files/Choice.wav");
+            Audio audio = new Audio(new File(FileUtils.getAbsoluteFilePath("testing-audio-files/Choice.wav")));
 
             // Extract samples
             double[] samples = audio.getMonoSamples();
