@@ -17,6 +17,7 @@ module site.overwrite.auditranscribe {
 
     exports site.overwrite.auditranscribe;
     exports site.overwrite.auditranscribe.views;
+    exports site.overwrite.auditranscribe.audio;
     exports site.overwrite.auditranscribe.audio.filters;
     opens site.overwrite.auditranscribe to javafx.fxml;
     opens site.overwrite.auditranscribe.views to javafx.fxml;

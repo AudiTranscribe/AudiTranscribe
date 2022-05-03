@@ -30,7 +30,8 @@ import site.overwrite.auditranscribe.utils.ArrayUtils;
 import site.overwrite.auditranscribe.utils.FileUtils;
 import site.overwrite.auditranscribe.utils.UnitConversion;
 
-import java.io.File;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -426,146 +427,148 @@ public class SpectrogramViewController implements Initializable {
     }
 
     // Public methods
-    public void setAudioFile(File fileObj) {
-        try {
-            // Get the audio file
-            audio = new Audio(fileObj);
 
-            // Update audio duration attribute and total time label
-            audioDuration = audio.getDuration();
-            totalTimeLabel.setText(UnitConversion.secondsToTimeString(audioDuration));
+    /**
+     * Method that sets the audio file for the spectrogram view.
+     *
+     * @param audioObj Audio object representing the audio file.
+     * @throws IOException If something went wrong when reading in a file.
+     */
+    public void setAudioFile(Audio audioObj) throws IOException {
+        // Set the audio file attribute
+        audio = audioObj;
 
-            // Set initial volume
-            audio.setPlaybackVolume(volume);
+        // Update audio duration attribute and total time label
+        audioDuration = audio.getDuration();
+        totalTimeLabel.setText(UnitConversion.secondsToTimeString(audioDuration));
 
-            // Generate spectrogram
-            Spectrogram spectrogram = new Spectrogram(
-                    audio, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER, BINS_PER_OCTAVE, PX_PER_SECOND, NUM_PX_PER_OCTAVE,
-                    SPECTROGRAM_HOP_LENGTH
-            );
-            WritableImage image = spectrogram.generateSpectrogram(Window.HANN_WINDOW, ColourScale.VIRIDIS);
+        // Set initial volume
+        audio.setPlaybackVolume(volume);
 
-            // Get the final width and height
-            double finalWidth = image.getWidth() * SPECTROGRAM_ZOOM_SCALE_X;
-            finalHeight = image.getHeight() * SPECTROGRAM_ZOOM_SCALE_Y;
+        // Generate spectrogram
+        Spectrogram spectrogram = new Spectrogram(
+                audio, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER, BINS_PER_OCTAVE, PX_PER_SECOND, NUM_PX_PER_OCTAVE,
+                SPECTROGRAM_HOP_LENGTH
+        );
+        WritableImage image = spectrogram.generateSpectrogram(Window.HANN_WINDOW, ColourScale.VIRIDIS);
 
-            // Fix panes' properties
-            leftPane.setFitToWidth(true);
-            leftPaneAnchor.setPrefHeight(finalHeight);
+        // Get the final width and height
+        double finalWidth = image.getWidth() * SPECTROGRAM_ZOOM_SCALE_X;
+        finalHeight = image.getHeight() * SPECTROGRAM_ZOOM_SCALE_Y;
 
-            spectrogramPaneAnchor.setPrefWidth(finalWidth);
-            spectrogramPaneAnchor.setPrefHeight(finalHeight);
+        // Fix panes' properties
+        leftPane.setFitToWidth(true);
+        leftPaneAnchor.setPrefHeight(finalHeight);
 
-            bottomPane.setFitToHeight(true);
-            bottomPaneAnchor.setPrefWidth(finalWidth);
+        spectrogramPaneAnchor.setPrefWidth(finalWidth);
+        spectrogramPaneAnchor.setPrefHeight(finalHeight);
 
-            clickableProgressPane.setPrefWidth(finalWidth);
-            colouredProgressPane.setPrefWidth(0);
+        bottomPane.setFitToHeight(true);
+        bottomPaneAnchor.setPrefWidth(finalWidth);
 
-            // Set scrolling for panes
-            leftPane.vvalueProperty().bindBidirectional(spectrogramPane.vvalueProperty());
-            bottomPane.hvalueProperty().bindBidirectional(spectrogramPane.hvalueProperty());
+        clickableProgressPane.setPrefWidth(finalWidth);
+        colouredProgressPane.setPrefWidth(0);
 
-            // Add the playhead line
-            playheadLine = PlottingStuffHandler.createPlayheadLine(finalHeight);
-            spectrogramPaneAnchor.getChildren().add(playheadLine);
+        // Set scrolling for panes
+        leftPane.vvalueProperty().bindBidirectional(spectrogramPane.vvalueProperty());
+        bottomPane.hvalueProperty().bindBidirectional(spectrogramPane.hvalueProperty());
 
-            // Create a constantly-executing service
-            ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(0, runnable -> {
-                Thread thread = Executors.defaultThreadFactory().newThread(runnable);
-                thread.setDaemon(true);  // Make it so that it can shut down gracefully by placing it in background
-                return thread;
-            });
-            scheduler.scheduleAtFixedRate(() -> {
-                // Nothing really changes if the audio is paused
-                if (!isPaused) {
-                    // Get the current audio time
-                    currTime = audio.getCurrAudioTime();
+        // Add the playhead line
+        playheadLine = PlottingStuffHandler.createPlayheadLine(finalHeight);
+        spectrogramPaneAnchor.getChildren().add(playheadLine);
 
-                    // Update the current time label
-                    Platform.runLater(() -> currTimeLabel.setText(UnitConversion.secondsToTimeString(currTime)));
+        // Create a constantly-executing service
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(0, runnable -> {
+            Thread thread = Executors.defaultThreadFactory().newThread(runnable);
+            thread.setDaemon(true);  // Make it so that it can shut down gracefully by placing it in background
+            return thread;
+        });
+        scheduler.scheduleAtFixedRate(() -> {
+            // Nothing really changes if the audio is paused
+            if (!isPaused) {
+                // Get the current audio time
+                currTime = audio.getCurrAudioTime();
 
-                    // Update coloured progress pane and playhead line
-                    double newPosX = currTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X;
-                    colouredProgressPane.setPrefWidth(newPosX);
-                    PlottingStuffHandler.updatePlayheadLine(playheadLine, newPosX);
+                // Update the current time label
+                Platform.runLater(() -> currTimeLabel.setText(UnitConversion.secondsToTimeString(currTime)));
 
-                    // Check if the current time has exceeded and is not paused
-                    if (currTime >= audioDuration) {
-                        logger.log(Level.FINE, "Playback reached end of audio, will start from beginning upon play");
-                        // Pause the audio
-                        isPaused = togglePaused(false);
+                // Update coloured progress pane and playhead line
+                double newPosX = currTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X;
+                colouredProgressPane.setPrefWidth(newPosX);
+                PlottingStuffHandler.updatePlayheadLine(playheadLine, newPosX);
 
-                        // Specially update the start time to 0
-                        // (Because the `seekToTime` method would have set it to the end, which is not what we want)
-                        audio.setAudioStartTime(0);
+                // Check if the current time has exceeded and is not paused
+                if (currTime >= audioDuration) {
+                    logger.log(Level.FINE, "Playback reached end of audio, will start from beginning upon play");
+                    // Pause the audio
+                    isPaused = togglePaused(false);
 
-                        // We need to do this so that the status is set to paused
-                        audio.stopAudio();
-                        audio.pauseAudio();
-                    }
+                    // Specially update the start time to 0
+                    // (Because the `seekToTime` method would have set it to the end, which is not what we want)
+                    audio.setAudioStartTime(0);
 
-                    // Update scrolling
-                    if (scrollToPlayhead) {
-                        // Get the 'half width' of the spectrogram area
-                        double spectrogramAreaHalfWidth = spectrogramPane.getWidth() / 2;
+                    // We need to do this so that the status is set to paused
+                    audio.stopAudio();
+                    audio.pauseAudio();
+                }
 
-                        // Set the H-value of the spectrogram pane
-                        if (newPosX <= spectrogramAreaHalfWidth) {
-                            // If the `newPosX` is within the first 'half width' of the initial screen, do not scroll
-                            spectrogramPane.setHvalue(0);
+                // Update scrolling
+                if (scrollToPlayhead) {
+                    // Get the 'half width' of the spectrogram area
+                    double spectrogramAreaHalfWidth = spectrogramPane.getWidth() / 2;
 
-                        } else if (newPosX >= finalWidth - spectrogramAreaHalfWidth) {
-                            // If the `newPoxX` is within the last 'half width' of the entire spectrogram area, keep the
-                            // scrolling to the end
-                            spectrogramPane.setHvalue(1);
-                        } else {
-                            // Otherwise, update the H-value accordingly so that the view is centered on the playhead
-                            spectrogramPane.setHvalue(
-                                    (newPosX - spectrogramAreaHalfWidth) / (finalWidth - 2 * spectrogramAreaHalfWidth)
-                            );
-                        }
+                    // Set the H-value of the spectrogram pane
+                    if (newPosX <= spectrogramAreaHalfWidth) {
+                        // If the `newPosX` is within the first 'half width' of the initial screen, do not scroll
+                        spectrogramPane.setHvalue(0);
+
+                    } else if (newPosX >= finalWidth - spectrogramAreaHalfWidth) {
+                        // If the `newPoxX` is within the last 'half width' of the entire spectrogram area, keep the
+                        // scrolling to the end
+                        spectrogramPane.setHvalue(1);
+                    } else {
+                        // Otherwise, update the H-value accordingly so that the view is centered on the playhead
+                        spectrogramPane.setHvalue(
+                                (newPosX - spectrogramAreaHalfWidth) / (finalWidth - 2 * spectrogramAreaHalfWidth)
+                        );
                     }
                 }
-            }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);
+            }
+        }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);
 
-            // Set image on the spectrogram area
-            spectrogramImage.setFitHeight(finalWidth);
-            spectrogramImage.setFitWidth(finalHeight);
-            spectrogramImage.setImage(image);
+        // Set image on the spectrogram area
+        spectrogramImage.setFitHeight(finalWidth);
+        spectrogramImage.setFitWidth(finalHeight);
+        spectrogramImage.setImage(image);
 
-            // Add note labels and note lines
-            noteLabels = PlottingStuffHandler.addNoteLabels(
-                    notePane, noteLabels, key, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER,
-                    USE_FANCY_SHARPS_FOR_NOTE_LABELS
-            );
-            PlottingStuffHandler.addNoteLines(spectrogramPaneAnchor, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER);
+        // Add note labels and note lines
+        noteLabels = PlottingStuffHandler.addNoteLabels(
+                notePane, noteLabels, key, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER,
+                USE_FANCY_SHARPS_FOR_NOTE_LABELS
+        );
+        PlottingStuffHandler.addNoteLines(spectrogramPaneAnchor, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER);
 
-            // Add the beat lines and bar number ellipses
-            beatLines = PlottingStuffHandler.getBeatLines(
-                    bpm, beatsPerBar, PX_PER_SECOND, finalHeight, audioDuration, offset, SPECTROGRAM_ZOOM_SCALE_X
-            );
-            PlottingStuffHandler.addBeatLines(spectrogramPaneAnchor, beatLines);
+        // Add the beat lines and bar number ellipses
+        beatLines = PlottingStuffHandler.getBeatLines(
+                bpm, beatsPerBar, PX_PER_SECOND, finalHeight, audioDuration, offset, SPECTROGRAM_ZOOM_SCALE_X
+        );
+        PlottingStuffHandler.addBeatLines(spectrogramPaneAnchor, beatLines);
 
-            barNumberEllipses = PlottingStuffHandler.getBarNumberEllipses(
-                    bpm, beatsPerBar, PX_PER_SECOND, barNumberPane.getPrefHeight(), audioDuration, offset,
-                    SPECTROGRAM_ZOOM_SCALE_X
-            );
-            PlottingStuffHandler.addBarNumberEllipses(barNumberPane, barNumberEllipses);
+        barNumberEllipses = PlottingStuffHandler.getBarNumberEllipses(
+                bpm, beatsPerBar, PX_PER_SECOND, barNumberPane.getPrefHeight(), audioDuration, offset,
+                SPECTROGRAM_ZOOM_SCALE_X
+        );
+        PlottingStuffHandler.addBarNumberEllipses(barNumberPane, barNumberEllipses);
 
-            // Resize spectrogram image pane
-            // (We do this at the end to ensure that the image is properly placed)
-            spectrogramImage.setFitWidth(finalWidth);
-            spectrogramImage.setFitHeight(finalHeight);
+        // Resize spectrogram image pane
+        // (We do this at the end to ensure that the image is properly placed)
+        spectrogramImage.setFitWidth(finalWidth);
+        spectrogramImage.setFitHeight(finalHeight);
 
-            // Show the spectrogram from the middle
-            spectrogramPane.setVvalue(0.5);
+        // Show the spectrogram from the middle
+        spectrogramPane.setVvalue(0.5);
 
-            // Report that the spectrogram view is ready to be shown
-            logger.log(Level.INFO, "Spectrogram view ready to be shown");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // Report that the spectrogram view is ready to be shown
+        logger.log(Level.INFO, "Spectrogram view ready to be shown");
     }
 }
