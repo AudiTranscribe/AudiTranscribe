@@ -2,7 +2,7 @@
  * SpectrogramViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-02
+ * Updated on 2022-05-03
  *
  * Description: Contains the spectrogram view's controller class.
  */
@@ -222,16 +222,214 @@ public class SpectrogramViewController implements Initializable {
         offset = newOffset;
     }
 
-    // Initialization function
+    // Initialization method
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Add CSS stylesheets to the scene
         mainPane.getStylesheets().add(FileUtils.getFileURLAsString("views/css/base.css"));
         mainPane.getStylesheets().add(FileUtils.getFileURLAsString("views/css/light-mode.css"));  // Todo: add theme support
 
+        // Update spinners' ranges
+        SpinnerValueFactory.DoubleSpinnerValueFactory bpmSpinnerFactory =
+                new SpinnerValueFactory.DoubleSpinnerValueFactory(
+                        BPM_RANGE.getKey(), BPM_RANGE.getValue(), 120, 0.1
+                );
+        SpinnerValueFactory.DoubleSpinnerValueFactory offsetSpinnerFactory =
+                new SpinnerValueFactory.DoubleSpinnerValueFactory(
+                        OFFSET_RANGE.getKey(), OFFSET_RANGE.getValue(), 0, 0.01
+                );
+
+        bpmSpinner.setValueFactory(bpmSpinnerFactory);
+        offsetSpinner.setValueFactory(offsetSpinnerFactory);
+
+        // Set the choice boxes' choices
+        for (String musicKey : MUSIC_KEYS) musicKeyChoice.getItems().add(musicKey);
+        for (String timeSignature : TIME_SIGNATURES) timeSignatureChoice.getItems().add(timeSignature);
+
+        musicKeyChoice.setValue("C");
+        timeSignatureChoice.setValue("4/4");
+
+        // Set methods on spinners
+        bpmSpinner.valueProperty().addListener((observable, oldValue, newValue) -> updateBPMValue(newValue));
+        offsetSpinner.valueProperty().addListener(((observable, oldValue, newValue) -> updateOffsetValue(newValue)));
+
+        bpmSpinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {  // Lost focus
+                updateBPMValue(bpmSpinner.getValue());
+            }
+        });
+
+        offsetSpinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {  // Lost focus
+                updateOffsetValue(offsetSpinner.getValue());
+            }
+        });
+
+        // Set methods on choice box fields
+        musicKeyChoice.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            logger.log(Level.FINE, "Changed music key from " + oldValue + " to " + newValue);
+
+            // Update note pane and note labels
+            noteLabels = PlottingStuffHandler.addNoteLabels(
+                    notePane, noteLabels, newValue, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER,
+                    USE_FANCY_SHARPS_FOR_NOTE_LABELS
+            );
+
+            // Update the music key value and music key index
+            key = newValue;
+            keyIndex = ArrayUtils.findIndex(MUSIC_KEYS, newValue);
+        });
+
+        timeSignatureChoice.getSelectionModel().selectedItemProperty()
+                .addListener((observable, oldValue, newValue) -> {
+                    logger.log(Level.FINE, "Changed time signature from " + oldValue + " to " + newValue);
+
+                    // Get the old and new beats per bar
+                    int oldBeatsPerBar = TIME_SIGNATURE_TO_BEATS_PER_BAR.get(oldValue);
+                    int newBeatsPerBar = TIME_SIGNATURE_TO_BEATS_PER_BAR.get(newValue);
+
+                    // Update the beat lines and bar number ellipses
+                    beatLines = PlottingStuffHandler.updateBeatLines(
+                            spectrogramPaneAnchor, beatLines, audioDuration, bpm, bpm, offset, offset, finalHeight,
+                            oldBeatsPerBar, newBeatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+                    );
+
+                    barNumberEllipses = PlottingStuffHandler.updateBarNumberEllipses(
+                            barNumberPane, barNumberEllipses, audioDuration, bpm, bpm, offset, offset,
+                            barNumberPane.getPrefHeight(), oldBeatsPerBar, newBeatsPerBar, PX_PER_SECOND,
+                            SPECTROGRAM_ZOOM_SCALE_X
+                    );
+
+                    // Update the time signature index
+                    timeSignatureIndex = ArrayUtils.findIndex(TIME_SIGNATURES, newValue);
+
+                    // Update the beats per bar
+                    beatsPerBar = newBeatsPerBar;
+                });
+
+        // Add methods to buttons
+        playButton.setOnAction(event -> {
+            logger.log(Level.FINE, "Pressed play button");
+
+            if (currTime == audioDuration) {
+                audio.setAudioPlaybackTime(0);
+            }
+            isPaused = togglePaused(isPaused);
+        });
+
+        stopButton.setOnAction(event -> {
+            logger.log(Level.FINE, "Pressed stop button");
+
+            // First stop the audio
+            audio.stopAudio();
+
+            // Then update the timings shown on the GUI
+            seekToTime(0);
+
+            // Finally, toggle the paused flag
+            isPaused = togglePaused(false);
+        });
+
+        playSkipBackButton.setOnAction(event -> {
+            logger.log(Level.FINE, "Pressed skip back button");
+
+            // Seek to the start of the audio
+            seekToTime(0);
+
+            // Pause the audio
+            isPaused = togglePaused(false);
+        });
+
+        playSkipForwardButton.setOnAction(event -> {
+            logger.log(Level.FINE, "Pressed skip forward button");
+
+            // Seek to the end of the audio
+            seekToTime(audioDuration);
+
+            // Force the audio to play at the end
+            // (This is to avoid a nasty seek to end issue where user needs to click on play button twice)
+            isPaused = togglePaused(true);
+        });
+
+        volumeButton.setOnAction(event -> {
+            if (isMuted) {
+                // Change the icon of the volume button from mute to non-mute
+                volumeButtonImage.setImage(new Image(FileUtils.getFileURLAsString("images/icons/PNGs/volume-high.png")));
+
+                // Unmute the audio by setting the volume back to the value before the mute
+                audio.setPlaybackVolume(volume);
+            } else {
+                // Change the icon of the volume button from non-mute to mute
+                volumeButtonImage.setImage(new Image(FileUtils.getFileURLAsString("images/icons/PNGs/volume-mute.png")));
+
+                // Mute the audio by setting the volume to zero
+                audio.setPlaybackVolume(0);
+            }
+
+            // Toggle the `isMuted` flag
+            isMuted = !isMuted;
+
+            logger.log(Level.FINE, "Pressed volume toggle button (muted is now " + isMuted + ")");
+        });
+
+        scrollButton.setOnAction(event -> {
+            if (scrollToPlayhead) {
+                // Change the icon of the scroll button from filled to non-filled
+                scrollButtonImage.setImage(new Image(FileUtils.getFileURLAsString("images/icons/PNGs/footsteps-outline.png")));
+
+            } else {
+                // Change the icon of the scroll button from non-filled to filled
+                scrollButtonImage.setImage(new Image(FileUtils.getFileURLAsString("images/icons/PNGs/footsteps-filled.png")));
+            }
+
+            // Toggle the `scrollToPlayhead` flag
+            scrollToPlayhead = !scrollToPlayhead;
+
+            logger.log(Level.FINE, "Pressed scroll toggle button (scroll is now " + scrollToPlayhead + ")");
+        });
+
+        // Set method on the volume slider
+        volumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            // Update the volume value
+            volume = newValue.doubleValue();
+
+            // Change the icon of the volume button from mute to non-mute
+            if (isMuted) {
+                volumeButtonImage.setImage(new Image(FileUtils.getFileURLAsString("images/icons/PNGs/volume-high.png")));
+                isMuted = false;
+            }
+
+            // Update audio volume
+            audio.setPlaybackVolume(volume);
+
+            logger.log(Level.FINE, "Changed volume from " + oldValue + " to " + newValue);
+        });
+
+        // Set clickable progress pane method
+        clickableProgressPane.setOnMouseClicked(event -> {
+            // Ensure that the click is within the pane
+            double clickX = event.getX();
+            double clickY = event.getY();
+
+            if (clickX >= clickableProgressPane.getBoundsInParent().getMinX() &&
+                    clickX <= clickableProgressPane.getBoundsInParent().getMaxX() &&
+                    clickY >= clickableProgressPane.getBoundsInParent().getMinY() &&
+                    clickY <= clickableProgressPane.getBoundsInParent().getMaxY()
+            ) {
+                // Convert the click position to seek time
+                double seekTime = clickX / SPECTROGRAM_ZOOM_SCALE_X / PX_PER_SECOND;
+
+                // Seek to that time
+                seekToTime(seekTime);
+            }
+        });
+    }
+
+    // Public methods
+    public void setAudioFile(File fileObj) {
         try {
             // Get the audio file
-            audio = new Audio(new File(FileUtils.getAbsoluteFilePath("testing-audio-files/RisingPitch.wav")));
+            audio = new Audio(fileObj);
 
             // Update audio duration attribute and total time label
             audioDuration = audio.getDuration();
@@ -271,201 +469,6 @@ public class SpectrogramViewController implements Initializable {
             // Add the playhead line
             playheadLine = PlottingStuffHandler.createPlayheadLine(finalHeight);
             spectrogramPaneAnchor.getChildren().add(playheadLine);
-
-            // Update spinners' ranges
-            SpinnerValueFactory.DoubleSpinnerValueFactory bpmSpinnerFactory =
-                    new SpinnerValueFactory.DoubleSpinnerValueFactory(
-                            BPM_RANGE.getKey(), BPM_RANGE.getValue(), 120, 0.1
-                    );
-            SpinnerValueFactory.DoubleSpinnerValueFactory offsetSpinnerFactory =
-                    new SpinnerValueFactory.DoubleSpinnerValueFactory(
-                            OFFSET_RANGE.getKey(), OFFSET_RANGE.getValue(), 0, 0.01
-                    );
-
-            bpmSpinner.setValueFactory(bpmSpinnerFactory);
-            offsetSpinner.setValueFactory(offsetSpinnerFactory);
-
-            // Set the choice boxes' choices
-            for (String musicKey : MUSIC_KEYS) musicKeyChoice.getItems().add(musicKey);
-            for (String timeSignature : TIME_SIGNATURES) timeSignatureChoice.getItems().add(timeSignature);
-
-            musicKeyChoice.setValue("C");
-            timeSignatureChoice.setValue("4/4");
-
-            // Set methods on spinners
-            bpmSpinner.valueProperty().addListener((observable, oldValue, newValue) -> updateBPMValue(newValue));
-            offsetSpinner.valueProperty().addListener(((observable, oldValue, newValue) -> updateOffsetValue(newValue)));
-
-            bpmSpinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
-                if (!newValue) {  // Lost focus
-                    updateBPMValue(bpmSpinner.getValue());
-                }
-            });
-
-            offsetSpinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
-                if (!newValue) {  // Lost focus
-                    updateOffsetValue(offsetSpinner.getValue());
-                }
-            });
-
-            // Set methods on choice box fields
-            musicKeyChoice.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-                logger.log(Level.FINE, "Changed music key from " + oldValue + " to " + newValue);
-
-                // Update note pane and note labels
-                noteLabels = PlottingStuffHandler.addNoteLabels(
-                        notePane, noteLabels, newValue, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER,
-                        USE_FANCY_SHARPS_FOR_NOTE_LABELS
-                );
-
-                // Update the music key value and music key index
-                key = newValue;
-                keyIndex = ArrayUtils.findIndex(MUSIC_KEYS, newValue);
-            });
-
-            timeSignatureChoice.getSelectionModel().selectedItemProperty()
-                    .addListener((observable, oldValue, newValue) -> {
-                        logger.log(Level.FINE, "Changed time signature from " + oldValue + " to " + newValue);
-
-                        // Get the old and new beats per bar
-                        int oldBeatsPerBar = TIME_SIGNATURE_TO_BEATS_PER_BAR.get(oldValue);
-                        int newBeatsPerBar = TIME_SIGNATURE_TO_BEATS_PER_BAR.get(newValue);
-
-                        // Update the beat lines and bar number ellipses
-                        beatLines = PlottingStuffHandler.updateBeatLines(
-                                spectrogramPaneAnchor, beatLines, audioDuration, bpm, bpm, offset, offset, finalHeight,
-                                oldBeatsPerBar, newBeatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
-                        );
-
-                        barNumberEllipses = PlottingStuffHandler.updateBarNumberEllipses(
-                                barNumberPane, barNumberEllipses, audioDuration, bpm, bpm, offset, offset,
-                                barNumberPane.getPrefHeight(), oldBeatsPerBar, newBeatsPerBar, PX_PER_SECOND,
-                                SPECTROGRAM_ZOOM_SCALE_X
-                        );
-
-                        // Update the time signature index
-                        timeSignatureIndex = ArrayUtils.findIndex(TIME_SIGNATURES, newValue);
-
-                        // Update the beats per bar
-                        beatsPerBar = newBeatsPerBar;
-                    });
-
-            // Add methods to buttons
-            playButton.setOnAction(event -> {
-                logger.log(Level.FINE, "Pressed play button");
-
-                if (currTime == audioDuration) {
-                    audio.setAudioPlaybackTime(0);
-                }
-                isPaused = togglePaused(isPaused);
-            });
-
-            stopButton.setOnAction(event -> {
-                logger.log(Level.FINE, "Pressed stop button");
-
-                // First stop the audio
-                audio.stopAudio();
-
-                // Then update the timings shown on the GUI
-                seekToTime(0);
-
-                // Finally, toggle the paused flag
-                isPaused = togglePaused(false);
-            });
-
-            playSkipBackButton.setOnAction(event -> {
-                logger.log(Level.FINE, "Pressed skip back button");
-
-                // Seek to the start of the audio
-                seekToTime(0);
-
-                // Pause the audio
-                isPaused = togglePaused(false);
-            });
-
-            playSkipForwardButton.setOnAction(event -> {
-                logger.log(Level.FINE, "Pressed skip forward button");
-
-                // Seek to the end of the audio
-                seekToTime(audioDuration);
-
-                // Force the audio to play at the end
-                // (This is to avoid a nasty seek to end issue where user needs to click on play button twice)
-                isPaused = togglePaused(true);
-            });
-
-            volumeButton.setOnAction(event -> {
-                if (isMuted) {
-                    // Change the icon of the volume button from mute to non-mute
-                    volumeButtonImage.setImage(new Image(FileUtils.getFileURLAsString("images/icons/PNGs/volume-high.png")));
-
-                    // Unmute the audio by setting the volume back to the value before the mute
-                    audio.setPlaybackVolume(volume);
-                } else {
-                    // Change the icon of the volume button from non-mute to mute
-                    volumeButtonImage.setImage(new Image(FileUtils.getFileURLAsString("images/icons/PNGs/volume-mute.png")));
-
-                    // Mute the audio by setting the volume to zero
-                    audio.setPlaybackVolume(0);
-                }
-
-                // Toggle the `isMuted` flag
-                isMuted = !isMuted;
-
-                logger.log(Level.FINE, "Pressed volume toggle button (muted is now " + isMuted + ")");
-            });
-
-            scrollButton.setOnAction(event -> {
-                if (scrollToPlayhead) {
-                    // Change the icon of the scroll button from filled to non-filled
-                    scrollButtonImage.setImage(new Image(FileUtils.getFileURLAsString("images/icons/PNGs/footsteps-outline.png")));
-
-                } else {
-                    // Change the icon of the scroll button from non-filled to filled
-                    scrollButtonImage.setImage(new Image(FileUtils.getFileURLAsString("images/icons/PNGs/footsteps-filled.png")));
-                }
-
-                // Toggle the `scrollToPlayhead` flag
-                scrollToPlayhead = !scrollToPlayhead;
-
-                logger.log(Level.FINE, "Pressed scroll toggle button (scroll is now " + scrollToPlayhead + ")");
-            });
-
-            // Set method on the volume slider
-            volumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-                // Update the volume value
-                volume = newValue.doubleValue();
-
-                // Change the icon of the volume button from mute to non-mute
-                if (isMuted) {
-                    volumeButtonImage.setImage(new Image(FileUtils.getFileURLAsString("images/icons/PNGs/volume-high.png")));
-                    isMuted = false;
-                }
-
-                // Update audio volume
-                audio.setPlaybackVolume(volume);
-
-                logger.log(Level.FINE, "Changed volume from " + oldValue + " to " + newValue);
-            });
-
-            // Set clickable progress pane method
-            clickableProgressPane.setOnMouseClicked(event -> {
-                // Ensure that the click is within the pane
-                double clickX = event.getX();
-                double clickY = event.getY();
-
-                if (clickX >= clickableProgressPane.getBoundsInParent().getMinX() &&
-                        clickX <= clickableProgressPane.getBoundsInParent().getMaxX() &&
-                        clickY >= clickableProgressPane.getBoundsInParent().getMinY() &&
-                        clickY <= clickableProgressPane.getBoundsInParent().getMaxY()
-                ) {
-                    // Convert the click position to seek time
-                    double seekTime = clickX / SPECTROGRAM_ZOOM_SCALE_X / PX_PER_SECOND;
-
-                    // Seek to that time
-                    seekToTime(seekTime);
-                }
-            });
 
             // Create a constantly-executing service
             ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(0, runnable -> {
@@ -558,7 +561,8 @@ public class SpectrogramViewController implements Initializable {
             // Show the spectrogram from the middle
             spectrogramPane.setVvalue(0.5);
 
-            logger.log(Level.INFO, "Spectrogram view ready");
+            // Report that the spectrogram view is ready to be shown
+            logger.log(Level.INFO, "Spectrogram view ready to be shown");
 
         } catch (Exception e) {
             e.printStackTrace();
