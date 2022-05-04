@@ -2,7 +2,7 @@
  * SpectrogramViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-03
+ * Updated on 2022-05-04
  *
  * Description: Contains the spectrogram view's controller class.
  */
@@ -23,6 +23,7 @@ import javafx.scene.shape.Line;
 import javafx.util.Pair;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.Window;
+import site.overwrite.auditranscribe.io.ProjectIOHandlers;
 import site.overwrite.auditranscribe.plotting.PlottingStuffHandler;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
 import site.overwrite.auditranscribe.spectrogram.Spectrogram;
@@ -30,7 +31,6 @@ import site.overwrite.auditranscribe.utils.ArrayUtils;
 import site.overwrite.auditranscribe.utils.FileUtils;
 import site.overwrite.auditranscribe.utils.UnitConversion;
 
-import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
@@ -309,6 +309,8 @@ public class SpectrogramViewController implements Initializable {
                 });
 
         // Add methods to buttons
+        newProjectButton.setOnAction(ProjectIOHandlers::newProject);
+
         playButton.setOnAction(event -> {
             logger.log(Level.FINE, "Pressed play button");
 
