@@ -4,6 +4,7 @@ Todo:
     - BPM Selection and Estimation
     - Menu GUI
     - Allow other audio types (e.g. mp3) to be input into the program
+    - Add progress bars
     - Implement file saving
         - We would probably save the spectrogram data as that takes the longest to generate
     - Add licence/credits for ionicons
