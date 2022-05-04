@@ -2,7 +2,7 @@
  * IOConvertersTest.java
  *
  * Created on 2022-05-01
- * Updated on 2022-05-01
+ * Updated on 2022-05-04
  *
  * Description: Test `IOConverters.java`.
  */
@@ -50,6 +50,48 @@ class IOConvertersTest {
     }
 
     @Test
+    void oneDimensionalDoubleArrayToBytes() {
+        // Define the double array
+        double[] array = {65.43, -123.45, 9876.54321, 3.14159265, -0.000082147128481};
+
+        // Define the correct hexadecimal string
+        String hexStr = "00000005" +
+                "40505b851eb851ec" +
+                "c05edccccccccccd" +
+                "40c34a4587e7c06e" +
+                "400921fb53c8d4f1" +
+                "bf1588ccebd0259f";
+
+        // Run test
+        assertArrayEquals(
+                HexFormat.of().parseHex(hexStr),
+                IOConverters.oneDimensionalDoubleArrayToBytes(array)
+        );
+    }
+
+    @Test
+    void twoDimensionalDoubleArrayToBytes() {
+        // Define the double array
+        double[][] array = {
+                {65.43, -123.45, 9876.54321, 3.14159265, -0.000082147128481},
+                {65.43, 9876.54321, 3.14159265, -0.000082147128481, -123.45},
+                {65.43, -123.45, 3.14159265, -0.000082147128481, 9876.54321}
+        };
+
+        // Define the correct hexadecimal string
+        String hexStr = "00000003" + "00000005"
+                + "40505b851eb851ec" + "c05edccccccccccd" + "40c34a4587e7c06e" + "400921fb53c8d4f1" + "bf1588ccebd0259f"
+                + "40505b851eb851ec" + "40c34a4587e7c06e" + "400921fb53c8d4f1" + "bf1588ccebd0259f" + "c05edccccccccccd"
+                + "40505b851eb851ec" + "c05edccccccccccd" + "400921fb53c8d4f1" + "bf1588ccebd0259f" + "40c34a4587e7c06e";
+
+        // Run test
+        assertArrayEquals(
+                HexFormat.of().parseHex(hexStr),
+                IOConverters.twoDimensionalDoubleArrayToBytes(array)
+        );
+    }
+
+    @Test
     void bytesToInt() {
         assertEquals(0, IOConverters.bytesToInt(HexFormat.of().parseHex("00000000")));
         assertEquals(1234, IOConverters.bytesToInt(HexFormat.of().parseHex("000004d2")));
@@ -80,5 +122,47 @@ class IOConvertersTest {
     @Test
     void bytesToString() {
         assertEquals("Az ?5", IOConverters.bytesToString(new byte[]{(byte) 0x41, (byte) 0x7a, (byte) 0x20, (byte) 0x3f, (byte) 0x35}));
+    }
+
+    @Test
+    void bytesToOneDimensionalDoubleArray() {
+        // Define the hexadecimal string
+        String hexStr = "00000005" +
+                "40505b851eb851ec" +
+                "c05edccccccccccd" +
+                "40c34a4587e7c06e" +
+                "400921fb53c8d4f1" +
+                "bf1588ccebd0259f";
+
+        // Define the correct double array
+        double[] array = {65.43, -123.45, 9876.54321, 3.14159265, -0.000082147128481};
+
+        // Run test
+        assertArrayEquals(
+                array,
+                IOConverters.bytesToOneDimensionalDoubleArray(HexFormat.of().parseHex(hexStr))
+        );
+    }
+
+    @Test
+    void bytesToTwoDimensionalDoubleArray() {
+        // Define the hexadecimal string
+        String hexStr = "00000003" + "00000005"
+                + "40505b851eb851ec" + "c05edccccccccccd" + "40c34a4587e7c06e" + "400921fb53c8d4f1" + "bf1588ccebd0259f"
+                + "40505b851eb851ec" + "40c34a4587e7c06e" + "400921fb53c8d4f1" + "bf1588ccebd0259f" + "c05edccccccccccd"
+                + "40505b851eb851ec" + "c05edccccccccccd" + "400921fb53c8d4f1" + "bf1588ccebd0259f" + "40c34a4587e7c06e";
+
+        // Define the correct double array
+        double[][] array = {
+                {65.43, -123.45, 9876.54321, 3.14159265, -0.000082147128481},
+                {65.43, 9876.54321, 3.14159265, -0.000082147128481, -123.45},
+                {65.43, -123.45, 3.14159265, -0.000082147128481, 9876.54321}
+        };
+
+        // Run test
+        assertArrayEquals(
+                array,
+                IOConverters.bytesToTwoDimensionalDoubleArray(HexFormat.of().parseHex(hexStr))
+        );
     }
 }
