@@ -10,6 +10,7 @@ module site.overwrite.auditranscribe {
     requires com.dlsc.formsfx;
     requires org.kordamp.bootstrapfx.core;
     requires commons.exec;
+    requires org.apache.commons.compress;
     requires com.google.gson;
     requires org.apache.commons.lang3;
     requires java.logging;
