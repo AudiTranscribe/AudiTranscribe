@@ -1,10 +1,22 @@
-Todo:
+====================================================================================================
+Todo (Important):
     - Add JPackage capability
     - Update README.md
-    - BPM Selection and Estimation
-        - Before estimation is implemented, allow user to select BPM and show beats lines updating
     - Menu GUI
     - Allow audio to play alongside spectrogram
     - Implement file saving
         - We would probably save the spectrogram data as that takes the longest to generate
+
+Todo (Less Important):
     - Add licence/credits for ionicons
+    - BPM Estimation
+    - Add keyboard shortcuts
+
+Todo (Not Important):
+    - Compress the filter data
+
+====================================================================================================
+Fixme:
+    - None
+
+====================================================================================================
