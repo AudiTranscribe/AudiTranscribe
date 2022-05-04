@@ -28,7 +28,7 @@
                            <graphic>
                               <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../images/icons/PNGs/create.png" />
+                                    <Image url="@../../icons/PNGs/create.png" />
                                  </image>
                               </ImageView>
                            </graphic>
@@ -37,7 +37,7 @@
                            <graphic>
                               <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../images/icons/PNGs/folder-open.png" />
+                                    <Image url="@../../icons/PNGs/folder-open.png" />
                                  </image>
                               </ImageView>
                            </graphic>
@@ -46,7 +46,7 @@
                            <graphic>
                               <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../images/icons/PNGs/save.png" />
+                                    <Image url="@../../icons/PNGs/save.png" />
                                  </image>
                               </ImageView>
                            </graphic>
@@ -154,7 +154,7 @@
                            <graphic>
                               <ImageView fx:id="playButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../images/icons/PNGs/play.png" />
+                                    <Image url="@../../icons/PNGs/play.png" />
                                  </image>
                               </ImageView>
                            </graphic>
@@ -163,7 +163,7 @@
                            <graphic>
                               <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../images/icons/PNGs/stop.png" />
+                                    <Image url="@../../icons/PNGs/stop.png" />
                                  </image>
                               </ImageView>
                            </graphic>
@@ -172,7 +172,7 @@
                            <graphic>
                               <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../images/icons/PNGs/play-skip-back.png" />
+                                    <Image url="@../../icons/PNGs/play-skip-back.png" />
                                  </image>
                               </ImageView>
                            </graphic>
@@ -181,7 +181,7 @@
                            <graphic>
                               <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../images/icons/PNGs/play-skip-forward.png" />
+                                    <Image url="@../../icons/PNGs/play-skip-forward.png" />
                                  </image>
                               </ImageView>
                            </graphic>
@@ -190,7 +190,7 @@
                            <graphic>
                               <ImageView fx:id="scrollButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../images/icons/PNGs/footsteps-outline.png" />
+                                    <Image url="@../../icons/PNGs/footsteps-outline.png" />
                                  </image>
                               </ImageView>
                            </graphic>
@@ -203,7 +203,7 @@
                            <graphic>
                               <ImageView fx:id="volumeButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../images/icons/PNGs/volume-high.png" />
+                                    <Image url="@../../icons/PNGs/volume-high.png" />
                                  </image>
                               </ImageView>
                            </graphic>

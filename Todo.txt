@@ -9,3 +9,6 @@ Todo:
     - Add licence/credits for ionicons
     - Add keyboard shortcuts
     - Add progress bar support
+
+Fixme:
+    - CRITICAL: Audio fails to play
