@@ -1,11 +1,22 @@
-Todo:
+====================================================================================================
+Todo (Important):
     - Add JPackage capability
     - Update README.md
-    - BPM Selection and Estimation
     - Menu GUI
     - Add progress bars
     - Implement file saving
         - We would probably save the spectrogram data as that takes the longest to generate
+
+Todo (Less Important):
     - Add licence/credits for ionicons
+    - BPM Estimation
     - Add keyboard shortcuts
-    - Add progress bar support
+
+Todo (Not Important):
+    - Compress the filter data
+
+====================================================================================================
+Fixme:
+    - None
+
+====================================================================================================
