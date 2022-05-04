@@ -148,13 +148,13 @@ public class SpectrogramViewController implements Initializable {
     protected boolean togglePaused(boolean isPaused) {
         if (isPaused) {
             // Change the icon of the play button from the play icon to the paused icon
-            playButtonImage.setImage(new Image(FileUtils.getFileURLAsString("images/icons/PNGs/pause.png")));
+            playButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/pause.png")));
 
             // Unpause the audio (i.e. play the audio)
             audio.playAudio();
         } else {
             // Change the icon of the play button from the paused icon to the play icon
-            playButtonImage.setImage(new Image(FileUtils.getFileURLAsString("images/icons/PNGs/play.png")));
+            playButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/play.png")));
 
             // Pause the audio
             audio.pauseAudio();
@@ -357,13 +357,13 @@ public class SpectrogramViewController implements Initializable {
         volumeButton.setOnAction(event -> {
             if (isMuted) {
                 // Change the icon of the volume button from mute to non-mute
-                volumeButtonImage.setImage(new Image(FileUtils.getFileURLAsString("images/icons/PNGs/volume-high.png")));
+                volumeButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/volume-high.png")));
 
                 // Unmute the audio by setting the volume back to the value before the mute
                 audio.setPlaybackVolume(volume);
             } else {
                 // Change the icon of the volume button from non-mute to mute
-                volumeButtonImage.setImage(new Image(FileUtils.getFileURLAsString("images/icons/PNGs/volume-mute.png")));
+                volumeButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/volume-mute.png")));
 
                 // Mute the audio by setting the volume to zero
                 audio.setPlaybackVolume(0);
@@ -378,11 +378,11 @@ public class SpectrogramViewController implements Initializable {
         scrollButton.setOnAction(event -> {
             if (scrollToPlayhead) {
                 // Change the icon of the scroll button from filled to non-filled
-                scrollButtonImage.setImage(new Image(FileUtils.getFileURLAsString("images/icons/PNGs/footsteps-outline.png")));
+                scrollButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/footsteps-outline.png")));
 
             } else {
                 // Change the icon of the scroll button from non-filled to filled
-                scrollButtonImage.setImage(new Image(FileUtils.getFileURLAsString("images/icons/PNGs/footsteps-filled.png")));
+                scrollButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/footsteps-filled.png")));
             }
 
             // Toggle the `scrollToPlayhead` flag
@@ -398,7 +398,7 @@ public class SpectrogramViewController implements Initializable {
 
             // Change the icon of the volume button from mute to non-mute
             if (isMuted) {
-                volumeButtonImage.setImage(new Image(FileUtils.getFileURLAsString("images/icons/PNGs/volume-high.png")));
+                volumeButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/volume-high.png")));
                 isMuted = false;
             }
 
