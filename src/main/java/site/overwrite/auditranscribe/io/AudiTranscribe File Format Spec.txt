@@ -17,8 +17,7 @@ The remainder of this document is separated into the following sections.
 4. Audio Data Section
 5. GUI Data Section
 6. Redundancy Section
-7. Metadata Section
-8. End-Of-File Section
+7. End-Of-File Section
 
 =====
 Section 1. General File Format
@@ -38,14 +37,16 @@ Notes on the convention of the format described below:
 0x41554449 0x5452414E 0x53435249 0x42450a0a
 0xAD75C1BE 0x00000ABC 0x0000EF12 0xE05E05E5
 
-0x00000001 0x00000000 0x0013579B
+0x00000001
+0x00000000 0x0013579B
 -------------------------------------------
 |             Q-TRANSFORM DATA            |
 |                GOES HERE                |
 -------------------------------------------
 0xE05E05E5
 
-0x00000002 0x00000000 0x002468AC
+0x00000002
+0x00000000 0x002468AC
 -------------------------------------------
 |                AUDIO DATA               |
 |                GOES HERE                |
@@ -66,11 +67,6 @@ Notes on the convention of the format described below:
 |            OTHER BINARY DATA            |
 |                GOES HERE                |
 -------------------------------------------
-
-0xDA7ADA7A
-0x00000000 0x49960123
-0x00000000 0x499602D2
-0xE05E05E5
 
 0xE0FE0FEF 0xE0FE0FEF
 *****(  END FILE  )*****
@@ -107,7 +103,8 @@ Section 3. Q-Transform Data Section
 =====
 The Q-Transform data section corresponds to the following lines in the example file given.
 
-    0x00000001 0x00000000 0x0013579B
+    0x00000001
+    0x00000000 0x0013579B
     -------------------------------------------
     |             Q-TRANSFORM DATA            |
     |                GOES HERE                |
@@ -128,7 +125,8 @@ Section 4. Audio Data Section
 =====
 The audio data section corresponds to the following lines in the example file given.
 
-    0x00000002 0x00000000 0x002468AC
+    0x00000002
+    0x00000000 0x002468AC
     -------------------------------------------
     |                AUDIO DATA               |
     |                GOES HERE                |
@@ -191,28 +189,7 @@ Currently, this section should be empty. This section will only be filled/update
 need to be added to the application and file specification.
 
 =====
-Section 7. Metadata Section
-=====
-The metadata section corresponds to the following lines.
-
-    0xDA7ADA7A
-    0x00000000 0x49960123
-    0x00000000 0x499602D2
-    0xE05E05E5
-
-- The first 4 bytes `0xDA7ADA7A` correspond to the section ID. The metadata section *has the section
-  ID 3665484410 (i.e. DA7ADA7A)*.
-- The next 16 bytes `0x00000000 0x49960123` correspond to the timestamp when AudiTranscribe created
-  the file.
-    - We use 16 bytes to avoid the impending Year 2038 Problem
-      (https://en.wikipedia.org/wiki/Year_2038_problem) and use an extended byte representation of
-      the Unix timestamp.
-- The next 16 bytes `0x00000000 0x499602D2` correspond to the last updated timestamp. This was the
-  timestamp when this file was last updated.
-- The final 4 bytes correspond to the end-of-section delimiter, `0xE05E05E5`.
-
-=====
-Section 8. End-Of-File Section
+Section 7. End-Of-File Section
 =====
 The end-of-file section should *always* consist of the following two bytes.
 

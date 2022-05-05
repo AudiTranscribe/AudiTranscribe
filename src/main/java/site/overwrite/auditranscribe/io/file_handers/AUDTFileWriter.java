@@ -2,7 +2,7 @@
  * AUDTFileWriter.java
  *
  * Created on 2022-05-01
- * Updated on 2022-05-02
+ * Updated on 2022-05-05
  *
  * Description: Class that handles the writing of the AudiTranscribe (AUDT) file.
  */
@@ -10,7 +10,9 @@
 package site.overwrite.auditranscribe.io.file_handers;
 
 import site.overwrite.auditranscribe.io.IOConverters;
+import site.overwrite.auditranscribe.io.LZ4;
 import site.overwrite.auditranscribe.io.data_encapsulators.GUIDataObject;
+import site.overwrite.auditranscribe.io.data_encapsulators.QTransformDataObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,6 +62,17 @@ public class AUDTFileWriter {
     }
 
     /**
+     * Method that writes the Q-Transform data (<b>section number 1</b>) to file.
+     *
+     * @param qTransformDataObj Data object that holds all the Q-Transform data.
+     */
+    public void writeQTransformData(QTransformDataObject qTransformDataObj) {
+        writeSectionID(1);
+        write2DDoubleArray(qTransformDataObj.qTransformMatrix);
+        writeEOSDelimiter();
+    }
+
+    /**
      * Method that writes the GUI data (<b>section number 3</b>) to file.
      *
      * @param guiDataObj Data object that holds all the GUI data.
@@ -99,6 +112,8 @@ public class AUDTFileWriter {
 
     /**
      * Helper method that writes an integer to the byte list.
+     *
+     * @param integer Integer to write.
      */
     private void writeInteger(int integer) {
         // Convert the integer into its bytes
@@ -110,6 +125,8 @@ public class AUDTFileWriter {
 
     /**
      * Helper method that writes a double to the byte list.
+     *
+     * @param dbl Double to write.
      */
     private void writeDouble(double dbl) {
         // Convert the double into its bytes
@@ -121,6 +138,8 @@ public class AUDTFileWriter {
 
     /**
      * Helper method that writes a string to the byte list.
+     *
+     * @param str String to write.
      */
     private void writeString(String str) {
         // Convert the string into its bytes
@@ -135,7 +154,35 @@ public class AUDTFileWriter {
     }
 
     /**
+     * Helper method that writes an 1D double array into the byte list.
+     *
+     * @param array 1D array of doubles.
+     */
+    private void write1DDoubleArray(double[] array) {
+        // Convert the 1D array into its bytes
+        byte[] byteArray = IOConverters.oneDimensionalDoubleArrayToBytes(array);
+
+        // Write to the byte list
+        FileHandlersHelpers.addBytesIntoBytesList(bytes, byteArray);
+    }
+
+    /**
+     * Helper method that writes an 2D double array into the byte list.
+     *
+     * @param array 2D array of doubles.
+     */
+    private void write2DDoubleArray(double[][] array) {
+        // Convert the 2D array into its bytes
+        byte[] byteArray = IOConverters.twoDimensionalDoubleArrayToBytes(array);
+
+        // Write to the byte list
+        FileHandlersHelpers.addBytesIntoBytesList(bytes, byteArray);
+    }
+
+    /**
      * Helper method that writes the section ID to the byte list.
+     *
+     * @param sectionID Section ID to write.
      */
     private void writeSectionID(int sectionID) {
         // This is just a special case of writing an integer
