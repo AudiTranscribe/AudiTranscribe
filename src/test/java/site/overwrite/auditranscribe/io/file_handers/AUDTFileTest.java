@@ -37,7 +37,7 @@ class AUDTFileTest {
     // Tests
     @Test
     @Order(1)
-    void fileWriterTest() {
+    void fileWriterTest() throws IOException {
         // Create a filewriter object
         AUDTFileWriter fileWriter = new AUDTFileWriter(fileName);
 

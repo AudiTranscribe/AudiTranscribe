@@ -66,7 +66,7 @@ public class AUDTFileWriter {
      *
      * @param qTransformDataObj Data object that holds all the Q-Transform data.
      */
-    public void writeQTransformData(QTransformDataObject qTransformDataObj) {
+    public void writeQTransformData(QTransformDataObject qTransformDataObj) throws IOException {
         writeSectionID(1);
         write2DDoubleArray(qTransformDataObj.qTransformMatrix);
         writeEOSDelimiter();
@@ -158,12 +158,19 @@ public class AUDTFileWriter {
      *
      * @param array 1D array of doubles.
      */
-    private void write1DDoubleArray(double[] array) {
+    private void write1DDoubleArray(double[] array) throws IOException {
         // Convert the 1D array into its bytes
         byte[] byteArray = IOConverters.oneDimensionalDoubleArrayToBytes(array);
 
+        // Compress the byte array
+        byte[] compressedBytes = LZ4.lz4Compress(byteArray);
+
+        // Get the number of compressed bytes
+        int numCompressedBytes = compressedBytes.length;
+
         // Write to the byte list
-        FileHandlersHelpers.addBytesIntoBytesList(bytes, byteArray);
+        writeInteger(numCompressedBytes);
+        FileHandlersHelpers.addBytesIntoBytesList(bytes, compressedBytes);
     }
 
     /**
@@ -171,12 +178,19 @@ public class AUDTFileWriter {
      *
      * @param array 2D array of doubles.
      */
-    private void write2DDoubleArray(double[][] array) {
+    private void write2DDoubleArray(double[][] array) throws IOException {
         // Convert the 2D array into its bytes
         byte[] byteArray = IOConverters.twoDimensionalDoubleArrayToBytes(array);
 
+        // Compress the byte array
+        byte[] compressedBytes = LZ4.lz4Compress(byteArray);
+
+        // Get the number of compressed bytes
+        int numCompressedBytes = compressedBytes.length;
+
         // Write to the byte list
-        FileHandlersHelpers.addBytesIntoBytesList(bytes, byteArray);
+        writeInteger(numCompressedBytes);
+        FileHandlersHelpers.addBytesIntoBytesList(bytes, compressedBytes);
     }
 
     /**
