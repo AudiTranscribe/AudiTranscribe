@@ -287,7 +287,7 @@ public class AUDTFileReader {
     }
 
     /**
-     * Helper method that checks if the next 4 bytes is an end-of-file (EOF) delimiter.
+     * Helper method that checks if the next 8 bytes is an end-of-file (EOF) delimiter.
      *
      * @return Boolean; <code>true</code> if it is an EOF delimiter and <code>false</code>
      * otherwise.
@@ -296,8 +296,8 @@ public class AUDTFileReader {
         // Get the total number of bytes
         int numBytes = bytes.length;
 
-        // Read the last 4 bytes
-        byte[] eofBytes = Arrays.copyOfRange(bytes, numBytes - 4, numBytes);
+        // Read the last 8 bytes
+        byte[] eofBytes = Arrays.copyOfRange(bytes, numBytes - 8, numBytes);
 
         // Check if it is the end of section (EOS) bytes
         return checkBytesMatch(AUDTFileConstants.AUDT_END_OF_FILE_DELIMITER, eofBytes);

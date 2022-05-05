@@ -38,7 +38,7 @@ Notes on the convention of the format described below:
 0xAD75C1BE 0x00000ABC 0x0000EF12 0xE05E05E5
 
 0x00000001
-0x00000000 0x0013579B
+0x0013579B
 -------------------------------------------
 |             Q-TRANSFORM DATA            |
 |                GOES HERE                |
@@ -46,7 +46,7 @@ Notes on the convention of the format described below:
 0xE05E05E5
 
 0x00000002
-0x00000000 0x002468AC
+0x002468AC
 -------------------------------------------
 |                AUDIO DATA               |
 |                GOES HERE                |
@@ -104,7 +104,7 @@ Section 3. Q-Transform Data Section
 The Q-Transform data section corresponds to the following lines in the example file given.
 
     0x00000001
-    0x00000000 0x0013579B
+    0x0013579B
     -------------------------------------------
     |             Q-TRANSFORM DATA            |
     |                GOES HERE                |
@@ -113,11 +113,10 @@ The Q-Transform data section corresponds to the following lines in the example f
 
 - The first 4 bytes `0x00000001` correspond to the section ID. The Q-Transform data section *has
   the section ID 1*.
-- The next 8 bytes `0x00000000 0x0013579B` correspond to the number of bytes that are used to store
+- The next 4 bytes `0x0013579B` correspond to the number of bytes that are used to store
   the LZ4 compressed Q-Transform data.
-- The next `0x00000000 0x0013579B` bytes correspond to the LZ4 compressed Q-Transform data. The
-  program will decode this data to retrieve the original Q-Transform data from the LZ4 compressed
-  version.
+- The next `0x0013579B` bytes correspond to the LZ4 compressed Q-Transform data. The program will
+  decode this data to retrieve the original Q-Transform data from the LZ4 compressed version.
 - The final 4 bytes correspond to the end-of-section delimiter, `0xE05E05E5`.
 
 =====
@@ -126,7 +125,7 @@ Section 4. Audio Data Section
 The audio data section corresponds to the following lines in the example file given.
 
     0x00000002
-    0x00000000 0x002468AC
+    0x002468AC
     -------------------------------------------
     |                AUDIO DATA               |
     |                GOES HERE                |
@@ -135,11 +134,11 @@ The audio data section corresponds to the following lines in the example file gi
 
 - The first 4 bytes `0x00000002` correspond to the section ID. The audio data section *has the
   section ID 2*.
-- The next 8 bytes `0x00000000 0x002468AC` correspond to the number of bytes that are used to store
+- The next 4 bytes `0x002468AC` correspond to the number of bytes that are used to store
   the audio data.
     - The audio data may be the data that is returned by Java
-- The next `0x00000000 0x002468AC` bytes correspond to the audio data. The program will decode this
-  data to retrieve the original audio data.
+- The next `0x002468AC` bytes correspond to the audio data. The program will decode this data to
+  retrieve the original audio data.
 - The final 4 bytes correspond to the end-of-section delimiter, `0xE05E05E5`.
 
 =====
