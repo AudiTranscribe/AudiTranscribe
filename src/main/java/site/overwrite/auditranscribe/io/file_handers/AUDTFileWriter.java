@@ -2,7 +2,7 @@
  * AUDTFileWriter.java
  *
  * Created on 2022-05-01
- * Updated on 2022-05-05
+ * Updated on 2022-05-06
  *
  * Description: Class that handles the writing of the AudiTranscribe (AUDT) file.
  */
@@ -11,6 +11,7 @@ package site.overwrite.auditranscribe.io.file_handers;
 
 import site.overwrite.auditranscribe.io.IOConverters;
 import site.overwrite.auditranscribe.io.LZ4;
+import site.overwrite.auditranscribe.io.data_encapsulators.AudioDataObject;
 import site.overwrite.auditranscribe.io.data_encapsulators.GUIDataObject;
 import site.overwrite.auditranscribe.io.data_encapsulators.QTransformDataObject;
 
@@ -69,6 +70,17 @@ public class AUDTFileWriter {
     public void writeQTransformData(QTransformDataObject qTransformDataObj) throws IOException {
         writeSectionID(1);
         write2DDoubleArray(qTransformDataObj.qTransformMatrix);
+        writeEOSDelimiter();
+    }
+
+    /**
+     * Method that writes the audio data (<b>section number 2</b>) to file.
+     *
+     * @param audioDataObj Data object that holds all the audio data.
+     */
+    public void writeAudioData(AudioDataObject audioDataObj) {
+        writeSectionID(2);
+        writeString(audioDataObj.audioFilePath);
         writeEOSDelimiter();
     }
 
