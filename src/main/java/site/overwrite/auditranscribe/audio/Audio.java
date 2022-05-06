@@ -2,7 +2,7 @@
  * Audio.java
  *
  * Created on 2022-02-13
- * Updated on 2022-05-02
+ * Updated on 2022-05-06
  *
  * Description: Class that handles audio processing and audio playback.
  */
@@ -49,13 +49,14 @@ public class Audio {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     /**
-     * Initializes an <code>Audio</code> object based on a file's input stream.
+     * Initializes an <code>Audio</code> object based on a file.
      *
-     * @param file File object, representing the audio file.
+     * @param file           File object, representing the audio file.
+     * @param useMediaPlayer Whether to use the media player to play the audio.
      * @throws IOException                   If there was a problem reading in the audio stream.
      * @throws UnsupportedAudioFileException If there was a problem reading in the audio file.
      */
-    public Audio(File file) throws UnsupportedAudioFileException, IOException {
+    public Audio(File file, boolean useMediaPlayer) throws UnsupportedAudioFileException, IOException {
         // Attempt to convert the input stream into an audio input stream
         InputStream bufferedIn = new BufferedInputStream(new FileInputStream(file));
         audioStream = AudioSystem.getAudioInputStream(bufferedIn);
@@ -64,20 +65,36 @@ public class Audio {
         audioFormat = audioStream.getFormat();
         sampleRate = audioFormat.getSampleRate();
 
-        // Get the media player for the audio file
-        MediaPlayer tempMediaPlayer;
+        // Create the media player object if needed
+        if (useMediaPlayer) {
+            // Get the media player for the audio file
+            MediaPlayer tempMediaPlayer;
 
-        try {
-            tempMediaPlayer = new MediaPlayer(new Media(file.toURI().toString()));
-        } catch (IllegalStateException e) {
-            tempMediaPlayer = null;
-            logger.log(Level.WARNING, "JavaFX Toolkit not initialized. Audio playback will not work.");
+            try {
+                tempMediaPlayer = new MediaPlayer(new Media(file.toURI().toString()));
+            } catch (IllegalStateException e) {
+                tempMediaPlayer = null;
+                logger.log(Level.SEVERE, "JavaFX Toolkit not initialized. Audio playback will not work.");
+            }
+
+            mediaPlayer = tempMediaPlayer;
+        } else {
+            mediaPlayer = null;
         }
-
-        mediaPlayer = tempMediaPlayer;
 
         // Generate audio samples
         generateSamples();
+    }
+
+    /**
+     * Initializes an <code>Audio</code> object based on a file.
+     *
+     * @param file File object, representing the audio file.
+     * @throws IOException                   If there was a problem reading in the audio stream.
+     * @throws UnsupportedAudioFileException If there was a problem reading in the audio file.
+     */
+    public Audio(File file) throws UnsupportedAudioFileException, IOException {
+        this(file, true);
     }
 
     // Getter/Setter methods
@@ -142,50 +159,83 @@ public class Audio {
 
     /**
      * Method that plays the audio.
+     *
+     * @throws InvalidObjectException If the media player was not initialized.
      */
-    public void playAudio() {
-        mediaPlayer.play();
+    public void playAudio() throws InvalidObjectException {
+        if (mediaPlayer != null) {
+            mediaPlayer.play();
+        } else {
+            throw new InvalidObjectException("Media player was not initialised.");
+        }
     }
 
     /**
      * Method that pauses the current audio that is playing.
+     *
+     * @throws InvalidObjectException If the media player was not initialized.
      */
-    public void pauseAudio() {
-        mediaPlayer.pause();
+    public void pauseAudio() throws InvalidObjectException {
+        if (mediaPlayer != null) {
+            mediaPlayer.pause();
+        } else {
+            throw new InvalidObjectException("Media player was not initialised.");
+        }
     }
 
     /**
      * Method that stops the audio.
+     *
+     * @throws InvalidObjectException If the media player was not initialized.
      */
-    public void stopAudio() {
-        mediaPlayer.stop();
+    public void stopAudio() throws InvalidObjectException {
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+        } else {
+            throw new InvalidObjectException("Media player was not initialised.");
+        }
     }
 
     /**
      * Set the current audio's playback time to <code>playbackTime</code> <b>seconds</b>.
      *
      * @param playbackTime The playback time in seconds.
+     * @throws InvalidObjectException If the media player was not initialized.
      */
-    public void setAudioPlaybackTime(double playbackTime) {
-        mediaPlayer.seek(new Duration(playbackTime * 1000));
+    public void setAudioPlaybackTime(double playbackTime) throws InvalidObjectException {
+        if (mediaPlayer != null) {
+            mediaPlayer.seek(new Duration(playbackTime * 1000));
+        } else {
+            throw new InvalidObjectException("Media player was not initialised.");
+        }
     }
 
     /**
      * Set the current audio's starting time to <code>startTime</code> <b>seconds</b>.
      *
      * @param startTime The start time of the audio in seconds.
+     * @throws InvalidObjectException If the media player was not initialized.
      */
-    public void setAudioStartTime(double startTime) {
-        mediaPlayer.setStartTime(new Duration(startTime * 1000));
+    public void setAudioStartTime(double startTime) throws InvalidObjectException {
+        if (mediaPlayer != null) {
+            mediaPlayer.setStartTime(new Duration(startTime * 1000));
+        } else {
+            throw new InvalidObjectException("Media player was not initialised.");
+        }
     }
 
     /**
      * Method that gets the current audio time in <b>seconds</b>.
      *
      * @return Returns the current audio time in <b>seconds</b>.
+     * @throws InvalidObjectException If the media player was not initialized.
      */
-    public double getCurrAudioTime() {
-        return mediaPlayer.getCurrentTime().toSeconds();
+    public double getCurrAudioTime() throws InvalidObjectException {
+        if (mediaPlayer != null) {
+            return mediaPlayer.getCurrentTime().toSeconds();
+        } else {
+            throw new InvalidObjectException("Media player was not initialised.");
+        }
     }
 
     /**
@@ -193,9 +243,14 @@ public class Audio {
      *
      * @param volume Volume value. This value should be in the interval [0, 1] where 0 means
      *               silent and 1 means full volume.
+     * @throws InvalidObjectException If the media player was not initialized.
      */
-    public void setPlaybackVolume(double volume) {
-        mediaPlayer.setVolume(volume);
+    public void setPlaybackVolume(double volume) throws InvalidObjectException {
+        if (mediaPlayer != null) {
+            mediaPlayer.setVolume(volume);
+        } else {
+            throw new InvalidObjectException("Media player was not initialised.");
+        }
     }
 
     // Public methods
