@@ -15,6 +15,7 @@ module site.overwrite.auditranscribe {
     requires org.apache.commons.lang3;
     requires java.logging;
     requires javafx.media;
+    requires ffmpeg;
 
     exports site.overwrite.auditranscribe;
     exports site.overwrite.auditranscribe.views;
