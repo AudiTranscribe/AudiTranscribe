@@ -2,7 +2,7 @@
  * AUDTFileWriter.java
  *
  * Created on 2022-05-01
- * Updated on 2022-05-06
+ * Updated on 2022-05-07
  *
  * Description: Class that handles the writing of the AudiTranscribe (AUDT) file.
  */
@@ -14,6 +14,7 @@ import site.overwrite.auditranscribe.io.LZ4;
 import site.overwrite.auditranscribe.io.data_encapsulators.AudioDataObject;
 import site.overwrite.auditranscribe.io.data_encapsulators.GUIDataObject;
 import site.overwrite.auditranscribe.io.data_encapsulators.QTransformDataObject;
+import site.overwrite.auditranscribe.utils.MathUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -226,6 +227,19 @@ public class AUDTFileWriter {
      * Helper method that writes the end-of-file delimiter.
      */
     private void writeEOFDelimiter() {
+        // Write the EOF delimiter bytes
         FileHandlersHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_END_OF_FILE_DELIMITER);
+
+        // Sum all the bytes inside the file
+        int byteSum = 0;
+        for (byte b : bytes) {
+            byteSum += b;
+        }
+
+        // Set the remainder of the byte sum after division by 2^31 - 1 as the checksum
+        int checksum = MathUtils.modWithMersennePrime(byteSum, 31);
+
+        // Write the checksum to the file as the last 4 bytes
+        writeInteger(checksum);
     }
 }

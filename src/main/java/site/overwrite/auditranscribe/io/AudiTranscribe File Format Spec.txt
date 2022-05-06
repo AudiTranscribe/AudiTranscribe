@@ -65,12 +65,16 @@ Notes on the convention of the format described below:
     -------------------------------------------
 
     0xE0FE0FEF 0xE0FE0FEF
+    0x0139ace9
 *****(  END FILE  )*****
 
 Here are some things to note about the bytes present within the provided file.
 - The 4 bytes `0xE05E05E5` are used to delimitate data sections.
 - The 8 bytes `0xE0FE0FEF 0xE0FE0FEF` is used to mark the end of the file. These 8 bytes should only
   appear at the end of the file.
+- The last value `0x0139ace9` is a checksum for the file. This checksum is the remainder after the
+  sum of all other bytes in the file is divided by the Mersenne prime 2^31 - 1, expressed as a byte
+  sequence.
 
 =====
 Section 2. Header Section
@@ -109,7 +113,7 @@ The Q-Transform data section corresponds to the following lines in the example f
 
 - The first 4 bytes `0x00000001` correspond to the section ID. The Q-Transform data section *has
   the section ID 1*.
-- The next 4 bytes `0x0013579B` correspond to the number of bytes that are used to store
+- The next 4 bytes `0x0013579B` corresponds to the number of bytes that are used to store
   the LZ4 compressed Q-Transform data.
 - The next `0x0013579B` bytes correspond to the LZ4 compressed Q-Transform data. The program will
   decode this data to retrieve the original Q-Transform data from the LZ4 compressed version.
@@ -181,11 +185,14 @@ need to be added to the application and file specification.
 =====
 Section 7. End-Of-File Section
 =====
-The end-of-file section should *always* consist of the following two bytes.
+The end-of-file section should *always* consist of the following 12 bytes.
 
     0xE0FE0FEF 0xE0FE0FEF
+    0x0139ace9
 
-This is the sentinel value for the AudiTranscribe file decoders to understand that they reached the
-end of the file. These 8 bytes should only appear at the end of the file.
+- The first 8 bytes `0xE0FE0FEF 0xE0FE0FEF` is the sentinel value for the AudiTranscribe file
+  decoders to understand that they reached the end of the file. These 8 bytes should only appear at
+  the end of the file.
+- The last 4 bytes `0x0139ace9` is the checksum value, as explained in Section 1.
 
 ----------------------------------------- END OF DOCUMENT ------------------------------------------

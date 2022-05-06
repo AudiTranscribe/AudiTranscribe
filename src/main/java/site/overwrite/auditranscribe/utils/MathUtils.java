@@ -2,7 +2,7 @@
  * MathUtils.java
  *
  * Created on 2022-02-15
- * Updated on 2022-03-15
+ * Updated on 2022-05-07
  *
  * Description: Class containing useful mathematical utility functions.
  */
@@ -43,6 +43,24 @@ public class MathUtils {
 
         // Return the logarithm
         return Math.log(x) / Math.log(n);
+    }
+
+    /**
+     * Method that quickly calculates the modulo of a number by a
+     * <a href="https://en.wikipedia.org/wiki/Mersenne_prime">Mersenne Prime</a>.
+     *
+     * @param x Number to find the modulo of.
+     * @param n Exponent of "2" in the mersenne prime expression "2<sup>n</sup> - 1". This assumes
+     *          that <b>"2<sup>n</sup> - 1" is a Mersenne prime</b>, as no further checks on its
+     *          primality are conducted.
+     * @return Value of <code>x</code> modulo 2<sup>n</sup> - 1.
+     * @see <a href="https://ariya.io/2007/02/modulus-with-mersenne-prime">This article</a> on the
+     * implementation of the modulo with Mersenne primes.
+     */
+    public static int modWithMersennePrime(int x, int n) {
+        int p = (int) (Math.pow(2, n) - 1);  // Mersenne prime
+        int i = (x & p) + (x >> n);          // Bit shift magic
+        return (i >= p) ? (i - p) : i;
     }
 
     /**
