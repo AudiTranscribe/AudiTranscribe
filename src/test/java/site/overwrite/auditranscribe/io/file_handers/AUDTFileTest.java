@@ -2,7 +2,7 @@
  * AUDTFileTest.java
  *
  * Created on 2022-05-01
- * Updated on 2022-05-05
+ * Updated on 2022-05-06
  *
  * Description: Test AUDT file reading and writing.
  */
@@ -11,11 +11,14 @@ package site.overwrite.auditranscribe.io.file_handers;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import site.overwrite.auditranscribe.io.data_encapsulators.AudioDataObject;
 import site.overwrite.auditranscribe.io.data_encapsulators.GUIDataObject;
 import site.overwrite.auditranscribe.io.data_encapsulators.QTransformDataObject;
 import site.overwrite.auditranscribe.io.exceptions.FailedToReadDataException;
 import site.overwrite.auditranscribe.io.exceptions.IncorrectFileFormatException;
+import site.overwrite.auditranscribe.utils.FileUtils;
 
+import java.io.File;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,6 +35,9 @@ class AUDTFileTest {
                     {65.43, -123.45, 3.14159265, -0.000082147128481, 9876.54321}
             }
     );  // This is just an example array for the Q-Transform data
+    AudioDataObject audioDataObject = new AudioDataObject(
+            FileUtils.getAbsoluteFilePath("testing-audio-files/A440.wav")
+    );
     GUIDataObject guiDataObject = new GUIDataObject(11, 9, 123.45, 0.01, 0.55, "Melancholy.wav", 120000, 9000);
 
     // Tests
@@ -43,6 +49,7 @@ class AUDTFileTest {
 
         // Test writing some data
         fileWriter.writeQTransformData(qTransformDataObject);
+        fileWriter.writeAudioData(audioDataObject);
         fileWriter.writeGUIData(guiDataObject);
 
         // Write the bytes to file
@@ -61,10 +68,12 @@ class AUDTFileTest {
 
         // Test reading some data
         QTransformDataObject readQTransformData = fileReader.readQTransformData();
+        AudioDataObject readAudioData = fileReader.readAudioData();
         GUIDataObject readGUIData = fileReader.readGUIData();
 
         // Check if the read data are equal
         assertEquals(qTransformDataObject, readQTransformData);
+        assertEquals(audioDataObject, readAudioData);
         assertEquals(guiDataObject, readGUIData);
     }
 }

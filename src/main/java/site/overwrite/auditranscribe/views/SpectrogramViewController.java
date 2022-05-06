@@ -2,7 +2,7 @@
  * SpectrogramViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-04
+ * Updated on 2022-05-06
  *
  * Description: Contains the spectrogram view's controller class.
  */
@@ -32,6 +32,7 @@ import site.overwrite.auditranscribe.utils.FileUtils;
 import site.overwrite.auditranscribe.utils.UnitConversion;
 
 import java.io.IOException;
+import java.io.InvalidObjectException;
 import java.net.URL;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -151,13 +152,22 @@ public class SpectrogramViewController implements Initializable {
             playButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/pause.png")));
 
             // Unpause the audio (i.e. play the audio)
-            audio.playAudio();
+            try {
+                audio.playAudio();
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
+
         } else {
             // Change the icon of the play button from the paused icon to the play icon
             playButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/play.png")));
 
             // Pause the audio
-            audio.pauseAudio();
+            try {
+                audio.pauseAudio();
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         // Return the toggled version of the `isPaused` flag
@@ -165,7 +175,7 @@ public class SpectrogramViewController implements Initializable {
         return !isPaused;
     }
 
-    protected void seekToTime(double seekTime) {
+    protected void seekToTime(double seekTime) throws InvalidObjectException {
         // Update the start time of the audio
         // (Do this so that when the player resumes out of a stop state it will start here)
         audio.setAudioStartTime(seekTime);
@@ -315,7 +325,11 @@ public class SpectrogramViewController implements Initializable {
             logger.log(Level.FINE, "Pressed play button");
 
             if (currTime == audioDuration) {
-                audio.setAudioPlaybackTime(0);
+                try {
+                    audio.setAudioPlaybackTime(0);
+                } catch (InvalidObjectException e) {
+                    throw new RuntimeException(e);
+                }
             }
             isPaused = togglePaused(isPaused);
         });
@@ -324,10 +338,18 @@ public class SpectrogramViewController implements Initializable {
             logger.log(Level.FINE, "Pressed stop button");
 
             // First stop the audio
-            audio.stopAudio();
+            try {
+                audio.stopAudio();
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
 
             // Then update the timings shown on the GUI
-            seekToTime(0);
+            try {
+                seekToTime(0);
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
 
             // Finally, toggle the paused flag
             isPaused = togglePaused(false);
@@ -337,7 +359,11 @@ public class SpectrogramViewController implements Initializable {
             logger.log(Level.FINE, "Pressed skip back button");
 
             // Seek to the start of the audio
-            seekToTime(0);
+            try {
+                seekToTime(0);
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
 
             // Pause the audio
             isPaused = togglePaused(false);
@@ -347,7 +373,11 @@ public class SpectrogramViewController implements Initializable {
             logger.log(Level.FINE, "Pressed skip forward button");
 
             // Seek to the end of the audio
-            seekToTime(audioDuration);
+            try {
+                seekToTime(audioDuration);
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
 
             // Force the audio to play at the end
             // (This is to avoid a nasty seek to end issue where user needs to click on play button twice)
@@ -360,13 +390,21 @@ public class SpectrogramViewController implements Initializable {
                 volumeButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/volume-high.png")));
 
                 // Unmute the audio by setting the volume back to the value before the mute
-                audio.setPlaybackVolume(volume);
+                try {
+                    audio.setPlaybackVolume(volume);
+                } catch (InvalidObjectException e) {
+                    throw new RuntimeException(e);
+                }
             } else {
                 // Change the icon of the volume button from non-mute to mute
                 volumeButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/volume-mute.png")));
 
                 // Mute the audio by setting the volume to zero
-                audio.setPlaybackVolume(0);
+                try {
+                    audio.setPlaybackVolume(0);
+                } catch (InvalidObjectException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
             // Toggle the `isMuted` flag
@@ -403,7 +441,11 @@ public class SpectrogramViewController implements Initializable {
             }
 
             // Update audio volume
-            audio.setPlaybackVolume(volume);
+            try {
+                audio.setPlaybackVolume(volume);
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
 
             logger.log(Level.FINE, "Changed volume from " + oldValue + " to " + newValue);
         });
@@ -423,7 +465,11 @@ public class SpectrogramViewController implements Initializable {
                 double seekTime = clickX / SPECTROGRAM_ZOOM_SCALE_X / PX_PER_SECOND;
 
                 // Seek to that time
-                seekToTime(seekTime);
+                try {
+                    seekToTime(seekTime);
+                } catch (InvalidObjectException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
     }
@@ -489,7 +535,11 @@ public class SpectrogramViewController implements Initializable {
             // Nothing really changes if the audio is paused
             if (!isPaused) {
                 // Get the current audio time
-                currTime = audio.getCurrAudioTime();
+                try {
+                    currTime = audio.getCurrAudioTime();
+                } catch (InvalidObjectException e) {
+                    throw new RuntimeException(e);
+                }
 
                 // Update the current time label
                 Platform.runLater(() -> currTimeLabel.setText(UnitConversion.secondsToTimeString(currTime)));
@@ -507,11 +557,19 @@ public class SpectrogramViewController implements Initializable {
 
                     // Specially update the start time to 0
                     // (Because the `seekToTime` method would have set it to the end, which is not what we want)
-                    audio.setAudioStartTime(0);
+                    try {
+                        audio.setAudioStartTime(0);
+                    } catch (InvalidObjectException e) {
+                        throw new RuntimeException(e);
+                    }
 
                     // We need to do this so that the status is set to paused
-                    audio.stopAudio();
-                    audio.pauseAudio();
+                    try {
+                        audio.stopAudio();
+                        audio.pauseAudio();
+                    } catch (InvalidObjectException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
 
                 // Update scrolling

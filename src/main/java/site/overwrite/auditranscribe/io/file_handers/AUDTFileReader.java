@@ -2,7 +2,7 @@
  * AUDTFileReader.java
  *
  * Created on 2022-05-02
- * Updated on 2022-05-05
+ * Updated on 2022-05-07
  *
  * Description: Class that handles the reading of the AudiTranscribe (AUDT) file.
  */
@@ -11,10 +11,12 @@ package site.overwrite.auditranscribe.io.file_handers;
 
 import site.overwrite.auditranscribe.io.IOConverters;
 import site.overwrite.auditranscribe.io.LZ4;
+import site.overwrite.auditranscribe.io.data_encapsulators.AudioDataObject;
 import site.overwrite.auditranscribe.io.data_encapsulators.GUIDataObject;
 import site.overwrite.auditranscribe.io.data_encapsulators.QTransformDataObject;
 import site.overwrite.auditranscribe.io.exceptions.FailedToReadDataException;
 import site.overwrite.auditranscribe.io.exceptions.IncorrectFileFormatException;
+import site.overwrite.auditranscribe.utils.MathUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -51,7 +53,8 @@ public class AUDTFileReader {
             // Verify that the last 4 bytes is the EOF delimiter
             if (!checkEOFDelimiter()) {
                 throw new IncorrectFileFormatException(
-                        "The file is not an AUDT file. Is the end-of-file delimiter correct?"
+                        "The file is not an AUDT file. Is the end-of-file delimiter correct? " +
+                                "Is the checksum value correct?"
                 );
             }
         }
@@ -62,7 +65,8 @@ public class AUDTFileReader {
     /**
      * Method that reads the Q-Transform data from the file.
      *
-     * @return A <code>QTransformDataObject</code> that encapsulates all the data that are needed for the Q-Transform matrix.
+     * @return A <code>QTransformDataObject</code> that encapsulates all the data that are needed
+     * for the Q-Transform matrix.
      * @throws FailedToReadDataException If the program failed to read the data from the file.
      * @throws IOException               If something went wrong during reading the file.
      */
@@ -86,6 +90,34 @@ public class AUDTFileReader {
 
         // Create and return a `QTransformDataObject`
         return new QTransformDataObject(qTransformMatrix);
+    }
+
+    /**
+     * Method that reads the audio data from the file.
+     *
+     * @return A <code>AudioDataObject</code> that encapsulates all the audio data.
+     * @throws FailedToReadDataException If the program failed to read the data from the file.
+     */
+    public AudioDataObject readAudioData() throws FailedToReadDataException {
+        // Ensure that the audio data section ID is 2
+        int sectionID = readSectionID();
+        if (sectionID != 2) {
+            throw new FailedToReadDataException(
+                    "Failed to read audio data; the audio data section has the incorrect section ID of " + sectionID +
+                            " (expected: 2)"
+            );
+        }
+
+        // Read in the rest of the data
+        String audioFilePath = readString();
+
+        // Check if there is an EOS
+        if (!checkEOSDelimiter()) {
+            throw new FailedToReadDataException("Failed to read audio data; end of section delimiter missing");
+        }
+
+        // Create and return an `AudioDataObject`
+        return new AudioDataObject(audioFilePath);
     }
 
     /**
@@ -296,10 +328,24 @@ public class AUDTFileReader {
         // Get the total number of bytes
         int numBytes = bytes.length;
 
-        // Read the last 8 bytes
-        byte[] eofBytes = Arrays.copyOfRange(bytes, numBytes - 8, numBytes);
+        // Check if the last 12th to last 4th bytes corresponds to the EOF bytes
+        byte[] eofBytes = Arrays.copyOfRange(bytes, numBytes - 12, numBytes - 4);
+        if (!checkBytesMatch(AUDTFileConstants.AUDT_END_OF_FILE_DELIMITER, eofBytes)) return false;
 
-        // Check if it is the end of section (EOS) bytes
-        return checkBytesMatch(AUDTFileConstants.AUDT_END_OF_FILE_DELIMITER, eofBytes);
+        // Get the checksum value from the file
+        byte[] checksumBytes = Arrays.copyOfRange(bytes, numBytes - 4, numBytes);
+        int supposedChecksum = IOConverters.bytesToInt(checksumBytes);
+
+        // Sum all the bytes inside the file, excluding the checksum bytes
+        int byteSum = 0;
+        for (byte b : Arrays.copyOfRange(bytes, 0, numBytes - 4)) {
+            byteSum += b;
+        }
+
+        // Get the remainder of the byte sum after division by 2^31 - 1 as the actual checksum
+        int actualChecksum = MathUtils.modWithMersennePrime(byteSum, 31);
+
+        // Check if the checksums match
+        return supposedChecksum == actualChecksum;
     }
 }

@@ -34,47 +34,47 @@ Notes on the convention of the format described below:
   with the supposed data that should be in these sections.
 
 *****( BEGIN FILE )*****
-0x41554449 0x5452414E 0x53435249 0x42450a0a
-0xAD75C1BE 0x00000ABC 0x0000EF12 0xE05E05E5
+    0x41554449 0x5452414E 0x53435249 0x42450a0a
+    0xAD75C1BE 0x00000ABC 0x0000EF12 0xE05E05E5
 
-0x00000001
-0x0013579B
--------------------------------------------
-|             Q-TRANSFORM DATA            |
-|                GOES HERE                |
--------------------------------------------
-0xE05E05E5
+    0x00000001
+    0x0013579B
+    -------------------------------------------
+    |             Q-TRANSFORM DATA            |
+    |                GOES HERE                |
+    -------------------------------------------
+    0xE05E05E5
 
-0x00000002
-0x002468AC
--------------------------------------------
-|                AUDIO DATA               |
-|                GOES HERE                |
--------------------------------------------
-0xE05E05E5
+    0x00000002
+    0x002468AC [AUDIO FILE PATH DATA]
+    0xE05E05E5
 
-0x00000003
-0x0000000B
-0x00000009
-0x00029300 0x29394010
-0x00000001 0x03918939
-0x00000004 0x0812BA23
-0x00012345 [FILE NAME DATA]
-0x000493E0 0x00018324
-0xE05E05E5
+    0x00000003
+    0x0000000B
+    0x00000009
+    0x00029300 0x29394010
+    0x00000001 0x03918939
+    0x00000004 0x0812BA23
+    0x00012345 [FILE NAME DATA]
+    0x000493E0 0x00018324
+    0xE05E05E5
 
--------------------------------------------
-|            OTHER BINARY DATA            |
-|                GOES HERE                |
--------------------------------------------
+    -------------------------------------------
+    |            OTHER BINARY DATA            |
+    |                GOES HERE                |
+    -------------------------------------------
 
-0xE0FE0FEF 0xE0FE0FEF
+    0xE0FE0FEF 0xE0FE0FEF
+    0x0139ace9
 *****(  END FILE  )*****
 
 Here are some things to note about the bytes present within the provided file.
 - The 4 bytes `0xE05E05E5` are used to delimitate data sections.
 - The 8 bytes `0xE0FE0FEF 0xE0FE0FEF` is used to mark the end of the file. These 8 bytes should only
   appear at the end of the file.
+- The last value `0x0139ace9` is a checksum for the file. This checksum is the remainder after the
+  sum of all other bytes in the file is divided by the Mersenne prime 2^31 - 1, expressed as a byte
+  sequence.
 
 =====
 Section 2. Header Section
@@ -113,7 +113,7 @@ The Q-Transform data section corresponds to the following lines in the example f
 
 - The first 4 bytes `0x00000001` correspond to the section ID. The Q-Transform data section *has
   the section ID 1*.
-- The next 4 bytes `0x0013579B` correspond to the number of bytes that are used to store
+- The next 4 bytes `0x0013579B` corresponds to the number of bytes that are used to store
   the LZ4 compressed Q-Transform data.
 - The next `0x0013579B` bytes correspond to the LZ4 compressed Q-Transform data. The program will
   decode this data to retrieve the original Q-Transform data from the LZ4 compressed version.
@@ -125,20 +125,15 @@ Section 4. Audio Data Section
 The audio data section corresponds to the following lines in the example file given.
 
     0x00000002
-    0x002468AC
-    -------------------------------------------
-    |                AUDIO DATA               |
-    |                GOES HERE                |
-    -------------------------------------------
+    0x002468AC [AUDIO FILE PATH DATA]
     0xE05E05E5
 
 - The first 4 bytes `0x00000002` correspond to the section ID. The audio data section *has the
   section ID 2*.
-- The next 4 bytes `0x002468AC` correspond to the number of bytes that are used to store
-  the audio data.
-    - The audio data may be the data that is returned by Java
-- The next `0x002468AC` bytes correspond to the audio data. The program will decode this data to
-  retrieve the original audio data.
+- The next 4 bytes `0x002468AC` corresponds to the number of bytes that are used to store
+  the audio file path.
+    - Note that this is the ABSOLUTE file path.
+- The next `0x002468AC` bytes is the audio file's name.
 - The final 4 bytes correspond to the end-of-section delimiter, `0xE05E05E5`.
 
 =====
@@ -190,11 +185,14 @@ need to be added to the application and file specification.
 =====
 Section 7. End-Of-File Section
 =====
-The end-of-file section should *always* consist of the following two bytes.
+The end-of-file section should *always* consist of the following 12 bytes.
 
     0xE0FE0FEF 0xE0FE0FEF
+    0x0139ace9
 
-This is the sentinel value for the AudiTranscribe file decoders to understand that they reached the
-end of the file. These 8 bytes should only appear at the end of the file.
+- The first 8 bytes `0xE0FE0FEF 0xE0FE0FEF` is the sentinel value for the AudiTranscribe file
+  decoders to understand that they reached the end of the file. These 8 bytes should only appear at
+  the end of the file.
+- The last 4 bytes `0x0139ace9` is the checksum value, as explained in Section 1.
 
 ----------------------------------------- END OF DOCUMENT ------------------------------------------
