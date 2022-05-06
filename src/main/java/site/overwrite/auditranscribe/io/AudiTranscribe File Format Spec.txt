@@ -46,7 +46,11 @@ Notes on the convention of the format described below:
     0xE05E05E5
 
     0x00000002
-    0x002468AC [AUDIO FILE PATH DATA]
+    0x002468AC
+    -------------------------------------------
+    |                AUDIO DATA               |
+    |                GOES HERE                |
+    -------------------------------------------
     0xE05E05E5
 
     0x00000003
@@ -125,7 +129,11 @@ Section 4. Audio Data Section
 The audio data section corresponds to the following lines in the example file given.
 
     0x00000002
-    0x002468AC [AUDIO FILE PATH DATA]
+    0x002468AC
+    -------------------------------------------
+    |                AUDIO DATA               |
+    |                GOES HERE                |
+    -------------------------------------------
     0xE05E05E5
 
 - The first 4 bytes `0x00000002` correspond to the section ID. The audio data section *has the
