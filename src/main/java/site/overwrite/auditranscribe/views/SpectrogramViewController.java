@@ -65,10 +65,10 @@ public class SpectrogramViewController implements Initializable {
     final Pair<Integer, Integer> BPM_RANGE = new Pair<>(1, 512);  // In the format [min, max]
     final Pair<Double, Double> OFFSET_RANGE = new Pair<>(-5., 5.);  // In the format [min, max]
 
-    final double SPECTROGRAM_ZOOM_SCALE_X = 2;
-    final double SPECTROGRAM_ZOOM_SCALE_Y = 5;
+    public final double SPECTROGRAM_ZOOM_SCALE_X = 2;
+    public final double SPECTROGRAM_ZOOM_SCALE_Y = 5;
 
-    final int PX_PER_SECOND = 120;
+    public final int PX_PER_SECOND = 120;
     final int BINS_PER_OCTAVE = 60;
     final int SPECTROGRAM_HOP_LENGTH = 1024;  // Needs to be a power of 2
     final double NUM_PX_PER_OCTAVE = 72;
@@ -106,6 +106,7 @@ public class SpectrogramViewController implements Initializable {
     private boolean isMuted = false;
     private boolean scrollToPlayhead = false;
 
+    private double finalWidth;
     private double finalHeight;
 
     private Label[] noteLabels;
@@ -687,6 +688,30 @@ public class SpectrogramViewController implements Initializable {
         finishSettingUpSpectrogram(image);
     }
 
+    /**
+     * Method that updates the scrolling of the page to center the playhead.
+     *
+     * @param newPosX   New X position.
+     */
+    public void updateScrollPosition(double newPosX) {
+        // Get the 'half width' of the spectrogram area
+        double spectrogramAreaHalfWidth = spectrogramPane.getWidth() / 2;
+
+        // Set the H-value of the spectrogram pane
+        if (newPosX <= spectrogramAreaHalfWidth) {
+            // If the `newPosX` is within the first 'half width' of the initial screen, do not scroll
+            spectrogramPane.setHvalue(0);
+
+        } else if (newPosX >= finalWidth - spectrogramAreaHalfWidth) {
+            // If the `newPoxX` is within the last 'half width' of the entire spectrogram area, keep the
+            // scrolling to the end
+            spectrogramPane.setHvalue(1);
+        } else {
+            // Otherwise, update the H-value accordingly so that the view is centered on the playhead
+            spectrogramPane.setHvalue((newPosX - spectrogramAreaHalfWidth) / (finalWidth - 2 * spectrogramAreaHalfWidth));
+        }
+    }
+
     // Private methods
 
     /**
@@ -694,7 +719,7 @@ public class SpectrogramViewController implements Initializable {
      */
     private void finishSettingUpSpectrogram(WritableImage image) {
         // Get the final width and height
-        double finalWidth = image.getWidth() * SPECTROGRAM_ZOOM_SCALE_X;
+        finalWidth = image.getWidth() * SPECTROGRAM_ZOOM_SCALE_X;
         finalHeight = image.getHeight() * SPECTROGRAM_ZOOM_SCALE_Y;
 
         // Fix panes' properties
@@ -767,24 +792,7 @@ public class SpectrogramViewController implements Initializable {
 
                 // Update scrolling
                 if (scrollToPlayhead) {
-                    // Get the 'half width' of the spectrogram area
-                    double spectrogramAreaHalfWidth = spectrogramPane.getWidth() / 2;
-
-                    // Set the H-value of the spectrogram pane
-                    if (newPosX <= spectrogramAreaHalfWidth) {
-                        // If the `newPosX` is within the first 'half width' of the initial screen, do not scroll
-                        spectrogramPane.setHvalue(0);
-
-                    } else if (newPosX >= finalWidth - spectrogramAreaHalfWidth) {
-                        // If the `newPoxX` is within the last 'half width' of the entire spectrogram area, keep the
-                        // scrolling to the end
-                        spectrogramPane.setHvalue(1);
-                    } else {
-                        // Otherwise, update the H-value accordingly so that the view is centered on the playhead
-                        spectrogramPane.setHvalue(
-                                (newPosX - spectrogramAreaHalfWidth) / (finalWidth - 2 * spectrogramAreaHalfWidth)
-                        );
-                    }
+                    updateScrollPosition(newPosX);
                 }
             }
         }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);

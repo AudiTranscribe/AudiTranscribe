@@ -178,6 +178,14 @@ public class ProjectIOHandlers {
                 // Show the new scene
                 stage.show();
 
+                // Update scroll position
+                // (Annoyingly we have to do this AFTER the stage is shown)
+                controller.updateScrollPosition(
+                        projectDataObject.guiData.currTimeInMS / 1000. *
+                                controller.PX_PER_SECOND *
+                                controller.SPECTROGRAM_ZOOM_SCALE_X
+                );
+
             } catch (IOException | IncorrectFileFormatException | FailedToReadDataException e) {
                 showExceptionAlert(
                         "Failed to read '" + file.getName() + "' as an AUDT ile.",
