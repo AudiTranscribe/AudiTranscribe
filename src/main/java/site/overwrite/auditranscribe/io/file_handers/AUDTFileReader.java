@@ -120,6 +120,7 @@ public class AUDTFileReader {
 
         // Read in the rest of the data
         String audioFilePath = readString();
+        double sampleRate = readDouble();
 
         // Check if there is an EOS
         if (!checkEOSDelimiter()) {
@@ -127,7 +128,7 @@ public class AUDTFileReader {
         }
 
         // Create and return an `AudioDataObject`
-        return new AudioDataObject(audioFilePath);
+        return new AudioDataObject(audioFilePath, sampleRate);
     }
 
     /**

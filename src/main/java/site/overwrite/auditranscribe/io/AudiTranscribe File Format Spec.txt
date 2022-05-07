@@ -47,6 +47,7 @@ Notes on the convention of the format described below:
 
     0x00000002
     0x002468AC [AUDIO FILE PATH DATA]
+    0x40e58880 0x00000000
     0xE05E05E5
 
     0x00000003
@@ -126,6 +127,7 @@ The audio data section corresponds to the following lines in the example file gi
 
     0x00000002
     0x002468AC [AUDIO FILE PATH DATA]
+    0x40e58880 0x00000000
     0xE05E05E5
 
 - The first 4 bytes `0x00000002` correspond to the section ID. The audio data section *has the
@@ -134,6 +136,7 @@ The audio data section corresponds to the following lines in the example file gi
   the audio file path.
     - Note that this is the ABSOLUTE file path.
 - The next `0x002468AC` bytes is the audio file's name.
+- The following 8 bytes `0x40e58880 0x00000000` is the sample rate of the audio file.
 - The final 4 bytes correspond to the end-of-section delimiter, `0xE05E05E5`.
 
 =====

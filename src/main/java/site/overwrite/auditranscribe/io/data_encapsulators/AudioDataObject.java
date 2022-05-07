@@ -17,14 +17,17 @@ import java.util.Objects;
 public class AudioDataObject extends AbstractDataObject {
     // Attributes
     public String audioFilePath;
+    public double sampleRate;
 
     /**
      * Initialization method for the audio data object.
      *
      * @param audioFilePath <b>Absolute</b> file path to the original audio file.
+     * @param sampleRate    Sample rate of the audio file.
      */
-    public AudioDataObject(String audioFilePath) {
+    public AudioDataObject(String audioFilePath, double sampleRate) {
         this.audioFilePath = audioFilePath;
+        this.sampleRate = sampleRate;
     }
 
     // Overwritten methods
@@ -33,11 +36,11 @@ public class AudioDataObject extends AbstractDataObject {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AudioDataObject that = (AudioDataObject) o;
-        return audioFilePath.equals(that.audioFilePath);
+        return audioFilePath.equals(that.audioFilePath) && sampleRate == that.sampleRate;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(audioFilePath);
+        return Objects.hash(audioFilePath, sampleRate);
     }
 }

@@ -82,6 +82,7 @@ public class AUDTFileWriter {
     public void writeAudioData(AudioDataObject audioDataObj) {
         writeSectionID(2);
         writeString(audioDataObj.audioFilePath);
+        writeDouble(audioDataObj.sampleRate);
         writeEOSDelimiter();
     }
 

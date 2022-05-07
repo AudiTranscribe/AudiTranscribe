@@ -81,6 +81,8 @@ public class SpectrogramViewController implements Initializable {
     final boolean USE_FANCY_SHARPS_FOR_NOTE_LABELS = true;
 
     // File-Savable Attributes
+    private double sampleRate;  // Sample rate of the audio
+
     private int musicKeyIndex = 0;  // Index of the music key chosen, according to the `MUSIC_KEYS` array
     private int timeSignatureIndex = 0;
     private double bpm = 120;
@@ -375,7 +377,7 @@ public class SpectrogramViewController implements Initializable {
                     magnitudes
             );
             AudioDataObject audioData = new AudioDataObject(
-                    audioFilePath
+                    audioFilePath, sampleRate
             );
             GUIDataObject guiData = new GUIDataObject(
                     musicKeyIndex, timeSignatureIndex, bpm, offset, volume, audioFileName,
@@ -636,6 +638,7 @@ public class SpectrogramViewController implements Initializable {
         audioFilePath = audioObj.getAudioFilePath();
         audioFileName = audioObj.getAudioFileName();
         audioDuration = audio.getDuration();
+        sampleRate = audio.getSampleRate();
 
         // Generate spectrogram image based on newly generated magnitude data
         Spectrogram spectrogram = new Spectrogram(
@@ -669,12 +672,14 @@ public class SpectrogramViewController implements Initializable {
         // Set attributes
         audioFilePath = audioData.audioFilePath;
         audio = new Audio(new File(audioFilePath));
+        sampleRate = audioData.sampleRate;
+
         magnitudes = qTransformData.qTransformMatrix;
 
         // Generate spectrogram image based on existing magnitude data
         Spectrogram spectrogram = new Spectrogram(
                 MIN_NOTE_NUMBER, MAX_NOTE_NUMBER, BINS_PER_OCTAVE, SPECTROGRAM_HOP_LENGTH, PX_PER_SECOND,
-                NUM_PX_PER_OCTAVE, audio.getSampleRate(), audioDuration
+                NUM_PX_PER_OCTAVE, sampleRate, audioDuration
         );
         WritableImage image = spectrogram.generateSpectrogram(magnitudes, ColourScale.VIRIDIS);
 

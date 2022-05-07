@@ -36,7 +36,8 @@ class AUDTFileTest {
             }
     );  // This is just an example array for the Q-Transform data
     AudioDataObject audioDataObject = new AudioDataObject(
-            FileUtils.getAbsoluteFilePath("testing-audio-files/A440.wav")
+            FileUtils.getAbsoluteFilePath("testing-audio-files/A440.wav"),
+            44100
     );
     GUIDataObject guiDataObject = new GUIDataObject(11, 9, 123.45, 0.01, 0.55, "Melancholy.wav", 120000, 9000);
 
