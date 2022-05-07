@@ -2,18 +2,22 @@
 Todo (Important):
     - Add JPackage capability
     - Update README.md
-    - Menu GUI
     - Allow other audio types (e.g. mp3) to be input into the program
     - Add progress bars
     - Add toolbar options
     - Add settings page
         - Need to allow for configuration of audio devices
+    - Add keyboard shortcuts
+        - Need to add two-key shortcuts (e.g. saving files)
+          [see https://stackoverflow.com/a/40329475]
+    - Tidy up `SpectrogramViewController` method organisation
+        - It is a mess
 
 Todo (Less Important):
     - Add licence/credits for ionicons
     - BPM Estimation
-    - Add keyboard shortcuts
     - Add "Save File As" button
+    - Add 'feedback' for successful file saving
 
 Todo (Not Important):
     - Compress the filter data
@@ -21,4 +25,5 @@ Todo (Not Important):
 ====================================================================================================
 Fixme:
     - "not in fullscreen state" leading to "Apple AWT Internal Exception: Java Exception"
+    - Weird bug where user has to double-click play if at end of audio file is back
 ====================================================================================================

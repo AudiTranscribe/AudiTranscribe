@@ -17,6 +17,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -79,6 +80,8 @@ public class SpectrogramViewController implements Initializable {
     final long UPDATE_PLAYBACK_SCHEDULER_PERIOD = 50;  // In milliseconds
 
     final boolean USE_FANCY_SHARPS_FOR_NOTE_LABELS = true;
+
+    final double VOLUME_VALUE_DELTA_ON_KEY_PRESS = 0.05;
 
     // File-Savable Attributes
     private double sampleRate;  // Sample rate of the audio
@@ -155,7 +158,14 @@ public class SpectrogramViewController implements Initializable {
     private Slider volumeSlider;
 
     // Helper methods
-    protected boolean togglePaused(boolean isPaused) {
+
+    /**
+     * Helper method that toggles the paused state.
+     *
+     * @param isPaused Old paused state.
+     * @return New paused state.
+     */
+    private boolean togglePaused(boolean isPaused) {
         if (isPaused) {
             // Change the icon of the play button from the play icon to the paused icon
             playButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/pause.png")));
@@ -184,7 +194,18 @@ public class SpectrogramViewController implements Initializable {
         return !isPaused;
     }
 
+    /**
+     * Helper method that seeks to the specified time.
+     *
+     * @param seekTime Time to seek to.
+     * @throws InvalidObjectException If the <code>MediaPlayer</code> object was not defined in the
+     *                                audio object.
+     */
     protected void seekToTime(double seekTime) throws InvalidObjectException {
+        // Ensure that the `seekTime` stays within range
+        if (seekTime < 0) seekTime = 0;
+        if (seekTime > audioDuration) seekTime = audioDuration;
+
         // Update the start time of the audio
         // (Do this so that when the player resumes out of a stop state it will start here)
         audio.setAudioStartTime(seekTime);
@@ -207,6 +228,13 @@ public class SpectrogramViewController implements Initializable {
     }
 
     // Value updating methods
+
+    /**
+     * Helper method that helps update the needed things when the BPM value is to be updated.
+     *
+     * @param newBPM      New BPM value.
+     * @param forceUpdate Whether to force an update to the BPM value.
+     */
     protected void updateBPMValue(double newBPM, boolean forceUpdate) {
         // Get the previous BPM value
         double oldBPM = forceUpdate ? -1 : bpm;
@@ -232,10 +260,21 @@ public class SpectrogramViewController implements Initializable {
         bpm = newBPM;
     }
 
+    /**
+     * Helper method that helps update the needed things when the BPM value is to be updated.
+     *
+     * @param newBPM New BPM value.
+     */
     protected void updateBPMValue(double newBPM) {
         updateBPMValue(newBPM, false);
     }
 
+    /**
+     * Helper method that helps update the needed things when the offset value is to be updated.
+     *
+     * @param newOffset   New offset value.
+     * @param forceUpdate Whether to force an update to the offset value.
+     */
     protected void updateOffsetValue(double newOffset, boolean forceUpdate) {
         // Get the previous offset value
         double oldOffset = forceUpdate ? OFFSET_RANGE.getKey() - 1 : offset;  // Make it 1 less than permitted
@@ -261,6 +300,11 @@ public class SpectrogramViewController implements Initializable {
         offset = newOffset;
     }
 
+    /**
+     * Helper method that helps update the needed things when the offset value is to be updated.
+     *
+     * @param newOffset New offset value.
+     */
     protected void updateOffsetValue(double newOffset) {
         updateOffsetValue(newOffset, false);
     }
@@ -398,18 +442,7 @@ public class SpectrogramViewController implements Initializable {
             logger.log(Level.INFO, "File saved");
         });
 
-        playButton.setOnAction(event -> {
-            logger.log(Level.FINE, "Pressed play button");
-
-            if (currTime == audioDuration) {
-                try {
-                    audio.setAudioPlaybackTime(0);
-                } catch (InvalidObjectException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            isPaused = togglePaused(isPaused);
-        });
+        playButton.setOnAction(event -> togglePlayButton());
 
         stopButton.setOnAction(event -> {
             logger.log(Level.FINE, "Pressed stop button");
@@ -461,50 +494,9 @@ public class SpectrogramViewController implements Initializable {
             isPaused = togglePaused(true);
         });
 
-        volumeButton.setOnAction(event -> {
-            if (isMuted) {
-                // Change the icon of the volume button from mute to non-mute
-                volumeButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/volume-high.png")));
+        volumeButton.setOnAction(event -> toggleMuteButton());
 
-                // Unmute the audio by setting the volume back to the value before the mute
-                try {
-                    audio.setPlaybackVolume(volume);
-                } catch (InvalidObjectException e) {
-                    throw new RuntimeException(e);
-                }
-            } else {
-                // Change the icon of the volume button from non-mute to mute
-                volumeButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/volume-mute.png")));
-
-                // Mute the audio by setting the volume to zero
-                try {
-                    audio.setPlaybackVolume(0);
-                } catch (InvalidObjectException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            // Toggle the `isMuted` flag
-            isMuted = !isMuted;
-
-            logger.log(Level.FINE, "Pressed volume toggle button (muted is now " + isMuted + ")");
-        });
-
-        scrollButton.setOnAction(event -> {
-            if (scrollToPlayhead) {
-                // Change the icon of the scroll button from filled to non-filled
-                scrollButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/footsteps-outline.png")));
-
-            } else {
-                // Change the icon of the scroll button from non-filled to filled
-                scrollButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/footsteps-filled.png")));
-            }
-
-            // Toggle the `scrollToPlayhead` flag
-            scrollToPlayhead = !scrollToPlayhead;
-
-            logger.log(Level.FINE, "Pressed scroll toggle button (scroll is now " + scrollToPlayhead + ")");
-        });
+        scrollButton.setOnAction(event -> toggleScrollButton());
 
         // Set method on the volume slider
         volumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -592,6 +584,62 @@ public class SpectrogramViewController implements Initializable {
         } catch (InvalidObjectException e) {
             throw new RuntimeException(e);
         }
+
+        // Set keyboard button press methods
+        mainPane.getScene().addEventFilter(KeyEvent.KEY_PRESSED, (KeyEvent keyEvent) -> {
+            keyEvent.consume();
+
+            switch (keyEvent.getCode()) {
+                // Space and K key is to toggle the play button
+                case SPACE -> togglePlayButton();
+                case K -> togglePlayButton();
+
+                // Up/Down arrows are to adjust volume
+                case UP -> volumeSlider.setValue(volumeSlider.getValue() + VOLUME_VALUE_DELTA_ON_KEY_PRESS);
+                case DOWN -> volumeSlider.setValue(volumeSlider.getValue() - VOLUME_VALUE_DELTA_ON_KEY_PRESS);
+
+                // M key is to mute/unmute
+                case M -> toggleMuteButton();
+
+                // Left/Right arrows are to seek 0.5 seconds before/ahead
+                case LEFT -> {
+                    try {
+                        seekToTime(currTime - 0.5);
+                    } catch (InvalidObjectException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                case RIGHT -> {
+                    try {
+                        seekToTime(currTime + 0.5);
+                    } catch (InvalidObjectException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                // J/L keys are to seek 1 second before/ahead
+                case J -> {
+                    try {
+                        seekToTime(currTime - 1);
+                    } catch (InvalidObjectException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                case L -> {
+                    try {
+                        seekToTime(currTime + 1);
+                    } catch (InvalidObjectException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                // S key is to toggle seeking to playhead
+                case S -> toggleScrollButton();
+            }
+        });
+
+        // Ensure main pane is in focus
+        mainPane.requestFocus();
     }
 
     /**
@@ -691,7 +739,7 @@ public class SpectrogramViewController implements Initializable {
     /**
      * Method that updates the scrolling of the page to center the playhead.
      *
-     * @param newPosX   New X position.
+     * @param newPosX New X position.
      */
     public void updateScrollPosition(double newPosX) {
         // Get the 'half width' of the spectrogram area
@@ -708,7 +756,9 @@ public class SpectrogramViewController implements Initializable {
             spectrogramPane.setHvalue(1);
         } else {
             // Otherwise, update the H-value accordingly so that the view is centered on the playhead
-            spectrogramPane.setHvalue((newPosX - spectrogramAreaHalfWidth) / (finalWidth - 2 * spectrogramAreaHalfWidth));
+            spectrogramPane.setHvalue(
+                    (newPosX - spectrogramAreaHalfWidth) / (finalWidth - 2 * spectrogramAreaHalfWidth)
+            );
         }
     }
 
@@ -831,5 +881,72 @@ public class SpectrogramViewController implements Initializable {
 
         // Report that the spectrogram view is ready to be shown
         logger.log(Level.INFO, "Spectrogram view ready to be shown");
+    }
+
+    /**
+     * Helper method that toggles the play button.
+     */
+    private void togglePlayButton() {
+        if (currTime == audioDuration) {
+            try {
+                audio.setAudioPlaybackTime(0);
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        isPaused = togglePaused(isPaused);
+
+        logger.log(Level.FINE, "Toggled pause state (paused is now " + isPaused + ")");
+    }
+
+    /**
+     * Helper method that toggles the scroll button.
+     */
+    private void toggleScrollButton() {
+        if (scrollToPlayhead) {
+            // Change the icon of the scroll button from filled to non-filled
+            scrollButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/footsteps-outline.png")));
+
+        } else {
+            // Change the icon of the scroll button from non-filled to filled
+            scrollButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/footsteps-filled.png")));
+        }
+
+        // Toggle the `scrollToPlayhead` flag
+        scrollToPlayhead = !scrollToPlayhead;
+
+        logger.log(Level.FINE, "Toggled scroll (scroll is now " + scrollToPlayhead + ")");
+    }
+
+    /**
+     * Helper method that toggles the mute button.
+     */
+    private void toggleMuteButton() {
+        if (isMuted) {
+            // Change the icon of the volume button from mute to non-mute
+            volumeButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/volume-high.png")));
+
+            // Unmute the audio by setting the volume back to the value before the mute
+            try {
+                audio.setPlaybackVolume(volume);
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            // Change the icon of the volume button from non-mute to mute
+            volumeButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/volume-mute.png")));
+
+            // Mute the audio by setting the volume to zero
+            try {
+                audio.setPlaybackVolume(0);
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        // Toggle the `isMuted` flag
+        isMuted = !isMuted;
+
+        logger.log(Level.FINE, "Toggled mute button (muted is now " + isMuted + ")");
     }
 }
