@@ -72,9 +72,9 @@ Here are some things to note about the bytes present within the provided file.
 - The 4 bytes `0xE05E05E5` are used to delimitate data sections.
 - The 8 bytes `0xE0FE0FEF 0xE0FE0FEF` is used to mark the end of the file. These 8 bytes should only
   appear at the end of the file.
-- The last value `0x0139ace9` is a checksum for the file. This checksum is the remainder after the
-  sum of all other bytes in the file is divided by the Mersenne prime 2^31 - 1, expressed as a byte
-  sequence.
+- The last value `0x0139ace9` is a checksum for the file. This checksum is the sum of all bytes of
+  the file, but modulo 2^32. This is equivalent of getting the byte representation of the integer
+  sum of all the bytes in the file.
 
 =====
 Section 2. Header Section

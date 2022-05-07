@@ -16,7 +16,6 @@ import site.overwrite.auditranscribe.io.data_encapsulators.GUIDataObject;
 import site.overwrite.auditranscribe.io.data_encapsulators.QTransformDataObject;
 import site.overwrite.auditranscribe.io.exceptions.FailedToReadDataException;
 import site.overwrite.auditranscribe.io.exceptions.IncorrectFileFormatException;
-import site.overwrite.auditranscribe.utils.MathUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -334,18 +333,16 @@ public class AUDTFileReader {
 
         // Get the checksum value from the file
         byte[] checksumBytes = Arrays.copyOfRange(bytes, numBytes - 4, numBytes);
-        int supposedChecksum = IOConverters.bytesToInt(checksumBytes);
+        int expectedChecksum = IOConverters.bytesToInt(checksumBytes);
 
-        // Sum all the bytes inside the file, excluding the checksum bytes
-        int byteSum = 0;
+        // Sum all the bytes inside the file, excluding the checksum bytes, as the checksum
+        // (The checksum will overflow if the sum exceeds 2^31; this is okay as we only want the bytes' values)
+        int actualChecksum = 0;
         for (byte b : Arrays.copyOfRange(bytes, 0, numBytes - 4)) {
-            byteSum += b;
+            actualChecksum += b;
         }
 
-        // Get the remainder of the byte sum after division by 2^31 - 1 as the actual checksum
-        int actualChecksum = MathUtils.modWithMersennePrime(byteSum, 31);
-
         // Check if the checksums match
-        return supposedChecksum == actualChecksum;
+        return expectedChecksum == actualChecksum;
     }
 }
