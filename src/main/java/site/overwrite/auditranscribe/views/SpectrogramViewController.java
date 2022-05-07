@@ -190,7 +190,8 @@ public class SpectrogramViewController implements Initializable {
         // (We do this after updating start time to avoid pesky seeking issues)
         audio.setAudioPlaybackTime(seekTime);
 
-        // Update the current time label
+        // Update the current time and current time label
+        currTime = seekTime;
         currTimeLabel.setText(UnitConversion.secondsToTimeString(seekTime));
 
         // Update coloured progress pane and playhead line
@@ -352,8 +353,6 @@ public class SpectrogramViewController implements Initializable {
         openProjectButton.setOnAction(ProjectIOHandlers::openProject);
 
         saveProjectButton.setOnAction(event -> {
-            // Todo: properly set the current time when saving
-
             // Allow user to select save location if `audtFilePath` is unset
             if (audtFilePath == null) {
                 logger.log(Level.FINE, "AUDT file destination not yet set; asking now");

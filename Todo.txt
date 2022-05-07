@@ -23,7 +23,5 @@ Todo (Not Important):
 
 ====================================================================================================
 Fixme:
-    - When saving file, current time is saved incorrectly
-        - The seek time is not taken into consideration
-
+    - "not in fullscreen state" leading to "Apple AWT Internal Exception: Java Exception"
 ====================================================================================================
