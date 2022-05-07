@@ -2,7 +2,7 @@
  * MainViewController.java
  *
  * Created on 2022-02-09
- * Updated on 2022-05-04
+ * Updated on 2022-05-07
  *
  * Description: Contains the main view's controller class.
  */
@@ -50,6 +50,7 @@ public class MainViewController implements Initializable {
 
             // Add methods to buttons
             newProjectButton.setOnAction(ProjectIOHandlers::newProject);
+            openProjectButton.setOnAction(ProjectIOHandlers::openProject);
 
             // Report that the main view is ready to be shown
             logger.log(Level.INFO, "Main view ready to be shown");

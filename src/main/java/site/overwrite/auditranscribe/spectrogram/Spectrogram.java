@@ -2,7 +2,7 @@
  * Spectrogram.java
  *
  * Created on 2022-02-12
- * Updated on 2022-04-16
+ * Updated on 2022-05-07
  *
  * Description: Spectrogram class.
  */
@@ -63,16 +63,16 @@ public class Spectrogram {
      * @param minNoteNumber  Smallest note number.
      * @param maxNoteNumber  Largest note number.
      * @param binsPerOctave  Number of frequency bins per octave.
+     * @param hopLength      Number of samples between successive columns.
      * @param numPxPerSecond Number of pixels of the spectrogram dedicated to each second of audio.
      * @param numPxPerOctave Number of pixels allocated for each octave.
-     * @param hopLength      Number of samples between successive columns.
      * @throws InvalidParameterException If <code>maxNoteNumber - minNoteNumber + 1</code> is not a
      *                                   multiple of 12.
      * @throws InvalidParameterException If the image height is too large.
      */
     public Spectrogram(
-            Audio audioObj, int minNoteNumber, int maxNoteNumber, int binsPerOctave, double numPxPerSecond,
-            double numPxPerOctave, int hopLength
+            Audio audioObj, int minNoteNumber, int maxNoteNumber, int binsPerOctave, int hopLength,
+            double numPxPerSecond, double numPxPerOctave
     ) {
         // Validate that `maxNoteNumber - minNoteNumber + 1` is a multiple of 12
         int numNotes = maxNoteNumber - minNoteNumber + 1;
@@ -112,18 +112,76 @@ public class Spectrogram {
         frequencyBins = VQT.getFreqBins(numFreqBins, binsPerOctave, minFreq);
     }
 
+    /**
+     * Creates a spectrogram object.<br>
+     * In this case, this assumes that the samples of the spectrogram object have already been
+     * processed and is saved in a 2D array of doubles, representing the matrix of Q-Transform
+     * magnitudes. Thus, this object has no access to the actual audio and hence the
+     * <code>sampleRate</code> and the <code>duration</code> of the audio must be provided.
+     *
+     * @param minNoteNumber  Smallest note number.
+     * @param maxNoteNumber  Largest note number.
+     * @param binsPerOctave  Number of frequency bins per octave.
+     * @param hopLength      Number of samples between successive columns.
+     * @param numPxPerSecond Number of pixels of the spectrogram dedicated to each second of audio.
+     * @param numPxPerOctave Number of pixels allocated for each octave.
+     * @param sampleRate     Audio's sampling rate.
+     * @param duration       Duration of the audio.
+     * @throws InvalidParameterException If <code>maxNoteNumber - minNoteNumber + 1</code> is not a
+     *                                   multiple of 12.
+     * @throws InvalidParameterException If the image height is too large.
+     */
+    public Spectrogram(int minNoteNumber, int maxNoteNumber, int binsPerOctave, int hopLength, double numPxPerSecond, double numPxPerOctave, double sampleRate, double duration) {
+        // Validate that `maxNoteNumber - minNoteNumber + 1` is a multiple of 12
+        int numNotes = maxNoteNumber - minNoteNumber + 1;
+        if (numNotes % 12 != 0) {
+            throw new InvalidParameterException(
+                    "Number of notes is not a multiple of 12 (i.e. `maxNoteNumber - minNoteNumber + 1` is not a " +
+                            "multiple of 12)"
+            );
+        }
+
+        // Update attributes
+        this.minNoteNumber = minNoteNumber;
+        this.maxNoteNumber = maxNoteNumber;
+        numOctaves = numNotes / 12;
+
+        minFreq = UnitConversion.noteNumberToFreq(minNoteNumber);
+        maxFreq = UnitConversion.noteNumberToFreq(maxNoteNumber);
+
+        this.binsPerOctave = binsPerOctave;
+        numFreqBins = numOctaves * binsPerOctave;
+
+        this.sampleRate = sampleRate;
+        this.hopLength = hopLength;
+
+        logger.log(Level.FINE, "Audio sample rate = " + sampleRate);
+
+        // Set the width and height of the image
+        width = (int) (duration * numPxPerSecond);
+        height = (int) (numOctaves * numPxPerOctave);
+
+        logger.log(Level.FINE, "Spectrogram width = " + width + " and height = " + height);
+
+        // We don't need samples in this case
+        samples = null;
+        logger.log(Level.FINE, "Spectrogram creation occurring WITHOUT audio file; samples not available");
+
+        // Get the frequency bins
+        frequencyBins = VQT.getFreqBins(numFreqBins, binsPerOctave, minFreq);
+    }
+
     // Public methods
 
     /**
-     * Generates the spectrogram image for the given audio samples.
+     * Generates the spectrogram magnitudes for the given audio samples.
      *
-     * @param window      The window function to use.
-     * @param colourScale The colour scale to use for the spectrogram.
-     * @return The spectrogram image.
+     * @param window The window function to use.
+     * @return The spectrogram magnitudes.
      * @throws NullPointerException If the maximum frequency value cannot be found in the computed
      *                              Q-transform frequency bins.
      */
-    public WritableImage generateSpectrogram(Window window, ColourScale colourScale) {
+    public double[][] getSpectrogramMagnitudes(Window window) throws NullPointerException {
         // Perform the spectrogram transform on the samples
         logger.log(Level.FINE, "Starting spectral matrix generation");
         Complex[][] QTMatrix;
@@ -160,10 +218,19 @@ public class Spectrogram {
             System.arraycopy(QTMatrix[i], 0, QTMatrixFinal[i], 0, QTMatrix[0].length);
         }
 
-        // Compute the magnitudes
+        // Compute the magnitudes and return
         logger.log(Level.FINE, "Calculating magnitudes");
-        double[][] magnitudes = calculateMagnitudes(QTMatrixFinal);
+        return calculateMagnitudes(QTMatrixFinal);
+    }
 
+    /**
+     * Generates the spectrogram image for the given Q-Transform magnitude data.
+     *
+     * @param magnitudes  Magnitudes of the Q-Transform data.
+     * @param colourScale The colour scale to use for the spectrogram.
+     * @return The spectrogram image.
+     */
+    public WritableImage generateSpectrogram(double[][] magnitudes, ColourScale colourScale) {
         // Plot spectrogram data
         logger.log(Level.FINE, "Plotting data");
         Plotter plotter = new Plotter(colourScale, INTENSITY_PRECISION);
