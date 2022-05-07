@@ -157,158 +157,6 @@ public class SpectrogramViewController implements Initializable {
     @FXML
     private Slider volumeSlider;
 
-    // Helper methods
-
-    /**
-     * Helper method that toggles the paused state.
-     *
-     * @param isPaused Old paused state.
-     * @return New paused state.
-     */
-    private boolean togglePaused(boolean isPaused) {
-        if (isPaused) {
-            // Change the icon of the play button from the play icon to the paused icon
-            playButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/pause.png")));
-
-            // Unpause the audio (i.e. play the audio)
-            try {
-                audio.playAudio();
-            } catch (InvalidObjectException e) {
-                throw new RuntimeException(e);
-            }
-
-        } else {
-            // Change the icon of the play button from the paused icon to the play icon
-            playButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/play.png")));
-
-            // Pause the audio
-            try {
-                audio.pauseAudio();
-            } catch (InvalidObjectException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        // Return the toggled version of the `isPaused` flag
-        logger.log(Level.FINE, "Toggled pause state from " + isPaused + " to " + !isPaused);
-        return !isPaused;
-    }
-
-    /**
-     * Helper method that seeks to the specified time.
-     *
-     * @param seekTime Time to seek to.
-     * @throws InvalidObjectException If the <code>MediaPlayer</code> object was not defined in the
-     *                                audio object.
-     */
-    protected void seekToTime(double seekTime) throws InvalidObjectException {
-        // Ensure that the `seekTime` stays within range
-        if (seekTime < 0) seekTime = 0;
-        if (seekTime > audioDuration) seekTime = audioDuration;
-
-        // Update the start time of the audio
-        // (Do this so that when the player resumes out of a stop state it will start here)
-        audio.setAudioStartTime(seekTime);
-
-        // Set the playback time
-        // (We do this after updating start time to avoid pesky seeking issues)
-        audio.setAudioPlaybackTime(seekTime);
-
-        // Update the current time and current time label
-        currTime = seekTime;
-        currTimeLabel.setText(UnitConversion.secondsToTimeString(seekTime));
-
-        // Update coloured progress pane and playhead line
-        double newXPos = seekTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X;
-
-        colouredProgressPane.setPrefWidth(newXPos);
-        PlottingStuffHandler.updatePlayheadLine(playheadLine, newXPos);
-
-        logger.log(Level.FINE, "Seeked to " + seekTime + " seconds");
-    }
-
-    // Value updating methods
-
-    /**
-     * Helper method that helps update the needed things when the BPM value is to be updated.
-     *
-     * @param newBPM      New BPM value.
-     * @param forceUpdate Whether to force an update to the BPM value.
-     */
-    protected void updateBPMValue(double newBPM, boolean forceUpdate) {
-        // Get the previous BPM value
-        double oldBPM = forceUpdate ? -1 : bpm;
-
-        // Update the beat lines
-        beatLines = PlottingStuffHandler.updateBeatLines(
-                spectrogramPaneAnchor, beatLines, audioDuration, oldBPM, newBPM, offset, offset, finalHeight, beatsPerBar,
-                beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
-        );
-
-        // Update the bar number ellipses
-        barNumberEllipses = PlottingStuffHandler.updateBarNumberEllipses(
-                barNumberPane, barNumberEllipses, audioDuration, oldBPM, newBPM, offset, offset,
-                barNumberPane.getPrefHeight(), beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
-        );
-
-        // Update the BPM value
-        if (!forceUpdate) {
-            logger.log(Level.FINE, "Updated BPM value from " + bpm + " to " + newBPM);
-        } else {
-            logger.log(Level.FINE, "Force update BPM value to " + newBPM);
-        }
-        bpm = newBPM;
-    }
-
-    /**
-     * Helper method that helps update the needed things when the BPM value is to be updated.
-     *
-     * @param newBPM New BPM value.
-     */
-    protected void updateBPMValue(double newBPM) {
-        updateBPMValue(newBPM, false);
-    }
-
-    /**
-     * Helper method that helps update the needed things when the offset value is to be updated.
-     *
-     * @param newOffset   New offset value.
-     * @param forceUpdate Whether to force an update to the offset value.
-     */
-    protected void updateOffsetValue(double newOffset, boolean forceUpdate) {
-        // Get the previous offset value
-        double oldOffset = forceUpdate ? OFFSET_RANGE.getKey() - 1 : offset;  // Make it 1 less than permitted
-
-        // Update the beat lines
-        beatLines = PlottingStuffHandler.updateBeatLines(
-                spectrogramPaneAnchor, beatLines, audioDuration, bpm, bpm, oldOffset, newOffset, finalHeight,
-                beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
-        );
-
-        // Update the bar number ellipses
-        barNumberEllipses = PlottingStuffHandler.updateBarNumberEllipses(
-                barNumberPane, barNumberEllipses, audioDuration, bpm, bpm, oldOffset, newOffset,
-                barNumberPane.getPrefHeight(), beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
-        );
-
-        // Update the offset value
-        if (!forceUpdate) {
-            logger.log(Level.FINE, "Updated offset value from " + offset + " to " + newOffset);
-        } else {
-            logger.log(Level.FINE, "Force update offset value to " + newOffset);
-        }
-        offset = newOffset;
-    }
-
-    /**
-     * Helper method that helps update the needed things when the offset value is to be updated.
-     *
-     * @param newOffset New offset value.
-     */
-    protected void updateOffsetValue(double newOffset) {
-        updateOffsetValue(newOffset, false);
-    }
-
     // Initialization method
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -763,6 +611,154 @@ public class SpectrogramViewController implements Initializable {
     }
 
     // Private methods
+
+    /**
+     * Helper method that seeks to the specified time.
+     *
+     * @param seekTime Time to seek to.
+     * @throws InvalidObjectException If the <code>MediaPlayer</code> object was not defined in the
+     *                                audio object.
+     */
+    protected void seekToTime(double seekTime) throws InvalidObjectException {
+        // Ensure that the `seekTime` stays within range
+        if (seekTime < 0) seekTime = 0;
+        if (seekTime > audioDuration) seekTime = audioDuration;
+
+        // Update the start time of the audio
+        // (Do this so that when the player resumes out of a stop state it will start here)
+        audio.setAudioStartTime(seekTime);
+
+        // Set the playback time
+        // (We do this after updating start time to avoid pesky seeking issues)
+        audio.setAudioPlaybackTime(seekTime);
+
+        // Update the current time and current time label
+        currTime = seekTime;
+        currTimeLabel.setText(UnitConversion.secondsToTimeString(seekTime));
+
+        // Update coloured progress pane and playhead line
+        double newXPos = seekTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X;
+
+        colouredProgressPane.setPrefWidth(newXPos);
+        PlottingStuffHandler.updatePlayheadLine(playheadLine, newXPos);
+
+        logger.log(Level.FINE, "Seeked to " + seekTime + " seconds");
+    }
+
+    /**
+     * Helper method that toggles the paused state.
+     *
+     * @param isPaused Old paused state.
+     * @return New paused state.
+     */
+    private boolean togglePaused(boolean isPaused) {
+        if (isPaused) {
+            // Change the icon of the play button from the play icon to the paused icon
+            playButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/pause.png")));
+
+            // Unpause the audio (i.e. play the audio)
+            try {
+                audio.playAudio();
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
+
+        } else {
+            // Change the icon of the play button from the paused icon to the play icon
+            playButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/play.png")));
+
+            // Pause the audio
+            try {
+                audio.pauseAudio();
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        // Return the toggled version of the `isPaused` flag
+        logger.log(Level.FINE, "Toggled pause state from " + isPaused + " to " + !isPaused);
+        return !isPaused;
+    }
+
+    /**
+     * Helper method that helps update the needed things when the BPM value is to be updated.
+     *
+     * @param newBPM      New BPM value.
+     * @param forceUpdate Whether to force an update to the BPM value.
+     */
+    private void updateBPMValue(double newBPM, boolean forceUpdate) {
+        // Get the previous BPM value
+        double oldBPM = forceUpdate ? -1 : bpm;
+
+        // Update the beat lines
+        beatLines = PlottingStuffHandler.updateBeatLines(
+                spectrogramPaneAnchor, beatLines, audioDuration, oldBPM, newBPM, offset, offset, finalHeight, beatsPerBar,
+                beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+        );
+
+        // Update the bar number ellipses
+        barNumberEllipses = PlottingStuffHandler.updateBarNumberEllipses(
+                barNumberPane, barNumberEllipses, audioDuration, oldBPM, newBPM, offset, offset,
+                barNumberPane.getPrefHeight(), beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+        );
+
+        // Update the BPM value
+        if (!forceUpdate) {
+            logger.log(Level.FINE, "Updated BPM value from " + bpm + " to " + newBPM);
+        } else {
+            logger.log(Level.FINE, "Force update BPM value to " + newBPM);
+        }
+        bpm = newBPM;
+    }
+
+    /**
+     * Helper method that helps update the needed things when the BPM value is to be updated.
+     *
+     * @param newBPM New BPM value.
+     */
+    private void updateBPMValue(double newBPM) {
+        updateBPMValue(newBPM, false);
+    }
+
+    /**
+     * Helper method that helps update the needed things when the offset value is to be updated.
+     *
+     * @param newOffset   New offset value.
+     * @param forceUpdate Whether to force an update to the offset value.
+     */
+    private void updateOffsetValue(double newOffset, boolean forceUpdate) {
+        // Get the previous offset value
+        double oldOffset = forceUpdate ? OFFSET_RANGE.getKey() - 1 : offset;  // Make it 1 less than permitted
+
+        // Update the beat lines
+        beatLines = PlottingStuffHandler.updateBeatLines(
+                spectrogramPaneAnchor, beatLines, audioDuration, bpm, bpm, oldOffset, newOffset, finalHeight,
+                beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+        );
+
+        // Update the bar number ellipses
+        barNumberEllipses = PlottingStuffHandler.updateBarNumberEllipses(
+                barNumberPane, barNumberEllipses, audioDuration, bpm, bpm, oldOffset, newOffset,
+                barNumberPane.getPrefHeight(), beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+        );
+
+        // Update the offset value
+        if (!forceUpdate) {
+            logger.log(Level.FINE, "Updated offset value from " + offset + " to " + newOffset);
+        } else {
+            logger.log(Level.FINE, "Force update offset value to " + newOffset);
+        }
+        offset = newOffset;
+    }
+
+    /**
+     * Helper method that helps update the needed things when the offset value is to be updated.
+     *
+     * @param newOffset New offset value.
+     */
+    private void updateOffsetValue(double newOffset) {
+        updateOffsetValue(newOffset, false);
+    }
 
     /**
      * Helper method that finishes the setup for the spectrogram.

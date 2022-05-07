@@ -10,8 +10,6 @@ Todo (Important):
     - Add keyboard shortcuts
         - Need to add two-key shortcuts (e.g. saving files)
           [see https://stackoverflow.com/a/40329475]
-    - Tidy up `SpectrogramViewController` method organisation
-        - It is a mess
 
 Todo (Less Important):
     - Add licence/credits for ionicons
