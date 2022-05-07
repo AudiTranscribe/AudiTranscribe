@@ -24,29 +24,29 @@
                <children>
                   <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0" HBox.hgrow="SOMETIMES">
                      <children>
-                        <Button fx:id="newProjectButton" contentDisplay="CENTER" mnemonicParsing="false">
+                        <Button fx:id="newProjectButton" contentDisplay="CENTER" mnemonicParsing="false" styleClass="image-button">
                            <graphic>
                               <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../images/icons/PNGs/document.png" />
+                                    <Image url="@../../icons/PNGs/create.png" />
                                  </image>
                               </ImageView>
                            </graphic>
                         </Button>
-                        <Button fx:id="openProjectButton" contentDisplay="CENTER" layoutX="20.0" layoutY="18.0" mnemonicParsing="false">
+                        <Button fx:id="openProjectButton" contentDisplay="CENTER" layoutX="20.0" layoutY="18.0" mnemonicParsing="false" styleClass="image-button">
                            <graphic>
                               <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../images/icons/PNGs/folder-open.png" />
+                                    <Image url="@../../icons/PNGs/folder-open.png" />
                                  </image>
                               </ImageView>
                            </graphic>
                         </Button>
-                        <Button fx:id="saveProjectButton" contentDisplay="CENTER" layoutX="72.0" layoutY="18.0" mnemonicParsing="false">
+                        <Button fx:id="saveProjectButton" contentDisplay="CENTER" layoutX="72.0" layoutY="18.0" mnemonicParsing="false" styleClass="image-button">
                            <graphic>
                               <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../images/icons/PNGs/save.png" />
+                                    <Image url="@../../icons/PNGs/save.png" />
                                  </image>
                               </ImageView>
                            </graphic>
@@ -150,47 +150,47 @@
                   </HBox>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" HBox.hgrow="NEVER">
                      <children>
-                        <Button fx:id="playButton" contentDisplay="CENTER" mnemonicParsing="false">
+                        <Button fx:id="playButton" contentDisplay="CENTER" mnemonicParsing="false" styleClass="image-button">
                            <graphic>
                               <ImageView fx:id="playButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../images/icons/PNGs/play.png" />
+                                    <Image url="@../../icons/PNGs/play.png" />
                                  </image>
                               </ImageView>
                            </graphic>
                         </Button>
-                        <Button fx:id="stopButton" contentDisplay="CENTER" mnemonicParsing="false">
+                        <Button fx:id="stopButton" contentDisplay="CENTER" mnemonicParsing="false" styleClass="image-button">
                            <graphic>
                               <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../images/icons/PNGs/stop.png" />
+                                    <Image url="@../../icons/PNGs/stop.png" />
                                  </image>
                               </ImageView>
                            </graphic>
                         </Button>
-                        <Button fx:id="playSkipBackButton" contentDisplay="CENTER" mnemonicParsing="false">
+                        <Button fx:id="playSkipBackButton" contentDisplay="CENTER" mnemonicParsing="false" styleClass="image-button">
                            <graphic>
                               <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../images/icons/PNGs/play-skip-back.png" />
+                                    <Image url="@../../icons/PNGs/play-skip-back.png" />
                                  </image>
                               </ImageView>
                            </graphic>
                         </Button>
-                        <Button fx:id="playSkipForwardButton" contentDisplay="CENTER" mnemonicParsing="false">
+                        <Button fx:id="playSkipForwardButton" contentDisplay="CENTER" mnemonicParsing="false" styleClass="image-button">
                            <graphic>
                               <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../images/icons/PNGs/play-skip-forward.png" />
+                                    <Image url="@../../icons/PNGs/play-skip-forward.png" />
                                  </image>
                               </ImageView>
                            </graphic>
                         </Button>
-                        <Button fx:id="scrollButton" contentDisplay="CENTER" mnemonicParsing="false">
+                        <Button fx:id="scrollButton" contentDisplay="CENTER" mnemonicParsing="false" styleClass="image-button">
                            <graphic>
                               <ImageView fx:id="scrollButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../images/icons/PNGs/footsteps-outline.png" />
+                                    <Image url="@../../icons/PNGs/footsteps-outline.png" />
                                  </image>
                               </ImageView>
                            </graphic>
@@ -199,11 +199,11 @@
                   </HBox>
                   <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="150.0" spacing="5.0" HBox.hgrow="ALWAYS">
                      <children>
-                        <Button fx:id="volumeButton" contentDisplay="CENTER" mnemonicParsing="false">
+                        <Button fx:id="volumeButton" contentDisplay="CENTER" mnemonicParsing="false" styleClass="image-button">
                            <graphic>
                               <ImageView fx:id="volumeButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@../../images/icons/PNGs/volume-high.png" />
+                                    <Image url="@../../icons/PNGs/volume-high.png" />
                                  </image>
                               </ImageView>
                            </graphic>

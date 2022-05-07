@@ -1,14 +1,72 @@
-/* BUTTONS */
-.button {
+/* GENERAL STYLING */
+/* Labels */
+.label {
+    -fx-font-family: "Arial", sans-serif;
+}
+
+/* Buttons */
+.image-button {
     -fx-background-color: transparent;
 }
 
-.button:hover {
-    -fx-background-color:
-            -fx-shadow-highlight-color,
-            -fx-outer-border,
-            -fx-inner-border,
-            -fx-body-color;
+.image-button:hover {
+    -fx-background-color: -fx-shadow-highlight-color, -fx-outer-border, -fx-inner-border, -fx-body-color;
     -fx-background-insets: 0 0 -1 0, 0, 1, 2;
     -fx-background-radius: 3px, 3px, 2px, 1px;
+}
+
+/* MAIN PAGE */
+/* Labels */
+.title-label {
+    -fx-font-size: 64px;
+    -fx-font-weight: bold;
+}
+
+.version-label {
+    -fx-font-size: 22px;
+}
+
+/* Buttons */
+.main-menu-button {
+    -fx-font-size: 16px;
+}
+
+/* Others */
+.main-page-separator {
+    -fx-stroke-width: 5px;
+    -fx-stroke: #000000ff;
+}
+
+.search-text-field {
+    -fx-font-size: 14px;
+}
+
+/* SPECTROGRAM PAGE */
+/* Labels */
+.display-label {
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+}
+
+/* Spectrogram */
+.note-line {
+    -fx-stroke-width: 2px;
+    -fx-stroke-dash-array: 10 6;
+}
+
+.note-line-c {
+    -fx-stroke-dash-array: 1;
+}
+
+.beat-line, .bar-line {
+    -fx-stroke-width: 5px;
+}
+
+.bar-number-ellipse {
+    -fx-stroke-width: 1px;
+}
+
+/* Playback */
+.playhead-line {
+    -fx-stroke-width: 5px;
 }

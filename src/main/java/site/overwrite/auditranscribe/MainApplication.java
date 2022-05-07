@@ -2,7 +2,7 @@
  * MainApplication.java
  *
  * Created on 2022-02-09
- * Updated on 2022-05-01
+ * Updated on 2022-05-03
  *
  * Description: Contains the main application class.
  */
@@ -18,32 +18,17 @@ import site.overwrite.auditranscribe.utils.FileUtils;
 import java.io.IOException;
 
 public class MainApplication extends Application {
+    // Initialization method
     @Override
     public void start(Stage stage) throws IOException {
-//        // Load the FXML file into the scene
-//        FXMLLoader fxmlLoader = new FXMLLoader(FileUtils.getFile("views/fxml/main-view.fxml"));
-//        Scene scene = new Scene(fxmlLoader.load());
-//
-//        // Set stage title and scene
-//        stage.setTitle("Main View");
-//        stage.setScene(scene);
-//
-//        // More stage config
-//        // Todo: make it not resizable?
-//        stage.setMaximized(true);
-//        // stage.setFullScreen(true);
-
-        FXMLLoader fxmlLoader = new FXMLLoader(FileUtils.getFileURL("views/fxml/spectrogram-view.fxml"));
+        // Load the FXML file into the scene
+        FXMLLoader fxmlLoader = new FXMLLoader(FileUtils.getFileURL("views/fxml/main-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
-        stage.setTitle("Spectrogram");
-        stage.setScene(scene);
-        stage.setMaximized(true);
-        stage.setFullScreen(true);
 
-//        FXMLLoader fxmlLoader = new FXMLLoader(FileUtils.getFileURL("views/fxml/file-loader-view.fxml"));
-//        Scene scene = new Scene(fxmlLoader.load());
-//        stage.setTitle("File Loader");
-//        stage.setScene(scene);
+        // Set stage properties
+        stage.setTitle("Welcome to AudiTranscribe");
+        stage.setScene(scene);
+        stage.setResizable(false);
 
         // Show the stage
         stage.show();

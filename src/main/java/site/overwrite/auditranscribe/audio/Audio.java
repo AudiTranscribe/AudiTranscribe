@@ -2,7 +2,7 @@
  * Audio.java
  *
  * Created on 2022-02-13
- * Updated on 2022-05-01
+ * Updated on 2022-05-07
  *
  * Description: Class that handles audio processing and audio playback.
  */
@@ -11,7 +11,6 @@ package site.overwrite.auditranscribe.audio;
 
 import javafx.util.Duration;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
-import site.overwrite.auditranscribe.utils.FileUtils;
 
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.Media;
@@ -20,9 +19,7 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -36,6 +33,9 @@ public class Audio {
     public static final int SAMPLES_BUFFER_SIZE = 1024;  // In bits
 
     // Attributes
+    private final String audioFilePath;
+    private final String audioFileName;
+
     private final AudioInputStream audioStream;
     private final AudioFormat audioFormat;
     private final double sampleRate;
@@ -52,38 +52,77 @@ public class Audio {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     /**
-     * Initializes an <code>Audio</code> object based on a file's input stream.
+     * Initializes an <code>Audio</code> object based on a file.
      *
-     * @param filePath Input stream of a file.
+     * @param file           File object, representing the audio file.
+     * @param useMediaPlayer Whether to use the media player to play the audio.
      * @throws IOException                   If there was a problem reading in the audio stream.
      * @throws UnsupportedAudioFileException If there was a problem reading in the audio file.
      */
-    public Audio(String filePath) throws UnsupportedAudioFileException, IOException {
+    public Audio(File file, boolean useMediaPlayer) throws UnsupportedAudioFileException, IOException {
+        // Set the audio file path and file name
+        audioFileName = file.getName();
+        audioFilePath = file.getAbsolutePath();
+
         // Attempt to convert the input stream into an audio input stream
-        InputStream bufferedIn = new BufferedInputStream(FileUtils.getInputStream(filePath));
+        InputStream bufferedIn = new BufferedInputStream(new FileInputStream(file));
         audioStream = AudioSystem.getAudioInputStream(bufferedIn);
 
         // Get the audio file's audio format and audio file's sample rate
         audioFormat = audioStream.getFormat();
         sampleRate = audioFormat.getSampleRate();
 
-        // Get the media player for the audio file
-        MediaPlayer tempMediaPlayer;
+        // Create the media player object if needed
+        if (useMediaPlayer) {
+            // Get the media player for the audio file
+            MediaPlayer tempMediaPlayer;
 
-        try {
-            tempMediaPlayer = new MediaPlayer(new Media(FileUtils.getFilePath(filePath)));
-        } catch (IllegalStateException e) {
-            tempMediaPlayer = null;
-            logger.log(Level.WARNING, "JavaFX Toolkit not initialized. Audio playback will not work.");
+            try {
+                tempMediaPlayer = new MediaPlayer(new Media(file.toURI().toString()));
+            } catch (IllegalStateException e) {
+                tempMediaPlayer = null;
+                logger.log(Level.SEVERE, "JavaFX Toolkit not initialized. Audio playback will not work.");
+            }
+
+            mediaPlayer = tempMediaPlayer;
+        } else {
+            mediaPlayer = null;
         }
-
-        mediaPlayer = tempMediaPlayer;
 
         // Generate audio samples
         generateSamples();
     }
 
+    /**
+     * Initializes an <code>Audio</code> object based on a file.
+     *
+     * @param file File object, representing the audio file.
+     * @throws IOException                   If there was a problem reading in the audio stream.
+     * @throws UnsupportedAudioFileException If there was a problem reading in the audio file.
+     */
+    public Audio(File file) throws UnsupportedAudioFileException, IOException {
+        this(file, true);
+    }
+
     // Getter/Setter methods
+
+    /**
+     * Getter method that returns the <b>absolute</b> audio file path.
+     *
+     * @return <b>Absolute</b> path to the audio file.
+     */
+    public String getAudioFilePath() {
+        return audioFilePath;
+    }
+
+    /**
+     * Getter method that returns the audio file's name.
+     *
+     * @return Name of the audio file.
+     */
+    public String getAudioFileName() {
+        return audioFileName;
+    }
 
     /**
      * Getter method that returns the sample rate of the audio file.
@@ -145,50 +184,83 @@ public class Audio {
 
     /**
      * Method that plays the audio.
+     *
+     * @throws InvalidObjectException If the media player was not initialized.
      */
-    public void playAudio() {
-        mediaPlayer.play();
+    public void playAudio() throws InvalidObjectException {
+        if (mediaPlayer != null) {
+            mediaPlayer.play();
+        } else {
+            throw new InvalidObjectException("Media player was not initialised.");
+        }
     }
 
     /**
      * Method that pauses the current audio that is playing.
+     *
+     * @throws InvalidObjectException If the media player was not initialized.
      */
-    public void pauseAudio() {
-        mediaPlayer.pause();
+    public void pauseAudio() throws InvalidObjectException {
+        if (mediaPlayer != null) {
+            mediaPlayer.pause();
+        } else {
+            throw new InvalidObjectException("Media player was not initialised.");
+        }
     }
 
     /**
      * Method that stops the audio.
+     *
+     * @throws InvalidObjectException If the media player was not initialized.
      */
-    public void stopAudio() {
-        mediaPlayer.stop();
+    public void stopAudio() throws InvalidObjectException {
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+        } else {
+            throw new InvalidObjectException("Media player was not initialised.");
+        }
     }
 
     /**
      * Set the current audio's playback time to <code>playbackTime</code> <b>seconds</b>.
      *
      * @param playbackTime The playback time in seconds.
+     * @throws InvalidObjectException If the media player was not initialized.
      */
-    public void setAudioPlaybackTime(double playbackTime) {
-        mediaPlayer.seek(new Duration(playbackTime * 1000));
+    public void setAudioPlaybackTime(double playbackTime) throws InvalidObjectException {
+        if (mediaPlayer != null) {
+            mediaPlayer.seek(new Duration(playbackTime * 1000));
+        } else {
+            throw new InvalidObjectException("Media player was not initialised.");
+        }
     }
 
     /**
      * Set the current audio's starting time to <code>startTime</code> <b>seconds</b>.
      *
      * @param startTime The start time of the audio in seconds.
+     * @throws InvalidObjectException If the media player was not initialized.
      */
-    public void setAudioStartTime(double startTime) {
-        mediaPlayer.setStartTime(new Duration(startTime * 1000));
+    public void setAudioStartTime(double startTime) throws InvalidObjectException {
+        if (mediaPlayer != null) {
+            mediaPlayer.setStartTime(new Duration(startTime * 1000));
+        } else {
+            throw new InvalidObjectException("Media player was not initialised.");
+        }
     }
 
     /**
      * Method that gets the current audio time in <b>seconds</b>.
      *
      * @return Returns the current audio time in <b>seconds</b>.
+     * @throws InvalidObjectException If the media player was not initialized.
      */
-    public double getCurrAudioTime() {
-        return mediaPlayer.getCurrentTime().toSeconds();
+    public double getCurrAudioTime() throws InvalidObjectException {
+        if (mediaPlayer != null) {
+            return mediaPlayer.getCurrentTime().toSeconds();
+        } else {
+            throw new InvalidObjectException("Media player was not initialised.");
+        }
     }
 
     /**
@@ -196,9 +268,14 @@ public class Audio {
      *
      * @param volume Volume value. This value should be in the interval [0, 1] where 0 means
      *               silent and 1 means full volume.
+     * @throws InvalidObjectException If the media player was not initialized.
      */
-    public void setPlaybackVolume(double volume) {
-        mediaPlayer.setVolume(volume);
+    public void setPlaybackVolume(double volume) throws InvalidObjectException {
+        if (mediaPlayer != null) {
+            mediaPlayer.setVolume(volume);
+        } else {
+            throw new InvalidObjectException("Media player was not initialised.");
+        }
     }
 
     // Public methods

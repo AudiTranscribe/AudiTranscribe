@@ -31,24 +31,29 @@
             <version>1.3</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.21</version>
+        </dependency>
+        <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-swing</artifactId>
-            <version>17.0.2</version>
+            <version>18.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>17.0.2</version>
+            <version>18.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>17.0.2</version>
+            <version>18.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-web</artifactId>
-            <version>17.0.2</version>
+            <version>18.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.controlsfx</groupId>
@@ -121,7 +126,8 @@
                             <launcher>AudiTranscribe</launcher>
                             <jlinkImageName>AudiTranscribe</jlinkImageName>
                             <jlinkZipName>AudiTranscribe</jlinkZipName>
-                            <mainClass>site.overwrite.auditranscribe/site.overwrite.auditranscribe.MainApplication</mainClass>
+                            <mainClass>site.overwrite.auditranscribe/site.overwrite.auditranscribe.MainApplication
+                            </mainClass>
                         </configuration>
                     </execution>
                 </executions>
@@ -148,5 +154,15 @@
                 </configuration>
             </plugin>
         </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources-filtered</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
 </project>

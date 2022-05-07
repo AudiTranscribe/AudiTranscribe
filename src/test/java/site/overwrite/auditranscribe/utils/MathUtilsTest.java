@@ -2,7 +2,7 @@
  * MathUtilsTest.java
  *
  * Created on 2022-03-12
- * Updated on 2022-03-14
+ * Updated on 2022-05-07
  *
  * Description: Test `MathUtils.java`.
  */
@@ -26,6 +26,13 @@ class MathUtilsTest {
         assertEquals(1, MathUtils.logN(Math.PI, Math.PI), 0.001);
         assertEquals(2.090, MathUtils.logN(123, 10), 0.001);
         assertEquals(1.272, MathUtils.logN(456, 123), 0.001);
+    }
+
+    @Test
+    void modWithMersennePrime() {
+        assertEquals(4, MathUtils.modWithMersennePrime(11, 3));
+        assertEquals(67, MathUtils.modWithMersennePrime(1337, 7));
+        assertEquals(7382, MathUtils.modWithMersennePrime(-9000, 13));
     }
 
     @Test
