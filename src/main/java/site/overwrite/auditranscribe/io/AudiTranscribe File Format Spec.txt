@@ -139,9 +139,8 @@ The audio data section corresponds to the following lines in the example file gi
 - The first 4 bytes `0x00000002` correspond to the section ID. The audio data section *has the
   section ID 2*.
 - The next 4 bytes `0x002468AC` corresponds to the number of bytes that are used to store
-  the audio file path.
-    - Note that this is the ABSOLUTE file path.
-- The next `0x002468AC` bytes is the audio file's name.
+  the audio data.
+- The next `0x002468AC` bytes are the compressed audio data.
 - The final 4 bytes correspond to the end-of-section delimiter, `0xE05E05E5`.
 
 =====
