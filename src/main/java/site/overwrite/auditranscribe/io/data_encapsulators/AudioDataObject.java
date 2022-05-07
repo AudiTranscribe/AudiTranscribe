@@ -2,7 +2,7 @@
  * AudioDataObject.java
  *
  * Created on 2022-05-06
- * Updated on 2022-05-06
+ * Updated on 2022-05-07
  *
  * Description: Data object that stores the audio data.
  */
@@ -11,6 +11,9 @@ package site.overwrite.auditranscribe.io.data_encapsulators;
 
 import java.util.Objects;
 
+/**
+ * Data object that stores the audio data.
+ */
 public class AudioDataObject extends AbstractDataObject {
     // Attributes
     public String audioFilePath;
