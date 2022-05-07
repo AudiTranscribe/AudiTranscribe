@@ -23,17 +23,18 @@ import java.util.List;
 
 public class AUDTFileWriter {
     // Attributes
-    public final String filename;
+    public final String filepath;
     private final List<Byte> bytes = new ArrayList<>();
 
     /**
      * Initialization method to make an <code>AUDTFileWriter</code> object.
      *
-     * @param filename File name of the AUDT file, <b>excluding extension</b>.
+     * @param filepath Path to the AUDT file. The file name at the end of the file path should
+     *                 <b>include</b> the extension of the AUDT file.
      */
-    public AUDTFileWriter(String filename) {
+    public AUDTFileWriter(String filepath) {
         // Update attributes
-        this.filename = filename;
+        this.filepath = filepath;
 
         // Write the header section
         writeHeaderSection();
@@ -59,7 +60,7 @@ public class AUDTFileWriter {
         }
 
         // Write the byte array to file
-        Files.write(new File(filename + ".audt").toPath(), byteArray);
+        Files.write(new File(filepath).toPath(), byteArray);
     }
 
     /**
@@ -81,6 +82,7 @@ public class AUDTFileWriter {
     public void writeAudioData(AudioDataObject audioDataObj) {
         writeSectionID(2);
         writeString(audioDataObj.audioFilePath);
+        writeDouble(audioDataObj.sampleRate);
         writeEOSDelimiter();
     }
 

@@ -2,7 +2,7 @@
  * AUDTFileTest.java
  *
  * Created on 2022-05-01
- * Updated on 2022-05-06
+ * Updated on 2022-05-07
  *
  * Description: Test AUDT file reading and writing.
  */
@@ -18,14 +18,14 @@ import site.overwrite.auditranscribe.io.exceptions.FailedToReadDataException;
 import site.overwrite.auditranscribe.io.exceptions.IncorrectFileFormatException;
 import site.overwrite.auditranscribe.utils.FileUtils;
 
-import java.io.File;
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class AUDTFileTest {
     // Define the file name
-    final String fileName = "src/main/resources/site/overwrite/auditranscribe/test-file-io-directory/test-AUDTFileTest";
+    final String fileName =
+            "src/main/resources/site/overwrite/auditranscribe/test-file-io-directory/test-AUDTFileTest.audt";
 
     // Define data to be used within the tests
     QTransformDataObject qTransformDataObject = new QTransformDataObject(
@@ -36,7 +36,8 @@ class AUDTFileTest {
             }
     );  // This is just an example array for the Q-Transform data
     AudioDataObject audioDataObject = new AudioDataObject(
-            FileUtils.getAbsoluteFilePath("testing-audio-files/A440.wav")
+            FileUtils.getAbsoluteFilePath("testing-audio-files/A440.wav"),
+            44100
     );
     GUIDataObject guiDataObject = new GUIDataObject(11, 9, 123.45, 0.01, 0.55, "Melancholy.wav", 120000, 9000);
 
@@ -53,18 +54,14 @@ class AUDTFileTest {
         fileWriter.writeGUIData(guiDataObject);
 
         // Write the bytes to file
-        try {
-            fileWriter.writeBytesToFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        fileWriter.writeBytesToFile();
     }
 
     @Test
     @Order(2)
     void fileReaderTest() throws IOException, IncorrectFileFormatException, FailedToReadDataException {
         // Create a filereader object
-        AUDTFileReader fileReader = new AUDTFileReader(fileName + ".audt");  // This needs the extension
+        AUDTFileReader fileReader = new AUDTFileReader(fileName);
 
         // Test reading some data
         QTransformDataObject readQTransformData = fileReader.readQTransformData();

@@ -24,7 +24,7 @@ import java.util.Arrays;
 
 public class AUDTFileReader {
     // Attributes
-    public final String filename;
+    public final String filepath;
     public int fileFormatVersion;
     public int lz4Version;
 
@@ -34,14 +34,25 @@ public class AUDTFileReader {
     /**
      * Initialization method to make an <code>AUDTFileReader</code> object.
      *
-     * @param filename File name of the AUDT file, <b>including extension</b>.
+     * @param filepath Path to the AUDT file. The file name at the end of the file path should
+     *                 <b>include</b> the extension of the AUDT file.
      */
-    public AUDTFileReader(String filename) throws IOException, IncorrectFileFormatException {
+    public AUDTFileReader(String filepath) throws IOException, IncorrectFileFormatException {
         // Update attributes
-        this.filename = filename;
+        this.filepath = filepath;
+
+        // Check extension
+        // (For simplicity assume the last 5 characters of the file path forms the extension)
+        int filepathLength = filepath.length();
+        if (!(
+                filepathLength >= 5 &&
+                        filepath.substring(filepathLength - 5, filepathLength).equalsIgnoreCase(".audt")
+        )) {
+            throw new IncorrectFileFormatException("The file is not an AUDT file. Is the extension correct?");
+        }
 
         // Read bytes in from file
-        try (InputStream inputStream = new FileInputStream(filename)) {
+        try (InputStream inputStream = new FileInputStream(filepath)) {
             bytes = inputStream.readAllBytes();
 
             // Verify that the header section is correct
@@ -109,6 +120,7 @@ public class AUDTFileReader {
 
         // Read in the rest of the data
         String audioFilePath = readString();
+        double sampleRate = readDouble();
 
         // Check if there is an EOS
         if (!checkEOSDelimiter()) {
@@ -116,7 +128,7 @@ public class AUDTFileReader {
         }
 
         // Create and return an `AudioDataObject`
-        return new AudioDataObject(audioFilePath);
+        return new AudioDataObject(audioFilePath, sampleRate);
     }
 
     /**

@@ -2,7 +2,7 @@
  * GUIDataObject.java
  *
  * Created on 2022-05-02
- * Updated on 2022-05-02
+ * Updated on 2022-05-07
  *
  * Description: Data object that stores the GUI data.
  */
@@ -58,14 +58,15 @@ public class GUIDataObject extends AbstractDataObject {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GUIDataObject that = (GUIDataObject) o;
-        return (musicKeyIndex == that.musicKeyIndex &&
-                timeSignatureIndex == that.timeSignatureIndex &&
-                Double.compare(that.bpm, bpm) == 0 &&
-                Double.compare(that.offsetSeconds, offsetSeconds) == 0 &&
-                Double.compare(that.playbackVolume, playbackVolume) == 0 &&
-                Objects.equals(audioFileName, that.audioFileName) &&
-                totalDurationInMS == that.totalDurationInMS &&
-                currTimeInMS == that.currTimeInMS
+        return (
+                musicKeyIndex == that.musicKeyIndex &&
+                        timeSignatureIndex == that.timeSignatureIndex &&
+                        Double.compare(that.bpm, bpm) == 0 &&
+                        Double.compare(that.offsetSeconds, offsetSeconds) == 0 &&
+                        Double.compare(that.playbackVolume, playbackVolume) == 0 &&
+                        Objects.equals(audioFileName, that.audioFileName) &&
+                        totalDurationInMS == that.totalDurationInMS &&
+                        currTimeInMS == that.currTimeInMS
         );
     }
 

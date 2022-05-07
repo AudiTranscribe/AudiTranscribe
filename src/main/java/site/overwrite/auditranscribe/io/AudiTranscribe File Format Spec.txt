@@ -51,6 +51,7 @@ Notes on the convention of the format described below:
     |                AUDIO DATA               |
     |                GOES HERE                |
     -------------------------------------------
+    0x40e58880 0x00000000
     0xE05E05E5
 
     0x00000003
@@ -134,6 +135,7 @@ The audio data section corresponds to the following lines in the example file gi
     |                AUDIO DATA               |
     |                GOES HERE                |
     -------------------------------------------
+    0x40e58880 0x00000000
     0xE05E05E5
 
 - The first 4 bytes `0x00000002` correspond to the section ID. The audio data section *has the
@@ -141,6 +143,7 @@ The audio data section corresponds to the following lines in the example file gi
 - The next 4 bytes `0x002468AC` corresponds to the number of bytes that are used to store
   the audio data.
 - The next `0x002468AC` bytes are the compressed audio data.
+- The following 8 bytes `0x40e58880 0x00000000` is the sample rate of the audio file.
 - The final 4 bytes correspond to the end-of-section delimiter, `0xE05E05E5`.
 
 =====
