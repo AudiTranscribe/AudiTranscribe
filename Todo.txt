@@ -6,18 +6,24 @@ Todo (Important):
     - Allow other audio types (e.g. mp3) to be input into the program
     - Add progress bars
     - Implement file saving
-        - We would probably save the spectrogram data as that takes the longest to generate
+        - Save sample rate to the file as well
+        - Allow scrolling to the position of the playhead
+    - Add toolbar options
+    - Add settings page
+        - Need to allow for configuration of audio devices
 
 Todo (Less Important):
     - Add licence/credits for ionicons
     - BPM Estimation
     - Add keyboard shortcuts
+    - Add "Save File As" button
 
 Todo (Not Important):
     - Compress the filter data
 
 ====================================================================================================
 Fixme:
-    - None
+    - When saving file, current time is saved incorrectly
+        - The seek time is not taken into consideration
 
 ====================================================================================================

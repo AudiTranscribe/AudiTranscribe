@@ -30,7 +30,7 @@ public class AUDTFileWriter {
      * Initialization method to make an <code>AUDTFileWriter</code> object.
      *
      * @param filepath Path to the AUDT file. The file name at the end of the file path should
-     *                 <b>exclude</b> the extension of the AUDT file.
+     *                 <b>include</b> the extension of the AUDT file.
      */
     public AUDTFileWriter(String filepath) {
         // Update attributes
@@ -60,7 +60,7 @@ public class AUDTFileWriter {
         }
 
         // Write the byte array to file
-        Files.write(new File(filepath + ".audt").toPath(), byteArray);
+        Files.write(new File(filepath).toPath(), byteArray);
     }
 
     /**

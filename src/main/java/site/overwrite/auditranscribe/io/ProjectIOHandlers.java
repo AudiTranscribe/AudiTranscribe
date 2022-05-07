@@ -2,7 +2,7 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-05-04
+ * Updated on 2022-05-07
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
@@ -23,6 +23,9 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import site.overwrite.auditranscribe.audio.Audio;
+import site.overwrite.auditranscribe.io.data_encapsulators.*;
+import site.overwrite.auditranscribe.io.exceptions.*;
+import site.overwrite.auditranscribe.io.file_handers.*;
 import site.overwrite.auditranscribe.utils.FileUtils;
 import site.overwrite.auditranscribe.views.SpectrogramViewController;
 
@@ -39,9 +42,9 @@ public class ProjectIOHandlers {
     // Public methods
 
     /**
-     * Helper method that handles the creation of a new AudiTranscribe project.
+     * Method that handles the creation of a new AudiTranscribe project.
      *
-     * @param actionEvent Event that triggered this function.
+     * @param actionEvent Event that triggered this method.
      */
     public static void newProject(ActionEvent actionEvent) {
         // Get current window
@@ -57,9 +60,9 @@ public class ProjectIOHandlers {
                 // Try and read the file as an audio file
                 Audio audio = new Audio(file);  // Failure to read will throw an exception
 
+                // Todo: extract this code into another method (to make it more DRY)
                 // Get the current stage
                 Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-                stage.setUserData(file);
 
                 // Close the current stage
                 stage.close();
@@ -68,13 +71,16 @@ public class ProjectIOHandlers {
                 FXMLLoader fxmlLoader = new FXMLLoader(
                         FileUtils.getFileURL("views/fxml/spectrogram-view.fxml")
                 );
-                Scene scene;
 
                 // Get the spectrogram view scene
-                scene = new Scene(fxmlLoader.load());
+                Scene scene = new Scene(fxmlLoader.load());
 
-                // After initialization set the audio file for the spectrogram
-                ((SpectrogramViewController) fxmlLoader.getController()).setAudioFile(audio);
+                // Get the spectrogram view controller
+                SpectrogramViewController controller = fxmlLoader.getController();
+
+                // Set the project data for the existing project
+                controller.setAudioAndSpectrogramData(audio);
+                controller.finishSetup();
 
                 // Set the new scene
                 stage.setScene(scene);
@@ -89,39 +95,12 @@ public class ProjectIOHandlers {
                 stage.show();
 
             } catch (UnsupportedAudioFileException | IOException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.initStyle(StageStyle.UTILITY);
-                alert.setTitle("Error");
-                alert.setHeaderText("Failed to read '" + file.getName() + "' as a WAV file.");
-                alert.setContentText(
-                        "The program failed to read '" + file.getName() + "' as a WAV file. Please check if " +
-                                "this is a valid WAV file."
+                showExceptionAlert(
+                        "Failed to read '" + file.getName() + "' as a WAV file.",
+                        "The program failed to read '" + file.getName() +
+                                "' as a WAV file. Please check if " + "this is a valid WAV file.",
+                        e
                 );
-
-                Label label = new Label("The exception stacktrace was:");
-
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                e.printStackTrace(pw);
-
-                TextArea textArea = new TextArea(sw.toString());
-                textArea.setEditable(false);
-                textArea.setWrapText(true);
-
-                textArea.setMaxWidth(Double.MAX_VALUE);
-                textArea.setMaxHeight(Double.MAX_VALUE);
-                GridPane.setVgrow(textArea, Priority.ALWAYS);
-                GridPane.setHgrow(textArea, Priority.ALWAYS);
-
-                GridPane expContent = new GridPane();
-                expContent.setMaxWidth(Double.MAX_VALUE);
-                expContent.add(label, 0, 0);
-                expContent.add(textArea, 0, 1);
-
-                // Set expandable Exception into the dialog pane.
-                alert.getDialogPane().setExpandableContent(expContent);
-
-                alert.showAndWait();
             }
 
         } else {
@@ -133,5 +112,147 @@ public class ProjectIOHandlers {
 
             alert.showAndWait();
         }
+    }
+
+    /**
+     * Method that handles the opening of an existing AudiTranscribe project.
+     *
+     * @param actionEvent Event that triggered this method.
+     */
+    public static void openProject(ActionEvent actionEvent) {
+        // Get current window
+        Window window = ((Node) actionEvent.getSource()).getScene().getWindow();
+
+        // Ask user to choose a file
+        FileChooser fileChooser = new FileChooser();
+        File file = fileChooser.showOpenDialog(window);
+
+        // Verify that the user choose a file
+        if (file != null) {
+            try {
+                // Try and read the file as an AUDT file
+                String audtFilePath = file.getAbsolutePath();
+                AUDTFileReader reader = new AUDTFileReader(audtFilePath);
+
+                // Read the data from the file
+                QTransformDataObject qTransformData = reader.readQTransformData();
+                AudioDataObject audioData = reader.readAudioData();
+                GUIDataObject guiData = reader.readGUIData();
+
+                // Pass these data into a `ProjectDataObject`
+                ProjectDataObject projectDataObject = new ProjectDataObject(
+                        qTransformData, audioData, guiData
+                );
+
+                // Todo: extract this code into another method (to make it more DRY)
+                // Get the current stage
+                Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+
+                // Close the current stage
+                stage.close();
+
+                // Get the FXML loader for the spectrogram view
+                FXMLLoader fxmlLoader = new FXMLLoader(
+                        FileUtils.getFileURL("views/fxml/spectrogram-view.fxml")
+                );
+
+                // Get the spectrogram view scene
+                Scene scene = new Scene(fxmlLoader.load());
+
+                // Get the spectrogram view controller
+                SpectrogramViewController controller = fxmlLoader.getController();
+
+                // Set the project data for the existing project
+                controller.useExistingData(audtFilePath, projectDataObject);
+                controller.finishSetup();
+
+                // Set the new scene
+                stage.setScene(scene);
+
+                // Set new scene properties
+                stage.setMaximized(true);
+                stage.setFullScreen(true);
+                stage.setResizable(false);
+                stage.setTitle(projectDataObject.guiData.audioFileName);
+
+                // Show the new scene
+                stage.show();
+
+            } catch (IOException | IncorrectFileFormatException | FailedToReadDataException e) {
+                showExceptionAlert(
+                        "Failed to read '" + file.getName() + "' as an AUDT ile.",
+                        "The program failed to read '" + file.getName() +
+                                "' as an AUDT file. Please check if " + "this is a valid AUDT file.",
+                        e
+                );
+            }
+        }
+    }
+
+    /**
+     * Method that handles the saving of an AudiTranscribe project.
+     *
+     * @param filepath          Path to the AUDT file.
+     * @param projectDataObject Data object that stores all the data for the project.
+     * @throws IOException If the writing to file encounters an error.
+     */
+    public static void saveProject(String filepath, ProjectDataObject projectDataObject) throws IOException {
+        // Declare the file writer object
+        AUDTFileWriter fileWriter = new AUDTFileWriter(filepath);
+
+        // Write data to the file
+        fileWriter.writeQTransformData(projectDataObject.qTransformData);
+        fileWriter.writeAudioData(projectDataObject.audioData);
+        fileWriter.writeGUIData(projectDataObject.guiData);
+
+        fileWriter.writeBytesToFile();
+    }
+
+    // Private methods
+
+    /**
+     * Helper method that shows an exception alert.
+     *
+     * @param headerText  Header text for the exception alert.
+     * @param contentText Content text for the exception alert.
+     * @param e           Exception that occurred.
+     */
+    private static void showExceptionAlert(String headerText, String contentText, Exception e) {
+        // Create a new error alert
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+
+        // Set the alert style to `UTILITY` so that it can be shown during fullscreen
+        alert.initStyle(StageStyle.UTILITY);
+
+        // Set texts
+        alert.setTitle("Error");
+        alert.setHeaderText(headerText);
+        alert.setContentText(contentText);
+
+        // Set exception texts
+        Label label = new Label("The exception stacktrace was:");
+
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+
+        TextArea textArea = new TextArea(sw.toString());
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+        GridPane.setVgrow(textArea, Priority.ALWAYS);
+        GridPane.setHgrow(textArea, Priority.ALWAYS);
+
+        GridPane expContent = new GridPane();
+        expContent.setMaxWidth(Double.MAX_VALUE);
+        expContent.add(label, 0, 0);
+        expContent.add(textArea, 0, 1);
+
+        alert.getDialogPane().setExpandableContent(expContent);
+
+        // Show the alert
+        alert.showAndWait();
     }
 }

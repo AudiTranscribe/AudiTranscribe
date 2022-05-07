@@ -2,7 +2,7 @@
  * Audio.java
  *
  * Created on 2022-02-13
- * Updated on 2022-05-06
+ * Updated on 2022-05-07
  *
  * Description: Class that handles audio processing and audio playback.
  */
@@ -33,6 +33,9 @@ public class Audio {
     public static final int SAMPLES_BUFFER_SIZE = 1024;  // In bits
 
     // Attributes
+    private final String audioFilePath;
+    private final String audioFileName;
+
     private final AudioInputStream audioStream;
     private final AudioFormat audioFormat;
     private final double sampleRate;
@@ -57,6 +60,10 @@ public class Audio {
      * @throws UnsupportedAudioFileException If there was a problem reading in the audio file.
      */
     public Audio(File file, boolean useMediaPlayer) throws UnsupportedAudioFileException, IOException {
+        // Set the audio file path and file name
+        audioFileName = file.getName();
+        audioFilePath = file.getAbsolutePath();
+
         // Attempt to convert the input stream into an audio input stream
         InputStream bufferedIn = new BufferedInputStream(new FileInputStream(file));
         audioStream = AudioSystem.getAudioInputStream(bufferedIn);
@@ -98,6 +105,24 @@ public class Audio {
     }
 
     // Getter/Setter methods
+
+    /**
+     * Getter method that returns the <b>absolute</b> audio file path.
+     *
+     * @return <b>Absolute</b> path to the audio file.
+     */
+    public String getAudioFilePath() {
+        return audioFilePath;
+    }
+
+    /**
+     * Getter method that returns the audio file's name.
+     *
+     * @return Name of the audio file.
+     */
+    public String getAudioFileName() {
+        return audioFileName;
+    }
 
     /**
      * Getter method that returns the sample rate of the audio file.
