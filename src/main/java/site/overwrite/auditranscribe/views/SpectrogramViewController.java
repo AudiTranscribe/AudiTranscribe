@@ -434,57 +434,7 @@ public class SpectrogramViewController implements Initializable {
         }
 
         // Set keyboard button press methods
-        mainPane.getScene().addEventFilter(KeyEvent.KEY_PRESSED, (KeyEvent keyEvent) -> {
-            keyEvent.consume();
-
-            switch (keyEvent.getCode()) {
-                // Space and K key is to toggle the play button
-                case SPACE -> togglePlayButton();
-                case K -> togglePlayButton();
-
-                // Up/Down arrows are to adjust volume
-                case UP -> volumeSlider.setValue(volumeSlider.getValue() + VOLUME_VALUE_DELTA_ON_KEY_PRESS);
-                case DOWN -> volumeSlider.setValue(volumeSlider.getValue() - VOLUME_VALUE_DELTA_ON_KEY_PRESS);
-
-                // M key is to mute/unmute
-                case M -> toggleMuteButton();
-
-                // Left/Right arrows are to seek 0.5 seconds before/ahead
-                case LEFT -> {
-                    try {
-                        seekToTime(currTime - 0.5);
-                    } catch (InvalidObjectException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                case RIGHT -> {
-                    try {
-                        seekToTime(currTime + 0.5);
-                    } catch (InvalidObjectException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-
-                // J/L keys are to seek 1 second before/ahead
-                case J -> {
-                    try {
-                        seekToTime(currTime - 1);
-                    } catch (InvalidObjectException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-                case L -> {
-                    try {
-                        seekToTime(currTime + 1);
-                    } catch (InvalidObjectException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-
-                // S key is to toggle seeking to playhead
-                case S -> toggleScrollButton();
-            }
-        });
+        mainPane.getScene().addEventFilter(KeyEvent.KEY_PRESSED, this::keyboardPressEventHandler);
 
         // Ensure main pane is in focus
         mainPane.requestFocus();
@@ -944,5 +894,44 @@ public class SpectrogramViewController implements Initializable {
         isMuted = !isMuted;
 
         logger.log(Level.FINE, "Toggled mute button (muted is now " + isMuted + ")");
+    }
+
+    /**
+     * Helper method that handles a keyboard press event.
+     * @param keyEvent  Key event.
+     */
+    private void keyboardPressEventHandler(KeyEvent keyEvent) {
+        keyEvent.consume();
+
+        switch (keyEvent.getCode()) {
+            // Space bar is to toggle the play button
+            case SPACE -> togglePlayButton();
+
+            // Up/Down arrows are to adjust volume
+            case UP -> volumeSlider.setValue(volumeSlider.getValue() + VOLUME_VALUE_DELTA_ON_KEY_PRESS);
+            case DOWN -> volumeSlider.setValue(volumeSlider.getValue() - VOLUME_VALUE_DELTA_ON_KEY_PRESS);
+
+            // M key is to mute/unmute
+            case M -> toggleMuteButton();
+
+            // Left/Right arrows are to seek 1 second before/ahead
+            case LEFT -> {
+                try {
+                    seekToTime(currTime - 1);
+                } catch (InvalidObjectException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            case RIGHT -> {
+                try {
+                    seekToTime(currTime + 1);
+                } catch (InvalidObjectException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            // S key is to toggle seeking to playhead
+            case S -> toggleScrollButton();
+        }
     }
 }
