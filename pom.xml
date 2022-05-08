@@ -153,6 +153,38 @@
                     <mainClass>MainApplication</mainClass>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.panteleyev</groupId>
+                <artifactId>jpackage-maven-plugin</artifactId>
+                <version>1.4.0</version>
+                <configuration>
+                    <name>AudiTranscribe</name>
+                    <appVersion>1.0.0</appVersion>
+                    <vendor>site.overwrite</vendor>
+                    <destination>target/dist</destination>
+                    <module>site.overwrite.auditranscribe/site.overwrite.auditranscribe.MainApplication</module>
+                    <runtimeImage>target/AudiTranscribe</runtimeImage>
+                    <javaOptions>
+                        <option>-Dfile.encoding=UTF-8</option>
+                    </javaOptions>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>mac</id>
+                        <configuration>
+                            <icon>${project.basedir}/designs/icons/icon.icns</icon>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>win</id>
+                        <configuration>
+                            <icon>${project.basedir}/designs/icons/icon.ico</icon>
+                            <winMenu>true</winMenu>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
 
         <resources>
