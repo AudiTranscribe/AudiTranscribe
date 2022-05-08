@@ -1,6 +1,5 @@
 ====================================================================================================
 Todo (Important):
-    - Update README.md
     - Allow other audio types (e.g. mp3) to be input into the program
     - Add progress bars
     - Add toolbar options
