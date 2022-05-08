@@ -1,6 +1,6 @@
 ====================================================================================================
 Todo (Important):
-    - Add JPackage capability
+    - Add JPackage integration
     - Update README.md
     - Allow other audio types (e.g. mp3) to be input into the program
     - Add progress bars
