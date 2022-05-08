@@ -2,7 +2,7 @@
  * SpectrogramViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-07
+ * Updated on 2022-05-08
  *
  * Description: Contains the spectrogram view's controller class.
  */
@@ -10,6 +10,7 @@
 package site.overwrite.auditranscribe.views;
 
 import javafx.application.Platform;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -17,6 +18,10 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -79,6 +84,12 @@ public class SpectrogramViewController implements Initializable {
     final long UPDATE_PLAYBACK_SCHEDULER_PERIOD = 50;  // In milliseconds
 
     final boolean USE_FANCY_SHARPS_FOR_NOTE_LABELS = true;
+
+    final double VOLUME_VALUE_DELTA_ON_KEY_PRESS = 0.05;
+
+    final KeyCodeCombination NEW_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN);
+    final KeyCodeCombination OPEN_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN);
+    final KeyCodeCombination SAVE_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN);
 
     // File-Savable Attributes
     private double sampleRate;  // Sample rate of the audio
@@ -153,117 +164,6 @@ public class SpectrogramViewController implements Initializable {
 
     @FXML
     private Slider volumeSlider;
-
-    // Helper methods
-    protected boolean togglePaused(boolean isPaused) {
-        if (isPaused) {
-            // Change the icon of the play button from the play icon to the paused icon
-            playButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/pause.png")));
-
-            // Unpause the audio (i.e. play the audio)
-            try {
-                audio.playAudio();
-            } catch (InvalidObjectException e) {
-                throw new RuntimeException(e);
-            }
-
-        } else {
-            // Change the icon of the play button from the paused icon to the play icon
-            playButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/play.png")));
-
-            // Pause the audio
-            try {
-                audio.pauseAudio();
-            } catch (InvalidObjectException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        // Return the toggled version of the `isPaused` flag
-        logger.log(Level.FINE, "Toggled pause state from " + isPaused + " to " + !isPaused);
-        return !isPaused;
-    }
-
-    protected void seekToTime(double seekTime) throws InvalidObjectException {
-        // Update the start time of the audio
-        // (Do this so that when the player resumes out of a stop state it will start here)
-        audio.setAudioStartTime(seekTime);
-
-        // Set the playback time
-        // (We do this after updating start time to avoid pesky seeking issues)
-        audio.setAudioPlaybackTime(seekTime);
-
-        // Update the current time and current time label
-        currTime = seekTime;
-        currTimeLabel.setText(UnitConversion.secondsToTimeString(seekTime));
-
-        // Update coloured progress pane and playhead line
-        double newXPos = seekTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X;
-
-        colouredProgressPane.setPrefWidth(newXPos);
-        PlottingStuffHandler.updatePlayheadLine(playheadLine, newXPos);
-
-        logger.log(Level.FINE, "Seeked to " + seekTime + " seconds");
-    }
-
-    // Value updating methods
-    protected void updateBPMValue(double newBPM, boolean forceUpdate) {
-        // Get the previous BPM value
-        double oldBPM = forceUpdate ? -1 : bpm;
-
-        // Update the beat lines
-        beatLines = PlottingStuffHandler.updateBeatLines(
-                spectrogramPaneAnchor, beatLines, audioDuration, oldBPM, newBPM, offset, offset, finalHeight, beatsPerBar,
-                beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
-        );
-
-        // Update the bar number ellipses
-        barNumberEllipses = PlottingStuffHandler.updateBarNumberEllipses(
-                barNumberPane, barNumberEllipses, audioDuration, oldBPM, newBPM, offset, offset,
-                barNumberPane.getPrefHeight(), beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
-        );
-
-        // Update the BPM value
-        if (!forceUpdate) {
-            logger.log(Level.FINE, "Updated BPM value from " + bpm + " to " + newBPM);
-        } else {
-            logger.log(Level.FINE, "Force update BPM value to " + newBPM);
-        }
-        bpm = newBPM;
-    }
-
-    protected void updateBPMValue(double newBPM) {
-        updateBPMValue(newBPM, false);
-    }
-
-    protected void updateOffsetValue(double newOffset, boolean forceUpdate) {
-        // Get the previous offset value
-        double oldOffset = forceUpdate ? OFFSET_RANGE.getKey() - 1 : offset;  // Make it 1 less than permitted
-
-        // Update the beat lines
-        beatLines = PlottingStuffHandler.updateBeatLines(
-                spectrogramPaneAnchor, beatLines, audioDuration, bpm, bpm, oldOffset, newOffset, finalHeight,
-                beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
-        );
-
-        // Update the bar number ellipses
-        barNumberEllipses = PlottingStuffHandler.updateBarNumberEllipses(
-                barNumberPane, barNumberEllipses, audioDuration, bpm, bpm, oldOffset, newOffset,
-                barNumberPane.getPrefHeight(), beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
-        );
-
-        // Update the offset value
-        if (!forceUpdate) {
-            logger.log(Level.FINE, "Updated offset value from " + offset + " to " + newOffset);
-        } else {
-            logger.log(Level.FINE, "Force update offset value to " + newOffset);
-        }
-        offset = newOffset;
-    }
-
-    protected void updateOffsetValue(double newOffset) {
-        updateOffsetValue(newOffset, false);
-    }
 
     // Initialization method
     @Override
@@ -355,61 +255,9 @@ public class SpectrogramViewController implements Initializable {
 
         openProjectButton.setOnAction(ProjectIOHandlers::openProject);
 
-        saveProjectButton.setOnAction(event -> {
-            // Allow user to select save location if `audtFilePath` is unset
-            if (audtFilePath == null) {
-                logger.log(Level.FINE, "AUDT file destination not yet set; asking now");
+        saveProjectButton.setOnAction(this::handleSavingProject);
 
-                // Get current window
-                javafx.stage.Window window = ((Node) event.getSource()).getScene().getWindow();
-
-                // Ask user to choose a file
-                FileChooser fileChooser = new FileChooser();
-                File file = fileChooser.showSaveDialog(window);
-                audtFilePath = file.getAbsolutePath();
-                if (!audtFilePath.toLowerCase().endsWith(".audt")) audtFilePath += ".audt";
-
-                logger.log(Level.FINE, "AUDT file destination set to " + audtFilePath);
-            }
-
-            // Package all the current data into a `ProjectDataObject`
-            logger.log(Level.INFO, "Packaging data for saving");
-            QTransformDataObject qTransformData = new QTransformDataObject(
-                    magnitudes
-            );
-            AudioDataObject audioData = new AudioDataObject(
-                    audioFilePath, sampleRate
-            );
-            GUIDataObject guiData = new GUIDataObject(
-                    musicKeyIndex, timeSignatureIndex, bpm, offset, volume, audioFileName,
-                    (int) (audioDuration * 1000), (int) (currTime * 1000)
-            );
-
-            ProjectDataObject projectData = new ProjectDataObject(
-                    qTransformData, audioData, guiData
-            );
-
-            // Save the project
-            try {
-                ProjectIOHandlers.saveProject(audtFilePath, projectData);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            logger.log(Level.INFO, "File saved");
-        });
-
-        playButton.setOnAction(event -> {
-            logger.log(Level.FINE, "Pressed play button");
-
-            if (currTime == audioDuration) {
-                try {
-                    audio.setAudioPlaybackTime(0);
-                } catch (InvalidObjectException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            isPaused = togglePaused(isPaused);
-        });
+        playButton.setOnAction(event -> togglePlayButton());
 
         stopButton.setOnAction(event -> {
             logger.log(Level.FINE, "Pressed stop button");
@@ -461,50 +309,9 @@ public class SpectrogramViewController implements Initializable {
             isPaused = togglePaused(true);
         });
 
-        volumeButton.setOnAction(event -> {
-            if (isMuted) {
-                // Change the icon of the volume button from mute to non-mute
-                volumeButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/volume-high.png")));
+        volumeButton.setOnAction(event -> toggleMuteButton());
 
-                // Unmute the audio by setting the volume back to the value before the mute
-                try {
-                    audio.setPlaybackVolume(volume);
-                } catch (InvalidObjectException e) {
-                    throw new RuntimeException(e);
-                }
-            } else {
-                // Change the icon of the volume button from non-mute to mute
-                volumeButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/volume-mute.png")));
-
-                // Mute the audio by setting the volume to zero
-                try {
-                    audio.setPlaybackVolume(0);
-                } catch (InvalidObjectException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            // Toggle the `isMuted` flag
-            isMuted = !isMuted;
-
-            logger.log(Level.FINE, "Pressed volume toggle button (muted is now " + isMuted + ")");
-        });
-
-        scrollButton.setOnAction(event -> {
-            if (scrollToPlayhead) {
-                // Change the icon of the scroll button from filled to non-filled
-                scrollButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/footsteps-outline.png")));
-
-            } else {
-                // Change the icon of the scroll button from non-filled to filled
-                scrollButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/footsteps-filled.png")));
-            }
-
-            // Toggle the `scrollToPlayhead` flag
-            scrollToPlayhead = !scrollToPlayhead;
-
-            logger.log(Level.FINE, "Pressed scroll toggle button (scroll is now " + scrollToPlayhead + ")");
-        });
+        scrollButton.setOnAction(event -> toggleScrollButton());
 
         // Set method on the volume slider
         volumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -592,6 +399,12 @@ public class SpectrogramViewController implements Initializable {
         } catch (InvalidObjectException e) {
             throw new RuntimeException(e);
         }
+
+        // Set keyboard button press methods
+        mainPane.getScene().addEventFilter(KeyEvent.KEY_PRESSED, this::keyboardPressEventHandler);
+
+        // Ensure main pane is in focus
+        mainPane.requestFocus();
     }
 
     /**
@@ -691,7 +504,7 @@ public class SpectrogramViewController implements Initializable {
     /**
      * Method that updates the scrolling of the page to center the playhead.
      *
-     * @param newPosX   New X position.
+     * @param newPosX New X position.
      */
     public void updateScrollPosition(double newPosX) {
         // Get the 'half width' of the spectrogram area
@@ -708,11 +521,209 @@ public class SpectrogramViewController implements Initializable {
             spectrogramPane.setHvalue(1);
         } else {
             // Otherwise, update the H-value accordingly so that the view is centered on the playhead
-            spectrogramPane.setHvalue((newPosX - spectrogramAreaHalfWidth) / (finalWidth - 2 * spectrogramAreaHalfWidth));
+            spectrogramPane.setHvalue(
+                    (newPosX - spectrogramAreaHalfWidth) / (finalWidth - 2 * spectrogramAreaHalfWidth)
+            );
         }
     }
 
     // Private methods
+
+    /**
+     * Helper method that seeks to the specified time.
+     *
+     * @param seekTime Time to seek to.
+     * @throws InvalidObjectException If the <code>MediaPlayer</code> object was not defined in the
+     *                                audio object.
+     */
+    private void seekToTime(double seekTime) throws InvalidObjectException {
+        // Ensure that the `seekTime` stays within range
+        if (seekTime < 0) seekTime = 0;
+        if (seekTime > audioDuration) seekTime = audioDuration;
+
+        // Update the start time of the audio
+        // (Do this so that when the player resumes out of a stop state it will start here)
+        audio.setAudioStartTime(seekTime);
+
+        // Set the playback time
+        // (We do this after updating start time to avoid pesky seeking issues)
+        audio.setAudioPlaybackTime(seekTime);
+
+        // Update the current time and current time label
+        currTime = seekTime;
+        currTimeLabel.setText(UnitConversion.secondsToTimeString(seekTime));
+
+        // Update coloured progress pane and playhead line
+        double newXPos = seekTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X;
+
+        colouredProgressPane.setPrefWidth(newXPos);
+        PlottingStuffHandler.updatePlayheadLine(playheadLine, newXPos);
+
+        logger.log(Level.FINE, "Seeked to " + seekTime + " seconds");
+    }
+
+    /**
+     * Helper method that handles the saving of the project.
+     *
+     * @param event Event that triggered this function.
+     */
+    private void handleSavingProject(Event event) {
+        // Allow user to select save location if `audtFilePath` is unset
+        if (audtFilePath == null) {
+            logger.log(Level.FINE, "AUDT file destination not yet set; asking now");
+
+            // Get current window
+            javafx.stage.Window window = ((Node) event.getSource()).getScene().getWindow();
+
+            // Ask user to choose a file
+            FileChooser fileChooser = new FileChooser();
+            File file = fileChooser.showSaveDialog(window);
+            audtFilePath = file.getAbsolutePath();
+            if (!audtFilePath.toLowerCase().endsWith(".audt")) audtFilePath += ".audt";
+
+            logger.log(Level.FINE, "AUDT file destination set to " + audtFilePath);
+        }
+
+        // Package all the current data into a `ProjectDataObject`
+        logger.log(Level.INFO, "Packaging data for saving");
+        QTransformDataObject qTransformData = new QTransformDataObject(
+                magnitudes
+        );
+        AudioDataObject audioData = new AudioDataObject(
+                audioFilePath, sampleRate
+        );
+        GUIDataObject guiData = new GUIDataObject(
+                musicKeyIndex, timeSignatureIndex, bpm, offset, volume, audioFileName,
+                (int) (audioDuration * 1000), (int) (currTime * 1000)
+        );
+
+        ProjectDataObject projectData = new ProjectDataObject(
+                qTransformData, audioData, guiData
+        );
+
+        // Save the project
+        try {
+            ProjectIOHandlers.saveProject(audtFilePath, projectData);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        logger.log(Level.INFO, "File saved");
+    }
+
+    /**
+     * Helper method that toggles the paused state.
+     *
+     * @param isPaused Old paused state.
+     * @return New paused state.
+     */
+    private boolean togglePaused(boolean isPaused) {
+        if (isPaused) {
+            // Change the icon of the play button from the play icon to the paused icon
+            playButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/pause.png")));
+
+            // Unpause the audio (i.e. play the audio)
+            try {
+                audio.playAudio();
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
+
+        } else {
+            // Change the icon of the play button from the paused icon to the play icon
+            playButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/play.png")));
+
+            // Pause the audio
+            try {
+                audio.pauseAudio();
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        // Return the toggled version of the `isPaused` flag
+        logger.log(Level.FINE, "Toggled pause state from " + isPaused + " to " + !isPaused);
+        return !isPaused;
+    }
+
+    /**
+     * Helper method that helps update the needed things when the BPM value is to be updated.
+     *
+     * @param newBPM      New BPM value.
+     * @param forceUpdate Whether to force an update to the BPM value.
+     */
+    private void updateBPMValue(double newBPM, boolean forceUpdate) {
+        // Get the previous BPM value
+        double oldBPM = forceUpdate ? -1 : bpm;
+
+        // Update the beat lines
+        beatLines = PlottingStuffHandler.updateBeatLines(
+                spectrogramPaneAnchor, beatLines, audioDuration, oldBPM, newBPM, offset, offset, finalHeight, beatsPerBar,
+                beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+        );
+
+        // Update the bar number ellipses
+        barNumberEllipses = PlottingStuffHandler.updateBarNumberEllipses(
+                barNumberPane, barNumberEllipses, audioDuration, oldBPM, newBPM, offset, offset,
+                barNumberPane.getPrefHeight(), beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+        );
+
+        // Update the BPM value
+        if (!forceUpdate) {
+            logger.log(Level.FINE, "Updated BPM value from " + bpm + " to " + newBPM);
+        } else {
+            logger.log(Level.FINE, "Force update BPM value to " + newBPM);
+        }
+        bpm = newBPM;
+    }
+
+    /**
+     * Helper method that helps update the needed things when the BPM value is to be updated.
+     *
+     * @param newBPM New BPM value.
+     */
+    private void updateBPMValue(double newBPM) {
+        updateBPMValue(newBPM, false);
+    }
+
+    /**
+     * Helper method that helps update the needed things when the offset value is to be updated.
+     *
+     * @param newOffset   New offset value.
+     * @param forceUpdate Whether to force an update to the offset value.
+     */
+    private void updateOffsetValue(double newOffset, boolean forceUpdate) {
+        // Get the previous offset value
+        double oldOffset = forceUpdate ? OFFSET_RANGE.getKey() - 1 : offset;  // Make it 1 less than permitted
+
+        // Update the beat lines
+        beatLines = PlottingStuffHandler.updateBeatLines(
+                spectrogramPaneAnchor, beatLines, audioDuration, bpm, bpm, oldOffset, newOffset, finalHeight,
+                beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+        );
+
+        // Update the bar number ellipses
+        barNumberEllipses = PlottingStuffHandler.updateBarNumberEllipses(
+                barNumberPane, barNumberEllipses, audioDuration, bpm, bpm, oldOffset, newOffset,
+                barNumberPane.getPrefHeight(), beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+        );
+
+        // Update the offset value
+        if (!forceUpdate) {
+            logger.log(Level.FINE, "Updated offset value from " + offset + " to " + newOffset);
+        } else {
+            logger.log(Level.FINE, "Force update offset value to " + newOffset);
+        }
+        offset = newOffset;
+    }
+
+    /**
+     * Helper method that helps update the needed things when the offset value is to be updated.
+     *
+     * @param newOffset New offset value.
+     */
+    private void updateOffsetValue(double newOffset) {
+        updateOffsetValue(newOffset, false);
+    }
 
     /**
      * Helper method that finishes the setup for the spectrogram.
@@ -831,5 +842,125 @@ public class SpectrogramViewController implements Initializable {
 
         // Report that the spectrogram view is ready to be shown
         logger.log(Level.INFO, "Spectrogram view ready to be shown");
+    }
+
+    /**
+     * Helper method that toggles the play button.
+     */
+    private void togglePlayButton() {
+        if (currTime == audioDuration) {
+            try {
+                audio.setAudioPlaybackTime(0);
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        isPaused = togglePaused(isPaused);
+
+        logger.log(Level.FINE, "Toggled pause state (paused is now " + isPaused + ")");
+    }
+
+    /**
+     * Helper method that toggles the scroll button.
+     */
+    private void toggleScrollButton() {
+        if (scrollToPlayhead) {
+            // Change the icon of the scroll button from filled to non-filled
+            scrollButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/footsteps-outline.png")));
+
+        } else {
+            // Change the icon of the scroll button from non-filled to filled
+            scrollButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/footsteps-filled.png")));
+        }
+
+        // Toggle the `scrollToPlayhead` flag
+        scrollToPlayhead = !scrollToPlayhead;
+
+        logger.log(Level.FINE, "Toggled scroll (scroll is now " + scrollToPlayhead + ")");
+    }
+
+    /**
+     * Helper method that toggles the mute button.
+     */
+    private void toggleMuteButton() {
+        if (isMuted) {
+            // Change the icon of the volume button from mute to non-mute
+            volumeButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/volume-high.png")));
+
+            // Unmute the audio by setting the volume back to the value before the mute
+            try {
+                audio.setPlaybackVolume(volume);
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            // Change the icon of the volume button from non-mute to mute
+            volumeButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/volume-mute.png")));
+
+            // Mute the audio by setting the volume to zero
+            try {
+                audio.setPlaybackVolume(0);
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        // Toggle the `isMuted` flag
+        isMuted = !isMuted;
+
+        logger.log(Level.FINE, "Toggled mute button (muted is now " + isMuted + ")");
+    }
+
+    /**
+     * Helper method that handles a keyboard press event.
+     *
+     * @param keyEvent Key event.
+     */
+    private void keyboardPressEventHandler(KeyEvent keyEvent) {
+        // Stop passing this event to the next node
+        keyEvent.consume();
+
+        // Handle key event
+        KeyCode code = keyEvent.getCode();
+
+        if (code == KeyCode.SPACE) {
+            // Space bar is to toggle the play button
+            togglePlayButton();
+        } else if (code == KeyCode.UP) {
+            // Up arrow is to increase volume
+            volumeSlider.setValue(volumeSlider.getValue() + VOLUME_VALUE_DELTA_ON_KEY_PRESS);
+        } else if (code == KeyCode.DOWN) {
+            // Down arrow is to decrease volume
+            volumeSlider.setValue(volumeSlider.getValue() - VOLUME_VALUE_DELTA_ON_KEY_PRESS);
+        } else if (code == KeyCode.M) {
+            // M key is to toggle mute
+            toggleMuteButton();
+        } else if (code == KeyCode.LEFT) {
+            // Left arrow is to seek 1 second before
+            try {
+                seekToTime(currTime - 1);
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
+        } else if (code == KeyCode.RIGHT) {
+            // Right arrow is to seek 1 second ahead
+            try {
+                seekToTime(currTime + 1);
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
+        } else if (code == KeyCode.PERIOD) {
+            // Period key ('.') is to toggle seeking to playhead
+            toggleScrollButton();
+        } else if (NEW_PROJECT_COMBINATION.match(keyEvent)) {
+            // Control/Command + N is to create a new project
+            ProjectIOHandlers.newProject(keyEvent);
+        } else if (OPEN_PROJECT_COMBINATION.match(keyEvent)) {
+            // Control/Command + O is to open a project
+            ProjectIOHandlers.openProject(keyEvent);
+        } else if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {
+            // Control/Command + S is to save current project
+            handleSavingProject(keyEvent);
+        }
     }
 }
