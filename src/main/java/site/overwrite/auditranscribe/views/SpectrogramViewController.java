@@ -2,7 +2,7 @@
  * SpectrogramViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-07
+ * Updated on 2022-05-08
  *
  * Description: Contains the spectrogram view's controller class.
  */
@@ -10,6 +10,7 @@
 package site.overwrite.auditranscribe.views;
 
 import javafx.application.Platform;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -17,6 +18,9 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
@@ -82,6 +86,10 @@ public class SpectrogramViewController implements Initializable {
     final boolean USE_FANCY_SHARPS_FOR_NOTE_LABELS = true;
 
     final double VOLUME_VALUE_DELTA_ON_KEY_PRESS = 0.05;
+
+    final KeyCodeCombination NEW_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN);
+    final KeyCodeCombination OPEN_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN);
+    final KeyCodeCombination SAVE_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN);
 
     // File-Savable Attributes
     private double sampleRate;  // Sample rate of the audio
@@ -247,48 +255,7 @@ public class SpectrogramViewController implements Initializable {
 
         openProjectButton.setOnAction(ProjectIOHandlers::openProject);
 
-        saveProjectButton.setOnAction(event -> {
-            // Allow user to select save location if `audtFilePath` is unset
-            if (audtFilePath == null) {
-                logger.log(Level.FINE, "AUDT file destination not yet set; asking now");
-
-                // Get current window
-                javafx.stage.Window window = ((Node) event.getSource()).getScene().getWindow();
-
-                // Ask user to choose a file
-                FileChooser fileChooser = new FileChooser();
-                File file = fileChooser.showSaveDialog(window);
-                audtFilePath = file.getAbsolutePath();
-                if (!audtFilePath.toLowerCase().endsWith(".audt")) audtFilePath += ".audt";
-
-                logger.log(Level.FINE, "AUDT file destination set to " + audtFilePath);
-            }
-
-            // Package all the current data into a `ProjectDataObject`
-            logger.log(Level.INFO, "Packaging data for saving");
-            QTransformDataObject qTransformData = new QTransformDataObject(
-                    magnitudes
-            );
-            AudioDataObject audioData = new AudioDataObject(
-                    audioFilePath, sampleRate
-            );
-            GUIDataObject guiData = new GUIDataObject(
-                    musicKeyIndex, timeSignatureIndex, bpm, offset, volume, audioFileName,
-                    (int) (audioDuration * 1000), (int) (currTime * 1000)
-            );
-
-            ProjectDataObject projectData = new ProjectDataObject(
-                    qTransformData, audioData, guiData
-            );
-
-            // Save the project
-            try {
-                ProjectIOHandlers.saveProject(audtFilePath, projectData);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            logger.log(Level.INFO, "File saved");
-        });
+        saveProjectButton.setOnAction(this::handleSavingProject);
 
         playButton.setOnAction(event -> togglePlayButton());
 
@@ -569,7 +536,7 @@ public class SpectrogramViewController implements Initializable {
      * @throws InvalidObjectException If the <code>MediaPlayer</code> object was not defined in the
      *                                audio object.
      */
-    protected void seekToTime(double seekTime) throws InvalidObjectException {
+    private void seekToTime(double seekTime) throws InvalidObjectException {
         // Ensure that the `seekTime` stays within range
         if (seekTime < 0) seekTime = 0;
         if (seekTime > audioDuration) seekTime = audioDuration;
@@ -593,6 +560,54 @@ public class SpectrogramViewController implements Initializable {
         PlottingStuffHandler.updatePlayheadLine(playheadLine, newXPos);
 
         logger.log(Level.FINE, "Seeked to " + seekTime + " seconds");
+    }
+
+    /**
+     * Helper method that handles the saving of the project.
+     *
+     * @param event Event that triggered this function.
+     */
+    private void handleSavingProject(Event event) {
+        // Allow user to select save location if `audtFilePath` is unset
+        if (audtFilePath == null) {
+            logger.log(Level.FINE, "AUDT file destination not yet set; asking now");
+
+            // Get current window
+            javafx.stage.Window window = ((Node) event.getSource()).getScene().getWindow();
+
+            // Ask user to choose a file
+            FileChooser fileChooser = new FileChooser();
+            File file = fileChooser.showSaveDialog(window);
+            audtFilePath = file.getAbsolutePath();
+            if (!audtFilePath.toLowerCase().endsWith(".audt")) audtFilePath += ".audt";
+
+            logger.log(Level.FINE, "AUDT file destination set to " + audtFilePath);
+        }
+
+        // Package all the current data into a `ProjectDataObject`
+        logger.log(Level.INFO, "Packaging data for saving");
+        QTransformDataObject qTransformData = new QTransformDataObject(
+                magnitudes
+        );
+        AudioDataObject audioData = new AudioDataObject(
+                audioFilePath, sampleRate
+        );
+        GUIDataObject guiData = new GUIDataObject(
+                musicKeyIndex, timeSignatureIndex, bpm, offset, volume, audioFileName,
+                (int) (audioDuration * 1000), (int) (currTime * 1000)
+        );
+
+        ProjectDataObject projectData = new ProjectDataObject(
+                qTransformData, audioData, guiData
+        );
+
+        // Save the project
+        try {
+            ProjectIOHandlers.saveProject(audtFilePath, projectData);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        logger.log(Level.INFO, "File saved");
     }
 
     /**
@@ -898,40 +913,54 @@ public class SpectrogramViewController implements Initializable {
 
     /**
      * Helper method that handles a keyboard press event.
-     * @param keyEvent  Key event.
+     *
+     * @param keyEvent Key event.
      */
     private void keyboardPressEventHandler(KeyEvent keyEvent) {
+        // Stop passing this event to the next node
         keyEvent.consume();
 
-        switch (keyEvent.getCode()) {
+        // Handle key event
+        KeyCode code = keyEvent.getCode();
+
+        if (code == KeyCode.SPACE) {
             // Space bar is to toggle the play button
-            case SPACE -> togglePlayButton();
-
-            // Up/Down arrows are to adjust volume
-            case UP -> volumeSlider.setValue(volumeSlider.getValue() + VOLUME_VALUE_DELTA_ON_KEY_PRESS);
-            case DOWN -> volumeSlider.setValue(volumeSlider.getValue() - VOLUME_VALUE_DELTA_ON_KEY_PRESS);
-
-            // M key is to mute/unmute
-            case M -> toggleMuteButton();
-
-            // Left/Right arrows are to seek 1 second before/ahead
-            case LEFT -> {
-                try {
-                    seekToTime(currTime - 1);
-                } catch (InvalidObjectException e) {
-                    throw new RuntimeException(e);
-                }
+            togglePlayButton();
+        } else if (code == KeyCode.UP) {
+            // Up arrow is to increase volume
+            volumeSlider.setValue(volumeSlider.getValue() + VOLUME_VALUE_DELTA_ON_KEY_PRESS);
+        } else if (code == KeyCode.DOWN) {
+            // Down arrow is to decrease volume
+            volumeSlider.setValue(volumeSlider.getValue() - VOLUME_VALUE_DELTA_ON_KEY_PRESS);
+        } else if (code == KeyCode.M) {
+            // M key is to toggle mute
+            toggleMuteButton();
+        } else if (code == KeyCode.LEFT) {
+            // Left arrow is to seek 1 second before
+            try {
+                seekToTime(currTime - 1);
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
             }
-            case RIGHT -> {
-                try {
-                    seekToTime(currTime + 1);
-                } catch (InvalidObjectException e) {
-                    throw new RuntimeException(e);
-                }
+        } else if (code == KeyCode.RIGHT) {
+            // Right arrow is to seek 1 second ahead
+            try {
+                seekToTime(currTime + 1);
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
             }
-
-            // S key is to toggle seeking to playhead
-            case S -> toggleScrollButton();
+        } else if (code == KeyCode.PERIOD) {
+            // Period key ('.') is to toggle seeking to playhead
+            toggleScrollButton();
+        } else if (NEW_PROJECT_COMBINATION.match(keyEvent)) {
+            // Control/Command + N is to create a new project
+            ProjectIOHandlers.newProject(keyEvent);
+        } else if (OPEN_PROJECT_COMBINATION.match(keyEvent)) {
+            // Control/Command + O is to open a project
+            ProjectIOHandlers.openProject(keyEvent);
+        } else if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {
+            // Control/Command + S is to save current project
+            handleSavingProject(keyEvent);
         }
     }
 }

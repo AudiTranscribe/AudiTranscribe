@@ -7,9 +7,8 @@ Todo (Important):
     - Add toolbar options
     - Add settings page
         - Need to allow for configuration of audio devices
-    - Add keyboard shortcuts
-        - Need to add two-key shortcuts (e.g. saving files)
-          [see https://stackoverflow.com/a/40329475]
+        * Using local app data folder: https://stackoverflow.com/a/1198954
+          [System.getenv("APPDATA")]
 
 Todo (Less Important):
     - Add licence/credits for ionicons
