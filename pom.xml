@@ -169,6 +169,21 @@
                         <option>-Dfile.encoding=UTF-8</option>
                     </javaOptions>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>mac</id>
+                        <configuration>
+                            <icon>${project.basedir}/images/icons/icon.icns</icon>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>win</id>
+                        <configuration>
+                            <icon>${project.basedir}/images/icons/icon.ico</icon>
+                            <winMenu>true</winMenu>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
 
