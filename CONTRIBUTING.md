@@ -48,8 +48,8 @@ However, for small issues such as
 
 you could submit an issue instead of a pull request.
 
-**NOTE: All (development) changes to *AudiTranscribe* should be pushed to the `development` branch first**. The `main`
-branch should be reserved for production builds.
+**NOTE: (Development) changes to *AudiTranscribe* should _never_ be pushed to the `main` branch**. The `main` branch
+should be reserved for production builds.
 
 ## Reporting Bugs
 
