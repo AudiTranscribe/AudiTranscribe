@@ -2,7 +2,7 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-05-08
+ * Updated on 2022-05-09
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
@@ -181,6 +181,9 @@ public class ProjectIOHandlers {
                 // Get the current stage
                 Stage stage = (Stage) window;
 
+                // Unset full screen first
+                stage.setFullScreen(false);
+
                 // Close the current stage
                 stage.close();
 
@@ -261,6 +264,9 @@ public class ProjectIOHandlers {
                 // Todo: extract this code into another method (to make it more DRY)
                 // Get the current stage
                 Stage stage = (Stage) window;
+
+                // Unset full screen first
+                stage.setFullScreen(false);
 
                 // Close the current stage
                 stage.close();
