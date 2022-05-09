@@ -13,6 +13,7 @@ module site.overwrite.auditranscribe {
     requires javafx.fxml;
     requires javafx.media;
     requires javafx.swing;
+    requires javafx.web;
 
     exports site.overwrite.auditranscribe;
     exports site.overwrite.auditranscribe.audio;

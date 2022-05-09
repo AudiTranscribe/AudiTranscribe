@@ -2,7 +2,7 @@
  * SpectrogramViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-08
+ * Updated on 2022-05-09
  *
  * Description: Contains the spectrogram view's controller class.
  */
@@ -320,7 +320,9 @@ public class SpectrogramViewController implements Initializable {
 
             // Change the icon of the volume button from mute to non-mute
             if (isMuted) {
-                volumeButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/volume-high.png")));
+                volumeButtonImage.setImage(
+                        new Image(FileUtils.getFileURLAsString("images/icons/PNGs/volume-high.png"))
+                );
                 isMuted = false;
             }
 
@@ -619,7 +621,7 @@ public class SpectrogramViewController implements Initializable {
     private boolean togglePaused(boolean isPaused) {
         if (isPaused) {
             // Change the icon of the play button from the play icon to the paused icon
-            playButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/pause.png")));
+            playButtonImage.setImage(new Image(FileUtils.getFileURLAsString("images/icons/PNGs/pause.png")));
 
             // Unpause the audio (i.e. play the audio)
             try {
@@ -630,7 +632,7 @@ public class SpectrogramViewController implements Initializable {
 
         } else {
             // Change the icon of the play button from the paused icon to the play icon
-            playButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/play.png")));
+            playButtonImage.setImage(new Image(FileUtils.getFileURLAsString("images/icons/PNGs/play.png")));
 
             // Pause the audio
             try {
@@ -657,8 +659,8 @@ public class SpectrogramViewController implements Initializable {
 
         // Update the beat lines
         beatLines = PlottingStuffHandler.updateBeatLines(
-                spectrogramPaneAnchor, beatLines, audioDuration, oldBPM, newBPM, offset, offset, finalHeight, beatsPerBar,
-                beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+                spectrogramPaneAnchor, beatLines, audioDuration, oldBPM, newBPM, offset, offset, finalHeight,
+                beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
         );
 
         // Update the bar number ellipses
@@ -866,11 +868,15 @@ public class SpectrogramViewController implements Initializable {
     private void toggleScrollButton() {
         if (scrollToPlayhead) {
             // Change the icon of the scroll button from filled to non-filled
-            scrollButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/footsteps-outline.png")));
+            scrollButtonImage.setImage(
+                    new Image(FileUtils.getFileURLAsString("images/icons/PNGs/footsteps-outline.png"))
+            );
 
         } else {
             // Change the icon of the scroll button from non-filled to filled
-            scrollButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/footsteps-filled.png")));
+            scrollButtonImage.setImage(
+                    new Image(FileUtils.getFileURLAsString("images/icons/PNGs/footsteps-filled.png"))
+            );
         }
 
         // Toggle the `scrollToPlayhead` flag
@@ -885,7 +891,9 @@ public class SpectrogramViewController implements Initializable {
     private void toggleMuteButton() {
         if (isMuted) {
             // Change the icon of the volume button from mute to non-mute
-            volumeButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/volume-high.png")));
+            volumeButtonImage.setImage(
+                    new Image(FileUtils.getFileURLAsString("images/icons/PNGs/volume-high.png"))
+            );
 
             // Unmute the audio by setting the volume back to the value before the mute
             try {
@@ -895,7 +903,9 @@ public class SpectrogramViewController implements Initializable {
             }
         } else {
             // Change the icon of the volume button from non-mute to mute
-            volumeButtonImage.setImage(new Image(FileUtils.getFileURLAsString("icons/PNGs/volume-mute.png")));
+            volumeButtonImage.setImage(
+                    new Image(FileUtils.getFileURLAsString("images/icons/PNGs/volume-mute.png"))
+            );
 
             // Mute the audio by setting the volume to zero
             try {

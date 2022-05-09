@@ -2,7 +2,7 @@
  * MainViewController.java
  *
  * Created on 2022-02-09
- * Updated on 2022-05-07
+ * Updated on 2022-05-09
  *
  * Description: Contains the main view's controller class.
  */
@@ -58,6 +58,5 @@ public class MainViewController implements Initializable {
         } catch (IOException | NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
-
     }
 }
