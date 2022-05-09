@@ -19,5 +19,5 @@ Todo (Not Important):
 
 ====================================================================================================
 Fixme:
-    - Weird bug where user has to double-click play if at end of audio file is back
+    - Sometimes the app fails to go to fullscreen
 ====================================================================================================
