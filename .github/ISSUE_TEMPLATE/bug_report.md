@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Report an unexpected behaviour of the program
-title: "[BUG]"
+title: ''
 labels: bug
 assignees: ''
 
