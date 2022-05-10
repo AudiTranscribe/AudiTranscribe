@@ -2,7 +2,7 @@
  * SpectrogramViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-09
+ * Updated on 2022-05-10
  *
  * Description: Contains the spectrogram view's controller class.
  */
@@ -30,8 +30,12 @@ import javafx.stage.FileChooser;
 import javafx.util.Pair;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.Window;
-import site.overwrite.auditranscribe.io.ProjectIOHandlers;
-import site.overwrite.auditranscribe.io.data_encapsulators.*;
+import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.io.audt_file.ProjectIOHandlers;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.ProjectDataObject;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
 import site.overwrite.auditranscribe.plotting.PlottingStuffHandler;
 import site.overwrite.auditranscribe.spectrogram.*;
 import site.overwrite.auditranscribe.utils.*;
@@ -169,8 +173,8 @@ public class SpectrogramViewController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Add CSS stylesheets to the scene
-        mainPane.getStylesheets().add(FileUtils.getFileURLAsString("views/css/base.css"));
-        mainPane.getStylesheets().add(FileUtils.getFileURLAsString("views/css/light-mode.css"));  // Todo: add theme support
+        mainPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
+        mainPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/light-mode.css"));  // Todo: add theme support
 
         // Update spinners' ranges
         SpinnerValueFactory.DoubleSpinnerValueFactory bpmSpinnerFactory =
@@ -321,7 +325,7 @@ public class SpectrogramViewController implements Initializable {
             // Change the icon of the volume button from mute to non-mute
             if (isMuted) {
                 volumeButtonImage.setImage(
-                        new Image(FileUtils.getFileURLAsString("images/icons/PNGs/volume-high.png"))
+                        new Image(IOMethods.getFileURLAsString("images/icons/PNGs/volume-high.png"))
                 );
                 isMuted = false;
             }
@@ -621,7 +625,7 @@ public class SpectrogramViewController implements Initializable {
     private boolean togglePaused(boolean isPaused) {
         if (isPaused) {
             // Change the icon of the play button from the play icon to the paused icon
-            playButtonImage.setImage(new Image(FileUtils.getFileURLAsString("images/icons/PNGs/pause.png")));
+            playButtonImage.setImage(new Image(IOMethods.getFileURLAsString("images/icons/PNGs/pause.png")));
 
             // Unpause the audio (i.e. play the audio)
             try {
@@ -632,7 +636,7 @@ public class SpectrogramViewController implements Initializable {
 
         } else {
             // Change the icon of the play button from the paused icon to the play icon
-            playButtonImage.setImage(new Image(FileUtils.getFileURLAsString("images/icons/PNGs/play.png")));
+            playButtonImage.setImage(new Image(IOMethods.getFileURLAsString("images/icons/PNGs/play.png")));
 
             // Pause the audio
             try {
@@ -869,13 +873,13 @@ public class SpectrogramViewController implements Initializable {
         if (scrollToPlayhead) {
             // Change the icon of the scroll button from filled to non-filled
             scrollButtonImage.setImage(
-                    new Image(FileUtils.getFileURLAsString("images/icons/PNGs/footsteps-outline.png"))
+                    new Image(IOMethods.getFileURLAsString("images/icons/PNGs/footsteps-outline.png"))
             );
 
         } else {
             // Change the icon of the scroll button from non-filled to filled
             scrollButtonImage.setImage(
-                    new Image(FileUtils.getFileURLAsString("images/icons/PNGs/footsteps-filled.png"))
+                    new Image(IOMethods.getFileURLAsString("images/icons/PNGs/footsteps-filled.png"))
             );
         }
 
@@ -892,7 +896,7 @@ public class SpectrogramViewController implements Initializable {
         if (isMuted) {
             // Change the icon of the volume button from mute to non-mute
             volumeButtonImage.setImage(
-                    new Image(FileUtils.getFileURLAsString("images/icons/PNGs/volume-high.png"))
+                    new Image(IOMethods.getFileURLAsString("images/icons/PNGs/volume-high.png"))
             );
 
             // Unmute the audio by setting the volume back to the value before the mute
@@ -904,7 +908,7 @@ public class SpectrogramViewController implements Initializable {
         } else {
             // Change the icon of the volume button from non-mute to mute
             volumeButtonImage.setImage(
-                    new Image(FileUtils.getFileURLAsString("images/icons/PNGs/volume-mute.png"))
+                    new Image(IOMethods.getFileURLAsString("images/icons/PNGs/volume-mute.png"))
             );
 
             // Mute the audio by setting the volume to zero

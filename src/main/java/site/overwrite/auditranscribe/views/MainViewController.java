@@ -2,7 +2,7 @@
  * MainViewController.java
  *
  * Created on 2022-02-09
- * Updated on 2022-05-09
+ * Updated on 2022-05-10
  *
  * Description: Contains the main view's controller class.
  */
@@ -12,7 +12,7 @@ package site.overwrite.auditranscribe.views;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import site.overwrite.auditranscribe.io.ProjectIOHandlers;
+import site.overwrite.auditranscribe.io.audt_file.ProjectIOHandlers;
 import site.overwrite.auditranscribe.io.PropertyFile;
 
 import java.io.IOException;

@@ -2,12 +2,12 @@
  * IncorrectFileFormatException.java
  *
  * Created on 2022-05-02
- * Updated on 2022-05-02
+ * Updated on 2022-05-10
  *
  * Description: Exception to mark that the file format is incorrect.
  */
 
-package site.overwrite.auditranscribe.io.exceptions;
+package site.overwrite.auditranscribe.io.audt_file.exceptions;
 
 /**
  * Exception to mark that the file format is incorrect.

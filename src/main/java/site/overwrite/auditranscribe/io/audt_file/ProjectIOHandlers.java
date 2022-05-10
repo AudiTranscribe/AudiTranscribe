@@ -2,12 +2,12 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-05-08
+ * Updated on 2022-05-10
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
 
-package site.overwrite.auditranscribe.io;
+package site.overwrite.auditranscribe.io.audt_file;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -24,10 +24,15 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import site.overwrite.auditranscribe.audio.Audio;
-import site.overwrite.auditranscribe.io.data_encapsulators.*;
-import site.overwrite.auditranscribe.io.exceptions.*;
-import site.overwrite.auditranscribe.io.file_handers.*;
-import site.overwrite.auditranscribe.utils.FileUtils;
+import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.ProjectDataObject;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
+import site.overwrite.auditranscribe.io.audt_file.exceptions.FailedToReadDataException;
+import site.overwrite.auditranscribe.io.audt_file.exceptions.IncorrectFileFormatException;
+import site.overwrite.auditranscribe.io.audt_file.file_handers.AUDTFileReader;
+import site.overwrite.auditranscribe.io.audt_file.file_handers.AUDTFileWriter;
 import site.overwrite.auditranscribe.views.SpectrogramViewController;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -186,7 +191,7 @@ public class ProjectIOHandlers {
 
                 // Get the FXML loader for the spectrogram view
                 FXMLLoader fxmlLoader = new FXMLLoader(
-                        FileUtils.getFileURL("views/fxml/spectrogram-view.fxml")
+                        IOMethods.getFileURL("views/fxml/spectrogram-view.fxml")
                 );
 
                 // Get the spectrogram view scene
@@ -267,7 +272,7 @@ public class ProjectIOHandlers {
 
                 // Get the FXML loader for the spectrogram view
                 FXMLLoader fxmlLoader = new FXMLLoader(
-                        FileUtils.getFileURL("views/fxml/spectrogram-view.fxml")
+                        IOMethods.getFileURL("views/fxml/spectrogram-view.fxml")
                 );
 
                 // Get the spectrogram view scene

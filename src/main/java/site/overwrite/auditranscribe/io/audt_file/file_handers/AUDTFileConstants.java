@@ -7,7 +7,7 @@
  * Description: Constants that are needed when processing the AudiTranscribe file format.
  */
 
-package site.overwrite.auditranscribe.io.file_handers;
+package site.overwrite.auditranscribe.io.audt_file.file_handers;
 
 import site.overwrite.auditranscribe.io.LZ4;
 
