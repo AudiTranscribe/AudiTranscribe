@@ -2,7 +2,7 @@
  * AUDTFileReader.java
  *
  * Created on 2022-05-02
- * Updated on 2022-05-07
+ * Updated on 2022-05-10
  *
  * Description: Class that handles the reading of the AudiTranscribe (AUDT) file.
  */
@@ -21,6 +21,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AUDTFileReader {
     // Attributes
@@ -30,6 +32,8 @@ public class AUDTFileReader {
 
     private final byte[] bytes;
     private int bytePos = 0;  // Position of the NEXT byte to read
+
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     /**
      * Initialization method to make an <code>AUDTFileReader</code> object.
@@ -200,8 +204,9 @@ public class AUDTFileReader {
      *
      * @return Boolean, where <code>true</code> means that the file format is correct and
      * <code>false</code> otherwise.
+     * @throws IncorrectFileFormatException If the LZ4 version is not current.
      */
-    private boolean verifyHeaderSection() {
+    private boolean verifyHeaderSection() throws IncorrectFileFormatException {
         // Check if the first 20 bytes follows the AUDT file header
         byte[] first20Bytes = Arrays.copyOfRange(bytes, 0, 20);
         if (!checkBytesMatch(AUDTFileConstants.AUDT_FILE_HEADER, first20Bytes)) {
@@ -214,6 +219,23 @@ public class AUDTFileReader {
         // Get the file format version and the LZ4 version
         fileFormatVersion = readInteger();
         lz4Version = readInteger();
+
+        // Check if the file format is the current version, or is a previous version
+        if (fileFormatVersion < AUDTFileConstants.FILE_VERSION_NUMBER) {
+            logger.log(
+                    Level.WARNING,
+                    "Reading in outdated AUDT file (file: " + fileFormatVersion +
+                            " but current version is " + AUDTFileConstants.FILE_VERSION_NUMBER + ")"
+            );
+        }
+
+        // Check if the LZ4 version is *exactly* the current version
+        if (lz4Version != AUDTFileConstants.LZ4_VERSION_NUMBER) {
+            throw new IncorrectFileFormatException(
+                    "LZ4 version mismatch (file: " + " but current version is " +
+                            AUDTFileConstants.LZ4_VERSION_NUMBER + ")"
+            );
+        }
 
         // Verify that the header ends with an end-of-section delimiter
         return checkEOSDelimiter();

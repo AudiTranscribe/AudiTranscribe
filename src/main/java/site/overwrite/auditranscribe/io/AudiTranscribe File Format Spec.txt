@@ -1,6 +1,6 @@
 
                             THE AUDITRANSCRIBE FILE FORMAT SPECIFICATION
-                                           Version 0.1.0
+                                           Version 0.2.0
 
 =====
 Section 0. Document Description
