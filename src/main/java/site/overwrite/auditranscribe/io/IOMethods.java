@@ -9,21 +9,26 @@
 
 package site.overwrite.auditranscribe.io;
 
+import net.harawata.appdirs.AppDirs;
+import net.harawata.appdirs.AppDirsFactory;
 import site.overwrite.auditranscribe.MainApplication;
 
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * Input/Output methods that are used in the AudiTranscribe project.
  */
 public class IOMethods {
     // Constants
-    public static final String SYSTEM_APP_DATA_FOLDER = System.getenv("APPDATA");
-    public static final String AUDITRANSCRIBE_APP_DATA_FOLDER_NAME = "AudiTranscribe";
+    final static AppDirs APP_DIRS_INSTANCE = AppDirsFactory.getInstance();
+
+    public static final Path APP_DATA_FOLDER_PATH = Path.of(
+            APP_DIRS_INSTANCE.getUserDataDir("AudiTranscribe", null, "AudiTranscribe")
+    );
+    public static final String APP_DATA_FOLDER_PATH_STRING = APP_DATA_FOLDER_PATH + "/";
 
     // Public methods
 
@@ -112,11 +117,8 @@ public class IOMethods {
      */
     public static boolean createAppDataFolder() {
         try {
-            // Get the path to the app data folder
-            Path path = Paths.get(SYSTEM_APP_DATA_FOLDER + AUDITRANSCRIBE_APP_DATA_FOLDER_NAME);
-
-            // Try to create the directory
-            Files.createDirectories(path);
+            // Try to create the app data folder
+            Files.createDirectory(APP_DATA_FOLDER_PATH);
 
             // Return `true` for successful directory creation
             return true;

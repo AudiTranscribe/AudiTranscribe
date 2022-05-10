@@ -1,6 +1,7 @@
 module site.overwrite.auditranscribe {
     requires java.desktop;
 
+    requires net.harawata.appdirs;
     requires commons.exec;
     requires com.dlsc.formsfx;
     requires com.google.gson;
