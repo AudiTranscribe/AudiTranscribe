@@ -9,11 +9,7 @@
 
 package site.overwrite.auditranscribe.io;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class SQLiteDatabaseManager {
     // Constants
@@ -40,7 +36,7 @@ public class SQLiteDatabaseManager {
     /**
      * Method that helps connect to the SQLite3 database.
      */
-    public void connectToDatabase() {
+    public void dbConnect() {
         try {
             // Attempt to connect to the database
             connection = DriverManager.getConnection(ACCESS_METHOD_STRING + databaseAbsolutePath);
@@ -57,7 +53,7 @@ public class SQLiteDatabaseManager {
     /**
      * Method that closes the connection to the SQLite3 database.
      */
-    public void closeConnectionToDatabase() {
+    public void dbDisconnect() {
         // Attempt to close the connection
         try {
             if (connection != null) connection.close();
@@ -71,6 +67,17 @@ public class SQLiteDatabaseManager {
     }
 
     /**
+     * Helper method that prepares an SQL statement.
+     *
+     * @param sqlStatement Statement to be prepared.
+     * @return Prepared SQL statement. (aka parameterized query)
+     * @throws SQLException If the SQL statement has an error.
+     */
+    public PreparedStatement prepareStatement(String sqlStatement) throws SQLException {
+        return connection.prepareStatement(sqlStatement);
+    }
+
+    /**
      * Method that executes an <em>update-like</em> SQL statement.
      *
      * @param sqlStatement Statement to execute.
@@ -81,16 +88,41 @@ public class SQLiteDatabaseManager {
         statement.executeUpdate(sqlStatement);
     }
 
+    /**
+     * Method that executes an <em>update-like</em> SQL statement.
+     *
+     * @param preparedStatement Prepared statement to execute.
+     * @throws SQLException If the SQL statement has an error, or if the execution of the SQL
+     *                      statement encounters an error.
+     */
+    public void executeUpdate(PreparedStatement preparedStatement) throws SQLException {
+        preparedStatement.executeUpdate();
+    }
+
 
     /**
      * Method that executes an <em>get-like</em> SQL statement. This retrieves data from the
      * database.
      *
      * @param sqlStatement Statement to execute.
+     * @return A <code>ResultSet</code> object containing the results of the query.
      * @throws SQLException If the SQL statement has an error, or if the execution of the SQL
      *                      statement encounters an error.
      */
     public ResultSet executeGetQuery(String sqlStatement) throws SQLException {
         return statement.executeQuery(sqlStatement);
+    }
+
+    /**
+     * Method that executes an <em>get-like</em> SQL statement. This retrieves data from the
+     * database.
+     *
+     * @param preparedStatement Prepared statement to execute.
+     * @return A <code>ResultSet</code> object containing the results of the query.
+     * @throws SQLException If the SQL statement has an error, or if the execution of the SQL
+     *                      statement encounters an error.
+     */
+    public ResultSet executeGetQuery(PreparedStatement preparedStatement) throws SQLException {
+        return preparedStatement.executeQuery();
     }
 }

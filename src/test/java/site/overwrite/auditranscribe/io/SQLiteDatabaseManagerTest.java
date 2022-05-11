@@ -62,7 +62,7 @@ class SQLiteDatabaseManagerTest {
         manager = new SQLiteDatabaseManager(IOMethods.getAbsoluteFilePath("test-resources/database/test-database.db"));
 
         // Connect to the database
-        manager.connectToDatabase();
+        manager.dbConnect();
     }
 
     @Test
@@ -105,6 +105,6 @@ class SQLiteDatabaseManagerTest {
     @Order(5)
     void closeConnection() {
         // Must close connection to the database
-        manager.closeConnectionToDatabase();
+        manager.dbDisconnect();
     }
 }
