@@ -2,7 +2,7 @@
  * AUDTFileTest.java
  *
  * Created on 2022-05-01
- * Updated on 2022-05-10
+ * Updated on 2022-05-11
  *
  * Description: Test AUDT file reading and writing.
  */
@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class AUDTFileTest {
     // Define the file name
     final String fileName =
-            "src/main/resources/site/overwrite/auditranscribe/test-file-io-directory/test-AUDTFileTest.audt";
+            "src/main/resources/site/overwrite/auditranscribe/test-resources/file-io-directory/test-AUDTFileTest.audt";
 
     // Define data to be used within the tests
     QTransformDataObject qTransformDataObject = new QTransformDataObject(

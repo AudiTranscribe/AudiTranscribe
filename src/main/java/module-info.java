@@ -1,5 +1,6 @@
 module site.overwrite.auditranscribe {
     requires java.desktop;
+    requires java.sql;
 
     requires net.harawata.appdirs;
     requires commons.exec;
