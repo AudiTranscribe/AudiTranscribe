@@ -2,19 +2,18 @@
  * IOMethodsTest.java
  *
  * Created on 2022-05-10
- * Updated on 2022-05-10
+ * Updated on 2022-05-11
  *
  * Description: Test `IOMethods.java`.
  */
 
 package site.overwrite.auditranscribe.io;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class IOMethodsTest {
     @BeforeAll
     static void createAppDataFolder() {
