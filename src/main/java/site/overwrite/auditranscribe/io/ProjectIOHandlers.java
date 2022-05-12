@@ -2,7 +2,7 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-05-09
+ * Updated on 2022-05-12
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
@@ -23,6 +23,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
+import org.javatuples.Triplet;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.io.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.exceptions.*;
@@ -177,26 +178,11 @@ public class ProjectIOHandlers {
                 // Try and read the file as an audio file
                 Audio audio = new Audio(file);  // Failure to read will throw an exception
 
-                // Todo: extract this code into another method (to make it more DRY)
-                // Get the current stage
-                Stage stage = (Stage) window;
-
-                // Unset full screen first
-                stage.setFullScreen(false);
-
-                // Close the current stage
-                stage.close();
-
-                // Get the FXML loader for the spectrogram view
-                FXMLLoader fxmlLoader = new FXMLLoader(
-                        FileUtils.getFileURL("views/fxml/spectrogram-view.fxml")
-                );
-
-                // Get the spectrogram view scene
-                Scene scene = new Scene(fxmlLoader.load());
-
-                // Get the spectrogram view controller
-                SpectrogramViewController controller = fxmlLoader.getController();
+                // Get the stage, scene and controller
+                Triplet<Stage, Scene, SpectrogramViewController> stageSceneAndController = getController(window);
+                Stage stage = stageSceneAndController.getValue0();
+                Scene scene = stageSceneAndController.getValue1();
+                SpectrogramViewController controller = stageSceneAndController.getValue2();
 
                 // Set the project data for the existing project
                 controller.setAudioAndSpectrogramData(audio);
@@ -261,26 +247,11 @@ public class ProjectIOHandlers {
                         qTransformData, audioData, guiData
                 );
 
-                // Todo: extract this code into another method (to make it more DRY)
-                // Get the current stage
-                Stage stage = (Stage) window;
-
-                // Unset full screen first
-                stage.setFullScreen(false);
-
-                // Close the current stage
-                stage.close();
-
-                // Get the FXML loader for the spectrogram view
-                FXMLLoader fxmlLoader = new FXMLLoader(
-                        FileUtils.getFileURL("views/fxml/spectrogram-view.fxml")
-                );
-
-                // Get the spectrogram view scene
-                Scene scene = new Scene(fxmlLoader.load());
-
-                // Get the spectrogram view controller
-                SpectrogramViewController controller = fxmlLoader.getController();
+                // Get the stage, scene and controller
+                Triplet<Stage, Scene, SpectrogramViewController> stageSceneAndController = getController(window);
+                Stage stage = stageSceneAndController.getValue0();
+                Scene scene = stageSceneAndController.getValue1();
+                SpectrogramViewController controller = stageSceneAndController.getValue2();
 
                 // Set the project data for the existing project
                 controller.useExistingData(audtFilePath, projectDataObject);
@@ -323,5 +294,38 @@ public class ProjectIOHandlers {
 
             alert.showAndWait();
         }
+    }
+
+    /**
+     * Helper method that gets the stage, scene and view controller of the spectrogram view.
+     *
+     * @param window Root window.
+     * @return Stage, scene and view controller.
+     * @throws IOException If the spectrogram view FXML file cannot be found.
+     */
+    private static Triplet<Stage, Scene, SpectrogramViewController> getController(Window window) throws IOException {
+        // Get the current stage
+        Stage stage = (Stage) window;
+
+        // Unset full screen and maximized first
+        stage.setMaximized(false);
+        stage.setFullScreen(false);
+
+        // Close the current stage
+        stage.close();
+
+        // Get the FXML loader for the spectrogram view
+        FXMLLoader fxmlLoader = new FXMLLoader(
+                FileUtils.getFileURL("views/fxml/spectrogram-view.fxml")
+        );
+
+        // Get the spectrogram view scene
+        Scene scene = new Scene(fxmlLoader.load());
+
+        // Get the spectrogram view controller
+        SpectrogramViewController controller = fxmlLoader.getController();
+
+        // Return the scene and controller
+        return new Triplet<>(stage, scene, controller);
     }
 }
