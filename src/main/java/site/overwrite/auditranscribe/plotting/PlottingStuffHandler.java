@@ -2,7 +2,7 @@
  * PlottingStuffHandler.java
  *
  * Created on 2022-03-20
- * Updated on 2022-05-01
+ * Updated on 2022-05-12
  *
  * Description: Class that adds the notes' stuff to the spectrogram area.
  */
@@ -124,12 +124,7 @@ public class PlottingStuffHandler {
             noteLine.getStyleClass().add("note-line");
 
             // Set the line dashed format
-            if (i % 12 != 0) {  // Not a C note
-//                noteLine.getStrokeDashArray().addAll(10d, 6d);  // Todo: make this a constant
-            } else {  // A C note
-//                noteLine.getStrokeDashArray().addAll(1d);
-                noteLine.getStyleClass().add("note-line-c");
-            }
+            if (i % 12 == 0) noteLine.getStyleClass().add("note-line-c");
 
             // Add the line to the spectrogram
             spectrogramPane.getChildren().add(noteLine);
