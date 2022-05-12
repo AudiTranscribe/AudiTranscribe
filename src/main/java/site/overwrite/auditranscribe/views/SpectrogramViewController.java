@@ -557,8 +557,17 @@ public class SpectrogramViewController implements Initializable {
      */
     private void seekToTime(double seekTime) throws InvalidObjectException {
         // Ensure that the `seekTime` stays within range
-        if (seekTime < 0) seekTime = 0;
-        if (seekTime > audioDuration) seekTime = audioDuration;
+        if (seekTime < 0 && currTime <= 0) return;  // Do nothing in this case
+        else if (seekTime < 0) seekTime = 0;
+
+        if (seekTime > audioDuration && currTime >= audioDuration) return;  // Do nothing in this case
+        else if (seekTime > audioDuration) {
+            seekTime = audioDuration;
+
+            // Handle weird case where the audio should switch from paused to play for a second to prevent the
+            // double-clicking of the pause button on the next iteration
+            if (isPaused) isPaused = togglePaused(true);
+        }
 
         // Update the start time of the audio
         // (Do this so that when the player resumes out of a stop state it will start here)

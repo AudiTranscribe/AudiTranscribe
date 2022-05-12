@@ -25,12 +25,12 @@ more stable for users to use.
 
 Unsure how to begin? There are a few places you can find issues for the project.
 
-- [`Todo.txt`](Todo.txt). This is the old way of making down what needs to be done in the project. In the future, we'll
-  hopefully migrate all of these to the issue tracker on GitHub.
 - The [GitHub Issue Tracker](https://github.com/Ryan-Kan/AudiTranscribe/issues). This is the new (and main) way of
   obtaining the issues that we need help with. If you're looking for something to contribute, try:
     - Beginner issues: Issues that should only require a few lines of code, and a test or two
     - Help Wanted issues: Issues that are more involved
+- The [AudiTranscribe Bug Tracking Sheet](https://github.com/orgs/AudiTranscribe/projects/2) on GitHub. This neatly
+  organizes all the bugs that are found, and that need fixing.
 
 ## Submitting Contributions
 

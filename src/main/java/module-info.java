@@ -12,6 +12,7 @@ module site.overwrite.auditranscribe {
     requires org.kordamp.bootstrapfx.core;
     requires javatuples;
     requires java.logging;
+    requires javatuples;
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.media;

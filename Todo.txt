@@ -19,6 +19,5 @@ Todo (Not Important):
 
 ====================================================================================================
 Fixme:
-    - "not in fullscreen state" leading to "Apple AWT Internal Exception: Java Exception"
-    - Weird bug where user has to double-click play if at end of audio file is back
+    - None
 ====================================================================================================
