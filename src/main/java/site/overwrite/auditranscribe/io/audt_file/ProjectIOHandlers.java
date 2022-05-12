@@ -324,7 +324,7 @@ public class ProjectIOHandlers {
 
         // Get the FXML loader for the spectrogram view
         FXMLLoader fxmlLoader = new FXMLLoader(
-                FileUtils.getFileURL("views/fxml/spectrogram-view.fxml")
+                IOMethods.getFileURL("views/fxml/spectrogram-view.fxml")
         );
 
         // Get the spectrogram view scene
