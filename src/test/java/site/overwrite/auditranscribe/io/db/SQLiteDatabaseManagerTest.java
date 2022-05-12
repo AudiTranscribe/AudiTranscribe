@@ -2,14 +2,15 @@
  * SQLiteDatabaseManagerTest.java
  *
  * Created on 2022-05-11
- * Updated on 2022-05-11
+ * Updated on 2022-05-12
  *
  * Description: Test `SQLiteDatabaseManager.java`.
  */
 
-package site.overwrite.auditranscribe.io;
+package site.overwrite.auditranscribe.io.db;
 
 import org.junit.jupiter.api.*;
+import site.overwrite.auditranscribe.io.IOMethods;
 
 import static org.junit.jupiter.api.Assertions.*;
 

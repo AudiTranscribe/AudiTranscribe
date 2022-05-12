@@ -2,7 +2,7 @@
  * SpectrogramViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-10
+ * Updated on 2022-05-12
  *
  * Description: Contains the spectrogram view's controller class.
  */
@@ -36,6 +36,7 @@ import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataOb
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.ProjectDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
+import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.plotting.PlottingStuffHandler;
 import site.overwrite.auditranscribe.spectrogram.*;
 import site.overwrite.auditranscribe.utils.*;
@@ -45,6 +46,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.*;
@@ -107,9 +109,11 @@ public class SpectrogramViewController implements Initializable {
     private double currTime = 0;
 
     // Other attributes
-    private String audtFilePath;
     private final Logger logger = Logger.getLogger(this.getClass().getName());
+    private ProjectsDB projectsDB;
 
+    private String audtFilePath;
+    private String audtFileName;
     private String audioFilePath;
     private String audioFileName;
     private Audio audio;
@@ -362,6 +366,13 @@ public class SpectrogramViewController implements Initializable {
                 }
             }
         });
+
+        // Get the projects database
+        try {
+            projectsDB = new ProjectsDB();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // Public methods
@@ -418,9 +429,10 @@ public class SpectrogramViewController implements Initializable {
      * supposedly read from a file.
      *
      * @param audtFilePath <b>Absolute</b> path to the file that contained the data.
+     * @param audtFileName The name of the AUDT file.
      * @param projectData  The project data.
      */
-    public void useExistingData(String audtFilePath, ProjectDataObject projectData) {
+    public void useExistingData(String audtFilePath, String audtFileName, ProjectDataObject projectData) {
         // Set up GUI data
         musicKeyIndex = projectData.guiData.musicKeyIndex;
         timeSignatureIndex = projectData.guiData.timeSignatureIndex;
@@ -431,8 +443,9 @@ public class SpectrogramViewController implements Initializable {
         audioDuration = projectData.guiData.totalDurationInMS / 1000.;
         currTime = projectData.guiData.currTimeInMS / 1000.;
 
-        // Set the AudiTranscribe file's file path
+        // Set the AudiTranscribe file's file path and file name
         this.audtFilePath = audtFilePath;
+        this.audtFileName = audtFileName;
 
         // Set up Q-Transform data and audio data
         try {
@@ -584,8 +597,12 @@ public class SpectrogramViewController implements Initializable {
             // Ask user to choose a file
             FileChooser fileChooser = new FileChooser();
             File file = fileChooser.showSaveDialog(window);
+
             audtFilePath = file.getAbsolutePath();
+            audtFileName = file.getName();
+
             if (!audtFilePath.toLowerCase().endsWith(".audt")) audtFilePath += ".audt";
+            if (!audtFileName.toLowerCase().endsWith(".audt")) audtFileName += ".audt";
 
             logger.log(Level.FINE, "AUDT file destination set to " + audtFilePath);
         }
@@ -614,6 +631,15 @@ public class SpectrogramViewController implements Initializable {
             throw new RuntimeException(e);
         }
         logger.log(Level.INFO, "File saved");
+
+        // Update the project file list
+        try {
+            if (!projectsDB.checkIfProjectExists(audtFilePath)) {
+                projectsDB.insertProjectRecord(audtFilePath, audtFileName);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

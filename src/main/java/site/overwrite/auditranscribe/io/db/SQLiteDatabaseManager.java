@@ -2,12 +2,12 @@
  * SQLiteDatabaseManager.java
  *
  * Created on 2022-05-11
- * Updated on 2022-05-11
+ * Updated on 2022-05-12
  *
  * Description: Class that helps manage the interactions with an SQLite3 database.
  */
 
-package site.overwrite.auditranscribe.io;
+package site.overwrite.auditranscribe.io.db;
 
 import java.sql.*;
 

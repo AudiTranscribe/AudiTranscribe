@@ -1,15 +1,16 @@
 /*
- * ProjectFileList.java
+ * ProjectsDB.java
  *
  * Created on 2022-05-11
- * Updated on 2022-05-11
+ * Updated on 2022-05-12
  *
- * Description: Class that interfaces with the project file list database.
+ * Description: Class that interfaces with the projects' database.
  */
 
-package site.overwrite.auditranscribe.io;
+package site.overwrite.auditranscribe.io.db;
 
 import javafx.util.Pair;
+import site.overwrite.auditranscribe.io.IOMethods;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,18 +18,25 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ProjectFileList {
+/**
+ * Class that interfaces with the projects' database.
+ */
+public class ProjectsDB {
     // SQL Queries
     public static String SQL_CREATE_TABLE = """
             CREATE TABLE IF NOT EXISTS "Projects" (
                 "id"			INTEGER,
             	"filepath"		TEXT UNIQUE,
-            	"filename"		TEXT NOT NULL
+            	"filename"		TEXT NOT NULL,
             	PRIMARY KEY("id")
             );
             """;
     public static String SQL_GET_ALL_PROJECTS = """
-            SELECT * FROM "Projects"
+            SELECT * FROM "Projects";
+            """;
+    public static String SQL_CHECK_IF_PROJECT_EXISTS = """
+            SELECT "id" FROM "Projects"
+            WHERE "filepath" = ?;
             """;
     public static String SQL_INSERT_PROJECT_RECORD = """
             INSERT INTO "Projects" ("filepath", "filename")
@@ -53,17 +61,21 @@ public class ProjectFileList {
     final SQLiteDatabaseManager dbManager;
 
     /**
-     * Initialization method for a new <code>ProjectFileList</code> object.
+     * Initialization method for a new <code>ProjectsDB</code> object.
      *
      * @throws SQLException If something went wrong when executing the SQL query.
      */
-    public ProjectFileList() throws SQLException {
+    public ProjectsDB() throws SQLException {
         // Attempt creation of the database file
         IOMethods.createFile(PROJECT_FILE_LIST_DB_PATH);
 
-        // Now attempt creation of the database table
+        // Create a database manager object
         dbManager = new SQLiteDatabaseManager(PROJECT_FILE_LIST_DB_PATH);
+
+        // Create the projects table
+        dbManager.dbConnect();
         dbManager.executeUpdate(SQL_CREATE_TABLE);
+        dbManager.dbDisconnect();
     }
 
     // Public methods
@@ -102,9 +114,40 @@ public class ProjectFileList {
     }
 
     /**
+     * Method that checks if the project with the specified file path already exists within the
+     * database.
+     *
+     * @param filepath <b>Absolute</b> path to the project file.
+     * @return Boolean. Is <code>true</code> if the project already exists, and <code>false</code>
+     * if it does not.
+     * @throws SQLException If something went wrong when executing the SQL query.
+     */
+    public boolean checkIfProjectExists(String filepath) throws SQLException {
+        // Start connection with the database
+        dbManager.dbConnect();
+
+        boolean projectExists = false;
+        try (PreparedStatement checkProjectStatement = dbManager.prepareStatement(SQL_CHECK_IF_PROJECT_EXISTS)) {
+            // Prepare the statement for execution
+            checkProjectStatement.setString(1, filepath);
+
+            // Execute the statement
+            try (ResultSet resultSet = dbManager.executeGetQuery(checkProjectStatement)) {
+                if (resultSet.next()) projectExists = true;
+            }
+        }
+
+        // Close connection with database
+        dbManager.dbDisconnect();
+
+        // Return the `projectExists` flag
+        return projectExists;
+    }
+
+    /**
      * Method that inserts a new project record into the database.
      *
-     * @param filepath <b>Absolute </b> path to the project file.
+     * @param filepath <b>Absolute</b> path to the project file.
      * @param filename Project file's name.
      * @throws SQLException If something went wrong when executing the SQL query.<br>
      *                      Specifically, for this method, a <code>SQLException</code> would likely

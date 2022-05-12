@@ -2,7 +2,7 @@
  * MainApplication.java
  *
  * Created on 2022-02-09
- * Updated on 2022-05-10
+ * Updated on 2022-05-11
  *
  * Description: Contains the main application class.
  */
@@ -21,6 +21,9 @@ public class MainApplication extends Application {
     // Initialization method
     @Override
     public void start(Stage stage) throws IOException {
+        // Ensure that an application folder exists
+        IOMethods.createAppDataFolder();
+
         // Load the FXML file into the scene
         FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/main-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());

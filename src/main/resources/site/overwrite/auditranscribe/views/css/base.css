@@ -16,7 +16,7 @@
 }
 
 /* MAIN PAGE */
-/* Labels */
+/* Labels and Texts */
 .title-label {
     -fx-font-size: 64px;
     -fx-font-weight: bold;
@@ -24,6 +24,28 @@
 
 .version-label {
     -fx-font-size: 22px;
+}
+
+.project-name-label, .last-opened-date-label, .filepath-label, .short-name-text {
+    -fx-text-overrun: ellipsis;
+}
+
+.project-name-label {
+    -fx-max-width: 375px;
+    -fx-text-alignment: left;
+}
+
+.last-opened-date-label {
+    -fx-max-width: 225px;
+    -fx-text-alignment: right;
+}
+
+.filepath-label {
+    -fx-max-width: 600px;
+}
+
+.short-name-text {
+    -fx-font-size: 24pt;
 }
 
 /* Buttons */
@@ -39,6 +61,11 @@
 
 .search-text-field {
     -fx-font-size: 14px;
+}
+
+.short-name-rectangle {
+    -fx-arc-width: 25px;
+    -fx-arc-height: 25px;
 }
 
 /* SPECTROGRAM PAGE */

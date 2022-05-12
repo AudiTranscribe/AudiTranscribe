@@ -1,3 +1,9 @@
+/* MAIN PAGE */
+/* Others */
+.short-name-rectangle {
+    -fx-stroke: #000000ff;
+}
+
 /* SPECTROGRAM PAGE */
 /* Labels */
 .display-label {

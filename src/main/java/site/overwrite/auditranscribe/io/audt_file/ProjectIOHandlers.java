@@ -2,7 +2,7 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-05-10
+ * Updated on 2022-05-12
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
@@ -223,6 +223,7 @@ public class ProjectIOHandlers {
                                 "' as a WAV file. Please check if " + "this is a valid WAV file.",
                         e
                 );
+                e.printStackTrace();
             }
 
         } else {
@@ -251,6 +252,7 @@ public class ProjectIOHandlers {
             try {
                 // Try and read the file as an AUDT file
                 String audtFilePath = file.getAbsolutePath();
+                String audtFileName = file.getName();
                 AUDTFileReader reader = new AUDTFileReader(audtFilePath);
 
                 // Read the data from the file
@@ -282,7 +284,7 @@ public class ProjectIOHandlers {
                 SpectrogramViewController controller = fxmlLoader.getController();
 
                 // Set the project data for the existing project
-                controller.useExistingData(audtFilePath, projectDataObject);
+                controller.useExistingData(audtFilePath, audtFileName, projectDataObject);
                 controller.finishSetup();
 
                 // Set the new scene
@@ -312,6 +314,7 @@ public class ProjectIOHandlers {
                                 "' as an AUDT file. Please check if " + "this is a valid AUDT file.",
                         e
                 );
+                e.printStackTrace();
             }
         } else {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
