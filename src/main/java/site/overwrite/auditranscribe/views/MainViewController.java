@@ -2,7 +2,7 @@
  * MainViewController.java
  *
  * Created on 2022-02-09
- * Updated on 2022-05-12
+ * Updated on 2022-05-14
  *
  * Description: Contains the main view's controller class.
  */
@@ -13,6 +13,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -21,7 +22,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
-import javafx.util.Pair;
+import org.javatuples.Pair;
 import org.javatuples.Quartet;
 import site.overwrite.auditranscribe.io.audt_file.ProjectIOHandlers;
 import site.overwrite.auditranscribe.io.PropertyFile;
@@ -43,7 +44,8 @@ import java.util.logging.Logger;
 class SortByTimestamp implements Comparator<Quartet<Long, String, String, String>> {
     @Override
     public int compare(
-            Quartet<Long, String, String, String> o1, Quartet<Long, String, String, String> o2
+            Quartet<Long, String, String, String> o1,
+            Quartet<Long, String, String, String> o2
     ) {
         return (int) -(o1.getValue0() - o2.getValue0());  // Sort in descending order
     }
@@ -83,7 +85,7 @@ class CustomListCell extends ListCell<Quartet<Long, String, String, String>> {
         shortNameRectangle = new Rectangle();
         shortNameRectangle.getStyleClass().add("short-name-rectangle");
 
-        shortNameRectangle.setFill(Color.TRANSPARENT);  // Todo: randomly assign colours
+        shortNameRectangle.setFill(Color.TRANSPARENT);
         shortNameRectangle.setWidth(50);
         shortNameRectangle.setHeight(50);
 
@@ -100,7 +102,10 @@ class CustomListCell extends ListCell<Quartet<Long, String, String, String>> {
         nameDateAndFilepathBox.setSpacing(5);
 
         content = new HBox(shortNameDisplayArea, nameDateAndFilepathBox);
-        content.setSpacing(15);
+        content.setSpacing(10);
+        content.setPadding(
+                new Insets(0, 25, 0, 25)  // Although FXML file uses 30, use 25 because spacing is 10
+        );
     }
 
     @Override
@@ -119,6 +124,8 @@ class CustomListCell extends ListCell<Quartet<Long, String, String, String>> {
             nameLabel.setText(object.getValue1());
             filepathLabel.setText(object.getValue2());
             shortNameText.setText(object.getValue3());
+
+            // Set the graphic of the list item
             setGraphic(content);
         } else {
             setGraphic(null);
@@ -163,8 +170,8 @@ public class MainViewController implements Initializable {
             for (int key : keys) {
                 // Get both the filepath and the filename
                 Pair<String, String> values = projectRecords.get(key);
-                String filepath = values.getKey();
-                String filename = values.getValue();
+                String filepath = values.getValue0();
+                String filename = values.getValue1();
 
                 // Get the last accessed time of the file
                 BasicFileAttributes attributes = Files.readAttributes(Path.of(filepath), BasicFileAttributes.class);
@@ -176,9 +183,7 @@ public class MainViewController implements Initializable {
                 String shortenedName = MiscUtils.getShortenedName(filename);
 
                 // Add to the list of projects
-                projects.add(new Quartet<>(
-                        lastAccessTimestamp, filename, filepath, shortenedName
-                ));
+                projects.add(new Quartet<>(lastAccessTimestamp, filename, filepath, shortenedName));
             }
 
             // Sort the list of projects by the last access timestamp

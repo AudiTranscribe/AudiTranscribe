@@ -2,14 +2,14 @@
  * ProjectsDB.java
  *
  * Created on 2022-05-11
- * Updated on 2022-05-12
+ * Updated on 2022-05-14
  *
  * Description: Class that interfaces with the projects' database.
  */
 
 package site.overwrite.auditranscribe.io.db;
 
-import javafx.util.Pair;
+import org.javatuples.Pair;
 import site.overwrite.auditranscribe.io.IOMethods;
 
 import java.sql.PreparedStatement;
@@ -25,9 +25,9 @@ public class ProjectsDB {
     // SQL Queries
     public static String SQL_CREATE_TABLE = """
             CREATE TABLE IF NOT EXISTS "Projects" (
-                "id"			INTEGER,
-            	"filepath"		TEXT UNIQUE,
-            	"filename"		TEXT NOT NULL,
+                "id"		INTEGER,
+            	"filepath"	TEXT UNIQUE,
+            	"filename"	TEXT NOT NULL,
             	PRIMARY KEY("id")
             );
             """;

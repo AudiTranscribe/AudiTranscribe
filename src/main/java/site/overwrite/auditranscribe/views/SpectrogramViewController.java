@@ -2,7 +2,7 @@
  * SpectrogramViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-12
+ * Updated on 2022-05-14
  *
  * Description: Contains the spectrogram view's controller class.
  */
@@ -27,7 +27,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Line;
 import javafx.stage.FileChooser;
-import javafx.util.Pair;
+import org.javatuples.Pair;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.Window;
 import site.overwrite.auditranscribe.io.IOMethods;
@@ -183,11 +183,11 @@ public class SpectrogramViewController implements Initializable {
         // Update spinners' ranges
         SpinnerValueFactory.DoubleSpinnerValueFactory bpmSpinnerFactory =
                 new SpinnerValueFactory.DoubleSpinnerValueFactory(
-                        BPM_RANGE.getKey(), BPM_RANGE.getValue(), 120, 0.1
+                        BPM_RANGE.getValue0(), BPM_RANGE.getValue1(), 120, 0.1
                 );
         SpinnerValueFactory.DoubleSpinnerValueFactory offsetSpinnerFactory =
                 new SpinnerValueFactory.DoubleSpinnerValueFactory(
-                        OFFSET_RANGE.getKey(), OFFSET_RANGE.getValue(), 0, 0.01
+                        OFFSET_RANGE.getValue0(), OFFSET_RANGE.getValue1(), 0, 0.01
                 );
 
         bpmSpinner.setValueFactory(bpmSpinnerFactory);
@@ -393,11 +393,11 @@ public class SpectrogramViewController implements Initializable {
 
         SpinnerValueFactory.DoubleSpinnerValueFactory bpmSpinnerFactory =
                 new SpinnerValueFactory.DoubleSpinnerValueFactory(
-                        BPM_RANGE.getKey(), BPM_RANGE.getValue(), bpm, 0.1
+                        BPM_RANGE.getValue0(), BPM_RANGE.getValue1(), bpm, 0.1
                 );
         SpinnerValueFactory.DoubleSpinnerValueFactory offsetSpinnerFactory =
                 new SpinnerValueFactory.DoubleSpinnerValueFactory(
-                        OFFSET_RANGE.getKey(), OFFSET_RANGE.getValue(), offset, 0.01
+                        OFFSET_RANGE.getValue0(), OFFSET_RANGE.getValue1(), offset, 0.01
                 );
 
         bpmSpinner.setValueFactory(bpmSpinnerFactory);
@@ -644,6 +644,7 @@ public class SpectrogramViewController implements Initializable {
         // Update the project file list
         try {
             if (!projectsDB.checkIfProjectExists(audtFilePath)) {
+                // Insert the record into the database
                 projectsDB.insertProjectRecord(audtFilePath, audtFileName);
             }
         } catch (SQLException e) {
@@ -734,7 +735,7 @@ public class SpectrogramViewController implements Initializable {
      */
     private void updateOffsetValue(double newOffset, boolean forceUpdate) {
         // Get the previous offset value
-        double oldOffset = forceUpdate ? OFFSET_RANGE.getKey() - 1 : offset;  // Make it 1 less than permitted
+        double oldOffset = forceUpdate ? OFFSET_RANGE.getValue0() - 1 : offset;  // Make it 1 less than permitted
 
         // Update the beat lines
         beatLines = PlottingStuffHandler.updateBeatLines(
