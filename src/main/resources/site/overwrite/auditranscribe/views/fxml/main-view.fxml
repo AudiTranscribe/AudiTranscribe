@@ -73,7 +73,25 @@
                   <Insets left="30.0" right="30.0" />
                </padding>
             </StackPane>
-            <ListView fx:id="projectsListView" prefHeight="357.0" prefWidth="800.0" />
+            <StackPane prefHeight="357.0" prefWidth="800.0">
+               <children>
+                  <VBox alignment="CENTER" prefHeight="357.0" prefWidth="800.0" style="-fx-background-color: white; -fx-border-color: lightgray;">
+                     <children>
+                        <Label alignment="CENTER" text="No Projects Yet...">
+                           <font>
+                              <Font size="28.0" />
+                           </font>
+                        </Label>
+                        <Label text="Create a new project from an audio file, or open an existing project.">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+                  <ListView fx:id="projectsListView" prefHeight="357.0" prefWidth="800.0" />
+               </children>
+            </StackPane>
          </children>
       </VBox>
    </children>

@@ -15,10 +15,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
@@ -208,9 +205,13 @@ public class MainViewController implements Initializable {
             newProjectButton.setOnAction(ProjectIOHandlers::newProject);
             openProjectButton.setOnAction(ProjectIOHandlers::openProject);
 
-            // Write the projects list
-            projectsListView.setItems(projectsList);
-            projectsListView.setCellFactory(customListCellListView -> new CustomListCell());
+            // Update the projects list view
+            if (projectsList.size() != 0) {
+                projectsListView.setItems(projectsList);
+                projectsListView.setCellFactory(customListCellListView -> new CustomListCell());
+            } else {
+                projectsListView.setBackground(Background.fill(Color.TRANSPARENT));
+            }
 
             // Report that the main view is ready to be shown
             logger.log(Level.INFO, "Main view ready to be shown");
