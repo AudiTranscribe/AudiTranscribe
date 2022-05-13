@@ -2,7 +2,7 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-05-12
+ * Updated on 2022-05-13
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
@@ -19,10 +19,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import javafx.stage.Window;
+import javafx.stage.*;
 import org.javatuples.Triplet;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.io.IOMethods;
@@ -41,6 +38,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+
+// Main class
 
 /**
  * Methods that handle the IO operations for an AudiTranscribe project.
@@ -198,12 +197,15 @@ public class ProjectIOHandlers {
 
                 // Set new scene properties
                 stage.setMaximized(true);
-                stage.setFullScreen(true);
-                stage.setResizable(false);
+                stage.setResizable(true);
                 stage.setTitle(file.getName());
 
                 // Show the new scene
                 stage.show();
+
+                // Update the minimum width and height
+                stage.setMinWidth(stage.getWidth());
+                stage.setMinHeight(stage.getHeight());
 
             } catch (UnsupportedAudioFileException | IOException e) {
                 showExceptionAlert(
@@ -269,12 +271,15 @@ public class ProjectIOHandlers {
 
                 // Set new scene properties
                 stage.setMaximized(true);
-                stage.setFullScreen(true);
-                stage.setResizable(false);
+                stage.setResizable(true);
                 stage.setTitle(projectDataObject.guiData.audioFileName);
 
                 // Show the new scene
                 stage.show();
+
+                // Update the minimum width and height
+                stage.setMinWidth(stage.getWidth());
+                stage.setMinHeight(stage.getHeight());
 
                 // Update scroll position
                 // (Annoyingly we have to do this AFTER the stage is shown)
