@@ -476,6 +476,16 @@ public class SpectrogramViewController implements Initializable {
         // Update music key and beats per bar
         musicKey = MUSIC_KEYS[musicKeyIndex];
         beatsPerBar = TIME_SIGNATURE_TO_BEATS_PER_BAR.get(TIME_SIGNATURES[timeSignatureIndex]);
+
+        // Attempt to add this project to the projects' database
+        try {
+            if (!projectsDB.checkIfProjectExists(audtFilePath)) {
+                // Insert the record into the database
+                projectsDB.insertProjectRecord(audtFilePath, audtFileName);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
