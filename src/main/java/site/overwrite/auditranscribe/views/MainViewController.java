@@ -11,6 +11,8 @@ package site.overwrite.auditranscribe.views;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -192,8 +194,9 @@ public class MainViewController implements Initializable {
             throw new RuntimeException(e);
         }
 
-        // Convert the `projects` list to an FXML `ObservableList`
+        // Convert the `projects` list to an FXML `ObservableList` and a `FilteredList` to allow for searching
         ObservableList<Quartet<Long, String, String, String>> projectsList = FXCollections.observableList(projects);
+        FilteredList<Quartet<Long, String, String, String>> filteredList = new FilteredList<>(projectsList);
 
         // Handle the rest of the startup
         try {
@@ -226,9 +229,23 @@ public class MainViewController implements Initializable {
                 ProjectIOHandlers.openProject(window, file);
             });
 
+            // Set the search field method
+            searchTextField.textProperty().addListener((observable, oldValue, newValue) ->
+                    filteredList.setPredicate(projectRecord -> {
+                        // If filter text is empty, display all projects
+                        if (newValue == null || newValue.isEmpty()) return true;
+
+                        // Attempt to find a match within the *file path*
+                        String searchFilter = newValue.toLowerCase();
+                        String lowercaseFilepath = projectRecord.getValue2().toLowerCase();
+
+                        return lowercaseFilepath.contains(searchFilter);
+                    })
+            );
+
             // Update the projects list view
             if (projectsList.size() != 0) {
-                projectsListView.setItems(projectsList);
+                projectsListView.setItems(new SortedList<>(filteredList));  // Use a sorted list for searching
                 projectsListView.setCellFactory(customListCellListView -> new CustomListCell());
                 projectsListView.setOnMouseClicked(mouseEvent -> {
                     // Get the selected item
