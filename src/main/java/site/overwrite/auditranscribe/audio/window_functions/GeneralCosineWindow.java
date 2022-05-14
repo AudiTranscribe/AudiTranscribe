@@ -2,12 +2,12 @@
  * GeneralCosineWindow.java
  *
  * Created on 2022-03-12
- * Updated on 2022-04-15
+ * Updated on 2022-05-14
  *
  * Description: Class that encapsulates the General Cosine window function.
  */
 
-package site.overwrite.auditranscribe.audio.windows;
+package site.overwrite.auditranscribe.audio.window_functions;
 
 /**
  * General Cosine window.
