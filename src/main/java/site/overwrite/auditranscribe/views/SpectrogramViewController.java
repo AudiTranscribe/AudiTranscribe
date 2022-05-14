@@ -27,12 +27,12 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Line;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.javatuples.Pair;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.io.audt_file.ProjectIOHandlers;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.ProjectDataObject;
@@ -110,6 +110,8 @@ public class SpectrogramViewController implements Initializable {
     private double currTime = 0;
 
     // Other attributes
+    Stage mainStage;
+
     private final Logger logger = Logger.getLogger(this.getClass().getName());
     private ProjectsDB projectsDB;
 
@@ -268,7 +270,7 @@ public class SpectrogramViewController implements Initializable {
             File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
             // Create the new project
-            ProjectIOHandlers.newProject(window, file);
+            ProjectIOHandlers.newProject(mainStage, (Stage) window, file);
         });
 
         openProjectButton.setOnAction(actionEvent -> {
@@ -279,7 +281,7 @@ public class SpectrogramViewController implements Initializable {
             File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
             // Open the existing project
-            ProjectIOHandlers.openProject(window, file);
+            ProjectIOHandlers.openProject(mainStage, (Stage) window, file);
         });
 
         saveProjectButton.setOnAction(this::handleSavingProject);
@@ -400,8 +402,12 @@ public class SpectrogramViewController implements Initializable {
      * Method that finishes the setting up of the spectrogram view controller.<br>
      * Note that this method has to be called <b>last</b>, after all other spectrogram things have
      * been set up.
+     * @param mainStage Main stage.
      */
-    public void finishSetup() {
+    public void finishSetup(Stage mainStage) {
+        // Update the main stage attribute
+        this.mainStage = mainStage;
+
         // Set choices
         musicKeyChoice.setValue(MUSIC_KEYS[musicKeyIndex]);
         timeSignatureChoice.setValue(TIME_SIGNATURES[timeSignatureIndex]);
@@ -553,10 +559,11 @@ public class SpectrogramViewController implements Initializable {
      * Method that updates the scrolling of the page to center the playhead.
      *
      * @param newPosX New X position.
+     * @param width   Width of the spectrogram pane.
      */
-    public void updateScrollPosition(double newPosX) {
+    public void updateScrollPosition(double newPosX, double width) {
         // Get the 'half width' of the spectrogram area
-        double spectrogramAreaHalfWidth = spectrogramPane.getWidth() / 2;
+        double spectrogramAreaHalfWidth = width / 2;
 
         // Set the H-value of the spectrogram pane
         if (newPosX <= spectrogramAreaHalfWidth) {
@@ -636,6 +643,10 @@ public class SpectrogramViewController implements Initializable {
             FileChooser fileChooser = new FileChooser();
             File file = fileChooser.showSaveDialog(window);
 
+            // If operation was cancelled return
+            if (file == null) return;
+
+            // Update the file path and file name
             audtFilePath = file.getAbsolutePath();
             audtFileName = file.getName();
 
@@ -874,7 +885,7 @@ public class SpectrogramViewController implements Initializable {
 
                 // Update scrolling
                 if (scrollToPlayhead) {
-                    updateScrollPosition(newPosX);
+                    updateScrollPosition(newPosX, spectrogramPane.getWidth());
                 }
             }
         }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);
@@ -1039,7 +1050,7 @@ public class SpectrogramViewController implements Initializable {
             File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
             // Create the new project
-            ProjectIOHandlers.newProject(window, file);
+            ProjectIOHandlers.newProject(mainStage, (Stage) window, file);
 
         } else if (OPEN_PROJECT_COMBINATION.match(keyEvent)) {  // Open a project
             // Get the current window
@@ -1049,7 +1060,7 @@ public class SpectrogramViewController implements Initializable {
             File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
             // Open the existing project
-            ProjectIOHandlers.openProject(window, file);
+            ProjectIOHandlers.openProject(mainStage, (Stage) window, file);
 
         } else if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {  // Save current project
             handleSavingProject(keyEvent);

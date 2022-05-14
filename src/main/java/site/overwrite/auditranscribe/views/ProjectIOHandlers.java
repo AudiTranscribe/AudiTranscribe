@@ -7,10 +7,11 @@
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
 
-package site.overwrite.auditranscribe.io.audt_file;
+package site.overwrite.auditranscribe.views;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -21,7 +22,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.stage.*;
-import org.javatuples.Triplet;
+import org.javatuples.Pair;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
@@ -32,7 +33,6 @@ import site.overwrite.auditranscribe.io.audt_file.exceptions.FailedToReadDataExc
 import site.overwrite.auditranscribe.io.audt_file.exceptions.IncorrectFileFormatException;
 import site.overwrite.auditranscribe.io.audt_file.file_handers.AUDTFileReader;
 import site.overwrite.auditranscribe.io.audt_file.file_handers.AUDTFileWriter;
-import site.overwrite.auditranscribe.views.SpectrogramViewController;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
@@ -51,40 +51,45 @@ public class ProjectIOHandlers {
     /**
      * Method that handles the creation of a new AudiTranscribe project.
      *
-     * @param window Window to use for the file selection dialog.
-     * @param file   File to open.
+     * @param mainStage          Main stage.
+     * @param transcriptionStage Stage that contains the transcription scene.
+     * @param file               File to open.
      */
-    public static void newProject(Window window, File file) {
+    public static void newProject(Stage mainStage, Stage transcriptionStage, File file) {
         // Verify that the user choose a file
         if (file != null) {
             try {
                 // Try and read the file as an audio file
                 Audio audio = new Audio(file);  // Failure to read will throw an exception
 
-                // Get the stage, scene and controller
-                Triplet<Stage, Scene, SpectrogramViewController> stageSceneAndController = getController(window);
-                Stage stage = stageSceneAndController.getValue0();
-                Scene scene = stageSceneAndController.getValue1();
-                SpectrogramViewController controller = stageSceneAndController.getValue2();
+                // Get the current scene and the spectrogram view controller
+                Pair<Scene, SpectrogramViewController> stageSceneAndController = getController(transcriptionStage);
+                Scene scene = stageSceneAndController.getValue0();
+                SpectrogramViewController controller = stageSceneAndController.getValue1();
 
                 // Set the project data for the existing project
                 controller.setAudioAndSpectrogramData(audio);
-                controller.finishSetup();
+                controller.finishSetup(mainStage);
 
-                // Set the new scene
-                stage.setScene(scene);
+                // Set the scene for the transcription page
+                transcriptionStage.setScene(scene);
 
                 // Set new scene properties
-                stage.setMaximized(true);
-                stage.setResizable(true);
-                stage.setTitle(file.getName());
+                transcriptionStage.setMaximized(true);
+                transcriptionStage.setResizable(true);
+                transcriptionStage.setTitle(file.getName());
 
-                // Show the new scene
-                stage.show();
+                // Set width and height of the new scene
+                Rectangle2D screenBounds = Screen.getPrimary().getBounds();
+                transcriptionStage.setMinWidth(screenBounds.getWidth());
+                transcriptionStage.setMinHeight(screenBounds.getHeight());
 
-                // Update the minimum width and height
-                stage.setMinWidth(stage.getWidth());
-                stage.setMinHeight(stage.getHeight());
+                // Hide main stage (if necessary) and show transcription stage (if necessary)
+                if (mainStage.isShowing()) mainStage.hide();
+                if (!transcriptionStage.isShowing()) {
+                    transcriptionStage.showAndWait();
+                    mainStage.show();  // Show the main scene upon the spectrogram scene's closure
+                }
 
             } catch (UnsupportedAudioFileException | IOException e) {
                 showExceptionAlert(
@@ -110,10 +115,11 @@ public class ProjectIOHandlers {
     /**
      * Method that handles the opening of an existing AudiTranscribe project.
      *
-     * @param window Window to use for the file selection dialog.
-     * @param file   File to open.
+     * @param mainStage          Main stage.
+     * @param transcriptionStage Stage that contains the transcription scene.
+     * @param file               File to open.
      */
-    public static void openProject(Window window, File file) {
+    public static void openProject(Stage mainStage, Stage transcriptionStage, File file) {
         // Verify that the user choose a file
         if (file != null) {
             try {
@@ -128,42 +134,44 @@ public class ProjectIOHandlers {
                 GUIDataObject guiData = reader.readGUIData();
 
                 // Pass these data into a `ProjectDataObject`
-                ProjectDataObject projectDataObject = new ProjectDataObject(
-                        qTransformData, audioData, guiData
-                );
+                ProjectDataObject projectDataObject = new ProjectDataObject(qTransformData, audioData, guiData);
 
-                // Get the stage, scene and controller
-                Triplet<Stage, Scene, SpectrogramViewController> stageSceneAndController = getController(window);
-                Stage stage = stageSceneAndController.getValue0();
-                Scene scene = stageSceneAndController.getValue1();
-                SpectrogramViewController controller = stageSceneAndController.getValue2();
+                // Get the current scene and the spectrogram view controller
+                Pair<Scene, SpectrogramViewController> stageSceneAndController = getController(transcriptionStage);
+                Scene scene = stageSceneAndController.getValue0();
+                SpectrogramViewController controller = stageSceneAndController.getValue1();
 
                 // Set the project data for the existing project
                 controller.useExistingData(audtFilePath, audtFileName, projectDataObject);
-                controller.finishSetup();
+                controller.finishSetup(mainStage);
 
-                // Set the new scene
-                stage.setScene(scene);
+                // Set the scene for the transcription page
+                transcriptionStage.setScene(scene);
 
                 // Set new scene properties
-                stage.setMaximized(true);
-                stage.setResizable(true);
-                stage.setTitle(projectDataObject.guiData.audioFileName);
+                transcriptionStage.setMaximized(true);
+                transcriptionStage.setResizable(true);
+                transcriptionStage.setTitle(guiData.audioFileName);
 
-                // Show the new scene
-                stage.show();
-
-                // Update the minimum width and height
-                stage.setMinWidth(stage.getWidth());
-                stage.setMinHeight(stage.getHeight());
+                // Set width and height of the new scene
+                Rectangle2D screenBounds = Screen.getPrimary().getBounds();
+                transcriptionStage.setMinWidth(screenBounds.getWidth());
+                transcriptionStage.setMinHeight(screenBounds.getHeight());
 
                 // Update scroll position
-                // (Annoyingly we have to do this AFTER the stage is shown)
                 controller.updateScrollPosition(
                         projectDataObject.guiData.currTimeInMS / 1000. *
                                 controller.PX_PER_SECOND *
-                                controller.SPECTROGRAM_ZOOM_SCALE_X
+                                controller.SPECTROGRAM_ZOOM_SCALE_X,
+                        screenBounds.getWidth()
                 );
+
+                // Hide main stage (if necessary) and show transcription stage (if necessary)
+                if (mainStage.isShowing()) mainStage.hide();
+                if (!transcriptionStage.isShowing()) {
+                    transcriptionStage.showAndWait();
+                    mainStage.show();  // Show the main scene upon the spectrogram scene's closure
+                }
 
             } catch (IOException | IncorrectFileFormatException | FailedToReadDataException e) {
                 showExceptionAlert(
@@ -294,27 +302,21 @@ public class ProjectIOHandlers {
     }
 
     /**
-     * Helper method that gets the stage, scene and view controller of the spectrogram view.
+     * Helper method that gets the spectrogram scene and spectrogram view controller.
      *
-     * @param window Root window.
-     * @return Stage, scene and view controller.
+     * @param transcriptionStage Stage that contains the transcription scene.
+     * @return Spectrogram scene object and the <code>SpectrogramViewController</code> object.
      * @throws IOException If the spectrogram view FXML file cannot be found.
      */
-    private static Triplet<Stage, Scene, SpectrogramViewController> getController(Window window) throws IOException {
-        // Get the current stage
-        Stage stage = (Stage) window;
-
+    private static Pair<Scene, SpectrogramViewController> getController(
+            Stage transcriptionStage
+    ) throws IOException {
         // Unset full screen and maximized first
-        stage.setMaximized(false);
-        stage.setFullScreen(false);
-
-        // Close the current stage
-        stage.close();
+        transcriptionStage.setMaximized(false);
+        transcriptionStage.setFullScreen(false);
 
         // Get the FXML loader for the spectrogram view
-        FXMLLoader fxmlLoader = new FXMLLoader(
-                IOMethods.getFileURL("views/fxml/spectrogram-view.fxml")
-        );
+        FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/spectrogram-view.fxml"));
 
         // Get the spectrogram view scene
         Scene scene = new Scene(fxmlLoader.load());
@@ -323,6 +325,6 @@ public class ProjectIOHandlers {
         SpectrogramViewController controller = fxmlLoader.getController();
 
         // Return the scene and controller
-        return new Triplet<>(stage, scene, controller);
+        return new Pair<>(scene, controller);
     }
 }

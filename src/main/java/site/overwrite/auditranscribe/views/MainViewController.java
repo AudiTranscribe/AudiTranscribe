@@ -23,11 +23,11 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.javatuples.Pair;
 import org.javatuples.Quartet;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.io.audt_file.ProjectIOHandlers;
 import site.overwrite.auditranscribe.io.PropertyFile;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.utils.MiscUtils;
@@ -48,6 +48,8 @@ import java.util.logging.Logger;
 public class MainViewController implements Initializable {
     // Attributes
     ProjectsDB projectsDB;
+    Stage transcriptionStage = new Stage();  // Will be used and shown later
+
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     // FXML Elements
@@ -200,8 +202,6 @@ public class MainViewController implements Initializable {
                 setGraphic(null);
             }
         }
-
-
     }
 
     static class SortByTimestamp implements Comparator<Quartet<Long, String, String, String>> {
@@ -217,6 +217,7 @@ public class MainViewController implements Initializable {
     // Initialization method
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        // Get all projects' records
         List<Quartet<Long, String, String, String>> projects = new ArrayList<>();
 
         try {
@@ -277,7 +278,7 @@ public class MainViewController implements Initializable {
                 File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
                 // Create the new project
-                ProjectIOHandlers.newProject(window, file);
+                ProjectIOHandlers.newProject((Stage) window, transcriptionStage, file);
             });
 
             openProjectButton.setOnAction(actionEvent -> {
@@ -288,7 +289,7 @@ public class MainViewController implements Initializable {
                 File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
                 // Open the existing project
-                ProjectIOHandlers.openProject(window, file);
+                ProjectIOHandlers.openProject((Stage) window, transcriptionStage, file);
             });
 
             // Set the search field method
@@ -326,7 +327,7 @@ public class MainViewController implements Initializable {
                         Window window = ProjectIOHandlers.getWindow(mouseEvent);
 
                         // Open the project with the filepath
-                        ProjectIOHandlers.openProject(window, file);
+                        ProjectIOHandlers.openProject((Stage) window, transcriptionStage, file);
                     }
                 });
             } else {

@@ -19,5 +19,6 @@ Todo (Not Important):
 
 ====================================================================================================
 Fixme:
-    - None
+    - Showing main view after closing the main view shows the selected project as white
+    - Need to refresh main page after projects' database update
 ====================================================================================================
