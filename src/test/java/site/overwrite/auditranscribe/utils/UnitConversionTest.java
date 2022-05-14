@@ -68,6 +68,13 @@ class UnitConversionTest {
     }
 
     @Test
+    void freqToNoteNumber() {
+        assertEquals(57, UnitConversion.freqToNoteNumber(440), 0.001);  // A4
+        assertEquals(0, UnitConversion.freqToNoteNumber(16.352), 0.001);  // C0
+        assertEquals(119, UnitConversion.freqToNoteNumber(15804.266), 0.001);  // B9
+    }
+
+    @Test
     void noteNumberToNote() {
         assertEquals("C0", UnitConversion.noteNumberToNote(0, false));
         assertEquals("D#3", UnitConversion.noteNumberToNote(39, false));

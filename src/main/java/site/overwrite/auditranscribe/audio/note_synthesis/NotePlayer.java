@@ -9,7 +9,6 @@
 
 package site.overwrite.auditranscribe.audio.note_synthesis;
 
-import javafx.application.Platform;
 import site.overwrite.auditranscribe.utils.UnitConversion;
 
 import javax.sound.midi.*;
@@ -133,7 +132,8 @@ public class NotePlayer {
             throw new InvalidParameterException("MIDI number cannot be found for note number " + noteNumber);
         }
 
-        Platform.runLater(() -> {
+        // Play the sound
+        Thread playSoundThread = new Thread(() -> {
             // Turn on the note on that channel
             midiChannels[channelNum].noteOn(midiNumber, onVelocity);
 
@@ -150,5 +150,7 @@ public class NotePlayer {
             } catch (InterruptedException ignored) {
             }
         });
+        playSoundThread.setDaemon(true);
+        playSoundThread.start();
     }
 }

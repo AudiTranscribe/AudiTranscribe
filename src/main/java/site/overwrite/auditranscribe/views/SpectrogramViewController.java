@@ -32,21 +32,25 @@ import javafx.stage.Window;
 import org.javatuples.Pair;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
+import site.overwrite.auditranscribe.audio.note_synthesis.NotePlayer;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.ProjectDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
+import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 import site.overwrite.auditranscribe.plotting.PlottingStuffHandler;
 import site.overwrite.auditranscribe.spectrogram.*;
 import site.overwrite.auditranscribe.utils.*;
 
+import javax.sound.midi.MidiUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.net.URL;
+import java.security.InvalidParameterException;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -94,6 +98,13 @@ public class SpectrogramViewController implements Initializable {
 
     final double VOLUME_VALUE_DELTA_ON_KEY_PRESS = 0.05;
 
+    final String NOTE_PLAYING_INSTRUMENT = "PIANO";
+    final int MIDI_CHANNEL_NUM = 0;
+    final int NOTE_PLAYING_ON_VELOCITY = 96;  // Within the range [0, 127]
+    final int NOTE_PLAYING_OFF_VELOCITY = 10;   // Within the range [0, 127]
+    final long NOTE_PLAYING_ON_DURATION = 100;  // In milliseconds
+    final long NOTE_PLAYING_OFF_DURATION = 900;  // In milliseconds
+
     final KeyCodeCombination NEW_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN);
     final KeyCodeCombination OPEN_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN);
     final KeyCodeCombination SAVE_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN);
@@ -112,6 +123,8 @@ public class SpectrogramViewController implements Initializable {
     // Other attributes
     Stage mainStage;
     MainViewController mainViewController;
+
+    NotePlayer notePlayer;
 
     private final Logger logger = Logger.getLogger(this.getClass().getName());
     private ProjectsDB projectsDB;
@@ -183,6 +196,13 @@ public class SpectrogramViewController implements Initializable {
         // Add CSS stylesheets to the scene
         mainPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
         mainPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/light-mode.css"));  // Todo: add theme support
+
+        // Update any attributes
+        try {
+            notePlayer = new NotePlayer(NOTE_PLAYING_INSTRUMENT, MIDI_CHANNEL_NUM);
+        } catch (MidiUnavailableException e) {
+            throw new RuntimeException(e);
+        }
 
         // Update spinners' ranges
         SpinnerValueFactory.DoubleSpinnerValueFactory bpmSpinnerFactory =
@@ -364,6 +384,35 @@ public class SpectrogramViewController implements Initializable {
             }
 
             logger.log(Level.FINE, "Changed volume from " + oldValue + " to " + newValue);
+        });
+
+        // Set spectrogram pane click method
+        spectrogramPaneAnchor.setOnMouseClicked(event -> {
+            // Ensure that the click is within the pane
+            double clickX = event.getX();
+            double clickY = event.getY();
+
+            if (clickX >= spectrogramPaneAnchor.getBoundsInParent().getMinX() &&
+                    clickX <= spectrogramPaneAnchor.getBoundsInParent().getMaxX() &&
+                    clickY >= spectrogramPaneAnchor.getBoundsInParent().getMinY() &&
+                    clickY <= spectrogramPaneAnchor.getBoundsInParent().getMaxY()
+            ) {
+                // Compute the frequency that the mouse click would correspond to
+                double estimatedFreq = PlottingHelpers.heightToFreq(
+                        clickY, UnitConversion.noteNumberToFreq(MIN_NOTE_NUMBER),
+                        UnitConversion.noteNumberToFreq(MAX_NOTE_NUMBER), spectrogramPaneAnchor.getHeight()
+                );
+
+                // Now estimate the note number
+                int estimatedNoteNum = (int) Math.round(UnitConversion.freqToNoteNumber(estimatedFreq));
+
+                // Play the note
+                try {
+                    logger.log(Level.FINE, "Playing " + UnitConversion.noteNumberToNote(estimatedNoteNum, false));
+                    notePlayer.playNoteForDuration(estimatedNoteNum, NOTE_PLAYING_ON_VELOCITY, NOTE_PLAYING_OFF_VELOCITY, NOTE_PLAYING_ON_DURATION, NOTE_PLAYING_OFF_DURATION);
+                } catch (InvalidParameterException ignored) {
+                }
+            }
         });
 
         // Set clickable progress pane method

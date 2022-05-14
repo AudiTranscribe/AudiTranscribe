@@ -13,6 +13,7 @@ Todo (Less Important):
     - BPM Estimation
     - Add "Save File As" button
     - Add 'feedback' for successful file saving
+    - Allow setting of note playing volume
 
 Todo (Not Important):
     - Compress the filter data

@@ -116,6 +116,17 @@ public class UnitConversion {
     }
 
     /**
+     * Converts the frequency to an estimated note number.
+     * @param freq  Frequency of the note with that note number. The returned frequency assumes that
+     *              the notes have been tuned to A440.
+     * @return  The estimated note number. This is a <b>double</b> and needs to be rounded. That
+     * task is left to another method and not this one.
+     */
+    public static double freqToNoteNumber(double freq) {
+        return 12 * MathUtils.log2(freq / 440) + 57;
+    }
+
+    /**
      * Converts a note number to its spelled note.<br>
      * Note that the note number for C0 is 0 and subsequent note numbers are given by their offset
      * from C0. For example, A4 has note number 57 as it is 57 notes away from C0.
