@@ -2,7 +2,7 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-05-13
+ * Updated on 2022-05-14
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
@@ -17,6 +17,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.stage.*;
@@ -50,132 +51,10 @@ public class ProjectIOHandlers {
     /**
      * Method that handles the creation of a new AudiTranscribe project.
      *
-     * @param event Action event that triggered this method.
+     * @param window Window to use for the file selection dialog.
+     * @param file   File to open.
      */
-    public static void newProject(ActionEvent event) {
-        // Get current window
-        Window window = ((Node) event.getSource()).getScene().getWindow();
-
-        // Continue the process
-        continueMakingNewProject(window);
-    }
-
-    /**
-     * Method that handles the creation of a new AudiTranscribe project.
-     *
-     * @param event Key event that triggered this method.
-     */
-    public static void newProject(KeyEvent event) {
-        // Get current window
-        Window window = ((Scene) event.getSource()).getWindow();
-
-        // Continue the process
-        continueMakingNewProject(window);
-    }
-
-    /**
-     * Method that handles the opening of an existing AudiTranscribe project.
-     *
-     * @param event Event that triggered this method.
-     */
-    public static void openProject(ActionEvent event) {
-        // Get current window
-        Window window = ((Node) event.getSource()).getScene().getWindow();
-
-        // Continue the process
-        continueOpeningProject(window);
-    }
-
-    /**
-     * Method that handles the opening of an existing AudiTranscribe project.
-     *
-     * @param event Event that triggered this method.
-     */
-    public static void openProject(KeyEvent event) {
-        // Get current window
-        Window window = ((Scene) event.getSource()).getWindow();
-
-        // Continue the process
-        continueOpeningProject(window);
-    }
-
-    /**
-     * Method that handles the saving of an AudiTranscribe project.
-     *
-     * @param filepath          Path to the AUDT file.
-     * @param projectDataObject Data object that stores all the data for the project.
-     * @throws IOException If the writing to file encounters an error.
-     */
-    public static void saveProject(String filepath, ProjectDataObject projectDataObject) throws IOException {
-        // Declare the file writer object
-        AUDTFileWriter fileWriter = new AUDTFileWriter(filepath);
-
-        // Write data to the file
-        fileWriter.writeQTransformData(projectDataObject.qTransformData);
-        fileWriter.writeAudioData(projectDataObject.audioData);
-        fileWriter.writeGUIData(projectDataObject.guiData);
-
-        fileWriter.writeBytesToFile();
-    }
-
-    // Private methods
-
-    /**
-     * Helper method that shows an exception alert.
-     *
-     * @param headerText  Header text for the exception alert.
-     * @param contentText Content text for the exception alert.
-     * @param e           Exception that occurred.
-     */
-    private static void showExceptionAlert(String headerText, String contentText, Exception e) {
-        // Create a new error alert
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-
-        // Set the alert style to `UTILITY` so that it can be shown during fullscreen
-        alert.initStyle(StageStyle.UTILITY);
-
-        // Set texts
-        alert.setTitle("Error");
-        alert.setHeaderText(headerText);
-        alert.setContentText(contentText);
-
-        // Set exception texts
-        Label label = new Label("The exception stacktrace was:");
-
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
-
-        TextArea textArea = new TextArea(sw.toString());
-        textArea.setEditable(false);
-        textArea.setWrapText(true);
-
-        textArea.setMaxWidth(Double.MAX_VALUE);
-        textArea.setMaxHeight(Double.MAX_VALUE);
-        GridPane.setVgrow(textArea, Priority.ALWAYS);
-        GridPane.setHgrow(textArea, Priority.ALWAYS);
-
-        GridPane expContent = new GridPane();
-        expContent.setMaxWidth(Double.MAX_VALUE);
-        expContent.add(label, 0, 0);
-        expContent.add(textArea, 0, 1);
-
-        alert.getDialogPane().setExpandableContent(expContent);
-
-        // Show the alert
-        alert.showAndWait();
-    }
-
-    /**
-     * Helper method that finishes the new project creation.
-     *
-     * @param window Current window.
-     */
-    private static void continueMakingNewProject(Window window) {
-        // Ask user to choose a file
-        FileChooser fileChooser = new FileChooser();
-        File file = fileChooser.showOpenDialog(window);
-
+    public static void newProject(Window window, File file) {
         // Verify that the user choose a file
         if (file != null) {
             try {
@@ -229,15 +108,12 @@ public class ProjectIOHandlers {
     }
 
     /**
-     * Helper method that finishes the opening of an AudiTranscribe project
+     * Method that handles the opening of an existing AudiTranscribe project.
      *
-     * @param window Current window.
+     * @param window Window to use for the file selection dialog.
+     * @param file   File to open.
      */
-    private static void continueOpeningProject(Window window) {
-        // Ask user to choose a file
-        FileChooser fileChooser = new FileChooser();
-        File file = fileChooser.showOpenDialog(window);
-
+    public static void openProject(Window window, File file) {
         // Verify that the user choose a file
         if (file != null) {
             try {
@@ -307,6 +183,114 @@ public class ProjectIOHandlers {
 
             alert.showAndWait();
         }
+    }
+
+    /**
+     * Method that handles the saving of an AudiTranscribe project.
+     *
+     * @param filepath          <b>Absolute</b> path to the AUDT file.
+     * @param projectDataObject Data object that stores all the data for the project.
+     * @throws IOException If the writing to file encounters an error.
+     */
+    public static void saveProject(String filepath, ProjectDataObject projectDataObject) throws IOException {
+        // Declare the file writer object
+        AUDTFileWriter fileWriter = new AUDTFileWriter(filepath);
+
+        // Write data to the file
+        fileWriter.writeQTransformData(projectDataObject.qTransformData);
+        fileWriter.writeAudioData(projectDataObject.audioData);
+        fileWriter.writeGUIData(projectDataObject.guiData);
+
+        fileWriter.writeBytesToFile();
+    }
+
+    /**
+     * Method that gets the window of the event.
+     *
+     * @param actionEvent Event caller.
+     * @return WindowFunction.
+     */
+    public static Window getWindow(ActionEvent actionEvent) {
+        return ((Node) actionEvent.getSource()).getScene().getWindow();
+    }
+
+    /**
+     * Method that gets the window of the event.
+     *
+     * @param keyEvent Event caller.
+     * @return WindowFunction.
+     */
+    public static Window getWindow(KeyEvent keyEvent) {
+        return ((Scene) keyEvent.getSource()).getWindow();
+    }
+
+    /**
+     * Method that gets the window of the event.
+     *
+     * @param mouseEvent Event caller.
+     * @return WindowFunction.
+     */
+    public static Window getWindow(MouseEvent mouseEvent) {
+        return ((Node) mouseEvent.getSource()).getScene().getWindow();
+    }
+
+    /**
+     * Method that helps show a file dialog for the user to select a file on.
+     *
+     * @param window WindowFunction to show the file dialog on.
+     * @return A <code>File</code> object, representing the selected file.
+     */
+    public static File getFileFromFileDialog(Window window) {
+        FileChooser fileChooser = new FileChooser();
+        return fileChooser.showOpenDialog(window);
+    }
+
+    // Private methods
+
+    /**
+     * Helper method that shows an exception alert.
+     *
+     * @param headerText  Header text for the exception alert.
+     * @param contentText Content text for the exception alert.
+     * @param e           Exception that occurred.
+     */
+    private static void showExceptionAlert(String headerText, String contentText, Exception e) {
+        // Create a new error alert
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+
+        // Set the alert style to `UTILITY` so that it can be shown during fullscreen
+        alert.initStyle(StageStyle.UTILITY);
+
+        // Set texts
+        alert.setTitle("Error");
+        alert.setHeaderText(headerText);
+        alert.setContentText(contentText);
+
+        // Set exception texts
+        Label label = new Label("The exception stacktrace was:");
+
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+
+        TextArea textArea = new TextArea(sw.toString());
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+        GridPane.setVgrow(textArea, Priority.ALWAYS);
+        GridPane.setHgrow(textArea, Priority.ALWAYS);
+
+        GridPane expContent = new GridPane();
+        expContent.setMaxWidth(Double.MAX_VALUE);
+        expContent.add(label, 0, 0);
+        expContent.add(textArea, 0, 1);
+
+        alert.getDialogPane().setExpandableContent(expContent);
+
+        // Show the alert
+        alert.showAndWait();
     }
 
     /**

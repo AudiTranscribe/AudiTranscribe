@@ -68,6 +68,18 @@
     -fx-arc-height: 25px;
 }
 
+.list-cell {
+    -fx-background-color: transparent;
+}
+
+.list-cell:empty {
+    visibility: hidden;
+}
+
+.list-cell:hover {
+    -fx-cursor: hand;
+}
+
 /* SPECTROGRAM PAGE */
 /* Labels */
 .display-label {

@@ -19,6 +19,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.stage.Window;
 import org.javatuples.Pair;
 import org.javatuples.Quartet;
 import site.overwrite.auditranscribe.io.audt_file.ProjectIOHandlers;
@@ -26,6 +27,7 @@ import site.overwrite.auditranscribe.io.PropertyFile;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.utils.MiscUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -202,13 +204,50 @@ public class MainViewController implements Initializable {
             versionLabel.setText("Version " + projectPropertiesFile.getProperty("version"));
 
             // Add methods to buttons
-            newProjectButton.setOnAction(ProjectIOHandlers::newProject);
-            openProjectButton.setOnAction(ProjectIOHandlers::openProject);
+            newProjectButton.setOnAction(actionEvent -> {
+                // Get the current window
+                Window window = ProjectIOHandlers.getWindow(actionEvent);
+
+                // Get user to select a file
+                File file = ProjectIOHandlers.getFileFromFileDialog(window);
+
+                // Create the new project
+                ProjectIOHandlers.newProject(window, file);
+            });
+
+            openProjectButton.setOnAction(actionEvent -> {
+                // Get the current window
+                Window window = ProjectIOHandlers.getWindow(actionEvent);
+
+                // Get user to select a file
+                File file = ProjectIOHandlers.getFileFromFileDialog(window);
+
+                // Open the existing project
+                ProjectIOHandlers.openProject(window, file);
+            });
 
             // Update the projects list view
             if (projectsList.size() != 0) {
                 projectsListView.setItems(projectsList);
                 projectsListView.setCellFactory(customListCellListView -> new CustomListCell());
+                projectsListView.setOnMouseClicked(mouseEvent -> {
+                    // Get the selected item
+                    Quartet<Long, String, String, String> selectedItem =
+                            projectsListView.getSelectionModel().getSelectedItem();
+
+                    // Check if an item was selected
+                    if (selectedItem != null) {
+                        // Get the file of the selected item
+                        String filepath = selectedItem.getValue2();
+                        File file = new File(filepath);
+
+                        // Get the window
+                        Window window = ProjectIOHandlers.getWindow(mouseEvent);
+
+                        // Open the project with the filepath
+                        ProjectIOHandlers.openProject(window, file);
+                    }
+                });
             } else {
                 projectsListView.setBackground(Background.fill(Color.TRANSPARENT));
             }

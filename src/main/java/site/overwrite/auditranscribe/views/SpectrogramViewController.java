@@ -27,9 +27,10 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Line;
 import javafx.stage.FileChooser;
+import javafx.stage.Window;
 import org.javatuples.Pair;
 import site.overwrite.auditranscribe.audio.Audio;
-import site.overwrite.auditranscribe.audio.Window;
+import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.ProjectIOHandlers;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
@@ -259,9 +260,27 @@ public class SpectrogramViewController implements Initializable {
                 });
 
         // Add methods to buttons
-        newProjectButton.setOnAction(ProjectIOHandlers::newProject);
+        newProjectButton.setOnAction(actionEvent -> {
+            // Get the current window
+            Window window = ProjectIOHandlers.getWindow(actionEvent);
 
-        openProjectButton.setOnAction(ProjectIOHandlers::openProject);
+            // Get user to select a file
+            File file = ProjectIOHandlers.getFileFromFileDialog(window);
+
+            // Create the new project
+            ProjectIOHandlers.newProject(window, file);
+        });
+
+        openProjectButton.setOnAction(actionEvent -> {
+            // Get the current window
+            Window window = ProjectIOHandlers.getWindow(actionEvent);
+
+            // Get user to select a file
+            File file = ProjectIOHandlers.getFileFromFileDialog(window);
+
+            // Open the existing project
+            ProjectIOHandlers.openProject(window, file);
+        });
 
         saveProjectButton.setOnAction(this::handleSavingProject);
 
@@ -478,7 +497,7 @@ public class SpectrogramViewController implements Initializable {
                 audio, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER, BINS_PER_OCTAVE, SPECTROGRAM_HOP_LENGTH, PX_PER_SECOND,
                 NUM_PX_PER_OCTAVE
         );
-        magnitudes = spectrogram.getSpectrogramMagnitudes(Window.HANN_WINDOW);
+        magnitudes = spectrogram.getSpectrogramMagnitudes(WindowFunction.HANN_WINDOW);
         WritableImage image = spectrogram.generateSpectrogram(magnitudes, ColourScale.VIRIDIS);
 
         // Finish setting up the spectrogram and its related attributes
@@ -973,43 +992,56 @@ public class SpectrogramViewController implements Initializable {
         // Handle key event
         KeyCode code = keyEvent.getCode();
 
-        if (code == KeyCode.SPACE) {
-            // Space bar is to toggle the play button
+        if (code == KeyCode.SPACE) {  // Space bar is to toggle the play button
             togglePlayButton();
-        } else if (code == KeyCode.UP) {
-            // Up arrow is to increase volume
+
+        } else if (code == KeyCode.UP) {  // Up arrow is to increase volume
             volumeSlider.setValue(volumeSlider.getValue() + VOLUME_VALUE_DELTA_ON_KEY_PRESS);
-        } else if (code == KeyCode.DOWN) {
-            // Down arrow is to decrease volume
+
+        } else if (code == KeyCode.DOWN) {  // Down arrow is to decrease volume
             volumeSlider.setValue(volumeSlider.getValue() - VOLUME_VALUE_DELTA_ON_KEY_PRESS);
-        } else if (code == KeyCode.M) {
-            // M key is to toggle mute
+
+        } else if (code == KeyCode.M) {  // M key is to toggle mute
             toggleMuteButton();
-        } else if (code == KeyCode.LEFT) {
-            // Left arrow is to seek 1 second before
+
+        } else if (code == KeyCode.LEFT) {  // Left arrow is to seek 1 second before
             try {
                 seekToTime(currTime - 1);
             } catch (InvalidObjectException e) {
                 throw new RuntimeException(e);
             }
-        } else if (code == KeyCode.RIGHT) {
-            // Right arrow is to seek 1 second ahead
+
+        } else if (code == KeyCode.RIGHT) {  // Right arrow is to seek 1 second ahead
             try {
                 seekToTime(currTime + 1);
             } catch (InvalidObjectException e) {
                 throw new RuntimeException(e);
             }
-        } else if (code == KeyCode.PERIOD) {
-            // Period key ('.') is to toggle seeking to playhead
+
+        } else if (code == KeyCode.PERIOD) {  // Period key ('.') is to toggle seeking to playhead
             toggleScrollButton();
-        } else if (NEW_PROJECT_COMBINATION.match(keyEvent)) {
-            // Control/Command + N is to create a new project
-            ProjectIOHandlers.newProject(keyEvent);
-        } else if (OPEN_PROJECT_COMBINATION.match(keyEvent)) {
-            // Control/Command + O is to open a project
-            ProjectIOHandlers.openProject(keyEvent);
-        } else if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {
-            // Control/Command + S is to save current project
+
+        } else if (NEW_PROJECT_COMBINATION.match(keyEvent)) {  // Create a new project
+            // Get the current window
+            Window window = ProjectIOHandlers.getWindow(keyEvent);
+
+            // Get user to select a file
+            File file = ProjectIOHandlers.getFileFromFileDialog(window);
+
+            // Create the new project
+            ProjectIOHandlers.newProject(window, file);
+
+        } else if (OPEN_PROJECT_COMBINATION.match(keyEvent)) {  // Open a project
+            // Get the current window
+            Window window = ProjectIOHandlers.getWindow(keyEvent);
+
+            // Get user to select a file
+            File file = ProjectIOHandlers.getFileFromFileDialog(window);
+
+            // Open the existing project
+            ProjectIOHandlers.openProject(window, file);
+
+        } else if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {  // Save current project
             handleSavingProject(keyEvent);
         }
     }
