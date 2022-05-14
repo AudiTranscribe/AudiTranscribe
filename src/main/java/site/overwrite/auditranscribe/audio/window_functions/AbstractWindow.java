@@ -2,12 +2,12 @@
  * AbstractWindow.java
  *
  * Created on 2022-03-11
- * Updated on 2022-04-15
+ * Updated on 2022-05-14
  *
  * Description: Abstract window class that implements most methods needed by window classes.
  */
 
-package site.overwrite.auditranscribe.audio.windows;
+package site.overwrite.auditranscribe.audio.window_functions;
 
 import javafx.util.Pair;
 

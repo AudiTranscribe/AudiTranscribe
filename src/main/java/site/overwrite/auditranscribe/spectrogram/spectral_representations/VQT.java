@@ -2,7 +2,7 @@
  * VQT.java
  *
  * Created on 2022-03-11
- * Updated on 2022-04-16
+ * Updated on 2022-05-14
  *
  * Description: Class that implements the Variable Q-Transform (VQT) algorithm.
  */
@@ -14,7 +14,7 @@ import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.Filter;
-import site.overwrite.auditranscribe.audio.Window;
+import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.spectrogram.Wavelet;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
 import site.overwrite.auditranscribe.utils.Complex;
@@ -48,15 +48,15 @@ public class VQT {
     /**
      * Variable-Q Transform function.
      *
-     * @param y             Audio time series.
-     * @param sr            Sample rate of the audio.
-     * @param hopLength     Number of samples between successive VQT columns.
-     * @param fmin          Minimum frequency.
-     * @param numBins       Number of frequency bins, starting at <code>fmin</code>.
-     * @param binsPerOctave Number of bins per octave.
-     * @param gamma         Bandwidth offset for determining filter lengths. <code>gamma = 0</code>
-     *                      means that the gamma value will be derived automatically.
-     * @param window        Window specification for the basis filters.
+     * @param y              Audio time series.
+     * @param sr             Sample rate of the audio.
+     * @param hopLength      Number of samples between successive VQT columns.
+     * @param fmin           Minimum frequency.
+     * @param numBins        Number of frequency bins, starting at <code>fmin</code>.
+     * @param binsPerOctave  Number of bins per octave.
+     * @param gamma          Bandwidth offset for determining filter lengths. <code>gamma = 0</code>
+     *                       means that the gamma value will be derived automatically.
+     * @param windowFunction Window function to apply to the basis filters.
      * @return Variable-Q value each frequency at each time.
      * @throws InvalidParameterException If number of frequency bins is negative or zero.
      * @throws InvalidParameterException If number of bins per octave is negative or zero.
@@ -67,26 +67,26 @@ public class VQT {
      */
     public static Complex[][] vqt(
             double[] y, double sr, int hopLength, double fmin, int numBins, int binsPerOctave, double gamma,
-            Window window
+            WindowFunction windowFunction
     ) {
-        return vqt(y, sr, hopLength, fmin, numBins, binsPerOctave, false, gamma, window);
+        return vqt(y, sr, hopLength, fmin, numBins, binsPerOctave, false, gamma, windowFunction);
     }
 
     /**
      * Variable-Q Transform function.
      *
-     * @param y             Audio time series.
-     * @param sr            Sample rate of the audio.
-     * @param hopLength     Number of samples between successive VQT columns.
-     * @param fmin          Minimum frequency.
-     * @param numBins       Number of frequency bins, starting at <code>fmin</code>.
-     * @param binsPerOctave Number of bins per octave.
-     * @param isCQT         Whether this is a CQT or not.
-     * @param gamma         Bandwidth offset for determining filter lengths. If <code>isCQT</code>is
-     *                      true and <code>gamma = 0</code>, produces the Constant-Q Transform
-     *                      (CQT). Otherwise, <code>gamma = 0</code> means that the gamma value will
-     *                      be derived automatically.
-     * @param window        Window specification for the basis filters.
+     * @param y              Audio time series.
+     * @param sr             Sample rate of the audio.
+     * @param hopLength      Number of samples between successive VQT columns.
+     * @param fmin           Minimum frequency.
+     * @param numBins        Number of frequency bins, starting at <code>fmin</code>.
+     * @param binsPerOctave  Number of bins per octave.
+     * @param isCQT          Whether this is a CQT or not.
+     * @param gamma          Bandwidth offset for determining filter lengths. If <code>isCQT</code>is
+     *                       true and <code>gamma = 0</code>, produces the Constant-Q Transform
+     *                       (CQT). Otherwise, <code>gamma = 0</code> means that the gamma value will
+     *                       be derived automatically.
+     * @param windowFunction Window function to apply to the basis filters.
      * @return Variable-Q value each frequency at each time.
      * @throws InvalidParameterException If number of frequency bins is negative or zero.
      * @throws InvalidParameterException If number of bins per octave is negative or zero.
@@ -97,7 +97,7 @@ public class VQT {
      */
     public static Complex[][] vqt(
             double[] y, double sr, int hopLength, double fmin, int numBins, int binsPerOctave, boolean isCQT,
-            double gamma, Window window
+            double gamma, WindowFunction windowFunction
     ) {
         // Validate parameters
         if (numBins <= 0) {
@@ -130,7 +130,7 @@ public class VQT {
 
         // Compute filter cutoff
         Pair<double[], Double> waveletLengthsResponse = Wavelet.computeWaveletLengths(
-                freqs, sr, window, 1., isCQT, gamma, alpha
+                freqs, sr, windowFunction, 1., isCQT, gamma, alpha
         );
         double filterCutoff = waveletLengthsResponse.getValue();
 
@@ -173,7 +173,7 @@ public class VQT {
 
             // Do the top octave before resampling to allow for fast resampling
             Triple<Complex[][], Integer, double[]> fftFilterResponse = vqtFilterFFT(
-                    sr, freqsOct, window, isCQT, gamma, alpha
+                    sr, freqsOct, windowFunction, isCQT, gamma, alpha
             );
             Complex[][] fftBasis = fftFilterResponse.getLeft();
             int numFFT = fftFilterResponse.getMiddle();
@@ -198,7 +198,7 @@ public class VQT {
 
             // Get the FFT basis and the `numFFT` for this octave
             Triple<Complex[][], Integer, double[]> fftFilterResponse = vqtFilterFFT(
-                    mySR, freqsOct, window, isCQT, gamma, alpha
+                    mySR, freqsOct, windowFunction, isCQT, gamma, alpha
             );
             Complex[][] fftBasis = fftFilterResponse.getLeft();
             int numFFT = fftFilterResponse.getMiddle();
@@ -229,7 +229,9 @@ public class VQT {
         int maxCol = V[0].length;
 
         // Recompute lengths here because early downsampling may have changed our sampling rate
-        waveletLengthsResponse = Wavelet.computeWaveletLengths(freqs, sr, window, 1., isCQT, gamma, alpha);
+        waveletLengthsResponse = Wavelet.computeWaveletLengths(
+                freqs, sr, windowFunction, 1., isCQT, gamma, alpha
+        );
         double[] lengths = waveletLengthsResponse.getKey();
 
         // Scale `V` back to normal
@@ -316,7 +318,7 @@ public class VQT {
             // Check if the signal can actually be downsampled
             if (y.length < downsampleFactor) {
                 throw new InvalidParameterException(
-                    "Input signal length of " + y.length + " is too short for " + numOctaves + "-octave VQT"
+                        "Input signal length of " + y.length + " is too short for " + numOctaves + "-octave VQT"
                 );
             }
 
@@ -338,22 +340,22 @@ public class VQT {
     /**
      * Generate the frequency domain variable-Q filter basis.
      *
-     * @param sr     Sample rate.
-     * @param freqs  Centre frequencies of the frequency bins.
-     * @param window Window function to use.
-     * @param isCQT  Whether this is a CQT or not.
-     * @param gamma  Gamma value.
-     * @param alpha  Alpha value.
+     * @param sr             Sample rate.
+     * @param freqs          Centre frequencies of the frequency bins.
+     * @param windowFunction Window function to use.
+     * @param isCQT          Whether this is a CQT or not.
+     * @param gamma          Gamma value.
+     * @param alpha          Alpha value.
      * @return Triplet of values. First value is a 2D array of complex coefficients, representing
      * the FFT basis. Second value is an integer, representing the number of FFT frequency bins.
      * Third value is a double array, representing the filters' lengths.
      */
     private static Triple<Complex[][], Integer, double[]> vqtFilterFFT(
-            double sr, double[] freqs, Window window, boolean isCQT, double gamma, double alpha
+            double sr, double[] freqs, WindowFunction windowFunction, boolean isCQT, double gamma, double alpha
     ) {
         // Get the frequency and lengths of the wavelet basis
         Pair<Complex[][], double[]> waveletBasisResponse = Wavelet.computeWaveletBasis(
-                freqs, sr, window, 1, true, 1, isCQT, gamma, alpha
+                freqs, sr, windowFunction, 1, true, 1, isCQT, gamma, alpha
         );
         Complex[][] basis = waveletBasisResponse.getKey();
         double[] lengths = waveletBasisResponse.getValue();
@@ -392,7 +394,7 @@ public class VQT {
      */
     private static Complex[][] vqtResponse(double[] y, int numFFT, int hopLength, Complex[][] fftBasis) {
         // Get the STFT matrix
-        Complex[][] D = STFT.stft(y, numFFT, hopLength, Window.ONES_WINDOW);
+        Complex[][] D = STFT.stft(y, numFFT, hopLength, WindowFunction.ONES_WINDOW);
 
         // Matrix multiply `fftBasis` with `D` and return the result
         return ArrayUtils.matmul(fftBasis, D);
@@ -410,7 +412,7 @@ public class VQT {
         // (We take the minimum to avoid weird index errors later when processing magnitudes)
         int maxPermittedNumCol = Integer.MAX_VALUE;
 
-        for (Complex[][] vqtResponse: vqtResponses) {
+        for (Complex[][] vqtResponse : vqtResponses) {
             maxPermittedNumCol = Math.min(vqtResponse[0].length, maxPermittedNumCol);
         }
 

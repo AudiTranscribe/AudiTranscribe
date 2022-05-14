@@ -1,8 +1,8 @@
 /*
- * WindowTests.java
+ * WindowFunctionTests.java
  *
  * Created on 2022-04-15
- * Updated on 2022-04-15
+ * Updated on 2022-05-14
  *
  * Description: Test the windowing functions.
  */
@@ -10,14 +10,14 @@
 package site.overwrite.auditranscribe.audio;
 
 import org.junit.jupiter.api.Test;
-import site.overwrite.auditranscribe.audio.windows.AbstractWindow;
-import site.overwrite.auditranscribe.audio.windows.HammingWindow;
-import site.overwrite.auditranscribe.audio.windows.HannWindow;
-import site.overwrite.auditranscribe.audio.windows.OnesWindow;
+import site.overwrite.auditranscribe.audio.window_functions.AbstractWindow;
+import site.overwrite.auditranscribe.audio.window_functions.HammingWindow;
+import site.overwrite.auditranscribe.audio.window_functions.HannWindow;
+import site.overwrite.auditranscribe.audio.window_functions.OnesWindow;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class WindowTests {
+class WindowFunctionTests {
     @Test
     void onesWindow() {
         // Define window object

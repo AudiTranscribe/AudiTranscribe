@@ -2,7 +2,7 @@
  * Spectrogram.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-07
+ * Updated on 2022-05-14
  *
  * Description: Spectrogram class.
  */
@@ -11,7 +11,7 @@ package site.overwrite.auditranscribe.spectrogram;
 
 import javafx.scene.image.WritableImage;
 import site.overwrite.auditranscribe.audio.Audio;
-import site.overwrite.auditranscribe.audio.Window;
+import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.plotting.Plotter;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.CQT;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.VQT;
@@ -176,22 +176,23 @@ public class Spectrogram {
     /**
      * Generates the spectrogram magnitudes for the given audio samples.
      *
-     * @param window The window function to use.
+     * @param windowFunction The window function to use.
      * @return The spectrogram magnitudes.
      * @throws NullPointerException If the maximum frequency value cannot be found in the computed
      *                              Q-transform frequency bins.
      */
-    public double[][] getSpectrogramMagnitudes(Window window) throws NullPointerException {
+    public double[][] getSpectrogramMagnitudes(WindowFunction windowFunction) throws NullPointerException {
         // Perform the spectrogram transform on the samples
         logger.log(Level.FINE, "Starting spectral matrix generation");
+
         Complex[][] QTMatrix;
         if (IS_CQT) {
             QTMatrix = CQT.cqt(
-                    samples, sampleRate, hopLength, minFreq, numFreqBins, binsPerOctave, window
+                    samples, sampleRate, hopLength, minFreq, numFreqBins, binsPerOctave, windowFunction
             );
         } else {
             QTMatrix = VQT.vqt(
-                    samples, sampleRate, hopLength, minFreq, numFreqBins, binsPerOctave, GAMMA, window
+                    samples, sampleRate, hopLength, minFreq, numFreqBins, binsPerOctave, GAMMA, windowFunction
             );
         }
 
