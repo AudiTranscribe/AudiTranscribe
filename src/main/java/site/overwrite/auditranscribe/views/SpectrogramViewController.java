@@ -111,6 +111,7 @@ public class SpectrogramViewController implements Initializable {
 
     // Other attributes
     Stage mainStage;
+    MainViewController mainViewController;
 
     private final Logger logger = Logger.getLogger(this.getClass().getName());
     private ProjectsDB projectsDB;
@@ -270,7 +271,7 @@ public class SpectrogramViewController implements Initializable {
             File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
             // Create the new project
-            ProjectIOHandlers.newProject(mainStage, (Stage) window, file);
+            ProjectIOHandlers.newProject(mainStage, (Stage) window, file, mainViewController);
         });
 
         openProjectButton.setOnAction(actionEvent -> {
@@ -281,7 +282,7 @@ public class SpectrogramViewController implements Initializable {
             File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
             // Open the existing project
-            ProjectIOHandlers.openProject(mainStage, (Stage) window, file);
+            ProjectIOHandlers.openProject(mainStage, (Stage) window, file, mainViewController);
         });
 
         saveProjectButton.setOnAction(this::handleSavingProject);
@@ -402,11 +403,14 @@ public class SpectrogramViewController implements Initializable {
      * Method that finishes the setting up of the spectrogram view controller.<br>
      * Note that this method has to be called <b>last</b>, after all other spectrogram things have
      * been set up.
-     * @param mainStage Main stage.
+     *
+     * @param mainStage          Main stage.
+     * @param mainViewController Controller object of the main class.
      */
-    public void finishSetup(Stage mainStage) {
-        // Update the main stage attribute
+    public void finishSetup(Stage mainStage, MainViewController mainViewController) {
+        // Update the main stage and main view controller attributes
         this.mainStage = mainStage;
+        this.mainViewController = mainViewController;
 
         // Set choices
         musicKeyChoice.setValue(MUSIC_KEYS[musicKeyIndex]);
@@ -1050,7 +1054,7 @@ public class SpectrogramViewController implements Initializable {
             File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
             // Create the new project
-            ProjectIOHandlers.newProject(mainStage, (Stage) window, file);
+            ProjectIOHandlers.newProject(mainStage, (Stage) window, file, mainViewController);
 
         } else if (OPEN_PROJECT_COMBINATION.match(keyEvent)) {  // Open a project
             // Get the current window
@@ -1060,7 +1064,7 @@ public class SpectrogramViewController implements Initializable {
             File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
             // Open the existing project
-            ProjectIOHandlers.openProject(mainStage, (Stage) window, file);
+            ProjectIOHandlers.openProject(mainStage, (Stage) window, file, mainViewController);
 
         } else if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {  // Save current project
             handleSavingProject(keyEvent);

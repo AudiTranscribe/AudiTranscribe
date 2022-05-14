@@ -54,8 +54,11 @@ public class ProjectIOHandlers {
      * @param mainStage          Main stage.
      * @param transcriptionStage Stage that contains the transcription scene.
      * @param file               File to open.
+     * @param mainViewController Controller object of the main class.
      */
-    public static void newProject(Stage mainStage, Stage transcriptionStage, File file) {
+    public static void newProject(
+            Stage mainStage, Stage transcriptionStage, File file, MainViewController mainViewController
+    ) {
         // Verify that the user choose a file
         if (file != null) {
             try {
@@ -69,7 +72,7 @@ public class ProjectIOHandlers {
 
                 // Set the project data for the existing project
                 controller.setAudioAndSpectrogramData(audio);
-                controller.finishSetup(mainStage);
+                controller.finishSetup(mainStage, mainViewController);
 
                 // Set the scene for the transcription page
                 transcriptionStage.setScene(scene);
@@ -88,6 +91,7 @@ public class ProjectIOHandlers {
                 if (mainStage.isShowing()) mainStage.hide();
                 if (!transcriptionStage.isShowing()) {
                     transcriptionStage.showAndWait();
+                    mainViewController.refreshProjectsListView();
                     mainStage.show();  // Show the main scene upon the spectrogram scene's closure
                 }
 
@@ -118,8 +122,11 @@ public class ProjectIOHandlers {
      * @param mainStage          Main stage.
      * @param transcriptionStage Stage that contains the transcription scene.
      * @param file               File to open.
+     * @param mainViewController Controller object of the main class.
      */
-    public static void openProject(Stage mainStage, Stage transcriptionStage, File file) {
+    public static void openProject(
+            Stage mainStage, Stage transcriptionStage, File file, MainViewController mainViewController
+    ) {
         // Verify that the user choose a file
         if (file != null) {
             try {
@@ -143,7 +150,7 @@ public class ProjectIOHandlers {
 
                 // Set the project data for the existing project
                 controller.useExistingData(audtFilePath, audtFileName, projectDataObject);
-                controller.finishSetup(mainStage);
+                controller.finishSetup(mainStage, mainViewController);
 
                 // Set the scene for the transcription page
                 transcriptionStage.setScene(scene);
@@ -170,6 +177,7 @@ public class ProjectIOHandlers {
                 if (mainStage.isShowing()) mainStage.hide();
                 if (!transcriptionStage.isShowing()) {
                     transcriptionStage.showAndWait();
+                    mainViewController.refreshProjectsListView();
                     mainStage.show();  // Show the main scene upon the spectrogram scene's closure
                 }
 
