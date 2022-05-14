@@ -53,6 +53,11 @@
     -fx-font-size: 16px;
 }
 
+.remove-project-button {
+    -fx-max-width: 50px;
+    -fx-max-height: 50px;
+}
+
 /* Others */
 .main-page-separator {
     -fx-stroke-width: 5px;

@@ -17,6 +17,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -24,6 +26,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Window;
 import org.javatuples.Pair;
 import org.javatuples.Quartet;
+import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.ProjectIOHandlers;
 import site.overwrite.auditranscribe.io.PropertyFile;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
@@ -41,102 +44,10 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-// Helper classes
-class SortByTimestamp implements Comparator<Quartet<Long, String, String, String>> {
-    @Override
-    public int compare(
-            Quartet<Long, String, String, String> o1,
-            Quartet<Long, String, String, String> o2
-    ) {
-        return (int) -(o1.getValue0() - o2.getValue0());  // Sort in descending order
-    }
-}
-
-class CustomListCell extends ListCell<Quartet<Long, String, String, String>> {
-    // FXML elements
-    HBox content;
-
-    StackPane shortNameDisplayArea;
-    Rectangle shortNameRectangle;
-    Text shortNameText;
-
-    Label nameLabel;
-    Label lastOpenedDateLabel;
-    Label filepathLabel;
-
-    public CustomListCell() {
-        // Call superclass initialization method
-        super();
-
-        // Create all labels and texts
-        nameLabel = new Label();
-        lastOpenedDateLabel = new Label();
-        filepathLabel = new Label();
-
-        shortNameText = new Text();
-
-        // Set CSS classes on text labels
-        nameLabel.getStyleClass().add("project-name-label");
-        lastOpenedDateLabel.getStyleClass().add("last-opened-date-label");
-        filepathLabel.getStyleClass().add("filepath-label");
-
-        shortNameText.getStyleClass().add("short-name-text");
-
-        // Create the short name display area
-        shortNameRectangle = new Rectangle();
-        shortNameRectangle.getStyleClass().add("short-name-rectangle");
-
-        shortNameRectangle.setFill(Color.TRANSPARENT);
-        shortNameRectangle.setWidth(50);
-        shortNameRectangle.setHeight(50);
-
-        shortNameDisplayArea = new StackPane();
-        shortNameDisplayArea.getChildren().addAll(shortNameRectangle, shortNameText);
-
-        // Set the content
-        HBox nameAndDateBox = new HBox(nameLabel, lastOpenedDateLabel);
-        HBox.setHgrow(nameLabel, Priority.ALWAYS);
-        HBox.setHgrow(lastOpenedDateLabel, Priority.ALWAYS);
-        nameAndDateBox.setSpacing(10);
-
-        VBox nameDateAndFilepathBox = new VBox(nameAndDateBox, filepathLabel);
-        nameDateAndFilepathBox.setSpacing(5);
-
-        content = new HBox(shortNameDisplayArea, nameDateAndFilepathBox);
-        content.setSpacing(10);
-        content.setPadding(
-                new Insets(0, 25, 0, 25)  // Although FXML file uses 30, use 25 because spacing is 10
-        );
-    }
-
-    @Override
-    protected void updateItem(Quartet<Long, String, String, String> object, boolean empty) {
-        // Call superclass method
-        super.updateItem(object, empty);
-
-        // Ensure that the object is not null and non-empty
-        if (object != null & !empty) {
-            // Convert the timestamp to a date string
-            lastOpenedDateLabel.setText(
-                    "[Last opened on " +
-                            MiscUtils.formatDate(new Date(object.getValue0()), "yyyy-MM-dd HH:mm") +
-                            "]"
-            );
-            nameLabel.setText(object.getValue1());
-            filepathLabel.setText(object.getValue2());
-            shortNameText.setText(object.getValue3());
-
-            // Set the graphic of the list item
-            setGraphic(content);
-        } else {
-            setGraphic(null);
-        }
-    }
-}
-
 // Main class
 public class MainViewController implements Initializable {
     // Attributes
+    ProjectsDB projectsDB;
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     // FXML Elements
@@ -152,6 +63,157 @@ public class MainViewController implements Initializable {
     @FXML
     private ListView<Quartet<Long, String, String, String>> projectsListView;
 
+    // Helper classes
+    static class CustomListCell extends ListCell<Quartet<Long, String, String, String>> {
+        // Attributes
+        ProjectsDB db;
+        ListView<?> projectsListView;
+        private final Logger logger = Logger.getLogger(this.getClass().getName());
+
+        // FXML elements
+        HBox content;
+
+        StackPane shortNameDisplayArea;
+        Rectangle shortNameRectangle;
+        Text shortNameText;
+
+        Label nameLabel;
+        Label lastOpenedDateLabel;
+        Label filepathLabel;
+
+        Button removeButton;
+
+        public CustomListCell(ProjectsDB db, ListView<?> projectsListView) {
+            // Call superclass initialization method
+            super();
+
+            // Update attributes
+            this.db = db;
+            this.projectsListView = projectsListView;
+
+            // Create all labels and texts
+            nameLabel = new Label();
+            lastOpenedDateLabel = new Label();
+            filepathLabel = new Label();
+
+            shortNameText = new Text();
+
+            // Set CSS classes on text labels
+            nameLabel.getStyleClass().add("project-name-label");
+            lastOpenedDateLabel.getStyleClass().add("last-opened-date-label");
+            filepathLabel.getStyleClass().add("filepath-label");
+
+            shortNameText.getStyleClass().add("short-name-text");
+
+            // Create the short name display area
+            shortNameRectangle = new Rectangle();
+            shortNameRectangle.getStyleClass().add("short-name-rectangle");
+
+            shortNameRectangle.setFill(Color.TRANSPARENT);
+            shortNameRectangle.setWidth(50);
+            shortNameRectangle.setHeight(50);
+
+            shortNameDisplayArea = new StackPane();
+            shortNameDisplayArea.getChildren().addAll(shortNameRectangle, shortNameText);
+
+            // Set the removal button's style and method
+            ImageView removeButtonGraphic = new ImageView(
+                    new Image(IOMethods.getFileURLAsString("images/icons/PNGs/close.png"))
+            );
+            removeButtonGraphic.setFitWidth(50);
+            removeButtonGraphic.setFitHeight(50);
+
+            removeButton = new Button();
+            removeButton.setGraphic(removeButtonGraphic);
+            removeButton.getStyleClass().add("image-button");
+            removeButton.getStyleClass().add("remove-project-button");
+
+            removeButton.setOnAction(actionEvent -> {
+                // Get the filepath of the project
+                String filepath = filepathLabel.getText();
+
+                // Get the primary key from the database
+                int pk;
+                try {
+                    pk = db.getIDOfProjectWithFilepath(filepath);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // Delete that project's record from the database
+                try {
+                    db.deleteProjectRecord(pk);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+
+                logger.log(
+                        Level.INFO,
+                        "Removed " + nameLabel.getText() + " with primary key " + pk + " from projects' database"
+                );
+
+                // Remove this list item from the list view
+                SortedList<?> sortedList = (SortedList<?>) getListView().getItems();
+                FilteredList<?> filteredList = (FilteredList<?>) sortedList.getSource();
+                ObservableList<?> sourceList = filteredList.getSource();
+                sourceList.remove(getItem());
+
+                if (sourceList.size() == 0) projectsListView.setBackground(Background.fill(Color.TRANSPARENT));
+            });
+
+            // Set the content
+            HBox nameAndDateBox = new HBox(nameLabel, lastOpenedDateLabel);
+            HBox.setHgrow(nameLabel, Priority.ALWAYS);
+            HBox.setHgrow(lastOpenedDateLabel, Priority.ALWAYS);
+            nameAndDateBox.setSpacing(10);
+
+            VBox nameDateAndFilepathBox = new VBox(nameAndDateBox, filepathLabel);
+            nameDateAndFilepathBox.setSpacing(5);
+
+            content = new HBox(shortNameDisplayArea, nameDateAndFilepathBox, removeButton);
+            content.setSpacing(10);
+            content.setPadding(
+                    new Insets(0, 25, 0, 25)  // Although FXML file uses 30, use 25 because spacing is 10
+            );
+        }
+
+        @Override
+        protected void updateItem(Quartet<Long, String, String, String> object, boolean empty) {
+            // Call superclass method
+            super.updateItem(object, empty);
+
+            // Ensure that the object is not null and non-empty
+            if (object != null & !empty) {
+                // Convert the timestamp to a date string
+                lastOpenedDateLabel.setText(
+                        "[Last opened on " +
+                                MiscUtils.formatDate(new Date(object.getValue0()), "yyyy-MM-dd HH:mm") +
+                                "]"
+                );
+                nameLabel.setText(object.getValue1());
+                filepathLabel.setText(object.getValue2());
+                shortNameText.setText(object.getValue3());
+
+                // Set the graphic of the list item
+                setGraphic(content);
+            } else {
+                setGraphic(null);
+            }
+        }
+
+
+    }
+
+    static class SortByTimestamp implements Comparator<Quartet<Long, String, String, String>> {
+        @Override
+        public int compare(
+                Quartet<Long, String, String, String> o1,
+                Quartet<Long, String, String, String> o2
+        ) {
+            return (int) -(o1.getValue0() - o2.getValue0());  // Sort in descending order
+        }
+    }
+
     // Initialization method
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -159,7 +221,7 @@ public class MainViewController implements Initializable {
 
         try {
             // Get the projects database
-            ProjectsDB projectsDB = new ProjectsDB();
+            projectsDB = new ProjectsDB();
 
             // Get all projects' records
             Map<Integer, Pair<String, String>> projectRecords = projectsDB.getAllProjects();
@@ -246,7 +308,9 @@ public class MainViewController implements Initializable {
             // Update the projects list view
             if (projectsList.size() != 0) {
                 projectsListView.setItems(new SortedList<>(filteredList));  // Use a sorted list for searching
-                projectsListView.setCellFactory(customListCellListView -> new CustomListCell());
+                projectsListView.setCellFactory(
+                        customListCellListView -> new CustomListCell(projectsDB, projectsListView)
+                );
                 projectsListView.setOnMouseClicked(mouseEvent -> {
                     // Get the selected item
                     Quartet<Long, String, String, String> selectedItem =
