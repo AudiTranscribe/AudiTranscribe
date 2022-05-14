@@ -53,6 +53,11 @@
     -fx-font-size: 16px;
 }
 
+.remove-project-button {
+    -fx-max-width: 50px;
+    -fx-max-height: 50px;
+}
+
 /* Others */
 .main-page-separator {
     -fx-stroke-width: 5px;
@@ -66,6 +71,18 @@
 .short-name-rectangle {
     -fx-arc-width: 25px;
     -fx-arc-height: 25px;
+}
+
+.list-cell {
+    -fx-background-color: transparent;
+}
+
+.list-cell:empty {
+    visibility: hidden;
+}
+
+.list-cell:hover {
+    -fx-cursor: hand;
 }
 
 /* SPECTROGRAM PAGE */

@@ -2,14 +2,14 @@
  * STFT.java
  *
  * Created on 2022-03-10
- * Updated on 2022-04-16
+ * Updated on 2022-05-14
  *
  * Description: Class that implements the Short-Time Fourier Transform (STFT) algorithm.
  */
 
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
-import site.overwrite.auditranscribe.audio.Window;
+import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
 import site.overwrite.auditranscribe.utils.Complex;
 
@@ -25,15 +25,15 @@ public class STFT {
     /**
      * Computes the Short-Time Fourier Transform (STFT) of the input array <code>x</code>.
      *
-     * @param x         The complex array <code>x</code> representing the data source.
-     * @param numFFT    Number of bins to use for the Fast Fourier Transform (FFT).
-     * @param hopLength Number of samples between successive columns.
-     * @param window    Windowing function.
+     * @param x              The complex array <code>x</code> representing the data source.
+     * @param numFFT         Number of bins to use for the Fast Fourier Transform (FFT).
+     * @param hopLength      Number of samples between successive columns.
+     * @param windowFunction Windowing function.
      * @return Complex-valued matrix of STFT coefficients.
      */
-    public static Complex[][] stft(double[] x, int numFFT, int hopLength, Window window) {
+    public static Complex[][] stft(double[] x, int numFFT, int hopLength, WindowFunction windowFunction) {
         // Get the FFT window
-        double[] fftWindow = window.window.generateWindow(numFFT, false);
+        double[] fftWindow = windowFunction.window.generateWindow(numFFT, false);
 
         // Pad the window out to `numFFT` size
         fftWindow = ArrayUtils.padCenter(fftWindow, numFFT);

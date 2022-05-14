@@ -4,6 +4,10 @@
     -fx-stroke: #000000ff;
 }
 
+.list-cell:hover {
+    -fx-background-color: #e0e0e0ff;
+}
+
 /* SPECTROGRAM PAGE */
 /* Labels */
 .display-label {

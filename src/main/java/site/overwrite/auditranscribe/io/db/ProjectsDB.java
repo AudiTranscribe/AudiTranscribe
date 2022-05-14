@@ -34,6 +34,10 @@ public class ProjectsDB {
     public static String SQL_GET_ALL_PROJECTS = """
             SELECT * FROM "Projects";
             """;
+    public static String SQL_GET_ID_OF_PROJECT_WITH_FILEPATH = """
+            SELECT "id" FROM "Projects"
+            WHERE "filepath" = ?;
+            """;
     public static String SQL_CHECK_IF_PROJECT_EXISTS = """
             SELECT "id" FROM "Projects"
             WHERE "filepath" = ?;
@@ -111,6 +115,38 @@ public class ProjectsDB {
 
         // Return the map
         return allProjects;
+    }
+
+    /**
+     * Method that gets the primary key of a project with a specified file path.
+     *
+     * @param filepath  <b>Absolute</b> file path to the project file.
+     * @return  An integer, representing the primary key of the project in the projects' database.
+     * Returns -1 if the project is not present in the database.
+     * @throws SQLException  If something went wrong when executing the SQL query.
+     */
+    public int getIDOfProjectWithFilepath(String filepath) throws SQLException {
+        // Start connection with the database
+        dbManager.dbConnect();
+
+        // Query the database for the PK of the project
+        int pk = -1;
+
+        try (PreparedStatement getIDStatement = dbManager.prepareStatement(SQL_GET_ID_OF_PROJECT_WITH_FILEPATH)) {
+            // Prepare the statement for execution
+            getIDStatement.setString(1, filepath);
+
+            // Execute the statement
+            try (ResultSet resultSet = dbManager.executeGetQuery(getIDStatement)) {
+                if (resultSet.next()) pk = resultSet.getInt("id");
+            }
+        }
+
+        // Close connection with database
+        dbManager.dbDisconnect();
+
+        // Return the found primary key
+        return pk;
     }
 
     /**
