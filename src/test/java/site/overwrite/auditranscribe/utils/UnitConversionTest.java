@@ -2,7 +2,7 @@
  * UnitConversionTest.java
  *
  * Created on 2022-03-12
- * Updated on 2022-04-30
+ * Updated on 2022-05-14
  *
  * Description: Test `UnitConversion.java`.
  */
@@ -82,6 +82,25 @@ class UnitConversionTest {
         assertEquals("B9", UnitConversion.noteNumberToNote(119, true));
     }
 
+    @Test
+    void noteNumberToMIDINumber() {
+        assertEquals(12, UnitConversion.noteNumberToMIDINumber(0));     // C0
+        assertEquals(127, UnitConversion.noteNumberToMIDINumber(115));  // G9
+        assertEquals(60, UnitConversion.noteNumberToMIDINumber(48));    // C4
+        assertEquals(113, UnitConversion.noteNumberToMIDINumber(101));  // F8
+        assertEquals(68, UnitConversion.noteNumberToMIDINumber(56));    // G#4
+        assertEquals(-1, UnitConversion.noteNumberToMIDINumber(119));   // B9
+    }
+
+    @Test
+    void noteToMIDINumber() {
+        assertEquals(12, UnitConversion.noteToMIDINumber("C0"));
+        assertEquals(127, UnitConversion.noteToMIDINumber("G9"));
+        assertEquals(60, UnitConversion.noteToMIDINumber("C4"));
+        assertEquals(113, UnitConversion.noteToMIDINumber("F8"));
+        assertEquals(68, UnitConversion.noteToMIDINumber("G#4"));
+        assertEquals(-1, UnitConversion.noteToMIDINumber("B9"));
+    }
 
     // Magnitude Scaling - Unit Conversion
     @Test
