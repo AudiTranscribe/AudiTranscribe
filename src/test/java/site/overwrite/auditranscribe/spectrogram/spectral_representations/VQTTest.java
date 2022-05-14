@@ -7,14 +7,13 @@
  * Description: Test `VQT.java`
  */
 
-
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.utils.Complex;
-import site.overwrite.auditranscribe.utils.FileUtils;
+import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.utils.MathUtils;
 import site.overwrite.auditranscribe.utils.UnitConversion;
 
@@ -34,7 +33,9 @@ class VQTTest {
         // Run the test
         try {
             // Get the audio file
-            Audio audio = new Audio(new File(FileUtils.getAbsoluteFilePath("testing-audio-files/Choice.wav")), false);
+            Audio audio = new Audio(
+                    new File(IOMethods.getAbsoluteFilePath("testing-audio-files/Choice.wav")), false
+            );
 
             // Extract samples
             double[] samples = audio.getMonoSamples();

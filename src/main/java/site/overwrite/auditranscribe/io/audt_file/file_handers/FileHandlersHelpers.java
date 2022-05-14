@@ -2,12 +2,12 @@
  * FileHandlersHelpers.java
  *
  * Created on 2022-05-01
- * Updated on 2022-05-01
+ * Updated on 2022-05-10
  *
  * Description: Helper methods for writing/reading from files.
  */
 
-package site.overwrite.auditranscribe.io.file_handers;
+package site.overwrite.auditranscribe.io.audt_file.file_handers;
 
 import java.util.List;
 

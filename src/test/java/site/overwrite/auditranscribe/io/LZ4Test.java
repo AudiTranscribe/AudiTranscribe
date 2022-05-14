@@ -2,15 +2,14 @@
  * LZ4Test.java
  *
  * Created on 2022-05-04
- * Updated on 2022-05-04
+ * Updated on 2022-05-10
  *
  * Description: Test `LZ4.java`.
  */
 
-package site.overwrite.auditranscribe.io.compressors;
+package site.overwrite.auditranscribe.io;
 
 import org.junit.jupiter.api.Test;
-import site.overwrite.auditranscribe.io.LZ4;
 
 import java.io.IOException;
 import java.util.HexFormat;

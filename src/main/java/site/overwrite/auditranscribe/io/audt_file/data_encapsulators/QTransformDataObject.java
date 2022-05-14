@@ -2,12 +2,12 @@
  * QTransformDataObject.java
  *
  * Created on 2022-05-05
- * Updated on 2022-05-07
+ * Updated on 2022-05-10
  *
  * Description: Data object that stores the Q-Transform data.
  */
 
-package site.overwrite.auditranscribe.io.data_encapsulators;
+package site.overwrite.auditranscribe.io.audt_file.data_encapsulators;
 
 import java.util.Arrays;
 

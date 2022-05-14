@@ -2,7 +2,7 @@
  * SpectrogramViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-09
+ * Updated on 2022-05-14
  *
  * Description: Contains the spectrogram view's controller class.
  */
@@ -27,11 +27,17 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Line;
 import javafx.stage.FileChooser;
-import javafx.util.Pair;
+import javafx.stage.Window;
+import org.javatuples.Pair;
 import site.overwrite.auditranscribe.audio.Audio;
-import site.overwrite.auditranscribe.audio.Window;
-import site.overwrite.auditranscribe.io.ProjectIOHandlers;
-import site.overwrite.auditranscribe.io.data_encapsulators.*;
+import site.overwrite.auditranscribe.audio.WindowFunction;
+import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.io.audt_file.ProjectIOHandlers;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.ProjectDataObject;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
+import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.plotting.PlottingStuffHandler;
 import site.overwrite.auditranscribe.spectrogram.*;
 import site.overwrite.auditranscribe.utils.*;
@@ -41,6 +47,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.*;
@@ -103,9 +110,11 @@ public class SpectrogramViewController implements Initializable {
     private double currTime = 0;
 
     // Other attributes
-    private String audtFilePath;
     private final Logger logger = Logger.getLogger(this.getClass().getName());
+    private ProjectsDB projectsDB;
 
+    private String audtFilePath;
+    private String audtFileName;
     private String audioFilePath;
     private String audioFileName;
     private Audio audio;
@@ -169,17 +178,17 @@ public class SpectrogramViewController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Add CSS stylesheets to the scene
-        mainPane.getStylesheets().add(FileUtils.getFileURLAsString("views/css/base.css"));
-        mainPane.getStylesheets().add(FileUtils.getFileURLAsString("views/css/light-mode.css"));  // Todo: add theme support
+        mainPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
+        mainPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/light-mode.css"));  // Todo: add theme support
 
         // Update spinners' ranges
         SpinnerValueFactory.DoubleSpinnerValueFactory bpmSpinnerFactory =
                 new SpinnerValueFactory.DoubleSpinnerValueFactory(
-                        BPM_RANGE.getKey(), BPM_RANGE.getValue(), 120, 0.1
+                        BPM_RANGE.getValue0(), BPM_RANGE.getValue1(), 120, 0.1
                 );
         SpinnerValueFactory.DoubleSpinnerValueFactory offsetSpinnerFactory =
                 new SpinnerValueFactory.DoubleSpinnerValueFactory(
-                        OFFSET_RANGE.getKey(), OFFSET_RANGE.getValue(), 0, 0.01
+                        OFFSET_RANGE.getValue0(), OFFSET_RANGE.getValue1(), 0, 0.01
                 );
 
         bpmSpinner.setValueFactory(bpmSpinnerFactory);
@@ -251,9 +260,27 @@ public class SpectrogramViewController implements Initializable {
                 });
 
         // Add methods to buttons
-        newProjectButton.setOnAction(ProjectIOHandlers::newProject);
+        newProjectButton.setOnAction(actionEvent -> {
+            // Get the current window
+            Window window = ProjectIOHandlers.getWindow(actionEvent);
 
-        openProjectButton.setOnAction(ProjectIOHandlers::openProject);
+            // Get user to select a file
+            File file = ProjectIOHandlers.getFileFromFileDialog(window);
+
+            // Create the new project
+            ProjectIOHandlers.newProject(window, file);
+        });
+
+        openProjectButton.setOnAction(actionEvent -> {
+            // Get the current window
+            Window window = ProjectIOHandlers.getWindow(actionEvent);
+
+            // Get user to select a file
+            File file = ProjectIOHandlers.getFileFromFileDialog(window);
+
+            // Open the existing project
+            ProjectIOHandlers.openProject(window, file);
+        });
 
         saveProjectButton.setOnAction(this::handleSavingProject);
 
@@ -321,7 +348,7 @@ public class SpectrogramViewController implements Initializable {
             // Change the icon of the volume button from mute to non-mute
             if (isMuted) {
                 volumeButtonImage.setImage(
-                        new Image(FileUtils.getFileURLAsString("images/icons/PNGs/volume-high.png"))
+                        new Image(IOMethods.getFileURLAsString("images/icons/PNGs/volume-high.png"))
                 );
                 isMuted = false;
             }
@@ -358,6 +385,13 @@ public class SpectrogramViewController implements Initializable {
                 }
             }
         });
+
+        // Get the projects database
+        try {
+            projectsDB = new ProjectsDB();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // Public methods
@@ -378,11 +412,11 @@ public class SpectrogramViewController implements Initializable {
 
         SpinnerValueFactory.DoubleSpinnerValueFactory bpmSpinnerFactory =
                 new SpinnerValueFactory.DoubleSpinnerValueFactory(
-                        BPM_RANGE.getKey(), BPM_RANGE.getValue(), bpm, 0.1
+                        BPM_RANGE.getValue0(), BPM_RANGE.getValue1(), bpm, 0.1
                 );
         SpinnerValueFactory.DoubleSpinnerValueFactory offsetSpinnerFactory =
                 new SpinnerValueFactory.DoubleSpinnerValueFactory(
-                        OFFSET_RANGE.getKey(), OFFSET_RANGE.getValue(), offset, 0.01
+                        OFFSET_RANGE.getValue0(), OFFSET_RANGE.getValue1(), offset, 0.01
                 );
 
         bpmSpinner.setValueFactory(bpmSpinnerFactory);
@@ -414,9 +448,10 @@ public class SpectrogramViewController implements Initializable {
      * supposedly read from a file.
      *
      * @param audtFilePath <b>Absolute</b> path to the file that contained the data.
+     * @param audtFileName The name of the AUDT file.
      * @param projectData  The project data.
      */
-    public void useExistingData(String audtFilePath, ProjectDataObject projectData) {
+    public void useExistingData(String audtFilePath, String audtFileName, ProjectDataObject projectData) {
         // Set up GUI data
         musicKeyIndex = projectData.guiData.musicKeyIndex;
         timeSignatureIndex = projectData.guiData.timeSignatureIndex;
@@ -427,8 +462,9 @@ public class SpectrogramViewController implements Initializable {
         audioDuration = projectData.guiData.totalDurationInMS / 1000.;
         currTime = projectData.guiData.currTimeInMS / 1000.;
 
-        // Set the AudiTranscribe file's file path
+        // Set the AudiTranscribe file's file path and file name
         this.audtFilePath = audtFilePath;
+        this.audtFileName = audtFileName;
 
         // Set up Q-Transform data and audio data
         try {
@@ -440,6 +476,16 @@ public class SpectrogramViewController implements Initializable {
         // Update music key and beats per bar
         musicKey = MUSIC_KEYS[musicKeyIndex];
         beatsPerBar = TIME_SIGNATURE_TO_BEATS_PER_BAR.get(TIME_SIGNATURES[timeSignatureIndex]);
+
+        // Attempt to add this project to the projects' database
+        try {
+            if (!projectsDB.checkIfProjectExists(audtFilePath)) {
+                // Insert the record into the database
+                projectsDB.insertProjectRecord(audtFilePath, audtFileName);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -461,7 +507,7 @@ public class SpectrogramViewController implements Initializable {
                 audio, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER, BINS_PER_OCTAVE, SPECTROGRAM_HOP_LENGTH, PX_PER_SECOND,
                 NUM_PX_PER_OCTAVE
         );
-        magnitudes = spectrogram.getSpectrogramMagnitudes(Window.HANN_WINDOW);
+        magnitudes = spectrogram.getSpectrogramMagnitudes(WindowFunction.HANN_WINDOW);
         WritableImage image = spectrogram.generateSpectrogram(magnitudes, ColourScale.VIRIDIS);
 
         // Finish setting up the spectrogram and its related attributes
@@ -589,8 +635,12 @@ public class SpectrogramViewController implements Initializable {
             // Ask user to choose a file
             FileChooser fileChooser = new FileChooser();
             File file = fileChooser.showSaveDialog(window);
+
             audtFilePath = file.getAbsolutePath();
+            audtFileName = file.getName();
+
             if (!audtFilePath.toLowerCase().endsWith(".audt")) audtFilePath += ".audt";
+            if (!audtFileName.toLowerCase().endsWith(".audt")) audtFileName += ".audt";
 
             logger.log(Level.FINE, "AUDT file destination set to " + audtFilePath);
         }
@@ -619,6 +669,16 @@ public class SpectrogramViewController implements Initializable {
             throw new RuntimeException(e);
         }
         logger.log(Level.INFO, "File saved");
+
+        // Update the project file list
+        try {
+            if (!projectsDB.checkIfProjectExists(audtFilePath)) {
+                // Insert the record into the database
+                projectsDB.insertProjectRecord(audtFilePath, audtFileName);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -630,7 +690,7 @@ public class SpectrogramViewController implements Initializable {
     private boolean togglePaused(boolean isPaused) {
         if (isPaused) {
             // Change the icon of the play button from the play icon to the paused icon
-            playButtonImage.setImage(new Image(FileUtils.getFileURLAsString("images/icons/PNGs/pause.png")));
+            playButtonImage.setImage(new Image(IOMethods.getFileURLAsString("images/icons/PNGs/pause.png")));
 
             // Unpause the audio (i.e. play the audio)
             try {
@@ -641,7 +701,7 @@ public class SpectrogramViewController implements Initializable {
 
         } else {
             // Change the icon of the play button from the paused icon to the play icon
-            playButtonImage.setImage(new Image(FileUtils.getFileURLAsString("images/icons/PNGs/play.png")));
+            playButtonImage.setImage(new Image(IOMethods.getFileURLAsString("images/icons/PNGs/play.png")));
 
             // Pause the audio
             try {
@@ -704,7 +764,7 @@ public class SpectrogramViewController implements Initializable {
      */
     private void updateOffsetValue(double newOffset, boolean forceUpdate) {
         // Get the previous offset value
-        double oldOffset = forceUpdate ? OFFSET_RANGE.getKey() - 1 : offset;  // Make it 1 less than permitted
+        double oldOffset = forceUpdate ? OFFSET_RANGE.getValue0() - 1 : offset;  // Make it 1 less than permitted
 
         // Update the beat lines
         beatLines = PlottingStuffHandler.updateBeatLines(
@@ -878,13 +938,13 @@ public class SpectrogramViewController implements Initializable {
         if (scrollToPlayhead) {
             // Change the icon of the scroll button from filled to non-filled
             scrollButtonImage.setImage(
-                    new Image(FileUtils.getFileURLAsString("images/icons/PNGs/footsteps-outline.png"))
+                    new Image(IOMethods.getFileURLAsString("images/icons/PNGs/footsteps-outline.png"))
             );
 
         } else {
             // Change the icon of the scroll button from non-filled to filled
             scrollButtonImage.setImage(
-                    new Image(FileUtils.getFileURLAsString("images/icons/PNGs/footsteps-filled.png"))
+                    new Image(IOMethods.getFileURLAsString("images/icons/PNGs/footsteps-filled.png"))
             );
         }
 
@@ -901,7 +961,7 @@ public class SpectrogramViewController implements Initializable {
         if (isMuted) {
             // Change the icon of the volume button from mute to non-mute
             volumeButtonImage.setImage(
-                    new Image(FileUtils.getFileURLAsString("images/icons/PNGs/volume-high.png"))
+                    new Image(IOMethods.getFileURLAsString("images/icons/PNGs/volume-high.png"))
             );
 
             // Unmute the audio by setting the volume back to the value before the mute
@@ -913,7 +973,7 @@ public class SpectrogramViewController implements Initializable {
         } else {
             // Change the icon of the volume button from non-mute to mute
             volumeButtonImage.setImage(
-                    new Image(FileUtils.getFileURLAsString("images/icons/PNGs/volume-mute.png"))
+                    new Image(IOMethods.getFileURLAsString("images/icons/PNGs/volume-mute.png"))
             );
 
             // Mute the audio by setting the volume to zero
@@ -942,43 +1002,56 @@ public class SpectrogramViewController implements Initializable {
         // Handle key event
         KeyCode code = keyEvent.getCode();
 
-        if (code == KeyCode.SPACE) {
-            // Space bar is to toggle the play button
+        if (code == KeyCode.SPACE) {  // Space bar is to toggle the play button
             togglePlayButton();
-        } else if (code == KeyCode.UP) {
-            // Up arrow is to increase volume
+
+        } else if (code == KeyCode.UP) {  // Up arrow is to increase volume
             volumeSlider.setValue(volumeSlider.getValue() + VOLUME_VALUE_DELTA_ON_KEY_PRESS);
-        } else if (code == KeyCode.DOWN) {
-            // Down arrow is to decrease volume
+
+        } else if (code == KeyCode.DOWN) {  // Down arrow is to decrease volume
             volumeSlider.setValue(volumeSlider.getValue() - VOLUME_VALUE_DELTA_ON_KEY_PRESS);
-        } else if (code == KeyCode.M) {
-            // M key is to toggle mute
+
+        } else if (code == KeyCode.M) {  // M key is to toggle mute
             toggleMuteButton();
-        } else if (code == KeyCode.LEFT) {
-            // Left arrow is to seek 1 second before
+
+        } else if (code == KeyCode.LEFT) {  // Left arrow is to seek 1 second before
             try {
                 seekToTime(currTime - 1);
             } catch (InvalidObjectException e) {
                 throw new RuntimeException(e);
             }
-        } else if (code == KeyCode.RIGHT) {
-            // Right arrow is to seek 1 second ahead
+
+        } else if (code == KeyCode.RIGHT) {  // Right arrow is to seek 1 second ahead
             try {
                 seekToTime(currTime + 1);
             } catch (InvalidObjectException e) {
                 throw new RuntimeException(e);
             }
-        } else if (code == KeyCode.PERIOD) {
-            // Period key ('.') is to toggle seeking to playhead
+
+        } else if (code == KeyCode.PERIOD) {  // Period key ('.') is to toggle seeking to playhead
             toggleScrollButton();
-        } else if (NEW_PROJECT_COMBINATION.match(keyEvent)) {
-            // Control/Command + N is to create a new project
-            ProjectIOHandlers.newProject(keyEvent);
-        } else if (OPEN_PROJECT_COMBINATION.match(keyEvent)) {
-            // Control/Command + O is to open a project
-            ProjectIOHandlers.openProject(keyEvent);
-        } else if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {
-            // Control/Command + S is to save current project
+
+        } else if (NEW_PROJECT_COMBINATION.match(keyEvent)) {  // Create a new project
+            // Get the current window
+            Window window = ProjectIOHandlers.getWindow(keyEvent);
+
+            // Get user to select a file
+            File file = ProjectIOHandlers.getFileFromFileDialog(window);
+
+            // Create the new project
+            ProjectIOHandlers.newProject(window, file);
+
+        } else if (OPEN_PROJECT_COMBINATION.match(keyEvent)) {  // Open a project
+            // Get the current window
+            Window window = ProjectIOHandlers.getWindow(keyEvent);
+
+            // Get user to select a file
+            File file = ProjectIOHandlers.getFileFromFileDialog(window);
+
+            // Open the existing project
+            ProjectIOHandlers.openProject(window, file);
+
+        } else if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {  // Save current project
             handleSavingProject(keyEvent);
         }
     }

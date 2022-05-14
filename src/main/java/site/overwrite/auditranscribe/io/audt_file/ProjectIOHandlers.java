@@ -2,12 +2,12 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-05-13
+ * Updated on 2022-05-14
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
 
-package site.overwrite.auditranscribe.io;
+package site.overwrite.auditranscribe.io.audt_file;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -17,15 +17,21 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.stage.*;
 import org.javatuples.Triplet;
 import site.overwrite.auditranscribe.audio.Audio;
-import site.overwrite.auditranscribe.io.data_encapsulators.*;
-import site.overwrite.auditranscribe.io.exceptions.*;
-import site.overwrite.auditranscribe.io.file_handers.*;
-import site.overwrite.auditranscribe.utils.FileUtils;
+import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.ProjectDataObject;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
+import site.overwrite.auditranscribe.io.audt_file.exceptions.FailedToReadDataException;
+import site.overwrite.auditranscribe.io.audt_file.exceptions.IncorrectFileFormatException;
+import site.overwrite.auditranscribe.io.audt_file.file_handers.AUDTFileReader;
+import site.overwrite.auditranscribe.io.audt_file.file_handers.AUDTFileWriter;
 import site.overwrite.auditranscribe.views.SpectrogramViewController;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -45,59 +51,144 @@ public class ProjectIOHandlers {
     /**
      * Method that handles the creation of a new AudiTranscribe project.
      *
-     * @param event Action event that triggered this method.
+     * @param window Window to use for the file selection dialog.
+     * @param file   File to open.
      */
-    public static void newProject(ActionEvent event) {
-        // Get current window
-        Window window = ((Node) event.getSource()).getScene().getWindow();
+    public static void newProject(Window window, File file) {
+        // Verify that the user choose a file
+        if (file != null) {
+            try {
+                // Try and read the file as an audio file
+                Audio audio = new Audio(file);  // Failure to read will throw an exception
 
-        // Continue the process
-        continueMakingNewProject(window);
-    }
+                // Get the stage, scene and controller
+                Triplet<Stage, Scene, SpectrogramViewController> stageSceneAndController = getController(window);
+                Stage stage = stageSceneAndController.getValue0();
+                Scene scene = stageSceneAndController.getValue1();
+                SpectrogramViewController controller = stageSceneAndController.getValue2();
 
-    /**
-     * Method that handles the creation of a new AudiTranscribe project.
-     *
-     * @param event Key event that triggered this method.
-     */
-    public static void newProject(KeyEvent event) {
-        // Get current window
-        Window window = ((Scene) event.getSource()).getWindow();
+                // Set the project data for the existing project
+                controller.setAudioAndSpectrogramData(audio);
+                controller.finishSetup();
 
-        // Continue the process
-        continueMakingNewProject(window);
+                // Set the new scene
+                stage.setScene(scene);
+
+                // Set new scene properties
+                stage.setMaximized(true);
+                stage.setResizable(true);
+                stage.setTitle(file.getName());
+
+                // Show the new scene
+                stage.show();
+
+                // Update the minimum width and height
+                stage.setMinWidth(stage.getWidth());
+                stage.setMinHeight(stage.getHeight());
+
+            } catch (UnsupportedAudioFileException | IOException e) {
+                showExceptionAlert(
+                        "Failed to read '" + file.getName() + "' as a WAV file.",
+                        "The program failed to read '" + file.getName() +
+                                "' as a WAV file. Please check if " + "this is a valid WAV file.",
+                        e
+                );
+                e.printStackTrace();
+            }
+
+        } else {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.initStyle(StageStyle.UTILITY);
+            alert.setTitle("Info");
+            alert.setHeaderText(null);
+            alert.setContentText("No file selected.");
+
+            alert.showAndWait();
+        }
     }
 
     /**
      * Method that handles the opening of an existing AudiTranscribe project.
      *
-     * @param event Event that triggered this method.
+     * @param window Window to use for the file selection dialog.
+     * @param file   File to open.
      */
-    public static void openProject(ActionEvent event) {
-        // Get current window
-        Window window = ((Node) event.getSource()).getScene().getWindow();
+    public static void openProject(Window window, File file) {
+        // Verify that the user choose a file
+        if (file != null) {
+            try {
+                // Try and read the file as an AUDT file
+                String audtFilePath = file.getAbsolutePath();
+                String audtFileName = file.getName();
+                AUDTFileReader reader = new AUDTFileReader(audtFilePath);
 
-        // Continue the process
-        continueOpeningProject(window);
-    }
+                // Read the data from the file
+                QTransformDataObject qTransformData = reader.readQTransformData();
+                AudioDataObject audioData = reader.readAudioData();
+                GUIDataObject guiData = reader.readGUIData();
 
-    /**
-     * Method that handles the opening of an existing AudiTranscribe project.
-     *
-     * @param event Event that triggered this method.
-     */
-    public static void openProject(KeyEvent event) {
-        // Get current window
-        Window window = ((Scene) event.getSource()).getWindow();
+                // Pass these data into a `ProjectDataObject`
+                ProjectDataObject projectDataObject = new ProjectDataObject(
+                        qTransformData, audioData, guiData
+                );
 
-        // Continue the process
-        continueOpeningProject(window);
+                // Get the stage, scene and controller
+                Triplet<Stage, Scene, SpectrogramViewController> stageSceneAndController = getController(window);
+                Stage stage = stageSceneAndController.getValue0();
+                Scene scene = stageSceneAndController.getValue1();
+                SpectrogramViewController controller = stageSceneAndController.getValue2();
+
+                // Set the project data for the existing project
+                controller.useExistingData(audtFilePath, audtFileName, projectDataObject);
+                controller.finishSetup();
+
+                // Set the new scene
+                stage.setScene(scene);
+
+                // Set new scene properties
+                stage.setMaximized(true);
+                stage.setResizable(true);
+                stage.setTitle(projectDataObject.guiData.audioFileName);
+
+                // Show the new scene
+                stage.show();
+
+                // Update the minimum width and height
+                stage.setMinWidth(stage.getWidth());
+                stage.setMinHeight(stage.getHeight());
+
+                // Update scroll position
+                // (Annoyingly we have to do this AFTER the stage is shown)
+                controller.updateScrollPosition(
+                        projectDataObject.guiData.currTimeInMS / 1000. *
+                                controller.PX_PER_SECOND *
+                                controller.SPECTROGRAM_ZOOM_SCALE_X
+                );
+
+            } catch (IOException | IncorrectFileFormatException | FailedToReadDataException e) {
+                showExceptionAlert(
+                        "Failed to read '" + file.getName() + "' as an AUDT ile.",
+                        "The program failed to read '" + file.getName() +
+                                "' as an AUDT file. Please check if " + "this is a valid AUDT file.",
+                        e
+                );
+                e.printStackTrace();
+            }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.initStyle(StageStyle.UTILITY);
+            alert.setTitle("Info");
+            alert.setHeaderText(null);
+            alert.setContentText("No file selected.");
+
+            alert.showAndWait();
+        }
     }
 
     /**
      * Method that handles the saving of an AudiTranscribe project.
      *
-     * @param filepath          Path to the AUDT file.
+     * @param filepath          <b>Absolute</b> path to the AUDT file.
      * @param projectDataObject Data object that stores all the data for the project.
      * @throws IOException If the writing to file encounters an error.
      */
@@ -111,6 +202,47 @@ public class ProjectIOHandlers {
         fileWriter.writeGUIData(projectDataObject.guiData);
 
         fileWriter.writeBytesToFile();
+    }
+
+    /**
+     * Method that gets the window of the event.
+     *
+     * @param actionEvent Event caller.
+     * @return WindowFunction.
+     */
+    public static Window getWindow(ActionEvent actionEvent) {
+        return ((Node) actionEvent.getSource()).getScene().getWindow();
+    }
+
+    /**
+     * Method that gets the window of the event.
+     *
+     * @param keyEvent Event caller.
+     * @return WindowFunction.
+     */
+    public static Window getWindow(KeyEvent keyEvent) {
+        return ((Scene) keyEvent.getSource()).getWindow();
+    }
+
+    /**
+     * Method that gets the window of the event.
+     *
+     * @param mouseEvent Event caller.
+     * @return WindowFunction.
+     */
+    public static Window getWindow(MouseEvent mouseEvent) {
+        return ((Node) mouseEvent.getSource()).getScene().getWindow();
+    }
+
+    /**
+     * Method that helps show a file dialog for the user to select a file on.
+     *
+     * @param window WindowFunction to show the file dialog on.
+     * @return A <code>File</code> object, representing the selected file.
+     */
+    public static File getFileFromFileDialog(Window window) {
+        FileChooser fileChooser = new FileChooser();
+        return fileChooser.showOpenDialog(window);
     }
 
     // Private methods
@@ -162,146 +294,6 @@ public class ProjectIOHandlers {
     }
 
     /**
-     * Helper method that finishes the new project creation.
-     *
-     * @param window Current window.
-     */
-    private static void continueMakingNewProject(Window window) {
-        // Ask user to choose a file
-        FileChooser fileChooser = new FileChooser();
-        File file = fileChooser.showOpenDialog(window);
-
-        // Verify that the user choose a file
-        if (file != null) {
-            try {
-                // Try and read the file as an audio file
-                Audio audio = new Audio(file);  // Failure to read will throw an exception
-
-                // Get the stage, scene and controller
-                Triplet<Stage, Scene, SpectrogramViewController> stageSceneAndController = getController(window);
-                Stage stage = stageSceneAndController.getValue0();
-                Scene scene = stageSceneAndController.getValue1();
-                SpectrogramViewController controller = stageSceneAndController.getValue2();
-
-                // Set the project data for the existing project
-                controller.setAudioAndSpectrogramData(audio);
-                controller.finishSetup();
-
-                // Set the new scene
-                stage.setScene(scene);
-
-                // Set new scene properties
-                stage.setMaximized(true);
-                stage.setResizable(true);
-                stage.setTitle(file.getName());
-
-                // Show the new scene
-                stage.show();
-
-                // Update the minimum width and height
-                stage.setMinWidth(stage.getWidth());
-                stage.setMinHeight(stage.getHeight());
-
-            } catch (UnsupportedAudioFileException | IOException e) {
-                showExceptionAlert(
-                        "Failed to read '" + file.getName() + "' as a WAV file.",
-                        "The program failed to read '" + file.getName() +
-                                "' as a WAV file. Please check if " + "this is a valid WAV file.",
-                        e
-                );
-            }
-
-        } else {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.initStyle(StageStyle.UTILITY);
-            alert.setTitle("Info");
-            alert.setHeaderText(null);
-            alert.setContentText("No file selected.");
-
-            alert.showAndWait();
-        }
-    }
-
-    /**
-     * Helper method that finishes the opening of an AudiTranscribe project
-     *
-     * @param window Current window.
-     */
-    private static void continueOpeningProject(Window window) {
-        // Ask user to choose a file
-        FileChooser fileChooser = new FileChooser();
-        File file = fileChooser.showOpenDialog(window);
-
-        // Verify that the user choose a file
-        if (file != null) {
-            try {
-                // Try and read the file as an AUDT file
-                String audtFilePath = file.getAbsolutePath();
-                AUDTFileReader reader = new AUDTFileReader(audtFilePath);
-
-                // Read the data from the file
-                QTransformDataObject qTransformData = reader.readQTransformData();
-                AudioDataObject audioData = reader.readAudioData();
-                GUIDataObject guiData = reader.readGUIData();
-
-                // Pass these data into a `ProjectDataObject`
-                ProjectDataObject projectDataObject = new ProjectDataObject(
-                        qTransformData, audioData, guiData
-                );
-
-                // Get the stage, scene and controller
-                Triplet<Stage, Scene, SpectrogramViewController> stageSceneAndController = getController(window);
-                Stage stage = stageSceneAndController.getValue0();
-                Scene scene = stageSceneAndController.getValue1();
-                SpectrogramViewController controller = stageSceneAndController.getValue2();
-
-                // Set the project data for the existing project
-                controller.useExistingData(audtFilePath, projectDataObject);
-                controller.finishSetup();
-
-                // Set the new scene
-                stage.setScene(scene);
-
-                // Set new scene properties
-                stage.setMaximized(true);
-                stage.setResizable(true);
-                stage.setTitle(projectDataObject.guiData.audioFileName);
-
-                // Show the new scene
-                stage.show();
-
-                // Update the minimum width and height
-                stage.setMinWidth(stage.getWidth());
-                stage.setMinHeight(stage.getHeight());
-
-                // Update scroll position
-                // (Annoyingly we have to do this AFTER the stage is shown)
-                controller.updateScrollPosition(
-                        projectDataObject.guiData.currTimeInMS / 1000. *
-                                controller.PX_PER_SECOND *
-                                controller.SPECTROGRAM_ZOOM_SCALE_X
-                );
-
-            } catch (IOException | IncorrectFileFormatException | FailedToReadDataException e) {
-                showExceptionAlert(
-                        "Failed to read '" + file.getName() + "' as an AUDT ile.",
-                        "The program failed to read '" + file.getName() +
-                                "' as an AUDT file. Please check if " + "this is a valid AUDT file.",
-                        e
-                );
-            }
-        } else {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.initStyle(StageStyle.UTILITY);
-            alert.setTitle("Info");
-            alert.setHeaderText(null);
-            alert.setContentText("No file selected.");
-
-            alert.showAndWait();
-        }
-    }
-
-    /**
      * Helper method that gets the stage, scene and view controller of the spectrogram view.
      *
      * @param window Root window.
@@ -321,7 +313,7 @@ public class ProjectIOHandlers {
 
         // Get the FXML loader for the spectrogram view
         FXMLLoader fxmlLoader = new FXMLLoader(
-                FileUtils.getFileURL("views/fxml/spectrogram-view.fxml")
+                IOMethods.getFileURL("views/fxml/spectrogram-view.fxml")
         );
 
         // Get the spectrogram view scene
