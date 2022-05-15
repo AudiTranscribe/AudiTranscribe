@@ -106,7 +106,7 @@
             </AnchorPane>
             <AnchorPane prefHeight="40.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
                <children>
-                  <Pane prefHeight="40.0" prefWidth="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+                  <Pane prefHeight="40.0" prefWidth="40.0" styleClass="spectrogram-square" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
                   <ScrollPane fx:id="bottomPane" hbarPolicy="NEVER" prefHeight="40.0" prefWidth="200.0" vbarPolicy="NEVER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="0.0">
                     <content>
                       <AnchorPane fx:id="bottomPaneAnchor" minHeight="0.0" minWidth="0.0" prefHeight="40.0" prefWidth="560.0">

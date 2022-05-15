@@ -7,7 +7,6 @@ Todo (Important):
         - Need to allow for configuration of audio devices
         * Using local app data folder: https://stackoverflow.com/a/1198954
           [System.getenv("APPDATA")]
-    - Need a way to display playback octave
 
 Todo (Less Important):
     - Add licence/credits for ionicons

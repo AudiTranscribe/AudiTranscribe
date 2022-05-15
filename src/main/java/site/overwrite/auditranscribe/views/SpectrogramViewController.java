@@ -2,7 +2,7 @@
  * SpectrogramViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-15
+ * Updated on 2022-05-16
  *
  * Description: Contains the spectrogram view's controller class.
  */
@@ -26,6 +26,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -178,6 +179,8 @@ public class SpectrogramViewController implements Initializable {
 
     @FXML
     private ImageView spectrogramImage;
+
+    private Rectangle currentOctaveRectangle;
 
     // Bottom HBox
     @FXML
@@ -499,6 +502,11 @@ public class SpectrogramViewController implements Initializable {
         } catch (InvalidObjectException e) {
             throw new RuntimeException(e);
         }
+
+        // Set the current octave rectangle
+        currentOctaveRectangle = PlottingStuffHandler.addCurrentOctaveRectangle(
+                notePane, finalHeight, octaveNum, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER
+        );
 
         // Set keyboard button press/release methods
         mainPane.getScene().addEventFilter(KeyEvent.KEY_PRESSED, this::keyPressEventHandler);
@@ -1129,14 +1137,18 @@ public class SpectrogramViewController implements Initializable {
             notePlayer.silenceChannel();  // Stop any notes from playing
             if (octaveNum > 0) {
                 logger.log(Level.FINE, "Playback octave raised to " + octaveNum);
-                octaveNum--;
+                PlottingStuffHandler.updateCurrentOctaveRectangle(
+                        currentOctaveRectangle, finalHeight, --octaveNum, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER
+                );
             }
 
         } else if (code == KeyCode.EQUALS) {  // Decrease playback octave number by 1
             notePlayer.silenceChannel();  // Stop any notes from playing
             if (octaveNum < 9) {
                 logger.log(Level.FINE, "Playback octave lowered to " + octaveNum);
-                octaveNum++;
+                PlottingStuffHandler.updateCurrentOctaveRectangle(
+                        currentOctaveRectangle, finalHeight, ++octaveNum, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER
+                );
             }
         }
 
