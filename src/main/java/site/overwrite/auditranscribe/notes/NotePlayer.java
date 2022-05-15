@@ -2,17 +2,18 @@
  * NotePlayer.java
  *
  * Created on 2022-05-14
- * Updated on 2022-05-14
+ * Updated on 2022-05-15
  *
  * Description: Class that handles the playing of notes.
  */
 
-package site.overwrite.auditranscribe.audio.note_synthesis;
+package site.overwrite.auditranscribe.notes;
 
 import site.overwrite.auditranscribe.utils.UnitConversion;
 
 import javax.sound.midi.*;
 import java.security.InvalidParameterException;
+import java.util.HashSet;
 import java.util.Map;
 
 /**
@@ -25,8 +26,7 @@ public class NotePlayer {
             Map.entry("XYLOPHONE", 13),
             Map.entry("VIOLIN", 40),
             Map.entry("TRUMPET", 56),
-            Map.entry("FLUTE", 73),
-            Map.entry("DRUMS", 114)
+            Map.entry("FLUTE", 73)
     );
 
     // Attributes
@@ -34,8 +34,9 @@ public class NotePlayer {
     final Soundbank soundbank;
     final Instrument[] instruments;
     final MidiChannel[] midiChannels;
-
     final int channelNum;
+
+    HashSet<Integer> onNotes = new HashSet<>();  // Keeps track of the notes that are currently on
 
     /**
      * Initialization method for a note player object.
@@ -65,49 +66,91 @@ public class NotePlayer {
     // Public methods
 
     /**
+     * Method that silences the note playing channel.
+     */
+    public void silenceChannel() {
+        midiChannels[channelNum].allNotesOff();
+        onNotes.clear();
+    }
+
+    /**
      * Method that makes the specified note play indefinitely, until told to stop.
      *
-     * @param noteNumber Note number of the note to play.
-     * @param velocity   So-called <em>volume</em> to play the note at. This value should be in the
-     *                   range [0, 127].
+     * @param noteNumber   Note number of the note to play.
+     * @param velocity     So-called <em>volume</em> to play the note at. This value should be in
+     *                     the range [0, 127].
+     * @param failSilently Whether the program should not throw errors.
      * @throws InvalidParameterException If the note number is invalid (i.e. cannot be played in
-     *                                   MIDI).
+     *                                   MIDI) and <code>failSilently</code> is <code>false</code>.
      * @see #noteOff(int, int)
      */
-    public void noteOn(int noteNumber, int velocity) throws InvalidParameterException {
+    public void noteOn(int noteNumber, int velocity, boolean failSilently) throws InvalidParameterException {
         // Get the MIDI number of the note number
         int midiNumber = UnitConversion.noteNumberToMIDINumber(noteNumber);
 
         // Ensure that the MIDI number found is not -1
-        if (midiNumber == -1) {
+        if (midiNumber == -1 && !failSilently) {
             throw new InvalidParameterException("MIDI number cannot be found for note number " + noteNumber);
         }
 
         // Turn on the note on that channel
-        midiChannels[channelNum].noteOn(midiNumber, velocity);
+        if (!onNotes.contains(midiNumber)) {
+            midiChannels[channelNum].noteOn(midiNumber, velocity);
+            onNotes.add(midiNumber);
+        }
+    }
+
+    /**
+     * Method that makes the specified note play indefinitely, until told to stop.<br>
+     * Invalid notes will not play.
+     *
+     * @param noteNumber Note number of the note to play.
+     * @param velocity   So-called <em>volume</em> to play the note at. This value should be in the
+     *                   range [0, 127].
+     * @see #noteOff(int, int)
+     */
+    public void noteOn(int noteNumber, int velocity) {
+        noteOn(noteNumber, velocity, true);
     }
 
     /**
      * Method that makes the specified note stop playing.
      *
-     * @param noteNumber Note number of the note to play.
-     * @param velocity   So-called <em>volume</em> to stop the note at. This value should be in the
-     *                   range [0, 127].
+     * @param noteNumber   Note number of the note to play.
+     * @param velocity     So-called <em>volume</em> to stop the note at. This value should be in
+     *                     the range [0, 127].
+     * @param failSilently Whether the program should not throw errors.
      * @throws InvalidParameterException If the note number is invalid (i.e. cannot be played in
-     *                                   MIDI).
+     *                                   MIDI) and <code>failSilently</code> is <code>false</code>.
      * @see #noteOn(int, int)
      */
-    public void noteOff(int noteNumber, int velocity) throws InvalidParameterException {
+    public void noteOff(int noteNumber, int velocity, boolean failSilently) throws InvalidParameterException {
         // Get the MIDI number of the note number
         int midiNumber = UnitConversion.noteNumberToMIDINumber(noteNumber);
 
         // Ensure that the MIDI number found is not -1
-        if (midiNumber == -1) {
+        if (midiNumber == -1 && !failSilently) {
             throw new InvalidParameterException("MIDI number cannot be found for note number " + noteNumber);
         }
 
         // Turn on the note on that channel
-        midiChannels[channelNum].noteOff(midiNumber, velocity);
+        if (onNotes.contains(midiNumber)) {
+            midiChannels[channelNum].noteOff(midiNumber, velocity);
+            onNotes.remove(midiNumber);
+        }
+    }
+
+    /**
+     * Method that makes the specified note stop playing.<br>
+     * Invalid notes will not play.
+     *
+     * @param noteNumber Note number of the note to play.
+     * @param velocity   So-called <em>volume</em> to stop the note at. This value should be in the
+     *                   range [0, 127].
+     * @see #noteOn(int, int)
+     */
+    public void noteOff(int noteNumber, int velocity) {
+        noteOff(noteNumber, velocity, true);
     }
 
     /**
@@ -123,7 +166,9 @@ public class NotePlayer {
      * @throws InvalidParameterException If the note number is invalid (i.e. cannot be played in
      *                                   MIDI).
      */
-    public void playNoteForDuration(int noteNumber, int onVelocity, int offVelocity, long onDuration, long offDuration) throws InvalidParameterException {
+    public void playNoteForDuration(
+            int noteNumber, int onVelocity, int offVelocity, long onDuration, long offDuration
+    ) throws InvalidParameterException {
         // Get the MIDI number of the note number
         int midiNumber = UnitConversion.noteNumberToMIDINumber(noteNumber);
 

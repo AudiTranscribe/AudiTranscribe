@@ -32,7 +32,7 @@ import javafx.stage.Window;
 import org.javatuples.Pair;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
-import site.overwrite.auditranscribe.audio.note_synthesis.NotePlayer;
+import site.overwrite.auditranscribe.notes.NotePlayer;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
@@ -144,6 +144,8 @@ public class SpectrogramViewController implements Initializable {
 
     private double finalWidth;
     private double finalHeight;
+
+    private int octaveNum = 4;
 
     private Label[] noteLabels;
     private Line[] beatLines;
@@ -409,7 +411,10 @@ public class SpectrogramViewController implements Initializable {
                 // Play the note
                 try {
                     logger.log(Level.FINE, "Playing " + UnitConversion.noteNumberToNote(estimatedNoteNum, false));
-                    notePlayer.playNoteForDuration(estimatedNoteNum, NOTE_PLAYING_ON_VELOCITY, NOTE_PLAYING_OFF_VELOCITY, NOTE_PLAYING_ON_DURATION, NOTE_PLAYING_OFF_DURATION);
+                    notePlayer.playNoteForDuration(
+                            estimatedNoteNum, NOTE_PLAYING_ON_VELOCITY, NOTE_PLAYING_OFF_VELOCITY,
+                            NOTE_PLAYING_ON_DURATION, NOTE_PLAYING_OFF_DURATION
+                    );
                 } catch (InvalidParameterException ignored) {
                 }
             }
@@ -495,8 +500,9 @@ public class SpectrogramViewController implements Initializable {
             throw new RuntimeException(e);
         }
 
-        // Set keyboard button press methods
-        mainPane.getScene().addEventFilter(KeyEvent.KEY_PRESSED, this::keyboardPressEventHandler);
+        // Set keyboard button press/release methods
+        mainPane.getScene().addEventFilter(KeyEvent.KEY_PRESSED, this::keyPressEventHandler);
+        mainPane.getScene().addEventFilter(KeyEvent.KEY_RELEASED, this::keyReleasedEventHandler);
 
         // Ensure main pane is in focus
         mainPane.requestFocus();
@@ -1055,17 +1061,18 @@ public class SpectrogramViewController implements Initializable {
     }
 
     /**
-     * Helper method that handles a keyboard press event.
+     * Helper method that handles a keyboard key press event.
      *
-     * @param keyEvent Key event.
+     * @param keyEvent Key press event.
      */
-    private void keyboardPressEventHandler(KeyEvent keyEvent) {
+    private void keyPressEventHandler(KeyEvent keyEvent) {
         // Stop passing this event to the next node
         keyEvent.consume();
 
         // Handle key event
         KeyCode code = keyEvent.getCode();
 
+        // Non-note playing key press inputs
         if (code == KeyCode.SPACE) {  // Space bar is to toggle the play button
             togglePlayButton();
 
@@ -1117,6 +1124,78 @@ public class SpectrogramViewController implements Initializable {
 
         } else if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {  // Save current project
             handleSavingProject(keyEvent);
+
+        } else if (code == KeyCode.MINUS) {  // Increase playback octave number by 1
+            notePlayer.silenceChannel();  // Stop any notes from playing
+            if (octaveNum > 0) {
+                logger.log(Level.FINE, "Playback octave raised to " + octaveNum);
+                octaveNum--;
+            }
+
+        } else if (code == KeyCode.EQUALS) {  // Decrease playback octave number by 1
+            notePlayer.silenceChannel();  // Stop any notes from playing
+            if (octaveNum < 9) {
+                logger.log(Level.FINE, "Playback octave lowered to " + octaveNum);
+                octaveNum++;
+            }
+        }
+
+        // Note playing keyboard inputs
+        else {
+            switch (code) {
+                case A -> notePlayer.noteOn(octaveNum * 12, NOTE_PLAYING_ON_VELOCITY);  // C
+                case W -> notePlayer.noteOn(octaveNum * 12 + 1, NOTE_PLAYING_ON_VELOCITY);  // C#
+                case S -> notePlayer.noteOn(octaveNum * 12 + 2, NOTE_PLAYING_ON_VELOCITY);  // D
+                case E -> notePlayer.noteOn(octaveNum * 12 + 3, NOTE_PLAYING_ON_VELOCITY);  // D#
+                case D -> notePlayer.noteOn(octaveNum * 12 + 4, NOTE_PLAYING_ON_VELOCITY);  // E
+                case F -> notePlayer.noteOn(octaveNum * 12 + 5, NOTE_PLAYING_ON_VELOCITY);  // F
+                case T -> notePlayer.noteOn(octaveNum * 12 + 6, NOTE_PLAYING_ON_VELOCITY);  // F#
+                case G -> notePlayer.noteOn(octaveNum * 12 + 7, NOTE_PLAYING_ON_VELOCITY);  // G
+                case Y -> notePlayer.noteOn(octaveNum * 12 + 8, NOTE_PLAYING_ON_VELOCITY);  // G#
+                case H -> notePlayer.noteOn(octaveNum * 12 + 9, NOTE_PLAYING_ON_VELOCITY);  // A
+                case U -> notePlayer.noteOn(octaveNum * 12 + 10, NOTE_PLAYING_ON_VELOCITY);  // A#
+                case J -> notePlayer.noteOn(octaveNum * 12 + 11, NOTE_PLAYING_ON_VELOCITY);  // B
+                case K -> notePlayer.noteOn(octaveNum * 12 + 12, NOTE_PLAYING_ON_VELOCITY);  // C'
+                case O -> notePlayer.noteOn(octaveNum * 12 + 13, NOTE_PLAYING_ON_VELOCITY);  // C#'
+                case L -> notePlayer.noteOn(octaveNum * 12 + 14, NOTE_PLAYING_ON_VELOCITY);  // D'
+                case P -> notePlayer.noteOn(octaveNum * 12 + 15, NOTE_PLAYING_ON_VELOCITY);  // D#'
+                case SEMICOLON -> notePlayer.noteOn(octaveNum * 12 + 16, NOTE_PLAYING_ON_VELOCITY);  // E'
+                case QUOTE -> notePlayer.noteOn(octaveNum * 12 + 17, NOTE_PLAYING_ON_VELOCITY);  // F'
+            }
+        }
+    }
+
+    /**
+     * Helper method that handles a keyboard key released event.
+     *
+     * @param keyEvent Key released event.
+     */
+    private void keyReleasedEventHandler(KeyEvent keyEvent) {
+        // Stop passing this event to the next node
+        keyEvent.consume();
+
+        // Handle key event
+        KeyCode code = keyEvent.getCode();
+
+        switch (code) {
+            case A -> notePlayer.noteOff(octaveNum * 12, NOTE_PLAYING_OFF_VELOCITY);  // C
+            case W -> notePlayer.noteOff(octaveNum * 12 + 1, NOTE_PLAYING_OFF_VELOCITY);  // C#
+            case S -> notePlayer.noteOff(octaveNum * 12 + 2, NOTE_PLAYING_OFF_VELOCITY);  // D
+            case E -> notePlayer.noteOff(octaveNum * 12 + 3, NOTE_PLAYING_OFF_VELOCITY);  // D#
+            case D -> notePlayer.noteOff(octaveNum * 12 + 4, NOTE_PLAYING_OFF_VELOCITY);  // E
+            case F -> notePlayer.noteOff(octaveNum * 12 + 5, NOTE_PLAYING_OFF_VELOCITY);  // F
+            case T -> notePlayer.noteOff(octaveNum * 12 + 6, NOTE_PLAYING_OFF_VELOCITY);  // F#
+            case G -> notePlayer.noteOff(octaveNum * 12 + 7, NOTE_PLAYING_OFF_VELOCITY);  // G
+            case Y -> notePlayer.noteOff(octaveNum * 12 + 8, NOTE_PLAYING_OFF_VELOCITY);  // G#
+            case H -> notePlayer.noteOff(octaveNum * 12 + 9, NOTE_PLAYING_OFF_VELOCITY);  // A
+            case U -> notePlayer.noteOff(octaveNum * 12 + 10, NOTE_PLAYING_OFF_VELOCITY);  // A#
+            case J -> notePlayer.noteOff(octaveNum * 12 + 11, NOTE_PLAYING_OFF_VELOCITY);  // B
+            case K -> notePlayer.noteOff(octaveNum * 12 + 12, NOTE_PLAYING_OFF_VELOCITY);  // C'
+            case O -> notePlayer.noteOff(octaveNum * 12 + 13, NOTE_PLAYING_OFF_VELOCITY);  // C#'
+            case L -> notePlayer.noteOff(octaveNum * 12 + 14, NOTE_PLAYING_OFF_VELOCITY);  // D'
+            case P -> notePlayer.noteOff(octaveNum * 12 + 15, NOTE_PLAYING_OFF_VELOCITY);  // D#'
+            case SEMICOLON -> notePlayer.noteOff(octaveNum * 12 + 16, NOTE_PLAYING_OFF_VELOCITY);  // E'
+            case QUOTE -> notePlayer.noteOff(octaveNum * 12 + 17, NOTE_PLAYING_OFF_VELOCITY);  // F'
         }
     }
 }
