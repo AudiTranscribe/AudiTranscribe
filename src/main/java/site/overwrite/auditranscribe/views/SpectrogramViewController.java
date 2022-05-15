@@ -2,7 +2,7 @@
  * SpectrogramViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-14
+ * Updated on 2022-05-15
  *
  * Description: Contains the spectrogram view's controller class.
  */
@@ -102,8 +102,8 @@ public class SpectrogramViewController implements Initializable {
     final int MIDI_CHANNEL_NUM = 0;
     final int NOTE_PLAYING_ON_VELOCITY = 96;  // Within the range [0, 127]
     final int NOTE_PLAYING_OFF_VELOCITY = 10;   // Within the range [0, 127]
-    final long NOTE_PLAYING_ON_DURATION = 100;  // In milliseconds
-    final long NOTE_PLAYING_OFF_DURATION = 900;  // In milliseconds
+    final long NOTE_PLAYING_ON_DURATION = 75;  // In milliseconds
+    final long NOTE_PLAYING_OFF_DURATION = 925;  // In milliseconds
 
     final KeyCodeCombination NEW_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN);
     final KeyCodeCombination OPEN_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN);
