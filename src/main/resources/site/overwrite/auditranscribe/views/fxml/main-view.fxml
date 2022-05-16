@@ -21,6 +21,21 @@
    <children>
       <VBox alignment="TOP_CENTER" layoutX="208.0" layoutY="38.0" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
+            <MenuBar fx:id="menuBar">
+              <menus>
+                <Menu mnemonicParsing="false" text="File">
+                  <items>
+                    <MenuItem fx:id="newProjectMenuItem" mnemonicParsing="false" text="New Project" />
+                        <MenuItem fx:id="openProjectMenuItem" mnemonicParsing="false" text="Open..." />
+                  </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Help">
+                  <items>
+                    <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" text="About AudiTranscribe" />
+                  </items>
+                </Menu>
+              </menus>
+            </MenuBar>
             <AnchorPane prefHeight="120.0" prefWidth="200.0">
                <children>
                   <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="75.0" styleClass="title-label" text="AudiTranscribe" textAlignment="CENTER" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
@@ -97,21 +112,6 @@
             </StackPane>
          </children>
       </VBox>
-      <MenuBar fx:id="menuBar">
-        <menus>
-          <Menu mnemonicParsing="false" text="File">
-            <items>
-              <MenuItem fx:id="newProjectMenuItem" mnemonicParsing="false" text="New Project" />
-                  <MenuItem fx:id="openProjectMenuItem" mnemonicParsing="false" text="Open Existing Project..." />
-            </items>
-          </Menu>
-          <Menu mnemonicParsing="false" text="Help">
-            <items>
-              <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" text="About AudiTranscribe" />
-            </items>
-          </Menu>
-        </menus>
-      </MenuBar>
    </children>
    <stylesheets>
       <URL value="@../css/base.css" />

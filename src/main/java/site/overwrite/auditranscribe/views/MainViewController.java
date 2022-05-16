@@ -15,10 +15,8 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -58,14 +56,16 @@ public class MainViewController implements Initializable {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     // FXML Elements
-    @FXML
-    private AnchorPane rootPane;
-
+    // Menu bar items
     @FXML
     private MenuBar menuBar;
 
     @FXML
     private MenuItem newProjectMenuItem, openProjectMenuItem, aboutMenuItem;
+
+    // Main elements
+    @FXML
+    private AnchorPane rootPane;
 
     @FXML
     private Label versionLabel;
@@ -249,9 +249,9 @@ public class MainViewController implements Initializable {
         }
 
         // Add methods to buttons
-        newProjectButton.setOnAction(this::newProjectAction);
+        newProjectButton.setOnAction(this::handleNewProject);
 
-        openProjectButton.setOnAction(this::openProjectAction);
+        openProjectButton.setOnAction(this::handleOpenProject);
 
         // Set the search field method
         searchTextField.textProperty().addListener((observable, oldValue, newValue) ->
@@ -267,30 +267,6 @@ public class MainViewController implements Initializable {
                 })
         );
 
-        // Add methods to menu items
-        newProjectMenuItem.setOnAction(this::newProjectAction);
-
-        openProjectMenuItem.setOnAction(this::openProjectAction);
-
-        aboutMenuItem.setOnAction(actionEvent -> {
-            try {
-                // Load the FXML file into the scene
-                FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/about-view.fxml"));
-                Scene scene = new Scene(fxmlLoader.load());
-
-                // Set stage properties
-                Stage aboutStage = new Stage();
-                aboutStage.setTitle("About AudiTranscribe");
-                aboutStage.setScene(scene);
-                aboutStage.setResizable(false);
-
-                // Show the stage
-                aboutStage.show();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
         // Update the projects list view
         projectsListView.setOnMouseClicked(mouseEvent -> {
             // Get the selected item
@@ -304,7 +280,7 @@ public class MainViewController implements Initializable {
                 File file = new File(filepath);
 
                 // Get the window
-                Window window = ProjectIOHandlers.getWindow(mouseEvent);
+                Window window = rootPane.getScene().getWindow();
 
                 // Open the project with the filepath
                 ProjectIOHandlers.openProject((Stage) window, transcriptionStage, file, this);
@@ -312,6 +288,13 @@ public class MainViewController implements Initializable {
         });
 
         refreshProjectsListView();
+
+        // Add methods to menu items
+        newProjectMenuItem.setOnAction(this::handleNewProject);
+
+        openProjectMenuItem.setOnAction(this::handleOpenProject);
+
+        aboutMenuItem.setOnAction(actionEvent -> AboutViewController.showAboutWindow());
 
         // Report that the main view is ready to be shown
         logger.log(Level.INFO, "Main view ready to be shown");
@@ -392,7 +375,7 @@ public class MainViewController implements Initializable {
      *
      * @param actionEvent Event that triggered this function.
      */
-    private void newProjectAction(ActionEvent actionEvent) {
+    private void handleNewProject(ActionEvent actionEvent) {
         // Get the current window
         Window window = rootPane.getScene().getWindow();
 
@@ -408,7 +391,7 @@ public class MainViewController implements Initializable {
      *
      * @param actionEvent Event that triggered this function.
      */
-    private void openProjectAction(ActionEvent actionEvent) {
+    private void handleOpenProject(ActionEvent actionEvent) {
         // Get the current window
         Window window = rootPane.getScene().getWindow();
 

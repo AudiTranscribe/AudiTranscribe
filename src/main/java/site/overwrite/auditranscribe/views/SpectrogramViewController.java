@@ -2,7 +2,7 @@
  * SpectrogramViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-14
+ * Updated on 2022-05-16
  *
  * Description: Contains the spectrogram view's controller class.
  */
@@ -13,7 +13,6 @@ import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -25,6 +24,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Line;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -138,8 +138,19 @@ public class SpectrogramViewController implements Initializable {
     private Line playheadLine;
 
     // FXML Elements
+    // Menu bar
     @FXML
-    private AnchorPane mainPane;
+    private MenuBar menuBar;
+
+    @FXML
+    private MenuItem newProjectMenuItem, openProjectMenuItem, saveProjectMenuItem, saveAsMenuItem, aboutMenuItem;
+
+    // Main elements
+    @FXML
+    private VBox masterVBox;
+
+    @FXML
+    private AnchorPane rootPane, mainPane;
 
     // Top HBox
     @FXML
@@ -180,9 +191,22 @@ public class SpectrogramViewController implements Initializable {
     // Initialization method
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Make macOS systems use the system menu bar
+        final String os = System.getProperty("os.name");
+        if (os != null && os.startsWith("Mac")) {
+            menuBar.useSystemMenuBarProperty().set(true);
+        }
+
         // Add CSS stylesheets to the scene
-        mainPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
-        mainPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/light-mode.css"));  // Todo: add theme support
+        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
+        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/light-mode.css"));  // Todo: add theme support
+
+        // Set the width and height of the root pane
+        masterVBox.prefWidthProperty().bind(rootPane.widthProperty());
+        masterVBox.prefHeightProperty().bind(rootPane.heightProperty());
+
+        mainPane.prefWidthProperty().bind(rootPane.widthProperty());
+        mainPane.prefHeightProperty().bind(rootPane.heightProperty().subtract(menuBar.heightProperty()));
 
         // Update spinners' ranges
         SpinnerValueFactory.DoubleSpinnerValueFactory bpmSpinnerFactory =
@@ -263,29 +287,11 @@ public class SpectrogramViewController implements Initializable {
                 });
 
         // Add methods to buttons
-        newProjectButton.setOnAction(actionEvent -> {
-            // Get the current window
-            Window window = ProjectIOHandlers.getWindow(actionEvent);
+        newProjectButton.setOnAction(this::handleNewProject);
 
-            // Get user to select a file
-            File file = ProjectIOHandlers.getFileFromFileDialog(window);
+        openProjectButton.setOnAction(this::handleOpenProject);
 
-            // Create the new project
-            ProjectIOHandlers.newProject(mainStage, (Stage) window, file, mainViewController);
-        });
-
-        openProjectButton.setOnAction(actionEvent -> {
-            // Get the current window
-            Window window = ProjectIOHandlers.getWindow(actionEvent);
-
-            // Get user to select a file
-            File file = ProjectIOHandlers.getFileFromFileDialog(window);
-
-            // Open the existing project
-            ProjectIOHandlers.openProject(mainStage, (Stage) window, file, mainViewController);
-        });
-
-        saveProjectButton.setOnAction(this::handleSavingProject);
+        saveProjectButton.setOnAction(event -> handleSavingProject(false));
 
         playButton.setOnAction(event -> togglePlayButton());
 
@@ -389,6 +395,17 @@ public class SpectrogramViewController implements Initializable {
             }
         });
 
+        // Add methods to menu items
+        newProjectMenuItem.setOnAction(this::handleNewProject);
+
+        openProjectMenuItem.setOnAction(this::handleOpenProject);
+
+        saveProjectMenuItem.setOnAction(event -> handleSavingProject(false));
+
+        saveAsMenuItem.setOnAction(event -> handleSavingProject(true));
+
+        aboutMenuItem.setOnAction(actionEvent -> AboutViewController.showAboutWindow());
+
         // Get the projects database
         try {
             projectsDB = new ProjectsDB();
@@ -447,10 +464,10 @@ public class SpectrogramViewController implements Initializable {
         }
 
         // Set keyboard button press methods
-        mainPane.getScene().addEventFilter(KeyEvent.KEY_PRESSED, this::keyboardPressEventHandler);
+        rootPane.getScene().addEventFilter(KeyEvent.KEY_PRESSED, this::keyboardPressEventHandler);
 
         // Ensure main pane is in focus
-        mainPane.requestFocus();
+        rootPane.requestFocus();
     }
 
     /**
@@ -631,17 +648,51 @@ public class SpectrogramViewController implements Initializable {
     }
 
     /**
-     * Helper method that handles the saving of the project.
+     * Helper method that helps open a new project.
      *
      * @param event Event that triggered this function.
      */
-    private void handleSavingProject(Event event) {
-        // Allow user to select save location if `audtFilePath` is unset
-        if (audtFilePath == null) {
+    private void handleNewProject(Event event) {
+        // Get the current window
+        Window window = rootPane.getScene().getWindow();
+
+        // Get user to select a file
+        File file = ProjectIOHandlers.getFileFromFileDialog(window);
+
+        // Create the new project
+        ProjectIOHandlers.newProject(mainStage, (Stage) window, file, mainViewController);
+    }
+
+    /**
+     * Helper method that helps open an existing project.
+     *
+     * @param event Event that triggered this function.
+     */
+    private void handleOpenProject(Event event) {
+        // Get the current window
+        Window window = rootPane.getScene().getWindow();
+
+        // Get user to select a file
+        File file = ProjectIOHandlers.getFileFromFileDialog(window);
+
+        // Open the existing project
+        ProjectIOHandlers.openProject(mainStage, (Stage) window, file, mainViewController);
+    }
+
+    /**
+     * Helper method that handles the saving of the project.
+     *
+     * @param forceChooseFile Boolean whether to force the user to choose a file.
+     */
+    private void handleSavingProject(boolean forceChooseFile) {
+        // Allow user to select save location
+        String saveDest, saveName;
+
+        if (audtFilePath == null || forceChooseFile) {
             logger.log(Level.FINE, "AUDT file destination not yet set; asking now");
 
             // Get current window
-            javafx.stage.Window window = ((Node) event.getSource()).getScene().getWindow();
+            Window window = rootPane.getScene().getWindow();
 
             // Ask user to choose a file
             FileChooser fileChooser = new FileChooser();
@@ -650,14 +701,26 @@ public class SpectrogramViewController implements Initializable {
             // If operation was cancelled return
             if (file == null) return;
 
+            // Set the actual destination to save the file
+            saveDest = file.getAbsolutePath();
+            saveName = file.getName();
+
+            if (!saveDest.toLowerCase().endsWith(".audt")) saveDest += ".audt";
+            if (!saveName.toLowerCase().endsWith(".audt")) saveName += ".audt";
+
             // Update the file path and file name
-            audtFilePath = file.getAbsolutePath();
-            audtFileName = file.getName();
+            if (audtFilePath == null) {
+                audtFilePath = saveDest;
+                audtFileName = saveName;
+            }
 
-            if (!audtFilePath.toLowerCase().endsWith(".audt")) audtFilePath += ".audt";
-            if (!audtFileName.toLowerCase().endsWith(".audt")) audtFileName += ".audt";
+            logger.log(Level.FINE, "AUDT file destination set to " + saveDest);
+        } else {
+            // Use the existing file path and file name
+            saveDest = audtFilePath;
+            saveName = audtFileName;
 
-            logger.log(Level.FINE, "AUDT file destination set to " + audtFilePath);
+            logger.log(Level.FINE, "Saving " + saveName + " to " + saveDest);
         }
 
         // Package all the current data into a `ProjectDataObject`
@@ -679,7 +742,7 @@ public class SpectrogramViewController implements Initializable {
 
         // Save the project
         try {
-            ProjectIOHandlers.saveProject(audtFilePath, projectData);
+            ProjectIOHandlers.saveProject(saveDest, projectData);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -1048,7 +1111,7 @@ public class SpectrogramViewController implements Initializable {
 
         } else if (NEW_PROJECT_COMBINATION.match(keyEvent)) {  // Create a new project
             // Get the current window
-            Window window = ProjectIOHandlers.getWindow(keyEvent);
+            Window window = rootPane.getScene().getWindow();
 
             // Get user to select a file
             File file = ProjectIOHandlers.getFileFromFileDialog(window);
@@ -1058,7 +1121,7 @@ public class SpectrogramViewController implements Initializable {
 
         } else if (OPEN_PROJECT_COMBINATION.match(keyEvent)) {  // Open a project
             // Get the current window
-            Window window = ProjectIOHandlers.getWindow(keyEvent);
+            Window window = rootPane.getScene().getWindow();
 
             // Get user to select a file
             File file = ProjectIOHandlers.getFileFromFileDialog(window);
@@ -1067,7 +1130,7 @@ public class SpectrogramViewController implements Initializable {
             ProjectIOHandlers.openProject(mainStage, (Stage) window, file, mainViewController);
 
         } else if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {  // Save current project
-            handleSavingProject(keyEvent);
+            handleSavingProject(false);
         }
     }
 }
