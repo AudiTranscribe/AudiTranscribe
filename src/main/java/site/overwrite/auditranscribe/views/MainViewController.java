@@ -13,6 +13,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -55,6 +56,17 @@ public class MainViewController implements Initializable {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     // FXML Elements
+    // Menu bar items
+    @FXML
+    private MenuBar menuBar;
+
+    @FXML
+    private MenuItem newProjectMenuItem, openProjectMenuItem, aboutMenuItem;
+
+    // Main elements
+    @FXML
+    private AnchorPane rootPane;
+
     @FXML
     private Label versionLabel;
 
@@ -219,78 +231,73 @@ public class MainViewController implements Initializable {
     // Initialization method
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        // Make macOS systems use the system menu bar
+        final String os = System.getProperty("os.name");
+        if (os != null && os.startsWith("Mac")) {
+            menuBar.useSystemMenuBarProperty().set(true);
+        }
+
+        // Get the current version
         try {
             // Get the project properties file
             PropertyFile projectPropertiesFile = new PropertyFile("project.properties");
 
             // Update the version label with the version number
             versionLabel.setText("Version " + projectPropertiesFile.getProperty("version"));
-
-            // Add methods to buttons
-            newProjectButton.setOnAction(actionEvent -> {
-                // Get the current window
-                Window window = ProjectIOHandlers.getWindow(actionEvent);
-
-                // Get user to select a file
-                File file = ProjectIOHandlers.getFileFromFileDialog(window);
-
-                // Create the new project
-                ProjectIOHandlers.newProject((Stage) window, transcriptionStage, file, this);
-            });
-
-            openProjectButton.setOnAction(actionEvent -> {
-                // Get the current window
-                Window window = ProjectIOHandlers.getWindow(actionEvent);
-
-                // Get user to select a file
-                File file = ProjectIOHandlers.getFileFromFileDialog(window);
-
-                // Open the existing project
-                ProjectIOHandlers.openProject((Stage) window, transcriptionStage, file, this);
-            });
-
-            // Set the search field method
-            searchTextField.textProperty().addListener((observable, oldValue, newValue) ->
-                    filteredList.setPredicate(projectRecord -> {
-                        // If filter text is empty, display all projects
-                        if (newValue == null || newValue.isEmpty()) return true;
-
-                        // Attempt to find a match within the *file path*
-                        String searchFilter = newValue.toLowerCase();
-                        String lowercaseFilepath = projectRecord.getValue2().toLowerCase();
-
-                        return lowercaseFilepath.contains(searchFilter);
-                    })
-            );
-
-            // Update the projects list view
-            projectsListView.setOnMouseClicked(mouseEvent -> {
-                // Get the selected item
-                Quartet<Long, String, String, String> selectedItem =
-                        projectsListView.getSelectionModel().getSelectedItem();
-
-                // Check if an item was selected
-                if (selectedItem != null) {
-                    // Get the file of the selected item
-                    String filepath = selectedItem.getValue2();
-                    File file = new File(filepath);
-
-                    // Get the window
-                    Window window = ProjectIOHandlers.getWindow(mouseEvent);
-
-                    // Open the project with the filepath
-                    ProjectIOHandlers.openProject((Stage) window, transcriptionStage, file, this);
-                }
-            });
-
-            refreshProjectsListView();
-
-            // Report that the main view is ready to be shown
-            logger.log(Level.INFO, "Main view ready to be shown");
-
         } catch (IOException | NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
+
+        // Add methods to buttons
+        newProjectButton.setOnAction(this::handleNewProject);
+
+        openProjectButton.setOnAction(this::handleOpenProject);
+
+        // Set the search field method
+        searchTextField.textProperty().addListener((observable, oldValue, newValue) ->
+                filteredList.setPredicate(projectRecord -> {
+                    // If filter text is empty, display all projects
+                    if (newValue == null || newValue.isEmpty()) return true;
+
+                    // Attempt to find a match within the *file path*
+                    String searchFilter = newValue.toLowerCase();
+                    String lowercaseFilepath = projectRecord.getValue2().toLowerCase();
+
+                    return lowercaseFilepath.contains(searchFilter);
+                })
+        );
+
+        // Update the projects list view
+        projectsListView.setOnMouseClicked(mouseEvent -> {
+            // Get the selected item
+            Quartet<Long, String, String, String> selectedItem =
+                    projectsListView.getSelectionModel().getSelectedItem();
+
+            // Check if an item was selected
+            if (selectedItem != null) {
+                // Get the file of the selected item
+                String filepath = selectedItem.getValue2();
+                File file = new File(filepath);
+
+                // Get the window
+                Window window = rootPane.getScene().getWindow();
+
+                // Open the project with the filepath
+                ProjectIOHandlers.openProject((Stage) window, transcriptionStage, file, this);
+            }
+        });
+
+        refreshProjectsListView();
+
+        // Add methods to menu items
+        newProjectMenuItem.setOnAction(this::handleNewProject);
+
+        openProjectMenuItem.setOnAction(this::handleOpenProject);
+
+        aboutMenuItem.setOnAction(actionEvent -> AboutViewController.showAboutWindow());
+
+        // Report that the main view is ready to be shown
+        logger.log(Level.INFO, "Main view ready to be shown");
     }
 
     // Public methods
@@ -359,5 +366,39 @@ public class MainViewController implements Initializable {
         } else {
             projectsListView.setBackground(Background.fill(Color.TRANSPARENT));
         }
+    }
+
+    // Private methods
+
+    /**
+     * Helper method that helps open a new project.
+     *
+     * @param actionEvent Event that triggered this function.
+     */
+    private void handleNewProject(ActionEvent actionEvent) {
+        // Get the current window
+        Window window = rootPane.getScene().getWindow();
+
+        // Get user to select a file
+        File file = ProjectIOHandlers.getFileFromFileDialog(window);
+
+        // Create the new project
+        ProjectIOHandlers.newProject((Stage) window, transcriptionStage, file, this);
+    }
+
+    /**
+     * Helper method that helps open an existing project.
+     *
+     * @param actionEvent Event that triggered this function.
+     */
+    private void handleOpenProject(ActionEvent actionEvent) {
+        // Get the current window
+        Window window = rootPane.getScene().getWindow();
+
+        // Get user to select a file
+        File file = ProjectIOHandlers.getFileFromFileDialog(window);
+
+        // Open the existing project
+        ProjectIOHandlers.openProject((Stage) window, transcriptionStage, file, this);
     }
 }

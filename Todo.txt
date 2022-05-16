@@ -2,7 +2,6 @@
 Todo (Important):
     - Allow other audio types (e.g. mp3) to be input into the program
     - Add progress bars
-    - Add toolbar options
     - Add settings page
         - Need to allow for configuration of audio devices
         * Using local app data folder: https://stackoverflow.com/a/1198954
