@@ -2,23 +2,19 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-05-14
+ * Updated on 2022-05-16
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
 
 package site.overwrite.auditranscribe.views;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.stage.*;
@@ -218,36 +214,6 @@ public class ProjectIOHandlers {
         fileWriter.writeGUIData(projectDataObject.guiData);
 
         fileWriter.writeBytesToFile();
-    }
-
-    /**
-     * Method that gets the window of the event.
-     *
-     * @param actionEvent Event caller.
-     * @return WindowFunction.
-     */
-    public static Window getWindow(ActionEvent actionEvent) {
-        return ((Node) actionEvent.getSource()).getScene().getWindow();
-    }
-
-    /**
-     * Method that gets the window of the event.
-     *
-     * @param keyEvent Event caller.
-     * @return WindowFunction.
-     */
-    public static Window getWindow(KeyEvent keyEvent) {
-        return ((Scene) keyEvent.getSource()).getWindow();
-    }
-
-    /**
-     * Method that gets the window of the event.
-     *
-     * @param mouseEvent Event caller.
-     * @return WindowFunction.
-     */
-    public static Window getWindow(MouseEvent mouseEvent) {
-        return ((Node) mouseEvent.getSource()).getScene().getWindow();
     }
 
     /**
