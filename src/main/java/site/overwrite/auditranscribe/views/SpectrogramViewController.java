@@ -1194,7 +1194,7 @@ public class SpectrogramViewController implements Initializable {
             ProjectIOHandlers.openProject(mainStage, (Stage) window, file, mainViewController);
 
         } else if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {  // Save current project
-            handleSavingProject(keyEvent);
+            handleSavingProject(false);
 
         } else if (code == KeyCode.MINUS) {  // Increase playback octave number by 1
             notePlayer.silenceChannel();  // Stop any notes from playing
