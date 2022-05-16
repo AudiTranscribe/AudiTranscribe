@@ -1,3 +1,13 @@
+/* MAIN PAGE */
+/* Others */
+.short-name-rectangle {
+    -fx-stroke: #000000ff;
+}
+
+.list-cell:hover {
+    -fx-background-color: #e0e0e0ff;
+}
+
 /* SPECTROGRAM PAGE */
 /* Labels */
 .display-label {
@@ -15,6 +25,14 @@
 
 .bar-number-ellipse {
     -fx-stroke: #000000ff;
+}
+
+.current-octave-rectangle {
+    -fx-fill: #ffbf0080;
+}
+
+.spectrogram-square {
+    -fx-border-color: #d3d3d3ff;  /* Lightgray */
 }
 
 /* Playback */

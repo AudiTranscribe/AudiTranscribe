@@ -2,7 +2,7 @@
  * Wavelet.java
  *
  * Created on 2022-02-13
- * Updated on 2022-04-16
+ * Updated on 2022-05-14
  *
  * Description: Class to implement audio windowing functions.
  */
@@ -10,7 +10,7 @@
 package site.overwrite.auditranscribe.spectrogram;
 
 import javafx.util.Pair;
-import site.overwrite.auditranscribe.audio.Window;
+import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.SpectralHelpers;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
 import site.overwrite.auditranscribe.utils.Complex;
@@ -29,13 +29,13 @@ public class Wavelet {
      * Return length of each filter in a wavelet basis.<br><br>
      * Assumes <code>freqs</code> are all positive and in strictly ascending order.
      *
-     * @param freqs         Array containing the centers of all the frequency bins.
-     * @param sr            Sample rate.
-     * @param window        Window function to use.
-     * @param filterScale   Scaling factor for the filter.
-     * @param isCQT         Whether this is a CQT or not.
-     * @param gammaValue    Default gamma value to use.
-     * @param fallbackAlpha Fallback alpha value if the alpha value cannot be calculated.
+     * @param freqs          Array containing the centers of all the frequency bins.
+     * @param sr             Sample rate.
+     * @param windowFunction Window function to use.
+     * @param filterScale    Scaling factor for the filter.
+     * @param isCQT          Whether this is a CQT or not.
+     * @param gammaValue     Default gamma value to use.
+     * @param fallbackAlpha  Fallback alpha value if the alpha value cannot be calculated.
      * @return Pair of values. First value represents the wavelet lengths. Second value represents
      * frequency cutoff.
      * @see <a href="https://www.sciencedirect.com/science/article/abs/pii/037859559090170T">This
@@ -43,7 +43,8 @@ public class Wavelet {
      * from notched-noise data." Hearing research 47.1-2 (1990): 103-138.
      */
     public static Pair<double[], Double> computeWaveletLengths(
-            double[] freqs, double sr, Window window, double filterScale, boolean isCQT, double gammaValue, double fallbackAlpha
+            double[] freqs, double sr, WindowFunction windowFunction, double filterScale, boolean isCQT,
+            double gammaValue, double fallbackAlpha
     ) {
         // Check the number of frequencies provided
         int numFreqs = freqs.length;
@@ -100,7 +101,7 @@ public class Wavelet {
 
         // Find frequency cutoff
         double freqCutoff = -Double.MAX_VALUE;
-        double bandwidth = window.window.getBandwidth();
+        double bandwidth = windowFunction.window.getBandwidth();
 
         for (int i = 0; i < numFreqs; i++) {
             double possibleCutoff = freqs[i] * (1. + 0.5 * bandwidth / Q[i]) + 0.5 * gammas[i];
@@ -123,15 +124,15 @@ public class Wavelet {
      * frequencies.<br><br>
      * Assumes <code>freqs</code> are all positive and in strictly ascending order.
      *
-     * @param freqs       Array containing the centers of all the frequency bins.
-     * @param sr          Sample rate.
-     * @param window      Wavelet function to use.
-     * @param filterScale Scaling factor for the filter.
-     * @param padFFT      Whether to pad in preparation for FFT.
-     * @param norm        p-value for the LP norm.
-     * @param isCQT       Whether this is a CQT or not.
-     * @param gamma       Gamma value.
-     * @param alpha       Alpha value.
+     * @param freqs          Array containing the centers of all the frequency bins.
+     * @param sr             Sample rate.
+     * @param windowFunction Window function to use.
+     * @param filterScale    Scaling factor for the filter.
+     * @param padFFT         Whether to pad in preparation for FFT.
+     * @param norm           p-value for the LP norm.
+     * @param isCQT          Whether this is a CQT or not.
+     * @param gamma          Gamma value.
+     * @param alpha          Alpha value.
      * @return Pair of values. First value is a 2D array of the filter. Second value is the lengths
      * of each of the filters.
      * @implNote From <a href="https://librosa.org/doc/0.9.1/_modules/librosa/filters.html#wavelet">
@@ -141,18 +142,12 @@ public class Wavelet {
      * from notched-noise data." Hearing research 47.1-2 (1990): 103-138.
      */
     public static Pair<Complex[][], double[]> computeWaveletBasis(
-            double[] freqs, double sr, Window window, double filterScale, boolean padFFT, double norm, boolean isCQT,
+            double[] freqs, double sr, WindowFunction windowFunction, double filterScale, boolean padFFT, double norm, boolean isCQT,
             double gamma, double alpha
     ) {
         // Pass-through parameters to get the filter lengths
         Pair<double[], Double> waveletLengthsResult = computeWaveletLengths(
-                freqs,
-                sr,
-                window,
-                filterScale,
-                isCQT,
-                gamma,
-                alpha
+                freqs, sr, windowFunction, filterScale, isCQT, gamma, alpha
         );
         double[] lengths = waveletLengthsResult.getKey();
         int numLengths = lengths.length;
@@ -181,7 +176,7 @@ public class Wavelet {
             }
 
             // Apply the windowing function
-            double[] windowArray = window.window.generateWindow(signalLength, false);
+            double[] windowArray = windowFunction.window.generateWindow(signalLength, false);
             for (int j = 0; j < signalLength; j++) {
                 sig[j] = sig[j].scale(windowArray[j]);
             }

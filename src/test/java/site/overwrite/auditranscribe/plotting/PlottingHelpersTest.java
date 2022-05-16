@@ -2,7 +2,7 @@
  * PlottingHelpersTest.java
  *
  * Created on 2022-04-09
- * Updated on 2022-04-09
+ * Updated on 2022-05-14
  *
  * Description: Test `PlottingHelpers.java`.
  */
@@ -19,7 +19,14 @@ class PlottingHelpersTest {
     void freqToHeight() {
         assertEquals(334.914, PlottingHelpers.freqToHeight(123, 10, 20000, 500), 0.001);
         assertEquals(153.6, PlottingHelpers.freqToHeight(4096,32,32768,512), 0.001);
-        assertEquals(59.392, PlottingHelpers.freqToHeight(12345, 1, 22050, 1024), 0.001);
+        assertEquals(59.39195, PlottingHelpers.freqToHeight(12345, 1, 22050, 1024), 0.001);
+    }
+
+    @Test
+    void heightToFreq() {
+        assertEquals(123, PlottingHelpers.heightToFreq(334.914, 10, 20000, 500), 0.001);
+        assertEquals(4096, PlottingHelpers.heightToFreq(153.6, 32, 32768, 512), 0.001);
+        assertEquals(12345, PlottingHelpers.heightToFreq(59.39195, 1, 22050, 1024), 0.001);
     }
 
     @Test

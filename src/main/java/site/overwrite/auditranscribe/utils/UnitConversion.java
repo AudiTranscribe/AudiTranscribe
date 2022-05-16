@@ -2,7 +2,7 @@
  * UnitConversion.java
  *
  * Created on 2022-03-12
- * Updated on 2022-04-30
+ * Updated on 2022-05-14
  *
  * Description: Unit conversion methods.
  */
@@ -116,6 +116,17 @@ public class UnitConversion {
     }
 
     /**
+     * Converts the frequency to an estimated note number.
+     * @param freq  Frequency of the note with that note number. The returned frequency assumes that
+     *              the notes have been tuned to A440.
+     * @return  The estimated note number. This is a <b>double</b> and needs to be rounded. That
+     * task is left to another method and not this one.
+     */
+    public static double freqToNoteNumber(double freq) {
+        return 12 * MathUtils.log2(freq / 440) + 57;
+    }
+
+    /**
      * Converts a note number to its spelled note.<br>
      * Note that the note number for C0 is 0 and subsequent note numbers are given by their offset
      * from C0. For example, A4 has note number 57 as it is 57 notes away from C0.
@@ -144,6 +155,35 @@ public class UnitConversion {
 
         // Return the full string
         return noteString + octave;  // Example: C0, D#3, E5 etc.
+    }
+
+    /**
+     * Converts a note number (as defined by AudiTranscribe) to its corresponding MIDI number.
+     *
+     * @param noteNumber Note number.
+     * @return Corresponding MIDI number. Note that this will return <code>-1</code> is there is no
+     * corresponding MIDI number (say above G9).
+     */
+    public static int noteNumberToMIDINumber(int noteNumber) {
+        // If the note number is above 116 (i.e. above G9) there is no MIDI number equivalent
+        if (noteNumber > 116) return -1;
+
+        // Otherwise, add 12 to the note number to get the MIDI number
+        return noteNumber + 12;
+    }
+
+    /**
+     * Converts a note string to its corresponding MIDI number.
+     *
+     * @param note Note string. Notes may be spelled out with optional accidentals or octave
+     *             numbers. The leading note name is case-insensitive. Sharps are indicated with
+     *             <code>#</code> or <code>♯</code>, flats may be indicated with <code>!</code>,
+     *             <code>b</code>, or <code>♭</code>.
+     * @return Corresponding MIDI number. Note that this will return <code>-1</code> is there is no
+     * corresponding MIDI number (say above G9).
+     */
+    public static int noteToMIDINumber(String note) {
+        return noteNumberToMIDINumber(noteToNoteNumber(note));
     }
 
     // Magnitude Scaling - Unit Conversion

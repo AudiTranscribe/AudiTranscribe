@@ -2,7 +2,7 @@
  * STFTTest.java
  *
  * Created on 2022-04-10
- * Updated on 2022-04-16
+ * Updated on 2022-05-14
  *
  * Description: Test `STFT.java`
  */
@@ -10,7 +10,7 @@
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
 import org.junit.jupiter.api.Test;
-import site.overwrite.auditranscribe.audio.Window;
+import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.utils.Complex;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,12 +28,11 @@ class STFTTest {
         };
 
         // Generate the STFT output
-        // (Note that these STFT uses pad mode reflect)
-        Complex[][] stftArray1Ones = STFT.stft(array1, 4, 3, Window.ONES_WINDOW);
-        Complex[][] stftArray1Hann = STFT.stft(array1, 4, 3, Window.HANN_WINDOW);
+        Complex[][] stftArray1Ones = STFT.stft(array1, 4, 3, WindowFunction.ONES_WINDOW);
+        Complex[][] stftArray1Hann = STFT.stft(array1, 4, 3, WindowFunction.HANN_WINDOW);
 
-        Complex[][] stftArray2Ones = STFT.stft(array2, 8, 9, Window.ONES_WINDOW);
-        Complex[][] stftArray2Hann = STFT.stft(array2, 8, 9, Window.HANN_WINDOW);
+        Complex[][] stftArray2Ones = STFT.stft(array2, 8, 9, WindowFunction.ONES_WINDOW);
+        Complex[][] stftArray2Hann = STFT.stft(array2, 8, 9, WindowFunction.HANN_WINDOW);
 
         // Check the output
         assertEquals(new Complex(3), stftArray1Ones[0][0].roundNicely(3));

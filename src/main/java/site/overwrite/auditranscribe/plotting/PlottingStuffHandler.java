@@ -2,7 +2,7 @@
  * PlottingStuffHandler.java
  *
  * Created on 2022-03-20
- * Updated on 2022-05-01
+ * Updated on 2022-05-16
  *
  * Description: Class that adds the notes' stuff to the spectrogram area.
  */
@@ -16,6 +16,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.*;
 import site.overwrite.auditranscribe.utils.MiscUtils;
@@ -31,6 +32,38 @@ public class PlottingStuffHandler {
     static final double BAR_NUMBER_ELLIPSE_RADIUS_Y = 16;
 
     // Public methods
+
+    /**
+     * Method that adds the notes lines to the spectrogram pane.
+     *
+     * @param spectrogramPane Spectrogram pane.
+     * @param height          Height of the spectrogram pane.
+     * @param minNoteNumber   Lowest permitted note number.
+     * @param maxNoteNumber   Highest permitted note number.
+     */
+    public static void addNoteLines(Pane spectrogramPane, double height, int minNoteNumber, int maxNoteNumber) {
+        // Get the width of the note pane
+        double width = spectrogramPane.getPrefWidth();
+
+        // Place the notes onto the pane
+        for (int i = minNoteNumber; i <= maxNoteNumber; i++) {
+            // Calculate the height to move the pointer to
+            double placementHeight = PlottingHelpers.noteNumToHeight(i, minNoteNumber, maxNoteNumber, height);
+            placementHeight += getHeightDifference(height, minNoteNumber, maxNoteNumber) / 2;
+
+            // Create the line
+            Line noteLine = new Line(0, placementHeight, width, placementHeight);
+
+            // Add CSS style class
+            noteLine.getStyleClass().add("note-line");
+
+            // Set the line dashed format
+            if (i % 12 == 0) noteLine.getStyleClass().add("note-line-c");
+
+            // Add the line to the spectrogram
+            spectrogramPane.getChildren().add(noteLine);
+        }
+    }
 
     /**
      * Method that adds the note labels to the note pane.
@@ -100,40 +133,69 @@ public class PlottingStuffHandler {
     }
 
     /**
-     * Method that adds the notes lines to the spectrogram pane.
+     * Method that adds the current octave's rectangle to the note pane.
      *
-     * @param spectrogramPane Spectrogram pane.
-     * @param height          Height of the spectrogram pane.
-     * @param minNoteNumber   Lowest permitted note number.
-     * @param maxNoteNumber   Highest permitted note number.
+     * @param notePane      Note pane.
+     * @param height        (Final) height of the note pane.
+     * @param octave        Octave to draw the rectangle for.
+     * @param minNoteNumber Minimum note number.
+     * @param maxNoteNumber Maximum note number.
+     * @return A <code>Rectangle</code> object representing the drawn rectangle.
      */
-    public static void addNoteLines(Pane spectrogramPane, double height, int minNoteNumber, int maxNoteNumber) {
+    public static Rectangle addCurrentOctaveRectangle(
+            Pane notePane, double height, int octave, int minNoteNumber, int maxNoteNumber
+    ) {
         // Get the width of the note pane
-        double width = spectrogramPane.getPrefWidth();
+        double width = notePane.getPrefWidth();
 
-        // Place the notes onto the pane
-        for (int i = minNoteNumber; i <= maxNoteNumber; i++) {
-            // Calculate the height to move the pointer to
-            double placementHeight = PlottingHelpers.noteNumToHeight(i, minNoteNumber, maxNoteNumber, height);
-            placementHeight += getHeightDifference(height, minNoteNumber, maxNoteNumber) / 2;
+        // Get the lowest and highest note number within that octave
+        int lowestNoteNum = octave * 12;  // Lowest note is C{octave}, e.g. C4 if octave is 4
+        int highestNoteNum = lowestNoteNum + 11;  // Highest note is B{octave}, e.g. B4 if octave is 4
 
-            // Create the line
-            Line noteLine = new Line(0, placementHeight, width, placementHeight);
+        // Get the height difference between two adjacent notes
+        double heightDelta = getHeightDifference(height, minNoteNumber, maxNoteNumber);
 
-            // Add CSS style class
-            noteLine.getStyleClass().add("note-line");
+        // Calculate the starting and ending Y positions of the rectangle
+        double startY = PlottingHelpers.noteNumToHeight(lowestNoteNum, minNoteNumber, maxNoteNumber, height) +
+                heightDelta / 2;
+        double endY = PlottingHelpers.noteNumToHeight(highestNoteNum, minNoteNumber, maxNoteNumber, height) -
+                heightDelta / 2;
 
-            // Set the line dashed format
-            if (i % 12 != 0) {  // Not a C note
-//                noteLine.getStrokeDashArray().addAll(10d, 6d);  // Todo: make this a constant
-            } else {  // A C note
-//                noteLine.getStrokeDashArray().addAll(1d);
-                noteLine.getStyleClass().add("note-line-c");
-            }
+        // Create the rectangle object
+        Rectangle rectangle = new Rectangle(0, endY, width, startY - endY);
+        rectangle.getStyleClass().add("current-octave-rectangle");
 
-            // Add the line to the spectrogram
-            spectrogramPane.getChildren().add(noteLine);
-        }
+        // Add the rectangle to the note pane
+        notePane.getChildren().add(rectangle);
+
+        // Return the rectangle object
+        return rectangle;
+    }
+
+    /**
+     * Method that updates the current octave's rectangle to the new octave value.
+     *
+     * @param octaveRectangle The rectangle that is bounding the current octave.
+     * @param height          (Final) height of the note pane.
+     * @param octave          Octave to draw the rectangle for.
+     * @param minNoteNumber   Minimum note number.
+     * @param maxNoteNumber   Maximum note number.
+     */
+    public static void updateCurrentOctaveRectangle(
+            Rectangle octaveRectangle, double height, int octave, int minNoteNumber, int maxNoteNumber
+    ) {
+        // Get the highest note number within that octave
+        int highestNoteNum = octave * 12 + 11;  // Highest note is B{octave}, e.g. B4 if octave is 4
+
+        // Get the height difference between two adjacent notes
+        double heightDelta = getHeightDifference(height, minNoteNumber, maxNoteNumber);
+
+        // Calculate the ending Y position of the rectangle
+        double endY = PlottingHelpers.noteNumToHeight(highestNoteNum, minNoteNumber, maxNoteNumber, height) -
+                heightDelta / 2;
+
+        // Update the octave rectangle
+        octaveRectangle.setY(endY);
     }
 
     /**
