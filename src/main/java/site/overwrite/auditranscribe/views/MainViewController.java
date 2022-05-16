@@ -36,6 +36,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
@@ -318,17 +319,24 @@ public class MainViewController implements Initializable {
                 String filepath = values.getValue0();
                 String filename = values.getValue1();
 
-                // Get the last modified time of the file
-                BasicFileAttributes attributes = Files.readAttributes(Path.of(filepath), BasicFileAttributes.class);
-                FileTime lastModifiedTime = attributes.lastModifiedTime();
-                long lastModifiedTimestamp = lastModifiedTime.toMillis();
+                // Add the project to the records
+                BasicFileAttributes attributes;
+                try {
+                    // Get the last modified time of the file
+                    attributes = Files.readAttributes(Path.of(filepath), BasicFileAttributes.class);
 
-                // Get the shortened name of the file name
-                filename = filename.substring(0, filename.length() - 5);  // Exclude the ".audt" at the end
-                String shortenedName = MiscUtils.getShortenedName(filename);
+                    FileTime lastModifiedTime = attributes.lastModifiedTime();
+                    long lastModifiedTimestamp = lastModifiedTime.toMillis();
 
-                // Add to the list of projects
-                projects.add(new Quartet<>(lastModifiedTimestamp, filename, filepath, shortenedName));
+                    // Get the shortened name of the file name
+                    filename = filename.substring(0, filename.length() - 5);  // Exclude the ".audt" at the end
+                    String shortenedName = MiscUtils.getShortenedName(filename);
+
+                    // Add to the list of projects
+                    projects.add(new Quartet<>(lastModifiedTimestamp, filename, filepath, shortenedName));
+                } catch (NoSuchFileException e) {
+                    projectsDB.deleteProjectRecord(key);
+                }
             }
 
             // Sort the list of projects by the last access timestamp
