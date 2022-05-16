@@ -8,7 +8,6 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Slider?>
@@ -93,15 +92,6 @@
                                     <Spinner fx:id="bpmSpinner" editable="true" />
                                     <ChoiceBox fx:id="timeSignatureChoice" prefWidth="150.0" />
                                     <Spinner fx:id="offsetSpinner" editable="true" />
-                                 </children>
-                              </HBox>
-                              <HBox alignment="CENTER_LEFT" layoutX="323.0" layoutY="10.0" prefHeight="100.0" prefWidth="200.0" spacing="10.0" HBox.hgrow="ALWAYS">
-                                 <padding>
-                                    <Insets left="10.0" right="10.0" />
-                                 </padding>
-                                 <children>
-                                    <ProgressBar progress="0.0" />
-                                    <Label text="Doing task now..." textOverrun="WORD_ELLIPSIS" />
                                  </children>
                               </HBox>
                            </children>
