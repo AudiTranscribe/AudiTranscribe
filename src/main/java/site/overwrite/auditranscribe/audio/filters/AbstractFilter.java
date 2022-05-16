@@ -2,7 +2,7 @@
  * AbstractFilter.java
  *
  * Created on 2022-03-07
- * Updated on 2022-03-15
+ * Updated on 2022-05-10
  *
  * Description: `AbstractFilter` class for resampling filters.
  */
@@ -10,7 +10,7 @@
 package site.overwrite.auditranscribe.audio.filters;
 
 import com.google.gson.Gson;
-import site.overwrite.auditranscribe.utils.FileUtils;
+import site.overwrite.auditranscribe.io.IOMethods;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -75,7 +75,7 @@ public abstract class AbstractFilter {
         // Create the GSON loader object
         Gson gson = new Gson();
 
-        try (Reader reader = new InputStreamReader(FileUtils.getInputStream(dataFilePath))) {
+        try (Reader reader = new InputStreamReader(IOMethods.getInputStream(dataFilePath))) {
             // Try loading the filter data
             FilterData filterData = gson.fromJson(reader, FilterData.class);
 

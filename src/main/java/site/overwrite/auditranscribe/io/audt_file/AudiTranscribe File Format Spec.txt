@@ -1,0 +1,208 @@
+
+                            THE AUDITRANSCRIBE FILE FORMAT SPECIFICATION
+                                           Version 0.2.0
+
+=====
+Section 0. Document Description
+=====
+This document serves two purposes.
+1. To give a detailed explanation for the AudiTranscribe file format and how it is meant to be used.
+2. To assist developers and contributors in understanding how to process and format their data into
+   the required specification.
+
+The remainder of this document is separated into the following sections.
+1. General File Format
+2. Header Section
+3. Q-Transform Data Section
+4. Audio Data Section
+5. GUI Data Section
+6. Redundancy Section
+7. End-Of-File Section
+
+=====
+Section 1. General File Format
+=====
+An AudiTranscribe file ends with the extension `.audt`. The file is a binary file containing binary
+data that can be understood by AudiTranscribe internals.
+
+Notes on the convention of the format described below:
+- A sequence of 4 bytes, such as `12 34 56 AB`, will be written as one 16-bit hexadecimal number,
+  such as `0x123456AB`. Note that the `0x` denotes that the number is in hexadecimal.
+- Sections of data separated by two newlines (not in byte form, but just what is shown) should be
+  *joined together* in the actual file
+- Boxed sections or sections with square brackets denote arbitrary data. These sections are labelled
+  with the supposed data that should be in these sections.
+
+*****( BEGIN FILE )*****
+    0x41554449 0x5452414E 0x53435249 0x42450a0a
+    0xAD75C1BE 0x00000ABC 0x0000EF12 0xE05E05E5
+
+    0x00000001
+    0x0013579B
+    -------------------------------------------
+    |             Q-TRANSFORM DATA            |
+    |                GOES HERE                |
+    -------------------------------------------
+    0xE05E05E5
+
+    0x00000002
+    0x002468AC
+    -------------------------------------------
+    |                AUDIO DATA               |
+    |                GOES HERE                |
+    -------------------------------------------
+    0x40e58880 0x00000000
+    0xE05E05E5
+
+    0x00000003
+    0x0000000B
+    0x00000009
+    0x00029300 0x29394010
+    0x00000001 0x03918939
+    0x00000004 0x0812BA23
+    0x00012345 [FILE NAME DATA]
+    0x000493E0 0x00018324
+    0xE05E05E5
+
+    -------------------------------------------
+    |            OTHER BINARY DATA            |
+    |                GOES HERE                |
+    -------------------------------------------
+
+    0xE0FE0FEF 0xE0FE0FEF
+    0x0139ace9
+*****(  END FILE  )*****
+
+Here are some things to note about the bytes present within the provided file.
+- The 4 bytes `0xE05E05E5` are used to delimitate data sections.
+- The 8 bytes `0xE0FE0FEF 0xE0FE0FEF` is used to mark the end of the file. These 8 bytes should only
+  appear at the end of the file.
+- The last value `0x0139ace9` is a checksum for the file. This checksum is the sum of all bytes of
+  the file, but modulo 2^32. This is equivalent of getting the byte representation of the integer
+  sum of all the bytes in the file.
+
+=====
+Section 2. Header Section
+=====
+The header section corresponds to the following 32 bytes in the example file given.
+
+    0x41554449 0x5452414E 0x53435249 0x42450a0a
+    0xAD75C1BE 0x00000ABC 0x0000EF12 0xE05E05E5
+
+- The first 16 bytes, `0x41554449 0x5452414E 0x53435249 0x42450a0a` decodes to "AUDITRANSCRIBE\n\n"
+  when decoded in ASCII. The "\n"s present are line breaks.
+- The next 4 bytes, `0xAD75C1BE` is the AudiTranscribe signature. After the line break, these two
+  bytes are to follow the first 16 bytes.
+- The next 4 bytes, `0x00000ABC`, corresponds to the version number of the file format
+  specification.
+- The following 4 bytes, `0x0000EF12`, describe the version number of the LZ4 compression algorithm.
+    -  The LZ4 compression algorithm (https://en.wikipedia.org/wiki/LZ4_(compression_algorithm)) is
+       a lossless data compression algorithm focused on compression and decompression speed.
+- The final 4 bytes correspond to the end-of-section delimiter, `0xE05E05E5`.
+
+These 32 bytes are to be present in every AudiTranscribe file. The first 20 of which *must be what
+is shown here*.
+
+=====
+Section 3. Q-Transform Data Section
+=====
+The Q-Transform data section corresponds to the following lines in the example file given.
+
+    0x00000001
+    0x0013579B
+    -------------------------------------------
+    |             Q-TRANSFORM DATA            |
+    |                GOES HERE                |
+    -------------------------------------------
+    0xE05E05E5
+
+- The first 4 bytes `0x00000001` correspond to the section ID. The Q-Transform data section *has
+  the section ID 1*.
+- The next 4 bytes `0x0013579B` corresponds to the number of bytes that are used to store
+  the LZ4 compressed Q-Transform data.
+- The next `0x0013579B` bytes correspond to the LZ4 compressed Q-Transform data. The program will
+  decode this data to retrieve the original Q-Transform data from the LZ4 compressed version.
+- The final 4 bytes correspond to the end-of-section delimiter, `0xE05E05E5`.
+
+=====
+Section 4. Audio Data Section
+=====
+The audio data section corresponds to the following lines in the example file given.
+
+    0x00000002
+    0x002468AC
+    -------------------------------------------
+    |                AUDIO DATA               |
+    |                GOES HERE                |
+    -------------------------------------------
+    0x40e58880 0x00000000
+    0xE05E05E5
+
+- The first 4 bytes `0x00000002` correspond to the section ID. The audio data section *has the
+  section ID 2*.
+- The next 4 bytes `0x002468AC` corresponds to the number of bytes that are used to store
+  the audio data.
+- The next `0x002468AC` bytes are the compressed audio data.
+- The following 8 bytes `0x40e58880 0x00000000` is the sample rate of the audio file.
+- The final 4 bytes correspond to the end-of-section delimiter, `0xE05E05E5`.
+
+=====
+Section 5. GUI Data Section
+=====
+The GUI data section corresponds to the following lines in the example file given.
+
+    0x00000003
+    0x0000000B
+    0x00000009
+    0x00029300 0x29394010
+    0x00000001 0x03918939
+    0x00000004 0x0812BA23
+    0x00012345 [FILE NAME DATA]
+    0x000493E0 0x00018324
+    0xE05E05E5
+
+- The first 4 bytes `0x00000003` correspond to the section ID. The GUI data section *has the section
+  ID 3*.
+- The next 4 bytes, `0x0000000B`, correspond to the music key index. This will be the index of the
+  music key in the dropdown menu shown in the application.
+- The following 4 bytes, `0x00000009`, is the time signature index. This will be the index of the
+  time signature in the dropdown menu shown in the application.
+- The 8 bytes `0x00029300 0x29394010` represent the beats per minute (BPM) (which is a double).
+- The following 8 bytes `0x00000001 0x03918939` represent the offset seconds (which is a double).
+- The next 8 bytes `0x00000004 0x0812BA23` represent the playback volume (which is a double).
+- The next 4 bytes `0x00012345` correspond to the number of bytes needed to store the original audio
+  file's name.
+- The proceeding `0x00012345` bytes is the original audio file's name.
+- The next 4 bytes, `0x000493E0`, is the total duration of the audio file *in milliseconds* as an
+  integer.
+- The next 4 bytes, `0x00018324`, is the current time when playing the audio file *in milliseconds*
+  as an integer. That is, this is when the playback of the audio file will continue.
+- The final 4 bytes correspond to the end-of-section delimiter, `0xE05E05E5`.
+
+=====
+Section 6. Redundancy Section
+=====
+The redundancy section corresponds to the following lines in the example file given.
+
+    -------------------------------------------
+    |            OTHER BINARY DATA            |
+    |                GOES HERE                |
+    -------------------------------------------
+
+Currently, this section should be empty. This section will only be filled/updated if more features
+need to be added to the application and file specification.
+
+=====
+Section 7. End-Of-File Section
+=====
+The end-of-file section should *always* consist of the following 12 bytes.
+
+    0xE0FE0FEF 0xE0FE0FEF
+    0x0139ace9
+
+- The first 8 bytes `0xE0FE0FEF 0xE0FE0FEF` is the sentinel value for the AudiTranscribe file
+  decoders to understand that they reached the end of the file. These 8 bytes should only appear at
+  the end of the file.
+- The last 4 bytes `0x0139ace9` is the checksum value, as explained in Section 1.
+
+----------------------------------------- END OF DOCUMENT ------------------------------------------
