@@ -1,0 +1,4 @@
+We have migrated the feature plan of AudiTranscribe to a Google Sheet. It is accessible here:
+https://docs.google.com/spreadsheets/d/1FIjpa6uS9hWHZBVQotbBpS2m-eU-mChQYlyy6ZCQLxA/edit?usp=sharing
+
+We may move this to a GitHub project in the future.
