@@ -2,7 +2,7 @@
  * PlottingHelpers.java
  *
  * Created on 2022-03-19
- * Updated on 2022-04-09
+ * Updated on 2022-05-14
  *
  * Description: Helper functions for plotting.
  */
@@ -36,6 +36,22 @@ public class PlottingHelpers {
         // Scale accordingly and return. Since (0, 0) is the upper left we have to adjust to make (0, 0) to be the
         // lower left corner instead
         return (1 - (loggedFrequency - loggedMinimum) / (loggedMaximum - loggedMinimum)) * maxHeight;
+    }
+
+    /**
+     * Converts a height on the spectrogram pane to an estimated frequency.
+     * @param height    Height on the spectrogram pane.
+     * @param minFreq   Lowest possible frequency. This will be assigned height 0.
+     * @param maxFreq   Highest possible frequency. This will be assigned the maximum height.
+     * @param maxHeight Maximum height.
+     * @return  Estimated frequency.
+     */
+    public static double heightToFreq(double height, double minFreq, double maxFreq, double maxHeight) {
+        // Compute the ratio of the given height and the spectrogram's height
+        double heightRatio = height / maxHeight;
+
+        // Return the estimated frequency
+        return Math.pow(minFreq, heightRatio) * Math.pow(maxFreq, 1 - heightRatio);
     }
 
     /**

@@ -27,6 +27,14 @@
     -fx-stroke: #000000ff;
 }
 
+.current-octave-rectangle {
+    -fx-fill: #ffbf0080;
+}
+
+.spectrogram-square {
+    -fx-border-color: #d3d3d3ff;  /* Lightgray */
+}
+
 /* Playback */
 .clickable-progress-pane {
     -fx-background-color: #00000000;
