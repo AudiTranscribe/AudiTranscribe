@@ -2,7 +2,7 @@
  * MainViewController.java
  *
  * Created on 2022-02-09
- * Updated on 2022-05-14
+ * Updated on 2022-05-16
  *
  * Description: Contains the main view's controller class.
  */
@@ -123,8 +123,8 @@ public class MainViewController implements Initializable {
             ImageView removeButtonGraphic = new ImageView(
                     new Image(IOMethods.getFileURLAsString("images/icons/PNGs/close.png"))
             );
-            removeButtonGraphic.setFitWidth(50);
-            removeButtonGraphic.setFitHeight(50);
+            removeButtonGraphic.setFitWidth(40);
+            removeButtonGraphic.setFitHeight(40);
 
             removeButton = new Button();
             removeButton.setGraphic(removeButtonGraphic);
