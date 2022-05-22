@@ -2,7 +2,7 @@
  * SpectrogramViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-16
+ * Updated on 2022-05-22
  *
  * Description: Contains the spectrogram view's controller class.
  */
@@ -626,7 +626,7 @@ public class SpectrogramViewController implements Initializable {
         audio = new Audio(new File(audioFilePath));
         sampleRate = audioData.sampleRate;
 
-        magnitudes = qTransformData.qTransformMatrix;
+        magnitudes = qTransformData.qTransformMagnitudes;
 
         // Generate spectrogram image based on existing magnitude data
         Spectrogram spectrogram = new Spectrogram(

@@ -2,7 +2,7 @@
  * MathUtilsTest.java
  *
  * Created on 2022-03-12
- * Updated on 2022-05-07
+ * Updated on 2022-05-21
  *
  * Description: Test `MathUtils.java`.
  */
@@ -60,21 +60,25 @@ class MathUtilsTest {
     }
 
     @Test
-    void normalise() {
+    void normalize() {
         // Test extreme values
-        assertEquals(0, MathUtils.normalise(1, 1, 5));
-        assertEquals(1, MathUtils.normalise(5, 1, 5));
+        assertEquals(0, MathUtils.normalize(1, 1, 5));
+        assertEquals(1, MathUtils.normalize(5, 1, 5));
 
-        assertEquals(0, MathUtils.normalise(3, 3, 9));
-        assertEquals(1, MathUtils.normalise(9, 3, 9));
+        assertEquals(0, MathUtils.normalize(3, 3, 9));
+        assertEquals(1, MathUtils.normalize(9, 3, 9));
 
         // Test in between
-        assertEquals(0.375, MathUtils.normalise(2.5, 1, 5), 0.0001);
-        assertEquals(0.535, MathUtils.normalise(3.14, 1, 5), 0.0001);
+        assertEquals(0.375, MathUtils.normalize(2.5, 1, 5), 0.0001);
+        assertEquals(0.535, MathUtils.normalize(3.14, 1, 5), 0.0001);
 
-        assertEquals(0.055, MathUtils.normalise(3.33, 3, 9), 0.0001);
-        assertEquals(0.333, MathUtils.normalise(5, 3, 9), 0.001);
-        assertEquals(0.667, MathUtils.normalise(7, 3, 9), 0.001);
+        assertEquals(0.055, MathUtils.normalize(3.33, 3, 9), 0.0001);
+        assertEquals(0.333, MathUtils.normalize(5, 3, 9), 0.001);
+        assertEquals(0.667, MathUtils.normalize(7, 3, 9), 0.001);
+
+        // Test different endpoints
+        assertEquals(0.2345, MathUtils.normalize(2.345, -10, 10, -1, 1), 1e-4);
+        assertEquals(4.3571, MathUtils.normalize(4, -1, 13, 4, 5), 1e-4);
     }
 
     @Test

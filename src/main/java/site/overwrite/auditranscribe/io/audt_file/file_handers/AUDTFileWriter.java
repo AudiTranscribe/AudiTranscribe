@@ -2,7 +2,7 @@
  * AUDTFileWriter.java
  *
  * Created on 2022-05-01
- * Updated on 2022-05-10
+ * Updated on 2022-05-21
  *
  * Description: Class that handles the writing of the AudiTranscribe (AUDT) file.
  */
@@ -70,7 +70,9 @@ public class AUDTFileWriter {
      */
     public void writeQTransformData(QTransformDataObject qTransformDataObj) throws IOException {
         writeSectionID(1);
-        write2DDoubleArray(qTransformDataObj.qTransformMatrix);
+        writeDouble(qTransformDataObj.minMagnitude);
+        writeDouble(qTransformDataObj.maxMagnitude);
+        write2DIntegerArray(qTransformDataObj.getIntegerMagnitudeValues());
         writeEOSDelimiter();
     }
 
@@ -188,13 +190,33 @@ public class AUDTFileWriter {
     }
 
     /**
-     * Helper method that writes an 2D double array into the byte list.
+     * Helper method that writes a 2D double array into the byte list.
      *
      * @param array 2D array of doubles.
      */
     private void write2DDoubleArray(double[][] array) throws IOException {
         // Convert the 2D array into its bytes
         byte[] byteArray = IOConverters.twoDimensionalDoubleArrayToBytes(array);
+
+        // Compress the byte array
+        byte[] compressedBytes = LZ4.lz4Compress(byteArray);
+
+        // Get the number of compressed bytes
+        int numCompressedBytes = compressedBytes.length;
+
+        // Write to the byte list
+        writeInteger(numCompressedBytes);
+        FileHandlersHelpers.addBytesIntoBytesList(bytes, compressedBytes);
+    }
+
+    /**
+     * Helper method that writes a 2D integer array into the byte list.
+     *
+     * @param array 2D array of integers.
+     */
+    private void write2DIntegerArray(int[][] array) throws IOException {
+        // Convert the 2D array into its bytes
+        byte[] byteArray = IOConverters.twoDimensionalIntegerArrayToBytes(array);
 
         // Compress the byte array
         byte[] compressedBytes = LZ4.lz4Compress(byteArray);
