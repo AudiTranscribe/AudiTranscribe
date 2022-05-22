@@ -160,7 +160,8 @@ public class TranscriptionViewController implements Initializable {
     private MenuBar menuBar;
 
     @FXML
-    private MenuItem newProjectMenuItem, openProjectMenuItem, saveProjectMenuItem, saveAsMenuItem, aboutMenuItem;
+    private MenuItem newProjectMenuItem, openProjectMenuItem, saveProjectMenuItem, saveAsMenuItem, preferencesMenuItem,
+            aboutMenuItem;
 
     // Main elements
     @FXML
@@ -461,6 +462,8 @@ public class TranscriptionViewController implements Initializable {
         saveProjectMenuItem.setOnAction(event -> handleSavingProject(false));
 
         saveAsMenuItem.setOnAction(event -> handleSavingProject(true));
+
+        preferencesMenuItem.setOnAction(actionEvent -> PreferencesViewController.showPreferencesWindow());
 
         aboutMenuItem.setOnAction(actionEvent -> AboutViewController.showAboutWindow());
 

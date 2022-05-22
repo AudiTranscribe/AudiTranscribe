@@ -62,7 +62,7 @@ public class MainViewController implements Initializable {
     private MenuBar menuBar;
 
     @FXML
-    private MenuItem newProjectMenuItem, openProjectMenuItem, aboutMenuItem;
+    private MenuItem newProjectMenuItem, openProjectMenuItem, preferencesMenuItem, aboutMenuItem;
 
     // Main elements
     @FXML
@@ -294,6 +294,8 @@ public class MainViewController implements Initializable {
         newProjectMenuItem.setOnAction(this::handleNewProject);
 
         openProjectMenuItem.setOnAction(this::handleOpenProject);
+
+        preferencesMenuItem.setOnAction(actionEvent -> PreferencesViewController.showPreferencesWindow());
 
         aboutMenuItem.setOnAction(actionEvent -> AboutViewController.showAboutWindow());
 
