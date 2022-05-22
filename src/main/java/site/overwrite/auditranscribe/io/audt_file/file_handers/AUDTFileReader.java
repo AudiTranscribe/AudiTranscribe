@@ -101,7 +101,6 @@ public class AUDTFileReader {
         }
 
         // Create and return a `QTransformDataObject`
-        // Todo: read and then pass in maximum and minimum magnitudes from file
         return new QTransformDataObject(qTransformMagnitudes, minMagnitude, maxMagnitude);
     }
 
