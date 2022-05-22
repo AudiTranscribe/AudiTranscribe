@@ -47,3 +47,10 @@
 .playhead-line {
     -fx-stroke: #00bfffff;
 }
+
+/* PREFERENCES PAGE */
+/* Buttons */
+.ok-button {
+    -fx-background-color: #4c8acaff;
+    -fx-text-fill: #ffffffff;
+}

@@ -36,13 +36,20 @@ public class SettingsFile {
             // Try loading the settings data
             settingsData = gson.fromJson(reader, SettingsData.class);
 
+        } catch (FileNotFoundException e) {
+            createNewSettingsFile();
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     // Public methods
-    public void writeToSettingsFile() {
+
+    /**
+     * Method that saves the current settings data to the settings file.
+     */
+    public void saveSettingsFile() {
         // Create the GSON object
         Gson gson = new Gson();
 
@@ -54,4 +61,18 @@ public class SettingsFile {
             throw new RuntimeException(e);
         }
     }
+
+    // Private methods
+
+    /**
+     * Helper method that creates a new settings file.
+     */
+    private void createNewSettingsFile() {
+        // Initialize a new `SettingsData` object with no data inside it
+        settingsData = new SettingsData();  // We use the blank data
+
+        // Write that data to the settings file
+        saveSettingsFile();
+    }
+
 }

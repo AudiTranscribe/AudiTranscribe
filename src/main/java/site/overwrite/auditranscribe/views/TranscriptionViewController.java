@@ -601,8 +601,8 @@ public class TranscriptionViewController implements Initializable {
                 audio, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER, BINS_PER_OCTAVE, SPECTROGRAM_HOP_LENGTH, PX_PER_SECOND,
                 NUM_PX_PER_OCTAVE
         );
-        magnitudes = spectrogram.getSpectrogramMagnitudes(WindowFunction.HANN_WINDOW);
-        WritableImage image = spectrogram.generateSpectrogram(magnitudes, ColourScale.VIRIDIS);
+        magnitudes = spectrogram.getSpectrogramMagnitudes(WindowFunction.HANN_WINDOW);  // Todo: modify this based on settings
+        WritableImage image = spectrogram.generateSpectrogram(magnitudes, ColourScale.VIRIDIS);  // Todo: modify this based on settings
 
         // Finish setting up the spectrogram and its related attributes
         finishSettingUpSpectrogram(image);
