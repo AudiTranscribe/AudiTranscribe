@@ -23,7 +23,9 @@ module site.overwrite.auditranscribe {
     exports site.overwrite.auditranscribe.audio.filters;
     exports site.overwrite.auditranscribe.io.audt_file.data_encapsulators;
     exports site.overwrite.auditranscribe.views;
+    exports site.overwrite.auditranscribe.views.helpers;
 
     opens site.overwrite.auditranscribe to javafx.fxml;
     opens site.overwrite.auditranscribe.views to javafx.fxml;
+    opens site.overwrite.auditranscribe.views.helpers to javafx.fxml;
 }
