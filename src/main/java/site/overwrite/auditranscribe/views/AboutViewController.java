@@ -2,7 +2,7 @@
  * AboutViewController.java
  *
  * Created on 2022-05-08
- * Updated on 2022-05-09
+ * Updated on 2022-05-16
  *
  * Description: View controller for the "about" window.
  */
@@ -10,9 +10,13 @@
 package site.overwrite.auditranscribe.views;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.stage.Stage;
+import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.PropertyFile;
 
 import java.awt.*;
@@ -55,6 +59,30 @@ public class AboutViewController implements Initializable {
             logger.log(Level.INFO, "About view ready to be shown");
 
         } catch (IOException | NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // Public methods
+
+    /**
+     * Method that shows the "about" window.
+     */
+    public static void showAboutWindow() {
+        try {
+            // Load the FXML file into the scene
+            FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/about-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+
+            // Set stage properties
+            Stage aboutStage = new Stage();
+            aboutStage.setTitle("About AudiTranscribe");
+            aboutStage.setScene(scene);
+            aboutStage.setResizable(false);
+
+            // Show the stage
+            aboutStage.show();
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

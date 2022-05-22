@@ -2,7 +2,7 @@
  * IOConverters.java
  *
  * Created on 2022-05-01
- * Updated on 2022-05-04
+ * Updated on 2022-05-21
  *
  * Description: Methods that converts Java objects/data into bytes for storage.
  */
@@ -136,7 +136,7 @@ public class IOConverters {
         System.arraycopy(subarrayLengthBytes, 0, bytes, 4, 4);
 
         // Copy each double's bytes into the master byte aray
-        int numWrittenBytes = 8;  // 4 for the length that was written
+        int numWrittenBytes = 8;  // We have already written 8 bytes in total
 
         for (double[] doubles : array) {
             for (double dbl : doubles) {
@@ -148,6 +148,55 @@ public class IOConverters {
 
                 // Update the number of written bytes
                 numWrittenBytes += 8;
+            }
+        }
+
+        // Return the byte array
+        return bytes;
+    }
+
+    /**
+     * Method that converts an 2D array of integers into a byte array.
+     *
+     * @param array 2D array of integers. <b>This assumes that each subarray has the same length.</b>
+     * @return Byte array, representing the 2D array of integers.
+     */
+    public static byte[] twoDimensionalIntegerArrayToBytes(int[][] array) {
+        // Get the number of 1D arrays present in the main array
+        int numSubarrays = array.length;
+        int subarrayLength = array[0].length;  // Using assumption: each subarray has the same length
+
+        // Calculate the total number of doubles
+        int numIntegers = numSubarrays * subarrayLength;
+
+        // Calculate the total number of bytes needed
+        int numBytes = 4 * numIntegers  // Each integer takes 4 bytes to store
+                + 4                     // Bytes to denote subarray length
+                + 4;                    // Bytes to denote number of subarrays
+
+        // Create the byte array
+        byte[] bytes = new byte[numBytes];
+
+        // Write the total number of subarrays and subarray length bytes into the bytes array
+        byte[] numSubarraysBytes = intToBytes(numSubarrays);
+        System.arraycopy(numSubarraysBytes, 0, bytes, 0, 4);
+
+        byte[] subarrayLengthBytes = intToBytes(subarrayLength);
+        System.arraycopy(subarrayLengthBytes, 0, bytes, 4, 4);
+
+        // Copy each double's bytes into the master byte aray
+        int numWrittenBytes = 8;  // We have already written 8 bytes in total
+
+        for (int[] integers : array) {
+            for (int integer : integers) {
+                // Get the bytes that represent the integer
+                byte[] integerBytes = intToBytes(integer);
+
+                // Update the byte array
+                System.arraycopy(integerBytes, 0, bytes, numWrittenBytes, 4);
+
+                // Update the number of written bytes
+                numWrittenBytes += 4;
             }
         }
 
@@ -267,6 +316,43 @@ public class IOConverters {
 
                 // Convert the bytes into a double and place into the array
                 array[i][j] = bytesToDouble(currElemBytes);
+            }
+        }
+
+        // Return the double array
+        return array;
+    }
+
+    /**
+     * Method that converts a byte array into a 2D integer array.
+     *
+     * @param bytes Byte array.
+     * @return 2D integer array that was represented by the byte array.
+     */
+    public static int[][] bytesToTwoDimensionalIntegerArray(byte[] bytes) {
+        // First 4 bytes represent the number of subarrays in the resulting array
+        byte[] numSubarraysBytes = Arrays.copyOfRange(bytes, 0, 4);
+        int numSubarrays = bytesToInt(numSubarraysBytes);
+
+        // Next 4 bytes represent the number of doubles in each subarray (i.e. subarray length)
+        byte[] subarrayLengthBytes = Arrays.copyOfRange(bytes, 4, 8);
+        int subarrayLength = bytesToInt(subarrayLengthBytes);
+
+        // Create the integer array
+        int[][] array = new int[numSubarrays][subarrayLength];
+
+        // Go through the remaining bytes and retrieve the doubles
+        for (int i = 0; i < numSubarrays; i++) {
+            for (int j = 0; j < subarrayLength; j++) {
+                // Get the bytes that represent the current element
+                byte[] currElemBytes = Arrays.copyOfRange(
+                        bytes,
+                        8 + 4 * i * subarrayLength + j * 4,
+                        8 + 4 * i * subarrayLength + (j + 1) * 4
+                );
+
+                // Convert the bytes into a double and place into the array
+                array[i][j] = bytesToInt(currElemBytes);
             }
         }
 

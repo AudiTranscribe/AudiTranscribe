@@ -54,8 +54,8 @@
 }
 
 .remove-project-button {
-    -fx-max-width: 50px;
-    -fx-max-height: 50px;
+    -fx-max-width: 40px;
+    -fx-max-height: 40px;
 }
 
 /* Others */

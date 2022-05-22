@@ -2,7 +2,7 @@
  * AUDTFileReader.java
  *
  * Created on 2022-05-02
- * Updated on 2022-05-10
+ * Updated on 2022-05-21
  *
  * Description: Class that handles the reading of the AudiTranscribe (AUDT) file.
  */
@@ -21,8 +21,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class AUDTFileReader {
     // Attributes
@@ -32,8 +30,6 @@ public class AUDTFileReader {
 
     private final byte[] bytes;
     private int bytePos = 0;  // Position of the NEXT byte to read
-
-    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     /**
      * Initialization method to make an <code>AUDTFileReader</code> object.
@@ -95,7 +91,9 @@ public class AUDTFileReader {
         }
 
         // Read in the rest of the data
-        double[][] qTransformMatrix = read2DDoubleArray();
+        double minMagnitude = readDouble();
+        double maxMagnitude = readDouble();
+        int[][] qTransformMagnitudes = read2DIntegerArray();
 
         // Check if there is an EOS
         if (!checkEOSDelimiter()) {
@@ -103,7 +101,8 @@ public class AUDTFileReader {
         }
 
         // Create and return a `QTransformDataObject`
-        return new QTransformDataObject(qTransformMatrix);
+        // Todo: read and then pass in maximum and minimum magnitudes from file
+        return new QTransformDataObject(qTransformMagnitudes, minMagnitude, maxMagnitude);
     }
 
     /**
@@ -204,7 +203,8 @@ public class AUDTFileReader {
      *
      * @return Boolean, where <code>true</code> means that the file format is correct and
      * <code>false</code> otherwise.
-     * @throws IncorrectFileFormatException If the LZ4 version is not current.
+     * @throws IncorrectFileFormatException If the file version is not correct, or if the LZ4
+     *                                      version is not current.
      */
     private boolean verifyHeaderSection() throws IncorrectFileFormatException {
         // Check if the first 20 bytes follows the AUDT file header
@@ -220,10 +220,9 @@ public class AUDTFileReader {
         fileFormatVersion = readInteger();
         lz4Version = readInteger();
 
-        // Check if the file format is the current version, or is a previous version
-        if (fileFormatVersion < AUDTFileConstants.FILE_VERSION_NUMBER) {
-            logger.log(
-                    Level.WARNING,
+        // Check if the file format is the current version
+        if (fileFormatVersion != AUDTFileConstants.FILE_VERSION_NUMBER) {
+            throw new IncorrectFileFormatException(
                     "Reading in outdated AUDT file (file: " + fileFormatVersion +
                             " but current version is " + AUDTFileConstants.FILE_VERSION_NUMBER + ")"
             );
@@ -307,9 +306,9 @@ public class AUDTFileReader {
     }
 
     /**
-     * Helper method that reads in a two-dimensional double array from the byte array.
+     * Helper method that reads in a 2D double array from the byte array.
      *
-     * @return Two-dimensional double array that was read in.
+     * @return 2D double array that was read in.
      */
     private double[][] read2DDoubleArray() throws IOException {
         // Get the number of bytes that stores the compressed 2D double array
@@ -324,6 +323,26 @@ public class AUDTFileReader {
 
         // Convert these bytes back into the 2D array and return
         return IOConverters.bytesToTwoDimensionalDoubleArray(decompressedBytes);
+    }
+
+    /**
+     * Helper method that reads in a 2D integer array from the byte array.
+     *
+     * @return 2D integer array that was read in.
+     */
+    private int[][] read2DIntegerArray() throws IOException {
+        // Get the number of bytes that stores the compressed 2D integer array
+        int numCompressedBytes = readInteger();
+
+        // Read in the compressed array's bytes
+        byte[] compressedBytes = Arrays.copyOfRange(bytes, bytePos, bytePos + numCompressedBytes);
+        bytePos += numCompressedBytes;
+
+        // Decompress the bytes
+        byte[] decompressedBytes = LZ4.lz4Decompress(compressedBytes);
+
+        // Convert these bytes back into the 2D array and return
+        return IOConverters.bytesToTwoDimensionalIntegerArray(decompressedBytes);
     }
 
     /**

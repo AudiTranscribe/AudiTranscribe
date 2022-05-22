@@ -2,7 +2,7 @@
  * IOConvertersTest.java
  *
  * Created on 2022-05-01
- * Updated on 2022-05-04
+ * Updated on 2022-05-21
  *
  * Description: Test `IOConverters.java`.
  */
@@ -92,6 +92,28 @@ class IOConvertersTest {
     }
 
     @Test
+    void twoDimensionalIntegerArrayToBytes() {
+        // Define the integer array
+        int[][] array = {
+                {1, 10, 100, 1000, 10000},
+                {10000, 1000, 100, 10, 1},
+                {7273818, 481289, 1249898, 81289489, 912849489}
+        };
+
+        // Define the correct hexadecimal string
+        String hexStr = "00000003" + "00000005"
+                + "00000001" + "0000000a" + "00000064" + "000003e8" + "00002710"
+                + "00002710" + "000003e8" + "00000064" + "0000000a" + "00000001"
+                + "006efd5a" + "00075809" + "0013126a" + "04d86111" + "3668fa51";
+
+        // Run test
+        assertArrayEquals(
+                HexFormat.of().parseHex(hexStr),
+                IOConverters.twoDimensionalIntegerArrayToBytes(array)
+        );
+    }
+
+    @Test
     void bytesToInt() {
         assertEquals(0, IOConverters.bytesToInt(HexFormat.of().parseHex("00000000")));
         assertEquals(1234, IOConverters.bytesToInt(HexFormat.of().parseHex("000004d2")));
@@ -163,6 +185,28 @@ class IOConvertersTest {
         assertArrayEquals(
                 array,
                 IOConverters.bytesToTwoDimensionalDoubleArray(HexFormat.of().parseHex(hexStr))
+        );
+    }
+
+    @Test
+    void bytesToTwoDimensionalIntegerArray() {
+        // Define the hexadecimal string
+        String hexStr = "00000003" + "00000005"
+                + "00000001" + "0000000a" + "00000064" + "000003e8" + "00002710"
+                + "00002710" + "000003e8" + "00000064" + "0000000a" + "00000001"
+                + "006efd5a" + "00075809" + "0013126a" + "04d86111" + "3668fa51";
+
+        // Define the correct integer array
+        int[][] array = {
+                {1, 10, 100, 1000, 10000},
+                {10000, 1000, 100, 10, 1},
+                {7273818, 481289, 1249898, 81289489, 912849489}
+        };
+
+        // Run test
+        assertArrayEquals(
+                array,
+                IOConverters.bytesToTwoDimensionalIntegerArray(HexFormat.of().parseHex(hexStr))
         );
     }
 }
