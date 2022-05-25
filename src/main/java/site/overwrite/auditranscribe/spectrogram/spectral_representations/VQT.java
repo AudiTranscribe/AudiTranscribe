@@ -2,7 +2,7 @@
  * VQT.java
  *
  * Created on 2022-03-11
- * Updated on 2022-05-14
+ * Updated on 2022-05-25
  *
  * Description: Class that implements the Variable Q-Transform (VQT) algorithm.
  */
@@ -12,6 +12,7 @@ package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 import javafx.util.Pair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
+import site.overwrite.auditranscribe.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.Filter;
 import site.overwrite.auditranscribe.audio.WindowFunction;
@@ -67,9 +68,9 @@ public class VQT {
      */
     public static Complex[][] vqt(
             double[] y, double sr, int hopLength, double fmin, int numBins, int binsPerOctave, double gamma,
-            WindowFunction windowFunction
+            WindowFunction windowFunction, CustomTask<?> task
     ) {
-        return vqt(y, sr, hopLength, fmin, numBins, binsPerOctave, false, gamma, windowFunction);
+        return vqt(y, sr, hopLength, fmin, numBins, binsPerOctave, false, gamma, windowFunction, task);
     }
 
     /**
@@ -97,7 +98,7 @@ public class VQT {
      */
     public static Complex[][] vqt(
             double[] y, double sr, int hopLength, double fmin, int numBins, int binsPerOctave, boolean isCQT,
-            double gamma, WindowFunction windowFunction
+            double gamma, WindowFunction windowFunction, CustomTask<?> task
     ) {
         // Validate parameters
         if (numBins <= 0) {
@@ -184,6 +185,9 @@ public class VQT {
             // Update values
             startingOctave = 1;
             filter = Filter.KAISER_FAST;
+
+            // Update task progress
+            if (task != null) task.updateProgress(1, numOctaves);
         }
 
         // Iterate down the octaves
@@ -220,6 +224,9 @@ public class VQT {
                 mySR /= 2.;
                 myY = Audio.resample(myY, 2, 1, filter, true);
             }
+
+            // Update task progress
+            if (task != null) task.updateProgress(octave, numOctaves);
         }
 
         // Trim and stack the VQT responses

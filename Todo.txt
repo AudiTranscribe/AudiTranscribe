@@ -2,10 +2,7 @@
 Todo (Important):
     - Allow other audio types (e.g. mp3) to be input into the program
     - Add progress bars
-    - Add settings page
-        - Need to allow for configuration of audio devices
-        * Using local app data folder: https://stackoverflow.com/a/1198954
-          [System.getenv("APPDATA")]
+    - Reorganise `utils` and `CustomTask`
 
 Todo (Less Important):
     - Add licence/credits for ionicons

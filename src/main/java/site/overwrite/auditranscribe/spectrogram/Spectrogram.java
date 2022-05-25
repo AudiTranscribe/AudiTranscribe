@@ -2,7 +2,7 @@
  * Spectrogram.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-14
+ * Updated on 2022-05-25
  *
  * Description: Spectrogram class.
  */
@@ -10,6 +10,7 @@
 package site.overwrite.auditranscribe.spectrogram;
 
 import javafx.scene.image.WritableImage;
+import site.overwrite.auditranscribe.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.plotting.Plotter;
@@ -56,6 +57,8 @@ public class Spectrogram {
 
     final Logger logger = Logger.getLogger(this.getClass().getName());
 
+    final CustomTask<?> task;
+
     /**
      * Creates a spectrogram object.
      *
@@ -72,7 +75,7 @@ public class Spectrogram {
      */
     public Spectrogram(
             Audio audioObj, int minNoteNumber, int maxNoteNumber, int binsPerOctave, int hopLength,
-            double numPxPerSecond, double numPxPerOctave
+            double numPxPerSecond, double numPxPerOctave, CustomTask<?> task
     ) {
         // Validate that `maxNoteNumber - minNoteNumber + 1` is a multiple of 12
         int numNotes = maxNoteNumber - minNoteNumber + 1;
@@ -96,6 +99,8 @@ public class Spectrogram {
 
         sampleRate = audioObj.getSampleRate();
         this.hopLength = hopLength;
+
+        this.task = task;
 
         logger.log(Level.FINE, "Audio sample rate = " + sampleRate);
 
@@ -131,7 +136,7 @@ public class Spectrogram {
      *                                   multiple of 12.
      * @throws InvalidParameterException If the image height is too large.
      */
-    public Spectrogram(int minNoteNumber, int maxNoteNumber, int binsPerOctave, int hopLength, double numPxPerSecond, double numPxPerOctave, double sampleRate, double duration) {
+    public Spectrogram(int minNoteNumber, int maxNoteNumber, int binsPerOctave, int hopLength, double numPxPerSecond, double numPxPerOctave, double sampleRate, double duration, CustomTask<?> task) {
         // Validate that `maxNoteNumber - minNoteNumber + 1` is a multiple of 12
         int numNotes = maxNoteNumber - minNoteNumber + 1;
         if (numNotes % 12 != 0) {
@@ -154,6 +159,8 @@ public class Spectrogram {
 
         this.sampleRate = sampleRate;
         this.hopLength = hopLength;
+
+        this.task = task;
 
         logger.log(Level.FINE, "Audio sample rate = " + sampleRate);
 
@@ -188,11 +195,11 @@ public class Spectrogram {
         Complex[][] QTMatrix;
         if (IS_CQT) {
             QTMatrix = CQT.cqt(
-                    samples, sampleRate, hopLength, minFreq, numFreqBins, binsPerOctave, windowFunction
+                    samples, sampleRate, hopLength, minFreq, numFreqBins, binsPerOctave, windowFunction, task
             );
         } else {
             QTMatrix = VQT.vqt(
-                    samples, sampleRate, hopLength, minFreq, numFreqBins, binsPerOctave, GAMMA, windowFunction
+                    samples, sampleRate, hopLength, minFreq, numFreqBins, binsPerOctave, GAMMA, windowFunction, task
             );
         }
 

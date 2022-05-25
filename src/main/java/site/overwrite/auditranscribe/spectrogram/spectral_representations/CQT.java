@@ -2,13 +2,14 @@
  * CQT.java
  *
  * Created on 2022-03-15
- * Updated on 2022-05-14
+ * Updated on 2022-05-25
  *
  * Description: Class that implements the Constant Q-Transform (CQT) algorithm.
  */
 
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
+import site.overwrite.auditranscribe.CustomTask;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.utils.Complex;
 
@@ -41,9 +42,10 @@ public class CQT {
      *                                   highest frequency exceeding the Nyquist frequency.
      */
     public static Complex[][] cqt(
-            double[] y, double sr, int hopLength, double fmin, int numBins, int binsPerOctave, WindowFunction windowFunction
+            double[] y, double sr, int hopLength, double fmin, int numBins, int binsPerOctave,
+            WindowFunction windowFunction, CustomTask<?> task
     ) {
         // CQT is the special case of VQT with gamma = 0
-        return VQT.vqt(y, sr, hopLength, fmin, numBins, binsPerOctave, true, 0, windowFunction);
+        return VQT.vqt(y, sr, hopLength, fmin, numBins, binsPerOctave, true, 0, windowFunction, task);
     }
 }
