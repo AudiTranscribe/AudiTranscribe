@@ -2,7 +2,7 @@
  * PreferencesViewController.java
  *
  * Created on 2022-05-22
- * Updated on 2022-05-22
+ * Updated on 2022-05-25
  *
  * Description: Contains the preferences view's controller class.
  */
@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
@@ -42,6 +43,9 @@ public class PreferencesViewController implements Initializable {
     @FXML
     private ChoiceBox<WindowFunction> windowFunctionChoiceBox;
 
+    @FXML
+    private Button cancelButton, applyButton, okButton;
+
     // Initialization method
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -58,10 +62,23 @@ public class PreferencesViewController implements Initializable {
         colourScaleChoiceBox.setValue(ColourScale.values()[settingsFile.settingsData.colourScaleEnumOrdinal]);
         windowFunctionChoiceBox.setValue(WindowFunction.values()[settingsFile.settingsData.windowFunctionEnumOrdinal]);
 
+        // Add methods to choice boxes
+        // Todo: is there a more DRY way of doing this?
+        colourScaleChoiceBox.setOnAction(event -> applyButton.setDisable(false));
+        windowFunctionChoiceBox.setOnAction(event -> applyButton.setDisable(false));
+
+        // Add methods to buttons
+        cancelButton.setOnAction(event -> closePreferencesPane());
+
+        applyButton.setOnAction(event -> applySettings());
+
+        okButton.setOnAction(event -> {
+            applySettings();
+            closePreferencesPane();
+        });
+
         // Report that the preferences view is ready to be shown
         logger.log(Level.INFO, "Preferences view ready to be shown");
-
-        // Todo: add buttons' methods
     }
 
     // Public methods
@@ -85,5 +102,26 @@ public class PreferencesViewController implements Initializable {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    // Private methods
+
+    /**
+     * Helper method that closes the preferences' pane window.
+     */
+    private void closePreferencesPane() {
+        ((Stage) rootPane.getScene().getWindow()).close();
+    }
+
+    /**
+     * Helper method that updates the settings file with the new settings.
+     */
+    private void applySettings() {
+        // Update settings' values
+        settingsFile.settingsData.colourScaleEnumOrdinal = colourScaleChoiceBox.getValue().ordinal();
+        settingsFile.settingsData.windowFunctionEnumOrdinal = windowFunctionChoiceBox.getValue().ordinal();
+
+        // Apply settings to the settings file
+        settingsFile.saveSettingsFile();
     }
 }
