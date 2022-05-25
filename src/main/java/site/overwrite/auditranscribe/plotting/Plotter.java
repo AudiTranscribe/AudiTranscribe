@@ -2,7 +2,7 @@
  * Plotter.java
  *
  * Created on 2022-02-18
- * Updated on 2022-04-16
+ * Updated on 2022-05-22
  *
  * Description: Class that contains plotting functions.
  */
@@ -116,7 +116,7 @@ public class Plotter {
         // Normalise packet values
         for (int w = 0; w < imgWidth; w++) {
             for (int h = 0; h < imgHeight; h++) {
-                packets[w][h] = MathUtils.normalise(packets[w][h], minPacketVal, maxPacketVal);
+                packets[w][h] = MathUtils.normalize(packets[w][h], minPacketVal, maxPacketVal);
             }
         }
         logger.log(Level.FINE, "Image packets normalised");

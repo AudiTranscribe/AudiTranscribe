@@ -2,12 +2,12 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-05-16
+ * Updated on 2022-05-22
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
 
-package site.overwrite.auditranscribe.views;
+package site.overwrite.auditranscribe.views.helpers;
 
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
@@ -29,6 +29,8 @@ import site.overwrite.auditranscribe.io.audt_file.exceptions.FailedToReadDataExc
 import site.overwrite.auditranscribe.io.audt_file.exceptions.IncorrectFileFormatException;
 import site.overwrite.auditranscribe.io.audt_file.file_handers.AUDTFileReader;
 import site.overwrite.auditranscribe.io.audt_file.file_handers.AUDTFileWriter;
+import site.overwrite.auditranscribe.views.MainViewController;
+import site.overwrite.auditranscribe.views.TranscriptionViewController;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
@@ -62,9 +64,9 @@ public class ProjectIOHandlers {
                 Audio audio = new Audio(file);  // Failure to read will throw an exception
 
                 // Get the current scene and the spectrogram view controller
-                Pair<Scene, SpectrogramViewController> stageSceneAndController = getController(transcriptionStage);
+                Pair<Scene, TranscriptionViewController> stageSceneAndController = getController(transcriptionStage);
                 Scene scene = stageSceneAndController.getValue0();
-                SpectrogramViewController controller = stageSceneAndController.getValue1();
+                TranscriptionViewController controller = stageSceneAndController.getValue1();
 
                 // Set the project data for the existing project
                 controller.setAudioAndSpectrogramData(audio);
@@ -140,9 +142,9 @@ public class ProjectIOHandlers {
                 ProjectDataObject projectDataObject = new ProjectDataObject(qTransformData, audioData, guiData);
 
                 // Get the current scene and the spectrogram view controller
-                Pair<Scene, SpectrogramViewController> stageSceneAndController = getController(transcriptionStage);
+                Pair<Scene, TranscriptionViewController> stageSceneAndController = getController(transcriptionStage);
                 Scene scene = stageSceneAndController.getValue0();
-                SpectrogramViewController controller = stageSceneAndController.getValue1();
+                TranscriptionViewController controller = stageSceneAndController.getValue1();
 
                 // Set the project data for the existing project
                 controller.useExistingData(audtFilePath, audtFileName, projectDataObject);
@@ -279,10 +281,10 @@ public class ProjectIOHandlers {
      * Helper method that gets the spectrogram scene and spectrogram view controller.
      *
      * @param transcriptionStage Stage that contains the transcription scene.
-     * @return Spectrogram scene object and the <code>SpectrogramViewController</code> object.
+     * @return Spectrogram scene object and the <code>TranscriptionViewController</code> object.
      * @throws IOException If the spectrogram view FXML file cannot be found.
      */
-    private static Pair<Scene, SpectrogramViewController> getController(
+    private static Pair<Scene, TranscriptionViewController> getController(
             Stage transcriptionStage
     ) throws IOException {
         // Unset full screen and maximized first
@@ -290,13 +292,13 @@ public class ProjectIOHandlers {
         transcriptionStage.setFullScreen(false);
 
         // Get the FXML loader for the spectrogram view
-        FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/spectrogram-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/transcription-view.fxml"));
 
         // Get the spectrogram view scene
         Scene scene = new Scene(fxmlLoader.load());
 
         // Get the spectrogram view controller
-        SpectrogramViewController controller = fxmlLoader.getController();
+        TranscriptionViewController controller = fxmlLoader.getController();
 
         // Return the scene and controller
         return new Pair<>(scene, controller);

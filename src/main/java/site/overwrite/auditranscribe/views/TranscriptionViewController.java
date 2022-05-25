@@ -1,10 +1,10 @@
 /*
- * SpectrogramViewController.java
+ * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-16
+ * Updated on 2022-05-22
  *
- * Description: Contains the spectrogram view's controller class.
+ * Description: Contains the transcription view's controller class.
  */
 
 package site.overwrite.auditranscribe.views;
@@ -44,6 +44,7 @@ import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 import site.overwrite.auditranscribe.plotting.PlottingStuffHandler;
 import site.overwrite.auditranscribe.spectrogram.*;
 import site.overwrite.auditranscribe.utils.*;
+import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
 
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -61,7 +62,7 @@ import java.util.logging.Logger;
 
 import static java.util.Map.entry;
 
-public class SpectrogramViewController implements Initializable {
+public class TranscriptionViewController implements Initializable {
     // Constants
     final String[] MUSIC_KEYS = {"C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"};
     final Map<String, Integer> TIME_SIGNATURE_TO_BEATS_PER_BAR = Map.ofEntries(
@@ -474,7 +475,7 @@ public class SpectrogramViewController implements Initializable {
     // Public methods
 
     /**
-     * Method that finishes the setting up of the spectrogram view controller.<br>
+     * Method that finishes the setting up of the transcription view controller.<br>
      * Note that this method has to be called <b>last</b>, after all other spectrogram things have
      * been set up.
      *
@@ -534,7 +535,7 @@ public class SpectrogramViewController implements Initializable {
     }
 
     /**
-     * Method that makes the spectrogram view controller use the existing project data, that was
+     * Method that makes the transcription view controller use the existing project data, that was
      * supposedly read from a file.
      *
      * @param audtFilePath <b>Absolute</b> path to the file that contained the data.
@@ -579,7 +580,7 @@ public class SpectrogramViewController implements Initializable {
     }
 
     /**
-     * Method that sets the audio and spectrogram data for the spectrogram view controller.<br>
+     * Method that sets the audio and spectrogram data for the transcription view controller.<br>
      * This method uses the actual audio file to do the setting of the data.
      *
      * @param audioObj An <code>Audio</code> object that contains audio data.
@@ -605,7 +606,7 @@ public class SpectrogramViewController implements Initializable {
     }
 
     /**
-     * Method that sets the audio and spectrogram data for the spectrogram view controller.<br>
+     * Method that sets the audio and spectrogram data for the transcription view controller.<br>
      * This method uses existing data (provided in <code>qTransformData</code> and
      * <code>audioData</code>) to do the setting of the data.
      *
@@ -626,7 +627,7 @@ public class SpectrogramViewController implements Initializable {
         audio = new Audio(new File(audioFilePath));
         sampleRate = audioData.sampleRate;
 
-        magnitudes = qTransformData.qTransformMatrix;
+        magnitudes = qTransformData.qTransformMagnitudes;
 
         // Generate spectrogram image based on existing magnitude data
         Spectrogram spectrogram = new Spectrogram(
@@ -1052,8 +1053,8 @@ public class SpectrogramViewController implements Initializable {
         // Show the spectrogram from the middle
         spectrogramPane.setVvalue(0.5);
 
-        // Report that the spectrogram view is ready to be shown
-        logger.log(Level.INFO, "Spectrogram view ready to be shown");
+        // Report that the transcription view is ready to be shown
+        logger.log(Level.INFO, "Transcription view for " + audioFileName + " ready to be shown");
     }
 
     /**
