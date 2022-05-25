@@ -20,9 +20,9 @@
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <Label layoutX="148.0" layoutY="138.0" text="Nothing here... yet.">
+                        <Label alignment="CENTER" contentDisplay="CENTER" layoutX="148.0" layoutY="138.0" text="Nothing here... yet." AnchorPane.bottomAnchor="138.0" AnchorPane.leftAnchor="145.0" AnchorPane.rightAnchor="145.0" AnchorPane.topAnchor="138.0">
                            <font>
-                              <Font size="36.0" />
+                              <Font name="System Font" size="36.0" />
                            </font>
                         </Label>
                      </children></AnchorPane>
@@ -64,7 +64,7 @@
          <children>
             <AnchorPane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
                <children>
-                  <Label styleClass="warning-label" text="⚠️ Changes will not take place until next restart." AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <Label styleClass="warning-label" text="⚠️ Changes may not take place until next restart." AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
             </AnchorPane>
             <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" prefWidth="60.0" text="Cancel" HBox.hgrow="NEVER" />

@@ -2,7 +2,7 @@
  * MainViewController.java
  *
  * Created on 2022-02-09
- * Updated on 2022-05-22
+ * Updated on 2022-05-25
  *
  * Description: Contains the main view's controller class.
  */
@@ -31,6 +31,7 @@ import org.javatuples.Quartet;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.PropertyFile;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
+import site.overwrite.auditranscribe.io.settings_file.SettingsFile;
 import site.overwrite.auditranscribe.utils.MiscUtils;
 import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
 
@@ -53,6 +54,8 @@ public class MainViewController implements Initializable {
     ProjectsDB projectsDB;
     Stage transcriptionStage = new Stage();  // Will be used and shown later
     FilteredList<Quartet<Long, String, String, String>> filteredList;  // List of project records
+
+    private final SettingsFile settingsFile = new SettingsFile();
 
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -284,7 +287,7 @@ public class MainViewController implements Initializable {
                 Window window = rootPane.getScene().getWindow();
 
                 // Open the project with the filepath
-                ProjectIOHandlers.openProject((Stage) window, transcriptionStage, file, this);
+                ProjectIOHandlers.openProject((Stage) window, transcriptionStage, file, settingsFile, this);
             }
         });
 
@@ -295,7 +298,7 @@ public class MainViewController implements Initializable {
 
         openProjectMenuItem.setOnAction(this::handleOpenProject);
 
-        preferencesMenuItem.setOnAction(actionEvent -> PreferencesViewController.showPreferencesWindow());
+        preferencesMenuItem.setOnAction(actionEvent -> PreferencesViewController.showPreferencesWindow(settingsFile));
 
         aboutMenuItem.setOnAction(actionEvent -> AboutViewController.showAboutWindow());
 
@@ -386,7 +389,7 @@ public class MainViewController implements Initializable {
         File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
         // Create the new project
-        ProjectIOHandlers.newProject((Stage) window, transcriptionStage, file, this);
+        ProjectIOHandlers.newProject((Stage) window, transcriptionStage, file, settingsFile, this);
     }
 
     /**
@@ -402,6 +405,6 @@ public class MainViewController implements Initializable {
         File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
         // Open the existing project
-        ProjectIOHandlers.openProject((Stage) window, transcriptionStage, file, this);
+        ProjectIOHandlers.openProject((Stage) window, transcriptionStage, file, settingsFile, this);
     }
 }

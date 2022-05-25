@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 public class PreferencesViewController implements Initializable {
     // Attributes
     private final Logger logger = Logger.getLogger(this.getClass().getName());
-    private final SettingsFile settingsFile = new SettingsFile();
+    private SettingsFile settingsFile;
 
     // FXML Elements
     @FXML
@@ -58,15 +58,6 @@ public class PreferencesViewController implements Initializable {
         for (WindowFunction windowFunction : WindowFunction.values())
             windowFunctionChoiceBox.getItems().add(windowFunction);
 
-        // Set choices
-        colourScaleChoiceBox.setValue(ColourScale.values()[settingsFile.settingsData.colourScaleEnumOrdinal]);
-        windowFunctionChoiceBox.setValue(WindowFunction.values()[settingsFile.settingsData.windowFunctionEnumOrdinal]);
-
-        // Add methods to choice boxes
-        // Todo: is there a more DRY way of doing this?
-        colourScaleChoiceBox.setOnAction(event -> applyButton.setDisable(false));
-        windowFunctionChoiceBox.setOnAction(event -> applyButton.setDisable(false));
-
         // Add methods to buttons
         cancelButton.setOnAction(event -> closePreferencesPane());
 
@@ -81,15 +72,48 @@ public class PreferencesViewController implements Initializable {
         logger.log(Level.INFO, "Preferences view ready to be shown");
     }
 
+    // Setter methods
+    public void setSettingsFile(SettingsFile settingsFile) {
+        this.settingsFile = settingsFile;
+    }
+
     // Public methods
+
+    /**
+     * Method that sets up the choice boxes <b>after</b> the <code>settingsFile</code> attribute has
+     * been set.
+     */
+    public void setUpChoiceBoxes() {
+        // Set choice box values
+        colourScaleChoiceBox.setValue(ColourScale.values()[settingsFile.settingsData.colourScaleEnumOrdinal]);
+        windowFunctionChoiceBox.setValue(WindowFunction.values()[settingsFile.settingsData.windowFunctionEnumOrdinal]);
+
+        // Add methods to choice boxes
+        // Todo: is there a more DRY way of doing this?
+        colourScaleChoiceBox.setOnAction(event -> applyButton.setDisable(false));
+        windowFunctionChoiceBox.setOnAction(event -> applyButton.setDisable(false));
+    }
+
     /**
      * Method that shows the preferences window.
+     *
+     * @param settingsFile The <code>SettingsFile</code> object that handles the reading and writing
+     *                     of settings.
      */
-    public static void showPreferencesWindow() {
+    public static void showPreferencesWindow(SettingsFile settingsFile) {
         try {
             // Load the FXML file into the scene
             FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/preferences-view.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
+
+            // Get the view controller
+            PreferencesViewController controller = fxmlLoader.getController();
+
+            // Update the `settingsFile` attribute
+            controller.setSettingsFile(settingsFile);
+
+            // Set choice boxes' values
+            controller.setUpChoiceBoxes();
 
             // Set stage properties
             Stage aboutStage = new Stage();
@@ -123,5 +147,8 @@ public class PreferencesViewController implements Initializable {
 
         // Apply settings to the settings file
         settingsFile.saveSettingsFile();
+
+        // Disable the apply button again
+        applyButton.setDisable(true);
     }
 }
