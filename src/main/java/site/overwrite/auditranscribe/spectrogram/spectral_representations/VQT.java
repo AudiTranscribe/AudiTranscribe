@@ -2,7 +2,7 @@
  * VQT.java
  *
  * Created on 2022-03-11
- * Updated on 2022-05-25
+ * Updated on 2022-05-26
  *
  * Description: Class that implements the Variable Q-Transform (VQT) algorithm.
  */
@@ -226,7 +226,7 @@ public class VQT {
             }
 
             // Update task progress
-            if (task != null) task.updateProgress(octave, numOctaves);
+            if (task != null) task.updateProgress(octave + 1, numOctaves);
         }
 
         // Trim and stack the VQT responses
