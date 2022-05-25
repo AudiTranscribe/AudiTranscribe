@@ -2,13 +2,14 @@
  * NotePlayer.java
  *
  * Created on 2022-05-14
- * Updated on 2022-05-15
+ * Updated on 2022-05-25
  *
  * Description: Class that handles the playing of notes.
  */
 
 package site.overwrite.auditranscribe.notes;
 
+import site.overwrite.auditranscribe.exceptions.ValueException;
 import site.overwrite.auditranscribe.utils.UnitConversion;
 
 import javax.sound.midi.*;
@@ -80,17 +81,17 @@ public class NotePlayer {
      * @param velocity     So-called <em>volume</em> to play the note at. This value should be in
      *                     the range [0, 127].
      * @param failSilently Whether the program should not throw errors.
-     * @throws InvalidParameterException If the note number is invalid (i.e. cannot be played in
-     *                                   MIDI) and <code>failSilently</code> is <code>false</code>.
+     * @throws ValueException If the note number is invalid (i.e. cannot be played in MIDI) and
+     *                        <code>failSilently</code> is <code>false</code>.
      * @see #noteOff(int, int)
      */
-    public void noteOn(int noteNumber, int velocity, boolean failSilently) throws InvalidParameterException {
+    public void noteOn(int noteNumber, int velocity, boolean failSilently) {
         // Get the MIDI number of the note number
         int midiNumber = UnitConversion.noteNumberToMIDINumber(noteNumber);
 
         // Ensure that the MIDI number found is not -1
         if (midiNumber == -1 && !failSilently) {
-            throw new InvalidParameterException("MIDI number cannot be found for note number " + noteNumber);
+            throw new ValueException("MIDI number cannot be found for note number " + noteNumber);
         }
 
         // Turn on the note on that channel
@@ -120,17 +121,17 @@ public class NotePlayer {
      * @param velocity     So-called <em>volume</em> to stop the note at. This value should be in
      *                     the range [0, 127].
      * @param failSilently Whether the program should not throw errors.
-     * @throws InvalidParameterException If the note number is invalid (i.e. cannot be played in
-     *                                   MIDI) and <code>failSilently</code> is <code>false</code>.
+     * @throws ValueException If the note number is invalid (i.e. cannot be played in MIDI) and
+     *                        <code>failSilently</code> is <code>false</code>.
      * @see #noteOn(int, int)
      */
-    public void noteOff(int noteNumber, int velocity, boolean failSilently) throws InvalidParameterException {
+    public void noteOff(int noteNumber, int velocity, boolean failSilently) {
         // Get the MIDI number of the note number
         int midiNumber = UnitConversion.noteNumberToMIDINumber(noteNumber);
 
         // Ensure that the MIDI number found is not -1
         if (midiNumber == -1 && !failSilently) {
-            throw new InvalidParameterException("MIDI number cannot be found for note number " + noteNumber);
+            throw new ValueException("MIDI number cannot be found for note number " + noteNumber);
         }
 
         // Turn on the note on that channel
@@ -163,8 +164,7 @@ public class NotePlayer {
      *                    range [0, 127].
      * @param onDuration  How long this note should be played, in <b>milliseconds</b>.
      * @param offDuration How long this note should be offed, in <b>milliseconds</b>.
-     * @throws InvalidParameterException If the note number is invalid (i.e. cannot be played in
-     *                                   MIDI).
+     * @throws ValueException If the note number is invalid (i.e. cannot be played in MIDI).
      */
     public void playNoteForDuration(
             int noteNumber, int onVelocity, int offVelocity, long onDuration, long offDuration
@@ -174,7 +174,7 @@ public class NotePlayer {
 
         // Ensure that the MIDI number found is not -1
         if (midiNumber == -1) {
-            throw new InvalidParameterException("MIDI number cannot be found for note number " + noteNumber);
+            throw new ValueException("MIDI number cannot be found for note number " + noteNumber);
         }
 
         // Play the sound

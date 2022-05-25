@@ -2,15 +2,15 @@
  * IncorrectFileFormatException.java
  *
  * Created on 2022-05-02
- * Updated on 2022-05-10
+ * Updated on 2022-05-25
  *
- * Description: Exception to mark that the file format is incorrect.
+ * Description: Exception to mark that the file does not have the AUDT file format.
  */
 
-package site.overwrite.auditranscribe.io.audt_file.exceptions;
+package site.overwrite.auditranscribe.exceptions;
 
 /**
- * Exception to mark that the file format is incorrect.
+ * Exception to mark that the file does not have the AUDT file format.
  */
 public class IncorrectFileFormatException extends Exception {
     public IncorrectFileFormatException() {

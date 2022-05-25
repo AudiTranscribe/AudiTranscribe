@@ -2,14 +2,15 @@
  * UnitConversion.java
  *
  * Created on 2022-03-12
- * Updated on 2022-05-14
+ * Updated on 2022-05-25
  *
  * Description: Unit conversion methods.
  */
 
 package site.overwrite.auditranscribe.utils;
 
-import java.security.InvalidParameterException;
+import site.overwrite.auditranscribe.exceptions.FormatException;
+
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -46,7 +47,7 @@ public class UnitConversion {
      *             <code>#</code> or <code>♯</code>, flats may be indicated with <code>!</code>,
      *             <code>b</code>, or <code>♭</code>.
      * @return Note number for the given note.
-     * @throws InvalidParameterException If the note format is incorrect.
+     * @throws FormatException the note format is incorrect.
      * @implNote Double sharp and double flat are not currently supported.
      */
     // Todo: find a way to incorporate double sharp and double flat
@@ -79,7 +80,7 @@ public class UnitConversion {
         // Attempt to match the `note` string to the pattern
         Matcher matcher = NOTE_PATTERN.matcher(note);
         if (!matcher.find()) {
-            throw new InvalidParameterException("Improper note format '" + note + "'");
+            throw new FormatException("Improper note format '" + note + "'");
         }
 
         // Get the matched groups from the note
@@ -117,9 +118,10 @@ public class UnitConversion {
 
     /**
      * Converts the frequency to an estimated note number.
-     * @param freq  Frequency of the note with that note number. The returned frequency assumes that
-     *              the notes have been tuned to A440.
-     * @return  The estimated note number. This is a <b>double</b> and needs to be rounded. That
+     *
+     * @param freq Frequency of the note with that note number. The returned frequency assumes that
+     *             the notes have been tuned to A440.
+     * @return The estimated note number. This is a <b>double</b> and needs to be rounded. That
      * task is left to another method and not this one.
      */
     public static double freqToNoteNumber(double freq) {

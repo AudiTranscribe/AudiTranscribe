@@ -21,6 +21,7 @@ module site.overwrite.auditranscribe {
     exports site.overwrite.auditranscribe;
     exports site.overwrite.auditranscribe.audio;
     exports site.overwrite.auditranscribe.audio.filters;
+    exports site.overwrite.auditranscribe.audio.window_functions;
     exports site.overwrite.auditranscribe.io.audt_file.data_encapsulators;
     exports site.overwrite.auditranscribe.views;
     exports site.overwrite.auditranscribe.views.helpers;

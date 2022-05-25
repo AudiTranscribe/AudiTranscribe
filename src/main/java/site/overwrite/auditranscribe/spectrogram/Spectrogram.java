@@ -2,7 +2,7 @@
  * Spectrogram.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-14
+ * Updated on 2022-05-25
  *
  * Description: Spectrogram class.
  */
@@ -12,13 +12,13 @@ package site.overwrite.auditranscribe.spectrogram;
 import javafx.scene.image.WritableImage;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
+import site.overwrite.auditranscribe.exceptions.ValueException;
 import site.overwrite.auditranscribe.plotting.Plotter;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.CQT;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.VQT;
 import site.overwrite.auditranscribe.utils.Complex;
 import site.overwrite.auditranscribe.utils.UnitConversion;
 
-import java.security.InvalidParameterException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -66,9 +66,8 @@ public class Spectrogram {
      * @param hopLength      Number of samples between successive columns.
      * @param numPxPerSecond Number of pixels of the spectrogram dedicated to each second of audio.
      * @param numPxPerOctave Number of pixels allocated for each octave.
-     * @throws InvalidParameterException If <code>maxNoteNumber - minNoteNumber + 1</code> is not a
-     *                                   multiple of 12.
-     * @throws InvalidParameterException If the image height is too large.
+     * @throws ValueException If the value of <code>maxNoteNumber - minNoteNumber + 1</code> is not
+     *                        a multiple of 12.
      */
     public Spectrogram(
             Audio audioObj, int minNoteNumber, int maxNoteNumber, int binsPerOctave, int hopLength,
@@ -77,7 +76,7 @@ public class Spectrogram {
         // Validate that `maxNoteNumber - minNoteNumber + 1` is a multiple of 12
         int numNotes = maxNoteNumber - minNoteNumber + 1;
         if (numNotes % 12 != 0) {
-            throw new InvalidParameterException(
+            throw new ValueException(
                     "Number of notes is not a multiple of 12 (i.e. `maxNoteNumber - minNoteNumber + 1` is not a " +
                             "multiple of 12)"
             );
@@ -127,15 +126,17 @@ public class Spectrogram {
      * @param numPxPerOctave Number of pixels allocated for each octave.
      * @param sampleRate     Audio's sampling rate.
      * @param duration       Duration of the audio.
-     * @throws InvalidParameterException If <code>maxNoteNumber - minNoteNumber + 1</code> is not a
-     *                                   multiple of 12.
-     * @throws InvalidParameterException If the image height is too large.
+     * @throws ValueException If the value of <code>maxNoteNumber - minNoteNumber + 1</code> is not
+     *                        a multiple of 12.
      */
-    public Spectrogram(int minNoteNumber, int maxNoteNumber, int binsPerOctave, int hopLength, double numPxPerSecond, double numPxPerOctave, double sampleRate, double duration) {
+    public Spectrogram(
+            int minNoteNumber, int maxNoteNumber, int binsPerOctave, int hopLength, double numPxPerSecond,
+            double numPxPerOctave, double sampleRate, double duration
+    ) {
         // Validate that `maxNoteNumber - minNoteNumber + 1` is a multiple of 12
         int numNotes = maxNoteNumber - minNoteNumber + 1;
         if (numNotes % 12 != 0) {
-            throw new InvalidParameterException(
+            throw new ValueException(
                     "Number of notes is not a multiple of 12 (i.e. `maxNoteNumber - minNoteNumber + 1` is not a " +
                             "multiple of 12)"
             );

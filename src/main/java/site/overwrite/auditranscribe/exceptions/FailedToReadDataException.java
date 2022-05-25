@@ -2,15 +2,15 @@
  * FailedToReadDataException.java
  *
  * Created on 2022-05-02
- * Updated on 2022-05-10
+ * Updated on 2022-05-25
  *
- * Description: Exception to mark that the program failed to read the data stored in the file successfully.
+ * Description: Exception to mark that the program failed to read the data stored in an AUDT file successfully.
  */
 
-package site.overwrite.auditranscribe.io.audt_file.exceptions;
+package site.overwrite.auditranscribe.exceptions;
 
 /**
- * Exception to mark that the program failed to read the data stored in the file successfully.
+ * Exception to mark that the program failed to read the data stored in an AUDT file successfully.
  */
 public class FailedToReadDataException extends Exception {
     public FailedToReadDataException() {

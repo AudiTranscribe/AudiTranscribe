@@ -2,7 +2,7 @@
  * PlottingHelpers.java
  *
  * Created on 2022-03-19
- * Updated on 2022-05-14
+ * Updated on 2022-05-25
  *
  * Description: Helper functions for plotting.
  */
@@ -20,12 +20,13 @@ public class PlottingHelpers {
 
     /**
      * Converts a frequency to a specific height on the canvas.
+     *
      * @param freq      Original frequency.
      * @param minFreq   Lowest possible frequency. This will be assigned height 0.
      * @param maxFreq   Highest possible frequency. This will be assigned the maximum height.
      * @param maxHeight Maximum height.
-     * @return  Double representing the height on the spectrogram that the original frequency would
-     *          be at.
+     * @return Double representing the height on the spectrogram that the original frequency would
+     * be at.
      */
     public static double freqToHeight(double freq, double minFreq, double maxFreq, double maxHeight) {
         // Take log base 2 of the frequency, the minimum frequency and maximum frequency
@@ -40,11 +41,12 @@ public class PlottingHelpers {
 
     /**
      * Converts a height on the spectrogram pane to an estimated frequency.
+     *
      * @param height    Height on the spectrogram pane.
      * @param minFreq   Lowest possible frequency. This will be assigned height 0.
      * @param maxFreq   Highest possible frequency. This will be assigned the maximum height.
      * @param maxHeight Maximum height.
-     * @return  Estimated frequency.
+     * @return Estimated frequency.
      */
     public static double heightToFreq(double height, double minFreq, double maxFreq, double maxHeight) {
         // Compute the ratio of the given height and the spectrogram's height
@@ -56,12 +58,13 @@ public class PlottingHelpers {
 
     /**
      * Converts the note number to a height on the spectrogram.
-     * @param noteNum       Original note number.
-     * @param minNoteNum    Smallest note number. This will be assigned height 0.
-     * @param maxNoteNum    Highest note number. This will be assigned the maximum height.
-     * @param maxHeight     Maximum height.
-     * @return  Double representing the height on the spectrogram that the original frequency would
-     *          be at.
+     *
+     * @param noteNum    Original note number.
+     * @param minNoteNum Smallest note number. This will be assigned height 0.
+     * @param maxNoteNum Highest note number. This will be assigned the maximum height.
+     * @param maxHeight  Maximum height.
+     * @return Double representing the height on the spectrogram that the original frequency would
+     * be at.
      */
     public static double noteNumToHeight(int noteNum, int minNoteNum, int maxNoteNum, double maxHeight) {
         // Convert all the notes to frequencies

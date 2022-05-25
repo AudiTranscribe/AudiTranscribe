@@ -2,7 +2,7 @@
  * PropertyFile.java
  *
  * Created on 2022-05-02
- * Updated on 2022-05-02
+ * Updated on 2022-05-25
  *
  * Description: Property file object to handle the loading and retrieval of data from a property
  *              file.
@@ -11,6 +11,7 @@
 package site.overwrite.auditranscribe.io;
 
 import site.overwrite.auditranscribe.MainApplication;
+import site.overwrite.auditranscribe.exceptions.NoSuchPropertyException;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -55,13 +56,13 @@ public class PropertyFile {
      *
      * @param name Name of the property.
      * @return String, representing the value of the property.
-     * @throws NoSuchFieldException If the property does not exist within the properties file.
+     * @throws NoSuchPropertyException If the property does not exist within the properties file.
      */
-    public String getProperty(String name) throws NoSuchFieldException {
+    public String getProperty(String name) throws NoSuchPropertyException {
         String value = properties.getProperty(name, null);
 
-        if (value == null) {  // If null then the property does not exist
-            throw new NoSuchFieldException("The properties file does not have a property with name " + name);
+        if (value == null) {  // If `null` then the property does not exist
+            throw new NoSuchPropertyException("The properties file does not have a property with name " + name);
         }
 
         return value;

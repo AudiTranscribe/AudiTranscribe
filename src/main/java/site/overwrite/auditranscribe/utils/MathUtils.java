@@ -2,14 +2,14 @@
  * MathUtils.java
  *
  * Created on 2022-02-15
- * Updated on 2022-05-22
+ * Updated on 2022-05-25
  *
  * Description: Class containing useful mathematical utility functions.
  */
 
 package site.overwrite.auditranscribe.utils;
 
-import java.security.InvalidParameterException;
+import site.overwrite.auditranscribe.exceptions.ValueException;
 
 /**
  * Class containing useful mathematical utility functions.
@@ -33,12 +33,12 @@ public class MathUtils {
      * @param x Number to take the log base <code>n</code> of.
      * @param n The base of the logarithm.
      * @return Log base <code>n</code> of <code>x</code>.
-     * @throws InvalidParameterException If the base of the logarithm is not positive, or is 1.
+     * @throws ValueException If the base of the logarithm is not positive, or is 1.
      */
     public static double logN(double x, double n) {
         // Validate `n`
         if (n <= 0 || n == 1) {
-            throw new InvalidParameterException("Invalid value for the base of logarithm: " + n);
+            throw new ValueException("Invalid value for the base of logarithm: " + n);
         }
 
         // Return the logarithm

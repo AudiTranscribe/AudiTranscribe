@@ -2,7 +2,7 @@
  * AbstractFilter.java
  *
  * Created on 2022-03-07
- * Updated on 2022-05-10
+ * Updated on 2022-05-25
  *
  * Description: `AbstractFilter` class for resampling filters.
  */
@@ -65,7 +65,7 @@ public abstract class AbstractFilter {
     /**
      * Define all the attributes of this filter.
      *
-     * @param dataFilePath Path (with reference to the resources directory) to the JSON data file
+     * @param dataFilePath Path (with reference to the resources' directory) to the JSON data file
      *                     that contains this data.
      */
     public void defineAttributes(String dataFilePath) {

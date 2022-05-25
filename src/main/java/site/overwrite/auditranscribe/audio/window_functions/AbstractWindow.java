@@ -2,7 +2,7 @@
  * AbstractWindow.java
  *
  * Created on 2022-03-11
- * Updated on 2022-05-14
+ * Updated on 2022-05-25
  *
  * Description: Abstract window class that implements most methods needed by window classes.
  */
@@ -12,11 +12,11 @@ package site.overwrite.auditranscribe.audio.window_functions;
 import javafx.util.Pair;
 
 /**
- * Abstract window class.
+ * Abstract window class that implements most methods needed by window classes.
  */
 public abstract class AbstractWindow {
     // Attributes
-    double bandwidth;  // Bandwidths can be found here: http://librosa.org/doc/main/_modules/librosa/filters.html
+    double bandwidth;  // Bandwidths can be found at http://librosa.org/doc/main/_modules/librosa/filters.html
 
     // Getter/Setter Methods
 
@@ -67,7 +67,7 @@ public abstract class AbstractWindow {
     /**
      * Method that generates the window value for a specific index <code>k</code>.
      *
-     * @param k      Index of the window. Note that this is 1-indexed.
+     * @param k      Index of the window. <b>Note that this index is 1-indexed</b>.
      * @param length Total length of the window.
      * @return Double representing the window value at index <code>k</code>.
      */
@@ -77,7 +77,8 @@ public abstract class AbstractWindow {
 
     /**
      * Helper function to handle small or incorrect window lengths.
-     * @return  A boolean whether the length is smaller than or equal to 1.
+     *
+     * @return A boolean whether the length is smaller than or equal to 1.
      * @throws NegativeArraySizeException If the length is negative.
      */
     boolean lengthGuard(int length) throws NegativeArraySizeException {
