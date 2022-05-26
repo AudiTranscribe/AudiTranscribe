@@ -609,7 +609,7 @@ public class TranscriptionViewController implements Initializable {
             }
         };
 
-        startGeneratingSpectrogramTask(task);
+        startGeneratingSpectrogramTask(task, "Generating spectrogram...");
     }
 
     /**
@@ -649,7 +649,7 @@ public class TranscriptionViewController implements Initializable {
         };
 
         // Link the progress of the task with the progress bar
-        startGeneratingSpectrogramTask(task);
+        startGeneratingSpectrogramTask(task, "Loading spectrogram...");
     }
 
     /**
@@ -959,13 +959,14 @@ public class TranscriptionViewController implements Initializable {
     /**
      * Helper method that starts the spectrogram generation task.
      *
-     * @param task The task to start.
+     * @param task    The task to start.
+     * @param message Message to display at the side of the progress bar.
      */
-    private void startGeneratingSpectrogramTask(CustomTask<WritableImage> task) {
+    private void startGeneratingSpectrogramTask(CustomTask<WritableImage> task, String message) {
         // Link the progress of the task with the progress bar
         progressBarHBox.setVisible(true);
         progressBar.progressProperty().bind(task.progressProperty());
-        progressLabel.setText("Generating spectrogram...");
+        progressLabel.setText(message);
 
         // Finish setting up the spectrogram and its related attributes
         task.setOnSucceeded(event -> {
