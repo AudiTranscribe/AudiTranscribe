@@ -1,6 +1,6 @@
 ![AudiTranscribe Banner](designs/banner/banner.png "AudiTranscribe")
 
-[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](.github/CODE_OF_CONDUCT.md)
 
 An open source music transcription application.
 
@@ -32,4 +32,4 @@ This project is licensed under the [GPLv3 licence](LICENSE).
 Read AudiTranscribe's security policy at [SECURITY.md](.github/SECURITY.md).
 
 # Contributing to AudiTranscribe
-Please read the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+Please read the [CONTRIBUTING.md](.github/CONTRIBUTING.md) file.
