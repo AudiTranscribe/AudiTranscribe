@@ -2,7 +2,7 @@
  * MainViewController.java
  *
  * Created on 2022-02-09
- * Updated on 2022-05-22
+ * Updated on 2022-05-25
  *
  * Description: Contains the main view's controller class.
  */
@@ -245,7 +245,7 @@ public class MainViewController implements Initializable {
 
             // Update the version label with the version number
             versionLabel.setText("Version " + projectPropertiesFile.getProperty("version"));
-        } catch (IOException | NoSuchFieldException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 

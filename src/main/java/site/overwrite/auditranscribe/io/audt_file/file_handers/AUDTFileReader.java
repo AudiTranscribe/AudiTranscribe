@@ -2,7 +2,7 @@
  * AUDTFileReader.java
  *
  * Created on 2022-05-02
- * Updated on 2022-05-21
+ * Updated on 2022-05-25
  *
  * Description: Class that handles the reading of the AudiTranscribe (AUDT) file.
  */
@@ -14,8 +14,8 @@ import site.overwrite.auditranscribe.io.LZ4;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
-import site.overwrite.auditranscribe.io.audt_file.exceptions.FailedToReadDataException;
-import site.overwrite.auditranscribe.io.audt_file.exceptions.IncorrectFileFormatException;
+import site.overwrite.auditranscribe.exceptions.FailedToReadDataException;
+import site.overwrite.auditranscribe.exceptions.IncorrectFileFormatException;
 
 import java.io.FileInputStream;
 import java.io.IOException;

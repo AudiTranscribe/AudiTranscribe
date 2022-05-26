@@ -16,6 +16,7 @@ import site.overwrite.auditranscribe.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.Filter;
 import site.overwrite.auditranscribe.audio.WindowFunction;
+import site.overwrite.auditranscribe.exceptions.ValueException;
 import site.overwrite.auditranscribe.spectrogram.Wavelet;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
 import site.overwrite.auditranscribe.utils.Complex;
@@ -61,12 +62,21 @@ public class VQT {
      * @param task           The <code>CustomTask</code> object that is handling the generation.
      *                       Pass in <code>null</code> if no such task is being used.
      * @return Variable-Q value each frequency at each time.
-     * @throws InvalidParameterException If number of frequency bins is negative or zero.
-     * @throws InvalidParameterException If number of bins per octave is negative or zero.
-     * @throws InvalidParameterException If number of bins is not a multiple of the number of bins
-     *                                   per octave.
-     * @throws InvalidParameterException If the current number of frequency bins results in the
-     *                                   highest frequency exceeding the Nyquist frequency.
+     * @throws ValueException If: <ul>
+     *                        <li>
+     *                        The number of frequency bins is negative or zero.
+     *                        </li>
+     *                        <li>
+     *                        The number of bins per octave is negative or zero.
+     *                        </li>
+     *                        <li>
+     *                        The number of bins is not a multiple of the number of bins per octave.
+     *                        </li>
+     *                        <li>
+     *                        The current number of frequency bins results in the highest frequency
+     *                        exceeding the Nyquist frequency.
+     *                        </li>
+     *                        </ul>
      */
     public static Complex[][] vqt(
             double[] y, double sr, int hopLength, double fmin, int numBins, int binsPerOctave, double gamma,
@@ -93,12 +103,21 @@ public class VQT {
      * @param task           The <code>CustomTask</code> object that is handling the generation.
      *                       Pass in <code>null</code> if no such task is being used.
      * @return Variable-Q value each frequency at each time.
-     * @throws InvalidParameterException If number of frequency bins is negative or zero.
-     * @throws InvalidParameterException If number of bins per octave is negative or zero.
-     * @throws InvalidParameterException If number of bins is not a multiple of the number of bins
-     *                                   per octave.
-     * @throws InvalidParameterException If the current number of frequency bins results in the
-     *                                   highest frequency exceeding the Nyquist frequency.
+     * @throws ValueException If: <ul>
+     *                        <li>
+     *                        The number of frequency bins is negative or zero.
+     *                        </li>
+     *                        <li>
+     *                        The number of bins per octave is negative or zero.
+     *                        </li>
+     *                        <li>
+     *                        The number of bins is not a multiple of the number of bins per octave.
+     *                        </li>
+     *                        <li>
+     *                        The current number of frequency bins results in the highest frequency
+     *                        exceeding the Nyquist frequency.
+     *                        </li>
+     *                        </ul>
      */
     public static Complex[][] vqt(
             double[] y, double sr, int hopLength, double fmin, int numBins, int binsPerOctave, boolean isCQT,
@@ -106,15 +125,15 @@ public class VQT {
     ) {
         // Validate parameters
         if (numBins <= 0) {
-            throw new InvalidParameterException("Number of frequency bins cannot be negative or zero.");
+            throw new ValueException("Number of frequency bins cannot be negative or zero.");
         }
 
         if (binsPerOctave <= 0) {
-            throw new InvalidParameterException("Number of bins per octave cannot be negative or zero");
+            throw new ValueException("Number of bins per octave cannot be negative or zero");
         }
 
         if (numBins % binsPerOctave != 0) {
-            throw new InvalidParameterException("Number of bins is not a multiple of the number of bins per octave.");
+            throw new ValueException("Number of bins is not a multiple of the number of bins per octave.");
         }
 
         // Compute number of octaves that we are processing
@@ -306,8 +325,8 @@ public class VQT {
      * @param filterCutoff Highest frequency value before cutoff begins.
      * @return Three values. First is the downsampled audio time series. Second is the new sample
      * rate. Third is the new hop length.
-     * @throws InvalidParameterException If The input signal length is too short for a
-     *                                   <code>numOctaves</code>-octave VQT.
+     * @throws ValueException If The input signal length is too short for a
+     *                        <code>numOctaves</code>-octave VQT.
      */
 
     private static Triple<double[], Double, Integer> earlyDownsample(
@@ -328,7 +347,7 @@ public class VQT {
 
             // Check if the signal can actually be downsampled
             if (y.length < downsampleFactor) {
-                throw new InvalidParameterException(
+                throw new ValueException(
                         "Input signal length of " + y.length + " is too short for " + numOctaves + "-octave VQT"
                 );
             }

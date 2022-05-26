@@ -21,8 +21,8 @@ import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataOb
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.ProjectDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
-import site.overwrite.auditranscribe.io.audt_file.exceptions.FailedToReadDataException;
-import site.overwrite.auditranscribe.io.audt_file.exceptions.IncorrectFileFormatException;
+import site.overwrite.auditranscribe.exceptions.FailedToReadDataException;
+import site.overwrite.auditranscribe.exceptions.IncorrectFileFormatException;
 import site.overwrite.auditranscribe.io.audt_file.file_handers.AUDTFileReader;
 import site.overwrite.auditranscribe.io.audt_file.file_handers.AUDTFileWriter;
 import site.overwrite.auditranscribe.views.MainViewController;

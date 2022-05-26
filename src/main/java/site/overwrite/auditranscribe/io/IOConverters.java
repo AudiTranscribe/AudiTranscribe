@@ -2,16 +2,17 @@
  * IOConverters.java
  *
  * Created on 2022-05-01
- * Updated on 2022-05-21
+ * Updated on 2022-05-25
  *
  * Description: Methods that converts Java objects/data into bytes for storage.
  */
 
 package site.overwrite.auditranscribe.io;
 
+import site.overwrite.auditranscribe.exceptions.LengthException;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.security.InvalidParameterException;
 import java.util.Arrays;
 
 /**
@@ -209,10 +210,11 @@ public class IOConverters {
      *
      * @param bytes Byte array to convert into an integer.
      * @return Integer represented by the 4 bytes.
+     * @throws LengthException If the <code>bytes</code> array does <b>not</b> have exactly 4 bytes.
      */
     public static int bytesToInt(byte[] bytes) {
         // Assert that there are exactly 4 bytes to convert
-        if (bytes.length != 4) throw new InvalidParameterException("There must be exactly 4 bytes in the bytes array.");
+        if (bytes.length != 4) throw new LengthException("There must be exactly 4 bytes in the bytes array.");
 
         // Convert the bytes array to the integer
         return ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN).getInt();
@@ -223,10 +225,11 @@ public class IOConverters {
      *
      * @param bytes Byte array to convert into a double.
      * @return Double represented by the 8 bytes.
+     * @throws LengthException If the <code>bytes</code> array does <b>not</b> have exactly 8 bytes.
      */
     public static double bytesToDouble(byte[] bytes) {
         // Assert that there are exactly 8 bytes to convert
-        if (bytes.length != 8) throw new InvalidParameterException("There must be exactly 8 bytes in the bytes array.");
+        if (bytes.length != 8) throw new LengthException("There must be exactly 8 bytes in the bytes array.");
 
         // Convert to double and return
         return ByteBuffer.wrap(bytes).getDouble();

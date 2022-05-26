@@ -2,7 +2,7 @@
  * Plotter.java
  *
  * Created on 2022-02-18
- * Updated on 2022-05-22
+ * Updated on 2022-05-25
  *
  * Description: Class that contains plotting functions.
  */
@@ -40,6 +40,7 @@ public class Plotter {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     // Constructor
+
     /**
      * Creates a plotter object.
      *
