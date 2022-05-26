@@ -13,6 +13,7 @@ import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -1150,26 +1151,37 @@ public class TranscriptionViewController implements Initializable {
      * @param keyEvent Key press event.
      */
     private void keyPressEventHandler(KeyEvent keyEvent) {
-        // Stop passing this event to the next node
-        keyEvent.consume();
+        // Get the key event's target
+        Node target = (Node) keyEvent.getTarget();
 
-        // Handle key event
+        // Check if the target is a text field or a spinner
+        if (target instanceof TextField || target instanceof Spinner) {
+            // If it is, do nothing
+            return;
+        }
+
+        // Get the key event's key code
         KeyCode code = keyEvent.getCode();
 
         // Non-note playing key press inputs
         if (code == KeyCode.SPACE) {  // Space bar is to toggle the play button
+            keyEvent.consume();
             togglePlayButton();
 
         } else if (code == KeyCode.UP) {  // Up arrow is to increase volume
+            keyEvent.consume();
             volumeSlider.setValue(volumeSlider.getValue() + VOLUME_VALUE_DELTA_ON_KEY_PRESS);
 
         } else if (code == KeyCode.DOWN) {  // Down arrow is to decrease volume
+            keyEvent.consume();
             volumeSlider.setValue(volumeSlider.getValue() - VOLUME_VALUE_DELTA_ON_KEY_PRESS);
 
         } else if (code == KeyCode.M) {  // M key is to toggle mute
+            keyEvent.consume();
             toggleMuteButton();
 
         } else if (code == KeyCode.LEFT) {  // Left arrow is to seek 1 second before
+            keyEvent.consume();
             try {
                 seekToTime(currTime - 1);
             } catch (InvalidObjectException e) {
@@ -1177,6 +1189,7 @@ public class TranscriptionViewController implements Initializable {
             }
 
         } else if (code == KeyCode.RIGHT) {  // Right arrow is to seek 1 second ahead
+            keyEvent.consume();
             try {
                 seekToTime(currTime + 1);
             } catch (InvalidObjectException e) {
@@ -1184,9 +1197,13 @@ public class TranscriptionViewController implements Initializable {
             }
 
         } else if (code == KeyCode.PERIOD) {  // Period key ('.') is to toggle seeking to playhead
+            keyEvent.consume();
             toggleScrollButton();
 
         } else if (NEW_PROJECT_COMBINATION.match(keyEvent)) {  // Create a new project
+            // Consume the key event
+            keyEvent.consume();
+
             // Get the current window
             Window window = rootPane.getScene().getWindow();
 
@@ -1197,6 +1214,9 @@ public class TranscriptionViewController implements Initializable {
             ProjectIOHandlers.newProject(mainStage, (Stage) window, file, mainViewController);
 
         } else if (OPEN_PROJECT_COMBINATION.match(keyEvent)) {  // Open a project
+            // Consume the key event
+            keyEvent.consume();
+
             // Get the current window
             Window window = rootPane.getScene().getWindow();
 
@@ -1210,6 +1230,7 @@ public class TranscriptionViewController implements Initializable {
             handleSavingProject(false);
 
         } else if (code == KeyCode.MINUS) {  // Increase playback octave number by 1
+            keyEvent.consume();
             notePlayer.silenceChannel();  // Stop any notes from playing
             if (octaveNum > 0) {
                 logger.log(Level.FINE, "Playback octave raised to " + octaveNum);
@@ -1219,6 +1240,7 @@ public class TranscriptionViewController implements Initializable {
             }
 
         } else if (code == KeyCode.EQUALS) {  // Decrease playback octave number by 1
+            keyEvent.consume();
             notePlayer.silenceChannel();  // Stop any notes from playing
             if (octaveNum < 9) {
                 logger.log(Level.FINE, "Playback octave lowered to " + octaveNum);
@@ -1259,9 +1281,6 @@ public class TranscriptionViewController implements Initializable {
      * @param keyEvent Key released event.
      */
     private void keyReleasedEventHandler(KeyEvent keyEvent) {
-        // Stop passing this event to the next node
-        keyEvent.consume();
-
         // Handle key event
         KeyCode code = keyEvent.getCode();
 
