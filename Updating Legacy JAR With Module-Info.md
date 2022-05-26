@@ -3,13 +3,24 @@
 Adapted from the comment by Philip Guin on [StackOverflow](https://stackoverflow.com/a/47222302).
 
 ---
+We would hope that all dependencies already have a `module-info.java` file. However, some do not. In these cases, you
+*will* need to update them. In the case where an error like "automatic module cannot be used with jlink" occurs, this
+file is meant to summarize what to do.
 
-In the case where an error like "automatic module cannot be used with jlink" occurs, this file is meant to summarize
-what to do.
+Here's a list of all the dependencies that need updating, with any issues that you might encounter when updating them.
 
-Suppose we want to fix the `org.apache.commons.compress` package.
-In the error message where you see "automatic module cannot be used with jlink", the error message should also specify a
-file path. For example:
+| Dependency Name         | Module Name                   | Issues Associated With It <u>To Ignore</u>      |
+|:------------------------|:------------------------------|:------------------------------------------------|
+| Apache Commons Compress | `org.apache.commons.compress` | Missing dependencies error                      |
+| Apache Commons Exec     | `commons.exec`                |                                                 |
+| Apache Commons Lang     | `org.apache.commons.lang3`    | Warning: module name should avoid ending digits |
+| Appdirs                 | `net.harawata.appdirs`        | Missing dependencies error                      |
+| Javatuples              | `javatuples`                  |                                                 |
+| SQLite JDBC             | `org.xerial.sqlitejdbc`       |                                                 |
+
+Suppose we want to fix the Commons Compress (`org.apache.commons.compress`) package.
+In the error message where you see "automatic module cannot be used with jlink", the error message
+should also specify a file path. For example:
 
 ```
 Error: automatic module cannot be used with jlink: org.apache.commons.compress from file:/path/to/the/jar/file
@@ -59,7 +70,7 @@ For example:
 jar uf commons-compress-1.21.jar -C org.apache.commons.compress module-info.class
 ```
 
-## Step 5: You're done!
+## You're done!
 
 You should now have a module that is no longer automatic, and have a `module-info.java` file. JLink should now work as
 expected.
