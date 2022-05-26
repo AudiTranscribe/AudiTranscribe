@@ -32,6 +32,7 @@ import org.javatuples.Pair;
 import site.overwrite.auditranscribe.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
+import site.overwrite.auditranscribe.io.settings_file.SettingsFile;
 import site.overwrite.auditranscribe.notes.NotePlayer;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
@@ -125,6 +126,7 @@ public class TranscriptionViewController implements Initializable {
     // Other attributes
     Stage mainStage;
     MainViewController mainViewController;
+    SettingsFile settingsFile;
 
     NotePlayer notePlayer;
 
@@ -162,7 +164,8 @@ public class TranscriptionViewController implements Initializable {
     private MenuBar menuBar;
 
     @FXML
-    private MenuItem newProjectMenuItem, openProjectMenuItem, saveProjectMenuItem, saveAsMenuItem, aboutMenuItem;
+    private MenuItem newProjectMenuItem, openProjectMenuItem, saveProjectMenuItem, saveAsMenuItem, preferencesMenuItem,
+            aboutMenuItem;
 
     // Main elements
     @FXML
@@ -479,6 +482,8 @@ public class TranscriptionViewController implements Initializable {
 
         saveAsMenuItem.setOnAction(event -> handleSavingProject(true));
 
+        preferencesMenuItem.setOnAction(actionEvent -> PreferencesViewController.showPreferencesWindow(settingsFile));
+
         aboutMenuItem.setOnAction(actionEvent -> AboutViewController.showAboutWindow());
 
         // Get the projects database
@@ -500,7 +505,7 @@ public class TranscriptionViewController implements Initializable {
      * @param mainViewController Controller object of the main class.
      */
     public void finishSetup(Stage mainStage, MainViewController mainViewController) {
-        // Update the main stage and main view controller attributes
+        // Update attributes
         this.mainStage = mainStage;
         this.mainViewController = mainViewController;
 
@@ -546,8 +551,12 @@ public class TranscriptionViewController implements Initializable {
      * @param audtFilePath <b>Absolute</b> path to the file that contained the data.
      * @param audtFileName The name of the AUDT file.
      * @param projectData  The project data.
+     * @param settingsFile The <code>SettingsFile</code> object that handles the reading and writing
+     *                     of settings.
      */
-    public void useExistingData(String audtFilePath, String audtFileName, ProjectDataObject projectData) {
+    public void useExistingData(
+            String audtFilePath, String audtFileName, ProjectDataObject projectData, SettingsFile settingsFile
+    ) {
         // Set up GUI data
         musicKeyIndex = projectData.guiData.musicKeyIndex;
         timeSignatureIndex = projectData.guiData.timeSignatureIndex;
@@ -564,7 +573,7 @@ public class TranscriptionViewController implements Initializable {
 
         // Set up Q-Transform data and audio data
         try {
-            setAudioAndSpectrogramData(projectData.qTransformData, projectData.audioData);
+            setAudioAndSpectrogramData(projectData.qTransformData, projectData.audioData, settingsFile);
         } catch (IOException | UnsupportedAudioFileException e) {
             AlertMessages.showExceptionAlert(
                     "Error loading audio data.",
@@ -594,15 +603,18 @@ public class TranscriptionViewController implements Initializable {
      * Method that sets the audio and spectrogram data for the transcription view controller.<br>
      * This method uses the actual audio file to do the setting of the data.
      *
-     * @param audioObj An <code>Audio</code> object that contains audio data.
+     * @param audioObj     An <code>Audio</code> object that contains audio data.
+     * @param settingsFile The <code>SettingsFile</code> object that handles the reading and writing of settings.
      */
-    public void setAudioAndSpectrogramData(Audio audioObj) {
+    public void setAudioAndSpectrogramData(Audio audioObj, SettingsFile settingsFile) {
         // Set attributes
         audio = audioObj;
         audioFilePath = audioObj.getAudioFilePath();
         audioFileName = audioObj.getAudioFileName();
         audioDuration = audio.getDuration();
         sampleRate = audio.getSampleRate();
+
+        this.settingsFile = settingsFile;
 
         // Generate spectrogram image based on newly generated magnitude data
         CustomTask<WritableImage> task = new CustomTask<>() {
@@ -612,8 +624,13 @@ public class TranscriptionViewController implements Initializable {
                         audio, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER, BINS_PER_OCTAVE, SPECTROGRAM_HOP_LENGTH, PX_PER_SECOND,
                         NUM_PX_PER_OCTAVE, this
                 );
-                magnitudes = spectrogram.getSpectrogramMagnitudes(WindowFunction.HANN_WINDOW);
-                return spectrogram.generateSpectrogram(magnitudes, ColourScale.VIRIDIS);
+                magnitudes = spectrogram.getSpectrogramMagnitudes(
+                        WindowFunction.values()[settingsFile.settingsData.windowFunctionEnumOrdinal]
+                );
+                return spectrogram.generateSpectrogram(
+                        magnitudes,
+                        ColourScale.values()[settingsFile.settingsData.colourScaleEnumOrdinal]
+                );
             }
         };
 
@@ -628,6 +645,8 @@ public class TranscriptionViewController implements Initializable {
      * @param qTransformData The Q-Transform data that will be used to set the spectrogram data.
      * @param audioData      The audio data that will be used in both the spectrogram data and
      *                       the audio data.
+     * @param settingsFile   The <code>SettingsFile</code> object that handles the reading and
+     *                       writing of settings.
      * @throws UnsupportedAudioFileException If the audio file path that was provided in
      *                                       <code>audioData</code> points to an invalid audio file.
      * @throws IOException                   If the audio file path that was provided in
@@ -635,7 +654,8 @@ public class TranscriptionViewController implements Initializable {
      *                                       (or does not exist).
      */
     public void setAudioAndSpectrogramData(
-            QTransformDataObject qTransformData, AudioDataObject audioData
+            QTransformDataObject qTransformData, AudioDataObject audioData,
+            SettingsFile settingsFile
     ) throws UnsupportedAudioFileException, IOException {
         // Set attributes
         audioFilePath = audioData.audioFilePath;
@@ -643,6 +663,8 @@ public class TranscriptionViewController implements Initializable {
         sampleRate = audioData.sampleRate;
 
         magnitudes = qTransformData.qTransformMagnitudes;
+
+        this.settingsFile = settingsFile;
 
         // Generate spectrogram image based on existing magnitude data
         CustomTask<WritableImage> task = new CustomTask<>() {
@@ -652,7 +674,10 @@ public class TranscriptionViewController implements Initializable {
                         MIN_NOTE_NUMBER, MAX_NOTE_NUMBER, BINS_PER_OCTAVE, SPECTROGRAM_HOP_LENGTH, PX_PER_SECOND,
                         NUM_PX_PER_OCTAVE, sampleRate, audioDuration, this
                 );
-                return spectrogram.generateSpectrogram(magnitudes, ColourScale.VIRIDIS);
+                return spectrogram.generateSpectrogram(
+                        magnitudes,
+                        ColourScale.values()[settingsFile.settingsData.colourScaleEnumOrdinal]
+                );
             }
         };
 
@@ -756,7 +781,7 @@ public class TranscriptionViewController implements Initializable {
         File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
         // Create the new project
-        ProjectIOHandlers.newProject(mainStage, (Stage) window, file, mainViewController);
+        ProjectIOHandlers.newProject(mainStage, (Stage) window, file, settingsFile, mainViewController);
     }
 
     /**
@@ -772,7 +797,7 @@ public class TranscriptionViewController implements Initializable {
         File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
         // Open the existing project
-        ProjectIOHandlers.openProject(mainStage, (Stage) window, file, mainViewController);
+        ProjectIOHandlers.openProject(mainStage, (Stage) window, file, settingsFile, mainViewController);
     }
 
     /**
@@ -1305,7 +1330,7 @@ public class TranscriptionViewController implements Initializable {
             File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
             // Create the new project
-            ProjectIOHandlers.newProject(mainStage, (Stage) window, file, mainViewController);
+            ProjectIOHandlers.newProject(mainStage, (Stage) window, file, settingsFile, mainViewController);
 
         } else if (OPEN_PROJECT_COMBINATION.match(keyEvent)) {  // Open a project
             // Consume the key event
@@ -1318,7 +1343,7 @@ public class TranscriptionViewController implements Initializable {
             File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
             // Open the existing project
-            ProjectIOHandlers.openProject(mainStage, (Stage) window, file, mainViewController);
+            ProjectIOHandlers.openProject(mainStage, (Stage) window, file, settingsFile, mainViewController);
 
         } else if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {  // Save current project
             handleSavingProject(false);

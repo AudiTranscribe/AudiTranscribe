@@ -35,6 +35,8 @@
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem fx:id="saveProjectMenuItem" mnemonicParsing="false" text="Save" />
                         <MenuItem fx:id="saveAsMenuItem" mnemonicParsing="false" text="Save As..." />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem fx:id="preferencesMenuItem" mnemonicParsing="false" text="Preferences..." />
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Help">

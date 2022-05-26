@@ -25,6 +25,7 @@ import site.overwrite.auditranscribe.exceptions.FailedToReadDataException;
 import site.overwrite.auditranscribe.exceptions.IncorrectFileFormatException;
 import site.overwrite.auditranscribe.io.audt_file.file_handers.AUDTFileReader;
 import site.overwrite.auditranscribe.io.audt_file.file_handers.AUDTFileWriter;
+import site.overwrite.auditranscribe.io.settings_file.SettingsFile;
 import site.overwrite.auditranscribe.views.MainViewController;
 import site.overwrite.auditranscribe.views.TranscriptionViewController;
 
@@ -46,10 +47,13 @@ public class ProjectIOHandlers {
      * @param mainStage          Main stage.
      * @param transcriptionStage Stage that contains the transcription scene.
      * @param file               File to open.
+     * @param settingsFile       The <code>SettingsFile</code> object that handles the reading and
+     *                           writing of settings.
      * @param mainViewController Controller object of the main class.
      */
     public static void newProject(
-            Stage mainStage, Stage transcriptionStage, File file, MainViewController mainViewController
+            Stage mainStage, Stage transcriptionStage, File file, SettingsFile settingsFile,
+            MainViewController mainViewController
     ) {
         // Verify that the user choose a file
         if (file != null) {
@@ -63,7 +67,7 @@ public class ProjectIOHandlers {
                 TranscriptionViewController controller = stageSceneAndController.getValue1();
 
                 // Set the project data for the existing project
-                controller.setAudioAndSpectrogramData(audio);
+                controller.setAudioAndSpectrogramData(audio, settingsFile);
                 controller.finishSetup(mainStage, mainViewController);
 
                 // Set the scene for the transcription page
@@ -109,10 +113,13 @@ public class ProjectIOHandlers {
      * @param mainStage          Main stage.
      * @param transcriptionStage Stage that contains the transcription scene.
      * @param file               File to open.
+     * @param settingsFile       The <code>SettingsFile</code> object that handles the reading and
+     *                           writing of settings.
      * @param mainViewController Controller object of the main class.
      */
     public static void openProject(
-            Stage mainStage, Stage transcriptionStage, File file, MainViewController mainViewController
+            Stage mainStage, Stage transcriptionStage, File file, SettingsFile settingsFile,
+            MainViewController mainViewController
     ) {
         // Verify that the user choose a file
         if (file != null) {
@@ -136,7 +143,7 @@ public class ProjectIOHandlers {
                 TranscriptionViewController controller = stageSceneAndController.getValue1();
 
                 // Set the project data for the existing project
-                controller.useExistingData(audtFilePath, audtFileName, projectDataObject);
+                controller.useExistingData(audtFilePath, audtFileName, projectDataObject, settingsFile);
                 controller.finishSetup(mainStage, mainViewController);
 
                 // Set the scene for the transcription page
