@@ -33,7 +33,7 @@ Please complete the following information:
 
 ## Application Information
 Please complete the following information:
- - Application Version [e.g. 0.2.0-alpha]
+ - Application Version: [e.g. 0.2.0-alpha]
 
 ## Additional Context
 Add any other context about the problem here.
