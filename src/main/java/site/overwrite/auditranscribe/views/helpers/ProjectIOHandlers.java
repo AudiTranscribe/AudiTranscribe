@@ -2,7 +2,7 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-05-22
+ * Updated on 2022-05-26
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
@@ -89,6 +89,7 @@ public class ProjectIOHandlers {
                 if (mainStage.isShowing()) mainStage.hide();
                 if (!transcriptionStage.isShowing()) {
                     transcriptionStage.showAndWait();
+                    controller.handleSceneClosing();
                     mainViewController.refreshProjectsListView();
                     mainStage.show();  // Show the main scene upon the spectrogram scene's closure
                 }
@@ -175,6 +176,7 @@ public class ProjectIOHandlers {
                 if (mainStage.isShowing()) mainStage.hide();
                 if (!transcriptionStage.isShowing()) {
                     transcriptionStage.showAndWait();
+                    controller.handleSceneClosing();
                     mainViewController.refreshProjectsListView();
                     mainStage.show();  // Show the main scene upon the spectrogram scene's closure
                 }

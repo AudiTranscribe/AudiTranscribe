@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-22
+ * Updated on 2022-05-26
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -664,6 +664,18 @@ public class TranscriptionViewController implements Initializable {
             spectrogramPane.setHvalue(
                     (newPosX - spectrogramAreaHalfWidth) / (finalWidth - 2 * spectrogramAreaHalfWidth)
             );
+        }
+    }
+
+    /**
+     * Method that handles the things to do when the scene is to be closed.
+     */
+    public void handleSceneClosing() {
+        // Stop the audio playing
+        try {
+            audio.stopAudio();
+        } catch (InvalidObjectException e) {
+            throw new RuntimeException(e);
         }
     }
 
