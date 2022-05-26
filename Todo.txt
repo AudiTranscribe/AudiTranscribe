@@ -5,7 +5,6 @@ Todo (Important):
 
 Todo (Less Important):
     - BPM Estimation
-    - Add 'feedback' for successful file saving
 
 Todo (Not Important):
     - Compress the filter data

@@ -29,7 +29,7 @@ If applicable, add screenshots to help explain your problem.
 ## System Information
 Please complete the following information:
  - OS: [e.g. Windows]
- - Version [e.g. 21H2 (10.0.19044.1682)]
+ - Version: [e.g. 21H2 (10.0.19044.1682)]
 
 ## Application Information
 Please complete the following information:
