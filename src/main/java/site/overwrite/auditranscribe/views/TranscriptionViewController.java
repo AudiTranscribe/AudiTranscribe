@@ -816,23 +816,43 @@ public class TranscriptionViewController implements Initializable {
                 qTransformData, audioData, guiData
         );
 
-        // Save the project
-        try {
-            ProjectIOHandlers.saveProject(saveDest, projectData);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        logger.log(Level.INFO, "File saved");
-
-        // Update the project file list
-        try {
-            if (!projectsDB.checkIfProjectExists(audtFilePath)) {
-                // Insert the record into the database
-                projectsDB.insertProjectRecord(audtFilePath, audtFileName);
+        // Set up task to run in alternate thread
+        String finalSaveDest = saveDest;
+        CustomTask<Void> task = new CustomTask<>() {
+            @Override
+            protected Void call() throws Exception {
+                // Save the project
+                ProjectIOHandlers.saveProject(finalSaveDest, projectData, this);
+                logger.log(Level.INFO, "File saved");
+                return null;
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        };
+
+        // Link the progress of the task with the progress bar
+        progressBarHBox.setVisible(true);
+        progressBar.progressProperty().bind(task.progressProperty());
+        progressLabel.setText("Saving file...");
+
+        // Methods to run after task succeeded
+        task.setOnSucceeded(event -> {
+            // Update the project file list
+            try {
+                if (!projectsDB.checkIfProjectExists(audtFilePath)) {
+                    // Insert the record into the database
+                    projectsDB.insertProjectRecord(audtFilePath, audtFileName);
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+            // Hide the progress box
+            progressBarHBox.setVisible(false);
+        });
+
+        // Start new thread to save the file
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
     }
 
     /**

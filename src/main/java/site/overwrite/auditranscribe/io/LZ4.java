@@ -2,7 +2,7 @@
  * LZ4.java
  *
  * Created on 2022-05-04
- * Updated on 2022-05-04
+ * Updated on 2022-05-26
  *
  * Description: Class that encapsulates LZ4 compression/decompression on byte arrays.
  */
@@ -11,6 +11,7 @@ package site.overwrite.auditranscribe.io;
 
 import org.apache.commons.compress.compressors.lz4.BlockLZ4CompressorInputStream;
 import org.apache.commons.compress.compressors.lz4.BlockLZ4CompressorOutputStream;
+import site.overwrite.auditranscribe.CustomTask;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -35,8 +36,24 @@ public class LZ4 {
      * @throws IOException If something went wrong when compressing the bytes.
      */
     public static byte[] lz4Compress(byte[] bytes) throws IOException {
+        return lz4Compress(bytes, null);
+    }
+
+    /**
+     * Method that returns an LZ4 compressed version of the bytes array.
+     *
+     * @param bytes Bytes array to be LZ4 compressed.
+     * @param task  The <code>CustomTask</code> object that is handling the generation. Pass in
+     *              <code>null</code> if no such task is being used.
+     * @return LZ4 compressed bytes.
+     * @throws IOException If something went wrong when compressing the bytes.
+     */
+    public static byte[] lz4Compress(byte[] bytes, CustomTask<?> task) throws IOException {
         // Create a byte buffer
         byte[] buf = new byte[LZ4_BYTE_BUFFER_SIZE];
+
+        // Count the number of passes that are needed for the LZ4 compression to complete
+        int numPasses = (int) Math.ceil((double) bytes.length / LZ4_BYTE_BUFFER_SIZE);
 
         // Define needed byte streams
         ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);  // Takes bytes from the input bytes array
@@ -47,8 +64,11 @@ public class LZ4 {
 
         // Pass bytes from the input stream through the LZ4 compression stream
         int len;
+        int currPass = 0;  // Current pass number
+
         while ((len = inputStream.read(buf)) > 0) {
             out.write(buf, 0, len);
+            task.updateProgress(++currPass, numPasses);
         }
 
         // Close streams

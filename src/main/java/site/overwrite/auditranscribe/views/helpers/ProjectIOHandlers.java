@@ -2,7 +2,7 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-05-22
+ * Updated on 2022-05-26
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
@@ -19,6 +19,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.stage.*;
 import org.javatuples.Pair;
+import site.overwrite.auditranscribe.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
@@ -206,9 +207,11 @@ public class ProjectIOHandlers {
      * @param projectDataObject Data object that stores all the data for the project.
      * @throws IOException If the writing to file encounters an error.
      */
-    public static void saveProject(String filepath, ProjectDataObject projectDataObject) throws IOException {
+    public static void saveProject(
+            String filepath, ProjectDataObject projectDataObject, CustomTask<?> task
+    ) throws IOException {
         // Declare the file writer object
-        AUDTFileWriter fileWriter = new AUDTFileWriter(filepath);
+        AUDTFileWriter fileWriter = new AUDTFileWriter(filepath, task);
 
         // Write data to the file
         fileWriter.writeQTransformData(projectDataObject.qTransformData);

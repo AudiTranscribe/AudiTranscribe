@@ -2,13 +2,14 @@
  * AUDTFileWriter.java
  *
  * Created on 2022-05-01
- * Updated on 2022-05-21
+ * Updated on 2022-05-26
  *
  * Description: Class that handles the writing of the AudiTranscribe (AUDT) file.
  */
 
 package site.overwrite.auditranscribe.io.audt_file.file_handers;
 
+import site.overwrite.auditranscribe.CustomTask;
 import site.overwrite.auditranscribe.io.IOConverters;
 import site.overwrite.auditranscribe.io.LZ4;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
@@ -26,6 +27,8 @@ public class AUDTFileWriter {
     public final String filepath;
     private final List<Byte> bytes = new ArrayList<>();
 
+    private final CustomTask<?> task;
+
     /**
      * Initialization method to make an <code>AUDTFileWriter</code> object.
      *
@@ -35,6 +38,24 @@ public class AUDTFileWriter {
     public AUDTFileWriter(String filepath) {
         // Update attributes
         this.filepath = filepath;
+        this.task = null;
+
+        // Write the header section
+        writeHeaderSection();
+    }
+
+    /**
+     * Initialization method to make an <code>AUDTFileWriter</code> object.
+     *
+     * @param filepath Path to the AUDT file. The file name at the end of the file path should
+     *                 <b>include</b> the extension of the AUDT file.
+     * @param task     The <code>CustomTask</code> object that is handling the generation. Pass in
+     *                 <code>null</code> if no such task is being used.
+     */
+    public AUDTFileWriter(String filepath, CustomTask<?> task) {
+        // Update attributes
+        this.filepath = filepath;
+        this.task = task;
 
         // Write the header section
         writeHeaderSection();
@@ -179,7 +200,7 @@ public class AUDTFileWriter {
         byte[] byteArray = IOConverters.oneDimensionalDoubleArrayToBytes(array);
 
         // Compress the byte array
-        byte[] compressedBytes = LZ4.lz4Compress(byteArray);
+        byte[] compressedBytes = LZ4.lz4Compress(byteArray, task);
 
         // Get the number of compressed bytes
         int numCompressedBytes = compressedBytes.length;
@@ -199,7 +220,7 @@ public class AUDTFileWriter {
         byte[] byteArray = IOConverters.twoDimensionalDoubleArrayToBytes(array);
 
         // Compress the byte array
-        byte[] compressedBytes = LZ4.lz4Compress(byteArray);
+        byte[] compressedBytes = LZ4.lz4Compress(byteArray, task);
 
         // Get the number of compressed bytes
         int numCompressedBytes = compressedBytes.length;
@@ -219,7 +240,7 @@ public class AUDTFileWriter {
         byte[] byteArray = IOConverters.twoDimensionalIntegerArrayToBytes(array);
 
         // Compress the byte array
-        byte[] compressedBytes = LZ4.lz4Compress(byteArray);
+        byte[] compressedBytes = LZ4.lz4Compress(byteArray, task);
 
         // Get the number of compressed bytes
         int numCompressedBytes = compressedBytes.length;
