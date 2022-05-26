@@ -58,6 +58,8 @@ public class VQT {
      * @param gamma          Bandwidth offset for determining filter lengths. <code>gamma = 0</code>
      *                       means that the gamma value will be derived automatically.
      * @param windowFunction Window function to apply to the basis filters.
+     * @param task           The <code>CustomTask</code> object that is handling the generation.
+     *                       Pass in <code>null</code> if no such task is being used.
      * @return Variable-Q value each frequency at each time.
      * @throws InvalidParameterException If number of frequency bins is negative or zero.
      * @throws InvalidParameterException If number of bins per octave is negative or zero.
@@ -88,6 +90,8 @@ public class VQT {
      *                       (CQT). Otherwise, <code>gamma = 0</code> means that the gamma value will
      *                       be derived automatically.
      * @param windowFunction Window function to apply to the basis filters.
+     * @param task           The <code>CustomTask</code> object that is handling the generation.
+     *                       Pass in <code>null</code> if no such task is being used.
      * @return Variable-Q value each frequency at each time.
      * @throws InvalidParameterException If number of frequency bins is negative or zero.
      * @throws InvalidParameterException If number of bins per octave is negative or zero.

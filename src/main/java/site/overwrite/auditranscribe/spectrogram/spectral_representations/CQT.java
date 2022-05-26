@@ -2,7 +2,7 @@
  * CQT.java
  *
  * Created on 2022-03-15
- * Updated on 2022-05-25
+ * Updated on 2022-05-26
  *
  * Description: Class that implements the Constant Q-Transform (CQT) algorithm.
  */
@@ -33,6 +33,8 @@ public class CQT {
      * @param numBins        Number of frequency bins, starting at <code>fmin</code>.
      * @param binsPerOctave  Number of bins per octave.
      * @param windowFunction Window specification for the basis filters.
+     * @param task           The <code>CustomTask</code> object that is handling the generation.
+     *                       Pass in <code>null</code> if no such task is being used.
      * @return Constant-Q value each frequency at each time.
      * @throws InvalidParameterException If number of frequency bins is negative or zero.
      * @throws InvalidParameterException If number of bins per octave is negative or zero.

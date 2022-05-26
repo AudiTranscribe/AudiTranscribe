@@ -2,7 +2,7 @@
  * Spectrogram.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-25
+ * Updated on 2022-05-26
  *
  * Description: Spectrogram class.
  */
@@ -69,6 +69,8 @@ public class Spectrogram {
      * @param hopLength      Number of samples between successive columns.
      * @param numPxPerSecond Number of pixels of the spectrogram dedicated to each second of audio.
      * @param numPxPerOctave Number of pixels allocated for each octave.
+     * @param task           The <code>CustomTask</code> object that is handling the generation.
+     *                       Pass in <code>null</code> if no such task is being used.
      * @throws InvalidParameterException If <code>maxNoteNumber - minNoteNumber + 1</code> is not a
      *                                   multiple of 12.
      * @throws InvalidParameterException If the image height is too large.
