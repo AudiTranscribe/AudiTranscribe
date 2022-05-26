@@ -16,6 +16,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.PropertyFile;
 
@@ -76,6 +77,7 @@ public class AboutViewController implements Initializable {
 
             // Set stage properties
             Stage aboutStage = new Stage();
+            aboutStage.initStyle(StageStyle.UTILITY);
             aboutStage.setTitle("About AudiTranscribe");
             aboutStage.setScene(scene);
             aboutStage.setResizable(false);

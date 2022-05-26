@@ -17,6 +17,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.settings_file.SettingsFile;
@@ -116,13 +117,14 @@ public class PreferencesViewController implements Initializable {
             controller.setUpChoiceBoxes();
 
             // Set stage properties
-            Stage aboutStage = new Stage();
-            aboutStage.setTitle("Settings and Preferences");
-            aboutStage.setScene(scene);
-            aboutStage.setResizable(false);
+            Stage preferencesStage = new Stage();
+            preferencesStage.initStyle(StageStyle.UTILITY);
+            preferencesStage.setTitle("Settings and Preferences");
+            preferencesStage.setScene(scene);
+            preferencesStage.setResizable(false);
 
             // Show the stage
-            aboutStage.show();
+            preferencesStage.show();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

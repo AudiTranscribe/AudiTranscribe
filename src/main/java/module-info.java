@@ -10,6 +10,7 @@ module site.overwrite.auditranscribe {
     requires org.apache.commons.lang3;
     requires org.controlsfx.controls;
     requires org.kordamp.bootstrapfx.core;
+    requires org.xerial.sqlitejdbc;
     requires java.logging;
     requires javatuples;
     requires javafx.controls;
