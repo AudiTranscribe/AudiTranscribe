@@ -12,11 +12,6 @@ package site.overwrite.auditranscribe.views.helpers;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
 import javafx.stage.*;
 import org.javatuples.Pair;
 import site.overwrite.auditranscribe.CustomTask;
@@ -36,8 +31,6 @@ import site.overwrite.auditranscribe.views.TranscriptionViewController;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 // Main class
 
@@ -90,12 +83,13 @@ public class ProjectIOHandlers {
                 if (mainStage.isShowing()) mainStage.hide();
                 if (!transcriptionStage.isShowing()) {
                     transcriptionStage.showAndWait();
+                    controller.handleSceneClosing();
                     mainViewController.refreshProjectsListView();
                     mainStage.show();  // Show the main scene upon the spectrogram scene's closure
                 }
 
             } catch (UnsupportedAudioFileException | IOException e) {
-                showExceptionAlert(
+                AlertMessages.showExceptionAlert(
                         "Failed to read '" + file.getName() + "' as a WAV file.",
                         "The program failed to read '" + file.getName() +
                                 "' as a WAV file. Please check if " + "this is a valid WAV file.",
@@ -105,13 +99,7 @@ public class ProjectIOHandlers {
             }
 
         } else {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.initStyle(StageStyle.UTILITY);
-            alert.setTitle("Info");
-            alert.setHeaderText(null);
-            alert.setContentText("No file selected.");
-
-            alert.showAndWait();
+            AlertMessages.showInformationAlert("Info", "No file selected.");
         }
     }
 
@@ -176,12 +164,13 @@ public class ProjectIOHandlers {
                 if (mainStage.isShowing()) mainStage.hide();
                 if (!transcriptionStage.isShowing()) {
                     transcriptionStage.showAndWait();
+                    controller.handleSceneClosing();
                     mainViewController.refreshProjectsListView();
                     mainStage.show();  // Show the main scene upon the spectrogram scene's closure
                 }
 
             } catch (IOException | IncorrectFileFormatException | FailedToReadDataException e) {
-                showExceptionAlert(
+                AlertMessages.showExceptionAlert(
                         "Failed to read '" + file.getName() + "' as an AUDT ile.",
                         "The program failed to read '" + file.getName() +
                                 "' as an AUDT file. Please check if " + "this is a valid AUDT file.",
@@ -190,13 +179,7 @@ public class ProjectIOHandlers {
                 e.printStackTrace();
             }
         } else {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.initStyle(StageStyle.UTILITY);
-            alert.setTitle("Info");
-            alert.setHeaderText(null);
-            alert.setContentText("No file selected.");
-
-            alert.showAndWait();
+            AlertMessages.showInformationAlert("Info", "No file selected.");
         }
     }
 
@@ -233,52 +216,6 @@ public class ProjectIOHandlers {
     }
 
     // Private methods
-
-    /**
-     * Helper method that shows an exception alert.
-     *
-     * @param headerText  Header text for the exception alert.
-     * @param contentText Content text for the exception alert.
-     * @param e           Exception that occurred.
-     */
-    private static void showExceptionAlert(String headerText, String contentText, Exception e) {
-        // Create a new error alert
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-
-        // Set the alert style to `UTILITY` so that it can be shown during fullscreen
-        alert.initStyle(StageStyle.UTILITY);
-
-        // Set texts
-        alert.setTitle("Error");
-        alert.setHeaderText(headerText);
-        alert.setContentText(contentText);
-
-        // Set exception texts
-        Label label = new Label("The exception stacktrace was:");
-
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
-
-        TextArea textArea = new TextArea(sw.toString());
-        textArea.setEditable(false);
-        textArea.setWrapText(true);
-
-        textArea.setMaxWidth(Double.MAX_VALUE);
-        textArea.setMaxHeight(Double.MAX_VALUE);
-        GridPane.setVgrow(textArea, Priority.ALWAYS);
-        GridPane.setHgrow(textArea, Priority.ALWAYS);
-
-        GridPane expContent = new GridPane();
-        expContent.setMaxWidth(Double.MAX_VALUE);
-        expContent.add(label, 0, 0);
-        expContent.add(textArea, 0, 1);
-
-        alert.getDialogPane().setExpandableContent(expContent);
-
-        // Show the alert
-        alert.showAndWait();
-    }
 
     /**
      * Helper method that gets the spectrogram scene and spectrogram view controller.
