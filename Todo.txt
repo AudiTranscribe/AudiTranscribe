@@ -1,15 +1,11 @@
 ====================================================================================================
 Todo (Important):
     - Allow other audio types (e.g. mp3) to be input into the program
-    - Add progress bars
     - Reorganise `utils` and `CustomTask`
 
 Todo (Less Important):
-    - Add licence/credits for ionicons
     - BPM Estimation
-    - Add "Save File As" button
     - Add 'feedback' for successful file saving
-    - Allow setting of note playing volume
 
 Todo (Not Important):
     - Compress the filter data

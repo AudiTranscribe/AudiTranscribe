@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-25
+ * Updated on 2022-05-26
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -528,13 +528,6 @@ public class TranscriptionViewController implements Initializable {
         // Update labels
         totalTimeLabel.setText(UnitConversion.secondsToTimeString(audioDuration));
         currTimeLabel.setText(UnitConversion.secondsToTimeString(currTime));
-
-        // Update playhead
-        try {
-            seekToTime(currTime);
-        } catch (InvalidObjectException e) {
-            throw new RuntimeException(e);
-        }
 
         // Set keyboard button press/release methods
         mainPane.getScene().addEventFilter(KeyEvent.KEY_PRESSED, this::keyPressEventHandler);
@@ -1096,31 +1089,38 @@ public class TranscriptionViewController implements Initializable {
             spectrogramPane.setPrefWidth(finalWidth);
             spectrogramPane.setPrefHeight(finalHeight);
 
-            // Show the spectrogram from the middle
-            // Fixme: this doesn't work
-//            System.out.println(spectrogramPane.getMinHeight() + " " + spectrogramPane.getMaxHeight());
-//            System.out.println(spectrogramPane.getVvalue());
-//            spectrogramPane.setMinSize(0, 0);
-//            spectrogramPane.setMaxSize(finalWidth, finalHeight);
-            spectrogramPane.setVvalue(0.5);
-//            System.out.println(spectrogramPane.getMinHeight() + " " + spectrogramPane.getMaxHeight());
-//            System.out.println(spectrogramPane.getVvalue());
+            // Settle layout of the main pane
+            mainPane.layout();
 
-            // Ensure main pane is in focus
-            rootPane.requestFocus();
+            // Show the spectrogram from the middle
+            spectrogramPane.setVvalue(0.5);
 
             // Hide the progress bar HBox
             progressBarHBox.setVisible(false);
             isSpectrogramReady = true;
+
+            // Update playhead position
+            try {
+                seekToTime(currTime);
+                updateScrollPosition(
+                        currTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X,
+                        spectrogramPane.getWidth()
+                );
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
+
+            // Ensure main pane is in focus
+            rootPane.requestFocus();
 
             // Report that the transcription view is ready to be shown
             logger.log(Level.INFO, "Spectrogram for " + audioFileName + " ready to be shown");
         });
 
         // Start task on an alternate thread
-        Thread th = new Thread(task);
-        th.setDaemon(true);
-        th.start();
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
     }
 
     /**
