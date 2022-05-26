@@ -68,7 +68,7 @@ public class LZ4 {
 
         while ((len = inputStream.read(buf)) > 0) {
             out.write(buf, 0, len);
-            task.updateProgress(++currPass, numPasses);
+            if (task != null) task.updateProgress(++currPass, numPasses);
         }
 
         // Close streams
