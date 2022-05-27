@@ -2,7 +2,7 @@
  * Audio.java
  *
  * Created on 2022-02-13
- * Updated on 2022-05-25
+ * Updated on 2022-05-27
  *
  * Description: Class that handles audio processing and audio playback.
  */
@@ -292,16 +292,16 @@ public class Audio {
      * @return Array representing the resampled signal.
      * @throws ValueException If: <ul>
      *                        <li>
-     *                            Either <code>srOrig</code> or <code>srFinal</code> is not
-     *                            positive.
+     *                        Either <code>srOrig</code> or <code>srFinal</code> is not
+     *                        positive.
      *                        </li>
      *                        <li>
-     *                            The input signal length is too short to be resampled to the
-     *                            desired sample rate.
+     *                        The input signal length is too short to be resampled to the
+     *                        desired sample rate.
      *                        </li>
      *                        </ul>
-     * @implNote Core algorithm is taken from
-     * <a href="https://github.com/bmcfee/resampy/blob/ccb8557/resampy/core.py">Resampy</a>.
+     * @see <a href="https://github.com/bmcfee/resampy/blob/ccb8557/resampy/core.py">Resampy</a>,
+     * where the main core of the code was taken from.
      */
     public static double[] resample(double[] x, double srOrig, double srFinal, Filter resType, boolean scale) throws ValueException {
         // Validate sample rates
