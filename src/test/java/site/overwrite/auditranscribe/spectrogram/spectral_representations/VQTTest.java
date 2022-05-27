@@ -2,7 +2,7 @@
  * VQTTest.java
  *
  * Created on 2022-04-10
- * Updated on 2022-05-25
+ * Updated on 2022-05-27
  *
  * Description: Test `VQT.java`.
  */
@@ -127,8 +127,8 @@ class VQTTest {
         };
 
         // Assertions
-        assertArrayEquals(correctFreqBins1, freqBins1);
-        assertArrayEquals(correctFreqBins2, freqBins2);
-        assertArrayEquals(correctFreqBins3, freqBins3);
+        assertArrayEquals(correctFreqBins1, freqBins1, 1e-5);
+        assertArrayEquals(correctFreqBins2, freqBins2, 1e-5);
+        assertArrayEquals(correctFreqBins3, freqBins3, 1e-5);
     }
 }
