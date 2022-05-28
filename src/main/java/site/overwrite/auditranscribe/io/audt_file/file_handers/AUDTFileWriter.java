@@ -2,14 +2,14 @@
  * AUDTFileWriter.java
  *
  * Created on 2022-05-01
- * Updated on 2022-05-26
+ * Updated on 2022-05-28
  *
  * Description: Class that handles the writing of the AudiTranscribe (AUDT) file.
  */
 
 package site.overwrite.auditranscribe.io.audt_file.file_handers;
 
-import site.overwrite.auditranscribe.CustomTask;
+import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.io.IOConverters;
 import site.overwrite.auditranscribe.io.LZ4;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;

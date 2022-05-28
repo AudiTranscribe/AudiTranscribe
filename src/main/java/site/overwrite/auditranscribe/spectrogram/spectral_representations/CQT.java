@@ -2,17 +2,17 @@
  * CQT.java
  *
  * Created on 2022-03-15
- * Updated on 2022-05-26
+ * Updated on 2022-05-28
  *
  * Description: Class that implements the Constant Q-Transform (CQT) algorithm.
  */
 
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
-import site.overwrite.auditranscribe.CustomTask;
+import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.exceptions.ValueException;
-import site.overwrite.auditranscribe.utils.Complex;
+import site.overwrite.auditranscribe.misc.Complex;
 
 /**
  * CQT class that contains Constant-Q Transform (CQT) methods.

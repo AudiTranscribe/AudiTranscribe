@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-26
+ * Updated on 2022-05-28
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -29,7 +29,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.javatuples.Pair;
-import site.overwrite.auditranscribe.CustomTask;
+import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.io.settings_file.SettingsFile;
@@ -430,16 +430,16 @@ public class TranscriptionViewController implements Initializable {
                 ) {
                     // Compute the frequency that the mouse click would correspond to
                     double estimatedFreq = PlottingHelpers.heightToFreq(
-                            clickY, UnitConversion.noteNumberToFreq(MIN_NOTE_NUMBER),
-                            UnitConversion.noteNumberToFreq(MAX_NOTE_NUMBER), spectrogramPaneAnchor.getHeight()
+                            clickY, UnitConversionUtils.noteNumberToFreq(MIN_NOTE_NUMBER),
+                            UnitConversionUtils.noteNumberToFreq(MAX_NOTE_NUMBER), spectrogramPaneAnchor.getHeight()
                     );
 
                     // Now estimate the note number
-                    int estimatedNoteNum = (int) Math.round(UnitConversion.freqToNoteNumber(estimatedFreq));
+                    int estimatedNoteNum = (int) Math.round(UnitConversionUtils.freqToNoteNumber(estimatedFreq));
 
                     // Play the note
                     try {
-                        logger.log(Level.FINE, "Playing " + UnitConversion.noteNumberToNote(estimatedNoteNum, false));
+                        logger.log(Level.FINE, "Playing " + UnitConversionUtils.noteNumberToNote(estimatedNoteNum, false));
                         notePlayer.playNoteForDuration(
                                 estimatedNoteNum, NOTE_PLAYING_ON_VELOCITY, NOTE_PLAYING_OFF_VELOCITY,
                                 NOTE_PLAYING_ON_DURATION, NOTE_PLAYING_OFF_DURATION
@@ -533,8 +533,8 @@ public class TranscriptionViewController implements Initializable {
         volumeSlider.setValue(volume);
 
         // Update labels
-        totalTimeLabel.setText(UnitConversion.secondsToTimeString(audioDuration));
-        currTimeLabel.setText(UnitConversion.secondsToTimeString(currTime));
+        totalTimeLabel.setText(UnitConversionUtils.secondsToTimeString(audioDuration));
+        currTimeLabel.setText(UnitConversionUtils.secondsToTimeString(currTime));
 
         // Set keyboard button press/release methods
         mainPane.getScene().addEventFilter(KeyEvent.KEY_PRESSED, this::keyPressEventHandler);
@@ -757,7 +757,7 @@ public class TranscriptionViewController implements Initializable {
 
         // Update the current time and current time label
         currTime = seekTime;
-        currTimeLabel.setText(UnitConversion.secondsToTimeString(seekTime));
+        currTimeLabel.setText(UnitConversionUtils.secondsToTimeString(seekTime));
 
         // Update coloured progress pane and playhead line
         double newXPos = seekTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X;
@@ -1080,7 +1080,7 @@ public class TranscriptionViewController implements Initializable {
                     }
 
                     // Update the current time label
-                    Platform.runLater(() -> currTimeLabel.setText(UnitConversion.secondsToTimeString(currTime)));
+                    Platform.runLater(() -> currTimeLabel.setText(UnitConversionUtils.secondsToTimeString(currTime)));
 
                     // Update coloured progress pane and playhead line
                     double newPosX = currTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X;

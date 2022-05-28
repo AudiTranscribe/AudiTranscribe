@@ -2,12 +2,14 @@
  * Complex.java
  *
  * Created on 2022-02-12
- * Updated on 2022-03-15
+ * Updated on 2022-05-28
  *
  * Description: Complex number class.
  */
 
-package site.overwrite.auditranscribe.utils;
+package site.overwrite.auditranscribe.misc;
+
+import site.overwrite.auditranscribe.utils.MathUtils;
 
 import java.util.Objects;
 

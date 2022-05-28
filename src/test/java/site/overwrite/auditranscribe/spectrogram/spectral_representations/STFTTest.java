@@ -2,16 +2,16 @@
  * STFTTest.java
  *
  * Created on 2022-04-10
- * Updated on 2022-05-14
+ * Updated on 2022-05-28
  *
- * Description: Test `STFT.java`
+ * Description: Test `STFT.java`.
  */
 
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.audio.WindowFunction;
-import site.overwrite.auditranscribe.utils.Complex;
+import site.overwrite.auditranscribe.misc.Complex;
 
 import static org.junit.jupiter.api.Assertions.*;
 

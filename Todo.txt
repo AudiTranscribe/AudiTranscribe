@@ -1,7 +1,6 @@
 ====================================================================================================
 Todo (Important):
     - Allow other audio types (e.g. mp3) to be input into the program
-    - Reorganise `utils` and `CustomTask`
 
 Todo (Less Important):
     - BPM Estimation

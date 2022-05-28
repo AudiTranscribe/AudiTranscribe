@@ -2,15 +2,15 @@
  * FFTTest.java
  *
  * Created on 2022-04-10
- * Updated on 2022-04-15
+ * Updated on 2022-05-28
  *
- * Description: Test `FFT.java`
+ * Description: Test `FFT.java`.
  */
 
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
 import org.junit.jupiter.api.Test;
-import site.overwrite.auditranscribe.utils.Complex;
+import site.overwrite.auditranscribe.misc.Complex;
 
 import static org.junit.jupiter.api.Assertions.*;
 

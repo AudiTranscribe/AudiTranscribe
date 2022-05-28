@@ -2,7 +2,7 @@
  * LZ4.java
  *
  * Created on 2022-05-04
- * Updated on 2022-05-26
+ * Updated on 2022-05-28
  *
  * Description: Class that encapsulates LZ4 compression/decompression on byte arrays.
  */
@@ -11,7 +11,7 @@ package site.overwrite.auditranscribe.io;
 
 import org.apache.commons.compress.compressors.lz4.BlockLZ4CompressorInputStream;
 import org.apache.commons.compress.compressors.lz4.BlockLZ4CompressorOutputStream;
-import site.overwrite.auditranscribe.CustomTask;
+import site.overwrite.auditranscribe.misc.CustomTask;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

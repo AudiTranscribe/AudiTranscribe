@@ -2,7 +2,7 @@
  * PlottingHelpers.java
  *
  * Created on 2022-03-19
- * Updated on 2022-05-25
+ * Updated on 2022-05-28
  *
  * Description: Helper functions for plotting.
  */
@@ -10,7 +10,7 @@
 package site.overwrite.auditranscribe.plotting;
 
 import site.overwrite.auditranscribe.utils.MathUtils;
-import site.overwrite.auditranscribe.utils.UnitConversion;
+import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 /**
  * Helper functions for plotting.
@@ -68,9 +68,9 @@ public class PlottingHelpers {
      */
     public static double noteNumToHeight(int noteNum, int minNoteNum, int maxNoteNum, double maxHeight) {
         // Convert all the notes to frequencies
-        double freq = UnitConversion.noteNumberToFreq(noteNum);
-        double minFreq = UnitConversion.noteNumberToFreq(minNoteNum);
-        double maxFreq = UnitConversion.noteNumberToFreq(maxNoteNum);
+        double freq = UnitConversionUtils.noteNumberToFreq(noteNum);
+        double minFreq = UnitConversionUtils.noteNumberToFreq(minNoteNum);
+        double maxFreq = UnitConversionUtils.noteNumberToFreq(maxNoteNum);
 
         // Now get the assigned height
         return freqToHeight(freq, minFreq, maxFreq, maxHeight);
