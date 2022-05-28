@@ -1,17 +1,17 @@
 #!/bin/zsh
 
 # Constants
-GROUP_IDS=("org.apache.commons" "org.apache.commons" "org.apache.commons" "net.harawata" "org.javatuples" "org.xerial")
-ARTIFACT_IDS=("commons-compress" "commons-exec" "commons-lang3" "appdirs" "javatuples" "sqlite-jdbc")
-MODULE_NAMES=("org.apache.commons.compress" "commons.exec" "org.apache.commons.lang3" "net.harawata.appdirs" "javatuples" "org.xerial.sqlitejdbc")
-MODULE_VERSIONS=("1.21" "1.3" "3.12.0" "1.2.1" "1.2" "3.36.0.3")
-MODULE_JARS=("commons-compress-1.21.jar" "commons-exec-1.3.jar" "commons-lang3-3.12.0.jar" "appdirs-1.2.1.jar" "javatuples-1.2.jar" "sqlite-jdbc-3.36.0.3.jar")
+GROUP_IDS=("org.apache.commons" "org.apache.commons" "org.apache.commons" "org.javatuples" "org.xerial")
+ARTIFACT_IDS=("commons-compress" "commons-exec" "commons-lang3" "javatuples" "sqlite-jdbc")
+MODULE_NAMES=("org.apache.commons.compress" "commons.exec" "org.apache.commons.lang3" "javatuples" "org.xerial.sqlitejdbc")
+MODULE_VERSIONS=("1.21" "1.3" "3.12.0" "1.2" "3.36.0.3")
+MODULE_JARS=("commons-compress-1.21.jar" "commons-exec-1.3.jar" "commons-lang3-3.12.0.jar" "javatuples-1.2.jar" "sqlite-jdbc-3.36.0.3.jar")
 
 # Get local Maven repository
 repositoryDir=$(mvn help:evaluate -Dexpression=settings.localRepository -q -DforceStdout)
 
 # Iterate through each one of the problematic modules
-for i in {1..6}; do
+for i in {1..5}; do
   # Get the module name and version
   groupID=${GROUP_IDS[$i]}
   artifactID=${ARTIFACT_IDS[$i]}
@@ -35,7 +35,7 @@ for i in {1..6}; do
     if [ $? -ne 0 ]; then
       # If we still can't generate the module-info.java file, then we're done
       echo "Failed to generate module-info.java for ${artifactID} (${moduleVersion})"
-      exit 1
+      continue # Skip to the next module
     fi
   fi
 
