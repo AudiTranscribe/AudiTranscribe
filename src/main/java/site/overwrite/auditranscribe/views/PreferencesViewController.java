@@ -21,6 +21,7 @@ import javafx.stage.StageStyle;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.settings_file.SettingsFile;
+import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
 
 import java.io.IOException;
@@ -45,16 +46,17 @@ public class PreferencesViewController implements Initializable {
     private ChoiceBox<WindowFunction> windowFunctionChoiceBox;
 
     @FXML
+    private ChoiceBox<Theme> themeChoiceBox;
+
+    @FXML
     private Button cancelButton, applyButton, okButton;
 
     // Initialization method
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Add CSS stylesheets to the scene
-        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
-        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/light-mode.css"));  // Todo: add theme support
-
         // Set choice box selections
+        for (Theme theme : Theme.values()) themeChoiceBox.getItems().add(theme);
+
         for (ColourScale colourScale : ColourScale.values()) colourScaleChoiceBox.getItems().add(colourScale);
         for (WindowFunction windowFunction : WindowFunction.values())
             windowFunctionChoiceBox.getItems().add(windowFunction);
@@ -81,11 +83,34 @@ public class PreferencesViewController implements Initializable {
     // Public methods
 
     /**
+     * Method that sets the CSS stylesheets for the scene.<br>
+     * Note that this method has to be called after the setting file has been set.
+     *
+     * @param theme The theme to set the CSS stylesheets for.
+     */
+    public void setCSSOnScene(Theme theme) {
+        rootPane.getStylesheets().clear();  // Reset the stylesheets first before adding new ones
+
+        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
+        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/" + theme.cssFile));
+    }
+
+    /**
+     * Method that sets the CSS stylesheets for the scene.<br>
+     * Note that this method has to be called after the setting file has been set.
+     */
+    public void setCSSOnScene() {
+        setCSSOnScene(Theme.values()[settingsFile.settingsData.themeEnumOrdinal]);
+    }
+
+    /**
      * Method that sets up the choice boxes <b>after</b> the <code>settingsFile</code> attribute has
      * been set.
      */
     public void setUpChoiceBoxes() {
         // Set choice box values
+        themeChoiceBox.setValue(Theme.values()[settingsFile.settingsData.themeEnumOrdinal]);
+
         colourScaleChoiceBox.setValue(ColourScale.values()[settingsFile.settingsData.colourScaleEnumOrdinal]);
         windowFunctionChoiceBox.setValue(WindowFunction.values()[settingsFile.settingsData.windowFunctionEnumOrdinal]);
 
@@ -93,6 +118,11 @@ public class PreferencesViewController implements Initializable {
         for (ChoiceBox<?> choiceBox : new ChoiceBox[]{colourScaleChoiceBox, windowFunctionChoiceBox}) {
             choiceBox.setOnAction(event -> applyButton.setDisable(false));
         }
+
+        themeChoiceBox.setOnAction(event -> {
+            applyButton.setDisable(false);
+            setCSSOnScene(themeChoiceBox.getValue());
+        });
     }
 
     /**
@@ -112,6 +142,9 @@ public class PreferencesViewController implements Initializable {
 
             // Update the `settingsFile` attribute
             controller.setSettingsFile(settingsFile);
+
+            // Set the theme of the scene
+            controller.setCSSOnScene();
 
             // Set choice boxes' values
             controller.setUpChoiceBoxes();
@@ -144,6 +177,8 @@ public class PreferencesViewController implements Initializable {
      */
     private void applySettings() {
         // Update settings' values
+        settingsFile.settingsData.themeEnumOrdinal = themeChoiceBox.getValue().ordinal();
+
         settingsFile.settingsData.colourScaleEnumOrdinal = colourScaleChoiceBox.getValue().ordinal();
         settingsFile.settingsData.windowFunctionEnumOrdinal = windowFunctionChoiceBox.getValue().ordinal();
 
