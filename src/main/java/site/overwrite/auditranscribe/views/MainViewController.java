@@ -253,7 +253,8 @@ public class MainViewController implements Initializable {
                     )
             );
         } else {
-            projectsListView.setBackground(Background.fill(Color.TRANSPARENT));
+            logger.log(Level.INFO, "No projects found");
+            projectsListView.opacityProperty().set(0);
         }
     }
 

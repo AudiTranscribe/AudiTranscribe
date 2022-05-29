@@ -96,7 +96,7 @@
             </StackPane>
             <StackPane prefHeight="357.0" prefWidth="800.0">
                <children>
-                  <VBox alignment="CENTER" prefHeight="357.0" prefWidth="800.0" style="-fx-background-color: white; -fx-border-color: lightgray;">
+                  <VBox alignment="CENTER" prefHeight="357.0" prefWidth="800.0" styleClass="no-projects-vbox">
                      <children>
                         <Label alignment="CENTER" text="No Projects Yet...">
                            <font>
