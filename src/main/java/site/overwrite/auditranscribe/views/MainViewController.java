@@ -2,7 +2,7 @@
  * MainViewController.java
  *
  * Created on 2022-02-09
- * Updated on 2022-05-25
+ * Updated on 2022-05-29
  *
  * Description: Contains the main view's controller class.
  */
@@ -31,7 +31,9 @@ import org.javatuples.Quartet;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.PropertyFile;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
+import site.overwrite.auditranscribe.io.settings_file.SettingsData;
 import site.overwrite.auditranscribe.io.settings_file.SettingsFile;
+import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.utils.MiscUtils;
 import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
 
@@ -81,7 +83,207 @@ public class MainViewController implements Initializable {
     private TextField searchTextField;
 
     @FXML
+    private ImageView searchImage;
+
+    @FXML
     private ListView<Quartet<Long, String, String, String>> projectsListView;
+
+    // Initialization method
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        // Make macOS systems use the system menu bar
+        final String os = System.getProperty("os.name");
+        if (os != null && os.startsWith("Mac")) {
+            menuBar.useSystemMenuBarProperty().set(true);
+        }
+
+        // Get the current version
+        try {
+            // Get the project properties file
+            PropertyFile projectPropertiesFile = new PropertyFile("project.properties");
+
+            // Update the version label with the version number
+            versionLabel.setText("Version " + projectPropertiesFile.getProperty("version"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Add methods to buttons
+        newProjectButton.setOnAction(this::handleNewProject);
+
+        openProjectButton.setOnAction(this::handleOpenProject);
+
+        // Set the search field method
+        searchTextField.textProperty().addListener((observable, oldValue, newValue) ->
+                filteredList.setPredicate(projectRecord -> {
+                    // If filter text is empty, display all projects
+                    if (newValue == null || newValue.isEmpty()) return true;
+
+                    // Attempt to find a match within the *file path*
+                    String searchFilter = newValue.toLowerCase();
+                    String lowercaseFilepath = projectRecord.getValue2().toLowerCase();
+
+                    return lowercaseFilepath.contains(searchFilter);
+                })
+        );
+
+        // Update the projects list view
+        projectsListView.setOnMouseClicked(mouseEvent -> {
+            // Get the selected item
+            Quartet<Long, String, String, String> selectedItem =
+                    projectsListView.getSelectionModel().getSelectedItem();
+
+            // Check if an item was selected
+            if (selectedItem != null) {
+                // Get the file of the selected item
+                String filepath = selectedItem.getValue2();
+                File file = new File(filepath);
+
+                // Get the window
+                Window window = rootPane.getScene().getWindow();
+
+                // Open the project with the filepath
+                ProjectIOHandlers.openProject((Stage) window, transcriptionStage, file, settingsFile, this);
+            }
+        });
+
+        refreshProjectsListView();
+
+        // Add methods to menu items
+        newProjectMenuItem.setOnAction(this::handleNewProject);
+
+        openProjectMenuItem.setOnAction(this::handleOpenProject);
+
+        preferencesMenuItem.setOnAction(actionEvent -> PreferencesViewController.showPreferencesWindow(settingsFile));
+
+        aboutMenuItem.setOnAction(actionEvent -> AboutViewController.showAboutWindow(settingsFile));
+
+        // Report that the main view is ready to be shown
+        logger.log(Level.INFO, "Main view ready to be shown");
+    }
+
+    // Public methods
+
+    /**
+     * Method that sets the theme for the scene.
+     */
+    public void setThemeOnScene() {
+        // Get the theme
+        Theme theme = Theme.values()[settingsFile.settingsData.themeEnumOrdinal];
+
+        // Set stylesheets
+        rootPane.getStylesheets().clear();  // Reset the stylesheets first before adding new ones
+
+        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
+        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/" + theme.cssFile));
+
+        // Set graphics
+        searchImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/icons/PNGs/" + theme.shortName + "/search.png"
+        )));
+    }
+
+    /**
+     * Method to refresh the projects' list view.
+     */
+    public void refreshProjectsListView() {
+        // Get all projects' records
+        List<Quartet<Long, String, String, String>> projects = new ArrayList<>();
+
+        try {
+            // Get the projects database
+            projectsDB = new ProjectsDB();
+
+            // Get all projects' records
+            Map<Integer, Pair<String, String>> projectRecords = projectsDB.getAllProjects();
+
+            // Get all the keys
+            Set<Integer> keys = projectRecords.keySet();
+
+            // For each file, get their last accessed time and generate the shortened name
+            for (int key : keys) {
+                // Get both the filepath and the filename
+                Pair<String, String> values = projectRecords.get(key);
+                String filepath = values.getValue0();
+                String filename = values.getValue1();
+
+                // Add the project to the records
+                BasicFileAttributes attributes;
+                try {
+                    // Get the last modified time of the file
+                    attributes = Files.readAttributes(Path.of(filepath), BasicFileAttributes.class);
+
+                    FileTime lastModifiedTime = attributes.lastModifiedTime();
+                    long lastModifiedTimestamp = lastModifiedTime.toMillis();
+
+                    // Get the shortened name of the file name
+                    filename = filename.substring(0, filename.length() - 5);  // Exclude the ".audt" at the end
+                    String shortenedName = MiscUtils.getShortenedName(filename);
+
+                    // Add to the list of projects
+                    projects.add(new Quartet<>(lastModifiedTimestamp, filename, filepath, shortenedName));
+                } catch (NoSuchFileException e) {
+                    projectsDB.deleteProjectRecord(key);
+                }
+            }
+
+            // Sort the list of projects by the last access timestamp
+            projects.sort(new SortByTimestamp());
+
+        } catch (SQLException | IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Convert the `projects` list to an FXML `ObservableList` and a `FilteredList` to allow for searching
+        ObservableList<Quartet<Long, String, String, String>> projectsList = FXCollections.observableList(projects);
+        filteredList = new FilteredList<>(projectsList);
+
+        if (projectsList.size() != 0) {
+            projectsListView.setBackground(Background.fill(Color.WHITE));
+            projectsListView.setItems(new SortedList<>(filteredList));  // Use a sorted list for searching
+            projectsListView.setCellFactory(
+                    customListCellListView -> new CustomListCell(
+                            projectsDB, projectsListView, settingsFile.settingsData
+                    )
+            );
+        } else {
+            projectsListView.setBackground(Background.fill(Color.TRANSPARENT));
+        }
+    }
+
+    // Private methods
+
+    /**
+     * Helper method that helps open a new project.
+     *
+     * @param actionEvent Event that triggered this function.
+     */
+    private void handleNewProject(ActionEvent actionEvent) {
+        // Get the current window
+        Window window = rootPane.getScene().getWindow();
+
+        // Get user to select a file
+        File file = ProjectIOHandlers.getFileFromFileDialog(window);
+
+        // Create the new project
+        ProjectIOHandlers.newProject((Stage) window, transcriptionStage, file, settingsFile, this);
+    }
+
+    /**
+     * Helper method that helps open an existing project.
+     *
+     * @param actionEvent Event that triggered this function.
+     */
+    private void handleOpenProject(ActionEvent actionEvent) {
+        // Get the current window
+        Window window = rootPane.getScene().getWindow();
+
+        // Get user to select a file
+        File file = ProjectIOHandlers.getFileFromFileDialog(window);
+
+        // Open the existing project
+        ProjectIOHandlers.openProject((Stage) window, transcriptionStage, file, settingsFile, this);
+    }
 
     // Helper classes
     static class CustomListCell extends ListCell<Quartet<Long, String, String, String>> {
@@ -103,7 +305,7 @@ public class MainViewController implements Initializable {
 
         Button removeButton;
 
-        public CustomListCell(ProjectsDB db, ListView<?> projectsListView) {
+        public CustomListCell(ProjectsDB db, ListView<?> projectsListView, SettingsData settingsData) {
             // Call superclass initialization method
             super();
 
@@ -138,7 +340,11 @@ public class MainViewController implements Initializable {
 
             // Set the removal button's style and method
             ImageView removeButtonGraphic = new ImageView(
-                    new Image(IOMethods.getFileURLAsString("images/icons/PNGs/close.png"))
+                    new Image(IOMethods.getFileURLAsString(
+                            "images/icons/PNGs/" +
+                                    Theme.values()[settingsData.themeEnumOrdinal].shortName +
+                                    "/close.png"
+                    ))
             );
             removeButtonGraphic.setFitWidth(40);
             removeButtonGraphic.setFitHeight(40);
@@ -230,181 +436,5 @@ public class MainViewController implements Initializable {
         ) {
             return (int) -(o1.getValue0() - o2.getValue0());  // Sort in descending order
         }
-    }
-
-    // Initialization method
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Make macOS systems use the system menu bar
-        final String os = System.getProperty("os.name");
-        if (os != null && os.startsWith("Mac")) {
-            menuBar.useSystemMenuBarProperty().set(true);
-        }
-
-        // Get the current version
-        try {
-            // Get the project properties file
-            PropertyFile projectPropertiesFile = new PropertyFile("project.properties");
-
-            // Update the version label with the version number
-            versionLabel.setText("Version " + projectPropertiesFile.getProperty("version"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        // Add methods to buttons
-        newProjectButton.setOnAction(this::handleNewProject);
-
-        openProjectButton.setOnAction(this::handleOpenProject);
-
-        // Set the search field method
-        searchTextField.textProperty().addListener((observable, oldValue, newValue) ->
-                filteredList.setPredicate(projectRecord -> {
-                    // If filter text is empty, display all projects
-                    if (newValue == null || newValue.isEmpty()) return true;
-
-                    // Attempt to find a match within the *file path*
-                    String searchFilter = newValue.toLowerCase();
-                    String lowercaseFilepath = projectRecord.getValue2().toLowerCase();
-
-                    return lowercaseFilepath.contains(searchFilter);
-                })
-        );
-
-        // Update the projects list view
-        projectsListView.setOnMouseClicked(mouseEvent -> {
-            // Get the selected item
-            Quartet<Long, String, String, String> selectedItem =
-                    projectsListView.getSelectionModel().getSelectedItem();
-
-            // Check if an item was selected
-            if (selectedItem != null) {
-                // Get the file of the selected item
-                String filepath = selectedItem.getValue2();
-                File file = new File(filepath);
-
-                // Get the window
-                Window window = rootPane.getScene().getWindow();
-
-                // Open the project with the filepath
-                ProjectIOHandlers.openProject((Stage) window, transcriptionStage, file, settingsFile, this);
-            }
-        });
-
-        refreshProjectsListView();
-
-        // Add methods to menu items
-        newProjectMenuItem.setOnAction(this::handleNewProject);
-
-        openProjectMenuItem.setOnAction(this::handleOpenProject);
-
-        preferencesMenuItem.setOnAction(actionEvent -> PreferencesViewController.showPreferencesWindow(settingsFile));
-
-        aboutMenuItem.setOnAction(actionEvent -> AboutViewController.showAboutWindow());
-
-        // Report that the main view is ready to be shown
-        logger.log(Level.INFO, "Main view ready to be shown");
-    }
-
-    // Public methods
-
-    /**
-     * Method to refresh the projects' list view.
-     */
-    public void refreshProjectsListView() {
-        // Get all projects' records
-        List<Quartet<Long, String, String, String>> projects = new ArrayList<>();
-
-        try {
-            // Get the projects database
-            projectsDB = new ProjectsDB();
-
-            // Get all projects' records
-            Map<Integer, Pair<String, String>> projectRecords = projectsDB.getAllProjects();
-
-            // Get all the keys
-            Set<Integer> keys = projectRecords.keySet();
-
-            // For each file, get their last accessed time and generate the shortened name
-            for (int key : keys) {
-                // Get both the filepath and the filename
-                Pair<String, String> values = projectRecords.get(key);
-                String filepath = values.getValue0();
-                String filename = values.getValue1();
-
-                // Add the project to the records
-                BasicFileAttributes attributes;
-                try {
-                    // Get the last modified time of the file
-                    attributes = Files.readAttributes(Path.of(filepath), BasicFileAttributes.class);
-
-                    FileTime lastModifiedTime = attributes.lastModifiedTime();
-                    long lastModifiedTimestamp = lastModifiedTime.toMillis();
-
-                    // Get the shortened name of the file name
-                    filename = filename.substring(0, filename.length() - 5);  // Exclude the ".audt" at the end
-                    String shortenedName = MiscUtils.getShortenedName(filename);
-
-                    // Add to the list of projects
-                    projects.add(new Quartet<>(lastModifiedTimestamp, filename, filepath, shortenedName));
-                } catch (NoSuchFileException e) {
-                    projectsDB.deleteProjectRecord(key);
-                }
-            }
-
-            // Sort the list of projects by the last access timestamp
-            projects.sort(new SortByTimestamp());
-
-        } catch (SQLException | IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        // Convert the `projects` list to an FXML `ObservableList` and a `FilteredList` to allow for searching
-        ObservableList<Quartet<Long, String, String, String>> projectsList = FXCollections.observableList(projects);
-        filteredList = new FilteredList<>(projectsList);
-
-        if (projectsList.size() != 0) {
-            projectsListView.setBackground(Background.fill(Color.WHITE));
-            projectsListView.setItems(new SortedList<>(filteredList));  // Use a sorted list for searching
-            projectsListView.setCellFactory(
-                    customListCellListView -> new CustomListCell(projectsDB, projectsListView)
-            );
-        } else {
-            projectsListView.setBackground(Background.fill(Color.TRANSPARENT));
-        }
-    }
-
-    // Private methods
-
-    /**
-     * Helper method that helps open a new project.
-     *
-     * @param actionEvent Event that triggered this function.
-     */
-    private void handleNewProject(ActionEvent actionEvent) {
-        // Get the current window
-        Window window = rootPane.getScene().getWindow();
-
-        // Get user to select a file
-        File file = ProjectIOHandlers.getFileFromFileDialog(window);
-
-        // Create the new project
-        ProjectIOHandlers.newProject((Stage) window, transcriptionStage, file, settingsFile, this);
-    }
-
-    /**
-     * Helper method that helps open an existing project.
-     *
-     * @param actionEvent Event that triggered this function.
-     */
-    private void handleOpenProject(ActionEvent actionEvent) {
-        // Get the current window
-        Window window = rootPane.getScene().getWindow();
-
-        // Get user to select a file
-        File file = ProjectIOHandlers.getFileFromFileDialog(window);
-
-        // Open the existing project
-        ProjectIOHandlers.openProject((Stage) window, transcriptionStage, file, settingsFile, this);
     }
 }

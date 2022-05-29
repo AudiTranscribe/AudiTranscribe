@@ -11,7 +11,7 @@
 /* TRANSCRIPTION PAGE */
 /* Labels */
 .display-label {
-    -fx-text-fill: #000000ff;
+    -fx-fill: #000000ff;
 }
 
 /* Spectrogram */
@@ -46,6 +46,11 @@
 
 .playhead-line {
     -fx-stroke: #00bfffff;
+}
+
+.volume-slider .track {
+    -slider-unfilled-colour: #e0e0e0ff;
+    -slider-filled-colour: #6caad9ff;
 }
 
 /* PREFERENCES PAGE */

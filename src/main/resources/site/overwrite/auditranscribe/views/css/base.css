@@ -5,6 +5,10 @@
 }
 
 /* Buttons */
+.button {
+    -fx-cursor: hand;
+}
+
 .image-button {
     -fx-background-color: transparent;
 }

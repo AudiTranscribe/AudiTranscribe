@@ -2,7 +2,7 @@
  * AboutViewController.java
  *
  * Created on 2022-05-08
- * Updated on 2022-05-25
+ * Updated on 2022-05-29
  *
  * Description: View controller for the "about" window.
  */
@@ -15,10 +15,15 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.PropertyFile;
+import site.overwrite.auditranscribe.io.settings_file.SettingsFile;
+import site.overwrite.auditranscribe.misc.Theme;
 
 import java.awt.*;
 import java.io.IOException;
@@ -34,13 +39,20 @@ public class AboutViewController implements Initializable {
     Desktop desktop = Desktop.getDesktop();
 
     private final Logger logger = Logger.getLogger(this.getClass().getName());
+    private SettingsFile settingsFile;
 
     // FXML Elements
     @FXML
-    public Label versionLabel;
+    private Pane rootPane;
 
     @FXML
-    public Hyperlink websiteHyperlink, licencesHyperlink;
+    private ImageView bannerImage;
+
+    @FXML
+    private Label versionLabel;
+
+    @FXML
+    private Hyperlink websiteHyperlink, licencesHyperlink;
 
     // Initialization method
     @Override
@@ -64,16 +76,52 @@ public class AboutViewController implements Initializable {
         }
     }
 
+    // Setter methods
+    public void setSettingsFile(SettingsFile settingsFile) {
+        this.settingsFile = settingsFile;
+    }
+
     // Public methods
 
     /**
-     * Method that shows the "about" window.
+     * Method that sets the theme for the scene.
      */
-    public static void showAboutWindow() {
+    public void setThemeOnScene() {
+        // Get the theme
+        Theme theme = Theme.values()[settingsFile.settingsData.themeEnumOrdinal];
+
+        // Set stylesheets
+        rootPane.getStylesheets().clear();  // Reset the stylesheets first before adding new ones
+
+        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
+        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/" + theme.cssFile));
+
+        // Set graphics
+        bannerImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/logo-and-banner/banner-" + theme.shortName + ".png"
+        )));
+    }
+
+    /**
+     * Method that shows the "about" window.
+     *
+     * @param settingsFile The <code>SettingsFile</code> object that handles the reading and writing
+     *                     of settings.
+     */
+    public static void showAboutWindow(SettingsFile settingsFile) {
         try {
             // Load the FXML file into the scene
             FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/about-view.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
+
+            // Get the view controller
+            AboutViewController controller = fxmlLoader.getController();
+
+            // Update the `settingsFile` attribute
+            controller.setSettingsFile(settingsFile);
+
+            // Set the theme of the scene
+            controller.setThemeOnScene();
 
             // Set stage properties
             Stage aboutStage = new Stage();

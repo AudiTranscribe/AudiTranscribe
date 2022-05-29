@@ -2,7 +2,7 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-05-28
+ * Updated on 2022-05-29
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
@@ -66,8 +66,14 @@ public class ProjectIOHandlers {
                 Scene scene = stageSceneAndController.getValue0();
                 TranscriptionViewController controller = stageSceneAndController.getValue1();
 
+                // Update the `settingsFile` attribute
+                controller.setSettingsFile(settingsFile);
+
+                // Set the theme of the scene
+                controller.setThemeOnScene();
+
                 // Set the project data for the existing project
-                controller.setAudioAndSpectrogramData(audio, settingsFile);
+                controller.setAudioAndSpectrogramData(audio);
                 controller.finishSetup(mainStage, mainViewController);
 
                 // Set the scene for the transcription page
@@ -142,8 +148,14 @@ public class ProjectIOHandlers {
                 Scene scene = stageSceneAndController.getValue0();
                 TranscriptionViewController controller = stageSceneAndController.getValue1();
 
+                // Update the `settingsFile` attribute
+                controller.setSettingsFile(settingsFile);
+
+                // Set the theme of the scene
+                controller.setThemeOnScene();
+
                 // Set the project data for the existing project
-                controller.useExistingData(audtFilePath, audtFileName, projectDataObject, settingsFile);
+                controller.useExistingData(audtFilePath, audtFileName, projectDataObject);
                 controller.finishSetup(mainStage, mainViewController);
 
                 // Set the scene for the transcription page
