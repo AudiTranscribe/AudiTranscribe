@@ -2,7 +2,7 @@
  * ProjectsDB.java
  *
  * Created on 2022-05-11
- * Updated on 2022-05-14
+ * Updated on 2022-05-25
  *
  * Description: Class that interfaces with the projects' database.
  */
@@ -120,10 +120,10 @@ public class ProjectsDB {
     /**
      * Method that gets the primary key of a project with a specified file path.
      *
-     * @param filepath  <b>Absolute</b> file path to the project file.
-     * @return  An integer, representing the primary key of the project in the projects' database.
-     * Returns -1 if the project is not present in the database.
-     * @throws SQLException  If something went wrong when executing the SQL query.
+     * @param filepath <b>Absolute</b> file path to the project file.
+     * @return An integer, representing the primary key of the project in the projects' database.
+     * Returns <code>-1</code> if the project is not present in the database.
+     * @throws SQLException If something went wrong when executing the SQL query.
      */
     public int getIDOfProjectWithFilepath(String filepath) throws SQLException {
         // Start connection with the database

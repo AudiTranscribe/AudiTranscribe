@@ -2,14 +2,17 @@
  * ArrayUtils.java
  *
  * Created on 2022-02-16
- * Updated on 2022-05-01
+ * Updated on 2022-05-28
  *
  * Description: Array utilities to modify, change, and search within arrays.
  */
 
 package site.overwrite.auditranscribe.utils;
 
-import java.security.InvalidParameterException;
+import site.overwrite.auditranscribe.exceptions.LengthException;
+import site.overwrite.auditranscribe.exceptions.ValueException;
+import site.overwrite.auditranscribe.misc.Complex;
+
 import java.util.NoSuchElementException;
 
 /**
@@ -46,19 +49,19 @@ public class ArrayUtils {
     }
 
     /**
-     * Normalises the elements in the given array such that the LP norm is 1.
+     * Normalizes the elements in the given array such that the LP norm is 1.
      *
-     * @param array The array to normalise.
+     * @param array The array to normalize.
      * @param p     The p value of the LP norm.
-     * @return The normalised complex array such that the LP norm of the array is 1.
-     * @throws IllegalArgumentException If <code>p</code> is negative.
+     * @return The normalized complex array such that the LP norm of the array is 1.
+     * @throws ValueException If <code>p</code> is negative.
      * @see <a href="https://en.wikipedia.org/wiki/Lp_space#The_p-norm_in_finite_dimensions">
      * L<sup>p</sup>-Norm</a>
      */
-    public static Complex[] lpNormalise(Complex[] array, double p) {
+    public static Complex[] lpNormalise(Complex[] array, double p) {  // Todo: rename this to "lpNormalize" (with a z)
         // Check that `p` is strictly non-negative
         if (p < 0) {
-            throw new IllegalArgumentException("Unsupported p value: " + p);
+            throw new ValueException("Unsupported p value: " + p);
         }
 
         // Get the number of elements in the array
@@ -95,15 +98,15 @@ public class ArrayUtils {
             lpNorm = threshold;
         }
 
-        // Normalise the array
-        Complex[] arrayNormalised = new Complex[numElem];
+        // Normalize the array
+        Complex[] normalizedArray = new Complex[numElem];
 
         for (int i = 0; i < numElem; i++) {
-            arrayNormalised[i] = array[i].divides(lpNorm);
+            normalizedArray[i] = array[i].divides(lpNorm);
         }
 
         // Return the LP-normalised array
-        return arrayNormalised;
+        return normalizedArray;
     }
 
     /**
@@ -112,12 +115,12 @@ public class ArrayUtils {
      * @param array The array to fix the length of.
      * @param size  The size to make the array.
      * @return <code>array</code> array where the length is now <code>size</code>.
-     * @throws IllegalArgumentException If <code>size</code> is negative.
+     * @throws ValueException If <code>size</code> is negative.
      */
     public static double[] fixLength(double[] array, int size) {
         // Verify that `size` is positive
         if (size <= 0) {
-            throw new IllegalArgumentException("Invalid size " + size);
+            throw new ValueException("Invalid size " + size);
         }
 
         // Get length of the array
@@ -143,12 +146,12 @@ public class ArrayUtils {
      * @param array The array to pad.
      * @param size  The size to make the array.
      * @return Padded array where the length is now <code>size</code>.
-     * @throws IllegalArgumentException If <code>size</code> is negative.
+     * @throws ValueException If <code>size</code> is negative.
      */
     public static double[] padCenter(double[] array, int size) {
         // Verify that `size` is positive
         if (size <= 0) {
-            throw new IllegalArgumentException("Invalid size " + size);
+            throw new ValueException("Invalid size " + size);
         }
 
         // Get length of the array
@@ -177,7 +180,7 @@ public class ArrayUtils {
      * @param array The array to pad.
      * @param size  The size to make the array.
      * @return Padded array where the length is now <code>size</code>.
-     * @throws IllegalArgumentException If <code>size</code> is negative.
+     * @throws ValueException If <code>size</code> is negative.
      * @implNote See <a href="https://numpy.org/doc/stable/reference/generated/numpy.pad.html">
      * Numpy's implementation</a> of this function.
      * @see <a href="https://stackoverflow.com/a/51780171">This StackOverflow answer</a> on how to
@@ -186,7 +189,7 @@ public class ArrayUtils {
     public static double[] padCenterReflect(double[] array, int size) {
         // Verify that `size` is positive
         if (size <= 0) {
-            throw new IllegalArgumentException("Invalid size " + size);
+            throw new ValueException("Invalid size " + size);
         }
 
         // Get length of the array
@@ -258,7 +261,7 @@ public class ArrayUtils {
      * @param array The array to pad.
      * @param size  The size to make the array.
      * @return Padded array where the length is now <code>size</code>.
-     * @throws IllegalArgumentException If <code>size</code> is smaller than the input size.
+     * @throws ValueException If <code>size</code> is smaller than the input size.
      */
     public static Complex[] padCenter(Complex[] array, int size) {
         // Get length of the array
@@ -266,7 +269,7 @@ public class ArrayUtils {
 
         // Assert that the length of the data at least the desired size
         if (size < n) {
-            throw new IllegalArgumentException("Target size (" + size + ") must be at least input size (" + n + ")");
+            throw new ValueException("Target size (" + size + ") must be at least input size (" + n + ")");
         }
 
         // If `n` is `size` just return the array
@@ -458,14 +461,14 @@ public class ArrayUtils {
      * @param A The first matrix.
      * @param B The second matrix.
      * @return The multiplied matrix.
-     * @throws InvalidParameterException If the matrix sizes are not suitable for multiplication.
+     * @throws LengthException If the matrix sizes are not suitable for multiplication.
      * @see <a href="https://en.wikipedia.org/wiki/Matrix_multiplication_algorithm">This article</a>
      * on the naiive implementation on the Matrix Multiplication algorithm.
      */
     public static Complex[][] matmul(Complex[][] A, Complex[][] B) {
         // Check if the matrices can be multiplied
         if (A[0].length != B.length) {
-            throw new InvalidParameterException("Matrix sizes not suitable for multiplication");
+            throw new LengthException("Matrix sizes not suitable for multiplication");
         }
 
         // Otherwise, perform matrix multiplication
@@ -498,14 +501,14 @@ public class ArrayUtils {
      * @param A The first matrix.
      * @param B The second matrix.
      * @return The multiplied matrix.
-     * @throws InvalidParameterException If the matrix sizes are not suitable for multiplication.
+     * @throws LengthException If the matrix sizes are not suitable for multiplication.
      * @see <a href="https://en.wikipedia.org/wiki/Matrix_multiplication_algorithm">This article</a>
      * on the naiive implementation on the Matrix Multiplication algorithm.
      */
     public static double[][] matmul(double[][] A, double[][] B) {
         // Check if the matrices can be multiplied
         if (A[0].length != B.length) {
-            throw new InvalidParameterException("Matrix sizes not suitable for multiplication");
+            throw new LengthException("Matrix sizes not suitable for multiplication");
         }
 
         // Otherwise, perform matrix multiplication

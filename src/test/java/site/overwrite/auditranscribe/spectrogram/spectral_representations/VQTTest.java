@@ -2,9 +2,9 @@
  * VQTTest.java
  *
  * Created on 2022-04-10
- * Updated on 2022-05-14
+ * Updated on 2022-05-28
  *
- * Description: Test `VQT.java`
+ * Description: Test `VQT.java`.
  */
 
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
@@ -12,10 +12,10 @@ package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
-import site.overwrite.auditranscribe.utils.Complex;
+import site.overwrite.auditranscribe.misc.Complex;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.utils.MathUtils;
-import site.overwrite.auditranscribe.utils.UnitConversion;
+import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -42,8 +42,8 @@ class VQTTest {
 
             // Process VQT on those samples
             Complex[][] vqtMatrix = VQT.vqt(
-                    samples, audio.getSampleRate(), 512, UnitConversion.noteToFreq("C1"), 168,
-                    24, false, 0, WindowFunction.HANN_WINDOW
+                    samples, audio.getSampleRate(), 512, UnitConversionUtils.noteToFreq("C1"), 168,
+                    24, false, 0, WindowFunction.HANN_WINDOW, null
             );
 
             // Check specific values in this resultant VQT matrix
@@ -127,8 +127,8 @@ class VQTTest {
         };
 
         // Assertions
-        assertArrayEquals(correctFreqBins1, freqBins1);
-        assertArrayEquals(correctFreqBins2, freqBins2);
-        assertArrayEquals(correctFreqBins3, freqBins3);
+        assertArrayEquals(correctFreqBins1, freqBins1, 1e-5);
+        assertArrayEquals(correctFreqBins2, freqBins2, 1e-5);
+        assertArrayEquals(correctFreqBins3, freqBins3, 1e-5);
     }
 }

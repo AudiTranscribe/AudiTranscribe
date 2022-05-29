@@ -2,23 +2,14 @@
 Todo (Important):
     - Allow other audio types (e.g. mp3) to be input into the program
     - Add FFmpeg installation
-    - Add progress bars
-    - Add settings page
-        - Need to allow for configuration of audio devices
-        * Using local app data folder: https://stackoverflow.com/a/1198954
-          [System.getenv("APPDATA")]
 
 Todo (Less Important):
-    - Add licence/credits for ionicons
     - BPM Estimation
-    - Add "Save File As" button
-    - Add 'feedback' for successful file saving
-    - Allow setting of note playing volume
 
 Todo (Not Important):
     - Compress the filter data
 
 ====================================================================================================
 Fixme:
-    - Showing main view after closing the main view shows the selected project as white
+    - None
 ====================================================================================================

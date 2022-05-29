@@ -2,7 +2,7 @@
  * GeneralCosineWindow.java
  *
  * Created on 2022-03-12
- * Updated on 2022-05-14
+ * Updated on 2022-05-25
  *
  * Description: Class that encapsulates the General Cosine window function.
  */
@@ -24,7 +24,7 @@ public abstract class GeneralCosineWindow extends AbstractWindow {
     /**
      * Method that generates the window value for a specific index <code>n</code>.
      *
-     * @param n      Index of the window. Note that this is 1-indexed.
+     * @param n      Index of the window. <b>Note that this index is 1-indexed</b>.
      * @param length Total length of the window.
      * @return Double representing the window value at index <code>n</code>.
      */

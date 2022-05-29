@@ -2,7 +2,7 @@
  * Audio.java
  *
  * Created on 2022-02-13
- * Updated on 2022-05-07
+ * Updated on 2022-05-27
  *
  * Description: Class that handles audio processing and audio playback.
  */
@@ -10,6 +10,7 @@
 package site.overwrite.auditranscribe.audio;
 
 import javafx.util.Duration;
+import site.overwrite.auditranscribe.exceptions.ValueException;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
 
 import javafx.scene.media.MediaPlayer;
@@ -289,17 +290,23 @@ public class Audio {
      * @param resType Resampling type, also known as the filter window's name.
      * @param scale   Whether to scale the final sample array.
      * @return Array representing the resampled signal.
-     * @throws InvalidParameterException If either <code>srOrig</code> or <code>srFinal</code> is
-     *                                   not positive.
-     * @throws InvalidParameterException If the input signal length is too short to be resampled to
-     *                                   the desired sample rate.
-     * @implNote Core algorithm is taken from
-     * <a href="https://github.com/bmcfee/resampy/blob/ccb8557/resampy/core.py">Resampy</a>.
+     * @throws ValueException If: <ul>
+     *                        <li>
+     *                        Either <code>srOrig</code> or <code>srFinal</code> is not
+     *                        positive.
+     *                        </li>
+     *                        <li>
+     *                        The input signal length is too short to be resampled to the
+     *                        desired sample rate.
+     *                        </li>
+     *                        </ul>
+     * @see <a href="https://github.com/bmcfee/resampy/blob/ccb8557/resampy/core.py">Resampy</a>,
+     * where the main core of the code was taken from.
      */
-    public static double[] resample(double[] x, double srOrig, double srFinal, Filter resType, boolean scale) {
+    public static double[] resample(double[] x, double srOrig, double srFinal, Filter resType, boolean scale) throws ValueException {
         // Validate sample rates
-        if (srOrig <= 0) throw new InvalidParameterException("Invalid original sample rate " + srOrig);
-        if (srFinal <= 0) throw new InvalidParameterException("Invalid final sample rate " + srFinal);
+        if (srOrig <= 0) throw new ValueException("Invalid original sample rate " + srOrig);
+        if (srFinal <= 0) throw new ValueException("Invalid final sample rate " + srFinal);
 
         // Calculate sample ratio
         double sampleRatio = srFinal / srOrig;

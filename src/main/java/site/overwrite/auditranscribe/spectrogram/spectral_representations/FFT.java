@@ -2,7 +2,7 @@
  * FFT.java
  *
  * Created on 2022-02-12
- * Updated on 2022-04-16
+ * Updated on 2022-05-28
  *
  * Description: Class that implements the Fast Fourier Transform (FFT) algorithm.
  *
@@ -11,7 +11,8 @@
 
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
-import site.overwrite.auditranscribe.utils.Complex;
+import site.overwrite.auditranscribe.exceptions.ValueException;
+import site.overwrite.auditranscribe.misc.Complex;
 
 import java.util.Arrays;
 
@@ -30,7 +31,7 @@ public class FFT {
      *
      * @param x The real-number array <code>x</code> representing the data source.
      * @return An array of <code>Complex</code> objects representing the FFT of the data source.
-     * @throws RuntimeException If the length of <code>x</code> is not a power of 2.
+     * @throws ValueException If the length of <code>x</code> is not a power of 2.
      * @implNote The array returned has length <code>N / 2 + 1</code>, so that only the non-negative
      * frequencies are returned.
      */
@@ -55,7 +56,7 @@ public class FFT {
      *
      * @param x The complex array <code>x</code> representing the data source.
      * @return An array of <code>Complex</code> objects representing the FFT of the data source.
-     * @throws RuntimeException If the length of <code>x</code> is not a power of 2.
+     * @throws ValueException If the length of <code>x</code> is not a power of 2.
      * @implNote The array returned has length <code>N / 2 + 1</code>, so that only the non-negative
      * frequencies are returned.
      */
@@ -76,7 +77,7 @@ public class FFT {
      *
      * @param x The complex array <code>x</code> representing the data source.
      * @return An array of <code>Complex</code> objects representing the FFT of the data source.
-     * @throws RuntimeException If the length of <code>x</code> is not a power of 2.
+     * @throws ValueException If the length of <code>x</code> is not a power of 2.
      * @implNote Unlike the public method, the array returned has length <code>N</code>.
      * @see <a href="https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm">Radix-2
      * Cooley-Tukey Algorithm</a>, which was the algorithm used to generate the FFT.
@@ -91,7 +92,7 @@ public class FFT {
         // Assert that the length is AT LEAST a multiple of 2
         // (We'll be able to catch non-powers of two in subsequent recursive calls)
         if (length % 2 != 0) {
-            throw new RuntimeException("The length of the array is not a power of 2.");
+            throw new ValueException("The length of the array is not a power of 2.");
         }
 
         // Compute FFT of even terms

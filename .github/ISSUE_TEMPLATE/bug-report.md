@@ -17,18 +17,23 @@ Steps to reproduce the behaviour:
 3. Scroll down to "..."
 4. See the error
 
-## What is expected? What happens?
-A clear and concise description of:
-- What you expect the code to do.
-- What happens when the code is run.
+## What is expected?
+A clear and concise description of what you expected the code to do.
 
-### Screenshots
+## What is actually happening?
+A clear and concise description of what the code actually does.
+
+## (Optional) Screenshots
 If applicable, add screenshots to help explain your problem.
 
 ## System Information
 Please complete the following information:
  - OS: [e.g. Windows]
- - Version [e.g. 21H2 (10.0.19044.1682)]
+ - Version: [e.g. 21H2 (10.0.19044.1682)]
+
+## Application Information
+Please complete the following information:
+ - Application Version: [e.g. 0.2.0-alpha]
 
 ## Additional Context
 Add any other context about the problem here.

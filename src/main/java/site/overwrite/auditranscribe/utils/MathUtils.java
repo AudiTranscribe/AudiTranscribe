@@ -2,14 +2,14 @@
  * MathUtils.java
  *
  * Created on 2022-02-15
- * Updated on 2022-05-07
+ * Updated on 2022-05-25
  *
  * Description: Class containing useful mathematical utility functions.
  */
 
 package site.overwrite.auditranscribe.utils;
 
-import java.security.InvalidParameterException;
+import site.overwrite.auditranscribe.exceptions.ValueException;
 
 /**
  * Class containing useful mathematical utility functions.
@@ -33,12 +33,12 @@ public class MathUtils {
      * @param x Number to take the log base <code>n</code> of.
      * @param n The base of the logarithm.
      * @return Log base <code>n</code> of <code>x</code>.
-     * @throws InvalidParameterException If the base of the logarithm is not positive, or is 1.
+     * @throws ValueException If the base of the logarithm is not positive, or is 1.
      */
     public static double logN(double x, double n) {
         // Validate `n`
         if (n <= 0 || n == 1) {
-            throw new InvalidParameterException("Invalid value for the base of logarithm: " + n);
+            throw new ValueException("Invalid value for the base of logarithm: " + n);
         }
 
         // Return the logarithm
@@ -111,15 +111,30 @@ public class MathUtils {
     }
 
     /**
-     * Normalises the value <code>x</code> to the range 0 to 1 inclusive.
+     * Normalizes the value <code>x</code> to the range <code>zMin</code> to <code>zMax</code>
+     * inclusive.
+     *
+     * @param x    Value to normalize.
+     * @param xMin Minimum possible value of <code>x</code>.
+     * @param xMax Maximum possible value of <code>x</code>.
+     * @param zMin Minimum normalized value.
+     * @param zMax Maximum normalized value.
+     * @return Normalized value of <code>x</code>.
+     */
+    public static double normalize(double x, double xMin, double xMax, double zMin, double zMax) {
+        return ((x - xMin) / (xMax - xMin)) * (zMax - zMin) + zMin;
+    }
+
+    /**
+     * Normalizes the value <code>x</code> to the range 0 to 1 inclusive.
      *
      * @param x   Value to normalise.
      * @param min Minimum possible value of <code>x</code>.
      * @param max Maximum possible value of <code>x</code>.
-     * @return Normalised value of <code>x</code>.
+     * @return Normalized value of <code>x</code>.
      */
-    public static double normalise(double x, double min, double max) {
-        return (x - min) / (max - min);
+    public static double normalize(double x, double min, double max) {
+        return normalize(x, min, max, 0, 1);
     }
 
     /**
