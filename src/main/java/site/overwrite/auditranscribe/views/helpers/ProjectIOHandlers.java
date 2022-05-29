@@ -232,10 +232,16 @@ public class ProjectIOHandlers {
      * Method that helps show a file dialog for the user to select a file on.
      *
      * @param window WindowFunction to show the file dialog on.
+     * @param filters Array of file filters to show in the file dialog.
      * @return A <code>File</code> object, representing the selected file.
      */
-    public static File getFileFromFileDialog(Window window) {
+    public static File getFileFromFileDialog(Window window, FileChooser.ExtensionFilter... filters) {
         FileChooser fileChooser = new FileChooser();
+
+        for (FileChooser.ExtensionFilter filter : filters) {
+            fileChooser.getExtensionFilters().add(filter);
+        }
+
         return fileChooser.showOpenDialog(window);
     }
 
