@@ -2,7 +2,7 @@
  * FFT.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-25
+ * Updated on 2022-05-28
  *
  * Description: Class that implements the Fast Fourier Transform (FFT) algorithm.
  *
@@ -12,7 +12,7 @@
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
 import site.overwrite.auditranscribe.exceptions.ValueException;
-import site.overwrite.auditranscribe.utils.Complex;
+import site.overwrite.auditranscribe.misc.Complex;
 
 import java.util.Arrays;
 

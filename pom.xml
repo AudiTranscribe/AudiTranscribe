@@ -6,7 +6,7 @@
 
     <groupId>site.overwrite</groupId>
     <artifactId>AudiTranscribe</artifactId>
-    <version>0.2.0</version>
+    <version>0.2.1</version>
     <name>AudiTranscribe</name>
 
     <properties>
@@ -15,11 +15,6 @@
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>net.harawata</groupId>
-            <artifactId>appdirs</artifactId>
-            <version>1.2.1</version>
-        </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
@@ -138,6 +133,9 @@
                         </exclude>
                         <exclude>
                             ${project.basedir}/src/main/resources/site/overwrite/auditranscribe/testing-audio-files/**
+                        </exclude>
+                        <exclude>
+                            *.svg
                         </exclude>
                     </excludes>
                     <source>17</source>

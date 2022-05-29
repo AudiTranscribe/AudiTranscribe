@@ -2,7 +2,7 @@
  * ArrayUtils.java
  *
  * Created on 2022-02-16
- * Updated on 2022-05-25
+ * Updated on 2022-05-28
  *
  * Description: Array utilities to modify, change, and search within arrays.
  */
@@ -11,6 +11,7 @@ package site.overwrite.auditranscribe.utils;
 
 import site.overwrite.auditranscribe.exceptions.LengthException;
 import site.overwrite.auditranscribe.exceptions.ValueException;
+import site.overwrite.auditranscribe.misc.Complex;
 
 import java.util.NoSuchElementException;
 

@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-26
+ * Updated on 2022-05-29
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -29,10 +29,11 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.javatuples.Pair;
-import site.overwrite.auditranscribe.CustomTask;
+import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.io.settings_file.SettingsFile;
+import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.notes.NotePlayer;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
@@ -55,6 +56,7 @@ import java.io.InvalidObjectException;
 import java.net.URL;
 import java.security.InvalidParameterException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.*;
@@ -127,6 +129,7 @@ public class TranscriptionViewController implements Initializable {
     Stage mainStage;
     MainViewController mainViewController;
     SettingsFile settingsFile;
+    Theme theme;
 
     NotePlayer notePlayer;
 
@@ -134,6 +137,7 @@ public class TranscriptionViewController implements Initializable {
 
     private final Logger logger = Logger.getLogger(this.getClass().getName());
     private ProjectsDB projectsDB;
+    private List<Audio> allAudio;
 
     private String audtFilePath;
     private String audtFileName;
@@ -179,6 +183,9 @@ public class TranscriptionViewController implements Initializable {
     private Button newProjectButton, openProjectButton, saveProjectButton;
 
     @FXML
+    private ImageView newProjectButtonImage, openProjectButtonImage, saveProjectButtonImage;
+
+    @FXML
     private ChoiceBox<String> musicKeyChoice, timeSignatureChoice;
 
     @FXML
@@ -216,7 +223,8 @@ public class TranscriptionViewController implements Initializable {
     private Button playButton, stopButton, playSkipBackButton, playSkipForwardButton, scrollButton, volumeButton;
 
     @FXML
-    private ImageView playButtonImage, volumeButtonImage, scrollButtonImage;
+    private ImageView playButtonImage, stopButtonImage, playSkipBackButtonImage, playSkipForwardButtonImage,
+            scrollButtonImage, volumeButtonImage;
 
     @FXML
     private Slider volumeSlider;
@@ -229,10 +237,6 @@ public class TranscriptionViewController implements Initializable {
         if (os != null && os.startsWith("Mac")) {
             menuBar.useSystemMenuBarProperty().set(true);
         }
-
-        // Add CSS stylesheets to the scene
-        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
-        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/light-mode.css"));  // Todo: add theme support
 
         // Set the width and height of the root pane
         masterVBox.prefWidthProperty().bind(rootPane.widthProperty());
@@ -393,29 +397,6 @@ public class TranscriptionViewController implements Initializable {
 
         scrollButton.setOnAction(event -> toggleScrollButton());
 
-        // Set method on the volume slider
-        volumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            // Update the volume value
-            volume = newValue.doubleValue();
-
-            // Change the icon of the volume button from mute to non-mute
-            if (isMuted) {
-                volumeButtonImage.setImage(
-                        new Image(IOMethods.getFileURLAsString("images/icons/PNGs/volume-high.png"))
-                );
-                isMuted = false;
-            }
-
-            // Update audio volume
-            try {
-                audio.setPlaybackVolume(volume);
-            } catch (InvalidObjectException e) {
-                throw new RuntimeException(e);
-            }
-
-            logger.log(Level.FINE, "Changed volume from " + oldValue + " to " + newValue);
-        });
-
         // Set spectrogram pane click method
         spectrogramPaneAnchor.setOnMouseClicked(event -> {
             if (isSpectrogramReady) {
@@ -430,16 +411,16 @@ public class TranscriptionViewController implements Initializable {
                 ) {
                     // Compute the frequency that the mouse click would correspond to
                     double estimatedFreq = PlottingHelpers.heightToFreq(
-                            clickY, UnitConversion.noteNumberToFreq(MIN_NOTE_NUMBER),
-                            UnitConversion.noteNumberToFreq(MAX_NOTE_NUMBER), spectrogramPaneAnchor.getHeight()
+                            clickY, UnitConversionUtils.noteNumberToFreq(MIN_NOTE_NUMBER),
+                            UnitConversionUtils.noteNumberToFreq(MAX_NOTE_NUMBER), spectrogramPaneAnchor.getHeight()
                     );
 
                     // Now estimate the note number
-                    int estimatedNoteNum = (int) Math.round(UnitConversion.freqToNoteNumber(estimatedFreq));
+                    int estimatedNoteNum = (int) Math.round(UnitConversionUtils.freqToNoteNumber(estimatedFreq));
 
                     // Play the note
                     try {
-                        logger.log(Level.FINE, "Playing " + UnitConversion.noteNumberToNote(estimatedNoteNum, false));
+                        logger.log(Level.FINE, "Playing " + UnitConversionUtils.noteNumberToNote(estimatedNoteNum, false));
                         notePlayer.playNoteForDuration(
                                 estimatedNoteNum, NOTE_PLAYING_ON_VELOCITY, NOTE_PLAYING_OFF_VELOCITY,
                                 NOTE_PLAYING_ON_DURATION, NOTE_PLAYING_OFF_DURATION
@@ -484,7 +465,7 @@ public class TranscriptionViewController implements Initializable {
 
         preferencesMenuItem.setOnAction(actionEvent -> PreferencesViewController.showPreferencesWindow(settingsFile));
 
-        aboutMenuItem.setOnAction(actionEvent -> AboutViewController.showAboutWindow());
+        aboutMenuItem.setOnAction(actionEvent -> AboutViewController.showAboutWindow(settingsFile));
 
         // Get the projects database
         try {
@@ -494,7 +475,72 @@ public class TranscriptionViewController implements Initializable {
         }
     }
 
+    // Setter methods
+    public void setSettingsFile(SettingsFile settingsFile) {
+        this.settingsFile = settingsFile;
+    }
+
     // Public methods
+
+    /**
+     * Method that sets the theme for the scene.
+     */
+    public void setThemeOnScene() {
+        // Get the theme
+        theme = Theme.values()[settingsFile.settingsData.themeEnumOrdinal];
+
+        // Set stylesheets
+        rootPane.getStylesheets().clear();  // Reset the stylesheets first before adding new ones
+
+        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
+        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/" + theme.cssFile));
+
+        // Set graphics
+        newProjectButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/icons/PNGs/" + theme.shortName + "/create.png"
+        )));
+        openProjectButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/icons/PNGs/" + theme.shortName + "/folder-open.png"
+        )));
+        saveProjectButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/icons/PNGs/" + theme.shortName + "/save.png"
+        )));
+
+        playButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/icons/PNGs/" + theme.shortName + "/play.png"
+        )));
+        stopButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/icons/PNGs/" + theme.shortName + "/stop.png"
+        )));
+        playSkipBackButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/icons/PNGs/" + theme.shortName + "/play-skip-back.png"
+        )));
+        playSkipForwardButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/icons/PNGs/" + theme.shortName + "/play-skip-forward.png"
+        )));
+        scrollButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/icons/PNGs/" + theme.shortName + "/footsteps-outline.png"
+        )));
+        volumeButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/icons/PNGs/" + theme.shortName + "/volume-high.png"
+        )));
+    }
+
+    /**
+     * Method that sets the volume slider's CSS.
+     */
+    public void updateVolumeSliderCSS() {
+        // Generate the style of the volume slider for the current volume value
+        String style = String.format(
+                "-fx-background-color: linear-gradient(" +
+                        "to right, -slider-filled-colour %f%%, -slider-unfilled-colour %f%%" +
+                        ");",
+                volume * 100, volume * 100);
+
+        // Apply the style to the volume slider's track (if available)
+        StackPane track = (StackPane) volumeSlider.lookup(".track");
+        if (track != null) track.setStyle(style);
+    }
 
     /**
      * Method that finishes the setting up of the transcription view controller.<br>
@@ -502,12 +548,17 @@ public class TranscriptionViewController implements Initializable {
      * been set up.
      *
      * @param mainStage          Main stage.
+     * @param allAudio           List of all opened <code>Audio</code> objects.
      * @param mainViewController Controller object of the main class.
      */
-    public void finishSetup(Stage mainStage, MainViewController mainViewController) {
+    public void finishSetup(Stage mainStage, List<Audio> allAudio, MainViewController mainViewController) {
         // Update attributes
         this.mainStage = mainStage;
         this.mainViewController = mainViewController;
+        this.allAudio = allAudio;
+
+        // Append the current audio to the list of all audio
+        allAudio.add(audio);
 
         // Set choices
         musicKeyChoice.setValue(MUSIC_KEYS[musicKeyIndex]);
@@ -529,12 +580,37 @@ public class TranscriptionViewController implements Initializable {
         bpmSpinner.setValueFactory(bpmSpinnerFactory);
         offsetSpinner.setValueFactory(offsetSpinnerFactory);
 
-        // Update sliders
-        volumeSlider.setValue(volume);
+        // Set method on the volume slider
+        volumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            // Update the volume value
+            volume = newValue.doubleValue();
+
+            // Change the icon of the volume button from mute to non-mute
+            if (isMuted) {
+                volumeButtonImage.setImage(
+                        new Image(IOMethods.getFileURLAsString(
+                                "images/icons/PNGs/" + theme.shortName + "/volume-high.png"
+                        ))
+                );
+                isMuted = false;
+            }
+
+            // Update audio volume
+            try {
+                audio.setPlaybackVolume(volume);
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
+
+            // Update CSS
+            updateVolumeSliderCSS();
+
+            logger.log(Level.FINE, "Changed volume from " + oldValue + " to " + newValue);
+        });
 
         // Update labels
-        totalTimeLabel.setText(UnitConversion.secondsToTimeString(audioDuration));
-        currTimeLabel.setText(UnitConversion.secondsToTimeString(currTime));
+        totalTimeLabel.setText(UnitConversionUtils.secondsToTimeString(audioDuration));
+        currTimeLabel.setText(UnitConversionUtils.secondsToTimeString(currTime));
 
         // Set keyboard button press/release methods
         mainPane.getScene().addEventFilter(KeyEvent.KEY_PRESSED, this::keyPressEventHandler);
@@ -551,11 +627,9 @@ public class TranscriptionViewController implements Initializable {
      * @param audtFilePath <b>Absolute</b> path to the file that contained the data.
      * @param audtFileName The name of the AUDT file.
      * @param projectData  The project data.
-     * @param settingsFile The <code>SettingsFile</code> object that handles the reading and writing
-     *                     of settings.
      */
     public void useExistingData(
-            String audtFilePath, String audtFileName, ProjectDataObject projectData, SettingsFile settingsFile
+            String audtFilePath, String audtFileName, ProjectDataObject projectData
     ) {
         // Set up GUI data
         musicKeyIndex = projectData.guiData.musicKeyIndex;
@@ -573,7 +647,7 @@ public class TranscriptionViewController implements Initializable {
 
         // Set up Q-Transform data and audio data
         try {
-            setAudioAndSpectrogramData(projectData.qTransformData, projectData.audioData, settingsFile);
+            setAudioAndSpectrogramData(projectData.qTransformData, projectData.audioData);
         } catch (IOException | UnsupportedAudioFileException e) {
             AlertMessages.showExceptionAlert(
                     "Error loading audio data.",
@@ -603,18 +677,15 @@ public class TranscriptionViewController implements Initializable {
      * Method that sets the audio and spectrogram data for the transcription view controller.<br>
      * This method uses the actual audio file to do the setting of the data.
      *
-     * @param audioObj     An <code>Audio</code> object that contains audio data.
-     * @param settingsFile The <code>SettingsFile</code> object that handles the reading and writing of settings.
+     * @param audioObj An <code>Audio</code> object that contains audio data.
      */
-    public void setAudioAndSpectrogramData(Audio audioObj, SettingsFile settingsFile) {
+    public void setAudioAndSpectrogramData(Audio audioObj) {
         // Set attributes
         audio = audioObj;
         audioFilePath = audioObj.getAudioFilePath();
         audioFileName = audioObj.getAudioFileName();
         audioDuration = audio.getDuration();
         sampleRate = audio.getSampleRate();
-
-        this.settingsFile = settingsFile;
 
         // Generate spectrogram image based on newly generated magnitude data
         CustomTask<WritableImage> task = new CustomTask<>() {
@@ -645,8 +716,6 @@ public class TranscriptionViewController implements Initializable {
      * @param qTransformData The Q-Transform data that will be used to set the spectrogram data.
      * @param audioData      The audio data that will be used in both the spectrogram data and
      *                       the audio data.
-     * @param settingsFile   The <code>SettingsFile</code> object that handles the reading and
-     *                       writing of settings.
      * @throws UnsupportedAudioFileException If the audio file path that was provided in
      *                                       <code>audioData</code> points to an invalid audio file.
      * @throws IOException                   If the audio file path that was provided in
@@ -654,8 +723,7 @@ public class TranscriptionViewController implements Initializable {
      *                                       (or does not exist).
      */
     public void setAudioAndSpectrogramData(
-            QTransformDataObject qTransformData, AudioDataObject audioData,
-            SettingsFile settingsFile
+            QTransformDataObject qTransformData, AudioDataObject audioData
     ) throws UnsupportedAudioFileException, IOException {
         // Set attributes
         audioFilePath = audioData.audioFilePath;
@@ -663,8 +731,6 @@ public class TranscriptionViewController implements Initializable {
         sampleRate = audioData.sampleRate;
 
         magnitudes = qTransformData.qTransformMagnitudes;
-
-        this.settingsFile = settingsFile;
 
         // Generate spectrogram image based on existing magnitude data
         CustomTask<WritableImage> task = new CustomTask<>() {
@@ -757,7 +823,7 @@ public class TranscriptionViewController implements Initializable {
 
         // Update the current time and current time label
         currTime = seekTime;
-        currTimeLabel.setText(UnitConversion.secondsToTimeString(seekTime));
+        currTimeLabel.setText(UnitConversionUtils.secondsToTimeString(seekTime));
 
         // Update coloured progress pane and playhead line
         double newXPos = seekTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X;
@@ -774,14 +840,29 @@ public class TranscriptionViewController implements Initializable {
      * @param event Event that triggered this function.
      */
     private void handleNewProject(Event event) {
+        // Do not do anything if the button is disabled
+        if (newProjectButton.isDisabled()) return;
+
+        // Pause the current audio
+        isPaused = togglePaused(false);
+
         // Get the current window
         Window window = rootPane.getScene().getWindow();
 
         // Get user to select a file
         File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
+        // If a file was selected, stop the audio completely
+        if (file != null) {
+            try {
+                audio.stopAudio();
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         // Create the new project
-        ProjectIOHandlers.newProject(mainStage, (Stage) window, file, settingsFile, mainViewController);
+        ProjectIOHandlers.newProject(mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController);
     }
 
     /**
@@ -790,14 +871,29 @@ public class TranscriptionViewController implements Initializable {
      * @param event Event that triggered this function.
      */
     private void handleOpenProject(Event event) {
+        // Do not do anything if the button is disabled
+        if (openProjectButton.isDisabled()) return;
+
+        // Pause the current audio
+        isPaused = togglePaused(false);
+
         // Get the current window
         Window window = rootPane.getScene().getWindow();
 
         // Get user to select a file
         File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
+        // If a file was selected, stop the audio completely
+        if (file != null) {
+            try {
+                audio.stopAudio();
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         // Open the existing project
-        ProjectIOHandlers.openProject(mainStage, (Stage) window, file, settingsFile, mainViewController);
+        ProjectIOHandlers.openProject(mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController);
     }
 
     /**
@@ -806,6 +902,9 @@ public class TranscriptionViewController implements Initializable {
      * @param forceChooseFile Boolean whether to force the user to choose a file.
      */
     private void handleSavingProject(boolean forceChooseFile) {
+        // Do not do anything if the button is disabled
+        if (saveProjectButton.isDisabled()) return;
+
         // Allow user to select save location
         String saveDest, saveName;
 
@@ -909,7 +1008,9 @@ public class TranscriptionViewController implements Initializable {
     private boolean togglePaused(boolean isPaused) {
         if (isPaused) {
             // Change the icon of the play button from the play icon to the paused icon
-            playButtonImage.setImage(new Image(IOMethods.getFileURLAsString("images/icons/PNGs/pause.png")));
+            playButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                    "images/icons/PNGs/" + theme.shortName + "/pause.png"
+            )));
 
             // Unpause the audio (i.e. play the audio)
             try {
@@ -920,7 +1021,9 @@ public class TranscriptionViewController implements Initializable {
 
         } else {
             // Change the icon of the play button from the paused icon to the play icon
-            playButtonImage.setImage(new Image(IOMethods.getFileURLAsString("images/icons/PNGs/play.png")));
+            playButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                    "images/icons/PNGs/" + theme.shortName + "/play.png"
+            )));
 
             // Pause the audio
             try {
@@ -1080,7 +1183,7 @@ public class TranscriptionViewController implements Initializable {
                     }
 
                     // Update the current time label
-                    Platform.runLater(() -> currTimeLabel.setText(UnitConversion.secondsToTimeString(currTime)));
+                    Platform.runLater(() -> currTimeLabel.setText(UnitConversionUtils.secondsToTimeString(currTime)));
 
                     // Update coloured progress pane and playhead line
                     double newPosX = currTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X;
@@ -1176,8 +1279,28 @@ public class TranscriptionViewController implements Initializable {
                 throw new RuntimeException(e);
             }
 
+            // Update volume slider
+            volumeSlider.setValue(volume);
+            updateVolumeSliderCSS();
+
             // Ensure main pane is in focus
             rootPane.requestFocus();
+
+            // Enable all disabled nodes
+            Node[] disabledNodes = new Node[]{
+                    // Top Hbox
+                    newProjectButton, openProjectButton, saveProjectButton,
+                    musicKeyChoice, bpmSpinner, timeSignatureChoice, offsetSpinner,
+
+                    // Bottom Hbox
+                    playButton, stopButton, playSkipBackButton, playSkipForwardButton,
+                    scrollButton,
+                    volumeButton, volumeSlider
+            };
+
+            for (Node node : disabledNodes) {
+                node.setDisable(false);
+            }
 
             // Report that the transcription view is ready to be shown
             logger.log(Level.INFO, "Spectrogram for " + audioFileName + " ready to be shown");
@@ -1212,13 +1335,17 @@ public class TranscriptionViewController implements Initializable {
         if (scrollToPlayhead) {
             // Change the icon of the scroll button from filled to non-filled
             scrollButtonImage.setImage(
-                    new Image(IOMethods.getFileURLAsString("images/icons/PNGs/footsteps-outline.png"))
+                    new Image(IOMethods.getFileURLAsString(
+                            "images/icons/PNGs/" + theme.shortName + "/footsteps-outline.png"
+                    ))
             );
 
         } else {
             // Change the icon of the scroll button from non-filled to filled
             scrollButtonImage.setImage(
-                    new Image(IOMethods.getFileURLAsString("images/icons/PNGs/footsteps-filled.png"))
+                    new Image(IOMethods.getFileURLAsString(
+                            "images/icons/PNGs/" + theme.shortName + "/footsteps-filled.png"
+                    ))
             );
         }
 
@@ -1235,7 +1362,9 @@ public class TranscriptionViewController implements Initializable {
         if (isMuted) {
             // Change the icon of the volume button from mute to non-mute
             volumeButtonImage.setImage(
-                    new Image(IOMethods.getFileURLAsString("images/icons/PNGs/volume-high.png"))
+                    new Image(IOMethods.getFileURLAsString(
+                            "images/icons/PNGs/" + theme.shortName + "/volume-high.png"
+                    ))
             );
 
             // Unmute the audio by setting the volume back to the value before the mute
@@ -1247,7 +1376,9 @@ public class TranscriptionViewController implements Initializable {
         } else {
             // Change the icon of the volume button from non-mute to mute
             volumeButtonImage.setImage(
-                    new Image(IOMethods.getFileURLAsString("images/icons/PNGs/volume-mute.png"))
+                    new Image(IOMethods.getFileURLAsString(
+                            "images/icons/PNGs/" + theme.shortName + "/volume-mute.png"
+                    ))
             );
 
             // Mute the audio by setting the volume to zero
@@ -1270,6 +1401,9 @@ public class TranscriptionViewController implements Initializable {
      * @param keyEvent Key press event.
      */
     private void keyPressEventHandler(KeyEvent keyEvent) {
+        // If the spectrogram is not ready do not do anything
+        if (!isSpectrogramReady) return;
+
         // Get the key event's target
         Node target = (Node) keyEvent.getTarget();
 
@@ -1330,7 +1464,7 @@ public class TranscriptionViewController implements Initializable {
             File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
             // Create the new project
-            ProjectIOHandlers.newProject(mainStage, (Stage) window, file, settingsFile, mainViewController);
+            ProjectIOHandlers.newProject(mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController);
 
         } else if (OPEN_PROJECT_COMBINATION.match(keyEvent)) {  // Open a project
             // Consume the key event
@@ -1343,7 +1477,7 @@ public class TranscriptionViewController implements Initializable {
             File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
             // Open the existing project
-            ProjectIOHandlers.openProject(mainStage, (Stage) window, file, settingsFile, mainViewController);
+            ProjectIOHandlers.openProject(mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController);
 
         } else if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {  // Save current project
             handleSavingProject(false);
@@ -1400,6 +1534,9 @@ public class TranscriptionViewController implements Initializable {
      * @param keyEvent Key released event.
      */
     private void keyReleasedEventHandler(KeyEvent keyEvent) {
+        // If the spectrogram is not ready do not do anything
+        if (!isSpectrogramReady) return;
+
         // Handle key event
         KeyCode code = keyEvent.getCode();
 

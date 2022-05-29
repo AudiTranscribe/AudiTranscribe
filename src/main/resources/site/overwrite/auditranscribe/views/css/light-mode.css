@@ -8,10 +8,15 @@
     -fx-background-color: #e0e0e0ff;
 }
 
+.list-cell:selected .text {
+    -fx-fill: #000000ff;
+    -fx-text-fill: #000000ff;
+}
+
 /* TRANSCRIPTION PAGE */
 /* Labels */
 .display-label {
-    -fx-text-fill: #000000ff;
+    -fx-fill: #000000ff;
 }
 
 /* Spectrogram */
@@ -32,7 +37,7 @@
 }
 
 .spectrogram-square {
-    -fx-border-color: #d3d3d3ff;  /* Lightgray */
+    -fx-border-color: #d3d3d3ff; /* Lightgray */
 }
 
 /* Playback */
@@ -46,6 +51,11 @@
 
 .playhead-line {
     -fx-stroke: #00bfffff;
+}
+
+.volume-slider .track {
+    -slider-unfilled-colour: #e0e0e0ff;
+    -slider-filled-colour: #6caad9ff;
 }
 
 /* PREFERENCES PAGE */

@@ -2,7 +2,7 @@
  * Wavelet.java
  *
  * Created on 2022-02-13
- * Updated on 2022-05-27
+ * Updated on 2022-05-28
  *
  * Description: Class to implement audio windowing functions.
  */
@@ -13,7 +13,7 @@ import javafx.util.Pair;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.SpectralHelpers;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
-import site.overwrite.auditranscribe.utils.Complex;
+import site.overwrite.auditranscribe.misc.Complex;
 import site.overwrite.auditranscribe.utils.MathUtils;
 
 import java.util.ArrayList;

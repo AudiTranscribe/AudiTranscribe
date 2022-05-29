@@ -2,14 +2,17 @@
  * ComplexTest.java
  *
  * Created on 2022-03-09
- * Updated on 2022-03-13
+ * Updated on 2022-05-28
  *
  * Description: Test `Complex.java`.
  */
 
-package site.overwrite.auditranscribe.utils;
+package site.overwrite.auditranscribe.misc;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import site.overwrite.auditranscribe.misc.Complex;
+import site.overwrite.auditranscribe.utils.MathUtils;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -93,7 +96,7 @@ class ComplexTest {
         assertEquals(5, (new Complex(3, -4)).abs());
         assertEquals(5, (new Complex(-3, -4)).abs());
 
-        assertEquals(5.8105, MathUtils.round((new Complex(1.234, 5.678)).abs(), 4));
+        Assertions.assertEquals(5.8105, MathUtils.round((new Complex(1.234, 5.678)).abs(), 4));
         assertEquals(5.8105, MathUtils.round((new Complex(-1.234, 5.678)).abs(), 4));
         assertEquals(5.8105, MathUtils.round((new Complex(1.234, -5.678)).abs(), 4));
         assertEquals(5.8105, MathUtils.round((new Complex(-1.234, -5.678)).abs(), 4));

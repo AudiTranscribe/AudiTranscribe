@@ -2,7 +2,7 @@
  * VQTTest.java
  *
  * Created on 2022-04-10
- * Updated on 2022-05-27
+ * Updated on 2022-05-28
  *
  * Description: Test `VQT.java`.
  */
@@ -12,10 +12,10 @@ package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
-import site.overwrite.auditranscribe.utils.Complex;
+import site.overwrite.auditranscribe.misc.Complex;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.utils.MathUtils;
-import site.overwrite.auditranscribe.utils.UnitConversion;
+import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -42,7 +42,7 @@ class VQTTest {
 
             // Process VQT on those samples
             Complex[][] vqtMatrix = VQT.vqt(
-                    samples, audio.getSampleRate(), 512, UnitConversion.noteToFreq("C1"), 168,
+                    samples, audio.getSampleRate(), 512, UnitConversionUtils.noteToFreq("C1"), 168,
                     24, false, 0, WindowFunction.HANN_WINDOW, null
             );
 

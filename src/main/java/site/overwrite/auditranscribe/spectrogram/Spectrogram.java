@@ -2,7 +2,7 @@
  * Spectrogram.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-26
+ * Updated on 2022-05-28
  *
  * Description: Spectrogram class.
  */
@@ -10,15 +10,15 @@
 package site.overwrite.auditranscribe.spectrogram;
 
 import javafx.scene.image.WritableImage;
-import site.overwrite.auditranscribe.CustomTask;
+import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.exceptions.ValueException;
 import site.overwrite.auditranscribe.plotting.Plotter;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.CQT;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.VQT;
-import site.overwrite.auditranscribe.utils.Complex;
-import site.overwrite.auditranscribe.utils.UnitConversion;
+import site.overwrite.auditranscribe.misc.Complex;
+import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -91,8 +91,8 @@ public class Spectrogram {
         this.maxNoteNumber = maxNoteNumber;
         numOctaves = numNotes / 12;
 
-        minFreq = UnitConversion.noteNumberToFreq(minNoteNumber);
-        maxFreq = UnitConversion.noteNumberToFreq(maxNoteNumber);
+        minFreq = UnitConversionUtils.noteNumberToFreq(minNoteNumber);
+        maxFreq = UnitConversionUtils.noteNumberToFreq(maxNoteNumber);
 
         this.binsPerOctave = binsPerOctave;
         numFreqBins = numOctaves * binsPerOctave;
@@ -153,8 +153,8 @@ public class Spectrogram {
         this.maxNoteNumber = maxNoteNumber;
         numOctaves = numNotes / 12;
 
-        minFreq = UnitConversion.noteNumberToFreq(minNoteNumber);
-        maxFreq = UnitConversion.noteNumberToFreq(maxNoteNumber);
+        minFreq = UnitConversionUtils.noteNumberToFreq(minNoteNumber);
+        maxFreq = UnitConversionUtils.noteNumberToFreq(maxNoteNumber);
 
         this.binsPerOctave = binsPerOctave;
         numFreqBins = numOctaves * binsPerOctave;
@@ -288,7 +288,7 @@ public class Spectrogram {
         for (int i = 0; i < numRows; i++) {
             for (int j = 0; j < numCols; j++) {
                 // Get the decibel value for this amplitude
-                double dbVal = UnitConversion.amplitudeToDecibel(moduli[i][j], maxModulus);
+                double dbVal = UnitConversionUtils.amplitudeToDecibel(moduli[i][j], maxModulus);
 
                 // Add it into the magnitudes array
                 magnitudes[i][j] = dbVal;

@@ -2,7 +2,7 @@
  * SettingsFile.java
  *
  * Created on 2022-05-22
- * Updated on 2022-05-22
+ * Updated on 2022-05-28
  *
  * Description: Handles the interactions with the settings file.
  */
@@ -10,6 +10,7 @@
 package site.overwrite.auditranscribe.io.settings_file;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import site.overwrite.auditranscribe.io.IOMethods;
 
 import java.io.*;
@@ -51,7 +52,7 @@ public class SettingsFile {
      */
     public void saveSettingsFile() {
         // Create the GSON object
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         try (Writer writer = new FileWriter(SETTINGS_FILE_PATH)) {
             // Try writing to the settings data file

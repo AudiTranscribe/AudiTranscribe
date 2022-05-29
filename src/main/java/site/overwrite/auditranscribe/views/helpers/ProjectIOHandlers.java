@@ -2,7 +2,7 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-05-26
+ * Updated on 2022-05-29
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
@@ -14,7 +14,7 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.stage.*;
 import org.javatuples.Pair;
-import site.overwrite.auditranscribe.CustomTask;
+import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
@@ -32,6 +32,7 @@ import site.overwrite.auditranscribe.views.TranscriptionViewController;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 // Main class
 
@@ -49,11 +50,12 @@ public class ProjectIOHandlers {
      * @param file               File to open.
      * @param settingsFile       The <code>SettingsFile</code> object that handles the reading and
      *                           writing of settings.
+     * @param allAudio           List of all opened <code>Audio</code> objects.
      * @param mainViewController Controller object of the main class.
      */
     public static void newProject(
             Stage mainStage, Stage transcriptionStage, File file, SettingsFile settingsFile,
-            MainViewController mainViewController
+            List<Audio> allAudio, MainViewController mainViewController
     ) {
         // Verify that the user choose a file
         if (file != null) {
@@ -66,9 +68,15 @@ public class ProjectIOHandlers {
                 Scene scene = stageSceneAndController.getValue0();
                 TranscriptionViewController controller = stageSceneAndController.getValue1();
 
+                // Update the `settingsFile` attribute
+                controller.setSettingsFile(settingsFile);
+
+                // Set the theme of the scene
+                controller.setThemeOnScene();
+
                 // Set the project data for the existing project
-                controller.setAudioAndSpectrogramData(audio, settingsFile);
-                controller.finishSetup(mainStage, mainViewController);
+                controller.setAudioAndSpectrogramData(audio);
+                controller.finishSetup(mainStage, allAudio, mainViewController);
 
                 // Set the scene for the transcription page
                 transcriptionStage.setScene(scene);
@@ -89,6 +97,7 @@ public class ProjectIOHandlers {
                     transcriptionStage.showAndWait();
                     controller.handleSceneClosing();
                     mainViewController.refreshProjectsListView();
+                    mainViewController.stopAllAudioObjects();
                     mainStage.show();  // Show the main scene upon the spectrogram scene's closure
                 }
 
@@ -115,11 +124,12 @@ public class ProjectIOHandlers {
      * @param file               File to open.
      * @param settingsFile       The <code>SettingsFile</code> object that handles the reading and
      *                           writing of settings.
+     * @param allAudio           List of all opened <code>Audio</code> objects.
      * @param mainViewController Controller object of the main class.
      */
     public static void openProject(
             Stage mainStage, Stage transcriptionStage, File file, SettingsFile settingsFile,
-            MainViewController mainViewController
+            List<Audio> allAudio, MainViewController mainViewController
     ) {
         // Verify that the user choose a file
         if (file != null) {
@@ -142,9 +152,15 @@ public class ProjectIOHandlers {
                 Scene scene = stageSceneAndController.getValue0();
                 TranscriptionViewController controller = stageSceneAndController.getValue1();
 
+                // Update the `settingsFile` attribute
+                controller.setSettingsFile(settingsFile);
+
+                // Set the theme of the scene
+                controller.setThemeOnScene();
+
                 // Set the project data for the existing project
-                controller.useExistingData(audtFilePath, audtFileName, projectDataObject, settingsFile);
-                controller.finishSetup(mainStage, mainViewController);
+                controller.useExistingData(audtFilePath, audtFileName, projectDataObject);
+                controller.finishSetup(mainStage, allAudio, mainViewController);
 
                 // Set the scene for the transcription page
                 transcriptionStage.setScene(scene);
@@ -173,6 +189,7 @@ public class ProjectIOHandlers {
                     transcriptionStage.showAndWait();
                     controller.handleSceneClosing();
                     mainViewController.refreshProjectsListView();
+                    mainViewController.stopAllAudioObjects();
                     mainStage.show();  // Show the main scene upon the spectrogram scene's closure
                 }
 

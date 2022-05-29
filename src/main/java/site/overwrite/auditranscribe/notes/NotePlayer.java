@@ -2,7 +2,7 @@
  * NotePlayer.java
  *
  * Created on 2022-05-14
- * Updated on 2022-05-25
+ * Updated on 2022-05-28
  *
  * Description: Class that handles the playing of notes.
  */
@@ -10,7 +10,7 @@
 package site.overwrite.auditranscribe.notes;
 
 import site.overwrite.auditranscribe.exceptions.ValueException;
-import site.overwrite.auditranscribe.utils.UnitConversion;
+import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 import javax.sound.midi.*;
 import java.security.InvalidParameterException;
@@ -87,7 +87,7 @@ public class NotePlayer {
      */
     public void noteOn(int noteNumber, int velocity, boolean failSilently) {
         // Get the MIDI number of the note number
-        int midiNumber = UnitConversion.noteNumberToMIDINumber(noteNumber);
+        int midiNumber = UnitConversionUtils.noteNumberToMIDINumber(noteNumber);
 
         // Ensure that the MIDI number found is not -1
         if (midiNumber == -1 && !failSilently) {
@@ -127,7 +127,7 @@ public class NotePlayer {
      */
     public void noteOff(int noteNumber, int velocity, boolean failSilently) {
         // Get the MIDI number of the note number
-        int midiNumber = UnitConversion.noteNumberToMIDINumber(noteNumber);
+        int midiNumber = UnitConversionUtils.noteNumberToMIDINumber(noteNumber);
 
         // Ensure that the MIDI number found is not -1
         if (midiNumber == -1 && !failSilently) {
@@ -170,7 +170,7 @@ public class NotePlayer {
             int noteNumber, int onVelocity, int offVelocity, long onDuration, long offDuration
     ) throws InvalidParameterException {
         // Get the MIDI number of the note number
-        int midiNumber = UnitConversion.noteNumberToMIDINumber(noteNumber);
+        int midiNumber = UnitConversionUtils.noteNumberToMIDINumber(noteNumber);
 
         // Ensure that the MIDI number found is not -1
         if (midiNumber == -1) {
