@@ -1,8 +1,8 @@
 ![AudiTranscribe Banner](designs/banner/banner.png "AudiTranscribe")
 
-[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](.github/CODE_OF_CONDUCT.md)
 
-A music transcription application.
+An open source music transcription application.
 
 # Features
 AudiTranscribe was built to assist you in transcribing music pieces.
@@ -25,8 +25,11 @@ The software is not perfect. There are a few limitations with the software in it
 - The application is janky and incomplete.
 - The application's functionality and features are (largely) undocumented and missing tutorials.
 
-# License
+# Licence
 This project is licensed under the [GPLv3 licence](LICENSE).
 
+# Security Policy
+Read AudiTranscribe's security policy at [SECURITY.md](.github/SECURITY.md).
+
 # Contributing to AudiTranscribe
-Please read the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+Please read the [CONTRIBUTING.md](.github/CONTRIBUTING.md) file.

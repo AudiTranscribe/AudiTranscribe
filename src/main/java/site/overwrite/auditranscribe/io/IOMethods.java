@@ -2,15 +2,13 @@
  * IOMethods.java
  *
  * Created on 2022-03-15
- * Updated on 2022-05-10
+ * Updated on 2022-05-28
  *
  * Description: Input/Output methods that are used in the AudiTranscribe project.
  */
 
 package site.overwrite.auditranscribe.io;
 
-import net.harawata.appdirs.AppDirs;
-import net.harawata.appdirs.AppDirsFactory;
 import site.overwrite.auditranscribe.MainApplication;
 
 import java.io.*;
@@ -23,10 +21,8 @@ import java.nio.file.Path;
  */
 public class IOMethods {
     // Constants
-    final static AppDirs APP_DIRS_INSTANCE = AppDirsFactory.getInstance();
-
     public static final Path APP_DATA_FOLDER_PATH = Path.of(
-            APP_DIRS_INSTANCE.getUserDataDir("AudiTranscribe", null, "AudiTranscribe")
+            ApplicationDirectory.getUserDataDirectory("AudiTranscribe", null)
     );
     public static final String APP_DATA_FOLDER_PATH_STRING = APP_DATA_FOLDER_PATH + "/";
 

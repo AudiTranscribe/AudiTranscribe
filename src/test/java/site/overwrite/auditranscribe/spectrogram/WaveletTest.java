@@ -2,9 +2,9 @@
  * WaveletTest.java
  *
  * Created on 2022-04-15
- * Updated on 2022-05-14
+ * Updated on 2022-05-28
  *
- * Description: Test `Wavelet.java`
+ * Description: Test `Wavelet.java`.
  */
 
 package site.overwrite.auditranscribe.spectrogram;
@@ -12,7 +12,7 @@ package site.overwrite.auditranscribe.spectrogram;
 import javafx.util.Pair;
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.audio.WindowFunction;
-import site.overwrite.auditranscribe.utils.Complex;
+import site.overwrite.auditranscribe.misc.Complex;
 
 import static org.junit.jupiter.api.Assertions.*;
 

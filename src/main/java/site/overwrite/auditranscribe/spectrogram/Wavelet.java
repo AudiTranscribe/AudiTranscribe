@@ -2,7 +2,7 @@
  * Wavelet.java
  *
  * Created on 2022-02-13
- * Updated on 2022-05-14
+ * Updated on 2022-05-28
  *
  * Description: Class to implement audio windowing functions.
  */
@@ -13,7 +13,7 @@ import javafx.util.Pair;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.SpectralHelpers;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
-import site.overwrite.auditranscribe.utils.Complex;
+import site.overwrite.auditranscribe.misc.Complex;
 import site.overwrite.auditranscribe.utils.MathUtils;
 
 import java.util.ArrayList;
@@ -135,7 +135,7 @@ public class Wavelet {
      * @param alpha          Alpha value.
      * @return Pair of values. First value is a 2D array of the filter. Second value is the lengths
      * of each of the filters.
-     * @implNote From <a href="https://librosa.org/doc/0.9.1/_modules/librosa/filters.html#wavelet">
+     * @see <a href="https://librosa.org/doc/0.9.1/_modules/librosa/filters.html#wavelet">
      * Librosa's Implementation</a>. This code is a Java version of that code.
      * @see <a href="https://www.sciencedirect.com/science/article/abs/pii/037859559090170T">This
      * paper</a> by Glasberg, Brian R., and Brian CJ Moore. "Derivation of auditory filter shapes

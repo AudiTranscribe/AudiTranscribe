@@ -2,7 +2,7 @@
  * MiscUtils.java
  *
  * Created on 2022-04-30
- * Updated on 2022-05-12
+ * Updated on 2022-05-28
  *
  * Description: Miscellaneous utility methods.
  */
@@ -29,7 +29,7 @@ public class MiscUtils {
      */
     public static HashSet<Integer> getNotesInKey(String key) {
         // Convert the key into a note number for easier processing
-        int keyNum = UnitConversion.noteToNoteNumber(key + "0");
+        int keyNum = UnitConversionUtils.noteToNoteNumber(key + "0");
 
         // Get the note offsets and place them into an array (for now)
         Integer[] noteOffsets = switch (keyNum % 12) {  // See the keys inside each musical scale

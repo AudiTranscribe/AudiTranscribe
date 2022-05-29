@@ -2,7 +2,7 @@
  * AUDTFileTest.java
  *
  * Created on 2022-05-01
- * Updated on 2022-05-13
+ * Updated on 2022-05-25
  *
  * Description: Test AUDT file reading and writing.
  */
@@ -18,9 +18,9 @@ import site.overwrite.auditranscribe.io.audt_file.file_handers.AUDTFileReader;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
-import site.overwrite.auditranscribe.io.audt_file.exceptions.FailedToReadDataException;
+import site.overwrite.auditranscribe.exceptions.FailedToReadDataException;
 import site.overwrite.auditranscribe.io.audt_file.file_handers.AUDTFileWriter;
-import site.overwrite.auditranscribe.io.audt_file.exceptions.IncorrectFileFormatException;
+import site.overwrite.auditranscribe.exceptions.IncorrectFileFormatException;
 
 import java.io.IOException;
 
@@ -74,7 +74,10 @@ class AUDTFileTest {
         GUIDataObject readGUIData = fileReader.readGUIData();
 
         // Check if the read data are equal
-        assertEquals(qTransformDataObject, readQTransformData);
+        assertArrayEquals(qTransformDataObject.qTransformMagnitudes[0], readQTransformData.qTransformMagnitudes[0], 1e-4);
+        assertArrayEquals(qTransformDataObject.qTransformMagnitudes[1], readQTransformData.qTransformMagnitudes[1], 1e-4);
+        assertArrayEquals(qTransformDataObject.qTransformMagnitudes[2], readQTransformData.qTransformMagnitudes[2], 1e-4);
+
         assertEquals(audioDataObject, readAudioData);
         assertEquals(guiDataObject, readGUIData);
     }

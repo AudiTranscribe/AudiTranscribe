@@ -8,6 +8,7 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -27,6 +28,8 @@
                   <items>
                     <MenuItem fx:id="newProjectMenuItem" mnemonicParsing="false" text="New Project" />
                         <MenuItem fx:id="openProjectMenuItem" mnemonicParsing="false" text="Open..." />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem fx:id="preferencesMenuItem" mnemonicParsing="false" text="Preferences..." />
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Help">
@@ -78,9 +81,9 @@
                         <Insets left="40.0" />
                      </padding>
                   </TextField>
-                  <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fx:id="searchImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@../../images/icons/PNGs/search.png" />
+                        <Image url="@../../images/icons/PNGs/light-mode/search.png" />
                      </image>
                      <StackPane.margin>
                         <Insets left="10.0" />
@@ -93,7 +96,7 @@
             </StackPane>
             <StackPane prefHeight="357.0" prefWidth="800.0">
                <children>
-                  <VBox alignment="CENTER" prefHeight="357.0" prefWidth="800.0" style="-fx-background-color: white; -fx-border-color: lightgray;">
+                  <VBox alignment="CENTER" prefHeight="357.0" prefWidth="800.0" styleClass="no-projects-vbox">
                      <children>
                         <Label alignment="CENTER" text="No Projects Yet...">
                            <font>

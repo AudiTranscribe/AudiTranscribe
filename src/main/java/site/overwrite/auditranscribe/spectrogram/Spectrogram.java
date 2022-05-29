@@ -2,7 +2,7 @@
  * Spectrogram.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-14
+ * Updated on 2022-05-28
  *
  * Description: Spectrogram class.
  */
@@ -10,15 +10,16 @@
 package site.overwrite.auditranscribe.spectrogram;
 
 import javafx.scene.image.WritableImage;
+import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
+import site.overwrite.auditranscribe.exceptions.ValueException;
 import site.overwrite.auditranscribe.plotting.Plotter;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.CQT;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.VQT;
-import site.overwrite.auditranscribe.utils.Complex;
-import site.overwrite.auditranscribe.utils.UnitConversion;
+import site.overwrite.auditranscribe.misc.Complex;
+import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
-import java.security.InvalidParameterException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -56,6 +57,8 @@ public class Spectrogram {
 
     final Logger logger = Logger.getLogger(this.getClass().getName());
 
+    final CustomTask<?> task;
+
     /**
      * Creates a spectrogram object.
      *
@@ -66,18 +69,18 @@ public class Spectrogram {
      * @param hopLength      Number of samples between successive columns.
      * @param numPxPerSecond Number of pixels of the spectrogram dedicated to each second of audio.
      * @param numPxPerOctave Number of pixels allocated for each octave.
-     * @throws InvalidParameterException If <code>maxNoteNumber - minNoteNumber + 1</code> is not a
-     *                                   multiple of 12.
-     * @throws InvalidParameterException If the image height is too large.
+     * @param task           The <code>CustomTask</code> object that is handling the generation.
+     * @throws ValueException If the value of <code>maxNoteNumber - minNoteNumber + 1</code> is not
+     *                        a multiple of 12.
      */
     public Spectrogram(
             Audio audioObj, int minNoteNumber, int maxNoteNumber, int binsPerOctave, int hopLength,
-            double numPxPerSecond, double numPxPerOctave
+            double numPxPerSecond, double numPxPerOctave, CustomTask<?> task
     ) {
         // Validate that `maxNoteNumber - minNoteNumber + 1` is a multiple of 12
         int numNotes = maxNoteNumber - minNoteNumber + 1;
         if (numNotes % 12 != 0) {
-            throw new InvalidParameterException(
+            throw new ValueException(
                     "Number of notes is not a multiple of 12 (i.e. `maxNoteNumber - minNoteNumber + 1` is not a " +
                             "multiple of 12)"
             );
@@ -88,14 +91,16 @@ public class Spectrogram {
         this.maxNoteNumber = maxNoteNumber;
         numOctaves = numNotes / 12;
 
-        minFreq = UnitConversion.noteNumberToFreq(minNoteNumber);
-        maxFreq = UnitConversion.noteNumberToFreq(maxNoteNumber);
+        minFreq = UnitConversionUtils.noteNumberToFreq(minNoteNumber);
+        maxFreq = UnitConversionUtils.noteNumberToFreq(maxNoteNumber);
 
         this.binsPerOctave = binsPerOctave;
         numFreqBins = numOctaves * binsPerOctave;
 
         sampleRate = audioObj.getSampleRate();
         this.hopLength = hopLength;
+
+        this.task = task;
 
         logger.log(Level.FINE, "Audio sample rate = " + sampleRate);
 
@@ -127,15 +132,17 @@ public class Spectrogram {
      * @param numPxPerOctave Number of pixels allocated for each octave.
      * @param sampleRate     Audio's sampling rate.
      * @param duration       Duration of the audio.
-     * @throws InvalidParameterException If <code>maxNoteNumber - minNoteNumber + 1</code> is not a
-     *                                   multiple of 12.
-     * @throws InvalidParameterException If the image height is too large.
+     * @throws ValueException If the value of <code>maxNoteNumber - minNoteNumber + 1</code> is not
+     *                        a multiple of 12.
      */
-    public Spectrogram(int minNoteNumber, int maxNoteNumber, int binsPerOctave, int hopLength, double numPxPerSecond, double numPxPerOctave, double sampleRate, double duration) {
+    public Spectrogram(
+            int minNoteNumber, int maxNoteNumber, int binsPerOctave, int hopLength, double numPxPerSecond,
+            double numPxPerOctave, double sampleRate, double duration, CustomTask<?> task
+    ) {
         // Validate that `maxNoteNumber - minNoteNumber + 1` is a multiple of 12
         int numNotes = maxNoteNumber - minNoteNumber + 1;
         if (numNotes % 12 != 0) {
-            throw new InvalidParameterException(
+            throw new ValueException(
                     "Number of notes is not a multiple of 12 (i.e. `maxNoteNumber - minNoteNumber + 1` is not a " +
                             "multiple of 12)"
             );
@@ -146,14 +153,16 @@ public class Spectrogram {
         this.maxNoteNumber = maxNoteNumber;
         numOctaves = numNotes / 12;
 
-        minFreq = UnitConversion.noteNumberToFreq(minNoteNumber);
-        maxFreq = UnitConversion.noteNumberToFreq(maxNoteNumber);
+        minFreq = UnitConversionUtils.noteNumberToFreq(minNoteNumber);
+        maxFreq = UnitConversionUtils.noteNumberToFreq(maxNoteNumber);
 
         this.binsPerOctave = binsPerOctave;
         numFreqBins = numOctaves * binsPerOctave;
 
         this.sampleRate = sampleRate;
         this.hopLength = hopLength;
+
+        this.task = task;
 
         logger.log(Level.FINE, "Audio sample rate = " + sampleRate);
 
@@ -188,11 +197,11 @@ public class Spectrogram {
         Complex[][] QTMatrix;
         if (IS_CQT) {
             QTMatrix = CQT.cqt(
-                    samples, sampleRate, hopLength, minFreq, numFreqBins, binsPerOctave, windowFunction
+                    samples, sampleRate, hopLength, minFreq, numFreqBins, binsPerOctave, windowFunction, task
             );
         } else {
             QTMatrix = VQT.vqt(
-                    samples, sampleRate, hopLength, minFreq, numFreqBins, binsPerOctave, GAMMA, windowFunction
+                    samples, sampleRate, hopLength, minFreq, numFreqBins, binsPerOctave, GAMMA, windowFunction, task
             );
         }
 
@@ -279,7 +288,7 @@ public class Spectrogram {
         for (int i = 0; i < numRows; i++) {
             for (int j = 0; j < numCols; j++) {
                 // Get the decibel value for this amplitude
-                double dbVal = UnitConversion.amplitudeToDecibel(moduli[i][j], maxModulus);
+                double dbVal = UnitConversionUtils.amplitudeToDecibel(moduli[i][j], maxModulus);
 
                 // Add it into the magnitudes array
                 magnitudes[i][j] = dbVal;

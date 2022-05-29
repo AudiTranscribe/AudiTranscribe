@@ -2,7 +2,7 @@
  * PlottingStuffHandler.java
  *
  * Created on 2022-03-20
- * Updated on 2022-05-16
+ * Updated on 2022-05-28
  *
  * Description: Class that adds the notes' stuff to the spectrogram area.
  */
@@ -20,7 +20,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.*;
 import site.overwrite.auditranscribe.utils.MiscUtils;
-import site.overwrite.auditranscribe.utils.UnitConversion;
+import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 import java.util.HashSet;
 
@@ -98,7 +98,7 @@ public class PlottingStuffHandler {
 
         for (int i = minNoteNumber; i <= maxNoteNumber; i++) {
             // Get the note's text
-            String note = UnitConversion.noteNumberToNote(i, fancySharps);
+            String note = UnitConversionUtils.noteNumberToNote(i, fancySharps);
 
             // Calculate the height to move the pointer to
             double placementHeight = PlottingHelpers.noteNumToHeight(i, minNoteNumber, maxNoteNumber, height);

@@ -2,14 +2,14 @@
  * Interpolation.java
  *
  * Created on 2022-03-14
- * Updated on 2022-04-16
+ * Updated on 2022-05-25
  *
  * Description: Class containing interpolation functions.
  */
 
 package site.overwrite.auditranscribe.plotting;
 
-import java.security.InvalidParameterException;
+import site.overwrite.auditranscribe.exceptions.LengthException;
 
 /**
  * Class containing interpolation functions.
@@ -24,24 +24,22 @@ public class Interpolation {
      * @param lengthYNew    New length of one subarray.
      * @param interpolation Interpolation method.
      * @return Interpolated version of the array.
-     * @throws InvalidParameterException If the new lengths specified are shorter than the original
-     *                                   lengths.
+     * @throws LengthException If the new lengths specified are shorter than the original lengths.
      */
-    public static double[][] interpolate(double[][] array, int lengthXNew, int lengthYNew,
-                                         InterpolationMethod interpolation) {
+    public static double[][] interpolate(
+            double[][] array, int lengthXNew, int lengthYNew, InterpolationMethod interpolation
+    ) {
         // Get the current `lengthX` and `lengthY`
         int lengthX = array.length;
         int lengthY = array[0].length;
 
         // Ensure that the new length is not shorter than the old length
         if (lengthXNew < lengthX) {
-            throw new InvalidParameterException("New X length " + lengthXNew +
-                    " shorter than original X length " + lengthX);
+            throw new LengthException("New X length " + lengthXNew + " shorter than original X length " + lengthX);
         }
 
         if (lengthYNew < lengthY) {
-            throw new InvalidParameterException("New Y length " + lengthYNew +
-                    " shorter than original Y length " + lengthY);
+            throw new LengthException("New Y length " + lengthYNew + " shorter than original Y length " + lengthY);
         }
 
         // Calculate ratio of the new lengths to the old lengths

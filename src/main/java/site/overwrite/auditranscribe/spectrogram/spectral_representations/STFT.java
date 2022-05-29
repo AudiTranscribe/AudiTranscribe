@@ -2,7 +2,7 @@
  * STFT.java
  *
  * Created on 2022-03-10
- * Updated on 2022-05-14
+ * Updated on 2022-05-28
  *
  * Description: Class that implements the Short-Time Fourier Transform (STFT) algorithm.
  */
@@ -11,7 +11,7 @@ package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
-import site.overwrite.auditranscribe.utils.Complex;
+import site.overwrite.auditranscribe.misc.Complex;
 
 /**
  * Class that implements the Short-Time Fourier Transform (STFT) algorithm.
