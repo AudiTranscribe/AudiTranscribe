@@ -1,6 +1,172 @@
-/* BASE STYLING */
+/* GENERAL STYLING */
 .root {
-    -fx-base: rgba(60, 63, 65, 255);
+    -fx-base: #3c3f41ff;
+    -fx-background: #3c3f41ff;
+    -fx-accent: #808080;
+
+    -fx-inner-border: -fx-base;
+    -fx-inner-border-horizontal: -fx-base;
+    -fx-inner-border-bottomup: -fx-base;
+    -fx-body-color: -fx-base;
+    -fx-body-color-bottomup: -fx-base;
+    -fx-body-color-to-right: -fx-base;
 }
 
-/* Todo: add */
+.pane {
+    -fx-border-color: #ffffffff !important;
+}
+
+/* Buttons */
+.button {
+    -fx-border-color: #646464ff;
+    -fx-border-radius: 3px;
+    -fx-background-color: #4c5052ff;
+}
+
+.button:hover {
+    -fx-background-color: #464a4dff;
+    -fx-border-color: #767c81ff;
+}
+
+.image-button {
+    -fx-background-color: transparent !important;
+    -fx-border-color: transparent !important;
+}
+
+.image-button:hover {
+    -fx-background-color: #464a4dff !important;
+    -fx-border-color: #767c81ff !important;
+}
+
+/* Spinners/Choice Boxes */
+.choice-box, .spinner {
+    -fx-background-color: #646464ff, #3c3f41ff;
+    -fx-background-insets: 0, 1px;
+}
+
+.choice-box .menu-item {
+    -fx-background-color: #3c3f41ff;
+}
+
+.choice-box .menu-item > .label {
+    -fx-text-fill: #bbbbbbff;
+}
+
+.choice-box .menu-item:focused {
+    -fx-background-color: #464a4dff;
+}
+
+.spinner > .text-field {
+    -fx-text-fill: #bbbbbbff;
+    -fx-background-color: transparent;
+}
+
+.arrow, .left-arrow, .right-arrow, .increment-arrow, .decrement-arrow {
+    -fx-background-color: #bbbbbbff;
+    -fx-cursor: hand;
+}
+
+.spinner > .increment-arrow-button, .spinner > .decrement-arrow-button {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+}
+
+.spinner > .increment-arrow-button:hover, .spinner > .decrement-arrow-button:hover {
+    -fx-background-color: #464a4dff;
+    -fx-border-color: #767c81ff;
+}
+
+/* Text */
+.text {
+    -fx-fill: #bbbbbbff;
+}
+
+.text-field {
+    -fx-border-color: #646464ff;
+    -fx-border-radius: 3px;
+    -fx-background-color: #45494aff;
+    -fx-prompt-text-fill: #777777ff;
+}
+
+/* Others */
+.menu-bar {
+    -fx-padding: 0 0 2 0;
+    -fx-background-color: #555555ff, #282828ff, #3c3f41ff;
+    -fx-background-insets: 0, 0 0 1 0, 0 0 2 0;
+}
+
+/* MAIN PAGE */
+/* Text */
+.short-name-text {
+    -fx-fill: #bbbbbbff;
+}
+
+/* Others */
+.short-name-rectangle {
+    -fx-stroke: #ccccccff;
+}
+
+.list-view {
+    -fx-background-color: #313335ff;
+}
+
+.list-cell:hover {
+    -fx-background-color: #464a4dff;
+}
+
+/* TRANSCRIPTION PAGE */
+/* Labels */
+.display-label {
+    -fx-fill: #bbbbbbff;
+}
+
+/* Spectrogram */
+.note-line, .beat-line {
+    -fx-stroke: #ffffff80;
+}
+
+.bar-line {
+    -fx-stroke: #00ff0080;
+}
+
+.bar-number-ellipse {
+    -fx-stroke: #ffffffff;
+}
+
+.current-octave-rectangle {
+    -fx-fill: #ffbf0050;
+}
+
+.spectrogram-square {
+    -fx-border-color: #d3d3d3ff; /* Lightgray */
+}
+
+/* Playback */
+.clickable-progress-pane {
+    -fx-background-color: #00000000;
+}
+
+.coloured-progress-pane {
+    -fx-background-color: #009fff50;
+}
+
+.playhead-line {
+    -fx-stroke: #00bfffff;
+}
+
+/* Others */
+.progress-bar > .bar {
+    -fx-background-color: #5297f7ff;
+}
+
+/* PREFERENCES PAGE */
+/* Labels */
+.warning-label {
+    -fx-text-fill: #ff0000ff;
+}
+
+/* Buttons */
+.ok-button {
+    -fx-background-color: #4c8acaff;
+    -fx-text-fill: #ffffffff;
+}

@@ -249,12 +249,12 @@
                      </children>
                   </AnchorPane>
                </children>
-               <stylesheets>
-                  <URL value="@../css/base.css" />
-                  <URL value="@../css/light-mode.css" />
-               </stylesheets>
             </AnchorPane>
          </children>
       </VBox>
    </children>
+   <stylesheets>
+      <URL value="@../css/base.css" />
+      <URL value="@../css/light-mode.css" />
+   </stylesheets>
 </AnchorPane>
