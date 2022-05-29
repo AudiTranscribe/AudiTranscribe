@@ -31,6 +31,7 @@ import org.javatuples.Quartet;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.PropertyFile;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
+import site.overwrite.auditranscribe.io.settings_file.SettingsData;
 import site.overwrite.auditranscribe.io.settings_file.SettingsFile;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.utils.MiscUtils;
@@ -80,6 +81,9 @@ public class MainViewController implements Initializable {
 
     @FXML
     private TextField searchTextField;
+
+    @FXML
+    private ImageView searchImage;
 
     @FXML
     private ListView<Quartet<Long, String, String, String>> projectsListView;
@@ -161,17 +165,22 @@ public class MainViewController implements Initializable {
     // Public methods
 
     /**
-     * Method that sets the CSS stylesheets for the scene.
+     * Method that sets the theme for the scene.
      */
-    public void setCSSOnScene() {
+    public void setThemeOnScene() {
+        // Get the theme
+        Theme theme = Theme.values()[settingsFile.settingsData.themeEnumOrdinal];
+
+        // Set stylesheets
         rootPane.getStylesheets().clear();  // Reset the stylesheets first before adding new ones
 
         rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
-        rootPane.getStylesheets().add(
-                IOMethods.getFileURLAsString("views/css/" +
-                        Theme.values()[settingsFile.settingsData.themeEnumOrdinal].cssFile
-                )
-        );
+        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/" + theme.cssFile));
+
+        // Set graphics
+        searchImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/icons/PNGs/" + theme.shortName + "/search.png"
+        )));
     }
 
     /**
@@ -233,7 +242,9 @@ public class MainViewController implements Initializable {
             projectsListView.setBackground(Background.fill(Color.WHITE));
             projectsListView.setItems(new SortedList<>(filteredList));  // Use a sorted list for searching
             projectsListView.setCellFactory(
-                    customListCellListView -> new CustomListCell(projectsDB, projectsListView)
+                    customListCellListView -> new CustomListCell(
+                            projectsDB, projectsListView, settingsFile.settingsData
+                    )
             );
         } else {
             projectsListView.setBackground(Background.fill(Color.TRANSPARENT));
@@ -294,7 +305,7 @@ public class MainViewController implements Initializable {
 
         Button removeButton;
 
-        public CustomListCell(ProjectsDB db, ListView<?> projectsListView) {
+        public CustomListCell(ProjectsDB db, ListView<?> projectsListView, SettingsData settingsData) {
             // Call superclass initialization method
             super();
 
@@ -329,7 +340,11 @@ public class MainViewController implements Initializable {
 
             // Set the removal button's style and method
             ImageView removeButtonGraphic = new ImageView(
-                    new Image(IOMethods.getFileURLAsString("images/icons/PNGs/close.png"))
+                    new Image(IOMethods.getFileURLAsString(
+                            "images/icons/PNGs/" +
+                                    Theme.values()[settingsData.themeEnumOrdinal].shortName +
+                                    "/close.png"
+                    ))
             );
             removeButtonGraphic.setFitWidth(40);
             removeButtonGraphic.setFitHeight(40);

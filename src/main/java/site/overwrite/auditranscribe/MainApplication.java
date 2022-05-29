@@ -33,7 +33,7 @@ public class MainApplication extends Application {
         MainViewController controller = fxmlLoader.getController();
 
         // Set the theme of the scene
-        controller.setCSSOnScene();
+        controller.setThemeOnScene();
 
         // Set stage properties
         stage.setTitle("Welcome to AudiTranscribe");

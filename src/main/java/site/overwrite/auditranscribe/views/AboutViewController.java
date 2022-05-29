@@ -15,6 +15,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -42,6 +44,9 @@ public class AboutViewController implements Initializable {
     // FXML Elements
     @FXML
     private Pane rootPane;
+
+    @FXML
+    private ImageView bannerImage;
 
     @FXML
     private Label versionLabel;
@@ -79,17 +84,22 @@ public class AboutViewController implements Initializable {
     // Public methods
 
     /**
-     * Method that sets the CSS stylesheets for the scene.
+     * Method that sets the theme for the scene.
      */
-    public void setCSSOnScene() {
+    public void setThemeOnScene() {
+        // Get the theme
+        Theme theme = Theme.values()[settingsFile.settingsData.themeEnumOrdinal];
+
+        // Set stylesheets
         rootPane.getStylesheets().clear();  // Reset the stylesheets first before adding new ones
 
         rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
-        rootPane.getStylesheets().add(
-                IOMethods.getFileURLAsString("views/css/" +
-                        Theme.values()[settingsFile.settingsData.themeEnumOrdinal].cssFile
-                )
-        );
+        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/" + theme.cssFile));
+
+        // Set graphics
+        bannerImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/logo-and-banner/banner-" + theme.shortName + ".png"
+        )));
     }
 
     /**
@@ -111,7 +121,7 @@ public class AboutViewController implements Initializable {
             controller.setSettingsFile(settingsFile);
 
             // Set the theme of the scene
-            controller.setCSSOnScene();
+            controller.setThemeOnScene();
 
             // Set stage properties
             Stage aboutStage = new Stage();

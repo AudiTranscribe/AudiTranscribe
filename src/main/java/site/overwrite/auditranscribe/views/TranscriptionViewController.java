@@ -128,6 +128,7 @@ public class TranscriptionViewController implements Initializable {
     Stage mainStage;
     MainViewController mainViewController;
     SettingsFile settingsFile;
+    Theme theme;
 
     NotePlayer notePlayer;
 
@@ -180,6 +181,9 @@ public class TranscriptionViewController implements Initializable {
     private Button newProjectButton, openProjectButton, saveProjectButton;
 
     @FXML
+    private ImageView newProjectButtonImage, openProjectButtonImage, saveProjectButtonImage;
+
+    @FXML
     private ChoiceBox<String> musicKeyChoice, timeSignatureChoice;
 
     @FXML
@@ -217,7 +221,8 @@ public class TranscriptionViewController implements Initializable {
     private Button playButton, stopButton, playSkipBackButton, playSkipForwardButton, scrollButton, volumeButton;
 
     @FXML
-    private ImageView playButtonImage, volumeButtonImage, scrollButtonImage;
+    private ImageView playButtonImage, stopButtonImage, playSkipBackButtonImage, playSkipForwardButtonImage,
+            scrollButtonImage, volumeButtonImage;
 
     @FXML
     private Slider volumeSlider;
@@ -230,10 +235,6 @@ public class TranscriptionViewController implements Initializable {
         if (os != null && os.startsWith("Mac")) {
             menuBar.useSystemMenuBarProperty().set(true);
         }
-
-        // Add CSS stylesheets to the scene
-        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
-        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/light-mode.css"));  // Todo: add theme support
 
         // Set the width and height of the root pane
         masterVBox.prefWidthProperty().bind(rootPane.widthProperty());
@@ -402,7 +403,9 @@ public class TranscriptionViewController implements Initializable {
             // Change the icon of the volume button from mute to non-mute
             if (isMuted) {
                 volumeButtonImage.setImage(
-                        new Image(IOMethods.getFileURLAsString("images/icons/PNGs/volume-high.png"))
+                        new Image(IOMethods.getFileURLAsString(
+                                "images/icons/PNGs/" + theme.shortName + "/volume-high.png"
+                        ))
                 );
                 isMuted = false;
             }
@@ -503,19 +506,48 @@ public class TranscriptionViewController implements Initializable {
     // Public methods
 
     /**
-     * Method that sets the CSS stylesheets for the scene.
+     * Method that sets the theme for the scene.
      */
-    public void setCSSOnScene() {
+    public void setThemeOnScene() {
+        // Get the theme
+        theme = Theme.values()[settingsFile.settingsData.themeEnumOrdinal];
+
+        // Set stylesheets
         rootPane.getStylesheets().clear();  // Reset the stylesheets first before adding new ones
 
         rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
-        rootPane.getStylesheets().add(
-                IOMethods.getFileURLAsString("views/css/" +
-                        Theme.values()[settingsFile.settingsData.themeEnumOrdinal].cssFile
-                )
-        );
-    }
+        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/" + theme.cssFile));
 
+        // Set graphics
+        newProjectButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/icons/PNGs/" + theme.shortName + "/create.png"
+        )));
+        openProjectButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/icons/PNGs/" + theme.shortName + "/folder-open.png"
+        )));
+        saveProjectButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/icons/PNGs/" + theme.shortName + "/save.png"
+        )));
+
+        playButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/icons/PNGs/" + theme.shortName + "/play.png"
+        )));
+        stopButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/icons/PNGs/" + theme.shortName + "/stop.png"
+        )));
+        playSkipBackButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/icons/PNGs/" + theme.shortName + "/play-skip-back.png"
+        )));
+        playSkipForwardButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/icons/PNGs/" + theme.shortName + "/play-skip-forward.png"
+        )));
+        scrollButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/icons/PNGs/" + theme.shortName + "/footsteps-outline.png"
+        )));
+        volumeButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/icons/PNGs/" + theme.shortName + "/volume-high.png"
+        )));
+    }
 
     /**
      * Method that finishes the setting up of the transcription view controller.<br>
@@ -920,7 +952,9 @@ public class TranscriptionViewController implements Initializable {
     private boolean togglePaused(boolean isPaused) {
         if (isPaused) {
             // Change the icon of the play button from the play icon to the paused icon
-            playButtonImage.setImage(new Image(IOMethods.getFileURLAsString("images/icons/PNGs/pause.png")));
+            playButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                    "images/icons/PNGs/" + theme.shortName + "/pause.png"
+            )));
 
             // Unpause the audio (i.e. play the audio)
             try {
@@ -931,7 +965,9 @@ public class TranscriptionViewController implements Initializable {
 
         } else {
             // Change the icon of the play button from the paused icon to the play icon
-            playButtonImage.setImage(new Image(IOMethods.getFileURLAsString("images/icons/PNGs/play.png")));
+            playButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                    "images/icons/PNGs/" + theme.shortName + "/play.png"
+            )));
 
             // Pause the audio
             try {
@@ -1223,13 +1259,17 @@ public class TranscriptionViewController implements Initializable {
         if (scrollToPlayhead) {
             // Change the icon of the scroll button from filled to non-filled
             scrollButtonImage.setImage(
-                    new Image(IOMethods.getFileURLAsString("images/icons/PNGs/footsteps-outline.png"))
+                    new Image(IOMethods.getFileURLAsString(
+                            "images/icons/PNGs/" + theme.shortName + "/footsteps-outline.png"
+                    ))
             );
 
         } else {
             // Change the icon of the scroll button from non-filled to filled
             scrollButtonImage.setImage(
-                    new Image(IOMethods.getFileURLAsString("images/icons/PNGs/footsteps-filled.png"))
+                    new Image(IOMethods.getFileURLAsString(
+                            "images/icons/PNGs/" + theme.shortName + "/footsteps-filled.png"
+                    ))
             );
         }
 
@@ -1246,7 +1286,9 @@ public class TranscriptionViewController implements Initializable {
         if (isMuted) {
             // Change the icon of the volume button from mute to non-mute
             volumeButtonImage.setImage(
-                    new Image(IOMethods.getFileURLAsString("images/icons/PNGs/volume-high.png"))
+                    new Image(IOMethods.getFileURLAsString(
+                            "images/icons/PNGs/" + theme.shortName + "/volume-high.png"
+                    ))
             );
 
             // Unmute the audio by setting the volume back to the value before the mute
@@ -1258,7 +1300,9 @@ public class TranscriptionViewController implements Initializable {
         } else {
             // Change the icon of the volume button from non-mute to mute
             volumeButtonImage.setImage(
-                    new Image(IOMethods.getFileURLAsString("images/icons/PNGs/volume-mute.png"))
+                    new Image(IOMethods.getFileURLAsString(
+                            "images/icons/PNGs/" + theme.shortName + "/volume-mute.png"
+                    ))
             );
 
             // Mute the audio by setting the volume to zero

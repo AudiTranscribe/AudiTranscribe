@@ -2,7 +2,7 @@
  * Theme.java
  *
  * Created on 2022-05-28
- * Updated on 2022-05-28
+ * Updated on 2022-05-29
  *
  * Description: Theme enum.
  */
@@ -11,17 +11,19 @@ package site.overwrite.auditranscribe.misc;
 
 public enum Theme {
     // Enum values
-    LIGHT_MODE("Light Mode", "light-mode.css"),
-    DARK_MODE("Dark Mode", "dark-mode.css");
+    LIGHT_MODE("Light Mode", "light-mode"),
+    DARK_MODE("Dark Mode", "dark-mode");
 
     // Enum attributes
-    public final String cssFile;
     private final String name;
+    public final String shortName;
+    public final String cssFile;
 
     // Enum constructor
-    Theme(String name, String cssFile) {
+    Theme(String name, String shortName) {
         this.name = name;
-        this.cssFile = cssFile;
+        this.shortName = shortName;
+        this.cssFile = shortName + ".css";
     }
 
     // Override methods

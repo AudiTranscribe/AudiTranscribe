@@ -83,12 +83,13 @@ public class PreferencesViewController implements Initializable {
     // Public methods
 
     /**
-     * Method that sets the CSS stylesheets for the scene.<br>
+     * Method that sets the theme for the scene.<br>
      * Note that this method has to be called after the setting file has been set.
      *
-     * @param theme The theme to set the CSS stylesheets for.
+     * @param theme The theme to set.
      */
-    public void setCSSOnScene(Theme theme) {
+    public void setThemeOnScene(Theme theme) {
+        // Set stylesheets
         rootPane.getStylesheets().clear();  // Reset the stylesheets first before adding new ones
 
         rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
@@ -96,11 +97,11 @@ public class PreferencesViewController implements Initializable {
     }
 
     /**
-     * Method that sets the CSS stylesheets for the scene.<br>
+     * Method that sets the theme for the scene.<br>
      * Note that this method has to be called after the setting file has been set.
      */
-    public void setCSSOnScene() {
-        setCSSOnScene(Theme.values()[settingsFile.settingsData.themeEnumOrdinal]);
+    public void setThemeOnScene() {
+        setThemeOnScene(Theme.values()[settingsFile.settingsData.themeEnumOrdinal]);
     }
 
     /**
@@ -121,7 +122,7 @@ public class PreferencesViewController implements Initializable {
 
         themeChoiceBox.setOnAction(event -> {
             applyButton.setDisable(false);
-            setCSSOnScene(themeChoiceBox.getValue());
+            setThemeOnScene(themeChoiceBox.getValue());
         });
     }
 
@@ -144,7 +145,7 @@ public class PreferencesViewController implements Initializable {
             controller.setSettingsFile(settingsFile);
 
             // Set the theme of the scene
-            controller.setCSSOnScene();
+            controller.setThemeOnScene();
 
             // Set choice boxes' values
             controller.setUpChoiceBoxes();

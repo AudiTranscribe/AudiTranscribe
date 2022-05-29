@@ -70,7 +70,7 @@ public class ProjectIOHandlers {
                 controller.setSettingsFile(settingsFile);
 
                 // Set the theme of the scene
-                controller.setCSSOnScene();
+                controller.setThemeOnScene();
 
                 // Set the project data for the existing project
                 controller.setAudioAndSpectrogramData(audio);
@@ -152,7 +152,7 @@ public class ProjectIOHandlers {
                 controller.setSettingsFile(settingsFile);
 
                 // Set the theme of the scene
-                controller.setCSSOnScene();
+                controller.setThemeOnScene();
 
                 // Set the project data for the existing project
                 controller.useExistingData(audtFilePath, audtFileName, projectDataObject);
