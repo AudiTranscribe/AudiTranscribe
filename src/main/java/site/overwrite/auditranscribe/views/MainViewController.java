@@ -28,6 +28,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.javatuples.Pair;
 import org.javatuples.Quartet;
+import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.PropertyFile;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
@@ -39,6 +40,7 @@ import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InvalidObjectException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -55,7 +57,9 @@ public class MainViewController implements Initializable {
     // Attributes
     ProjectsDB projectsDB;
     Stage transcriptionStage = new Stage();  // Will be used and shown later
+
     FilteredList<Quartet<Long, String, String, String>> filteredList;  // List of project records
+    private final List<Audio> allAudio = new ArrayList<>(0);  // List of all opened `Audio` objects
 
     private final SettingsFile settingsFile = new SettingsFile();
 
@@ -143,7 +147,9 @@ public class MainViewController implements Initializable {
                 Window window = rootPane.getScene().getWindow();
 
                 // Open the project with the filepath
-                ProjectIOHandlers.openProject((Stage) window, transcriptionStage, file, settingsFile, this);
+                ProjectIOHandlers.openProject(
+                        (Stage) window, transcriptionStage, file, settingsFile, allAudio, this
+                );
             }
         });
 
@@ -251,6 +257,24 @@ public class MainViewController implements Initializable {
         }
     }
 
+    /**
+     * Method that stops all the audio objects that have been loaded.
+     */
+    public void stopAllAudioObjects() {
+        // Stop all `Audio` objects
+        for (Audio audio: allAudio) {
+            try {
+                audio.stopAudio();
+                logger.log(Level.FINE, "Stopped audio: " + audio.getAudioFileName());
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        // Clear the `allAudio` list
+        allAudio.clear();
+    }
+
     // Private methods
 
     /**
@@ -266,7 +290,9 @@ public class MainViewController implements Initializable {
         File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
         // Create the new project
-        ProjectIOHandlers.newProject((Stage) window, transcriptionStage, file, settingsFile, this);
+        ProjectIOHandlers.newProject(
+                (Stage) window, transcriptionStage, file, settingsFile, allAudio, this
+        );
     }
 
     /**
@@ -282,7 +308,9 @@ public class MainViewController implements Initializable {
         File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
         // Open the existing project
-        ProjectIOHandlers.openProject((Stage) window, transcriptionStage, file, settingsFile, this);
+        ProjectIOHandlers.openProject(
+                (Stage) window, transcriptionStage, file, settingsFile, allAudio, this
+        );
     }
 
     // Helper classes

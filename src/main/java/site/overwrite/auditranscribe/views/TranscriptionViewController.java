@@ -56,6 +56,7 @@ import java.io.InvalidObjectException;
 import java.net.URL;
 import java.security.InvalidParameterException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.*;
@@ -136,6 +137,7 @@ public class TranscriptionViewController implements Initializable {
 
     private final Logger logger = Logger.getLogger(this.getClass().getName());
     private ProjectsDB projectsDB;
+    private List<Audio> allAudio;
 
     private String audtFilePath;
     private String audtFileName;
@@ -546,12 +548,17 @@ public class TranscriptionViewController implements Initializable {
      * been set up.
      *
      * @param mainStage          Main stage.
+     * @param allAudio           List of all opened <code>Audio</code> objects.
      * @param mainViewController Controller object of the main class.
      */
-    public void finishSetup(Stage mainStage, MainViewController mainViewController) {
+    public void finishSetup(Stage mainStage, List<Audio> allAudio, MainViewController mainViewController) {
         // Update attributes
         this.mainStage = mainStage;
         this.mainViewController = mainViewController;
+        this.allAudio = allAudio;
+
+        // Append the current audio to the list of all audio
+        allAudio.add(audio);
 
         // Set choices
         musicKeyChoice.setValue(MUSIC_KEYS[musicKeyIndex]);
@@ -836,14 +843,26 @@ public class TranscriptionViewController implements Initializable {
         // Do not do anything if the button is disabled
         if (newProjectButton.isDisabled()) return;
 
+        // Pause the current audio
+        isPaused = togglePaused(false);
+
         // Get the current window
         Window window = rootPane.getScene().getWindow();
 
         // Get user to select a file
         File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
+        // If a file was selected, stop the audio completely
+        if (file != null) {
+            try {
+                audio.stopAudio();
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         // Create the new project
-        ProjectIOHandlers.newProject(mainStage, (Stage) window, file, settingsFile, mainViewController);
+        ProjectIOHandlers.newProject(mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController);
     }
 
     /**
@@ -855,14 +874,26 @@ public class TranscriptionViewController implements Initializable {
         // Do not do anything if the button is disabled
         if (openProjectButton.isDisabled()) return;
 
+        // Pause the current audio
+        isPaused = togglePaused(false);
+
         // Get the current window
         Window window = rootPane.getScene().getWindow();
 
         // Get user to select a file
         File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
+        // If a file was selected, stop the audio completely
+        if (file != null) {
+            try {
+                audio.stopAudio();
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         // Open the existing project
-        ProjectIOHandlers.openProject(mainStage, (Stage) window, file, settingsFile, mainViewController);
+        ProjectIOHandlers.openProject(mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController);
     }
 
     /**
@@ -1370,6 +1401,9 @@ public class TranscriptionViewController implements Initializable {
      * @param keyEvent Key press event.
      */
     private void keyPressEventHandler(KeyEvent keyEvent) {
+        // If the spectrogram is not ready do not do anything
+        if (!isSpectrogramReady) return;
+
         // Get the key event's target
         Node target = (Node) keyEvent.getTarget();
 
@@ -1430,7 +1464,7 @@ public class TranscriptionViewController implements Initializable {
             File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
             // Create the new project
-            ProjectIOHandlers.newProject(mainStage, (Stage) window, file, settingsFile, mainViewController);
+            ProjectIOHandlers.newProject(mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController);
 
         } else if (OPEN_PROJECT_COMBINATION.match(keyEvent)) {  // Open a project
             // Consume the key event
@@ -1443,7 +1477,7 @@ public class TranscriptionViewController implements Initializable {
             File file = ProjectIOHandlers.getFileFromFileDialog(window);
 
             // Open the existing project
-            ProjectIOHandlers.openProject(mainStage, (Stage) window, file, settingsFile, mainViewController);
+            ProjectIOHandlers.openProject(mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController);
 
         } else if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {  // Save current project
             handleSavingProject(false);
@@ -1500,6 +1534,9 @@ public class TranscriptionViewController implements Initializable {
      * @param keyEvent Key released event.
      */
     private void keyReleasedEventHandler(KeyEvent keyEvent) {
+        // If the spectrogram is not ready do not do anything
+        if (!isSpectrogramReady) return;
+
         // Handle key event
         KeyCode code = keyEvent.getCode();
 
