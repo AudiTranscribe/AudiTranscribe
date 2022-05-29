@@ -527,15 +527,20 @@ public class TranscriptionViewController implements Initializable {
     /**
      * Method that sets the volume slider's CSS.
      */
-    public void setVolumeSliderCSS() {
+    public void updateVolumeSliderCSS() {
+        // Generate the style of the volume slider for the current volume value
         String style = String.format(
                 "-fx-background-color: linear-gradient(" +
                         "to right, -slider-filled-colour %f%%, -slider-unfilled-colour %f%%" +
                         ");",
                 volume * 100, volume * 100);
 
+        // Apply the style to the volume slider's track (if available)
         StackPane track = (StackPane) volumeSlider.lookup(".track");
         if (track != null) track.setStyle(style);
+
+        // Enable the volume slider (if disabled)
+        if (volumeSlider.isDisabled()) volumeSlider.setDisable(false);
     }
 
     /**
@@ -594,13 +599,10 @@ public class TranscriptionViewController implements Initializable {
             }
 
             // Update CSS
-            setVolumeSliderCSS();
+            updateVolumeSliderCSS();
 
             logger.log(Level.FINE, "Changed volume from " + oldValue + " to " + newValue);
         });
-
-        // Update sliders
-        volumeSlider.setValue(volume);
 
         // Update labels
         totalTimeLabel.setText(UnitConversionUtils.secondsToTimeString(audioDuration));
@@ -671,7 +673,7 @@ public class TranscriptionViewController implements Initializable {
      * Method that sets the audio and spectrogram data for the transcription view controller.<br>
      * This method uses the actual audio file to do the setting of the data.
      *
-     * @param audioObj     An <code>Audio</code> object that contains audio data.
+     * @param audioObj An <code>Audio</code> object that contains audio data.
      */
     public void setAudioAndSpectrogramData(Audio audioObj) {
         // Set attributes
@@ -1240,8 +1242,9 @@ public class TranscriptionViewController implements Initializable {
                 throw new RuntimeException(e);
             }
 
-            // Update volume slider CSS
-            setVolumeSliderCSS();
+            // Update volume slider
+            volumeSlider.setValue(volume);
+            updateVolumeSliderCSS();
 
             // Ensure main pane is in focus
             rootPane.requestFocus();

@@ -54,7 +54,7 @@
                            <children>
                               <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                                  <children>
-                                    <Button fx:id="newProjectButton" contentDisplay="CENTER" mnemonicParsing="false" styleClass="image-button">
+                                    <Button fx:id="newProjectButton" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="30.0" styleClass="image-button">
                                        <graphic>
                                           <ImageView fx:id="newProjectButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
@@ -63,7 +63,7 @@
                                           </ImageView>
                                        </graphic>
                                     </Button>
-                                    <Button fx:id="openProjectButton" contentDisplay="CENTER" layoutX="20.0" layoutY="18.0" mnemonicParsing="false" styleClass="image-button">
+                                    <Button fx:id="openProjectButton" contentDisplay="CENTER" layoutX="20.0" layoutY="18.0" mnemonicParsing="false" prefHeight="30.0" styleClass="image-button">
                                        <graphic>
                                           <ImageView fx:id="openProjectButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
@@ -72,7 +72,7 @@
                                           </ImageView>
                                        </graphic>
                                     </Button>
-                                    <Button fx:id="saveProjectButton" contentDisplay="CENTER" layoutX="72.0" layoutY="18.0" mnemonicParsing="false" styleClass="image-button">
+                                    <Button fx:id="saveProjectButton" contentDisplay="CENTER" layoutX="72.0" layoutY="18.0" mnemonicParsing="false" prefHeight="30.0" styleClass="image-button">
                                        <graphic>
                                           <ImageView fx:id="saveProjectButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
@@ -91,10 +91,10 @@
                                     <Insets left="10.0" right="10.0" />
                                  </padding>
                                  <children>
-                                    <ChoiceBox fx:id="musicKeyChoice" prefWidth="150.0" />
-                                    <Spinner fx:id="bpmSpinner" editable="true" />
-                                    <ChoiceBox fx:id="timeSignatureChoice" prefWidth="150.0" />
-                                    <Spinner fx:id="offsetSpinner" editable="true" />
+                                    <ChoiceBox fx:id="musicKeyChoice" prefHeight="30.0" prefWidth="150.0" />
+                                    <Spinner fx:id="bpmSpinner" editable="true" prefHeight="30.0" />
+                                    <ChoiceBox fx:id="timeSignatureChoice" prefHeight="30.0" prefWidth="150.0" />
+                                    <Spinner fx:id="offsetSpinner" editable="true" prefHeight="30.0" />
                                  </children>
                               </HBox>
                               <HBox fx:id="progressBarHBox" alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0" HBox.hgrow="ALWAYS">
@@ -102,8 +102,8 @@
                                     <Insets left="10.0" right="10.0" />
                                  </padding>
                                  <children>
-                                    <ProgressBar fx:id="progressBar" progress="0.0" />
-                                    <Label fx:id="progressLabel" text="Doing task now..." textOverrun="WORD_ELLIPSIS" />
+                                    <ProgressBar fx:id="progressBar" prefHeight="20.0" progress="0.0" />
+                                    <Label fx:id="progressLabel" prefHeight="30.0" text="Doing task now..." textOverrun="WORD_ELLIPSIS" />
                                  </children>
                               </HBox>
                            </children>
@@ -238,7 +238,7 @@
                                           </ImageView>
                                        </graphic>
                                     </Button>
-                                    <Slider fx:id="volumeSlider" max="1.0" styleClass="volume-slider" value="0.5" />
+                                    <Slider fx:id="volumeSlider" disable="true" max="1.0" styleClass="volume-slider" value="0.5" />
                                  </children>
                                  <padding>
                                     <Insets left="10.0" right="10.0" />

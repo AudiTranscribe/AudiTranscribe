@@ -118,3 +118,7 @@
 .playhead-line {
     -fx-stroke-width: 5px;
 }
+
+.volume-slider .track {
+    -fx-background-color: linear-gradient(to right, -slider-filled-colour 50%, -slider-unfilled-colour 50%);
+}
