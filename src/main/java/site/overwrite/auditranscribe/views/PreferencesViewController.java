@@ -2,7 +2,7 @@
  * PreferencesViewController.java
  *
  * Created on 2022-05-22
- * Updated on 2022-05-25
+ * Updated on 2022-05-29
  *
  * Description: Contains the preferences view's controller class.
  */
@@ -90,9 +90,9 @@ public class PreferencesViewController implements Initializable {
         windowFunctionChoiceBox.setValue(WindowFunction.values()[settingsFile.settingsData.windowFunctionEnumOrdinal]);
 
         // Add methods to choice boxes
-        // Todo: is there a more DRY way of doing this?
-        colourScaleChoiceBox.setOnAction(event -> applyButton.setDisable(false));
-        windowFunctionChoiceBox.setOnAction(event -> applyButton.setDisable(false));
+        for (ChoiceBox<?> choiceBox : new ChoiceBox[]{colourScaleChoiceBox, windowFunctionChoiceBox}) {
+            choiceBox.setOnAction(event -> applyButton.setDisable(false));
+        }
     }
 
     /**
