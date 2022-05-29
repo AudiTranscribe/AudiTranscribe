@@ -152,6 +152,15 @@
     -fx-stroke: #00bfffff;
 }
 
+.volume-slider .track {
+    -slider-unfilled-colour: #313335ff;
+    -slider-filled-colour: #007bd9ff;
+}
+
+.volume-slider .thumb {
+    -fx-background-color: #5d6266ff;
+}
+
 /* Others */
 .progress-bar > .bar {
     -fx-background-color: #31578cff;

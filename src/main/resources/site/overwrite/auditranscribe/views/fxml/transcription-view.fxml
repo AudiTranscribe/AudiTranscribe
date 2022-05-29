@@ -238,7 +238,7 @@
                                           </ImageView>
                                        </graphic>
                                     </Button>
-                                    <Slider fx:id="volumeSlider" max="1.0" value="0.5" />
+                                    <Slider fx:id="volumeSlider" max="1.0" styleClass="volume-slider" value="0.5" />
                                  </children>
                                  <padding>
                                     <Insets left="10.0" right="10.0" />

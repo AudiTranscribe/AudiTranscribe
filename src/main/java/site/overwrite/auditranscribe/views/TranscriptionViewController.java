@@ -395,31 +395,6 @@ public class TranscriptionViewController implements Initializable {
 
         scrollButton.setOnAction(event -> toggleScrollButton());
 
-        // Set method on the volume slider
-        volumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            // Update the volume value
-            volume = newValue.doubleValue();
-
-            // Change the icon of the volume button from mute to non-mute
-            if (isMuted) {
-                volumeButtonImage.setImage(
-                        new Image(IOMethods.getFileURLAsString(
-                                "images/icons/PNGs/" + theme.shortName + "/volume-high.png"
-                        ))
-                );
-                isMuted = false;
-            }
-
-            // Update audio volume
-            try {
-                audio.setPlaybackVolume(volume);
-            } catch (InvalidObjectException e) {
-                throw new RuntimeException(e);
-            }
-
-            logger.log(Level.FINE, "Changed volume from " + oldValue + " to " + newValue);
-        });
-
         // Set spectrogram pane click method
         spectrogramPaneAnchor.setOnMouseClicked(event -> {
             if (isSpectrogramReady) {
@@ -550,6 +525,20 @@ public class TranscriptionViewController implements Initializable {
     }
 
     /**
+     * Method that sets the volume slider's CSS.
+     */
+    public void setVolumeSliderCSS() {
+        String style = String.format(
+                "-fx-background-color: linear-gradient(" +
+                        "to right, -slider-filled-colour %f%%, -slider-unfilled-colour %f%%" +
+                        ");",
+                volume * 100, volume * 100);
+
+        StackPane track = (StackPane) volumeSlider.lookup(".track");
+        if (track != null) track.setStyle(style);
+    }
+
+    /**
      * Method that finishes the setting up of the transcription view controller.<br>
      * Note that this method has to be called <b>last</b>, after all other spectrogram things have
      * been set up.
@@ -581,6 +570,34 @@ public class TranscriptionViewController implements Initializable {
 
         bpmSpinner.setValueFactory(bpmSpinnerFactory);
         offsetSpinner.setValueFactory(offsetSpinnerFactory);
+
+        // Set method on the volume slider
+        volumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            // Update the volume value
+            volume = newValue.doubleValue();
+
+            // Change the icon of the volume button from mute to non-mute
+            if (isMuted) {
+                volumeButtonImage.setImage(
+                        new Image(IOMethods.getFileURLAsString(
+                                "images/icons/PNGs/" + theme.shortName + "/volume-high.png"
+                        ))
+                );
+                isMuted = false;
+            }
+
+            // Update audio volume
+            try {
+                audio.setPlaybackVolume(volume);
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
+
+            // Update CSS
+            setVolumeSliderCSS();
+
+            logger.log(Level.FINE, "Changed volume from " + oldValue + " to " + newValue);
+        });
 
         // Update sliders
         volumeSlider.setValue(volume);
@@ -1222,6 +1239,9 @@ public class TranscriptionViewController implements Initializable {
             } catch (InvalidObjectException e) {
                 throw new RuntimeException(e);
             }
+
+            // Update volume slider CSS
+            setVolumeSliderCSS();
 
             // Ensure main pane is in focus
             rootPane.requestFocus();

@@ -48,6 +48,11 @@
     -fx-stroke: #00bfffff;
 }
 
+.volume-slider .track {
+    -slider-unfilled-colour: #e0e0e0ff;
+    -slider-filled-colour: #6caad9ff;
+}
+
 /* PREFERENCES PAGE */
 /* Labels */
 .warning-label {
