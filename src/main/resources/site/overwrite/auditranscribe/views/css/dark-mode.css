@@ -112,6 +112,11 @@
     -fx-background-color: #464a4dff;
 }
 
+.list-cell:selected .text {
+    -fx-fill: #bbbbbbff;
+    -fx-text-fill: #bbbbbbff;
+}
+
 /* TRANSCRIPTION PAGE */
 /* Labels */
 .display-label {

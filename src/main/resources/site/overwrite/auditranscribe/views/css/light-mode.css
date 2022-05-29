@@ -8,6 +8,11 @@
     -fx-background-color: #e0e0e0ff;
 }
 
+.list-cell:selected .text {
+    -fx-fill: #000000ff;
+    -fx-text-fill: #000000ff;
+}
+
 /* TRANSCRIPTION PAGE */
 /* Labels */
 .display-label {
@@ -32,7 +37,7 @@
 }
 
 .spectrogram-square {
-    -fx-border-color: #d3d3d3ff;  /* Lightgray */
+    -fx-border-color: #d3d3d3ff; /* Lightgray */
 }
 
 /* Playback */
