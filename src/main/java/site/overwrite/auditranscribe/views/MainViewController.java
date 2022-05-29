@@ -24,6 +24,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.javatuples.Pair;
@@ -253,7 +254,8 @@ public class MainViewController implements Initializable {
                     )
             );
         } else {
-            projectsListView.setBackground(Background.fill(Color.TRANSPARENT));
+            logger.log(Level.INFO, "No projects found");
+            projectsListView.opacityProperty().set(0);
         }
     }
 
@@ -286,8 +288,11 @@ public class MainViewController implements Initializable {
         // Get the current window
         Window window = rootPane.getScene().getWindow();
 
-        // Get user to select a file
-        File file = ProjectIOHandlers.getFileFromFileDialog(window);
+        // Get user to select a WAV file
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                "WAV files (*.wav)", "*.wav"
+        );
+        File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
 
         // Create the new project
         ProjectIOHandlers.newProject(
@@ -304,8 +309,11 @@ public class MainViewController implements Initializable {
         // Get the current window
         Window window = rootPane.getScene().getWindow();
 
-        // Get user to select a file
-        File file = ProjectIOHandlers.getFileFromFileDialog(window);
+        // Get user to select an AUDT file
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                "AudiTranscribe files (*.audt)", "*.audt"
+        );
+        File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
 
         // Open the existing project
         ProjectIOHandlers.openProject(

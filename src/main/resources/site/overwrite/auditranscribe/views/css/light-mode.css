@@ -1,5 +1,10 @@
 /* MAIN PAGE */
 /* Others */
+.no-projects-vbox {
+    -fx-background-color: #ffffffff;
+    -fx-border-color: #d3d3d3ff;
+}
+
 .short-name-rectangle {
     -fx-stroke: #000000ff;
 }

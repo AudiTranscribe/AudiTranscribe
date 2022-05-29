@@ -849,8 +849,9 @@ public class TranscriptionViewController implements Initializable {
         // Get the current window
         Window window = rootPane.getScene().getWindow();
 
-        // Get user to select a file
-        File file = ProjectIOHandlers.getFileFromFileDialog(window);
+        // Get user to select a WAV file
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("WAV files (*.wav)", "*.wav");
+        File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
 
         // If a file was selected, stop the audio completely
         if (file != null) {
@@ -880,8 +881,11 @@ public class TranscriptionViewController implements Initializable {
         // Get the current window
         Window window = rootPane.getScene().getWindow();
 
-        // Get user to select a file
-        File file = ProjectIOHandlers.getFileFromFileDialog(window);
+        // Get user to select an AUDT file
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                "AudiTranscribe files (*.audt)", "*.audt"
+        );
+        File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
 
         // If a file was selected, stop the audio completely
         if (file != null) {
@@ -1460,8 +1464,11 @@ public class TranscriptionViewController implements Initializable {
             // Get the current window
             Window window = rootPane.getScene().getWindow();
 
-            // Get user to select a file
-            File file = ProjectIOHandlers.getFileFromFileDialog(window);
+            // Get user to select a WAV file
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                    "WAV files (*.wav)", "*.wav"
+            );
+            File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
 
             // Create the new project
             ProjectIOHandlers.newProject(mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController);
@@ -1473,8 +1480,11 @@ public class TranscriptionViewController implements Initializable {
             // Get the current window
             Window window = rootPane.getScene().getWindow();
 
-            // Get user to select a file
-            File file = ProjectIOHandlers.getFileFromFileDialog(window);
+            // Get user to select an AUDT file
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                    "AudiTranscribe files (*.audt)", "*.audt"
+            );
+            File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
 
             // Open the existing project
             ProjectIOHandlers.openProject(mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController);
