@@ -538,9 +538,6 @@ public class TranscriptionViewController implements Initializable {
         // Apply the style to the volume slider's track (if available)
         StackPane track = (StackPane) volumeSlider.lookup(".track");
         if (track != null) track.setStyle(style);
-
-        // Enable the volume slider (if disabled)
-        if (volumeSlider.isDisabled()) volumeSlider.setDisable(false);
     }
 
     /**
@@ -836,6 +833,9 @@ public class TranscriptionViewController implements Initializable {
      * @param event Event that triggered this function.
      */
     private void handleNewProject(Event event) {
+        // Do not do anything if the button is disabled
+        if (newProjectButton.isDisabled()) return;
+
         // Get the current window
         Window window = rootPane.getScene().getWindow();
 
@@ -852,6 +852,9 @@ public class TranscriptionViewController implements Initializable {
      * @param event Event that triggered this function.
      */
     private void handleOpenProject(Event event) {
+        // Do not do anything if the button is disabled
+        if (openProjectButton.isDisabled()) return;
+
         // Get the current window
         Window window = rootPane.getScene().getWindow();
 
@@ -868,6 +871,9 @@ public class TranscriptionViewController implements Initializable {
      * @param forceChooseFile Boolean whether to force the user to choose a file.
      */
     private void handleSavingProject(boolean forceChooseFile) {
+        // Do not do anything if the button is disabled
+        if (saveProjectButton.isDisabled()) return;
+
         // Allow user to select save location
         String saveDest, saveName;
 
@@ -1248,6 +1254,22 @@ public class TranscriptionViewController implements Initializable {
 
             // Ensure main pane is in focus
             rootPane.requestFocus();
+
+            // Enable all disabled nodes
+            Node[] disabledNodes = new Node[]{
+                    // Top Hbox
+                    newProjectButton, openProjectButton, saveProjectButton,
+                    musicKeyChoice, bpmSpinner, timeSignatureChoice, offsetSpinner,
+
+                    // Bottom Hbox
+                    playButton, stopButton, playSkipBackButton, playSkipForwardButton,
+                    scrollButton,
+                    volumeButton, volumeSlider
+            };
+
+            for (Node node : disabledNodes) {
+                node.setDisable(false);
+            }
 
             // Report that the transcription view is ready to be shown
             logger.log(Level.INFO, "Spectrogram for " + audioFileName + " ready to be shown");
