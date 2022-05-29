@@ -25,7 +25,7 @@ more stable for users to use.
 
 Unsure how to begin? There are a few places you can find issues for the project.
 
-- The [GitHub Issue Tracker](https://github.com/Ryan-Kan/AudiTranscribe/issues). This is the new (and main) way of
+- The [GitHub Issue Tracker](https://github.com/AudiTranscribe/AudiTranscribe/issues). This is the new (and main) way of
   obtaining the issues that we need help with. If you're looking for something to contribute, try:
     - Beginner issues: Issues that should only require a few lines of code, and a test or two
     - Help Wanted issues: Issues that are more involved
@@ -48,13 +48,17 @@ However, for small issues such as
 
 you could submit an issue instead of a pull request.
 
-**NOTE: (Development) changes to *AudiTranscribe* should _never_ be pushed to the `main` branch**. The `main` branch
-should be reserved for production builds.
+**Note:**
+
+- (Development) changes to *AudiTranscribe* should _never_ be pushed to the `main` branch**. The `main` branch
+  should be reserved for production builds. Instead, push changes to the `staging` branch.
+- Make pull requests instead of directly editing files on the `staging` branch.
 
 ## Reporting Bugs
 
-If you find a bug within AudiTranscribe, please [submit an issue](https://github.com/Ryan-Kan/AudiTranscribe/issues)
-on the issue tracker. We recommend using the issue template to aid us in fixing the bug.
+If you find a bug within AudiTranscribe, please 
+[submit an issue](https://github.com/AudiTranscribe/AudiTranscribe/issues) on the issue tracker. We recommend using the
+issue template to aid us in fixing the bug.
 
 ## Suggesting Features/Enhancements
 
