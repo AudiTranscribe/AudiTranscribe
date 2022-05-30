@@ -35,16 +35,19 @@
 }
 
 .project-name-label {
+    -fx-pref-width: 375px;
     -fx-max-width: 375px;
     -fx-text-alignment: left;
 }
 
 .last-opened-date-label {
+    -fx-pref-width: 225px;
     -fx-max-width: 225px;
     -fx-text-alignment: right;
 }
 
 .filepath-label {
+    -fx-pref-width: 600px;
     -fx-max-width: 600px;
 }
 
