@@ -2,7 +2,7 @@
  * ArrayUtils.java
  *
  * Created on 2022-02-16
- * Updated on 2022-05-28
+ * Updated on 2022-05-30
  *
  * Description: Array utilities to modify, change, and search within arrays.
  */
@@ -13,6 +13,8 @@ import site.overwrite.auditranscribe.exceptions.LengthException;
 import site.overwrite.auditranscribe.exceptions.ValueException;
 import site.overwrite.auditranscribe.misc.Complex;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.NoSuchElementException;
 
 /**
@@ -181,10 +183,8 @@ public class ArrayUtils {
      * @param size  The size to make the array.
      * @return Padded array where the length is now <code>size</code>.
      * @throws ValueException If <code>size</code> is negative.
-     * @implNote See <a href="https://numpy.org/doc/stable/reference/generated/numpy.pad.html">
-     * Numpy's implementation</a> of this function.
-     * @see <a href="https://stackoverflow.com/a/51780171">This StackOverflow answer</a> on how to
-     * visualise the "reflect" mode of the padding operation.
+     * @see <a href="https://bit.ly/3z73f0U">SciPy's intended implementation</a> of the reflection
+     * mode.
      */
     public static double[] padCenterReflect(double[] array, int size) {
         // Verify that `size` is positive
@@ -209,18 +209,25 @@ public class ArrayUtils {
         System.arraycopy(array, 0, output, lpad, n);  // Copy center elements
 
         int reflectedElemIndex = 0;
+        boolean doubleCount = true;  // Whether to include the current element twice
         int changeInVal = n == 1 ? 0 : 1;  // Don't add anything if there is only 1 element
         for (int i = 0; i < lpad; i++) {  // Left padding
             // Handle reflected element index calculation
             if (reflectedElemIndex + changeInVal >= n) {
                 changeInVal = -1;
+                doubleCount = true;
             }
 
             if (reflectedElemIndex + changeInVal < 0) {
                 changeInVal = 1;
+                doubleCount = true;
             }
 
-            reflectedElemIndex += changeInVal;
+            if (!doubleCount) {
+                reflectedElemIndex += changeInVal;
+            } else {
+                doubleCount = false;
+            }
 
             // Get the position to place this element
             int placementIndex = lpad - i - 1;  // We start from the back of the section to be padded
@@ -230,18 +237,25 @@ public class ArrayUtils {
         }
 
         reflectedElemIndex = n - 1;  // Start from the end
+        doubleCount = true;
         changeInVal = n == 1 ? 0 : -1;  // Don't add anything if there is only 1 element
         for (int i = 0; i < rpad; i++) {  // Right padding
             // Handle reflected element index calculation
             if (reflectedElemIndex + changeInVal >= n) {
                 changeInVal = -1;
+                doubleCount = true;
             }
 
             if (reflectedElemIndex + changeInVal < 0) {
                 changeInVal = 1;
+                doubleCount = true;
             }
 
-            reflectedElemIndex += changeInVal;
+            if (!doubleCount) {
+                reflectedElemIndex += changeInVal;
+            } else {
+                doubleCount = false;
+            }
 
             // Get the position to place this element
             int placementIndex = size - rpad + i;
@@ -394,6 +408,79 @@ public class ArrayUtils {
 
         // Return the `framed` array
         return framed;
+    }
+
+    /**
+     * Calculate a 1-D maximum filter along the given axis.<br>
+     * The lines of the array along the given axis are filtered with a maximum filter of given size.
+     *
+     * @param array The input array.
+     * @param size  Length along which to calculate the 1-D maximum.
+     * @return Maximum-filtered array with same shape as input.
+     * @see <a href="https://bit.ly/37iRiK3">SciPy's implementation</a> of the MAXLIST algorithm.
+     * This code is based off how that works. See also
+     * <a href="https://stackoverflow.com/a/66808375">this StackOverflow answer</a> on how the
+     * algorithm should work. Implementation is based off of Method 4 of
+     * <a href="https://bit.ly/3LYIc3l">this GeeksForGeeks article</a>.
+     */
+    public static double[] maximumFilter1D(double[] array, int size) {
+        // Get the number of elements in the array
+        int numElem = array.length;
+
+        // Pad array using the center reflect mode
+        int padAmount;
+        if (size % 2 == 1) {  // Odd size
+            // Initial window is centered on FIRST element, and final window is centered on LAST element
+            padAmount = (size - 1) / 2;
+        } else {  // Even size
+            // Initial window's center two elements are the FIRST element of the array
+            padAmount = size / 2;
+        }
+
+        double[] paddedArray = padCenterReflect(array, numElem + 2 * padAmount);
+
+        // Define maximum filter array and the double-ended queue (Deque)
+        double[] maxFilterArray = new double[numElem];
+        Deque<Integer> indicesQueue = new ArrayDeque<>();
+
+        // Process first window
+        for (int i = 0; i < size; i++) {
+            // For every element, the previous smaller elements are useless so remove them from the indices queue
+            while (indicesQueue.size() != 0 && paddedArray[i] >= paddedArray[indicesQueue.peekLast()]) {
+                indicesQueue.removeLast();
+            }
+
+            // Add new element to the rear of the deque
+            indicesQueue.addLast(i);
+        }
+
+        // Process the rest of the elements
+        for (int i = size; i < numElem + 2 * padAmount; i++) {
+            // The element at the front of the queue is the largest element of previous window, so add that into the
+            // maximum filter array
+            maxFilterArray[i - size] = paddedArray[indicesQueue.getFirst()];
+
+            // Remove the elements which are out of this window
+            while (indicesQueue.size() != 0 && indicesQueue.peekFirst() <= i - size) {
+                indicesQueue.removeFirst();
+            }
+
+            // Remove all elements smaller than the currently being added element
+            while (indicesQueue.size() != 0 && paddedArray[i] >= paddedArray[indicesQueue.peekLast()]) {
+                indicesQueue.removeLast();
+            }
+
+            // Add new element to the rear of the deque
+            indicesQueue.addLast(i);
+        }
+
+        // Add last window's maximum element to the maximum filter array if the size is odd
+        if (size % 2 == 1) {
+            maxFilterArray[numElem - 1] = paddedArray[indicesQueue.getFirst()];
+        }
+
+        // Return the maximum filter array
+        return maxFilterArray;
     }
 
     /**
