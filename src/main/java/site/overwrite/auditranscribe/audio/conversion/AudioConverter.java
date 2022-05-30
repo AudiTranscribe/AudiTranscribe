@@ -61,26 +61,35 @@ public class AudioConverter {
      * Note that this method produces a new audio file, <code>converted.ext</code> (with the
      * provided extension <code>.ext</code>).
      *
-     * @param file      File object representing the original audio file.
-     * @param extension Extension of the resulting audio object. <b>Note that the extension
-     *                  <em>should have a dot</em> before the extension string</b> (e.g.
-     *                  <code>.wav</code>, <code>.mp3</code>)
+     * @param file           File object representing the original audio file.
+     * @param outputFilePath Output file's path, <b>including the extension</b>.
+     * @return A string, representing the output file's path after processing it.
      */
-    public void convertAudio(File file, String extension) {
+    public String convertAudio(File file, String outputFilePath) {
+        // Obtain the extension from the file path
+        String[] split = outputFilePath.split("\\.");
+        String extension = "." + split[split.length - 1];  // The extension is the last one
+
         // Convert the extension to lowercase
         extension = extension.toLowerCase();
+
+        // Obtain the filepath excluding the extension
+        String filePath = outputFilePath.substring(0, outputFilePath.length() - extension.length());
 
         // Define the command to run
         FFmpegBuilder builder = new FFmpegBuilder()
                 .setInput(file.getAbsolutePath())
                 .overrideOutputFiles(true)
 
-                .addOutput("converted" + extension)
+                .addOutput(filePath + extension)
                 .setFormat(EXTENSION_TO_CODEC.get(extension))
 
                 .done();
 
         // Run the command
         executor.createJob(builder).run();
+
+        // Return the output file
+        return filePath + extension;
     }
 }
