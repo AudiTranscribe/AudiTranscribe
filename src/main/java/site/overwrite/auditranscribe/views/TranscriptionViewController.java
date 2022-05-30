@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-29
+ * Updated on 2022-05-30
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -32,7 +32,7 @@ import org.javatuples.Pair;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
-import site.overwrite.auditranscribe.io.settings_file.SettingsFile;
+import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.notes.NotePlayer;
 import site.overwrite.auditranscribe.io.IOMethods;
@@ -487,7 +487,7 @@ public class TranscriptionViewController implements Initializable {
      */
     public void setThemeOnScene() {
         // Get the theme
-        theme = Theme.values()[settingsFile.settingsData.themeEnumOrdinal];
+        theme = Theme.values()[settingsFile.data.themeEnumOrdinal];
 
         // Set stylesheets
         rootPane.getStylesheets().clear();  // Reset the stylesheets first before adding new ones
@@ -696,11 +696,11 @@ public class TranscriptionViewController implements Initializable {
                         NUM_PX_PER_OCTAVE, this
                 );
                 magnitudes = spectrogram.getSpectrogramMagnitudes(
-                        WindowFunction.values()[settingsFile.settingsData.windowFunctionEnumOrdinal]
+                        WindowFunction.values()[settingsFile.data.windowFunctionEnumOrdinal]
                 );
                 return spectrogram.generateSpectrogram(
                         magnitudes,
-                        ColourScale.values()[settingsFile.settingsData.colourScaleEnumOrdinal]
+                        ColourScale.values()[settingsFile.data.colourScaleEnumOrdinal]
                 );
             }
         };
@@ -742,7 +742,7 @@ public class TranscriptionViewController implements Initializable {
                 );
                 return spectrogram.generateSpectrogram(
                         magnitudes,
-                        ColourScale.values()[settingsFile.settingsData.colourScaleEnumOrdinal]
+                        ColourScale.values()[settingsFile.data.colourScaleEnumOrdinal]
                 );
             }
         };

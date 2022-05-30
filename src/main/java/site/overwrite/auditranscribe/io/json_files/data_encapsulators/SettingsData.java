@@ -2,12 +2,12 @@
  * SettingsData.java
  *
  * Created on 2022-05-22
- * Updated on 2022-05-29
+ * Updated on 2022-05-30
  *
  * Description: Class that contains the settings data.
  */
 
-package site.overwrite.auditranscribe.io.settings_file;
+package site.overwrite.auditranscribe.io.json_files.data_encapsulators;
 
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.misc.Theme;
