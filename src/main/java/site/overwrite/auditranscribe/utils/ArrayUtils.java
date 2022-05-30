@@ -308,6 +308,26 @@ public class ArrayUtils {
     }
 
     /**
+     * Take certain elements of an array and return them in a new array.
+     *
+     * @param array   The array to take elements from.
+     * @param indices The indices to take.
+     * @return The new array containing the selected elements.
+     */
+    public static double[] takeElem(double[] array, int[] indices) {
+        // Define output array
+        double[] output = new double[indices.length];
+
+        // Copy elements
+        for (int i = 0; i < indices.length; i++) {
+            output[i] = array[indices[i]];
+        }
+
+        // Return output array
+        return output;
+    }
+
+    /**
      * Find the index where an element should be inserted to maintain order in a sorted array.<br>
      * <p>
      * Find the index into a <b>sorted</b> array <code>array</code> such that, if the

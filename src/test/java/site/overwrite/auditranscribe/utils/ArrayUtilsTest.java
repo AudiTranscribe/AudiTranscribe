@@ -84,6 +84,11 @@ class ArrayUtilsTest {
     }
 
     @Test
+    void takeElem() {
+        assertArrayEquals(new double[]{2, 4, 5, 8}, ArrayUtils.takeElem(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new int[]{1, 3, 4, 7}));
+    }
+
+    @Test
     void searchSorted() {
         // Define searching arrays
         double[] array1 = new double[]{1.23, 3.45, 5.67, 7.89, 9.01};
