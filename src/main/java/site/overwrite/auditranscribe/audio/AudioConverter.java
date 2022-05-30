@@ -7,7 +7,7 @@
  * Description: Methods that help to convert audio files to the correct format.
  */
 
-package site.overwrite.auditranscribe.audio.conversion;
+package site.overwrite.auditranscribe.audio;
 
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;

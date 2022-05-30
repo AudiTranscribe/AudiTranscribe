@@ -7,7 +7,7 @@
  * Description: Test `AudioConverter.java`.
  */
 
-package site.overwrite.auditranscribe.audio.conversion;
+package site.overwrite.auditranscribe.audio;
 
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.io.IOMethods;

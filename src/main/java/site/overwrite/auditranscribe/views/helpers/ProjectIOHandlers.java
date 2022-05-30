@@ -102,7 +102,7 @@ public class ProjectIOHandlers {
                 }
 
             } catch (UnsupportedAudioFileException | IOException e) {
-                AlertMessages.showExceptionAlert(
+                Popups.showExceptionAlert(
                         "Failed to read '" + file.getName() + "' as a WAV file.",
                         "The program failed to read '" + file.getName() +
                                 "' as a WAV file. Please check if " + "this is a valid WAV file.",
@@ -112,7 +112,7 @@ public class ProjectIOHandlers {
             }
 
         } else {
-            AlertMessages.showInformationAlert("Info", "No file selected.");
+            Popups.showInformationAlert("Info", "No file selected.");
         }
     }
 
@@ -194,7 +194,7 @@ public class ProjectIOHandlers {
                 }
 
             } catch (IOException | IncorrectFileFormatException | FailedToReadDataException e) {
-                AlertMessages.showExceptionAlert(
+                Popups.showExceptionAlert(
                         "Failed to read '" + file.getName() + "' as an AUDT ile.",
                         "The program failed to read '" + file.getName() +
                                 "' as an AUDT file. Please check if " + "this is a valid AUDT file.",
@@ -203,7 +203,7 @@ public class ProjectIOHandlers {
                 e.printStackTrace();
             }
         } else {
-            AlertMessages.showInformationAlert("Info", "No file selected.");
+            Popups.showInformationAlert("Info", "No file selected.");
         }
     }
 
