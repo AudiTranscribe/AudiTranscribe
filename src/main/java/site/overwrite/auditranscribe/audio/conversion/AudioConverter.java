@@ -2,7 +2,7 @@
  * AudioConverter.java
  *
  * Created on 2022-05-06
- * Updated on 2022-05-06
+ * Updated on 2022-05-30
  *
  * Description: Methods that help to convert audio files to the correct format.
  */
@@ -11,7 +11,6 @@ package site.overwrite.auditranscribe.audio.conversion;
 
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
-import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
 
 import java.io.File;
@@ -20,6 +19,9 @@ import java.util.Map;
 
 import static java.util.Map.entry;
 
+/**
+ * Methods that help to convert audio files to the correct format.
+ */
 public class AudioConverter {
     // Constants
     final Map<String, String> EXTENSION_TO_CODEC = Map.ofEntries(
@@ -44,14 +46,11 @@ public class AudioConverter {
      * Initialization method for the audio converter.
      *
      * @param ffmpegPath  Path to the ffmpeg binary.
-     * @param ffprobePath Path to the ffprobe binary.
      * @throws IOException If the program fails to find the ffmpeg installation.
      */
-    public AudioConverter(String ffmpegPath, String ffprobePath) throws IOException {
+    public AudioConverter(String ffmpegPath) throws IOException {
         FFmpeg ffmpeg = new FFmpeg(ffmpegPath);
-        FFprobe ffprobe = new FFprobe(ffprobePath);
-
-        executor = new FFmpegExecutor(ffmpeg, ffprobe);
+        executor = new FFmpegExecutor(ffmpeg);
     }
 
     // Public methods
