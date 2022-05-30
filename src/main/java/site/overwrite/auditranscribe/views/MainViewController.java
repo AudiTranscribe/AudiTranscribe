@@ -34,6 +34,7 @@ import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.PropertyFile;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.io.json_files.data_encapsulators.SettingsData;
+import site.overwrite.auditranscribe.io.json_files.file_classes.PersistentDataFile;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.utils.MiscUtils;
@@ -63,6 +64,7 @@ public class MainViewController implements Initializable {
     private final List<Audio> allAudio = new ArrayList<>(0);  // List of all opened `Audio` objects
 
     private final SettingsFile settingsFile = new SettingsFile();
+    private final PersistentDataFile persistentDataFile = new PersistentDataFile();
 
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
