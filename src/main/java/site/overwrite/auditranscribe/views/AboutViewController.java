@@ -2,7 +2,7 @@
  * AboutViewController.java
  *
  * Created on 2022-05-08
- * Updated on 2022-05-29
+ * Updated on 2022-05-30
  *
  * Description: View controller for the "about" window.
  */
@@ -22,7 +22,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.PropertyFile;
-import site.overwrite.auditranscribe.io.settings_file.SettingsFile;
+import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.Theme;
 
 import java.awt.*;
@@ -88,7 +88,7 @@ public class AboutViewController implements Initializable {
      */
     public void setThemeOnScene() {
         // Get the theme
-        Theme theme = Theme.values()[settingsFile.settingsData.themeEnumOrdinal];
+        Theme theme = Theme.values()[settingsFile.data.themeEnumOrdinal];
 
         // Set stylesheets
         rootPane.getStylesheets().clear();  // Reset the stylesheets first before adding new ones

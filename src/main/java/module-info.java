@@ -25,7 +25,9 @@ module site.overwrite.auditranscribe {
     exports site.overwrite.auditranscribe.audio.window_functions;
     exports site.overwrite.auditranscribe.exceptions;
     exports site.overwrite.auditranscribe.io.audt_file.data_encapsulators;
-    exports site.overwrite.auditranscribe.io.settings_file;
+    exports site.overwrite.auditranscribe.io.json_files;
+    exports site.overwrite.auditranscribe.io.json_files.data_encapsulators;
+    exports site.overwrite.auditranscribe.io.json_files.file_classes;
     exports site.overwrite.auditranscribe.misc;
     exports site.overwrite.auditranscribe.spectrogram;
     exports site.overwrite.auditranscribe.utils;
