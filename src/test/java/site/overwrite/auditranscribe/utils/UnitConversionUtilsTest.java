@@ -193,6 +193,21 @@ class UnitConversionUtilsTest {
         assertArrayEquals(correctOutput2, UnitConversionUtils.samplesToFrames(samples2, 256, 1024));
     }
 
+    @Test
+    void timeToFrames() {
+        // Define times arrays
+        double[] times1 = {0., 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
+        double[] times2 = {1., 1.25, 1.5, 1.75, 2., 2.25, 2.5, 2.75, 3., 3.25, 3.5, 3.75};
+
+        // Define correct output arrays
+        int[] correctOutput1 = {0,  4,  8, 12, 17, 21, 25, 30, 34, 38};
+        int[] correctOutput2 = {170, 213, 256, 299, 342, 385, 428, 471, 514, 557, 600, 643};
+
+        // Run tests
+        assertArrayEquals(correctOutput1, UnitConversionUtils.timeToFrames(times1, 22050, 512));
+        assertArrayEquals(correctOutput2, UnitConversionUtils.timeToFrames(times2, 44100, 256, 1024));
+    }
+
     // Graphics Units Conversion
     @Test
     void pxToPt() {

@@ -286,6 +286,40 @@ public class UnitConversionUtils {
         return frames;
     }
 
+    /**
+     * Method that converts time stamps into STFT frames.
+     *
+     * @param times      Timestamps to convert.
+     * @param sampleRate Sample rate of the audio.
+     * @param hopLength  Hop length of the STFT.
+     * @param numFFT     Number of FFT bins.
+     * @return STFT frames corresponding to the given timestamps.
+     */
+    public static int[] timeToFrames(double[] times, double sampleRate, int hopLength, int numFFT) {
+        // Convert time to samples
+        int[] samples = timeToSamples(times, sampleRate);
+
+        // Then convert the samples into frames
+        return samplesToFrames(samples, hopLength, numFFT);
+    }
+
+    /**
+     * Method that converts time stamps into STFT frames.
+     *
+     * @param times      Timestamps to convert.
+     * @param sampleRate Sample rate of the audio.
+     * @param hopLength  Hop length of the STFT.
+     * @return STFT frames corresponding to the given timestamps.
+     */
+    public static int[] timeToFrames(double[] times, double sampleRate, int hopLength) {
+        // Convert time to samples
+        int[] samples = timeToSamples(times, sampleRate);
+
+        // Then convert the samples into frames
+        return samplesToFrames(samples, hopLength);
+    }
+
+
     // Graphics Units Conversion
 
     /**
