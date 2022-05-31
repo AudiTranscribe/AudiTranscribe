@@ -109,7 +109,7 @@ class UnitConversionUtilsTest {
         assertEquals(-1, UnitConversionUtils.noteToMIDINumber("B9"));
     }
 
-    // Magnitude Scaling - Unit Conversion
+    // Audio unit conversion
     @Test
     void powerToDecibel() {
         // With `refVal` equals to 1
@@ -136,6 +136,22 @@ class UnitConversionUtilsTest {
         assertEquals(5.194, UnitConversionUtils.amplitudeToDecibel(12.345, 6.789), 0.001);
     }
 
+    @Test
+    void hzToMel() {
+        assertEquals(0.9, UnitConversionUtils.hzToMel(60), 1e-5);
+        assertEquals(1.65, UnitConversionUtils.hzToMel(110), 1e-5);
+        assertEquals(3.3, UnitConversionUtils.hzToMel(220), 1e-5);
+        assertEquals(6.6, UnitConversionUtils.hzToMel(440), 1e-5);
+    }
+
+    @Test
+    void melToHz() {
+        assertEquals(60, UnitConversionUtils.melToHz(0.9), 1e-5);
+        assertEquals(110, UnitConversionUtils.melToHz(1.65), 1e-5);
+        assertEquals(220, UnitConversionUtils.melToHz(3.3), 1e-5);
+        assertEquals(440, UnitConversionUtils.melToHz(6.6), 1e-5);
+    }
+
     // Time unit conversion
     @Test
     void timeToSamples() {
@@ -156,11 +172,11 @@ class UnitConversionUtilsTest {
     void samplesToFrames() {
         // Define samples arrays
         int[] samples1 = {
-                0,   256,   512,   768,  1024,  1280,  1536,  1792,  2048,
-                2304,  2560,  2816,  3072,  3328,  3584,  3840,  4096,  4352,
-                4608,  4864,  5120,  5376,  5632,  5888,  6144,  6400,  6656,
-                6912,  7168,  7424,  7680,  7936,  8192,  8448,  8704,  8960,
-                9216,  9472,  9728,  9984, 10240, 10496, 10752, 11008, 11264,
+                0, 256, 512, 768, 1024, 1280, 1536, 1792, 2048,
+                2304, 2560, 2816, 3072, 3328, 3584, 3840, 4096, 4352,
+                4608, 4864, 5120, 5376, 5632, 5888, 6144, 6400, 6656,
+                6912, 7168, 7424, 7680, 7936, 8192, 8448, 8704, 8960,
+                9216, 9472, 9728, 9984, 10240, 10496, 10752, 11008, 11264,
                 11520, 11776, 12032, 12288, 12544, 12800, 13056, 13312, 13568,
                 13824, 14080, 14336, 14592, 14848, 15104, 15360, 15616, 15872,
                 16128, 16384, 16640, 16896, 17152, 17408, 17664, 17920, 18176,
@@ -184,7 +200,7 @@ class UnitConversionUtilsTest {
                 42, 42, 43
         };
         int[] correctOutput2 = {
-                84,  88,  92,  96, 100, 104, 108, 112, 116, 120, 124, 128, 132,
+                84, 88, 92, 96, 100, 104, 108, 112, 116, 120, 124, 128, 132,
                 136, 140, 144, 148, 152, 156, 160, 164, 168
         };
 
@@ -200,7 +216,7 @@ class UnitConversionUtilsTest {
         double[] times2 = {1., 1.25, 1.5, 1.75, 2., 2.25, 2.5, 2.75, 3., 3.25, 3.5, 3.75};
 
         // Define correct output arrays
-        int[] correctOutput1 = {0,  4,  8, 12, 17, 21, 25, 30, 34, 38};
+        int[] correctOutput1 = {0, 4, 8, 12, 17, 21, 25, 30, 34, 38};
         int[] correctOutput2 = {170, 213, 256, 299, 342, 385, 428, 471, 514, 557, 600, 643};
 
         // Run tests

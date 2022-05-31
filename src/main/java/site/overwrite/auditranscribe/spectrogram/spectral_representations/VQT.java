@@ -2,7 +2,7 @@
  * VQT.java
  *
  * Created on 2022-03-11
- * Updated on 2022-05-28
+ * Updated on 2022-05-31
  *
  * Description: Class that implements the Variable Q-Transform (VQT) algorithm.
  */
@@ -140,7 +140,7 @@ public class VQT {
         int numOctaves = getNumOctaves(numBins, binsPerOctave);
 
         // Get the VQT frequency bins
-        double[] freqs = getFreqBins(numBins, binsPerOctave, fmin);
+        double[] freqs = FrequencyBins.getQTFreqBins(numBins, binsPerOctave, fmin);
 
         // Get the frequencies for the top octave
         double[] freqsTop = new double[binsPerOctave];
@@ -276,28 +276,6 @@ public class VQT {
         // Return VQT matrix
         logger.log(Level.FINE, "VQT Matrix generated; has shape (" + V.length + ", " + V[0].length + ")");
         return V;
-    }
-
-    /**
-     * Compute the center frequencies of Variable-Q bins.
-     *
-     * @param numBins       Number of Variable-Q bins.
-     * @param binsPerOctave Number of bins per octave.
-     * @param fmin          Minimum frequency.
-     * @return Array of center frequencies for each VQT bin.
-     */
-    public static double[] getFreqBins(int numBins, int binsPerOctave, double fmin) {
-        double[] frequencies = new double[numBins];
-
-        for (double i = 0; i < numBins; i++) {
-            // Calculate the frequency of the current frequency bin
-            double freq = fmin * Math.pow(2, i / binsPerOctave);
-
-            // Append it to the list of frequencies
-            frequencies[(int) i] = freq;
-        }
-
-        return frequencies;
     }
 
     // Private Methods
