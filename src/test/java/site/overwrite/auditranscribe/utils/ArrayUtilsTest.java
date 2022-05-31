@@ -2,7 +2,7 @@
  * ArrayUtilsTest.java
  *
  * Created on 2022-03-12
- * Updated on 2022-05-30
+ * Updated on 2022-05-31
  *
  * Description: Test `ArrayUtils.java`.
  */
@@ -49,6 +49,42 @@ class ArrayUtilsTest {
         assertThrowsExactly(NoSuchElementException.class, () -> ArrayUtils.findIndex(array2, 1337.));
         assertThrowsExactly(NoSuchElementException.class, () -> ArrayUtils.findIndex(array3, 1337.));
         assertThrowsExactly(NoSuchElementException.class, () -> ArrayUtils.findIndex(array4, 1337.));
+    }
+
+    @Test
+    void lpNormalize() {
+        // Define the arrays
+        double[] array1 = {1, 2, 4, 8, 16};
+        double[] array2 = {1, 3, 9, 27, 81, 243};
+        double[] array3 = {0, 1, 0, -2, 0, 3, 0};
+        double[] array4 = {0.1, -0.02, 0.003, -0.0004};
+        double[] array5 = {219, 0.24, 9.14};
+        Complex[] array6 = {new Complex(1), new Complex(0, 1), new Complex(-1), new Complex(0, -1), new Complex(-1, 1)};
+
+        // Define correct results
+        double[] array1Normalized = {0.0625, 0.125, 0.25, 0.5, 1.};
+        double[] array2Normalized = {0.00411183, 0.0123355, 0.0370065, 0.11101951, 0.33305853, 0.9991756};
+        double[] array3Normalized = {0., 0.33333333, 0., -0.66666667, 0., 1., 0.};
+        double[] array4Normalized = {250., -50., 7.5, -1.};
+        double[] array5Normalized = {219, 0.24, 9.14};
+        Complex[] array6Normalized = {
+                new Complex(0.70710678), new Complex(0, 0.70710678),
+                new Complex(-0.70710678), new Complex(0, -0.70710678),
+                new Complex(-0.70710678, 0.70710678)
+        };
+
+        // Run tests
+        assertArrayEquals(array1Normalized, ArrayUtils.lpNormalize(array1, Double.POSITIVE_INFINITY), 1e-4);
+        assertArrayEquals(array2Normalized, ArrayUtils.lpNormalize(array2, 5), 1e-4);
+        assertArrayEquals(array3Normalized, ArrayUtils.lpNormalize(array3, 0), 1e-4);
+        assertArrayEquals(array4Normalized, ArrayUtils.lpNormalize(array4, Double.NEGATIVE_INFINITY), 1e-4);
+        assertArrayEquals(array5Normalized, ArrayUtils.lpNormalize(array5, -1337), 1e-4);  // No change
+
+        Complex[] array6Computed = ArrayUtils.lpNormalize(array6, Double.POSITIVE_INFINITY);
+        assertEquals(array6Computed.length, array6Normalized.length);
+        for (int i = 0; i < array6Normalized.length; i++) {
+            assertEquals(array6Normalized[i].roundNicely(4), array6Computed[i].roundNicely(4));
+        }
     }
 
     @Test

@@ -2,7 +2,7 @@
  * ArrayUtils.java
  *
  * Created on 2022-02-16
- * Updated on 2022-05-30
+ * Updated on 2022-05-31
  *
  * Description: Array utilities to modify, change, and search within arrays.
  */
@@ -51,25 +51,41 @@ public class ArrayUtils {
     }
 
     /**
-     * Normalizes the elements in the given array such that the LP norm is 1.
+     * Normalizes the elements in the given array such that the L<sup>p</sup> norm is 1.
      *
      * @param array The array to normalize.
-     * @param p     The p value of the LP norm.
-     * @return The normalized complex array such that the LP norm of the array is 1.
-     * @throws ValueException If <code>p</code> is negative.
-     * @see <a href="https://en.wikipedia.org/wiki/Lp_space#The_p-norm_in_finite_dimensions">
-     * L<sup>p</sup>-Norm</a>
+     * @param norm  The norm parameter for the L<sup>p</sup> normalization. There are 5 cases to
+     *              consider for the value of <code>norm</code>.
+     *              <ul>
+     *                  <li>
+     *                      <code>norm = Double.NEGATIVE_INFINITY</code>: The L<sup>p</sup> norm is
+     *                      considered to be the <b>minimum</b> absolute value.
+     *                  </li>
+     *                  <li>
+     *                      <code>norm = Double.POSITIVE_INFINITY</code>: The L<sup>p</sup> norm is
+     *                      considered to be the <b>maximum</b> absolute value.
+     *                  </li>
+     *                  <li>
+     *                      <code>norm = 0</code>: The L<sup>p</sup> norm is considered to be the
+     *                      sum of all magnitudes.
+     *                  </li>
+     *                  <li>
+     *                      <code>norm > 0</code>: The <code>p</code> value is equal to
+     *                      <code>norm</code>, and L<sup>p</sup> norm will be calculated normally.
+     *                  </li>
+     *                  <li>
+     *                      <code>norm < 0</code>: No normalization will be performed.
+     *                  </li>
+     *              </ul>
+     * @return The normalized complex array such that the L<sup>p</sup> norm of the array is 1.
+     * @see <a href="https://bit.ly/3LVePPv">L<sup>p</sup>-Norm</a> on Wikipedia, and
+     * <a href="https://bit.ly/3GwhYUJ">Librosa's Implementation</a> of this method.
      */
-    public static Complex[] lpNormalise(Complex[] array, double p) {  // Todo: rename this to "lpNormalize" (with a z)
-        // Check that `p` is strictly non-negative
-        if (p < 0) {
-            throw new ValueException("Unsupported p value: " + p);
-        }
-
+    public static Complex[] lpNormalize(Complex[] array, double norm) {
         // Get the number of elements in the array
         int numElem = array.length;
 
-        // Set threshold to be the smallest non-zero number supported
+        // Set threshold to be the smallest (in absolute terms) non-zero number supported
         double threshold = Double.MIN_VALUE;
 
         // Get the magnitudes of the data in the array
@@ -79,23 +95,45 @@ public class ArrayUtils {
             magnitudes[i] = array[i].abs();
         }
 
-        // Compute the current `lpNorm` of the array
+        // Determine the `lpNorm` value
         double lpNorm = 0;
 
-        if (p == 0) {
-            // The `lpNorm` is the sum of all magnitudes
-            for (double mag : magnitudes) {
-                lpNorm += mag;
+        if (norm == Double.NEGATIVE_INFINITY) {
+            // `p` value is the minimum absolute value of the values in the array
+            double minAbsVal = Double.MAX_VALUE;
+            for (double absVal : magnitudes) {
+                if (absVal < minAbsVal) {
+                    minAbsVal = absVal;
+                }
             }
-        } else {  // We know `p > 0`
+            lpNorm = minAbsVal;
+        } else if (norm == Double.POSITIVE_INFINITY) {
+            // `p` value is the maximum absolute value of the values in the array
+            double maxAbsVal = Double.MIN_VALUE;
+            for (double absVal : magnitudes) {
+                if (absVal > maxAbsVal) {
+                    maxAbsVal = absVal;
+                }
+            }
+            lpNorm = maxAbsVal;
+        } else if (norm == 0) {
+            // The `lpNorm` is the number of positive values in the array
+            for (double mag : magnitudes) {
+                if (mag > 0) lpNorm++;
+            }
+        } else if (norm > 0) {
             // Use the LP norm formula
             for (double mag : magnitudes) {
-                lpNorm += Math.pow(mag, p);
+                lpNorm += Math.pow(mag, norm);
             }
-            lpNorm = Math.pow(lpNorm, 1.0 / p);
+            lpNorm = Math.pow(lpNorm, 1.0 / norm);
+
+        } else {  // `norm` is negative
+            // Do not perform normalization
+            return array;
         }
 
-        // Ensure that the LP Norm is at least the threshold
+        // Ensure that the Lp-norm is at least the threshold
         if (lpNorm < threshold) {
             lpNorm = threshold;
         }
@@ -107,7 +145,36 @@ public class ArrayUtils {
             normalizedArray[i] = array[i].divides(lpNorm);
         }
 
-        // Return the LP-normalised array
+        // Return the Lp-normalised array
+        return normalizedArray;
+    }
+
+    /**
+     * Normalizes the elements in the given array such that the L<sup>p</sup> norm is 1.
+     *
+     * @param array The array to normalize.
+     * @param norm  The norm parameter for the L<sup>p</sup> normalization.
+     * @return The normalized complex array such that the L<sup>p</sup> norm of the array is 1.
+     * @see <a href="https://bit.ly/3LVePPv">L<sup>p</sup>-Norm</a> on Wikipedia, and
+     * <a href="https://bit.ly/3GwhYUJ">Librosa's Implementation</a> of this method.
+     */
+    public static double[] lpNormalize(double[] array, double norm) {
+        // Convert all `double` values into `Complex` values
+        Complex[] complexArray = new Complex[array.length];
+        for (int i = 0; i < array.length; i++) {
+            complexArray[i] = new Complex(array[i]);
+        }
+
+        // Normalize the array
+        complexArray = lpNormalize(complexArray, norm);
+
+        // Convert all `Complex` values back into `double` values
+        double[] normalizedArray = new double[array.length];
+        for (int i = 0; i < array.length; i++) {
+            normalizedArray[i] = complexArray[i].re();
+        }
+
+        // Return the normalized array
         return normalizedArray;
     }
 
