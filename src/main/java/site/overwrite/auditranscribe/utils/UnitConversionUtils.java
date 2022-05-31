@@ -2,7 +2,7 @@
  * UnitConversionUtils.java
  *
  * Created on 2022-03-12
- * Updated on 2022-05-28
+ * Updated on 2022-05-31
  *
  * Description: Unit conversion methods.
  */
@@ -230,6 +230,60 @@ public class UnitConversionUtils {
      */
     public static double amplitudeToDecibel(double amplitude, double refVal) {
         return powerToDecibel(amplitude * amplitude, refVal * refVal);
+    }
+
+    // Time unit conversion
+
+    /**
+     * Method that converts timestamps (in seconds) to sample indices.
+     *
+     * @param times      Timestamps (in seconds) to convert.
+     * @param sampleRate Sample rate of the audio.
+     * @return Sample indices corresponding to the given timestamps.
+     * @see <a href="https://bit.ly/3N4JoUe">Librosa's Implementation</a> of this method.
+     */
+    public static int[] timeToSamples(double[] times, double sampleRate) {
+        int[] samples = new int[times.length];
+        for (int i = 0; i < times.length; i++) {
+            samples[i] = (int) Math.round(times[i] * sampleRate);
+        }
+        return samples;
+    }
+
+    /**
+     * Method that converts sample indices into STFT frames.
+     *
+     * @param samples   Sample indices to convert.
+     * @param hopLength Hop length of the STFT.
+     * @param numFFT    Number of FFT bins.
+     * @return STFT frames corresponding to the given sample indices.
+     */
+    public static int[] samplesToFrames(int[] samples, int hopLength, int numFFT) {
+        // Compute offset value
+        int offset = (int) Math.floor(numFFT / 2.0);
+
+        // Compute frame indices
+        int[] frames = new int[samples.length];
+        for (int i = 0; i < samples.length; i++) {
+            frames[i] = (int) Math.floor((double) (samples[i] - offset) / hopLength);
+        }
+        return frames;
+    }
+
+    /**
+     * Method that converts sample indices into STFT frames.
+     *
+     * @param samples   Sample indices to convert.
+     * @param hopLength Hop length of the STFT.
+     * @return STFT frames corresponding to the given sample indices.
+     */
+    public static int[] samplesToFrames(int[] samples, int hopLength) {
+        // Compute frame indices
+        int[] frames = new int[samples.length];
+        for (int i = 0; i < samples.length; i++) {
+            frames[i] = (int) Math.floor((double) samples[i] / hopLength);
+        }
+        return frames;
     }
 
     // Graphics Units Conversion
