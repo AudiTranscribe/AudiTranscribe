@@ -12,8 +12,6 @@ package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.misc.Complex;
 
-import java.util.Arrays;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class FFTTest {
