@@ -2,7 +2,7 @@
  * ArrayUtils.java
  *
  * Created on 2022-02-16
- * Updated on 2022-05-31
+ * Updated on 2022-06-01
  *
  * Description: Array utilities to modify, change, and search within arrays.
  */
@@ -244,6 +244,45 @@ public class ArrayUtils {
 
     /**
      * Pad an array <code>array</code> to length <code>size</code> by centering the pre-existing
+     * elements in <code>array</code>.
+     *
+     * @param array The array to pad.
+     * @param size  The size to make the array.
+     * @return Padded array where the length is now <code>size</code>.
+     * @throws ValueException If <code>size</code> is smaller than the input size.
+     */
+    public static Complex[] padCenter(Complex[] array, int size) {
+        // Get length of the array
+        int n = array.length;
+
+        // Assert that the length of the data at least the desired size
+        if (size < n) {
+            throw new ValueException("Target size (" + size + ") must be at least input size (" + n + ")");
+        }
+
+        // If `n` is `size` just return the array
+        if (n == size) {
+            return array;
+        }
+
+        // Calculate left padding
+        int lpad = (size - n) / 2;
+
+        // Fill in the output array
+        Complex[] output = new Complex[size];
+        for (int i = 0; i < size; i++) {
+            output[i] = Complex.ZERO;
+        }
+
+        // Copy the existing array into the array
+        System.arraycopy(array, 0, output, lpad, n);
+
+        // Return the output array
+        return output;
+    }
+
+    /**
+     * Pad an array <code>array</code> to length <code>size</code> by centering the pre-existing
      * elements in <code>array</code> and using mode "reflect" to handle padding.
      *
      * @param array The array to pad.
@@ -330,45 +369,6 @@ public class ArrayUtils {
             // Place the element
             output[placementIndex] = array[reflectedElemIndex];
         }
-
-        // Return the output array
-        return output;
-    }
-
-    /**
-     * Pad an array <code>array</code> to length <code>size</code> by centering the pre-existing
-     * elements in <code>array</code>.
-     *
-     * @param array The array to pad.
-     * @param size  The size to make the array.
-     * @return Padded array where the length is now <code>size</code>.
-     * @throws ValueException If <code>size</code> is smaller than the input size.
-     */
-    public static Complex[] padCenter(Complex[] array, int size) {
-        // Get length of the array
-        int n = array.length;
-
-        // Assert that the length of the data at least the desired size
-        if (size < n) {
-            throw new ValueException("Target size (" + size + ") must be at least input size (" + n + ")");
-        }
-
-        // If `n` is `size` just return the array
-        if (n == size) {
-            return array;
-        }
-
-        // Calculate left padding
-        int lpad = (size - n) / 2;
-
-        // Fill in the output array
-        Complex[] output = new Complex[size];
-        for (int i = 0; i < size; i++) {
-            output[i] = Complex.ZERO;
-        }
-
-        // Copy the existing array into the array
-        System.arraycopy(array, 0, output, lpad, n);
 
         // Return the output array
         return output;

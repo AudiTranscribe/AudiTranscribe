@@ -2,7 +2,7 @@
  * UnitConversionUtils.java
  *
  * Created on 2022-03-12
- * Updated on 2022-05-31
+ * Updated on 2022-06-01
  *
  * Description: Unit conversion methods.
  */
@@ -10,6 +10,7 @@
 package site.overwrite.auditranscribe.utils;
 
 import site.overwrite.auditranscribe.exceptions.FormatException;
+import site.overwrite.auditranscribe.exceptions.ValueException;
 
 import java.util.Map;
 import java.util.Objects;
@@ -212,6 +213,62 @@ public class UnitConversionUtils {
 
         // Return it
         return logSpec;
+    }
+
+    /**
+     * Convert a power value (amplitude squared) to decibel (dB) units.
+     *
+     * @param power  Input power.
+     * @return Decibel value for the given power.
+     * @implNote See
+     * <a href="https://librosa.org/doc/main/_modules/librosa/core/spectrum.html#power_to_db">
+     * Librosa's Implementation</a> of this function.
+     */
+    public static double powerToDecibel(double power) {
+        return powerToDecibel(power, 1.0);
+    }
+
+    /**
+     * Convert a power value (amplitude squared) to decibel (dB) units.
+     * @param S  Spectrogram of input powers.
+     * @param refVal Value such that the amplitude <code>abs(power)</code> is scaled relative to
+     *               <code>refVal</code> using the formula
+     *               <code>10 * log10(power / refVal)</code>.
+     * @param topDB Threshold the output at <code>topDB</code> below the peak:<br>
+     *              <code>max(10 * log10(S / ref)) - topDB</code>.
+     * @return  Spectrogram of decibel values for the given powers.
+     * @throws ValueException If the value of <code>topDB</code> is negative.
+     */
+    public static double[][] powerToDecibel(double[][] S, double refVal, double topDB) {
+        // Check that `topDB` is non-negative
+        if (topDB < 0) throw new ValueException("The value of `topDB` must be non-negative.");
+
+        // Compute decibel values for all powers
+        double maxDB = -Double.MAX_VALUE;
+
+        double[][] DB = new double[S.length][S[0].length];
+        for (int i = 0; i < S.length; i++) {
+            for (int j = 0; j < S[0].length; j++) {
+                // Compute the decibel value for the specific power
+                double dbVal = powerToDecibel(S[i][j], refVal);
+
+                // Update `maxDB` if necessary
+                if (dbVal > maxDB) maxDB = dbVal;
+
+                // Update decibel matrix
+                DB[i][j] = dbVal;
+            }
+        }
+
+        // Threshold the output at `topDB` below the peak
+        for (int i = 0; i < DB.length; i++) {
+            for (int j = 0; j < DB[0].length; j++) {
+                DB[i][j] = Math.max(DB[i][j], maxDB - topDB);
+            }
+        }
+
+        // Return the decibel matrix
+        return DB;
     }
 
     /**

@@ -2,7 +2,7 @@
  * UnitConversionUtilsTest.java
  *
  * Created on 2022-03-12
- * Updated on 2022-05-31
+ * Updated on 2022-06-01
  *
  * Description: Test `UnitConversionUtils.java`.
  */
@@ -121,6 +121,9 @@ class UnitConversionUtilsTest {
         assertEquals(-7.782, UnitConversionUtils.powerToDecibel(2, 12), 0.001);
         assertEquals(3.010, UnitConversionUtils.powerToDecibel(10, 5), 0.001);
         assertEquals(2.597, UnitConversionUtils.powerToDecibel(12.345, 6.789), 0.001);
+
+        // With matrix
+        assertArrayEquals(new double[][] {{-60, 0}, {10, 20}, {20, 10}}, UnitConversionUtils.powerToDecibel(new double[][] {{0, 1}, {10, 100}, {100, 10}}, 1, 80));
     }
 
     @Test
