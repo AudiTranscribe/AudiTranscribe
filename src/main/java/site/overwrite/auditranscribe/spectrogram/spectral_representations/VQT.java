@@ -2,7 +2,7 @@
  * VQT.java
  *
  * Created on 2022-03-11
- * Updated on 2022-05-31
+ * Updated on 2022-06-01
  *
  * Description: Class that implements the Variable Q-Transform (VQT) algorithm.
  */
@@ -384,7 +384,7 @@ public class VQT {
         // FFT and retain only the non-negative frequencies
         Complex[][] fftBasis = new Complex[fftWindowLength][numFFT];
         for (int i = 0; i < fftWindowLength; i++) {
-            fftBasis[i] = FFT.fft(basis[i]);
+            fftBasis[i] = FFT.rfft(basis[i]);
         }
 
         // Return required data
