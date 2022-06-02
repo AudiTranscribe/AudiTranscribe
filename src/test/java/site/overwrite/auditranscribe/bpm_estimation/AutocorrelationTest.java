@@ -43,8 +43,8 @@ class AutocorrelationTest {
         };
 
         // Generate outputs
-        Complex[][] realMatrix1Output = Autocorrelation.autocorrelation(realMatrix1);
-        Complex[][] realMatrix2Output = Autocorrelation.autocorrelation(realMatrix2);
+        double[][] realMatrix1Output = Autocorrelation.autocorrelation(realMatrix1);
+        double[][] realMatrix2Output = Autocorrelation.autocorrelation(realMatrix2);
 
         Complex[][] complexMatrix1Output = Autocorrelation.autocorrelation(complexMatrix1);
         Complex[][] complexMatrix2Output = Autocorrelation.autocorrelation(complexMatrix2);
@@ -63,26 +63,26 @@ class AutocorrelationTest {
         assertEquals(2, complexMatrix2Output[0].length);
 
         // Check output values
-        assertEquals(new Complex(66), realMatrix1Output[0][0].roundNicely(5));
-        assertEquals(new Complex(93), realMatrix1Output[0][1].roundNicely(5));
-        assertEquals(new Complex(126), realMatrix1Output[0][2].roundNicely(5));
-        assertEquals(new Complex(32), realMatrix1Output[1][0].roundNicely(5));
-        assertEquals(new Complex(50), realMatrix1Output[1][1].roundNicely(5));
-        assertEquals(new Complex(72), realMatrix1Output[1][2].roundNicely(5));
-        assertEquals(new Complex(7), realMatrix1Output[2][0].roundNicely(5));
-        assertEquals(new Complex(16), realMatrix1Output[2][1].roundNicely(5));
-        assertEquals(new Complex(27), realMatrix1Output[2][2].roundNicely(5));
+        assertEquals(66, realMatrix1Output[0][0], 1e-5);
+        assertEquals(93, realMatrix1Output[0][1], 1e-5);
+        assertEquals(126, realMatrix1Output[0][2], 1e-5);
+        assertEquals(32, realMatrix1Output[1][0], 1e-5);
+        assertEquals(50, realMatrix1Output[1][1], 1e-5);
+        assertEquals(72, realMatrix1Output[1][2], 1e-5);
+        assertEquals(7, realMatrix1Output[2][0], 1e-5);
+        assertEquals(16, realMatrix1Output[2][1], 1e-5);
+        assertEquals(27, realMatrix1Output[2][2], 1e-5);
 
-        assertEquals(new Complex(37), realMatrix2Output[0][0].roundNicely(5));
-        assertEquals(new Complex(53), realMatrix2Output[0][1].roundNicely(5));
-        assertEquals(new Complex(73), realMatrix2Output[0][2].roundNicely(5));
-        assertEquals(new Complex(97), realMatrix2Output[0][3].roundNicely(5));
-        assertEquals(new Complex(125), realMatrix2Output[0][4].roundNicely(5));
-        assertEquals(new Complex(6), realMatrix2Output[1][0].roundNicely(5));
-        assertEquals(new Complex(14), realMatrix2Output[1][1].roundNicely(5));
-        assertEquals(new Complex(24), realMatrix2Output[1][2].roundNicely(5));
-        assertEquals(new Complex(36), realMatrix2Output[1][3].roundNicely(5));
-        assertEquals(new Complex(50), realMatrix2Output[1][4].roundNicely(5));
+        assertEquals(37, realMatrix2Output[0][0], 1e-5);
+        assertEquals(53, realMatrix2Output[0][1], 1e-5);
+        assertEquals(73, realMatrix2Output[0][2], 1e-5);
+        assertEquals(97, realMatrix2Output[0][3], 1e-5);
+        assertEquals(125, realMatrix2Output[0][4], 1e-5);
+        assertEquals(6, realMatrix2Output[1][0], 1e-5);
+        assertEquals(14, realMatrix2Output[1][1], 1e-5);
+        assertEquals(24, realMatrix2Output[1][2], 1e-5);
+        assertEquals(36, realMatrix2Output[1][3], 1e-5);
+        assertEquals(50, realMatrix2Output[1][4], 1e-5);
 
         assertEquals(new Complex(66), complexMatrix1Output[0][0].roundNicely(5));
         assertEquals(new Complex(93), complexMatrix1Output[0][1].roundNicely(5));

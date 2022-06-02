@@ -2,7 +2,7 @@
  * OnsetTest.java
  *
  * Created on 2022-05-31
- * Updated on 2022-06-01
+ * Updated on 2022-06-02
  *
  * Description: Test `Onset.java`.
  */
@@ -23,7 +23,7 @@ class OnsetTest {
 
     @Test
     void onsetStrength() throws UnsupportedAudioFileException, IOException {
-        // Get the audio file
+        // Get the audio files
         Audio audio1 = new Audio(
                 new File(IOMethods.getAbsoluteFilePath("testing-audio-files/Choice.wav")), false
         );

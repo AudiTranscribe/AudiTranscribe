@@ -84,7 +84,7 @@ public class Autocorrelation {
      * @param y The matrix to autocorrelate.
      * @return The autocorrelation of the given matrix.
      */
-    public static Complex[][] autocorrelation(double[][] y) {
+    public static double[][] autocorrelation(double[][] y) {
         // Convert to complex
         Complex[][] yComplex = new Complex[y.length][y[0].length];
         for (int i = 0; i < y.length; i++) {
@@ -94,6 +94,16 @@ public class Autocorrelation {
         }
 
         // Compute autocorrelation
-        return autocorrelation(yComplex);
+        Complex[][] autocorrelated = autocorrelation(yComplex);
+
+        // Convert each of the complex values to doubles
+        double[][] autocorrelatedDoubles = new double[autocorrelated.length][autocorrelated[0].length];
+        for (int i = 0; i < autocorrelated.length; i++) {
+            for (int j = 0; j < autocorrelated[0].length; j++) {
+                autocorrelatedDoubles[i][j] = autocorrelated[i][j].abs();
+            }
+        }
+
+        return autocorrelatedDoubles;
     }
 }
