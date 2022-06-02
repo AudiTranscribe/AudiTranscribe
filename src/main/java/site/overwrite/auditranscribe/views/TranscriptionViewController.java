@@ -1319,13 +1319,8 @@ public class TranscriptionViewController implements Initializable {
      */
     private void setupBPMEstimationTask(CustomTask<Double> task) {
         task.setOnSucceeded(event -> {
-            // Update the BPM variable
+            // Update the BPM value
             updateBPMValue(MathUtils.round(task.getValue(), 1));
-
-            // Update BPM spinner initial value
-            bpmSpinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(
-                    BPM_RANGE.getValue0(), BPM_RANGE.getValue1(), bpm, 0.1
-            ));
 
             logger.log(Level.INFO, "BPM estimation task complete");
         });
