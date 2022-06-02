@@ -44,20 +44,28 @@ public class Rhythm {
         int padAmount = (int) Math.floor(winLength / 2.);
         double[] onsetEnvelope = new double[2 * padAmount + n];
 
-        for (int i = 0; i < padAmount; i++) {  // Todo: check if this is correct
+        for (int i = 0; i < padAmount; i++) {
             onsetEnvelope[i] = MathUtils.normalize(
-                    (double) (i + 1) / padAmount, 0, 1, 0, rawOnsetEnvelope[0]
+                    (double) (i + 1) / padAmount,
+                    0,
+                    1,
+                    0,
+                    rawOnsetEnvelope[0]
             );
         }
         System.arraycopy(rawOnsetEnvelope, 0, onsetEnvelope, padAmount, n);
-        for (int i = padAmount + n; i < onsetEnvelope.length; i++) {  // Todo: check if this is correct
+        for (int i = padAmount + n; i < onsetEnvelope.length; i++) {
             onsetEnvelope[i] = MathUtils.normalize(
-                    (double) (i - padAmount - n + 1) / padAmount, 0, 1, rawOnsetEnvelope[rawOnsetEnvelope.length - 1], 0
+                    (double) (i - padAmount - n + 1) / padAmount,
+                    0,
+                    1,
+                    rawOnsetEnvelope[rawOnsetEnvelope.length - 1],
+                    0
             );
         }
 
         // Carve onset envelope into frames
-        double[][] rawODFFrame = ArrayUtils.frame(onsetEnvelope, winLength, 1, true);  // Todo: check vertical framing
+        double[][] rawODFFrame = ArrayUtils.frame(onsetEnvelope, winLength, 1, true);
 
         // Truncate to the length of the original signal
         double[][] odfFrame = new double[winLength][n];
