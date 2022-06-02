@@ -2,7 +2,7 @@
  * MiscUtils.java
  *
  * Created on 2022-04-30
- * Updated on 2022-05-28
+ * Updated on 2022-06-01
  *
  * Description: Miscellaneous utility methods.
  */
@@ -84,6 +84,30 @@ public class MiscUtils {
     public static String formatDate(Date date, String format) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
         return simpleDateFormat.format(date);
+    }
+
+    // Bit manipulation utils
+
+    /**
+     * Method that gets the number of bits set in the given integer.<br>
+     * (i.e. the number of significant bits in the binary representation of the integer).
+     *
+     * @param value The integer to get the number of bits set in.
+     * @return The number of bits set in the given integer.
+     * @implNote This method is based on the algorithm found at
+     * <a href="https://stackoverflow.com/a/2891946">this StackOverflow answer</a>.
+     */
+    public static int numOfSetBits(int value) {
+        // Get the number which has all ones in the binary representation
+        int allOnes = value;  // Initially set as the given value
+        allOnes |= (allOnes >> 1);
+        allOnes |= (allOnes >> 2);
+        allOnes |= (allOnes >> 4);
+        allOnes |= (allOnes >> 8);
+        allOnes |= (allOnes >> 16);
+
+        // Get number of digits in the binary representation of the `allOnes` integer
+        return (int) MathUtils.log2(allOnes + 1);
     }
 
     // Name utils

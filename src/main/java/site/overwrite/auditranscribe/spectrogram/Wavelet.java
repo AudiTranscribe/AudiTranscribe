@@ -2,7 +2,7 @@
  * Wavelet.java
  *
  * Created on 2022-02-13
- * Updated on 2022-05-28
+ * Updated on 2022-05-31
  *
  * Description: Class to implement audio windowing functions.
  */
@@ -182,7 +182,7 @@ public class Wavelet {
             }
 
             // Normalise
-            sig = ArrayUtils.lpNormalise(sig, norm);
+            sig = ArrayUtils.lpNormalize(sig, norm);
 
             // Append the signal to the `filters` list
             filters.add(sig);

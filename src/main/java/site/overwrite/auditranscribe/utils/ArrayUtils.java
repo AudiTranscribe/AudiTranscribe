@@ -2,7 +2,7 @@
  * ArrayUtils.java
  *
  * Created on 2022-02-16
- * Updated on 2022-05-28
+ * Updated on 2022-06-01
  *
  * Description: Array utilities to modify, change, and search within arrays.
  */
@@ -13,6 +13,8 @@ import site.overwrite.auditranscribe.exceptions.LengthException;
 import site.overwrite.auditranscribe.exceptions.ValueException;
 import site.overwrite.auditranscribe.misc.Complex;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.NoSuchElementException;
 
 /**
@@ -49,25 +51,41 @@ public class ArrayUtils {
     }
 
     /**
-     * Normalizes the elements in the given array such that the LP norm is 1.
+     * Normalizes the elements in the given array such that the L<sup>p</sup> norm is 1.
      *
      * @param array The array to normalize.
-     * @param p     The p value of the LP norm.
-     * @return The normalized complex array such that the LP norm of the array is 1.
-     * @throws ValueException If <code>p</code> is negative.
-     * @see <a href="https://en.wikipedia.org/wiki/Lp_space#The_p-norm_in_finite_dimensions">
-     * L<sup>p</sup>-Norm</a>
+     * @param norm  The norm parameter for the L<sup>p</sup> normalization. There are 5 cases to
+     *              consider for the value of <code>norm</code>.
+     *              <ul>
+     *                  <li>
+     *                      <code>norm = Double.NEGATIVE_INFINITY</code>: The L<sup>p</sup> norm is
+     *                      considered to be the <b>minimum</b> absolute value.
+     *                  </li>
+     *                  <li>
+     *                      <code>norm = Double.POSITIVE_INFINITY</code>: The L<sup>p</sup> norm is
+     *                      considered to be the <b>maximum</b> absolute value.
+     *                  </li>
+     *                  <li>
+     *                      <code>norm = 0</code>: The L<sup>p</sup> norm is considered to be the
+     *                      sum of all magnitudes.
+     *                  </li>
+     *                  <li>
+     *                      <code>norm > 0</code>: The <code>p</code> value is equal to
+     *                      <code>norm</code>, and L<sup>p</sup> norm will be calculated normally.
+     *                  </li>
+     *                  <li>
+     *                      <code>norm < 0</code>: No normalization will be performed.
+     *                  </li>
+     *              </ul>
+     * @return The normalized complex array such that the L<sup>p</sup> norm of the array is 1.
+     * @see <a href="https://bit.ly/3LVePPv">L<sup>p</sup>-Norm</a> on Wikipedia, and
+     * <a href="https://bit.ly/3GwhYUJ">Librosa's Implementation</a> of this method.
      */
-    public static Complex[] lpNormalise(Complex[] array, double p) {  // Todo: rename this to "lpNormalize" (with a z)
-        // Check that `p` is strictly non-negative
-        if (p < 0) {
-            throw new ValueException("Unsupported p value: " + p);
-        }
-
+    public static Complex[] lpNormalize(Complex[] array, double norm) {
         // Get the number of elements in the array
         int numElem = array.length;
 
-        // Set threshold to be the smallest non-zero number supported
+        // Set threshold to be the smallest (in absolute terms) non-zero number supported
         double threshold = Double.MIN_VALUE;
 
         // Get the magnitudes of the data in the array
@@ -77,23 +95,45 @@ public class ArrayUtils {
             magnitudes[i] = array[i].abs();
         }
 
-        // Compute the current `lpNorm` of the array
+        // Determine the `lpNorm` value
         double lpNorm = 0;
 
-        if (p == 0) {
-            // The `lpNorm` is the sum of all magnitudes
-            for (double mag : magnitudes) {
-                lpNorm += mag;
+        if (norm == Double.NEGATIVE_INFINITY) {
+            // `p` value is the minimum absolute value of the values in the array
+            double minAbsVal = Double.MAX_VALUE;
+            for (double absVal : magnitudes) {
+                if (absVal < minAbsVal) {
+                    minAbsVal = absVal;
+                }
             }
-        } else {  // We know `p > 0`
+            lpNorm = minAbsVal;
+        } else if (norm == Double.POSITIVE_INFINITY) {
+            // `p` value is the maximum absolute value of the values in the array
+            double maxAbsVal = Double.MIN_VALUE;
+            for (double absVal : magnitudes) {
+                if (absVal > maxAbsVal) {
+                    maxAbsVal = absVal;
+                }
+            }
+            lpNorm = maxAbsVal;
+        } else if (norm == 0) {
+            // The `lpNorm` is the number of positive values in the array
+            for (double mag : magnitudes) {
+                if (mag > 0) lpNorm++;
+            }
+        } else if (norm > 0) {
             // Use the LP norm formula
             for (double mag : magnitudes) {
-                lpNorm += Math.pow(mag, p);
+                lpNorm += Math.pow(mag, norm);
             }
-            lpNorm = Math.pow(lpNorm, 1.0 / p);
+            lpNorm = Math.pow(lpNorm, 1.0 / norm);
+
+        } else {  // `norm` is negative
+            // Do not perform normalization
+            return array;
         }
 
-        // Ensure that the LP Norm is at least the threshold
+        // Ensure that the Lp-norm is at least the threshold
         if (lpNorm < threshold) {
             lpNorm = threshold;
         }
@@ -105,7 +145,36 @@ public class ArrayUtils {
             normalizedArray[i] = array[i].divides(lpNorm);
         }
 
-        // Return the LP-normalised array
+        // Return the Lp-normalised array
+        return normalizedArray;
+    }
+
+    /**
+     * Normalizes the elements in the given array such that the L<sup>p</sup> norm is 1.
+     *
+     * @param array The array to normalize.
+     * @param norm  The norm parameter for the L<sup>p</sup> normalization.
+     * @return The normalized complex array such that the L<sup>p</sup> norm of the array is 1.
+     * @see <a href="https://bit.ly/3LVePPv">L<sup>p</sup>-Norm</a> on Wikipedia, and
+     * <a href="https://bit.ly/3GwhYUJ">Librosa's Implementation</a> of this method.
+     */
+    public static double[] lpNormalize(double[] array, double norm) {
+        // Convert all `double` values into `Complex` values
+        Complex[] complexArray = new Complex[array.length];
+        for (int i = 0; i < array.length; i++) {
+            complexArray[i] = new Complex(array[i]);
+        }
+
+        // Normalize the array
+        complexArray = lpNormalize(complexArray, norm);
+
+        // Convert all `Complex` values back into `double` values
+        double[] normalizedArray = new double[array.length];
+        for (int i = 0; i < array.length; i++) {
+            normalizedArray[i] = complexArray[i].re();
+        }
+
+        // Return the normalized array
         return normalizedArray;
     }
 
@@ -175,87 +244,6 @@ public class ArrayUtils {
 
     /**
      * Pad an array <code>array</code> to length <code>size</code> by centering the pre-existing
-     * elements in <code>array</code> and using mode "reflect" to handle padding.
-     *
-     * @param array The array to pad.
-     * @param size  The size to make the array.
-     * @return Padded array where the length is now <code>size</code>.
-     * @throws ValueException If <code>size</code> is negative.
-     * @implNote See <a href="https://numpy.org/doc/stable/reference/generated/numpy.pad.html">
-     * Numpy's implementation</a> of this function.
-     * @see <a href="https://stackoverflow.com/a/51780171">This StackOverflow answer</a> on how to
-     * visualise the "reflect" mode of the padding operation.
-     */
-    public static double[] padCenterReflect(double[] array, int size) {
-        // Verify that `size` is positive
-        if (size <= 0) {
-            throw new ValueException("Invalid size " + size);
-        }
-
-        // Get length of the array
-        int n = array.length;
-
-        // If `n` is `size` just return the array
-        if (n == size) {
-            return array;
-        }
-
-        // Calculate left and right padding
-        int lpad = (size - n) / 2;
-        int rpad = size - n - lpad;
-
-        // Fill the output array
-        double[] output = new double[size];
-        System.arraycopy(array, 0, output, lpad, n);  // Copy center elements
-
-        int reflectedElemIndex = 0;
-        int changeInVal = n == 1 ? 0 : 1;  // Don't add anything if there is only 1 element
-        for (int i = 0; i < lpad; i++) {  // Left padding
-            // Handle reflected element index calculation
-            if (reflectedElemIndex + changeInVal >= n) {
-                changeInVal = -1;
-            }
-
-            if (reflectedElemIndex + changeInVal < 0) {
-                changeInVal = 1;
-            }
-
-            reflectedElemIndex += changeInVal;
-
-            // Get the position to place this element
-            int placementIndex = lpad - i - 1;  // We start from the back of the section to be padded
-
-            // Place the element
-            output[placementIndex] = array[reflectedElemIndex];
-        }
-
-        reflectedElemIndex = n - 1;  // Start from the end
-        changeInVal = n == 1 ? 0 : -1;  // Don't add anything if there is only 1 element
-        for (int i = 0; i < rpad; i++) {  // Right padding
-            // Handle reflected element index calculation
-            if (reflectedElemIndex + changeInVal >= n) {
-                changeInVal = -1;
-            }
-
-            if (reflectedElemIndex + changeInVal < 0) {
-                changeInVal = 1;
-            }
-
-            reflectedElemIndex += changeInVal;
-
-            // Get the position to place this element
-            int placementIndex = size - rpad + i;
-
-            // Place the element
-            output[placementIndex] = array[reflectedElemIndex];
-        }
-
-        // Return the output array
-        return output;
-    }
-
-    /**
-     * Pad an array <code>array</code> to length <code>size</code> by centering the pre-existing
      * elements in <code>array</code>.
      *
      * @param array The array to pad.
@@ -290,6 +278,119 @@ public class ArrayUtils {
         System.arraycopy(array, 0, output, lpad, n);
 
         // Return the output array
+        return output;
+    }
+
+    /**
+     * Pad an array <code>array</code> to length <code>size</code> by centering the pre-existing
+     * elements in <code>array</code> and using mode "reflect" to handle padding.
+     *
+     * @param array The array to pad.
+     * @param size  The size to make the array.
+     * @return Padded array where the length is now <code>size</code>.
+     * @throws ValueException If <code>size</code> is negative.
+     * @see <a href="https://bit.ly/3z73f0U">SciPy's intended implementation</a> of the reflection
+     * mode.
+     */
+    public static double[] padCenterReflect(double[] array, int size) {
+        // Verify that `size` is positive
+        if (size <= 0) {
+            throw new ValueException("Invalid size " + size);
+        }
+
+        // Get length of the array
+        int n = array.length;
+
+        // If `n` is `size` just return the array
+        if (n == size) {
+            return array;
+        }
+
+        // Calculate left and right padding
+        int lpad = (size - n) / 2;
+        int rpad = size - n - lpad;
+
+        // Fill the output array
+        double[] output = new double[size];
+        System.arraycopy(array, 0, output, lpad, n);  // Copy center elements
+
+        int reflectedElemIndex = 0;
+        boolean doubleCount = true;  // Whether to include the current element twice
+        int changeInVal = n == 1 ? 0 : 1;  // Don't add anything if there is only 1 element
+        for (int i = 0; i < lpad; i++) {  // Left padding
+            // Handle reflected element index calculation
+            if (reflectedElemIndex + changeInVal >= n) {
+                changeInVal = -1;
+                doubleCount = true;
+            }
+
+            if (reflectedElemIndex + changeInVal < 0) {
+                changeInVal = 1;
+                doubleCount = true;
+            }
+
+            if (!doubleCount) {
+                reflectedElemIndex += changeInVal;
+            } else {
+                doubleCount = false;
+            }
+
+            // Get the position to place this element
+            int placementIndex = lpad - i - 1;  // We start from the back of the section to be padded
+
+            // Place the element
+            output[placementIndex] = array[reflectedElemIndex];
+        }
+
+        reflectedElemIndex = n - 1;  // Start from the end
+        doubleCount = true;
+        changeInVal = n == 1 ? 0 : -1;  // Don't add anything if there is only 1 element
+        for (int i = 0; i < rpad; i++) {  // Right padding
+            // Handle reflected element index calculation
+            if (reflectedElemIndex + changeInVal >= n) {
+                changeInVal = -1;
+                doubleCount = true;
+            }
+
+            if (reflectedElemIndex + changeInVal < 0) {
+                changeInVal = 1;
+                doubleCount = true;
+            }
+
+            if (!doubleCount) {
+                reflectedElemIndex += changeInVal;
+            } else {
+                doubleCount = false;
+            }
+
+            // Get the position to place this element
+            int placementIndex = size - rpad + i;
+
+            // Place the element
+            output[placementIndex] = array[reflectedElemIndex];
+        }
+
+        // Return the output array
+        return output;
+    }
+
+    /**
+     * Take certain elements of an array and return them in a new array.
+     *
+     * @param array   The array to take elements from.
+     * @param indices The indices to take.
+     * @return The new array containing the selected elements.
+     */
+    public static double[] takeElem(double[] array, int[] indices) {
+        // Define output array
+        double[] output = new double[indices.length];
+
+        // Copy elements
+        for (int i = 0; i < indices.length; i++) {
+            output[i] = array[indices[i]];
+        }
+
+        // Return output array
         return output;
     }
 
@@ -394,6 +495,79 @@ public class ArrayUtils {
 
         // Return the `framed` array
         return framed;
+    }
+
+    /**
+     * Calculate a 1-D maximum filter along the given axis.<br>
+     * The lines of the array along the given axis are filtered with a maximum filter of given size.
+     *
+     * @param array The input array.
+     * @param size  Length along which to calculate the 1-D maximum.
+     * @return Maximum-filtered array with same shape as input.
+     * @see <a href="https://bit.ly/37iRiK3">SciPy's implementation</a> of the MAXLIST algorithm.
+     * This code is based off how that works. See also
+     * <a href="https://stackoverflow.com/a/66808375">this StackOverflow answer</a> on how the
+     * algorithm should work. Implementation is based off of Method 4 of
+     * <a href="https://bit.ly/3LYIc3l">this GeeksForGeeks article</a>.
+     */
+    public static double[] maximumFilter1D(double[] array, int size) {
+        // Get the number of elements in the array
+        int numElem = array.length;
+
+        // Pad array using the center reflect mode
+        int padAmount;
+        if (size % 2 == 1) {  // Odd size
+            // Initial window is centered on FIRST element, and final window is centered on LAST element
+            padAmount = (size - 1) / 2;
+        } else {  // Even size
+            // Initial window's center two elements are the FIRST element of the array
+            padAmount = size / 2;
+        }
+
+        double[] paddedArray = padCenterReflect(array, numElem + 2 * padAmount);
+
+        // Define maximum filter array and the double-ended queue (Deque)
+        double[] maxFilterArray = new double[numElem];
+        Deque<Integer> indicesQueue = new ArrayDeque<>();
+
+        // Process first window
+        for (int i = 0; i < size; i++) {
+            // For every element, the previous smaller elements are useless so remove them from the indices queue
+            while (indicesQueue.size() != 0 && paddedArray[i] >= paddedArray[indicesQueue.peekLast()]) {
+                indicesQueue.removeLast();
+            }
+
+            // Add new element to the rear of the deque
+            indicesQueue.addLast(i);
+        }
+
+        // Process the rest of the elements
+        for (int i = size; i < numElem + 2 * padAmount; i++) {
+            // The element at the front of the queue is the largest element of previous window, so add that into the
+            // maximum filter array
+            maxFilterArray[i - size] = paddedArray[indicesQueue.getFirst()];
+
+            // Remove the elements which are out of this window
+            while (indicesQueue.size() != 0 && indicesQueue.peekFirst() <= i - size) {
+                indicesQueue.removeFirst();
+            }
+
+            // Remove all elements smaller than the currently being added element
+            while (indicesQueue.size() != 0 && paddedArray[i] >= paddedArray[indicesQueue.peekLast()]) {
+                indicesQueue.removeLast();
+            }
+
+            // Add new element to the rear of the deque
+            indicesQueue.addLast(i);
+        }
+
+        // Add last window's maximum element to the maximum filter array if the size is odd
+        if (size % 2 == 1) {
+            maxFilterArray[numElem - 1] = paddedArray[indicesQueue.getFirst()];
+        }
+
+        // Return the maximum filter array
+        return maxFilterArray;
     }
 
     /**

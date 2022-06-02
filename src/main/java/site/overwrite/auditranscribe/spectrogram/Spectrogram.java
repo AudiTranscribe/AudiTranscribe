@@ -2,7 +2,7 @@
  * Spectrogram.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-28
+ * Updated on 2022-05-31
  *
  * Description: Spectrogram class.
  */
@@ -16,6 +16,7 @@ import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.exceptions.ValueException;
 import site.overwrite.auditranscribe.plotting.Plotter;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.CQT;
+import site.overwrite.auditranscribe.spectrogram.spectral_representations.FrequencyBins;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.VQT;
 import site.overwrite.auditranscribe.misc.Complex;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
@@ -114,7 +115,7 @@ public class Spectrogram {
         samples = audioObj.getMonoSamples();
 
         // Get the frequency bins
-        frequencyBins = VQT.getFreqBins(numFreqBins, binsPerOctave, minFreq);
+        frequencyBins = FrequencyBins.getQTFreqBins(numFreqBins, binsPerOctave, minFreq);
     }
 
     /**
@@ -177,7 +178,7 @@ public class Spectrogram {
         logger.log(Level.FINE, "Spectrogram creation occurring WITHOUT audio file; samples not available");
 
         // Get the frequency bins
-        frequencyBins = VQT.getFreqBins(numFreqBins, binsPerOctave, minFreq);
+        frequencyBins = FrequencyBins.getQTFreqBins(numFreqBins, binsPerOctave, minFreq);
     }
 
     // Public methods
@@ -206,7 +207,7 @@ public class Spectrogram {
         }
 
         // Get also the frequency bins of the VQT
-        double[] freqBins = VQT.getFreqBins(numFreqBins, binsPerOctave, minFreq);  // CQT and VQT bins are the same
+        double[] freqBins = FrequencyBins.getQTFreqBins(numFreqBins, binsPerOctave, minFreq);  // CQT and VQT bins are the same
 
         // Find the highest permitted frequency bin
         int highestPermittedIndex = -1;
