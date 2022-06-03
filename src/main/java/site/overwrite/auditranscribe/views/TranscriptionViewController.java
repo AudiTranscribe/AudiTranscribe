@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-02
+ * Updated on 2022-06-03
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -1321,6 +1321,11 @@ public class TranscriptionViewController implements Initializable {
         task.setOnSucceeded(event -> {
             // Update the BPM value
             updateBPMValue(MathUtils.round(task.getValue(), 1));
+
+            // Update BPM spinner initial value
+            bpmSpinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(
+                    BPM_RANGE.getValue0(), BPM_RANGE.getValue1(), bpm, 0.1
+            ));
 
             logger.log(Level.INFO, "BPM estimation task complete");
         });
