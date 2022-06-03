@@ -2,12 +2,12 @@
  * AudioConverterTest.java
  *
  * Created on 2022-05-06
- * Updated on 2022-05-30
+ * Updated on 2022-06-03
  *
  * Description: Test `AudioConverter.java`.
  */
 
-package site.overwrite.auditranscribe.audio;
+package site.overwrite.auditranscribe.audio.ffmpeg;
 
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.io.IOMethods;
@@ -26,14 +26,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AudioConverterTest {
     @Test
-    void convertAudio() throws IOException, NoSuchAlgorithmException {
+    void convertAudio() throws IOException, NoSuchAlgorithmException, FFmpegNotFound {
         // Get a testing MP3 file
         File testFile = new File(IOMethods.getAbsoluteFilePath("testing-audio-files/A440.mp3"));
 
         // Create a converter
-        // Todo: make this dependent on operating system
-        AudioConverter converter = new AudioConverter("ffmpeg");
-        converter.convertAudio(testFile, "test-converted.wAV");
+        AudioConverter converter = new AudioConverter();
+        String outputFilePath = converter.convertAudio(testFile, "test-converted.WAV");  // Ext. in caps
+
+        // Check the output file path
+        assertEquals("test-converted.wav", outputFilePath);  // Ext. not in caps
 
         // Compute file hash
         byte[] buff = new byte[1024];
