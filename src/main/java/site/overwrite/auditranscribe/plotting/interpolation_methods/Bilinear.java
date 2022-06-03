@@ -2,7 +2,7 @@
  * Bilinear.java
  *
  * Created on 2022-04-12
- * Updated on 2022-04-12
+ * Updated on 2022-06-03
  *
  * Description: Helper class that contains the bilinear interpolation method.
  */
@@ -25,12 +25,14 @@ public class Bilinear extends AbstractInterpolation {
      * @param XNew Array of new x values.
      * @param YNew Array of new y values.
      * @return Array of new values, `ZNew`, where the point <code>(XNew[i], YNew[j])</code> has
-     * a value of <code>Z_new[i][j]</code>.
+     * a value of <code>ZNew[i][j]</code>.
      * @implNote <a href="https://en.wikipedia.org/wiki/Bilinear_interpolation#Computation">This
-     * Wikipedia Article</a> on the Bilinear Interpolation's implementation
+     * Wikipedia Article</a> on the Bilinear Interpolation's implementation.
      */
     @Override
-    public double[][] interpolationHelper(double[] X, double[] Y, double[][] Z, double[] XNew, double[] YNew) {
+    public double[][] interpolationHelper(
+            double[] X, double[] Y, double[][] Z, double[] XNew, double[] YNew
+    ) {
         // Get the lengths of the arrays
         int lengthX = X.length;
         int lengthY = Y.length;
@@ -56,7 +58,7 @@ public class Bilinear extends AbstractInterpolation {
                 // Calculate actual indices
                 int i1, i2, j1, j2;
 
-                if (i < 0) {  // Handle weird negative index case
+                if (i < 0 || i >= lengthX - 1) {  // Handle weird index case
                     i1 = lengthX - 1;
                     i2 = 0;
                 } else {
@@ -64,7 +66,7 @@ public class Bilinear extends AbstractInterpolation {
                     i2 = i + 1;
                 }
 
-                if (j < 0) {
+                if (j < 0 || j >= lengthY - 1) {  // Handle weird index case
                     j1 = lengthY - 1;
                     j2 = 0;
                 } else {
@@ -80,13 +82,23 @@ public class Bilinear extends AbstractInterpolation {
                 double y2 = Y[j2];
 
                 // Get the values of `f(x, y1)` and `f(x, y2)`
-                double coefficient = 1. / (x2 - x1);
-                double fxy1 = coefficient * ((x2 - xNew) * Z[i1][j1] + (xNew - x1) * Z[i2][j1]);
-                double fxy2 = coefficient * ((x2 - xNew) * Z[i1][j2] + (xNew - x1) * Z[i2][j2]);
+                double coefficient, fxy1, fxy2, fxy;
+                if (x1 != x2) {
+                    coefficient = 1. / (x2 - x1);
+                    fxy1 = coefficient * ((x2 - xNew) * Z[i1][j1] + (xNew - x1) * Z[i2][j1]);
+                    fxy2 = coefficient * ((x2 - xNew) * Z[i1][j2] + (xNew - x1) * Z[i2][j2]);
+                } else {  // Have same x-coordinate
+                    fxy1 = Z[i1][j1];
+                    fxy2 = Z[i1][j2];
+                }
 
                 // Proceed to interpolate in the y direction
-                coefficient = 1. / (y2 - y1);
-                double fxy = coefficient * ((y2 - yNew) * fxy1 + (yNew - y1) * fxy2);
+                if (y1 != y2) {
+                    coefficient = 1. / (y2 - y1);
+                    fxy = coefficient * ((y2 - yNew) * fxy1 + (yNew - y1) * fxy2);
+                } else {  // Have same y-coordinate
+                    fxy = fxy1;
+                }
 
                 // Set the value in the output array
                 ZNew[iNew][jNew] = fxy;

@@ -2,7 +2,7 @@
  * Plotter.java
  *
  * Created on 2022-02-18
- * Updated on 2022-05-25
+ * Updated on 2022-06-03
  *
  * Description: Class that contains plotting functions.
  */
@@ -88,9 +88,11 @@ public class Plotter {
     public void plot(double[][] spectrogramMagnitudes, int imgWidth, int imgHeight) {
         // Define the image that will show the spectrogram
         bufferedImage = new BufferedImage(imgWidth, imgHeight, BufferedImage.TYPE_INT_RGB);
+        logger.log(Level.FINE, "Defined buffer image");
 
         // Get the pixels of the spectrogram image
         int[] pixels = ((DataBufferInt) bufferedImage.getRaster().getDataBuffer()).getData();
+        logger.log(Level.FINE, "Got pixels of buffer image");
 
         // Generate the values of each packet on the image
         /*
@@ -100,7 +102,11 @@ public class Plotter {
          *   representing the relative 'intensity' that should be shown on the pixel.
          */
         double[][] packets = Interpolation.interpolate(spectrogramMagnitudes, imgHeight, imgWidth, interpolationMethod);
-        packets = ArrayUtils.transpose(packets);  // Make dimensions (width, height) instead of (height, width)
+        logger.log(Level.FINE, "Interpolated spectrogram magnitudes");
+
+        // Transpose packets
+        // (Make dimensions (width, height) instead of (height, width) for easier indexing)
+        packets = ArrayUtils.transpose(packets);
         logger.log(Level.FINE, "Image packets generated");
 
         // Get min and max of packet values
@@ -113,6 +119,7 @@ public class Plotter {
                 if (maxPacketVal < packet) maxPacketVal = packet;
             }
         }
+        logger.log(Level.FINE, "Got min and max packet values");
 
         // Normalise packet values
         for (int w = 0; w < imgWidth; w++) {
