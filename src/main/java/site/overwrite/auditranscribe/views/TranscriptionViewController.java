@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-30
+ * Updated on 2022-06-03
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -29,6 +29,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.javatuples.Pair;
+import site.overwrite.auditranscribe.bpm_estimation.BPMEstimator;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
@@ -56,9 +57,7 @@ import java.io.InvalidObjectException;
 import java.net.URL;
 import java.security.InvalidParameterException;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -84,7 +83,7 @@ public class TranscriptionViewController implements Initializable {
     final String[] TIME_SIGNATURES = {"4/4", "2/2", "2/4", "3/4", "3/8", "6/8", "9/8", "12/8"};
 
     final Pair<Integer, Integer> BPM_RANGE = new Pair<>(1, 512);  // In the format [min, max]
-    final Pair<Double, Double> OFFSET_RANGE = new Pair<>(-5., 5.);  // In the format [min, max]
+    final Pair<Double, Double> OFFSET_RANGE = new Pair<>(-15., 15.);  // In the format [min, max]
 
     public final double SPECTROGRAM_ZOOM_SCALE_X = 2;
     public final double SPECTROGRAM_ZOOM_SCALE_Y = 5;
@@ -420,7 +419,9 @@ public class TranscriptionViewController implements Initializable {
 
                     // Play the note
                     try {
-                        logger.log(Level.FINE, "Playing " + UnitConversionUtils.noteNumberToNote(estimatedNoteNum, false));
+                        logger.log(Level.FINE, "Playing " + UnitConversionUtils.noteNumberToNote(
+                                estimatedNoteNum, false
+                        ));
                         notePlayer.playNoteForDuration(
                                 estimatedNoteNum, NOTE_PLAYING_ON_VELOCITY, NOTE_PLAYING_OFF_VELOCITY,
                                 NOTE_PLAYING_ON_DURATION, NOTE_PLAYING_OFF_DURATION
@@ -688,7 +689,7 @@ public class TranscriptionViewController implements Initializable {
         sampleRate = audio.getSampleRate();
 
         // Generate spectrogram image based on newly generated magnitude data
-        CustomTask<WritableImage> task = new CustomTask<>() {
+        CustomTask<WritableImage> spectrogramTask = new CustomTask<>() {
             @Override
             protected WritableImage call() {
                 Spectrogram spectrogram = new Spectrogram(
@@ -705,7 +706,20 @@ public class TranscriptionViewController implements Initializable {
             }
         };
 
-        startGeneratingSpectrogramTask(task, "Generating spectrogram...");
+        // Estimate BPM based on the audio samples
+        CustomTask<Double> bpmTask = new CustomTask<>() {
+            @Override
+            protected Double call() {
+                return BPMEstimator.estimate(audio.getMonoSamples(), sampleRate).get(0);  // Assume we take fist element
+            }
+        };
+
+        // Set up tasks
+        setupSpectrogramTask(spectrogramTask, "Generating spectrogram...");
+        setupBPMEstimationTask(bpmTask);
+
+        // Start the tasks
+        startTasks(spectrogramTask, bpmTask);
     }
 
     /**
@@ -733,7 +747,7 @@ public class TranscriptionViewController implements Initializable {
         magnitudes = qTransformData.qTransformMagnitudes;
 
         // Generate spectrogram image based on existing magnitude data
-        CustomTask<WritableImage> task = new CustomTask<>() {
+        CustomTask<WritableImage> spectrogramTask = new CustomTask<>() {
             @Override
             protected WritableImage call() {
                 Spectrogram spectrogram = new Spectrogram(
@@ -747,8 +761,11 @@ public class TranscriptionViewController implements Initializable {
             }
         };
 
-        // Link the progress of the task with the progress bar
-        startGeneratingSpectrogramTask(task, "Loading spectrogram...");
+        // Set up the spectrogram task
+        setupSpectrogramTask(spectrogramTask, "Loading spectrogram...");
+
+        // Start the tasks
+        startTasks(spectrogramTask);
     }
 
     /**
@@ -1134,7 +1151,7 @@ public class TranscriptionViewController implements Initializable {
      * @param task    The task to start.
      * @param message Message to display at the side of the progress bar.
      */
-    private void startGeneratingSpectrogramTask(CustomTask<WritableImage> task, String message) {
+    private void setupSpectrogramTask(CustomTask<WritableImage> task, String message) {
         // Link the progress of the task with the progress bar
         progressBarHBox.setVisible(true);
         progressBar.progressProperty().bind(task.progressProperty());
@@ -1290,30 +1307,95 @@ public class TranscriptionViewController implements Initializable {
             // Ensure main pane is in focus
             rootPane.requestFocus();
 
-            // Enable all disabled nodes
-            Node[] disabledNodes = new Node[]{
-                    // Top Hbox
-                    newProjectButton, openProjectButton, saveProjectButton,
-                    musicKeyChoice, bpmSpinner, timeSignatureChoice, offsetSpinner,
-
-                    // Bottom Hbox
-                    playButton, stopButton, playSkipBackButton, playSkipForwardButton,
-                    scrollButton,
-                    volumeButton, volumeSlider
-            };
-
-            for (Node node : disabledNodes) {
-                node.setDisable(false);
-            }
-
             // Report that the transcription view is ready to be shown
             logger.log(Level.INFO, "Spectrogram for " + audioFileName + " ready to be shown");
         });
+    }
 
-        // Start task on an alternate thread
-        Thread thread = new Thread(task);
-        thread.setDaemon(true);
-        thread.start();
+    /**
+     * Helper method that starts the BPM estimation task.
+     *
+     * @param task The task to start.
+     */
+    private void setupBPMEstimationTask(CustomTask<Double> task) {
+        task.setOnSucceeded(event -> {
+            // Update the BPM value
+            updateBPMValue(MathUtils.round(task.getValue(), 1));
+
+            // Update BPM spinner initial value
+            bpmSpinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(
+                    BPM_RANGE.getValue0(), BPM_RANGE.getValue1(), bpm, 0.1
+            ));
+
+            logger.log(Level.INFO, "BPM estimation task complete");
+        });
+    }
+
+    /**
+     * Helper method that starts all the transcription view tasks.
+     *
+     * @param tasks The tasks to start.
+     */
+    private void startTasks(CustomTask<?>... tasks) {
+        // Create a task that starts the tasks
+        CustomTask<Boolean> masterTask = new CustomTask<>() {
+            @Override
+            protected Boolean call() {
+                // Define a worker thread pool
+                ExecutorService executor = Executors.newFixedThreadPool(
+                        tasks.length, runnable -> {
+                            Thread thread = Executors.defaultThreadFactory().newThread(runnable);
+                            thread.setDaemon(true);  // Make it so that it can shut down gracefully by placing it in background
+                            return thread;
+                        }
+                );
+
+                // Execute all tasks
+                for (CustomTask<?> task : tasks) {
+                    executor.execute(task);
+                }
+
+                logger.log(Level.INFO, "Started all transcription view tasks");
+
+                // Await for all tasks' completion
+                executor.shutdown();  // Prevent new tasks from being submitted
+
+                boolean hasTerminated;
+                try {
+                    hasTerminated = executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+
+                logger.log(Level.INFO, "All tasks have completed");
+                return hasTerminated;
+            }
+        };
+        masterTask.setOnSucceeded(event -> {
+            // Check if all tasks are completed
+            if (masterTask.getValue()) {
+                // Enable all disabled nodes
+                Node[] disabledNodes = new Node[]{
+                        // Top Hbox
+                        newProjectButton, openProjectButton, saveProjectButton,
+                        musicKeyChoice, bpmSpinner, timeSignatureChoice, offsetSpinner,
+
+                        // Bottom Hbox
+                        playButton, stopButton, playSkipBackButton, playSkipForwardButton,
+                        scrollButton,
+                        volumeButton, volumeSlider
+                };
+
+                for (Node node : disabledNodes) {
+                    node.setDisable(false);
+                }
+            }
+        });
+
+        // Start the thread
+        Thread masterThread = new Thread(masterTask);
+        masterThread.setDaemon(true);
+        masterThread.start();
     }
 
     /**
