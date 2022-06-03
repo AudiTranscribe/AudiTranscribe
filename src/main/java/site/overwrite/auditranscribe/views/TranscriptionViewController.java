@@ -161,6 +161,8 @@ public class TranscriptionViewController implements Initializable {
     private StackPane[] barNumberEllipses;
     private Line playheadLine;
 
+    Queue<CustomTask<?>> ongoingTasks = new LinkedList<>();
+
     // FXML Elements
     // Menu bar
     @FXML
@@ -1152,12 +1154,10 @@ public class TranscriptionViewController implements Initializable {
      * @param message Message to display at the side of the progress bar.
      */
     private void setupSpectrogramTask(CustomTask<WritableImage> task, String message) {
-        // Link the progress of the task with the progress bar
-        progressBarHBox.setVisible(true);
-        progressBar.progressProperty().bind(task.progressProperty());
-        progressLabel.setText(message);
+        // Set the task's message
+        task.setMessage(message);
 
-        // Finish setting up the spectrogram and its related attributes
+        // Set task completion listener
         task.setOnSucceeded(event -> {
             // Define a variable for the image
             WritableImage image = task.getValue();
@@ -1286,7 +1286,6 @@ public class TranscriptionViewController implements Initializable {
             spectrogramPane.setVvalue(0.5);
 
             // Hide the progress bar HBox
-            progressBarHBox.setVisible(false);
             isSpectrogramReady = true;
 
             // Update playhead position
@@ -1307,7 +1306,8 @@ public class TranscriptionViewController implements Initializable {
             // Ensure main pane is in focus
             rootPane.requestFocus();
 
-            // Report that the transcription view is ready to be shown
+            // Mark the task as completed and report that the transcription view is ready to be shown
+            markTaskAsCompleted(task);
             logger.log(Level.INFO, "Spectrogram for " + audioFileName + " ready to be shown");
         });
     }
@@ -1318,6 +1318,10 @@ public class TranscriptionViewController implements Initializable {
      * @param task The task to start.
      */
     private void setupBPMEstimationTask(CustomTask<Double> task) {
+        // Set the task's message
+        task.setMessage("Estimating tempo...");
+
+        // Set task completion listener
         task.setOnSucceeded(event -> {
             // Update the BPM value
             updateBPMValue(MathUtils.round(task.getValue(), 1));
@@ -1327,6 +1331,8 @@ public class TranscriptionViewController implements Initializable {
                     BPM_RANGE.getValue0(), BPM_RANGE.getValue1(), bpm, 0.1
             ));
 
+            // Mark the task as completed
+            markTaskAsCompleted(task);
             logger.log(Level.INFO, "BPM estimation task complete");
         });
     }
@@ -1350,11 +1356,17 @@ public class TranscriptionViewController implements Initializable {
                         }
                 );
 
-                // Execute all tasks
-                for (CustomTask<?> task : tasks) {
-                    executor.execute(task);
-                }
+                // Convert the array of tasks into a list of tasks
+                Collection<CustomTask<?>> taskList = List.of(tasks);
 
+                // Add all tasks to the ongoing tasks queue
+                ongoingTasks.addAll(taskList);
+
+                // Update the progress bar section
+                markTaskAsCompleted(null);
+
+                // Execute all tasks
+                taskList.forEach(executor::execute);
                 logger.log(Level.INFO, "Started all transcription view tasks");
 
                 // Await for all tasks' completion
@@ -1396,6 +1408,36 @@ public class TranscriptionViewController implements Initializable {
         Thread masterThread = new Thread(masterTask);
         masterThread.setDaemon(true);
         masterThread.start();
+    }
+
+    /**
+     * Helper method that marks a task as completed and handles the ongoing tasks list.
+     *
+     * @param completedTask The completed task.
+     */
+    private void markTaskAsCompleted(CustomTask<?> completedTask) {
+        // Get the current task that is being processed
+        CustomTask<?> currentTask = ongoingTasks.peek();
+
+        // Remove the completed task from the ongoing tasks queue
+        if (completedTask != null) ongoingTasks.remove(completedTask);
+
+        // Update the progress bar section if the completed task is the current task or if the current task is `null`
+        if (completedTask == null || currentTask == completedTask) {
+            // Check if there are any tasks left in the queue
+            if (ongoingTasks.size() != 0) {
+                // Get the next task in the queue
+                currentTask = ongoingTasks.peek();
+
+                // Update the progress section
+                progressBar.progressProperty().bind(currentTask.progressProperty());
+                progressLabel.textProperty().bind(currentTask.messageProperty());
+
+            } else {
+                // Hide the progress bar section
+                progressBarHBox.setVisible(false);
+            }
+        }
     }
 
     /**

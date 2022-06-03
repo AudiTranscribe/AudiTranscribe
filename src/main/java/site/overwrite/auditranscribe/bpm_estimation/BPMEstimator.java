@@ -2,7 +2,7 @@
  * BPMEstimator.java
  *
  * Created on 2022-06-02
- * Updated on 2022-06-02
+ * Updated on 2022-06-03
  *
  * Description: Class that handles all the methods to estimate the Beats Per Minute (BPM) of an
  *              audio signal.
@@ -21,6 +21,8 @@ import java.util.List;
  */
 public class BPMEstimator {
     // Constants
+    public static final int MAX_SAMPLES_TO_CONSIDER = 1_323_000;  // 30 seconds of samples at 44100 Hz
+
     public static final int HOP_LENGTH = 512;
     public static final double START_BPM = 120;
     public static final double STD_BPM = 1.;
@@ -39,11 +41,15 @@ public class BPMEstimator {
      * Implementation</a> of the BPM estimator.
      */
     public static List<Double> estimate(double[] x, double sampleRate) {
+        // Limit the number of samples to avoid heap space error
+        double[] xTruncated = new double[Math.min(x.length, MAX_SAMPLES_TO_CONSIDER)];
+        System.arraycopy(x, 0, xTruncated, 0, xTruncated.length);
+
         // Generate the window length
         int winLength = UnitConversionUtils.timeToFrames(new double[]{AC_SIZE}, sampleRate, HOP_LENGTH)[0];
 
         // Generate the tempogram
-        double[][] tempogram = Rhythm.tempogram(x, sampleRate, HOP_LENGTH, winLength);
+        double[][] tempogram = Rhythm.tempogram(xTruncated, sampleRate, HOP_LENGTH, winLength);
 
         // Aggregate the tempogram using the mean
         double[] tempogramAggregated = new double[tempogram.length];
