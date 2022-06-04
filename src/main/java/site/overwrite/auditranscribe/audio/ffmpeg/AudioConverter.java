@@ -2,7 +2,7 @@
  * AudioConverter.java
  *
  * Created on 2022-05-06
- * Updated on 2022-06-03
+ * Updated on 2022-06-04
  *
  * Description: Methods that help to convert audio files to the correct format.
  */
@@ -12,12 +12,10 @@ package site.overwrite.auditranscribe.audio.ffmpeg;
 import net.bramp.ffmpeg.FFmpeg;
 import net.bramp.ffmpeg.FFmpegExecutor;
 import net.bramp.ffmpeg.builder.FFmpegBuilder;
-import site.overwrite.auditranscribe.io.StreamGobbler;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.Executors;
 
 import static java.util.Map.entry;
 
@@ -47,16 +45,10 @@ public class AudioConverter {
     /**
      * Initialization method for the audio converter.
      *
-     * @throws IOException    If the program fails to find the ffmpeg installation.
-     * @throws FFmpegNotFound If the program fails to find the ffmpeg installation.
+     * @param ffmpegPath The path to the ffmpeg installation.
+     * @throws IOException If the program fails to find the ffmpeg installation.
      */
-    public AudioConverter() throws IOException, FFmpegNotFound {
-        // Continually attempt to get the ffmpeg path
-        String ffmpegPath = null;
-        while (ffmpegPath == null) {  // Todo: is this a good way of doing this?
-            ffmpegPath = getPathToffmpeg();
-        }
-
+    public AudioConverter(String ffmpegPath) throws IOException {
         // Create the ffmpeg instance
         FFmpeg ffmpeg = new FFmpeg(ffmpegPath);
 
@@ -102,52 +94,5 @@ public class AudioConverter {
 
         // Return the output file
         return filePath + extension;
-    }
-
-    // Private methods
-
-    /**
-     * Method that attempts to find the ffmpeg installation path.
-     *
-     * @return A string, representing the ffmpeg installation path.
-     * @throws FFmpegNotFound If the program fails to find the ffmpeg installation.
-     */
-    private String getPathToffmpeg() throws FFmpegNotFound {
-        // Check the operating system
-        boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
-
-        // Generate the command to execute
-        ProcessBuilder builder = new ProcessBuilder();
-        if (isWindows) {
-            builder.command("cmd.exe", "/c", "where ffmpeg");  // Todo: check if this works on windows
-        } else {
-            builder.command("sh", "-c", "which ffmpeg");
-        }
-
-        // Specify the working directory
-        builder.directory(new File(System.getProperty("user.home")));
-
-        // Define variables
-        final String[] ffmpegPath = new String[1];
-        try {
-            // Build the process
-            Process process = builder.start();
-
-            // Define stream gobbler
-            StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), s -> ffmpegPath[0] = s);
-
-            // Start the process
-            Executors.newSingleThreadExecutor().submit(streamGobbler);
-
-            // Check exit code of the command
-            int exitCode = process.waitFor();
-            if (exitCode != 0) throw new FFmpegNotFound("ffmpeg binary cannot be located.\n" + ffmpegPath[0]);
-
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-        // Return the ffmpeg path
-        return ffmpegPath[0];
     }
 }

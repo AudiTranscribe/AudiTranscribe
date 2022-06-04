@@ -2,7 +2,7 @@
  * Popups.java
  *
  * Created on 2022-05-26
- * Updated on 2022-05-30
+ * Updated on 2022-06-04
  *
  * Description: Class that handles the popups and dialogs.
  */
@@ -49,7 +49,7 @@ public class Popups {
      * @param buttonTypes Button types for the confirmation alert.
      * @return A <code>ButtonType</code> value.
      */
-    public static Optional<ButtonType> showConfirmationAlert(String title, String headerText, String contentText, ButtonType... buttonTypes) {
+    public static Optional<ButtonType> showMultiButtonAlert(String title, String headerText, String contentText, ButtonType... buttonTypes) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.initStyle(StageStyle.UTILITY);
         alert.setTitle(title);
@@ -70,7 +70,7 @@ public class Popups {
      * @return A <code>ButtonType</code> value.
      */
     public static Optional<ButtonType> showConfirmationAlert(String title, String headerText, String contentText) {
-        return showConfirmationAlert(title, headerText, contentText, ButtonType.OK, ButtonType.CANCEL);
+        return showMultiButtonAlert(title, headerText, contentText, ButtonType.OK, ButtonType.CANCEL);
     }
 
     /**

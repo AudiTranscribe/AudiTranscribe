@@ -2,7 +2,7 @@
  * AudioConverterTest.java
  *
  * Created on 2022-05-06
- * Updated on 2022-06-03
+ * Updated on 2022-06-04
  *
  * Description: Test `AudioConverter.java`.
  */
@@ -31,7 +31,7 @@ class AudioConverterTest {
         File testFile = new File(IOMethods.getAbsoluteFilePath("testing-audio-files/A440.mp3"));
 
         // Create a converter
-        AudioConverter converter = new AudioConverter();
+        AudioConverter converter = new AudioConverter("ffmpeg");
         String outputFilePath = converter.convertAudio(testFile, "test-converted.WAV");  // Ext. in caps
 
         // Check the output file path
@@ -43,8 +43,7 @@ class AudioConverterTest {
 
         MessageDigest md = MessageDigest.getInstance("MD5");
         try (InputStream is = Files.newInputStream(Paths.get("test-converted.wav"));
-             DigestInputStream dis = new DigestInputStream(is, md))
-        {
+             DigestInputStream dis = new DigestInputStream(is, md)) {
             while ((bytesCount = dis.read(buff)) != -1) {
                 md.update(buff, 0, bytesCount);
             }

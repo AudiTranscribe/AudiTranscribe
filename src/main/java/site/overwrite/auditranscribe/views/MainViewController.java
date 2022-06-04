@@ -2,7 +2,7 @@
  * MainViewController.java
  *
  * Created on 2022-02-09
- * Updated on 2022-05-30
+ * Updated on 2022-06-04
  *
  * Description: Contains the main view's controller class.
  */
@@ -63,8 +63,8 @@ public class MainViewController implements Initializable {
     FilteredList<Quartet<Long, String, String, String>> filteredList;  // List of project records
     private final List<Audio> allAudio = new ArrayList<>(0);  // List of all opened `Audio` objects
 
-    private final SettingsFile settingsFile = new SettingsFile();
-    private final PersistentDataFile persistentDataFile = new PersistentDataFile();
+    private SettingsFile settingsFile;
+    private PersistentDataFile persistentDataFile;
 
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -169,6 +169,16 @@ public class MainViewController implements Initializable {
 
         // Report that the main view is ready to be shown
         logger.log(Level.INFO, "Main view ready to be shown");
+    }
+
+    // Getter/Setter methods
+
+    public void setSettingsFile(SettingsFile settingsFile) {
+        this.settingsFile = settingsFile;
+    }
+
+    public void setPersistentDataFile(PersistentDataFile persistentDataFile) {
+        this.persistentDataFile = persistentDataFile;
     }
 
     // Public methods
