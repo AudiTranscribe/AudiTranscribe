@@ -151,7 +151,8 @@ public class MainViewController implements Initializable {
 
                 // Open the project with the filepath
                 ProjectIOHandlers.openProject(
-                        (Stage) window, transcriptionStage, file, settingsFile, allAudio, this
+                        (Stage) window, transcriptionStage, file, settingsFile, persistentDataFile, allAudio,
+                        this
                 );
             }
         });
@@ -300,16 +301,17 @@ public class MainViewController implements Initializable {
         // Get the current window
         Window window = rootPane.getScene().getWindow();
 
-        // Get user to select a WAV file
+        // Get user to select an audio file
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
-                "WAV files (*.wav)", "*.wav"
+                "Audio files (*.wav, *.mp3, *.flac, *.aif, *.aiff)",
+                "*.wav", "*.mp3", "*.flac", "*.aif", "*.aiff"
         );
         File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
 
         // Create the new project
         ProjectIOHandlers.newProject(
-                (Stage) window, transcriptionStage, file, settingsFile, allAudio, this
-        );
+                (Stage) window, transcriptionStage, file, settingsFile, persistentDataFile, allAudio,
+                this);
     }
 
     /**
@@ -329,7 +331,8 @@ public class MainViewController implements Initializable {
 
         // Open the existing project
         ProjectIOHandlers.openProject(
-                (Stage) window, transcriptionStage, file, settingsFile, allAudio, this
+                (Stage) window, transcriptionStage, file, settingsFile, persistentDataFile, allAudio,
+                this
         );
     }
 

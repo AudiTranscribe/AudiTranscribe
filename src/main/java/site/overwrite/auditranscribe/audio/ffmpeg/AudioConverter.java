@@ -24,7 +24,7 @@ import static java.util.Map.entry;
  */
 public class AudioConverter {
     // Constants
-    final Map<String, String> EXTENSION_TO_CODEC = Map.ofEntries(
+    public static final Map<String, String> EXTENSION_TO_CODEC = Map.ofEntries(
             entry(".wav", "wav"),
             entry(".mp3", "mp3"),
             entry(".flac", "flac"),
@@ -32,7 +32,7 @@ public class AudioConverter {
             entry(".aiff", "aac")
     );
 
-    final Map<String, String> CODEC_TO_EXTENSION = Map.ofEntries(
+    public static final Map<String, String> CODEC_TO_EXTENSION = Map.ofEntries(
             entry("wav", ".wav"),
             entry("mp3", ".mp3"),
             entry("flac", ".flac"),
