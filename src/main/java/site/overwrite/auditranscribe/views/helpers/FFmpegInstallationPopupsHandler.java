@@ -181,7 +181,7 @@ public class FFmpegInstallationPopupsHandler {
         // Generate the command to execute
         ProcessBuilder builder = new ProcessBuilder();
         if (isWindows) {
-            builder.command("cmd.exe", "/c", "where ffmpeg");  // Todo: check if this works on windows
+            builder.command("cmd.exe", "/c", "where ffmpeg");
         } else {
             builder.command("sh", "-c", "which ffmpeg");
         }
