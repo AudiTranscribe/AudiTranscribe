@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-03
+ * Updated on 2022-06-04
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -1436,6 +1436,9 @@ public class TranscriptionViewController implements Initializable {
             } else {
                 // Hide the progress bar section
                 progressBarHBox.setVisible(false);
+
+                // Unbind the progress label text property
+                progressLabel.textProperty().unbind();
             }
         }
     }
