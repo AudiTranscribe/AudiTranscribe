@@ -2,7 +2,7 @@
  * STFT.java
  *
  * Created on 2022-03-10
- * Updated on 2022-05-28
+ * Updated on 2022-06-01
  *
  * Description: Class that implements the Short-Time Fourier Transform (STFT) algorithm.
  */
@@ -59,7 +59,7 @@ public class STFT {
         // Generate the transposed STFT matrix
         Complex[][] stftMatrixTransposed = new Complex[innerArrayLength][1 + numFFT / 2];
         for (int i = 0; i < innerArrayLength; i++) {
-            stftMatrixTransposed[i] = FFT.fft(windowedFramesTransposed[i]);
+            stftMatrixTransposed[i] = FFT.rfft(windowedFramesTransposed[i]);
         }
 
         // Transpose the transposed matrix and return it

@@ -6,7 +6,7 @@
 
     <groupId>site.overwrite</groupId>
     <artifactId>AudiTranscribe</artifactId>
-    <version>0.2.1</version>
+    <version>0.3.0</version>
     <name>AudiTranscribe</name>
 
     <properties>
@@ -80,6 +80,11 @@
                     <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>net.bramp.ffmpeg</groupId>
+            <artifactId>ffmpeg</artifactId>
+            <version>0.7.0</version>
         </dependency>
         <dependency>
             <groupId>org.xerial</groupId>

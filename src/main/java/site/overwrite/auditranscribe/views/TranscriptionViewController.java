@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-29
+ * Updated on 2022-06-03
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -29,10 +29,12 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.javatuples.Pair;
+import site.overwrite.auditranscribe.bpm_estimation.BPMEstimator;
+import site.overwrite.auditranscribe.io.json_files.file_classes.PersistentDataFile;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
-import site.overwrite.auditranscribe.io.settings_file.SettingsFile;
+import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.notes.NotePlayer;
 import site.overwrite.auditranscribe.io.IOMethods;
@@ -45,7 +47,7 @@ import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 import site.overwrite.auditranscribe.plotting.PlottingStuffHandler;
 import site.overwrite.auditranscribe.spectrogram.*;
 import site.overwrite.auditranscribe.utils.*;
-import site.overwrite.auditranscribe.views.helpers.AlertMessages;
+import site.overwrite.auditranscribe.views.helpers.Popups;
 import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
 
 import javax.sound.midi.MidiUnavailableException;
@@ -56,9 +58,7 @@ import java.io.InvalidObjectException;
 import java.net.URL;
 import java.security.InvalidParameterException;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -84,7 +84,7 @@ public class TranscriptionViewController implements Initializable {
     final String[] TIME_SIGNATURES = {"4/4", "2/2", "2/4", "3/4", "3/8", "6/8", "9/8", "12/8"};
 
     final Pair<Integer, Integer> BPM_RANGE = new Pair<>(1, 512);  // In the format [min, max]
-    final Pair<Double, Double> OFFSET_RANGE = new Pair<>(-5., 5.);  // In the format [min, max]
+    final Pair<Double, Double> OFFSET_RANGE = new Pair<>(-15., 15.);  // In the format [min, max]
 
     public final double SPECTROGRAM_ZOOM_SCALE_X = 2;
     public final double SPECTROGRAM_ZOOM_SCALE_Y = 5;
@@ -129,6 +129,7 @@ public class TranscriptionViewController implements Initializable {
     Stage mainStage;
     MainViewController mainViewController;
     SettingsFile settingsFile;
+    PersistentDataFile persistentDataFile;
     Theme theme;
 
     NotePlayer notePlayer;
@@ -161,6 +162,8 @@ public class TranscriptionViewController implements Initializable {
     private Line[] beatLines;
     private StackPane[] barNumberEllipses;
     private Line playheadLine;
+
+    Queue<CustomTask<?>> ongoingTasks = new LinkedList<>();
 
     // FXML Elements
     // Menu bar
@@ -420,7 +423,9 @@ public class TranscriptionViewController implements Initializable {
 
                     // Play the note
                     try {
-                        logger.log(Level.FINE, "Playing " + UnitConversionUtils.noteNumberToNote(estimatedNoteNum, false));
+                        logger.log(Level.FINE, "Playing " + UnitConversionUtils.noteNumberToNote(
+                                estimatedNoteNum, false
+                        ));
                         notePlayer.playNoteForDuration(
                                 estimatedNoteNum, NOTE_PLAYING_ON_VELOCITY, NOTE_PLAYING_OFF_VELOCITY,
                                 NOTE_PLAYING_ON_DURATION, NOTE_PLAYING_OFF_DURATION
@@ -480,6 +485,10 @@ public class TranscriptionViewController implements Initializable {
         this.settingsFile = settingsFile;
     }
 
+    public void setPersistentDataFile(PersistentDataFile persistentDataFile) {
+        this.persistentDataFile = persistentDataFile;
+    }
+
     // Public methods
 
     /**
@@ -487,7 +496,7 @@ public class TranscriptionViewController implements Initializable {
      */
     public void setThemeOnScene() {
         // Get the theme
-        theme = Theme.values()[settingsFile.settingsData.themeEnumOrdinal];
+        theme = Theme.values()[settingsFile.data.themeEnumOrdinal];
 
         // Set stylesheets
         rootPane.getStylesheets().clear();  // Reset the stylesheets first before adding new ones
@@ -649,7 +658,7 @@ public class TranscriptionViewController implements Initializable {
         try {
             setAudioAndSpectrogramData(projectData.qTransformData, projectData.audioData);
         } catch (IOException | UnsupportedAudioFileException e) {
-            AlertMessages.showExceptionAlert(
+            Popups.showExceptionAlert(
                     "Error loading audio data.",
                     "An error occurred when loading the audio data. Does the audio file " +
                             "still exist at the original location?",
@@ -688,7 +697,7 @@ public class TranscriptionViewController implements Initializable {
         sampleRate = audio.getSampleRate();
 
         // Generate spectrogram image based on newly generated magnitude data
-        CustomTask<WritableImage> task = new CustomTask<>() {
+        CustomTask<WritableImage> spectrogramTask = new CustomTask<>() {
             @Override
             protected WritableImage call() {
                 Spectrogram spectrogram = new Spectrogram(
@@ -696,16 +705,29 @@ public class TranscriptionViewController implements Initializable {
                         NUM_PX_PER_OCTAVE, this
                 );
                 magnitudes = spectrogram.getSpectrogramMagnitudes(
-                        WindowFunction.values()[settingsFile.settingsData.windowFunctionEnumOrdinal]
+                        WindowFunction.values()[settingsFile.data.windowFunctionEnumOrdinal]
                 );
                 return spectrogram.generateSpectrogram(
                         magnitudes,
-                        ColourScale.values()[settingsFile.settingsData.colourScaleEnumOrdinal]
+                        ColourScale.values()[settingsFile.data.colourScaleEnumOrdinal]
                 );
             }
         };
 
-        startGeneratingSpectrogramTask(task, "Generating spectrogram...");
+        // Estimate BPM based on the audio samples
+        CustomTask<Double> bpmTask = new CustomTask<>() {
+            @Override
+            protected Double call() {
+                return BPMEstimator.estimate(audio.getMonoSamples(), sampleRate).get(0);  // Assume we take fist element
+            }
+        };
+
+        // Set up tasks
+        setupSpectrogramTask(spectrogramTask, "Generating spectrogram...");
+        setupBPMEstimationTask(bpmTask);
+
+        // Start the tasks
+        startTasks(spectrogramTask, bpmTask);
     }
 
     /**
@@ -733,7 +755,7 @@ public class TranscriptionViewController implements Initializable {
         magnitudes = qTransformData.qTransformMagnitudes;
 
         // Generate spectrogram image based on existing magnitude data
-        CustomTask<WritableImage> task = new CustomTask<>() {
+        CustomTask<WritableImage> spectrogramTask = new CustomTask<>() {
             @Override
             protected WritableImage call() {
                 Spectrogram spectrogram = new Spectrogram(
@@ -742,13 +764,16 @@ public class TranscriptionViewController implements Initializable {
                 );
                 return spectrogram.generateSpectrogram(
                         magnitudes,
-                        ColourScale.values()[settingsFile.settingsData.colourScaleEnumOrdinal]
+                        ColourScale.values()[settingsFile.data.colourScaleEnumOrdinal]
                 );
             }
         };
 
-        // Link the progress of the task with the progress bar
-        startGeneratingSpectrogramTask(task, "Loading spectrogram...");
+        // Set up the spectrogram task
+        setupSpectrogramTask(spectrogramTask, "Loading spectrogram...");
+
+        // Start the tasks
+        startTasks(spectrogramTask);
     }
 
     /**
@@ -849,8 +874,11 @@ public class TranscriptionViewController implements Initializable {
         // Get the current window
         Window window = rootPane.getScene().getWindow();
 
-        // Get user to select a WAV file
-        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("WAV files (*.wav)", "*.wav");
+        // Get user to select an audio file
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                "Audio files (*.wav, *.mp3, *.flac, *.aif, *.aiff)",
+                "*.wav", "*.mp3", "*.flac", "*.aif", "*.aiff"
+        );
         File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
 
         // If a file was selected, stop the audio completely
@@ -863,7 +891,9 @@ public class TranscriptionViewController implements Initializable {
         }
 
         // Create the new project
-        ProjectIOHandlers.newProject(mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController);
+        ProjectIOHandlers.newProject(
+                mainStage, (Stage) window, file, settingsFile, persistentDataFile, allAudio, mainViewController
+        );
     }
 
     /**
@@ -897,7 +927,9 @@ public class TranscriptionViewController implements Initializable {
         }
 
         // Open the existing project
-        ProjectIOHandlers.openProject(mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController);
+        ProjectIOHandlers.openProject(
+                mainStage, (Stage) window, file, settingsFile, persistentDataFile, allAudio, mainViewController
+        );
     }
 
     /**
@@ -1134,13 +1166,11 @@ public class TranscriptionViewController implements Initializable {
      * @param task    The task to start.
      * @param message Message to display at the side of the progress bar.
      */
-    private void startGeneratingSpectrogramTask(CustomTask<WritableImage> task, String message) {
-        // Link the progress of the task with the progress bar
-        progressBarHBox.setVisible(true);
-        progressBar.progressProperty().bind(task.progressProperty());
-        progressLabel.setText(message);
+    private void setupSpectrogramTask(CustomTask<WritableImage> task, String message) {
+        // Set the task's message
+        task.setMessage(message);
 
-        // Finish setting up the spectrogram and its related attributes
+        // Set task completion listener
         task.setOnSucceeded(event -> {
             // Define a variable for the image
             WritableImage image = task.getValue();
@@ -1269,7 +1299,6 @@ public class TranscriptionViewController implements Initializable {
             spectrogramPane.setVvalue(0.5);
 
             // Hide the progress bar HBox
-            progressBarHBox.setVisible(false);
             isSpectrogramReady = true;
 
             // Update playhead position
@@ -1290,30 +1319,138 @@ public class TranscriptionViewController implements Initializable {
             // Ensure main pane is in focus
             rootPane.requestFocus();
 
-            // Enable all disabled nodes
-            Node[] disabledNodes = new Node[]{
-                    // Top Hbox
-                    newProjectButton, openProjectButton, saveProjectButton,
-                    musicKeyChoice, bpmSpinner, timeSignatureChoice, offsetSpinner,
-
-                    // Bottom Hbox
-                    playButton, stopButton, playSkipBackButton, playSkipForwardButton,
-                    scrollButton,
-                    volumeButton, volumeSlider
-            };
-
-            for (Node node : disabledNodes) {
-                node.setDisable(false);
-            }
-
-            // Report that the transcription view is ready to be shown
+            // Mark the task as completed and report that the transcription view is ready to be shown
+            markTaskAsCompleted(task);
             logger.log(Level.INFO, "Spectrogram for " + audioFileName + " ready to be shown");
         });
+    }
 
-        // Start task on an alternate thread
-        Thread thread = new Thread(task);
-        thread.setDaemon(true);
-        thread.start();
+    /**
+     * Helper method that starts the BPM estimation task.
+     *
+     * @param task The task to start.
+     */
+    private void setupBPMEstimationTask(CustomTask<Double> task) {
+        // Set the task's message
+        task.setMessage("Estimating tempo...");
+
+        // Set task completion listener
+        task.setOnSucceeded(event -> {
+            // Update the BPM value
+            updateBPMValue(MathUtils.round(task.getValue(), 1));
+
+            // Update BPM spinner initial value
+            bpmSpinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(
+                    BPM_RANGE.getValue0(), BPM_RANGE.getValue1(), bpm, 0.1
+            ));
+
+            // Mark the task as completed
+            markTaskAsCompleted(task);
+            logger.log(Level.INFO, "BPM estimation task complete");
+        });
+    }
+
+    /**
+     * Helper method that starts all the transcription view tasks.
+     *
+     * @param tasks The tasks to start.
+     */
+    private void startTasks(CustomTask<?>... tasks) {
+        // Create a task that starts the tasks
+        CustomTask<Boolean> masterTask = new CustomTask<>() {
+            @Override
+            protected Boolean call() {
+                // Define a worker thread pool
+                ExecutorService executor = Executors.newFixedThreadPool(
+                        tasks.length, runnable -> {
+                            Thread thread = Executors.defaultThreadFactory().newThread(runnable);
+                            thread.setDaemon(true);  // Make it so that it can shut down gracefully by placing it in background
+                            return thread;
+                        }
+                );
+
+                // Convert the array of tasks into a list of tasks
+                Collection<CustomTask<?>> taskList = List.of(tasks);
+
+                // Add all tasks to the ongoing tasks queue
+                ongoingTasks.addAll(taskList);
+
+                // Update the progress bar section
+                markTaskAsCompleted(null);
+
+                // Execute all tasks
+                taskList.forEach(executor::execute);
+                logger.log(Level.INFO, "Started all transcription view tasks");
+
+                // Await for all tasks' completion
+                executor.shutdown();  // Prevent new tasks from being submitted
+
+                boolean hasTerminated;
+                try {
+                    hasTerminated = executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+
+                logger.log(Level.INFO, "All tasks have completed");
+                return hasTerminated;
+            }
+        };
+        masterTask.setOnSucceeded(event -> {
+            // Check if all tasks are completed
+            if (masterTask.getValue()) {
+                // Enable all disabled nodes
+                Node[] disabledNodes = new Node[]{
+                        // Top Hbox
+                        newProjectButton, openProjectButton, saveProjectButton,
+                        musicKeyChoice, bpmSpinner, timeSignatureChoice, offsetSpinner,
+
+                        // Bottom Hbox
+                        playButton, stopButton, playSkipBackButton, playSkipForwardButton,
+                        scrollButton,
+                        volumeButton, volumeSlider
+                };
+
+                for (Node node : disabledNodes) {
+                    node.setDisable(false);
+                }
+            }
+        });
+
+        // Start the thread
+        Thread masterThread = new Thread(masterTask);
+        masterThread.setDaemon(true);
+        masterThread.start();
+    }
+
+    /**
+     * Helper method that marks a task as completed and handles the ongoing tasks list.
+     *
+     * @param completedTask The completed task.
+     */
+    private void markTaskAsCompleted(CustomTask<?> completedTask) {
+        // Get the current task that is being processed
+        CustomTask<?> currentTask = ongoingTasks.peek();
+
+        // Remove the completed task from the ongoing tasks queue
+        if (completedTask != null) ongoingTasks.remove(completedTask);
+
+        // Update the progress bar section if the completed task is the current task or if the current task is `null`
+        if (completedTask == null || currentTask == completedTask) {
+            // Check if there are any tasks left in the queue
+            if (ongoingTasks.size() != 0) {
+                // Get the next task in the queue
+                currentTask = ongoingTasks.peek();
+
+                // Update the progress section
+                progressBar.progressProperty().bind(currentTask.progressProperty());
+                progressLabel.textProperty().bind(currentTask.messageProperty());
+
+            } else {
+                // Hide the progress bar section
+                progressBarHBox.setVisible(false);
+            }
+        }
     }
 
     /**
@@ -1471,7 +1608,9 @@ public class TranscriptionViewController implements Initializable {
             File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
 
             // Create the new project
-            ProjectIOHandlers.newProject(mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController);
+            ProjectIOHandlers.newProject(
+                    mainStage, (Stage) window, file, settingsFile, persistentDataFile, allAudio, mainViewController
+            );
 
         } else if (OPEN_PROJECT_COMBINATION.match(keyEvent)) {  // Open a project
             // Consume the key event
@@ -1487,7 +1626,9 @@ public class TranscriptionViewController implements Initializable {
             File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
 
             // Open the existing project
-            ProjectIOHandlers.openProject(mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController);
+            ProjectIOHandlers.openProject(
+                    mainStage, (Stage) window, file, settingsFile, persistentDataFile, allAudio, mainViewController
+            );
 
         } else if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {  // Save current project
             handleSavingProject(false);

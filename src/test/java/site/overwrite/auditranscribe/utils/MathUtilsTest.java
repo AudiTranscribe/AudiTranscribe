@@ -2,7 +2,7 @@
  * MathUtilsTest.java
  *
  * Created on 2022-03-12
- * Updated on 2022-05-21
+ * Updated on 2022-05-30
  *
  * Description: Test `MathUtils.java`.
  */
@@ -40,6 +40,21 @@ class MathUtilsTest {
         assertEquals(5., MathUtils.norm(new double[]{3, 4}), 0.01);
         assertEquals(19.105, MathUtils.norm(new double[]{10, 11, 12}), 0.001);
         assertEquals(16.882, MathUtils.norm(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9}), 0.001);
+    }
+
+    @Test
+    void mean() {
+        assertEquals(2.5, MathUtils.mean(new double[]{1, 2, 3, 4}), 0.001);
+        assertEquals(3, MathUtils.mean(new double[]{1, 2, 3, 4, 5}), 0.001);
+        assertEquals(9, MathUtils.mean(new double[]{10, 8, 13, 9, 11, 14, 6, 4, 12, 7, 5}), 0.001);
+        assertEquals(7.50, MathUtils.mean(new double[]{8.04, 6.95, 7.58, 8.81, 8.33, 9.96, 7.24, 4.26, 10.84, 4.82, 5.68}), 0.001);
+    }
+
+    @Test
+    void argmax() {
+        assertEquals(1, MathUtils.argmax(new double[]{1, 3, 2}));
+        assertEquals(5, MathUtils.argmax(new double[]{10, 11, 12, 13, 14, 15}));
+        assertEquals(1, MathUtils.argmax(new double[]{0, 5, 2, 3, 4, 5}));
     }
 
     // Data-related methods

@@ -2,7 +2,7 @@
  * PreferencesViewController.java
  *
  * Created on 2022-05-22
- * Updated on 2022-05-29
+ * Updated on 2022-05-30
  *
  * Description: Contains the preferences view's controller class.
  */
@@ -20,7 +20,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.io.settings_file.SettingsFile;
+import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
 
@@ -101,7 +101,7 @@ public class PreferencesViewController implements Initializable {
      * Note that this method has to be called after the setting file has been set.
      */
     public void setThemeOnScene() {
-        setThemeOnScene(Theme.values()[settingsFile.settingsData.themeEnumOrdinal]);
+        setThemeOnScene(Theme.values()[settingsFile.data.themeEnumOrdinal]);
     }
 
     /**
@@ -110,10 +110,10 @@ public class PreferencesViewController implements Initializable {
      */
     public void setUpChoiceBoxes() {
         // Set choice box values
-        themeChoiceBox.setValue(Theme.values()[settingsFile.settingsData.themeEnumOrdinal]);
+        themeChoiceBox.setValue(Theme.values()[settingsFile.data.themeEnumOrdinal]);
 
-        colourScaleChoiceBox.setValue(ColourScale.values()[settingsFile.settingsData.colourScaleEnumOrdinal]);
-        windowFunctionChoiceBox.setValue(WindowFunction.values()[settingsFile.settingsData.windowFunctionEnumOrdinal]);
+        colourScaleChoiceBox.setValue(ColourScale.values()[settingsFile.data.colourScaleEnumOrdinal]);
+        windowFunctionChoiceBox.setValue(WindowFunction.values()[settingsFile.data.windowFunctionEnumOrdinal]);
 
         // Add methods to choice boxes
         for (ChoiceBox<?> choiceBox : new ChoiceBox[]{colourScaleChoiceBox, windowFunctionChoiceBox}) {
@@ -178,13 +178,13 @@ public class PreferencesViewController implements Initializable {
      */
     private void applySettings() {
         // Update settings' values
-        settingsFile.settingsData.themeEnumOrdinal = themeChoiceBox.getValue().ordinal();
+        settingsFile.data.themeEnumOrdinal = themeChoiceBox.getValue().ordinal();
 
-        settingsFile.settingsData.colourScaleEnumOrdinal = colourScaleChoiceBox.getValue().ordinal();
-        settingsFile.settingsData.windowFunctionEnumOrdinal = windowFunctionChoiceBox.getValue().ordinal();
+        settingsFile.data.colourScaleEnumOrdinal = colourScaleChoiceBox.getValue().ordinal();
+        settingsFile.data.windowFunctionEnumOrdinal = windowFunctionChoiceBox.getValue().ordinal();
 
         // Apply settings to the settings file
-        settingsFile.saveSettingsFile();
+        settingsFile.saveFile();
 
         // Disable the apply button again
         applyButton.setDisable(true);

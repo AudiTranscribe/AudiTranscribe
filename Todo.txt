@@ -1,6 +1,7 @@
 ====================================================================================================
 Todo (Important):
     - Allow other audio types (e.g. mp3) to be input into the program
+    - Add FFmpeg installation
 
 Todo (Less Important):
     - BPM Estimation

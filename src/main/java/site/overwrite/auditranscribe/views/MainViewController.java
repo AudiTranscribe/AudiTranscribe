@@ -2,7 +2,7 @@
  * MainViewController.java
  *
  * Created on 2022-02-09
- * Updated on 2022-05-29
+ * Updated on 2022-06-04
  *
  * Description: Contains the main view's controller class.
  */
@@ -33,8 +33,9 @@ import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.PropertyFile;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
-import site.overwrite.auditranscribe.io.settings_file.SettingsData;
-import site.overwrite.auditranscribe.io.settings_file.SettingsFile;
+import site.overwrite.auditranscribe.io.json_files.data_encapsulators.SettingsData;
+import site.overwrite.auditranscribe.io.json_files.file_classes.PersistentDataFile;
+import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.utils.MiscUtils;
 import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
@@ -62,7 +63,8 @@ public class MainViewController implements Initializable {
     FilteredList<Quartet<Long, String, String, String>> filteredList;  // List of project records
     private final List<Audio> allAudio = new ArrayList<>(0);  // List of all opened `Audio` objects
 
-    private final SettingsFile settingsFile = new SettingsFile();
+    private SettingsFile settingsFile;
+    private PersistentDataFile persistentDataFile;
 
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -149,7 +151,8 @@ public class MainViewController implements Initializable {
 
                 // Open the project with the filepath
                 ProjectIOHandlers.openProject(
-                        (Stage) window, transcriptionStage, file, settingsFile, allAudio, this
+                        (Stage) window, transcriptionStage, file, settingsFile, persistentDataFile, allAudio,
+                        this
                 );
             }
         });
@@ -169,6 +172,16 @@ public class MainViewController implements Initializable {
         logger.log(Level.INFO, "Main view ready to be shown");
     }
 
+    // Getter/Setter methods
+
+    public void setSettingsFile(SettingsFile settingsFile) {
+        this.settingsFile = settingsFile;
+    }
+
+    public void setPersistentDataFile(PersistentDataFile persistentDataFile) {
+        this.persistentDataFile = persistentDataFile;
+    }
+
     // Public methods
 
     /**
@@ -176,7 +189,7 @@ public class MainViewController implements Initializable {
      */
     public void setThemeOnScene() {
         // Get the theme
-        Theme theme = Theme.values()[settingsFile.settingsData.themeEnumOrdinal];
+        Theme theme = Theme.values()[settingsFile.data.themeEnumOrdinal];
 
         // Set stylesheets
         rootPane.getStylesheets().clear();  // Reset the stylesheets first before adding new ones
@@ -250,7 +263,7 @@ public class MainViewController implements Initializable {
             projectsListView.setItems(new SortedList<>(filteredList));  // Use a sorted list for searching
             projectsListView.setCellFactory(
                     customListCellListView -> new CustomListCell(
-                            projectsDB, projectsListView, settingsFile.settingsData
+                            projectsDB, projectsListView, settingsFile.data
                     )
             );
         } else {
@@ -288,16 +301,17 @@ public class MainViewController implements Initializable {
         // Get the current window
         Window window = rootPane.getScene().getWindow();
 
-        // Get user to select a WAV file
+        // Get user to select an audio file
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
-                "WAV files (*.wav)", "*.wav"
+                "Audio files (*.wav, *.mp3, *.flac, *.aif, *.aiff)",
+                "*.wav", "*.mp3", "*.flac", "*.aif", "*.aiff"
         );
         File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
 
         // Create the new project
         ProjectIOHandlers.newProject(
-                (Stage) window, transcriptionStage, file, settingsFile, allAudio, this
-        );
+                (Stage) window, transcriptionStage, file, settingsFile, persistentDataFile, allAudio,
+                this);
     }
 
     /**
@@ -317,7 +331,8 @@ public class MainViewController implements Initializable {
 
         // Open the existing project
         ProjectIOHandlers.openProject(
-                (Stage) window, transcriptionStage, file, settingsFile, allAudio, this
+                (Stage) window, transcriptionStage, file, settingsFile, persistentDataFile, allAudio,
+                this
         );
     }
 
