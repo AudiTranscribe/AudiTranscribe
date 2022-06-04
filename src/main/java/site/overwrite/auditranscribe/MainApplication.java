@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.json_files.file_classes.PersistentDataFile;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
-import site.overwrite.auditranscribe.views.helpers.FFmpegInstallationAlertsHandler;
+import site.overwrite.auditranscribe.views.helpers.FFmpegInstallationPopupsHandler;
 import site.overwrite.auditranscribe.views.MainViewController;
 
 import java.io.IOException;
@@ -33,7 +33,7 @@ public class MainApplication extends Application {
         IOMethods.createAppDataFolder();
 
         // Ask user for FFmpeg installation
-        FFmpegInstallationAlertsHandler.showFFmpegInstallationView(persistentDataFile);
+        FFmpegInstallationPopupsHandler.showFFmpegInstallationView(persistentDataFile);
 
         // Load the FXML file into the scene
         FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/main-view.fxml"));

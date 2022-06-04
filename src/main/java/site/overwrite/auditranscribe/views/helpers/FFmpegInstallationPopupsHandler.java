@@ -1,5 +1,5 @@
 /*
- * FFmpegInstallationAlertsHandler.java
+ * FFmpegInstallationPopupsHandler.java
  *
  * Created on 2022-06-04
  * Updated on 2022-06-04
@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 
-public class FFmpegInstallationAlertsHandler {
+public class FFmpegInstallationPopupsHandler {
     // Public methods
 
     /**
@@ -59,11 +59,13 @@ public class FFmpegInstallationAlertsHandler {
 
         while (!isFFmpegInstalled) {
             // Give FFmpeg installation instructions if the user says that they have not installed it
+            // Todo: add custom installation instructions view as this is quite ugly
             if (!userSayFFmpegInstalled && !usingCustomInstallation) {
                 Popups.showMultiButtonAlert(
                         "FFmpeg Installation",
                         "Instructions to Install FFmpeg",
-                        "Please had to https://ffmpeg.org/download.html and install FFmpeg. It is recommended to install FFmpeg version 5.0.x or higher.",
+                        "Please had to https://ffmpeg.org/download.html and install FFmpeg. " +
+                                "It is recommended to install FFmpeg version 5.0.x or higher.",
                         new ButtonType("I've installed FFmpeg.", ButtonBar.ButtonData.CANCEL_CLOSE)
                 );
             }
@@ -84,12 +86,16 @@ public class FFmpegInstallationAlertsHandler {
             } catch (FFmpegNotFound e) {
                 // Show error that the FFmpeg binary was not found
                 ButtonType specifyManually = new ButtonType("Specify Manually");
-                ButtonType readInstructionsAgain = new ButtonType("Read Instructions Again", ButtonBar.ButtonData.CANCEL_CLOSE);
+                ButtonType readInstructionsAgain = new ButtonType(
+                        "Read Instructions Again",
+                        ButtonBar.ButtonData.CANCEL_CLOSE
+                );
 
                 selectedChoice = Popups.showMultiButtonAlert(
                         "FFmpeg Installation",
                         "FFmpeg Not Found",
-                        "FFmpeg could not be located automatically. Would you like to specify its path manually?",
+                        "FFmpeg could not be located automatically. " +
+                                "Would you like to specify its path manually?",
                         specifyManually, readInstructionsAgain
                 );
 
