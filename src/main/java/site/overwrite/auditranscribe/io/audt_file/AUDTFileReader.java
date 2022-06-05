@@ -2,12 +2,12 @@
  * AUDTFileReader.java
  *
  * Created on 2022-05-02
- * Updated on 2022-05-25
+ * Updated on 2022-06-05
  *
  * Description: Class that handles the reading of the AudiTranscribe (AUDT) file.
  */
 
-package site.overwrite.auditranscribe.io.audt_file.file_handers;
+package site.overwrite.auditranscribe.io.audt_file;
 
 import site.overwrite.auditranscribe.io.IOConverters;
 import site.overwrite.auditranscribe.io.LZ4;

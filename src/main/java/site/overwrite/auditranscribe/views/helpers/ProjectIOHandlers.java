@@ -2,7 +2,7 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-05-30
+ * Updated on 2022-06-05
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
@@ -23,8 +23,8 @@ import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.ProjectData
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
 import site.overwrite.auditranscribe.exceptions.FailedToReadDataException;
 import site.overwrite.auditranscribe.exceptions.IncorrectFileFormatException;
-import site.overwrite.auditranscribe.io.audt_file.file_handers.AUDTFileReader;
-import site.overwrite.auditranscribe.io.audt_file.file_handers.AUDTFileWriter;
+import site.overwrite.auditranscribe.io.audt_file.AUDTFileReader;
+import site.overwrite.auditranscribe.io.audt_file.AUDTFileWriter;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.views.MainViewController;
 import site.overwrite.auditranscribe.views.TranscriptionViewController;

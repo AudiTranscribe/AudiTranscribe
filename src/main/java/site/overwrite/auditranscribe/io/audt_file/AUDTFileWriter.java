@@ -2,12 +2,12 @@
  * AUDTFileWriter.java
  *
  * Created on 2022-05-01
- * Updated on 2022-05-28
+ * Updated on 2022-06-05
  *
  * Description: Class that handles the writing of the AudiTranscribe (AUDT) file.
  */
 
-package site.overwrite.auditranscribe.io.audt_file.file_handers;
+package site.overwrite.auditranscribe.io.audt_file;
 
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.io.IOConverters;
@@ -134,14 +134,14 @@ public class AUDTFileWriter {
      */
     private void writeHeaderSection() {
         // Write the file header
-        FileHandlersHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_FILE_HEADER);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_FILE_HEADER);
 
         // Write version numbers
         byte[] fileVersionBytes = IOConverters.intToBytes(AUDTFileConstants.FILE_VERSION_NUMBER);
         byte[] lz4VersionBytes = IOConverters.intToBytes(AUDTFileConstants.LZ4_VERSION_NUMBER);
 
-        FileHandlersHelpers.addBytesIntoBytesList(bytes, fileVersionBytes);
-        FileHandlersHelpers.addBytesIntoBytesList(bytes, lz4VersionBytes);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, fileVersionBytes);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, lz4VersionBytes);
 
         // Write the end-of-section delimiter
         writeEOSDelimiter();
@@ -157,7 +157,7 @@ public class AUDTFileWriter {
         byte[] byteArray = IOConverters.intToBytes(integer);
 
         // Write to the byte list
-        FileHandlersHelpers.addBytesIntoBytesList(bytes, byteArray);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, byteArray);
     }
 
     /**
@@ -170,7 +170,7 @@ public class AUDTFileWriter {
         byte[] byteArray = IOConverters.doubleToBytes(dbl);
 
         // Write to the byte list
-        FileHandlersHelpers.addBytesIntoBytesList(bytes, byteArray);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, byteArray);
     }
 
     /**
@@ -187,7 +187,7 @@ public class AUDTFileWriter {
 
         // Write to the byte list
         writeInteger(numBytes);
-        FileHandlersHelpers.addBytesIntoBytesList(bytes, byteArray);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, byteArray);
     }
 
     /**
@@ -207,7 +207,7 @@ public class AUDTFileWriter {
 
         // Write to the byte list
         writeInteger(numCompressedBytes);
-        FileHandlersHelpers.addBytesIntoBytesList(bytes, compressedBytes);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, compressedBytes);
     }
 
     /**
@@ -227,7 +227,7 @@ public class AUDTFileWriter {
 
         // Write to the byte list
         writeInteger(numCompressedBytes);
-        FileHandlersHelpers.addBytesIntoBytesList(bytes, compressedBytes);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, compressedBytes);
     }
 
     /**
@@ -247,7 +247,7 @@ public class AUDTFileWriter {
 
         // Write to the byte list
         writeInteger(numCompressedBytes);
-        FileHandlersHelpers.addBytesIntoBytesList(bytes, compressedBytes);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, compressedBytes);
     }
 
     /**
@@ -264,7 +264,7 @@ public class AUDTFileWriter {
      * Helper method that writes the end-of-section delimiter.
      */
     private void writeEOSDelimiter() {
-        FileHandlersHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_SECTION_DELIMITER);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_SECTION_DELIMITER);
     }
 
     /**
@@ -272,7 +272,7 @@ public class AUDTFileWriter {
      */
     private void writeEOFDelimiter() {
         // Write the EOF delimiter bytes
-        FileHandlersHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_END_OF_FILE_DELIMITER);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_END_OF_FILE_DELIMITER);
 
         // Sum all the bytes inside the file as a checksum
         // (The checksum will overflow if the sum exceeds 2^31; this is okay as we only want the bytes' values)

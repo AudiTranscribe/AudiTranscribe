@@ -2,7 +2,7 @@
  * AUDTFileTest.java
  *
  * Created on 2022-05-01
- * Updated on 2022-05-25
+ * Updated on 2022-06-05
  *
  * Description: Test AUDT file reading and writing.
  */
@@ -14,12 +14,12 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.io.audt_file.file_handers.AUDTFileReader;
+import site.overwrite.auditranscribe.io.audt_file.AUDTFileReader;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
 import site.overwrite.auditranscribe.exceptions.FailedToReadDataException;
-import site.overwrite.auditranscribe.io.audt_file.file_handers.AUDTFileWriter;
+import site.overwrite.auditranscribe.io.audt_file.AUDTFileWriter;
 import site.overwrite.auditranscribe.exceptions.IncorrectFileFormatException;
 
 import java.io.IOException;

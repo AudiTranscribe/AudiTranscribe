@@ -2,12 +2,12 @@
  * AUDTFileConstants.java
  *
  * Created on 2022-05-01
- * Updated on 2022-05-10
+ * Updated on 2022-06-05
  *
  * Description: Constants that are needed when processing the AudiTranscribe file format.
  */
 
-package site.overwrite.auditranscribe.io.audt_file.file_handers;
+package site.overwrite.auditranscribe.io.audt_file;
 
 import site.overwrite.auditranscribe.io.LZ4;
 
