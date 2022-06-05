@@ -2,7 +2,7 @@
  * IOMethods.java
  *
  * Created on 2022-03-15
- * Updated on 2022-05-28
+ * Updated on 2022-06-05
  *
  * Description: Input/Output methods that are used in the AudiTranscribe project.
  */
@@ -25,6 +25,8 @@ public class IOMethods {
             ApplicationDirectory.getUserDataDirectory("AudiTranscribe", null)
     );
     public static final String APP_DATA_FOLDER_PATH_STRING = APP_DATA_FOLDER_PATH + "/";
+
+    public static final String RESOURCES_FOLDER_PATH_STRING = "src/main/resources/site/overwrite/auditranscribe/";
 
     // Public methods
 

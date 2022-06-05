@@ -2,7 +2,7 @@
  * ProjectsDB.java
  *
  * Created on 2022-05-11
- * Updated on 2022-05-25
+ * Updated on 2022-06-05
  *
  * Description: Class that interfaces with the projects' database.
  */
@@ -70,9 +70,6 @@ public class ProjectsDB {
      * @throws SQLException If something went wrong when executing the SQL query.
      */
     public ProjectsDB() throws SQLException {
-        // Attempt creation of the database file
-        IOMethods.createFile(PROJECT_FILE_LIST_DB_PATH);
-
         // Create a database manager object
         dbManager = new SQLiteDatabaseManager(PROJECT_FILE_LIST_DB_PATH);
 

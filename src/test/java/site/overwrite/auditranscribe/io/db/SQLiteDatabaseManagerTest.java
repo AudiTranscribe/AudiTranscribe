@@ -60,7 +60,7 @@ class SQLiteDatabaseManagerTest {
     @Order(1)
     void setUpDatabase() {
         // Set up the SQLite database manager for the tests
-        manager = new SQLiteDatabaseManager(IOMethods.getAbsoluteFilePath("test-resources/database/test-database.db"));
+        manager = new SQLiteDatabaseManager(IOMethods.RESOURCES_FOLDER_PATH_STRING + "test-resources/database/test-database.db");
 
         // Connect to the database
         manager.dbConnect();
