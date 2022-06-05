@@ -9,6 +9,7 @@
 
 package site.overwrite.auditranscribe.io.audt_file;
 
+import org.javatuples.Triplet;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,7 @@ import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObje
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
 import site.overwrite.auditranscribe.exceptions.FailedToReadDataException;
 import site.overwrite.auditranscribe.exceptions.IncorrectFileFormatException;
+import site.overwrite.auditranscribe.utils.TypeConversionUtils;
 
 import java.io.IOException;
 
@@ -30,19 +32,37 @@ class AUDTFileTest {
     final String fileName =
             "src/main/resources/site/overwrite/auditranscribe/test-resources/file-io-directory/test-AUDTFileTest.audt";
 
+    // Define Q-Transform magnitude data
+    // (This is just an example array, not actual data)
+    double[][] qTransformMagnitudes = new double[][]{
+            {65.43, -123.45, 9876.54321, 3.14159265, -0.000082147128481},
+            {65.43, 9876.54321, 3.14159265, -0.000082147128481, -123.45},
+            {65.43, -123.45, 3.14159265, -0.000082147128481, 9876.54321}
+    };
+
+    // Convert the magnitude data to required form
+    Triplet<Byte[], Double, Double> conversionTuple =
+            QTransformDataObject.qTransformMagnitudesToByteData(qTransformMagnitudes, null);
+    byte[] qTransformBytes = TypeConversionUtils.toByteArray(conversionTuple.getValue0());
+    double minMagnitude = conversionTuple.getValue1();
+    double maxMagnitude = conversionTuple.getValue2();
+
     // Define data to be used within the tests
     QTransformDataObject qTransformDataObject = new QTransformDataObject(
-            new double[][]{
-                    {65.43, -123.45, 9876.54321, 3.14159265, -0.000082147128481},
-                    {65.43, 9876.54321, 3.14159265, -0.000082147128481, -123.45},
-                    {65.43, -123.45, 3.14159265, -0.000082147128481, 9876.54321}
-            }
-    );  // This is just an example array for the Q-Transform data
+            qTransformBytes, minMagnitude, maxMagnitude
+    );
     AudioDataObject audioDataObject = new AudioDataObject(
             IOMethods.getAbsoluteFilePath("testing-audio-files/A440.wav"),
             44100
     );
-    GUIDataObject guiDataObject = new GUIDataObject(11, 9, 123.45, 0.01, 0.55, "Melancholy.wav", 120000, 9000);
+    GUIDataObject guiDataObject = new GUIDataObject(
+            11, 9, 123.45, 0.01, 0.55,
+            "Melancholy.wav", 120000, 9000
+    );
+
+    // Initialization method
+    AUDTFileTest() throws IOException {
+    }
 
     // Tests
     @Test
@@ -72,11 +92,20 @@ class AUDTFileTest {
         GUIDataObject readGUIData = fileReader.readGUIData();
 
         // Check if the read data are equal
-        assertArrayEquals(qTransformDataObject.qTransformMagnitudes[0], readQTransformData.qTransformMagnitudes[0], 1e-4);
-        assertArrayEquals(qTransformDataObject.qTransformMagnitudes[1], readQTransformData.qTransformMagnitudes[1], 1e-4);
-        assertArrayEquals(qTransformDataObject.qTransformMagnitudes[2], readQTransformData.qTransformMagnitudes[2], 1e-4);
-
+        assertEquals(qTransformDataObject, readQTransformData);
         assertEquals(audioDataObject, readAudioData);
         assertEquals(guiDataObject, readGUIData);
+
+        // Check if the decompressed version of the Q-Transform magnitudes is the same
+        double[][] array = QTransformDataObject.byteDataToQTransformMagnitudes(
+                qTransformDataObject.qTransformBytes,
+                qTransformDataObject.minMagnitude,
+                qTransformDataObject.maxMagnitude
+        );
+
+        assertEquals(array.length, qTransformMagnitudes.length);
+        for (int i = 0; i < array.length; i++) {
+            assertArrayEquals(array[i], qTransformMagnitudes[i], 1e-5);
+        }
     }
 }

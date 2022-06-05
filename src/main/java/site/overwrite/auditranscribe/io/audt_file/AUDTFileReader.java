@@ -93,7 +93,7 @@ public class AUDTFileReader {
         // Read in the rest of the data
         double minMagnitude = readDouble();
         double maxMagnitude = readDouble();
-        int[][] qTransformMagnitudes = read2DIntegerArray();
+        byte[] qTransformData = readByteArray();
 
         // Check if there is an EOS
         if (!checkEOSDelimiter()) {
@@ -101,7 +101,7 @@ public class AUDTFileReader {
         }
 
         // Create and return a `QTransformDataObject`
-        return new QTransformDataObject(qTransformMagnitudes, minMagnitude, maxMagnitude);
+        return new QTransformDataObject(qTransformData, minMagnitude, maxMagnitude);
     }
 
     /**
@@ -282,6 +282,23 @@ public class AUDTFileReader {
 
         // Convert these string bytes back into a string and return
         return IOConverters.bytesToString(stringBytes);
+    }
+
+    /**
+     * Helper method that reads a byte array from the file's byte array.
+     *
+     * @return Byte array that was read in.
+     */
+    private byte[] readByteArray() {
+        // Get the number of bytes that are present in the byte array
+        int numBytes = readInteger();
+
+        // Get the byte array
+        byte[] byteArray = Arrays.copyOfRange(bytes, bytePos, bytePos + numBytes);
+        bytePos += numBytes;
+
+        // Return the byte array
+        return byteArray;
     }
 
     /**

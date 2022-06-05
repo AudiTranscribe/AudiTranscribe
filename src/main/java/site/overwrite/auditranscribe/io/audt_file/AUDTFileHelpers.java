@@ -9,6 +9,7 @@
 
 package site.overwrite.auditranscribe.io.audt_file;
 
+import org.javatuples.Triplet;
 import site.overwrite.auditranscribe.utils.MathUtils;
 
 import java.util.List;
@@ -38,10 +39,12 @@ public class AUDTFileHelpers {
     /**
      * Method that converts a 2D double array into a 2D integer array to save space when saving the
      * file.
+     *
      * @param array 2D double array to convert.
-     * @return    2D integer array.
+     * @return Triplet of values. First value is the 2D integer array. Second value is the minimum
+     * value of the doubles array. Final value is the maximum value of the doubles array.
      */
-    public static int[][] doubles2DtoInt2D(double[][] array) {
+    public static Triplet<Integer[][], Double, Double> doubles2DtoInt2D(double[][] array) {
         // Get array size
         int m = array.length;
         int n = array[0].length;
@@ -57,7 +60,7 @@ public class AUDTFileHelpers {
         }
 
         // Convert the doubles to integers
-        int[][] intArray = new int[m][n];
+        Integer[][] intArray = new Integer[m][n];
         for (int i = 0; i < m; i++) {
             for (int j = 0; j < n; j++) {
                 // There should not be any overflow because the max and min values are integers
@@ -67,18 +70,18 @@ public class AUDTFileHelpers {
             }
         }
 
-        // Return the integer array
-        return intArray;
+        // Return the integer array, minimum value, and maximum value
+        return new Triplet<>(intArray, min, max);
     }
 
     /**
      * Method that converts a 2D integer array into a 2D double array to retrieve the
      * psuedo-original data before conversion.
      *
-     * @param array 2D integer array to convert.
+     * @param array    2D integer array to convert.
      * @param minValue Minimum value of the original doubles array.
      * @param maxValue Maximum value of the original doubles array.
-     * @return  2D double array.
+     * @return 2D double array.
      */
     public static double[][] int2DtoDoubles2D(int[][] array, double minValue, double maxValue) {
         // Get array size

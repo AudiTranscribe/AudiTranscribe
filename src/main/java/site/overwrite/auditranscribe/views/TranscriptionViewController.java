@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-04
+ * Updated on 2022-06-05
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -29,6 +29,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.javatuples.Pair;
+import org.javatuples.Triplet;
 import site.overwrite.auditranscribe.bpm_estimation.BPMEstimator;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
@@ -143,7 +144,10 @@ public class TranscriptionViewController implements Initializable {
     private String audioFilePath;
     private String audioFileName;
     private Audio audio;
-    private double[][] magnitudes;
+
+    private byte[] qTransformBytes;  // LZ4 compressed version
+    private double minQTransformMagnitude;
+    private double maxQTransformMagnitude;
 
     private String musicKey = "C";
     private int beatsPerBar = 4;
@@ -693,14 +697,28 @@ public class TranscriptionViewController implements Initializable {
         // Generate spectrogram image based on newly generated magnitude data
         CustomTask<WritableImage> spectrogramTask = new CustomTask<>() {
             @Override
-            protected WritableImage call() {
+            protected WritableImage call() throws IOException {
+                // Define a spectrogram object
                 Spectrogram spectrogram = new Spectrogram(
                         audio, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER, BINS_PER_OCTAVE, SPECTROGRAM_HOP_LENGTH, PX_PER_SECOND,
                         NUM_PX_PER_OCTAVE, this
                 );
-                magnitudes = spectrogram.getSpectrogramMagnitudes(
+
+                // Obtain the raw spectrogram magnitudes
+                double[][] magnitudes = spectrogram.getSpectrogramMagnitudes(
                         WindowFunction.values()[settingsFile.data.windowFunctionEnumOrdinal]
                 );
+
+                // Update attributes
+                this.setMessage("Compressing spectrogram data...");
+                Triplet<Byte[], Double, Double> conversionTuple =
+                        QTransformDataObject.qTransformMagnitudesToByteData(magnitudes, this);
+
+                qTransformBytes = TypeConversionUtils.toByteArray(conversionTuple.getValue0());
+                minQTransformMagnitude = conversionTuple.getValue1();
+                maxQTransformMagnitude = conversionTuple.getValue2();
+
+                // Generate spectrogram
                 return spectrogram.generateSpectrogram(
                         magnitudes,
                         ColourScale.values()[settingsFile.data.colourScaleEnumOrdinal]
@@ -746,7 +764,14 @@ public class TranscriptionViewController implements Initializable {
         audio = new Audio(new File(audioFilePath));
         sampleRate = audioData.sampleRate;
 
-        magnitudes = qTransformData.qTransformMagnitudes;
+        qTransformBytes = qTransformData.qTransformBytes;
+        minQTransformMagnitude = qTransformData.minMagnitude;
+        maxQTransformMagnitude = qTransformData.maxMagnitude;
+
+        // Convert the bytes back into magnitude data
+        double[][] magnitudes = QTransformDataObject.byteDataToQTransformMagnitudes(
+                qTransformBytes, minQTransformMagnitude, maxQTransformMagnitude
+        );
 
         // Generate spectrogram image based on existing magnitude data
         CustomTask<WritableImage> spectrogramTask = new CustomTask<>() {
@@ -969,7 +994,7 @@ public class TranscriptionViewController implements Initializable {
         // Package all the current data into a `ProjectDataObject`
         logger.log(Level.INFO, "Packaging data for saving");
         QTransformDataObject qTransformData = new QTransformDataObject(
-                magnitudes
+                qTransformBytes, minQTransformMagnitude, maxQTransformMagnitude
         );
         AudioDataObject audioData = new AudioDataObject(
                 audioFilePath, sampleRate

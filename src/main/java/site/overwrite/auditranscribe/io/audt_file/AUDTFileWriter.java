@@ -89,11 +89,11 @@ public class AUDTFileWriter {
      *
      * @param qTransformDataObj Data object that holds all the Q-Transform data.
      */
-    public void writeQTransformData(QTransformDataObject qTransformDataObj) throws IOException {
+    public void writeQTransformData(QTransformDataObject qTransformDataObj) {
         writeSectionID(1);
         writeDouble(qTransformDataObj.minMagnitude);
         writeDouble(qTransformDataObj.maxMagnitude);
-        write2DIntegerArray(qTransformDataObj.getIntegerMagnitudeValues());
+        writeByteArray(qTransformDataObj.qTransformBytes);
         writeEOSDelimiter();
     }
 
@@ -188,6 +188,16 @@ public class AUDTFileWriter {
         // Write to the byte list
         writeInteger(numBytes);
         AUDTFileHelpers.addBytesIntoBytesList(bytes, byteArray);
+    }
+
+    /**
+     * Helper method that writes a byte array to the byte list.
+     *
+     * @param array Byte array to write.
+     */
+    private void writeByteArray(byte[] array) {
+        writeInteger(array.length);  // Write number of bytes present in the array
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, array);
     }
 
     /**
