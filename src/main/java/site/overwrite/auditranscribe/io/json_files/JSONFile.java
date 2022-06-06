@@ -2,7 +2,7 @@
  * JSONFile.java
  *
  * Created on 2022-05-30
- * Updated on 2022-05-30
+ * Updated on 2022-06-06
  *
  * Description: Handles interactions with JSON files.
  */
@@ -11,6 +11,7 @@ package site.overwrite.auditranscribe.io.json_files;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 
 import java.io.*;
@@ -34,7 +35,7 @@ public abstract class JSONFile<T> {
     public JSONFile(String fileName, Class<T> cls) {
         // Update attributes
         this.cls = cls;
-        FILE_PATH = IOMethods.APP_DATA_FOLDER_PATH_STRING + fileName;
+        FILE_PATH = IOConstants.APP_DATA_FOLDER_PATH_STRING + fileName;
 
         // Create the GSON object
         Gson gson = new Gson();

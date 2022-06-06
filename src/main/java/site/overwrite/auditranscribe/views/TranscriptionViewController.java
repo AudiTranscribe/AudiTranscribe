@@ -32,6 +32,7 @@ import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.bpm_estimation.BPMEstimator;
+import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.LZ4;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
@@ -775,9 +776,7 @@ public class TranscriptionViewController implements Initializable {
 
         // Write the raw MP3 bytes into a temporary file
         // Todo: handle this better
-        File auxiliaryMP3File = new File(
-                System.getProperty("user.dir") + File.separator + "temp" + File.separator + audioFileName
-        );
+        File auxiliaryMP3File = new File(IOConstants.TEMP_FOLDER + audioFileName);
         auxiliaryMP3File.getParentFile().mkdirs();
         auxiliaryMP3File.createNewFile();
         FileOutputStream fos = new FileOutputStream(auxiliaryMP3File);

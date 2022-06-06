@@ -17,6 +17,7 @@ import org.apache.commons.compress.utils.FileNameUtils;
 import org.javatuples.Pair;
 import site.overwrite.auditranscribe.audio.ffmpeg.AudioConverter;
 import site.overwrite.auditranscribe.audio.Audio;
+import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
@@ -74,8 +75,11 @@ public class ProjectIOHandlers {
                     throw new UnsupportedAudioFileException("The file extension is not supported.");
                 }
 
-                // Get the base name of the file
-                String baseName = file.getAbsolutePath().replace(fileExt, "");
+                // Attempt creation of temporary folder if it doesn't exist
+                IOMethods.createFolder(IOConstants.TEMP_FOLDER);
+
+                // Get the base path for the auxiliary files
+                String baseName = IOConstants.TEMP_FOLDER + file.getName().replace(fileExt, "");
 
                 // Check if the original file is a WAV file
                 AudioConverter audioConverter = new AudioConverter(settingsFile.data.ffmpegInstallationPath);
