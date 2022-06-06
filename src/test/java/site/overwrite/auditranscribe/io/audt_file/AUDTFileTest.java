@@ -56,11 +56,9 @@ class AUDTFileTest {
     );
     AudioDataObject audioDataObject = new AudioDataObject(
             LZ4.lz4Compress(Files.readAllBytes(Path.of(IOMethods.getAbsoluteFilePath("testing-audio-files/A440.mp3")))),
-            44100, "A440.wav"
-    );
+            44100, 120000, "A440.wav");
     GUIDataObject guiDataObject = new GUIDataObject(
-            11, 9, 123.45, 0.01, 0.55,
-            120000, 9000
+            11, 9, 123.45, 0.01, 0.55, 9000
     );
 
     // Initialization method

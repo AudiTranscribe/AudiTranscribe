@@ -19,6 +19,7 @@ public class AudioDataObject extends AbstractDataObject {
     // Attributes
     public byte[] compressedMP3Bytes;
     public double sampleRate;
+    public int totalDurationInMS;
     public String audioFileName;
 
     /**
@@ -26,11 +27,13 @@ public class AudioDataObject extends AbstractDataObject {
      *
      * @param compressedMP3Bytes The LZ4 compressed bytes of the MP3 audio file.
      * @param sampleRate         Sample rate of the audio file
+     * @param totalDurationInMS  Total duration of the audio in <b>milliseconds</b>.
      * @param audioFileName      The name of the audio file.
      */
-    public AudioDataObject(byte[] compressedMP3Bytes, double sampleRate, String audioFileName) {
+    public AudioDataObject(byte[] compressedMP3Bytes, double sampleRate, int totalDurationInMS, String audioFileName) {
         this.compressedMP3Bytes = compressedMP3Bytes;
         this.sampleRate = sampleRate;
+        this.totalDurationInMS = totalDurationInMS;
         this.audioFileName = audioFileName;
     }
 
@@ -42,6 +45,7 @@ public class AudioDataObject extends AbstractDataObject {
         AudioDataObject that = (AudioDataObject) o;
         return (
                 Double.compare(that.sampleRate, sampleRate) == 0 &&
+                        totalDurationInMS == that.totalDurationInMS &&
                         Arrays.equals(compressedMP3Bytes, that.compressedMP3Bytes) &&
                         audioFileName.equals(that.audioFileName)
         );
@@ -49,7 +53,7 @@ public class AudioDataObject extends AbstractDataObject {
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(sampleRate, audioFileName);
+        int result = Objects.hash(sampleRate, totalDurationInMS, audioFileName);
         result = 31 * result + Arrays.hashCode(compressedMP3Bytes);
         return result;
     }

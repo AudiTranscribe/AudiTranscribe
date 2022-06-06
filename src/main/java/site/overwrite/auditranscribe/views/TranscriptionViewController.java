@@ -649,7 +649,6 @@ public class TranscriptionViewController implements Initializable {
         bpm = projectData.guiData.bpm;
         offset = projectData.guiData.offsetSeconds;
         volume = projectData.guiData.playbackVolume;
-        audioDuration = projectData.guiData.totalDurationInMS / 1000.;
         currTime = projectData.guiData.currTimeInMS / 1000.;
 
         // Set the AudiTranscribe file's file path and file name
@@ -765,6 +764,7 @@ public class TranscriptionViewController implements Initializable {
         // Set attributes
         compressedMP3Bytes = audioData.compressedMP3Bytes;
         sampleRate = audioData.sampleRate;
+        audioDuration = audioData.totalDurationInMS / 1000.;
         audioFileName = audioData.audioFileName;
 
         qTransformBytes = qTransformData.qTransformBytes;
@@ -774,11 +774,14 @@ public class TranscriptionViewController implements Initializable {
         // Decompress the MP3 bytes
         byte[] rawMP3Bytes = LZ4.lz4Decompress(compressedMP3Bytes);
 
-        // Write the raw MP3 bytes into a temporary file
-        // Todo: handle this better
+        // Ensure that the temporary directory exists
+        IOMethods.createFolder(IOConstants.TEMP_FOLDER);
+
+        // Create an empty MP3 file in the temporary directory
         File auxiliaryMP3File = new File(IOConstants.TEMP_FOLDER + audioFileName);
-        auxiliaryMP3File.getParentFile().mkdirs();
-        auxiliaryMP3File.createNewFile();
+        IOMethods.createFile(auxiliaryMP3File.getAbsolutePath());
+
+        // Write the raw MP3 bytes into a temporary file
         FileOutputStream fos = new FileOutputStream(auxiliaryMP3File);
         fos.write(rawMP3Bytes);
         fos.close();
@@ -787,7 +790,11 @@ public class TranscriptionViewController implements Initializable {
         audio = Audio.initAudio(auxiliaryMP3File, audioFileName, AudioProcessingMode.PLAYBACK_ONLY);
 
         // Delete the temporary file
-        auxiliaryMP3File.delete();
+        IOMethods.deleteFile(auxiliaryMP3File.getAbsolutePath());
+
+        // Update the audio object's duration
+        // (The `MediaPlayer` duration cannot be trusted)
+        audio.setDuration(audioDuration);
 
         // Convert the bytes back into magnitude data
         double[][] magnitudes = QTransformDataObject.byteDataToQTransformMagnitudes(
@@ -1037,11 +1044,11 @@ public class TranscriptionViewController implements Initializable {
                         qTransformBytes, minQTransformMagnitude, maxQTransformMagnitude
                 );
                 AudioDataObject audioData = new AudioDataObject(
-                        compressedMP3Bytes, sampleRate, audioFileName
-                );
+                        compressedMP3Bytes, sampleRate, (int) audioDuration * 1000,
+                        audioFileName);
                 GUIDataObject guiData = new GUIDataObject(
                         musicKeyIndex, timeSignatureIndex, bpm, offset, volume,
-                        (int) (audioDuration * 1000), (int) (currTime * 1000)
+                        (int) currTime * 1000
                 );
 
                 ProjectDataObject projectData = new ProjectDataObject(
@@ -1280,7 +1287,8 @@ public class TranscriptionViewController implements Initializable {
                         // Specially update the start time to 0
                         // (Because the `seekToTime` method would have set it to the end, which is not what we want)
                         try {
-                            audio.setAudioStartTime(0);
+                            audio.setAudioStartTime(Double.MIN_VALUE);
+//                            currTime = 0;
                         } catch (InvalidObjectException e) {
                             throw new RuntimeException(e);
                         }

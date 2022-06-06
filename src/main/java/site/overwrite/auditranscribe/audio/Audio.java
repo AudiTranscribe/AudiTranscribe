@@ -156,7 +156,7 @@ public class Audio {
         }
     }
 
-    // Getter methods
+    // Getter/Setter methods
 
     public String getAudioFileName() {
         return audioFileName;
@@ -172,6 +172,11 @@ public class Audio {
         }
 
         return duration;
+    }
+
+    public void setDuration(double duration) {
+        if (duration <= 0) throw new ValueException("Duration must be greater than 0.");
+        this.duration = duration;
     }
 
     public double[] getMonoSamples() {
@@ -255,7 +260,7 @@ public class Audio {
      */
     public double getCurrAudioTime() throws InvalidObjectException {
         if (mediaPlayer != null) {
-            return mediaPlayer.getCurrentTime().toSeconds();
+            return Math.min(mediaPlayer.getCurrentTime().toSeconds(), duration);
         } else {
             throw new InvalidObjectException("Media player was not initialised.");
         }

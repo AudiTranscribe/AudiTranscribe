@@ -122,6 +122,7 @@ public class AUDTFileReader {
         // Read in the rest of the data
         byte[] compressedMP3Bytes = readByteArray();
         double sampleRate = readDouble();
+        int totalDurationInMS = readInteger();
         String originalFileName = readString();
 
         // Check if there is an EOS
@@ -130,7 +131,7 @@ public class AUDTFileReader {
         }
 
         // Create and return an `AudioDataObject`
-        return new AudioDataObject(compressedMP3Bytes, sampleRate, originalFileName);
+        return new AudioDataObject(compressedMP3Bytes, sampleRate, totalDurationInMS, originalFileName);
     }
 
     /**
@@ -155,7 +156,6 @@ public class AUDTFileReader {
         double bpm = readDouble();
         double offsetSeconds = readDouble();
         double playbackVolume = readDouble();
-        int totalDurationInMS = readInteger();
         int currTimeInMS = readInteger();
 
         // Check if there is an EOS
@@ -165,7 +165,7 @@ public class AUDTFileReader {
 
         // Create and return a `GUIDataObject`
         return new GUIDataObject(
-                musicKeyIndex, timeSignatureIndex, bpm, offsetSeconds, playbackVolume, totalDurationInMS, currTimeInMS
+                musicKeyIndex, timeSignatureIndex, bpm, offsetSeconds, playbackVolume, currTimeInMS
         );
     }
 

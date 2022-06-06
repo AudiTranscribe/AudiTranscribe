@@ -84,6 +84,7 @@ public class AUDTFileWriter {
         writeSectionID(2);
         writeByteArray(audioDataObj.compressedMP3Bytes);
         writeDouble(audioDataObj.sampleRate);
+        writeInteger(audioDataObj.totalDurationInMS);
         writeString(audioDataObj.audioFileName);
         writeEOSDelimiter();
     }
@@ -100,7 +101,6 @@ public class AUDTFileWriter {
         writeDouble(guiDataObj.bpm);
         writeDouble(guiDataObj.offsetSeconds);
         writeDouble(guiDataObj.playbackVolume);
-        writeInteger(guiDataObj.totalDurationInMS);
         writeInteger(guiDataObj.currTimeInMS);
         writeEOSDelimiter();
     }
