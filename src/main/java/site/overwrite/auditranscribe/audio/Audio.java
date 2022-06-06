@@ -50,7 +50,7 @@ public class Audio {
     private double[] audioSamples;
     private double[] monoAudioSamples;  // Average of stereo samples
 
-    private byte[] rawMP3Bytes;
+    public byte[] rawMP3Bytes;
 
     private final MediaPlayer mediaPlayer;
 
@@ -131,24 +131,26 @@ public class Audio {
     /**
      * Initializes an <code>Audio</code> object based on a file.
      *
-     * @param audioFile        File object representing the audio file to be used.
-     * @param originalFileName The file name of the original audio file.
-     * @param processingMode   The processing mode when handling the audio file.
-     *                         <ul>
-     *                         <li><code>SAMPLES_ONLY</code>: Treat <code>audioFile</code> as a WAV file and only generate samples.</li>
-     *                         <li><code>PLAYBACK_ONLY</code>: Treat <code>audioFile</code> as a MP3 file and only permit playback.</li>
-     *                         </ul>
-     *                         Treat any other option as a <code>ValueException</code>.
+     * @param audioFile      File object representing the audio file to be used.
+     * @param audioFileName  The file name of the original audio file.
+     * @param processingMode The processing mode when handling the audio file.
+     *                       <ul>
+     *                       <li><code>SAMPLES_ONLY</code>: Treat <code>audioFile</code> as a WAV file and only generate samples.</li>
+     *                       <li><code>PLAYBACK_ONLY</code>: Treat <code>audioFile</code> as a MP3 file and only permit playback.</li>
+     *                       </ul>
+     *                       Treat any other option as a <code>ValueException</code>.
      * @throws ValueException                If the processing mode is not <code>SAMPLES_ONLY</code>
      *                                       or <code>PLAYBACK_ONLY</code>.
      * @throws IOException                   If there was a problem reading in the audio stream.
      * @throws UnsupportedAudioFileException If there was a problem reading in the audio file.
      */
-    public static Audio initAudio(File audioFile, String originalFileName, AudioProcessingMode processingMode) throws UnsupportedAudioFileException, IOException {
+    public static Audio initAudio(
+            File audioFile, String audioFileName, AudioProcessingMode processingMode
+    ) throws UnsupportedAudioFileException, IOException {
         if (processingMode == AudioProcessingMode.SAMPLES_ONLY) {
-            return new Audio(audioFile, null, originalFileName);
+            return new Audio(audioFile, null, audioFileName);
         } else if (processingMode == AudioProcessingMode.PLAYBACK_ONLY) {
-            return new Audio(null, audioFile, originalFileName);
+            return new Audio(null, audioFile, audioFileName);
         } else {
             throw new ValueException("Invalid audio processing mode.");
         }
@@ -156,20 +158,8 @@ public class Audio {
 
     // Getter methods
 
-    public AudioProcessingMode getAudioProcessingMode() {
-        return audioProcessingMode;
-    }
-
     public String getAudioFileName() {
         return audioFileName;
-    }
-
-    public String getMp3FilePath() {
-        return mp3FilePath;
-    }
-
-    public String getWavFilePath() {
-        return wavFilePath;
     }
 
     public double getSampleRate() {

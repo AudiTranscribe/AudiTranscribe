@@ -2,7 +2,7 @@
  * AUDTFileTest.java
  *
  * Created on 2022-05-01
- * Updated on 2022-06-05
+ * Updated on 2022-06-06
  *
  * Description: Test AUDT file reading and writing.
  */
@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.io.LZ4;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
@@ -23,6 +24,8 @@ import site.overwrite.auditranscribe.exceptions.IncorrectFileFormatException;
 import site.overwrite.auditranscribe.utils.TypeConversionUtils;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -52,12 +55,12 @@ class AUDTFileTest {
             qTransformBytes, minMagnitude, maxMagnitude
     );
     AudioDataObject audioDataObject = new AudioDataObject(
-            IOMethods.getAbsoluteFilePath("testing-audio-files/A440.wav"),
-            44100
+            LZ4.lz4Compress(Files.readAllBytes(Path.of(IOMethods.getAbsoluteFilePath("testing-audio-files/A440.mp3")))),
+            44100, "A440.wav"
     );
     GUIDataObject guiDataObject = new GUIDataObject(
             11, 9, 123.45, 0.01, 0.55,
-            "Melancholy.wav", 120000, 9000
+            120000, 9000
     );
 
     // Initialization method

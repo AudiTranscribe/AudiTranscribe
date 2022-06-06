@@ -2,16 +2,14 @@
  * AUDTFileWriter.java
  *
  * Created on 2022-05-01
- * Updated on 2022-06-05
+ * Updated on 2022-06-06
  *
  * Description: Class that handles the writing of the AudiTranscribe (AUDT) file.
  */
 
 package site.overwrite.auditranscribe.io.audt_file;
 
-import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.io.IOConverters;
-import site.overwrite.auditranscribe.io.LZ4;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
@@ -27,8 +25,6 @@ public class AUDTFileWriter {
     public final String filepath;
     private final List<Byte> bytes = new ArrayList<>();
 
-    private final CustomTask<?> task;
-
     /**
      * Initialization method to make an <code>AUDTFileWriter</code> object.
      *
@@ -38,24 +34,6 @@ public class AUDTFileWriter {
     public AUDTFileWriter(String filepath) {
         // Update attributes
         this.filepath = filepath;
-        this.task = null;
-
-        // Write the header section
-        writeHeaderSection();
-    }
-
-    /**
-     * Initialization method to make an <code>AUDTFileWriter</code> object.
-     *
-     * @param filepath Path to the AUDT file. The file name at the end of the file path should
-     *                 <b>include</b> the extension of the AUDT file.
-     * @param task     The <code>CustomTask</code> object that is handling the generation. Pass in
-     *                 <code>null</code> if no such task is being used.
-     */
-    public AUDTFileWriter(String filepath, CustomTask<?> task) {
-        // Update attributes
-        this.filepath = filepath;
-        this.task = task;
 
         // Write the header section
         writeHeaderSection();
@@ -104,8 +82,9 @@ public class AUDTFileWriter {
      */
     public void writeAudioData(AudioDataObject audioDataObj) {
         writeSectionID(2);
-        writeString(audioDataObj.audioFilePath);
+        writeByteArray(audioDataObj.compressedMP3Bytes);
         writeDouble(audioDataObj.sampleRate);
+        writeString(audioDataObj.audioFileName);
         writeEOSDelimiter();
     }
 
@@ -121,7 +100,6 @@ public class AUDTFileWriter {
         writeDouble(guiDataObj.bpm);
         writeDouble(guiDataObj.offsetSeconds);
         writeDouble(guiDataObj.playbackVolume);
-        writeString(guiDataObj.audioFileName);
         writeInteger(guiDataObj.totalDurationInMS);
         writeInteger(guiDataObj.currTimeInMS);
         writeEOSDelimiter();
@@ -200,65 +178,66 @@ public class AUDTFileWriter {
         AUDTFileHelpers.addBytesIntoBytesList(bytes, array);
     }
 
-    /**
-     * Helper method that writes an 1D double array into the byte list.
-     *
-     * @param array 1D array of doubles.
-     */
-    private void write1DDoubleArray(double[] array) throws IOException {
-        // Convert the 1D array into its bytes
-        byte[] byteArray = IOConverters.oneDimensionalDoubleArrayToBytes(array);
-
-        // Compress the byte array
-        byte[] compressedBytes = LZ4.lz4Compress(byteArray, task);
-
-        // Get the number of compressed bytes
-        int numCompressedBytes = compressedBytes.length;
-
-        // Write to the byte list
-        writeInteger(numCompressedBytes);
-        AUDTFileHelpers.addBytesIntoBytesList(bytes, compressedBytes);
-    }
-
-    /**
-     * Helper method that writes a 2D double array into the byte list.
-     *
-     * @param array 2D array of doubles.
-     */
-    private void write2DDoubleArray(double[][] array) throws IOException {
-        // Convert the 2D array into its bytes
-        byte[] byteArray = IOConverters.twoDimensionalDoubleArrayToBytes(array);
-
-        // Compress the byte array
-        byte[] compressedBytes = LZ4.lz4Compress(byteArray, task);
-
-        // Get the number of compressed bytes
-        int numCompressedBytes = compressedBytes.length;
-
-        // Write to the byte list
-        writeInteger(numCompressedBytes);
-        AUDTFileHelpers.addBytesIntoBytesList(bytes, compressedBytes);
-    }
-
-    /**
-     * Helper method that writes a 2D integer array into the byte list.
-     *
-     * @param array 2D array of integers.
-     */
-    private void write2DIntegerArray(int[][] array) throws IOException {
-        // Convert the 2D array into its bytes
-        byte[] byteArray = IOConverters.twoDimensionalIntegerArrayToBytes(array);
-
-        // Compress the byte array
-        byte[] compressedBytes = LZ4.lz4Compress(byteArray, task);
-
-        // Get the number of compressed bytes
-        int numCompressedBytes = compressedBytes.length;
-
-        // Write to the byte list
-        writeInteger(numCompressedBytes);
-        AUDTFileHelpers.addBytesIntoBytesList(bytes, compressedBytes);
-    }
+    // Todo: remove
+//    /**
+//     * Helper method that writes an 1D double array into the byte list.
+//     *
+//     * @param array 1D array of doubles.
+//     */
+//    private void write1DDoubleArray(double[] array) throws IOException {
+//        // Convert the 1D array into its bytes
+//        byte[] byteArray = IOConverters.oneDimensionalDoubleArrayToBytes(array);
+//
+//        // Compress the byte array
+//        byte[] compressedBytes = LZ4.lz4Compress(byteArray, task);
+//
+//        // Get the number of compressed bytes
+//        int numCompressedBytes = compressedBytes.length;
+//
+//        // Write to the byte list
+//        writeInteger(numCompressedBytes);
+//        AUDTFileHelpers.addBytesIntoBytesList(bytes, compressedBytes);
+//    }
+//
+//    /**
+//     * Helper method that writes a 2D double array into the byte list.
+//     *
+//     * @param array 2D array of doubles.
+//     */
+//    private void write2DDoubleArray(double[][] array) throws IOException {
+//        // Convert the 2D array into its bytes
+//        byte[] byteArray = IOConverters.twoDimensionalDoubleArrayToBytes(array);
+//
+//        // Compress the byte array
+//        byte[] compressedBytes = LZ4.lz4Compress(byteArray, task);
+//
+//        // Get the number of compressed bytes
+//        int numCompressedBytes = compressedBytes.length;
+//
+//        // Write to the byte list
+//        writeInteger(numCompressedBytes);
+//        AUDTFileHelpers.addBytesIntoBytesList(bytes, compressedBytes);
+//    }
+//
+//    /**
+//     * Helper method that writes a 2D integer array into the byte list.
+//     *
+//     * @param array 2D array of integers.
+//     */
+//    private void write2DIntegerArray(int[][] array) throws IOException {
+//        // Convert the 2D array into its bytes
+//        byte[] byteArray = IOConverters.twoDimensionalIntegerArrayToBytes(array);
+//
+//        // Compress the byte array
+//        byte[] compressedBytes = LZ4.lz4Compress(byteArray, task);
+//
+//        // Get the number of compressed bytes
+//        int numCompressedBytes = compressedBytes.length;
+//
+//        // Write to the byte list
+//        writeInteger(numCompressedBytes);
+//        AUDTFileHelpers.addBytesIntoBytesList(bytes, compressedBytes);
+//    }
 
     /**
      * Helper method that writes the section ID to the byte list.

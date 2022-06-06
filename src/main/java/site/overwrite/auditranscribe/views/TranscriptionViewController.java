@@ -30,7 +30,9 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
+import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.bpm_estimation.BPMEstimator;
+import site.overwrite.auditranscribe.io.LZ4;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
@@ -53,6 +55,7 @@ import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.net.URL;
@@ -141,9 +144,10 @@ public class TranscriptionViewController implements Initializable {
 
     private String audtFilePath;
     private String audtFileName;
-    private String audioFilePath;
     private String audioFileName;
     private Audio audio;
+
+    private byte[] compressedMP3Bytes;
 
     private byte[] qTransformBytes;  // LZ4 compressed version
     private double minQTransformMagnitude;
@@ -644,7 +648,6 @@ public class TranscriptionViewController implements Initializable {
         bpm = projectData.guiData.bpm;
         offset = projectData.guiData.offsetSeconds;
         volume = projectData.guiData.playbackVolume;
-        audioFileName = projectData.guiData.audioFileName;
         audioDuration = projectData.guiData.totalDurationInMS / 1000.;
         currTime = projectData.guiData.currTimeInMS / 1000.;
 
@@ -689,7 +692,6 @@ public class TranscriptionViewController implements Initializable {
     public void setAudioAndSpectrogramData(Audio audioObj) {
         // Set attributes
         audio = audioObj;
-        audioFilePath = audioObj.getWavFilePath();
         audioFileName = audioObj.getAudioFileName();
         audioDuration = audio.getDuration();
         sampleRate = audio.getSampleRate();
@@ -760,16 +762,33 @@ public class TranscriptionViewController implements Initializable {
             QTransformDataObject qTransformData, AudioDataObject audioData
     ) throws UnsupportedAudioFileException, IOException {
         // Set attributes
-        audioFilePath = audioData.audioFilePath;
-
-        File audioFile = new File(audioFilePath);
-        audio = new Audio(audioFile, audioFile, audioFile.getName());  // Todo: update to `initAudio`
-
+        compressedMP3Bytes = audioData.compressedMP3Bytes;
         sampleRate = audioData.sampleRate;
+        audioFileName = audioData.audioFileName;
 
         qTransformBytes = qTransformData.qTransformBytes;
         minQTransformMagnitude = qTransformData.minMagnitude;
         maxQTransformMagnitude = qTransformData.maxMagnitude;
+
+        // Decompress the MP3 bytes
+        byte[] rawMP3Bytes = LZ4.lz4Decompress(compressedMP3Bytes);
+
+        // Write the raw MP3 bytes into a temporary file
+        // Todo: handle this better
+        File auxiliaryMP3File = new File(
+                System.getProperty("user.dir") + File.separator + "temp" + File.separator + audioFileName
+        );
+        auxiliaryMP3File.getParentFile().mkdirs();
+        auxiliaryMP3File.createNewFile();
+        FileOutputStream fos = new FileOutputStream(auxiliaryMP3File);
+        fos.write(rawMP3Bytes);
+        fos.close();
+
+        // Create the `Audio` object
+        audio = Audio.initAudio(auxiliaryMP3File, audioFileName, AudioProcessingMode.PLAYBACK_ONLY);
+
+        // Delete the temporary file
+        auxiliaryMP3File.delete();
 
         // Convert the bytes back into magnitude data
         double[][] magnitudes = QTransformDataObject.byteDataToQTransformMagnitudes(
@@ -1001,30 +1020,37 @@ public class TranscriptionViewController implements Initializable {
             logger.log(Level.FINE, "Saving " + saveName + " to " + saveDest);
         }
 
-        // Package all the current data into a `ProjectDataObject`
-        logger.log(Level.INFO, "Packaging data for saving");
-        QTransformDataObject qTransformData = new QTransformDataObject(
-                qTransformBytes, minQTransformMagnitude, maxQTransformMagnitude
-        );
-        AudioDataObject audioData = new AudioDataObject(
-                audioFilePath, sampleRate
-        );
-        GUIDataObject guiData = new GUIDataObject(
-                musicKeyIndex, timeSignatureIndex, bpm, offset, volume, audioFileName,
-                (int) (audioDuration * 1000), (int) (currTime * 1000)
-        );
-
-        ProjectDataObject projectData = new ProjectDataObject(
-                qTransformData, audioData, guiData
-        );
-
         // Set up task to run in alternate thread
         String finalSaveDest = saveDest;
         CustomTask<Void> task = new CustomTask<>("Save Project") {
             @Override
             protected Void call() throws Exception {
+                // Compress the raw MP3 bytes
+                try {
+                    compressedMP3Bytes = LZ4.lz4Compress(audio.rawMP3Bytes, this);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // Package all the current data into a `ProjectDataObject`
+                logger.log(Level.INFO, "Packaging data for saving");
+                QTransformDataObject qTransformData = new QTransformDataObject(
+                        qTransformBytes, minQTransformMagnitude, maxQTransformMagnitude
+                );
+                AudioDataObject audioData = new AudioDataObject(
+                        compressedMP3Bytes, sampleRate, audioFileName
+                );
+                GUIDataObject guiData = new GUIDataObject(
+                        musicKeyIndex, timeSignatureIndex, bpm, offset, volume,
+                        (int) (audioDuration * 1000), (int) (currTime * 1000)
+                );
+
+                ProjectDataObject projectData = new ProjectDataObject(
+                        qTransformData, audioData, guiData
+                );
+
                 // Save the project
-                ProjectIOHandlers.saveProject(finalSaveDest, projectData, this);
+                ProjectIOHandlers.saveProject(finalSaveDest, projectData);
                 logger.log(Level.INFO, "File saved");
                 return null;
             }

@@ -16,7 +16,6 @@ import javafx.stage.*;
 import org.apache.commons.compress.utils.FileNameUtils;
 import org.javatuples.Pair;
 import site.overwrite.auditranscribe.audio.ffmpeg.AudioConverter;
-import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
@@ -212,7 +211,7 @@ public class ProjectIOHandlers {
                 // Set new scene properties
                 transcriptionStage.setMaximized(true);
                 transcriptionStage.setResizable(true);
-                transcriptionStage.setTitle(guiData.audioFileName);
+                transcriptionStage.setTitle(audioData.audioFileName);
 
                 // Set width and height of the new scene
                 Rectangle2D screenBounds = Screen.getPrimary().getBounds();
@@ -259,10 +258,10 @@ public class ProjectIOHandlers {
      * @throws IOException If the writing to file encounters an error.
      */
     public static void saveProject(
-            String filepath, ProjectDataObject projectDataObject, CustomTask<?> task
+            String filepath, ProjectDataObject projectDataObject
     ) throws IOException {
         // Declare the file writer object
-        AUDTFileWriter fileWriter = new AUDTFileWriter(filepath, task);
+        AUDTFileWriter fileWriter = new AUDTFileWriter(filepath);
 
         // Write data to the file
         fileWriter.writeQTransformData(projectDataObject.qTransformData);
