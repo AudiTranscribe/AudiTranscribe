@@ -695,7 +695,7 @@ public class TranscriptionViewController implements Initializable {
         sampleRate = audio.getSampleRate();
 
         // Generate spectrogram image based on newly generated magnitude data
-        CustomTask<WritableImage> spectrogramTask = new CustomTask<>() {
+        CustomTask<WritableImage> spectrogramTask = new CustomTask<>("Generate Spectrogram") {
             @Override
             protected WritableImage call() throws IOException {
                 // Define a spectrogram object
@@ -727,7 +727,7 @@ public class TranscriptionViewController implements Initializable {
         };
 
         // Estimate BPM based on the audio samples
-        CustomTask<Double> bpmTask = new CustomTask<>() {
+        CustomTask<Double> bpmTask = new CustomTask<>("Estimate BPM") {
             @Override
             protected Double call() {
                 return BPMEstimator.estimate(audio.getMonoSamples(), sampleRate).get(0);  // Assume we take fist element
@@ -777,7 +777,7 @@ public class TranscriptionViewController implements Initializable {
         );
 
         // Generate spectrogram image based on existing magnitude data
-        CustomTask<WritableImage> spectrogramTask = new CustomTask<>() {
+        CustomTask<WritableImage> spectrogramTask = new CustomTask<>("Load Spectrogram") {
             @Override
             protected WritableImage call() {
                 Spectrogram spectrogram = new Spectrogram(
@@ -1020,7 +1020,7 @@ public class TranscriptionViewController implements Initializable {
 
         // Set up task to run in alternate thread
         String finalSaveDest = saveDest;
-        CustomTask<Void> task = new CustomTask<>() {
+        CustomTask<Void> task = new CustomTask<>("Save Project") {
             @Override
             protected Void call() throws Exception {
                 // Save the project
@@ -1394,6 +1394,19 @@ public class TranscriptionViewController implements Initializable {
                 // Convert the array of tasks into a list of tasks
                 Collection<CustomTask<?>> taskList = List.of(tasks);
 
+                taskList.forEach(task -> task.setOnFailed(event -> {
+                    // Log the error
+                    logger.log(Level.SEVERE, "Task \"" + task.name + "\" failed: " + task.getException().getMessage());
+                    task.getException().printStackTrace();
+
+                    // Show error dialog
+                    Popups.showExceptionAlert(
+                            "An Error Occurred",
+                            "Task \"" + task.name + "\" failed.",
+                            (Exception) task.getException()
+                    );
+                }));
+
                 // Add all tasks to the ongoing tasks queue
                 ongoingTasks.addAll(taskList);
 
@@ -1414,7 +1427,7 @@ public class TranscriptionViewController implements Initializable {
                     throw new RuntimeException(e);
                 }
 
-                logger.log(Level.INFO, "All tasks have completed");
+                logger.log(Level.INFO, "All tasks have finished");
                 return hasTerminated;
             }
         };
