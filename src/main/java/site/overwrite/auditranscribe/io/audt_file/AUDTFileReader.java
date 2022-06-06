@@ -299,67 +299,6 @@ public class AUDTFileReader {
         return byteArray;
     }
 
-    // Todo: remove
-//    /**
-//     * Helper method that reads in a one-dimensional double array from the byte array.
-//     *
-//     * @return One-dimensional double array that was read in.
-//     */
-//    private double[] read1DDoubleArray() throws IOException {
-//        // Get the number of bytes that stores the compressed 1D double array
-//        int numCompressedBytes = readInteger();
-//
-//        // Read in the compressed array's bytes
-//        byte[] compressedBytes = Arrays.copyOfRange(bytes, bytePos, bytePos + numCompressedBytes);
-//        bytePos += numCompressedBytes;
-//
-//        // Decompress the bytes
-//        byte[] decompressedBytes = LZ4.lz4Decompress(compressedBytes);
-//
-//        // Convert these bytes back into the 1D array and return
-//        return IOConverters.bytesToOneDimensionalDoubleArray(decompressedBytes);
-//    }
-//
-//    /**
-//     * Helper method that reads in a 2D double array from the byte array.
-//     *
-//     * @return 2D double array that was read in.
-//     */
-//    private double[][] read2DDoubleArray() throws IOException {
-//        // Get the number of bytes that stores the compressed 2D double array
-//        int numCompressedBytes = readInteger();
-//
-//        // Read in the compressed array's bytes
-//        byte[] compressedBytes = Arrays.copyOfRange(bytes, bytePos, bytePos + numCompressedBytes);
-//        bytePos += numCompressedBytes;
-//
-//        // Decompress the bytes
-//        byte[] decompressedBytes = LZ4.lz4Decompress(compressedBytes);
-//
-//        // Convert these bytes back into the 2D array and return
-//        return IOConverters.bytesToTwoDimensionalDoubleArray(decompressedBytes);
-//    }
-//
-//    /**
-//     * Helper method that reads in a 2D integer array from the byte array.
-//     *
-//     * @return 2D integer array that was read in.
-//     */
-//    private int[][] read2DIntegerArray() throws IOException {
-//        // Get the number of bytes that stores the compressed 2D integer array
-//        int numCompressedBytes = readInteger();
-//
-//        // Read in the compressed array's bytes
-//        byte[] compressedBytes = Arrays.copyOfRange(bytes, bytePos, bytePos + numCompressedBytes);
-//        bytePos += numCompressedBytes;
-//
-//        // Decompress the bytes
-//        byte[] decompressedBytes = LZ4.lz4Decompress(compressedBytes);
-//
-//        // Convert these bytes back into the 2D array and return
-//        return IOConverters.bytesToTwoDimensionalIntegerArray(decompressedBytes);
-//    }
-
     /**
      * Helper methods that reads in the section ID from the byte array.
      *

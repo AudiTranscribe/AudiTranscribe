@@ -178,67 +178,6 @@ public class AUDTFileWriter {
         AUDTFileHelpers.addBytesIntoBytesList(bytes, array);
     }
 
-    // Todo: remove
-//    /**
-//     * Helper method that writes an 1D double array into the byte list.
-//     *
-//     * @param array 1D array of doubles.
-//     */
-//    private void write1DDoubleArray(double[] array) throws IOException {
-//        // Convert the 1D array into its bytes
-//        byte[] byteArray = IOConverters.oneDimensionalDoubleArrayToBytes(array);
-//
-//        // Compress the byte array
-//        byte[] compressedBytes = LZ4.lz4Compress(byteArray, task);
-//
-//        // Get the number of compressed bytes
-//        int numCompressedBytes = compressedBytes.length;
-//
-//        // Write to the byte list
-//        writeInteger(numCompressedBytes);
-//        AUDTFileHelpers.addBytesIntoBytesList(bytes, compressedBytes);
-//    }
-//
-//    /**
-//     * Helper method that writes a 2D double array into the byte list.
-//     *
-//     * @param array 2D array of doubles.
-//     */
-//    private void write2DDoubleArray(double[][] array) throws IOException {
-//        // Convert the 2D array into its bytes
-//        byte[] byteArray = IOConverters.twoDimensionalDoubleArrayToBytes(array);
-//
-//        // Compress the byte array
-//        byte[] compressedBytes = LZ4.lz4Compress(byteArray, task);
-//
-//        // Get the number of compressed bytes
-//        int numCompressedBytes = compressedBytes.length;
-//
-//        // Write to the byte list
-//        writeInteger(numCompressedBytes);
-//        AUDTFileHelpers.addBytesIntoBytesList(bytes, compressedBytes);
-//    }
-//
-//    /**
-//     * Helper method that writes a 2D integer array into the byte list.
-//     *
-//     * @param array 2D array of integers.
-//     */
-//    private void write2DIntegerArray(int[][] array) throws IOException {
-//        // Convert the 2D array into its bytes
-//        byte[] byteArray = IOConverters.twoDimensionalIntegerArrayToBytes(array);
-//
-//        // Compress the byte array
-//        byte[] compressedBytes = LZ4.lz4Compress(byteArray, task);
-//
-//        // Get the number of compressed bytes
-//        int numCompressedBytes = compressedBytes.length;
-//
-//        // Write to the byte list
-//        writeInteger(numCompressedBytes);
-//        AUDTFileHelpers.addBytesIntoBytesList(bytes, compressedBytes);
-//    }
-
     /**
      * Helper method that writes the section ID to the byte list.
      *
