@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-05
+ * Updated on 2022-06-06
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -47,7 +47,7 @@ import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 import site.overwrite.auditranscribe.plotting.PlottingStuffHandler;
 import site.overwrite.auditranscribe.spectrogram.*;
 import site.overwrite.auditranscribe.utils.*;
-import site.overwrite.auditranscribe.views.helpers.AlertMessages;
+import site.overwrite.auditranscribe.views.helpers.Popups;
 import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
 
 import javax.sound.midi.MidiUnavailableException;
@@ -656,7 +656,7 @@ public class TranscriptionViewController implements Initializable {
         try {
             setAudioAndSpectrogramData(projectData.qTransformData, projectData.audioData);
         } catch (IOException | UnsupportedAudioFileException e) {
-            AlertMessages.showExceptionAlert(
+            Popups.showExceptionAlert(
                     "Error loading audio data.",
                     "An error occurred when loading the audio data. Does the audio file " +
                             "still exist at the original location?",
@@ -893,8 +893,11 @@ public class TranscriptionViewController implements Initializable {
         // Get the current window
         Window window = rootPane.getScene().getWindow();
 
-        // Get user to select a WAV file
-        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("WAV files (*.wav)", "*.wav");
+        // Get user to select an audio file
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                "Audio files (*.wav, *.mp3, *.flac, *.aif, *.aiff)",
+                "*.wav", "*.mp3", "*.flac", "*.aif", "*.aiff"
+        );
         File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
 
         // If a file was selected, stop the audio completely
@@ -907,7 +910,9 @@ public class TranscriptionViewController implements Initializable {
         }
 
         // Create the new project
-        ProjectIOHandlers.newProject(mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController);
+        ProjectIOHandlers.newProject(
+                mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController
+        );
     }
 
     /**
@@ -941,7 +946,9 @@ public class TranscriptionViewController implements Initializable {
         }
 
         // Open the existing project
-        ProjectIOHandlers.openProject(mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController);
+        ProjectIOHandlers.openProject(
+                mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController
+        );
     }
 
     /**
@@ -1623,7 +1630,9 @@ public class TranscriptionViewController implements Initializable {
             File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
 
             // Create the new project
-            ProjectIOHandlers.newProject(mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController);
+            ProjectIOHandlers.newProject(
+                    mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController
+            );
 
         } else if (OPEN_PROJECT_COMBINATION.match(keyEvent)) {  // Open a project
             // Consume the key event
@@ -1639,7 +1648,9 @@ public class TranscriptionViewController implements Initializable {
             File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
 
             // Open the existing project
-            ProjectIOHandlers.openProject(mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController);
+            ProjectIOHandlers.openProject(
+                    mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController
+            );
 
         } else if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {  // Save current project
             handleSavingProject(false);

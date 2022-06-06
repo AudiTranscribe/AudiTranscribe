@@ -2,7 +2,7 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-06-05
+ * Updated on 2022-06-06
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
@@ -13,7 +13,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.stage.*;
+import org.apache.commons.compress.utils.FileNameUtils;
 import org.javatuples.Pair;
+import site.overwrite.auditranscribe.audio.ffmpeg.AudioConverter;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.io.IOMethods;
@@ -60,8 +62,48 @@ public class ProjectIOHandlers {
         // Verify that the user choose a file
         if (file != null) {
             try {
-                // Try and read the file as an audio file
-                Audio audio = new Audio(file);  // Failure to read will throw an exception
+                // Get the extension of the provided file
+                String fileExt = "." + FileNameUtils.getExtension(file.getName()).toLowerCase();
+
+                // Check if the file is supported
+                if (!AudioConverter.EXTENSION_TO_CODEC.containsKey(fileExt)) {
+                    throw new UnsupportedAudioFileException("The file extension is not supported.");
+                }
+
+                // Check if the original file is a WAV file
+                AudioConverter audioConverter = new AudioConverter(settingsFile.data.ffmpegInstallationPath);
+                boolean originalFileIsWAV = false;
+                File axillaryAudioFile;
+
+                if (fileExt.equals(".wav")) {
+                    // Set auxiliary file to the current file
+                    axillaryAudioFile = file;
+
+                    // Update the flag
+                    originalFileIsWAV = true;
+                } else {
+                    // Convert original file to a WAV file
+                    axillaryAudioFile = new File(
+                            audioConverter.convertAudio(
+                                    file,
+                                    file.getAbsolutePath().replace(fileExt, "") + "-converted.wav"
+                            )
+                    );
+                }
+
+                // Try and read the auxiliary file as an audio file
+                Audio audio = new Audio(axillaryAudioFile);  // Failure to read will throw an exception
+
+                // Delete auxiliary file if it is not a WAV file
+                // Todo: implement when we have properly optimised the file saving
+//                if (!originalFileIsWAV) {
+//                    boolean successfullyDeleted = axillaryAudioFile.delete();
+//                    if (successfullyDeleted) {
+//                        System.out.println("Successfully deleted auxiliary audio file.");
+//                    } else {
+//                        System.out.println("Failed to delete auxiliary audio file.");
+//                    }
+//                }
 
                 // Get the current scene and the spectrogram view controller
                 Pair<Scene, TranscriptionViewController> stageSceneAndController = getController(transcriptionStage);
@@ -102,7 +144,7 @@ public class ProjectIOHandlers {
                 }
 
             } catch (UnsupportedAudioFileException | IOException e) {
-                AlertMessages.showExceptionAlert(
+                Popups.showExceptionAlert(
                         "Failed to read '" + file.getName() + "' as a WAV file.",
                         "The program failed to read '" + file.getName() +
                                 "' as a WAV file. Please check if " + "this is a valid WAV file.",
@@ -112,7 +154,7 @@ public class ProjectIOHandlers {
             }
 
         } else {
-            AlertMessages.showInformationAlert("Info", "No file selected.");
+            Popups.showInformationAlert("Info", "No file selected.");
         }
     }
 
@@ -194,7 +236,7 @@ public class ProjectIOHandlers {
                 }
 
             } catch (IOException | IncorrectFileFormatException | FailedToReadDataException e) {
-                AlertMessages.showExceptionAlert(
+                Popups.showExceptionAlert(
                         "Failed to read '" + file.getName() + "' as an AUDT ile.",
                         "The program failed to read '" + file.getName() +
                                 "' as an AUDT file. Please check if " + "this is a valid AUDT file.",
@@ -203,7 +245,7 @@ public class ProjectIOHandlers {
                 e.printStackTrace();
             }
         } else {
-            AlertMessages.showInformationAlert("Info", "No file selected.");
+            Popups.showInformationAlert("Info", "No file selected.");
         }
     }
 
@@ -231,7 +273,7 @@ public class ProjectIOHandlers {
     /**
      * Method that helps show a file dialog for the user to select a file on.
      *
-     * @param window WindowFunction to show the file dialog on.
+     * @param window  WindowFunction to show the file dialog on.
      * @param filters Array of file filters to show in the file dialog.
      * @return A <code>File</code> object, representing the selected file.
      */
