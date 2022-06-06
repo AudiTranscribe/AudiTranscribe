@@ -35,6 +35,8 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 // Main class
 
@@ -42,6 +44,9 @@ import java.util.List;
  * Methods that handle the IO operations for an AudiTranscribe project.
  */
 public class ProjectIOHandlers {
+    // Attributes
+    private static final Logger logger = Logger.getLogger(ProjectIOHandlers.class.getName());
+
     // Public methods
 
     /**
@@ -70,41 +75,37 @@ public class ProjectIOHandlers {
                     throw new UnsupportedAudioFileException("The file extension is not supported.");
                 }
 
+                // Get the base name of the file
+                String baseName = file.getAbsolutePath().replace(fileExt, "");
+
                 // Check if the original file is a WAV file
                 AudioConverter audioConverter = new AudioConverter(settingsFile.data.ffmpegInstallationPath);
-                boolean originalFileIsWAV = false;
-                File axillaryAudioFile;
 
-                if (fileExt.equals(".wav")) {
-                    // Set auxiliary file to the current file
-                    axillaryAudioFile = file;
+                File auxiliaryWAVFile = new File(
+                        audioConverter.convertAudio(file, baseName + "-auxiliary-wav.wav")
+                );
+                File auxiliaryMP3File = new File(
+                        audioConverter.convertAudio(file, baseName + "-auxiliary-mp3.mp3")
+                );
 
-                    // Update the flag
-                    originalFileIsWAV = true;
+                // Try and read the auxiliary files as an `Audio` object
+                // (Failure to read will throw exceptions)
+                Audio audio = new Audio(auxiliaryWAVFile, auxiliaryMP3File, file.getName());
+
+                // Delete auxiliary files if original file is not a WAV file
+                boolean successfullyDeleted = auxiliaryWAVFile.delete();
+                if (successfullyDeleted) {
+                    logger.log(Level.FINE, "Successfully deleted auxiliary WAV file.");
                 } else {
-                    // Convert original file to a WAV file
-                    axillaryAudioFile = new File(
-                            audioConverter.convertAudio(
-                                    file,
-                                    file.getAbsolutePath().replace(fileExt, "") + "-converted.wav"
-                            )
-                    );
+                    logger.log(Level.WARNING, "Failed to delete auxiliary WAV file.");
                 }
 
-                // Try and read the auxiliary file as an audio file
-                // Todo: update to `initAudio`
-                Audio audio = new Audio(axillaryAudioFile, axillaryAudioFile, axillaryAudioFile.getName());  // Failure to read will throw an exception
-
-                // Delete auxiliary file if it is not a WAV file
-                // Todo: implement when we have properly optimised the file saving
-//                if (!originalFileIsWAV) {
-//                    boolean successfullyDeleted = axillaryAudioFile.delete();
-//                    if (successfullyDeleted) {
-//                        System.out.println("Successfully deleted auxiliary audio file.");
-//                    } else {
-//                        System.out.println("Failed to delete auxiliary audio file.");
-//                    }
-//                }
+                successfullyDeleted = auxiliaryMP3File.delete();
+                if (successfullyDeleted) {
+                    logger.log(Level.FINE, "Successfully deleted auxiliary MP3 file.");
+                } else {
+                    logger.log(Level.WARNING, "Failed to delete auxiliary MP3 file.");
+                }
 
                 // Get the current scene and the spectrogram view controller
                 Pair<Scene, TranscriptionViewController> stageSceneAndController = getController(transcriptionStage);

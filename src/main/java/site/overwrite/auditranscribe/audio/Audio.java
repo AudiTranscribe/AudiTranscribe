@@ -21,6 +21,7 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.*;
+import java.nio.file.Files;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -47,13 +48,11 @@ public class Audio {
 
     private int numSamples;
     private double[] audioSamples;
+    private double[] monoAudioSamples;  // Average of stereo samples
 
-    private int numMonoSamples;
-    private double[] monoAudioSamples;
+    private byte[] rawMP3Bytes;
 
     private final MediaPlayer mediaPlayer;
-
-    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     /**
      * Initializes an <code>Audio</code> object based on a file.
@@ -96,13 +95,16 @@ public class Audio {
                 tempMediaPlayer = new MediaPlayer(new Media(mp3File.toURI().toString()));
             } catch (IllegalStateException e) {
                 tempMediaPlayer = null;
+
+                Logger logger = Logger.getLogger(this.getClass().getName());
                 logger.log(Level.SEVERE, "JavaFX Toolkit not initialized. Audio playback will not work.");
             }
 
             mediaPlayer = tempMediaPlayer;
 
-            // Update duration
-            duration = mediaPlayer.getTotalDuration().toSeconds();
+            // Get the raw bytes from the MP3 file
+            rawMP3Bytes = Files.readAllBytes(mp3File.toPath());
+
         } else {
             mediaPlayer = null;
         }
@@ -170,32 +172,16 @@ public class Audio {
         return wavFilePath;
     }
 
-    public AudioInputStream getAudioStream() {
-        return audioStream;
-    }
-
-    public AudioFormat getAudioFormat() {
-        return audioFormat;
-    }
-
     public double getSampleRate() {
         return sampleRate;
     }
 
     public double getDuration() {
+        if (duration == 0) {
+            duration = mediaPlayer.getTotalDuration().toSeconds();
+        }
+
         return duration;
-    }
-
-    public int getNumSamples() {
-        return numSamples;
-    }
-
-    public double[] getSamples() {
-        return audioSamples;
-    }
-
-    public int getNumMonoSamples() {
-        return numMonoSamples;
     }
 
     public double[] getMonoSamples() {
@@ -516,6 +502,7 @@ public class Audio {
             e.printStackTrace();
         } finally {
             // Remove stereo samples if they are there
+            int numMonoSamples;
             if (audioFormat.getChannels() == 2) {  // Stereo
                 // Calculate the number of mono samples there are
                 numMonoSamples = numSamples / 2;

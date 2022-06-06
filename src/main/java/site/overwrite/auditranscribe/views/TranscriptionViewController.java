@@ -133,7 +133,7 @@ public class TranscriptionViewController implements Initializable {
 
     NotePlayer notePlayer;
 
-    private boolean isSpectrogramReady = false;
+    private boolean isEverythingReady = false;
 
     private final Logger logger = Logger.getLogger(this.getClass().getName());
     private ProjectsDB projectsDB;
@@ -295,7 +295,7 @@ public class TranscriptionViewController implements Initializable {
             logger.log(Level.FINE, "Changed music key from " + oldValue + " to " + newValue);
 
             // Update note pane and note labels
-            if (isSpectrogramReady) {
+            if (isEverythingReady) {
                 noteLabels = PlottingStuffHandler.addNoteLabels(
                         notePane, noteLabels, newValue, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER,
                         USE_FANCY_SHARPS_FOR_NOTE_LABELS
@@ -319,7 +319,7 @@ public class TranscriptionViewController implements Initializable {
                     int newBeatsPerBar = TIME_SIGNATURE_TO_BEATS_PER_BAR.get(newValue);
 
                     // Update the beat lines and bar number ellipses, if the spectrogram is ready
-                    if (isSpectrogramReady) {
+                    if (isEverythingReady) {
                         beatLines = PlottingStuffHandler.updateBeatLines(
                                 spectrogramPaneAnchor, beatLines, audioDuration, bpm, bpm, offset, offset, finalHeight,
                                 oldBeatsPerBar, newBeatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
@@ -404,7 +404,7 @@ public class TranscriptionViewController implements Initializable {
 
         // Set spectrogram pane click method
         spectrogramPaneAnchor.setOnMouseClicked(event -> {
-            if (isSpectrogramReady) {
+            if (isEverythingReady) {
                 // Ensure that the click is within the pane
                 double clickX = event.getX();
                 double clickY = event.getY();
@@ -876,7 +876,7 @@ public class TranscriptionViewController implements Initializable {
         double newXPos = seekTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X;
 
         colouredProgressPane.setPrefWidth(newXPos);
-        if (isSpectrogramReady) PlottingStuffHandler.updatePlayheadLine(playheadLine, newXPos);
+        if (isEverythingReady) PlottingStuffHandler.updatePlayheadLine(playheadLine, newXPos);
 
         logger.log(Level.FINE, "Seeked to " + seekTime + " seconds");
     }
@@ -1107,7 +1107,7 @@ public class TranscriptionViewController implements Initializable {
         double oldBPM = forceUpdate ? -1 : bpm;
 
         // These can only be called when the spectrogram is ready to be shown
-        if (isSpectrogramReady) {
+        if (isEverythingReady) {
             // Update the beat lines
             beatLines = PlottingStuffHandler.updateBeatLines(
                     spectrogramPaneAnchor, beatLines, audioDuration, oldBPM, newBPM, offset, offset, finalHeight,
@@ -1150,7 +1150,7 @@ public class TranscriptionViewController implements Initializable {
         double oldOffset = forceUpdate ? OFFSET_RANGE.getValue0() - 1 : offset;  // Make it 1 less than permitted
 
         // These can only be called when the spectrogram is ready to be shown
-        if (isSpectrogramReady) {
+        if (isEverythingReady) {
             // Update the beat lines
             beatLines = PlottingStuffHandler.updateBeatLines(
                     spectrogramPaneAnchor, beatLines, audioDuration, bpm, bpm, oldOffset, newOffset, finalHeight,
@@ -1320,9 +1320,6 @@ public class TranscriptionViewController implements Initializable {
             // Show the spectrogram from the middle
             spectrogramPane.setVvalue(0.5);
 
-            // Hide the progress bar HBox
-            isSpectrogramReady = true;
-
             // Update playhead position
             try {
                 seekToTime(currTime);
@@ -1449,6 +1446,9 @@ public class TranscriptionViewController implements Initializable {
                 for (Node node : disabledNodes) {
                     node.setDisable(false);
                 }
+
+                // Update the `isTranscriptionViewReady` flag
+                isEverythingReady = true;
             }
         });
 
@@ -1581,7 +1581,7 @@ public class TranscriptionViewController implements Initializable {
      */
     private void keyPressEventHandler(KeyEvent keyEvent) {
         // If the spectrogram is not ready do not do anything
-        if (!isSpectrogramReady) return;
+        if (!isEverythingReady) return;
 
         // Get the key event's target
         Node target = (Node) keyEvent.getTarget();
@@ -1724,7 +1724,7 @@ public class TranscriptionViewController implements Initializable {
      */
     private void keyReleasedEventHandler(KeyEvent keyEvent) {
         // If the spectrogram is not ready do not do anything
-        if (!isSpectrogramReady) return;
+        if (!isEverythingReady) return;
 
         // Handle key event
         KeyCode code = keyEvent.getCode();
