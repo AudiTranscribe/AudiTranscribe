@@ -2,7 +2,7 @@
  * FFmpegInstallationPopupsHandler.java
  *
  * Created on 2022-06-04
- * Updated on 2022-06-04
+ * Updated on 2022-06-06
  *
  * Description: View controller for the FFmpeg installation window.
  */
@@ -14,7 +14,7 @@ import javafx.scene.control.ButtonType;
 import net.bramp.ffmpeg.FFmpeg;
 import site.overwrite.auditranscribe.audio.ffmpeg.FFmpegNotFound;
 import site.overwrite.auditranscribe.io.StreamGobbler;
-import site.overwrite.auditranscribe.io.json_files.file_classes.PersistentDataFile;
+import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,11 +27,11 @@ public class FFmpegInstallationPopupsHandler {
     /**
      * Method that shows the FFmpeg installation window.
      *
-     * @param persistentDataFile Persistent data file.
+     * @param settingsFile  The settings file.
      */
-    public static void showFFmpegInstallationView(PersistentDataFile persistentDataFile) {
+    public static void showFFmpegInstallationView(SettingsFile settingsFile) {
         // If FFmpeg has a specified path skip this
-        if (persistentDataFile.data.ffmpegInstallationPath != null) return;
+        if (settingsFile.data.ffmpegInstallationPath != null) return;
 
         // Ask whether FFmpeg has been installed or not
         boolean userSayFFmpegInstalled = false;
@@ -155,9 +155,9 @@ public class FFmpegInstallationPopupsHandler {
             }
         }
 
-        // Sve to persistent data file
-        persistentDataFile.data.ffmpegInstallationPath = ffmpegPath;
-        persistentDataFile.saveFile();
+        // Sve to settings file
+        settingsFile.data.ffmpegInstallationPath = ffmpegPath;
+        settingsFile.saveFile();
 
         // Confirm that FFmpeg has been detected
         Popups.showInformationAlert(

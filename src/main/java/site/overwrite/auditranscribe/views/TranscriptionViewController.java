@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-03
+ * Updated on 2022-06-06
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -30,7 +30,6 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.javatuples.Pair;
 import site.overwrite.auditranscribe.bpm_estimation.BPMEstimator;
-import site.overwrite.auditranscribe.io.json_files.file_classes.PersistentDataFile;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
@@ -129,7 +128,6 @@ public class TranscriptionViewController implements Initializable {
     Stage mainStage;
     MainViewController mainViewController;
     SettingsFile settingsFile;
-    PersistentDataFile persistentDataFile;
     Theme theme;
 
     NotePlayer notePlayer;
@@ -483,10 +481,6 @@ public class TranscriptionViewController implements Initializable {
     // Setter methods
     public void setSettingsFile(SettingsFile settingsFile) {
         this.settingsFile = settingsFile;
-    }
-
-    public void setPersistentDataFile(PersistentDataFile persistentDataFile) {
-        this.persistentDataFile = persistentDataFile;
     }
 
     // Public methods
@@ -892,7 +886,7 @@ public class TranscriptionViewController implements Initializable {
 
         // Create the new project
         ProjectIOHandlers.newProject(
-                mainStage, (Stage) window, file, settingsFile, persistentDataFile, allAudio, mainViewController
+                mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController
         );
     }
 
@@ -928,7 +922,7 @@ public class TranscriptionViewController implements Initializable {
 
         // Open the existing project
         ProjectIOHandlers.openProject(
-                mainStage, (Stage) window, file, settingsFile, persistentDataFile, allAudio, mainViewController
+                mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController
         );
     }
 
@@ -1609,7 +1603,7 @@ public class TranscriptionViewController implements Initializable {
 
             // Create the new project
             ProjectIOHandlers.newProject(
-                    mainStage, (Stage) window, file, settingsFile, persistentDataFile, allAudio, mainViewController
+                    mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController
             );
 
         } else if (OPEN_PROJECT_COMBINATION.match(keyEvent)) {  // Open a project
@@ -1627,7 +1621,7 @@ public class TranscriptionViewController implements Initializable {
 
             // Open the existing project
             ProjectIOHandlers.openProject(
-                    mainStage, (Stage) window, file, settingsFile, persistentDataFile, allAudio, mainViewController
+                    mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController
             );
 
         } else if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {  // Save current project

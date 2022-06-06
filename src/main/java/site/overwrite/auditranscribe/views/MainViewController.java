@@ -2,7 +2,7 @@
  * MainViewController.java
  *
  * Created on 2022-02-09
- * Updated on 2022-06-04
+ * Updated on 2022-06-06
  *
  * Description: Contains the main view's controller class.
  */
@@ -34,7 +34,6 @@ import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.PropertyFile;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.io.json_files.data_encapsulators.SettingsData;
-import site.overwrite.auditranscribe.io.json_files.file_classes.PersistentDataFile;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.utils.MiscUtils;
@@ -64,8 +63,6 @@ public class MainViewController implements Initializable {
     private final List<Audio> allAudio = new ArrayList<>(0);  // List of all opened `Audio` objects
 
     private SettingsFile settingsFile;
-    private PersistentDataFile persistentDataFile;
-
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     // FXML Elements
@@ -151,7 +148,7 @@ public class MainViewController implements Initializable {
 
                 // Open the project with the filepath
                 ProjectIOHandlers.openProject(
-                        (Stage) window, transcriptionStage, file, settingsFile, persistentDataFile, allAudio,
+                        (Stage) window, transcriptionStage, file, settingsFile, allAudio,
                         this
                 );
             }
@@ -176,10 +173,6 @@ public class MainViewController implements Initializable {
 
     public void setSettingsFile(SettingsFile settingsFile) {
         this.settingsFile = settingsFile;
-    }
-
-    public void setPersistentDataFile(PersistentDataFile persistentDataFile) {
-        this.persistentDataFile = persistentDataFile;
     }
 
     // Public methods
@@ -310,7 +303,7 @@ public class MainViewController implements Initializable {
 
         // Create the new project
         ProjectIOHandlers.newProject(
-                (Stage) window, transcriptionStage, file, settingsFile, persistentDataFile, allAudio,
+                (Stage) window, transcriptionStage, file, settingsFile, allAudio,
                 this);
     }
 
@@ -331,7 +324,7 @@ public class MainViewController implements Initializable {
 
         // Open the existing project
         ProjectIOHandlers.openProject(
-                (Stage) window, transcriptionStage, file, settingsFile, persistentDataFile, allAudio,
+                (Stage) window, transcriptionStage, file, settingsFile, allAudio,
                 this
         );
     }

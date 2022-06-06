@@ -2,7 +2,7 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-06-04
+ * Updated on 2022-06-06
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
@@ -16,7 +16,6 @@ import javafx.stage.*;
 import org.apache.commons.compress.utils.FileNameUtils;
 import org.javatuples.Pair;
 import site.overwrite.auditranscribe.audio.ffmpeg.AudioConverter;
-import site.overwrite.auditranscribe.io.json_files.file_classes.PersistentDataFile;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.io.IOMethods;
@@ -53,14 +52,12 @@ public class ProjectIOHandlers {
      * @param file               File to open.
      * @param settingsFile       The <code>SettingsFile</code> object that handles the reading and
      *                           writing of settings.
-     * @param persistentDataFile The <code>PersistentDataFile</code> object that handles the
-     *                           persistent data of the application.
      * @param allAudio           List of all opened <code>Audio</code> objects.
      * @param mainViewController Controller object of the main class.
      */
     public static void newProject(
             Stage mainStage, Stage transcriptionStage, File file, SettingsFile settingsFile,
-            PersistentDataFile persistentDataFile, List<Audio> allAudio, MainViewController mainViewController
+            List<Audio> allAudio, MainViewController mainViewController
     ) {
         // Verify that the user choose a file
         if (file != null) {
@@ -74,7 +71,7 @@ public class ProjectIOHandlers {
                 }
 
                 // Check if the original file is a WAV file
-                AudioConverter audioConverter = new AudioConverter(persistentDataFile.data.ffmpegInstallationPath);
+                AudioConverter audioConverter = new AudioConverter(settingsFile.data.ffmpegInstallationPath);
                 boolean originalFileIsWAV = false;
                 File axillaryAudioFile;
 
@@ -113,9 +110,8 @@ public class ProjectIOHandlers {
                 Scene scene = stageSceneAndController.getValue0();
                 TranscriptionViewController controller = stageSceneAndController.getValue1();
 
-                // Update the `settingsFile` and `persistentDataFile` attributes
+                // Update the `settingsFile` attribute
                 controller.setSettingsFile(settingsFile);
-                controller.setPersistentDataFile(persistentDataFile);
 
                 // Set the theme of the scene
                 controller.setThemeOnScene();
@@ -170,14 +166,12 @@ public class ProjectIOHandlers {
      * @param file               File to open.
      * @param settingsFile       The <code>SettingsFile</code> object that handles the reading and
      *                           writing of settings.
-     * @param persistentDataFile The <code>PersistentDataFile</code> object that handles the
-     *                           persistent data of the application.
      * @param allAudio           List of all opened <code>Audio</code> objects.
      * @param mainViewController Controller object of the main class.
      */
     public static void openProject(
             Stage mainStage, Stage transcriptionStage, File file, SettingsFile settingsFile,
-            PersistentDataFile persistentDataFile, List<Audio> allAudio, MainViewController mainViewController
+            List<Audio> allAudio, MainViewController mainViewController
     ) {
         // Verify that the user choose a file
         if (file != null) {
@@ -200,9 +194,8 @@ public class ProjectIOHandlers {
                 Scene scene = stageSceneAndController.getValue0();
                 TranscriptionViewController controller = stageSceneAndController.getValue1();
 
-                // Update the `settingsFile` and `persistentDataFile` attributes
+                // Update the `settingsFile` attribute
                 controller.setSettingsFile(settingsFile);
-                controller.setPersistentDataFile(persistentDataFile);
 
                 // Set the theme of the scene
                 controller.setThemeOnScene();
