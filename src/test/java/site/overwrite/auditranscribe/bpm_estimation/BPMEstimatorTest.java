@@ -2,7 +2,7 @@
  * BPMEstimatorTest.java
  *
  * Created on 2022-06-02
- * Updated on 2022-06-02
+ * Updated on 2022-06-06
  *
  * Description: Test `BPMEstimator.java`.
  */
@@ -11,6 +11,7 @@ package site.overwrite.auditranscribe.bpm_estimation;
 
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.audio.Audio;
+import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.io.IOMethods;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -25,11 +26,15 @@ class BPMEstimatorTest {
     @Test
     void estimate() throws UnsupportedAudioFileException, IOException {
         // Get the audio files
-        Audio audio1 = new Audio(
-                new File(IOMethods.getAbsoluteFilePath("testing-audio-files/175bpm.wav")), false
+        Audio audio1 = Audio.initAudio(
+                new File(IOMethods.getAbsoluteFilePath("testing-audio-files/175bpm.wav")),
+                "175bpm.wav",
+                AudioProcessingMode.SAMPLES_ONLY
         );
-        Audio audio2 = new Audio(
-                new File(IOMethods.getAbsoluteFilePath("testing-audio-files/137bpmNoisy.wav")), false
+        Audio audio2 = Audio.initAudio(
+                new File(IOMethods.getAbsoluteFilePath("testing-audio-files/137bpmNoisy.wav")),
+                "137bpmNoisy.wav",
+                AudioProcessingMode.SAMPLES_ONLY
         );
 
         // Extract samples and sample rate

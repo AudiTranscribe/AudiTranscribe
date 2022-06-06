@@ -92,7 +92,8 @@ public class ProjectIOHandlers {
                 }
 
                 // Try and read the auxiliary file as an audio file
-                Audio audio = new Audio(axillaryAudioFile);  // Failure to read will throw an exception
+                // Todo: update to `initAudio`
+                Audio audio = new Audio(axillaryAudioFile, axillaryAudioFile, axillaryAudioFile.getName());  // Failure to read will throw an exception
 
                 // Delete auxiliary file if it is not a WAV file
                 // Todo: implement when we have properly optimised the file saving

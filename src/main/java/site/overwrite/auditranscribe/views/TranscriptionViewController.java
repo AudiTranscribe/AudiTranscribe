@@ -353,7 +353,7 @@ public class TranscriptionViewController implements Initializable {
 
             // First stop the audio
             try {
-                audio.stopAudio();
+                audio.stop();
             } catch (InvalidObjectException e) {
                 throw new RuntimeException(e);
             }
@@ -689,7 +689,7 @@ public class TranscriptionViewController implements Initializable {
     public void setAudioAndSpectrogramData(Audio audioObj) {
         // Set attributes
         audio = audioObj;
-        audioFilePath = audioObj.getAudioFilePath();
+        audioFilePath = audioObj.getWavFilePath();
         audioFileName = audioObj.getAudioFileName();
         audioDuration = audio.getDuration();
         sampleRate = audio.getSampleRate();
@@ -761,7 +761,10 @@ public class TranscriptionViewController implements Initializable {
     ) throws UnsupportedAudioFileException, IOException {
         // Set attributes
         audioFilePath = audioData.audioFilePath;
-        audio = new Audio(new File(audioFilePath));
+
+        File audioFile = new File(audioFilePath);
+        audio = new Audio(audioFile, audioFile, audioFile.getName());  // Todo: update to `initAudio`
+
         sampleRate = audioData.sampleRate;
 
         qTransformBytes = qTransformData.qTransformBytes;
@@ -828,7 +831,7 @@ public class TranscriptionViewController implements Initializable {
     public void handleSceneClosing() {
         // Stop the audio playing
         try {
-            audio.stopAudio();
+            audio.stop();
         } catch (InvalidObjectException e) {
             throw new RuntimeException(e);
         }
@@ -903,7 +906,7 @@ public class TranscriptionViewController implements Initializable {
         // If a file was selected, stop the audio completely
         if (file != null) {
             try {
-                audio.stopAudio();
+                audio.stop();
             } catch (InvalidObjectException e) {
                 throw new RuntimeException(e);
             }
@@ -939,7 +942,7 @@ public class TranscriptionViewController implements Initializable {
         // If a file was selected, stop the audio completely
         if (file != null) {
             try {
-                audio.stopAudio();
+                audio.stop();
             } catch (InvalidObjectException e) {
                 throw new RuntimeException(e);
             }
@@ -1069,7 +1072,7 @@ public class TranscriptionViewController implements Initializable {
 
             // Unpause the audio (i.e. play the audio)
             try {
-                audio.playAudio();
+                audio.play();
             } catch (InvalidObjectException e) {
                 throw new RuntimeException(e);
             }
@@ -1082,7 +1085,7 @@ public class TranscriptionViewController implements Initializable {
 
             // Pause the audio
             try {
-                audio.pauseAudio();
+                audio.pause();
             } catch (InvalidObjectException e) {
                 throw new RuntimeException(e);
             }
@@ -1259,8 +1262,8 @@ public class TranscriptionViewController implements Initializable {
 
                         // We need to do this so that the status is set to paused
                         try {
-                            audio.stopAudio();
-                            audio.pauseAudio();
+                            audio.stop();
+                            audio.pause();
                         } catch (InvalidObjectException e) {
                             throw new RuntimeException(e);
                         }

@@ -272,7 +272,7 @@ public class MainViewController implements Initializable {
         // Stop all `Audio` objects
         for (Audio audio: allAudio) {
             try {
-                audio.stopAudio();
+                audio.stop();
                 logger.log(Level.FINE, "Stopped audio: " + audio.getAudioFileName());
             } catch (InvalidObjectException e) {
                 throw new RuntimeException(e);

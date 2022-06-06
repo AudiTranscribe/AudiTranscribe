@@ -2,7 +2,7 @@
  * VQTTest.java
  *
  * Created on 2022-04-10
- * Updated on 2022-05-31
+ * Updated on 2022-06-06
  *
  * Description: Test `VQT.java`.
  */
@@ -11,6 +11,7 @@ package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.audio.Audio;
+import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.misc.Complex;
 import site.overwrite.auditranscribe.io.IOMethods;
@@ -33,8 +34,10 @@ class VQTTest {
         // Run the test
         try {
             // Get the audio file
-            Audio audio = new Audio(
-                    new File(IOMethods.getAbsoluteFilePath("testing-audio-files/Choice.wav")), false
+            Audio audio = Audio.initAudio(
+                    new File(IOMethods.getAbsoluteFilePath("testing-audio-files/Choice.wav")),
+                    "Choice.wav",
+                    AudioProcessingMode.SAMPLES_ONLY
             );
 
             // Extract samples
