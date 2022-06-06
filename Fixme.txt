@@ -2,3 +2,4 @@ Fixme:
     - Issue on Windows: no line matching interface SourceDataLine supporting format PCM_SIGNED 44100.0 Hz, 16 bit,
       stereo, 4 bytes/frame, little-endian is supported.
     - Playhead doesn't move sometimes.
+        - Hard to recreate, but still possible to happen. Need further investigation.

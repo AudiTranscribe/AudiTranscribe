@@ -1287,8 +1287,7 @@ public class TranscriptionViewController implements Initializable {
                         // Specially update the start time to 0
                         // (Because the `seekToTime` method would have set it to the end, which is not what we want)
                         try {
-                            audio.setAudioStartTime(Double.MIN_VALUE);
-//                            currTime = 0;
+                            audio.setAudioStartTime(0);
                         } catch (InvalidObjectException e) {
                             throw new RuntimeException(e);
                         }
