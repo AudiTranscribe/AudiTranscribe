@@ -18,10 +18,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
@@ -51,6 +48,7 @@ import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 import site.overwrite.auditranscribe.plotting.PlottingStuffHandler;
 import site.overwrite.auditranscribe.spectrogram.*;
 import site.overwrite.auditranscribe.utils.*;
+import site.overwrite.auditranscribe.views.helpers.MouseHandler;
 import site.overwrite.auditranscribe.views.helpers.Popups;
 import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
 
@@ -415,8 +413,8 @@ public class TranscriptionViewController implements Initializable {
 
         volumeButton.setOnAction(event -> toggleMuteButton());
 
-        // Set spectrogram pane click method
-        spectrogramPaneAnchor.setOnMouseClicked(event -> {
+        // Set spectrogram pane mouse event handler
+        spectrogramPaneAnchor.addEventHandler(MouseEvent.ANY, new MouseHandler(event -> {}, event -> {
             if (isEverythingReady) {
                 // Ensure that the click is within the pane
                 double clickX = event.getX();
@@ -468,7 +466,7 @@ public class TranscriptionViewController implements Initializable {
                     }
                 }
             }
-        });
+        }));
 
         // Set clickable progress pane method
         clickableProgressPane.setOnMouseClicked(event -> {
