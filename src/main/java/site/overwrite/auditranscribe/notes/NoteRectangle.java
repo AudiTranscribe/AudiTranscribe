@@ -41,8 +41,9 @@ public class NoteRectangle extends StackPane {
     private double initYTrans;  // Initial translation of the note's y-coordinate
     private double initYEvent;  // Initial difference between the mouse's y-coordinate and the note's y-coordinate
 
-    private final Rectangle mainRectangle;  // Base rectangle to be used for the note
     private final Region resizingRegion;    // Region that permits resizing
+
+    private final double rectangleWidth, rectangleHeight;
 
     /**
      * Initialization method for a <code>NoteRectangle</code> object.
@@ -59,67 +60,74 @@ public class NoteRectangle extends StackPane {
 
         // Define the nodes
         this.resizingRegion = new Region();
-        this.mainRectangle = new Rectangle();
+        Rectangle mainRectangle = new Rectangle();  // Base rectangle to be used for the note
 
         // Update properties of the main rectangle
-        this.mainRectangle.widthProperty().bind(this.resizingRegion.prefWidthProperty().subtract(5));
-        this.mainRectangle.heightProperty().bind(this.resizingRegion.prefHeightProperty().subtract(5));
+        mainRectangle.widthProperty().bind(this.resizingRegion.prefWidthProperty().subtract(5));
+        mainRectangle.heightProperty().bind(this.resizingRegion.prefHeightProperty().subtract(5));
 
         // Update the nodes' style classes
         this.resizingRegion.getStyleClass().add("note-resizing-region");
-        this.mainRectangle.getStyleClass().add("note-main-rectangle");
+        mainRectangle.getStyleClass().add("note-main-rectangle");
 
         // Calculate the pixels per second for the spectrogram
         double pixelsPerSecond = spectrogramWidth / totalDuration;
 
         // Calculate the x-coordinate of the note rectangle and the width of the note rectangle
-        double rectWidth = duration * pixelsPerSecond;
+        rectangleWidth = duration * pixelsPerSecond;
         double xCoord = timeToPlaceRect * pixelsPerSecond;
 
         // Calculate y-coordinate and height to place the rectangle
-        double rectHeight = PlottingHelpers.getHeightDifference(spectrogramHeight, minNoteNum, maxNoteNum);
+        rectangleHeight = PlottingHelpers.getHeightDifference(spectrogramHeight, minNoteNum, maxNoteNum);
         double yCoord = PlottingHelpers.noteNumToHeight(noteNum, minNoteNum, maxNoteNum, spectrogramHeight) -
-                rectHeight / 2;
+                rectangleHeight / 2;
 
         // Now set the region's attributes
-        this.resizingRegion.setPrefWidth(rectWidth);
-        this.resizingRegion.setPrefHeight(rectHeight);
+        this.resizingRegion.setPrefWidth(rectangleWidth);
+        this.resizingRegion.setPrefHeight(rectangleHeight);
 
         // Update the stack pane
-        this.getChildren().addAll(this.resizingRegion, this.mainRectangle);
+        this.getChildren().addAll(this.resizingRegion, mainRectangle);
         this.setTranslateX(xCoord);
         this.setTranslateY(yCoord);
 
         // Set cursor handlers on hover
-        this.mainRectangle.hoverProperty().addListener((observable, oldValue, newValue) -> {
+        mainRectangle.hoverProperty().addListener((observable, oldValue, newValue) -> {
             if (canEdit && newValue) this.setCursor(Cursor.OPEN_HAND);
         });
 
         // Set mouse events for the main rectangle
-        EventHandler<ScrollEvent> cancelScroll = Event::consume;
+        EventHandler<ScrollEvent> cancelScroll = Event::consume;  // To handle disabling/enabling of scrolling
 
-        // Todo: disable dragging off the edge of the spectrogram (i.e. exceeding x = 0 and max x as well as y = 0 and max y)
-        this.mainRectangle.setOnMouseDragged(event -> {
+        mainRectangle.setOnMouseDragged(event -> {
             // Check if editing is enabled
             if (canEdit) {
                 // Set cursor
                 this.setCursor(Cursor.CLOSED_HAND);
 
-                // Move the note rectangle horizontally
-                this.setTranslateX(event.getSceneX() - initXDiff);
+                // Move the note rectangle horizontally if it is within range
+                double newX = event.getSceneX() - initXDiff;
+
+                if (newX >= 0 && newX + rectangleWidth <= spectrogramWidth) {
+                    this.setTranslateX(event.getSceneX() - initXDiff);
+                }
 
                 // If the difference in Y coordinates are greater than the height of the note rectangle,
                 // then move the note rectangle vertically
                 double diffY = event.getSceneY() - initYEvent;
-                int numIncrements = (int) (diffY / rectHeight);
-                this.setTranslateY(numIncrements * rectHeight + initYTrans);
+                int numIncrements = (int) (diffY / rectangleHeight);
+                double newY = numIncrements * rectangleHeight + initYTrans;
+
+                if (newY >= 0 && newY + rectangleHeight <= spectrogramHeight) {
+                    this.setTranslateY(newY);
+                }
 
                 // Prevent default scrolling action
                 event.consume();
             }
         });
 
-        this.mainRectangle.setOnMousePressed(event -> {
+        mainRectangle.setOnMousePressed(event -> {
             // Check if editing is enabled
             if (canEdit) {
                 // Set initial values
@@ -136,7 +144,7 @@ public class NoteRectangle extends StackPane {
             }
         });
 
-        this.mainRectangle.setOnMouseReleased(event -> {
+        mainRectangle.setOnMouseReleased(event -> {
             // Remove the scroll cancelling effect
             this.getParent().removeEventHandler(ScrollEvent.ANY, cancelScroll);
 

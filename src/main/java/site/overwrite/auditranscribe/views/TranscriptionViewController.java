@@ -414,7 +414,8 @@ public class TranscriptionViewController implements Initializable {
         volumeButton.setOnAction(event -> toggleMuteButton());
 
         // Set spectrogram pane mouse event handler
-        spectrogramPaneAnchor.addEventHandler(MouseEvent.ANY, new MouseHandler(event -> {}, event -> {
+        spectrogramPaneAnchor.addEventHandler(MouseEvent.ANY, new MouseHandler(event -> {
+        }, event -> {
             if (isEverythingReady) {
                 // Ensure that the click is within the pane
                 double clickX = event.getX();
@@ -440,6 +441,12 @@ public class TranscriptionViewController implements Initializable {
 
                         // Compute the duration of one beat
                         double beatDuration = 60 / bpm;
+
+                        // Ignore any clicks that are too close to the boundary
+                        if (estimatedTime > audioDuration - beatDuration ||
+                                estimatedNoteNum < MIN_NOTE_NUMBER + 1 ||
+                                estimatedNoteNum > MAX_NOTE_NUMBER - 1
+                        ) return;
 
                         // Create a new note rectangle and add it to the note rectangles list
                         NoteRectangle noteRect = new NoteRectangle(estimatedTime, beatDuration, estimatedNoteNum);
