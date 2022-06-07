@@ -24,7 +24,7 @@ public class NoteRectangle extends StackPane {
     private static final double BORDER_WIDTH = 3;  // In pixels
     private static final double EXTEND_REGIONS_WIDTH = 8;  // In pixels
 
-    // Attributes
+    // Static attributes
     public static double spectrogramWidth;
     public static double spectrogramHeight;
     public static int minNoteNum;
@@ -38,6 +38,8 @@ public class NoteRectangle extends StackPane {
 
     public static boolean canEdit = false;
 
+    // Instance attributes
+    public final double timeToPlaceRect;
     private final double duration;
     private final int noteNum;
 
@@ -65,6 +67,7 @@ public class NoteRectangle extends StackPane {
      */
     public NoteRectangle(double timeToPlaceRect, double duration, int noteNum) {
         // Update attributes
+        this.timeToPlaceRect = timeToPlaceRect;
         this.duration = duration;
         this.noteNum = noteNum;
 
