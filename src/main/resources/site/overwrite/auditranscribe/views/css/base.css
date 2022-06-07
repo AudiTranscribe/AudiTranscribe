@@ -132,11 +132,17 @@
 }
 
 .note-rectangle {
-    -fx-border-width: 3px;
+    -fx-border-width: 5px;
     -fx-border-radius: 5px;
     -fx-border-color: #ffa0ffff;
     -fx-background-radius: 5px;
     -fx-background-color: #ff80ffb0;
+}
+
+/* Todo: add styling for main body of note rectangle */
+
+.note-rectangle:hover { /* This is the border */
+    -fx-cursor: e-resize;
 }
 
 .note-label {

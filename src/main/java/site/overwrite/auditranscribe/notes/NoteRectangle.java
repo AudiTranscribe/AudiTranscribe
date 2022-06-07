@@ -34,6 +34,10 @@ public class NoteRectangle extends StackPane {
     private final double duration;
     private final int noteNum;
 
+    private double initXDiff;  // Initial difference between the mouse's x-coordinate and the note's x-coordinate
+    private double initYTrans;  // Initial translation of the note's y-coordinate
+    private double initYEvent;  // Initial difference between the mouse's y-coordinate and the note's y-coordinate
+
     private final Region region;  // Base region to be used for the note
 
     /**
@@ -54,9 +58,9 @@ public class NoteRectangle extends StackPane {
         Label noteLabel = new Label();  // Label to show what note this is
 
         // Make the text label's width and height follow the note rectangle's width and height
-        noteLabel.prefWidthProperty().bind(region.widthProperty().subtract(3));
+        noteLabel.prefWidthProperty().bind(region.widthProperty().subtract(5));
         noteLabel.prefHeightProperty().bind(region.heightProperty());
-        noteLabel.setPadding(new Insets(0, 0, 0, 3));  // 3px left padding
+        noteLabel.setPadding(new Insets(0, 0, 0, 5));  // 5px left padding
 
         // Update the nodes' style classes
         this.region.getStyleClass().add("note-rectangle");
@@ -66,13 +70,13 @@ public class NoteRectangle extends StackPane {
         double pixelsPerSecond = spectrogramWidth / totalDuration;
 
         // Calculate the x-coordinate of the note rectangle and the width of the note rectangle
-        double xCoord = timeToPlaceRect * pixelsPerSecond;
         double rectWidth = duration * pixelsPerSecond;
+        double xCoord = timeToPlaceRect * pixelsPerSecond;
 
         // Calculate y-coordinate and height to place the rectangle
-        double yCoord = PlottingHelpers.noteNumToHeight(noteNum, minNoteNum, maxNoteNum, spectrogramHeight) -
-                PlottingHelpers.getHeightDifference(spectrogramHeight, minNoteNum, maxNoteNum) / 2;
         double rectHeight = PlottingHelpers.getHeightDifference(spectrogramHeight, minNoteNum, maxNoteNum);
+        double yCoord = PlottingHelpers.noteNumToHeight(noteNum, minNoteNum, maxNoteNum, spectrogramHeight) -
+                rectHeight / 2;
 
         // Now set the region's attributes
         this.region.setPrefWidth(rectWidth);
@@ -85,6 +89,33 @@ public class NoteRectangle extends StackPane {
         this.getChildren().addAll(this.region, noteLabel);
         this.setTranslateX(xCoord);
         this.setTranslateY(yCoord);
+
+        // Set mouse events
+        // Todo: disable dragging off the edge of the spectrogram (i.e. exceeding x = 0 and max x as well as y = 0 and max y)
+        this.setOnMouseDragged(event -> {
+            // Move the note rectangle horizontally
+            this.setTranslateX(event.getSceneX() - initXDiff);
+
+            // If the difference in Y coordinates are greater than the height of the note rectangle,
+            // then move the note rectangle vertically
+            double diffY = event.getSceneY() - initYEvent;
+            int numIncrements = (int) (diffY / rectHeight);
+            this.setTranslateY(numIncrements * rectHeight + initYTrans);
+
+            // Prevent default scrolling action
+            event.consume();
+        });
+
+        this.setOnMousePressed(event -> {
+            // Set initial values
+            initXDiff = event.getSceneX() - this.getTranslateX();
+
+            initYTrans = this.getTranslateY();
+            initYEvent = event.getSceneY();
+
+            // Prevent default action
+            event.consume();
+        });
     }
 
     // Setter methods
