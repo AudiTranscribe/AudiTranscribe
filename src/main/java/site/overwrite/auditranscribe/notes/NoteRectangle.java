@@ -19,6 +19,10 @@ import javafx.scene.shape.Rectangle;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 
 public class NoteRectangle extends StackPane {
+    // Constants
+    private static final double BORDER_WIDTH = 3;  // In pixels
+    private static final double EXTEND_REGIONS_WIDTH = 8;  // In pixels
+
     // Attributes
     public static double spectrogramWidth;
     public static double spectrogramHeight;
@@ -41,7 +45,10 @@ public class NoteRectangle extends StackPane {
     private double initYTrans;  // Initial translation of the note's y-coordinate
     private double initYEvent;  // Initial difference between the mouse's y-coordinate and the note's y-coordinate
 
-    private final Region resizingRegion;    // Region that permits resizing
+    private final Region bordersRegion;    // Region for the borders
+    private final Rectangle mainRectangle;  // Base rectangle to be used for the note
+    private final Region resizeLeftRegion;  // Region that permits left-side resizing
+    private final Region resizeRightRegion;  // Region that permits right-side resizing
 
     private final double rectangleWidth, rectangleHeight;
 
@@ -59,15 +66,17 @@ public class NoteRectangle extends StackPane {
         this.noteNum = noteNum;
 
         // Define the nodes
-        this.resizingRegion = new Region();
-        Rectangle mainRectangle = new Rectangle();  // Base rectangle to be used for the note
+        bordersRegion = new Region();
+        mainRectangle = new Rectangle();
+        resizeLeftRegion = new Region();
+        resizeRightRegion = new Region();
 
         // Update properties of the main rectangle
-        mainRectangle.widthProperty().bind(this.resizingRegion.prefWidthProperty().subtract(5));
-        mainRectangle.heightProperty().bind(this.resizingRegion.prefHeightProperty().subtract(5));
+        mainRectangle.widthProperty().bind(bordersRegion.prefWidthProperty().subtract(BORDER_WIDTH));
+        mainRectangle.heightProperty().bind(bordersRegion.prefHeightProperty().subtract(BORDER_WIDTH));
 
         // Update the nodes' style classes
-        this.resizingRegion.getStyleClass().add("note-resizing-region");
+        bordersRegion.getStyleClass().add("note-borders-region");
         mainRectangle.getStyleClass().add("note-main-rectangle");
 
         // Calculate the pixels per second for the spectrogram
@@ -82,18 +91,49 @@ public class NoteRectangle extends StackPane {
         double yCoord = PlottingHelpers.noteNumToHeight(noteNum, minNoteNum, maxNoteNum, spectrogramHeight) -
                 rectangleHeight / 2;
 
-        // Now set the region's attributes
-        this.resizingRegion.setPrefWidth(rectangleWidth);
-        this.resizingRegion.setPrefHeight(rectangleHeight);
+        // Set the borders' region's attributes
+        bordersRegion.setPrefWidth(rectangleWidth);
+        bordersRegion.setPrefHeight(rectangleHeight);
+
+        // Update properties of the resizing regions
+        resizeLeftRegion.setTranslateX(-rectangleWidth / 2);
+        resizeLeftRegion.prefHeightProperty().bind(bordersRegion.prefHeightProperty());
+        resizeLeftRegion.setPrefWidth(EXTEND_REGIONS_WIDTH);
+        resizeLeftRegion.setMaxWidth(EXTEND_REGIONS_WIDTH);
+
+        resizeRightRegion.setTranslateX(rectangleWidth / 2);
+        resizeRightRegion.prefHeightProperty().bind(bordersRegion.prefHeightProperty());
+        resizeRightRegion.setPrefWidth(EXTEND_REGIONS_WIDTH);
+        resizeRightRegion.setMaxWidth(EXTEND_REGIONS_WIDTH);
 
         // Update the stack pane
-        this.getChildren().addAll(this.resizingRegion, mainRectangle);
+        this.getChildren().addAll(bordersRegion, mainRectangle, resizeLeftRegion, resizeRightRegion);
         this.setTranslateX(xCoord);
         this.setTranslateY(yCoord);
 
         // Set cursor handlers on hover
         mainRectangle.hoverProperty().addListener((observable, oldValue, newValue) -> {
-            if (canEdit && newValue) this.setCursor(Cursor.OPEN_HAND);
+            if (canEdit && newValue) {
+                this.setCursor(Cursor.OPEN_HAND);
+            } else {
+                this.setCursor(Cursor.DEFAULT);
+            }
+        });
+
+        resizeLeftRegion.hoverProperty().addListener((observable, oldValue, newValue) -> {
+            if (canEdit && newValue) {
+                this.setCursor(Cursor.W_RESIZE);
+            } else {
+                this.setCursor(Cursor.DEFAULT);
+            }
+        });
+
+        resizeRightRegion.hoverProperty().addListener((observable, oldValue, newValue) -> {
+            if (canEdit && newValue) {
+                this.setCursor(Cursor.E_RESIZE);
+            } else {
+                this.setCursor(Cursor.DEFAULT);
+            }
         });
 
         // Set mouse events for the main rectangle
@@ -197,37 +237,39 @@ public class NoteRectangle extends StackPane {
     // Public methods
 
     /**
-     * Lengthen the note rectangle from the left (i.e. right-most side's position is unchanged).
+     * Change the note rectangle's width from the left (i.e. right-most side's position is
+     * unchanged).
      *
      * @param durationOfNote The duration (in seconds) of the note.
      */
-    public void extendWidthFromLeft(double durationOfNote) {
+    public void changeWidthFromLeft(double durationOfNote) {
         // Calculate the pixels per second for the spectrogram, if not set already
         if (Double.isNaN(pixelsPerSecond)) pixelsPerSecond = spectrogramWidth / totalDuration;
 
         // Simultaneously update the x-coordinate and width of rectangle
         double xCoord = this.getTranslateX() - durationOfNote * pixelsPerSecond;
-        double rectWidth = resizingRegion.getWidth() + durationOfNote * pixelsPerSecond;
+        double rectWidth = bordersRegion.getWidth() + durationOfNote * pixelsPerSecond;
 
         // Update the rectangle's attributes
-        this.setTranslateX(xCoord);
-        this.resizingRegion.setPrefWidth(rectWidth);
+        setTranslateX(xCoord);
+        bordersRegion.setPrefWidth(rectWidth);
     }
 
     /**
-     * Shorten the note rectangle from the right (i.e. left-most side's position is unchanged).
+     * Change the note rectangle's width from the right (i.e. left-most side's position is
+     * unchanged).
      *
      * @param durationOfNote The duration (in seconds) of the note.
      */
-    public void extendWidthFromRight(double durationOfNote) {
+    public void changeWidthFromRight(double durationOfNote) {
         // Calculate the pixels per second for the spectrogram, if not set already
         if (Double.isNaN(pixelsPerSecond)) pixelsPerSecond = spectrogramWidth / totalDuration;
 
         // Update width of rectangle
-        double rectWidth = resizingRegion.getWidth() + durationOfNote * pixelsPerSecond;
+        double rectWidth = bordersRegion.getWidth() + durationOfNote * pixelsPerSecond;
 
         // Update the rectangle's attributes
-        this.resizingRegion.setPrefWidth(rectWidth);
+        bordersRegion.setPrefWidth(rectWidth);
     }
 
     /**
@@ -235,7 +277,7 @@ public class NoteRectangle extends StackPane {
      */
     public void playNote() {
         notePlayer.playNoteForDuration(
-                this.noteNum, onVelocity, offVelocity, (long) duration * 1000,
+                noteNum, onVelocity, offVelocity, (long) duration * 1000,
                 (long) offDuration * 1000
         );
     }

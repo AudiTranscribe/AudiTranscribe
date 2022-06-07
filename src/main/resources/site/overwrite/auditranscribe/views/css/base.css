@@ -131,14 +131,10 @@
     -fx-background-color: #00000000;
 }
 
-.note-resizing-region {
-    -fx-border-width: 5px;
+.note-borders-region {
+    -fx-border-width: 3px;
     -fx-border-radius: 5px;
     -fx-border-color: #ffa0ffff;
-}
-
-.note-resizing-region:hover {
-    -fx-cursor: e-resize;
 }
 
 .note-main-rectangle {
