@@ -468,9 +468,6 @@ public class TranscriptionViewController implements Initializable {
             }
         }));
 
-        // Disable scrolling by scroll-wheel
-        spectrogramPaneAnchor.addEventHandler(ScrollEvent.ANY, Event::consume);
-
         // Set clickable progress pane method
         clickableProgressPane.setOnMouseClicked(event -> {
             // Ensure that the click is within the pane

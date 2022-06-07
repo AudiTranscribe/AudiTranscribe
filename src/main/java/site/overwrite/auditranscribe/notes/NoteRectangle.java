@@ -9,12 +9,13 @@
 
 package site.overwrite.auditranscribe.notes;
 
-import javafx.geometry.Insets;
-import javafx.scene.control.Label;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Rectangle;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
-import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 public class NoteRectangle extends StackPane {
     // Attributes
@@ -38,7 +39,8 @@ public class NoteRectangle extends StackPane {
     private double initYTrans;  // Initial translation of the note's y-coordinate
     private double initYEvent;  // Initial difference between the mouse's y-coordinate and the note's y-coordinate
 
-    private final Region region;  // Base region to be used for the note
+    private final Rectangle mainRectangle;  // Base rectangle to be used for the note
+    private final Region resizingRegion;    // Region that permits resizing
 
     /**
      * Initialization method for a <code>NoteRectangle</code> object.
@@ -54,17 +56,16 @@ public class NoteRectangle extends StackPane {
         this.noteNum = noteNum;
 
         // Define the nodes
-        this.region = new Region();  // Region to show where the note rectangle is
-        Label noteLabel = new Label();  // Label to show what note this is
+        this.resizingRegion = new Region();
+        this.mainRectangle = new Rectangle();
 
-        // Make the text label's width and height follow the note rectangle's width and height
-        noteLabel.prefWidthProperty().bind(region.widthProperty().subtract(5));
-        noteLabel.prefHeightProperty().bind(region.heightProperty());
-        noteLabel.setPadding(new Insets(0, 0, 0, 5));  // 5px left padding
+        // Update properties of the main rectangle
+        this.mainRectangle.widthProperty().bind(this.resizingRegion.prefWidthProperty().subtract(5));
+        this.mainRectangle.heightProperty().bind(this.resizingRegion.prefHeightProperty().subtract(5));
 
         // Update the nodes' style classes
-        this.region.getStyleClass().add("note-rectangle");
-        noteLabel.getStyleClass().add("note-label");
+        this.resizingRegion.getStyleClass().add("note-resizing-region");
+        this.mainRectangle.getStyleClass().add("note-main-rectangle");
 
         // Calculate the pixels per second for the spectrogram
         double pixelsPerSecond = spectrogramWidth / totalDuration;
@@ -79,20 +80,19 @@ public class NoteRectangle extends StackPane {
                 rectHeight / 2;
 
         // Now set the region's attributes
-        this.region.setPrefWidth(rectWidth);
-        this.region.setPrefHeight(rectHeight);
-
-        // Update the duration label
-        noteLabel.setText(UnitConversionUtils.noteNumberToNote(noteNum, true));
+        this.resizingRegion.setPrefWidth(rectWidth);
+        this.resizingRegion.setPrefHeight(rectHeight);
 
         // Update the stack pane
-        this.getChildren().addAll(this.region, noteLabel);
+        this.getChildren().addAll(this.resizingRegion, this.mainRectangle);
         this.setTranslateX(xCoord);
         this.setTranslateY(yCoord);
 
-        // Set mouse events
+        // Set mouse events for the main rectangle
+        EventHandler<ScrollEvent> cancelScroll = Event::consume;
+
         // Todo: disable dragging off the edge of the spectrogram (i.e. exceeding x = 0 and max x as well as y = 0 and max y)
-        this.setOnMouseDragged(event -> {
+        this.mainRectangle.setOnMouseDragged(event -> {
             // Move the note rectangle horizontally
             this.setTranslateX(event.getSceneX() - initXDiff);
 
@@ -106,16 +106,21 @@ public class NoteRectangle extends StackPane {
             event.consume();
         });
 
-        this.setOnMousePressed(event -> {
+        this.mainRectangle.setOnMousePressed(event -> {
             // Set initial values
             initXDiff = event.getSceneX() - this.getTranslateX();
 
             initYTrans = this.getTranslateY();
             initYEvent = event.getSceneY();
 
+            // Disable scrolling
+            this.getParent().addEventHandler(ScrollEvent.ANY, cancelScroll);
+
             // Prevent default action
             event.consume();
         });
+
+        this.mainRectangle.setOnMouseReleased(event -> this.getParent().removeEventHandler(ScrollEvent.ANY, cancelScroll));
     }
 
     // Setter methods
@@ -168,11 +173,11 @@ public class NoteRectangle extends StackPane {
 
         // Simultaneously update the x-coordinate and width of rectangle
         double xCoord = this.getTranslateX() - durationOfNote * pixelsPerSecond;
-        double rectWidth = region.getWidth() + durationOfNote * pixelsPerSecond;
+        double rectWidth = resizingRegion.getWidth() + durationOfNote * pixelsPerSecond;
 
         // Update the rectangle's attributes
         this.setTranslateX(xCoord);
-        this.region.setPrefWidth(rectWidth);
+        this.resizingRegion.setPrefWidth(rectWidth);
     }
 
     /**
@@ -185,10 +190,10 @@ public class NoteRectangle extends StackPane {
         if (Double.isNaN(pixelsPerSecond)) pixelsPerSecond = spectrogramWidth / totalDuration;
 
         // Update width of rectangle
-        double rectWidth = region.getWidth() + durationOfNote * pixelsPerSecond;
+        double rectWidth = resizingRegion.getWidth() + durationOfNote * pixelsPerSecond;
 
         // Update the rectangle's attributes
-        this.region.setPrefWidth(rectWidth);
+        this.resizingRegion.setPrefWidth(rectWidth);
     }
 
     /**

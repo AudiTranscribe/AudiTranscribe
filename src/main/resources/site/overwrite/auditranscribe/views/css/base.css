@@ -131,20 +131,25 @@
     -fx-background-color: #00000000;
 }
 
-.note-rectangle {
+.note-resizing-region {
     -fx-border-width: 5px;
     -fx-border-radius: 5px;
     -fx-border-color: #ffa0ffff;
-    -fx-background-radius: 5px;
-    -fx-background-color: #ff80ffb0;
 }
 
-/* Todo: add styling for main body of note rectangle */
-
-.note-rectangle:hover { /* This is the border */
+.note-resizing-region:hover {
     -fx-cursor: e-resize;
 }
 
-.note-label {
-    -fx-fill: #444444ff !important;
+.note-main-rectangle {
+    -fx-border-radius: 5px;
+    -fx-fill: #ff80ffb0;
+}
+
+.note-main-rectangle:hover {
+    -fx-cursor: open-hand;
+}
+
+.note-main-rectangle:pressed {
+    -fx-cursor: closed-hand;
 }
