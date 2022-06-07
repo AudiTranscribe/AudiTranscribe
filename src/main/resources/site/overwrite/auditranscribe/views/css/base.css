@@ -145,11 +145,3 @@
     -fx-border-radius: 5px;
     -fx-fill: #ff80ffb0;
 }
-
-.note-main-rectangle:hover {
-    -fx-cursor: open-hand;
-}
-
-.note-main-rectangle:pressed {
-    -fx-cursor: closed-hand;
-}

@@ -131,7 +131,6 @@
                                   <AnchorPane fx:id="spectrogramPaneAnchor" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0">
                                        <children>
                                           <ImageView fx:id="spectrogramImage" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                                          <Pane fx:id="noteRectanglesPane" prefHeight="0.0" prefWidth="0.0" styleClass="note-rectangles-pane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                        </children>
                                     </AnchorPane>
                                 </content>
@@ -238,9 +237,9 @@
                                           </ImageView>
                                        </graphic>
                                     </Button>
-                                    <Button fx:id="placeNotesButton" contentDisplay="CENTER" disable="true" layoutX="10.0" layoutY="23.0" mnemonicParsing="false" styleClass="image-button">
+                                    <Button fx:id="editNotesButton" contentDisplay="CENTER" disable="true" layoutX="10.0" layoutY="23.0" mnemonicParsing="false" styleClass="image-button">
                                        <graphic>
-                                          <ImageView fx:id="placeNotesButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                                          <ImageView fx:id="editNotesButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
                                                 <Image url="@../../images/icons/PNGs/light-mode/musical-notes-outline.png" />
                                              </image>

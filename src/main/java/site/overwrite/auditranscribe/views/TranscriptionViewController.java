@@ -128,7 +128,7 @@ public class TranscriptionViewController implements Initializable {
     private double audioDuration = 0;  // Will be updated upon scene initialization
     private double currTime = 0;
 
-    private List<NoteRectangle> noteRectangles = new ArrayList<>();
+    private final List<NoteRectangle> noteRectangles = new ArrayList<>();
 
     // Other attributes
     Stage mainStage;
@@ -161,7 +161,7 @@ public class TranscriptionViewController implements Initializable {
     private boolean isMuted = false;
 
     private boolean scrollToPlayhead = false;
-    private boolean placeNotes = false;
+    private boolean canEditNotes = false;
 
     private double finalWidth;
     private double finalHeight;
@@ -221,7 +221,7 @@ public class TranscriptionViewController implements Initializable {
     private AnchorPane leftPaneAnchor, spectrogramPaneAnchor, bottomPaneAnchor;
 
     @FXML
-    private Pane notePane, barNumberPane, noteRectanglesPane, clickableProgressPane, colouredProgressPane;
+    private Pane notePane, barNumberPane, clickableProgressPane, colouredProgressPane;
 
     @FXML
     private ImageView spectrogramImage;
@@ -233,12 +233,12 @@ public class TranscriptionViewController implements Initializable {
     private Label currTimeLabel, totalTimeLabel;
 
     @FXML
-    private Button playButton, stopButton, playSkipBackButton, playSkipForwardButton, scrollButton, placeNotesButton,
+    private Button playButton, stopButton, playSkipBackButton, playSkipForwardButton, scrollButton, editNotesButton,
             volumeButton;
 
     @FXML
     private ImageView playButtonImage, stopButtonImage, playSkipBackButtonImage, playSkipForwardButtonImage,
-            placeNotesButtonImage, scrollButtonImage, volumeButtonImage;
+            editNotesButtonImage, scrollButtonImage, volumeButtonImage;
 
     @FXML
     private Slider volumeSlider;
@@ -409,7 +409,7 @@ public class TranscriptionViewController implements Initializable {
 
         scrollButton.setOnAction(event -> toggleScrollButton());
 
-        placeNotesButton.setOnAction(event -> togglePlaceNotesButton());
+        editNotesButton.setOnAction(event -> toggleEditNotesButton());
 
         volumeButton.setOnAction(event -> toggleMuteButton());
 
@@ -434,7 +434,7 @@ public class TranscriptionViewController implements Initializable {
                     // Now estimate the note number
                     int estimatedNoteNum = (int) Math.round(UnitConversionUtils.freqToNoteNumber(estimatedFreq));
 
-                    if (placeNotes) {
+                    if (canEditNotes) {
                         // Compute the time that the mouse click would correspond to
                         double estimatedTime = clickX / finalWidth * audioDuration;
 
@@ -446,7 +446,7 @@ public class TranscriptionViewController implements Initializable {
                         noteRectangles.add(noteRect);
 
                         // Add the note rectangle to the spectrogram pane
-                        noteRectanglesPane.getChildren().add(noteRect);
+                        spectrogramPaneAnchor.getChildren().add(noteRect);
                         logger.log(Level.FINE,
                                 "Placed note " + estimatedNoteNum + " at " + estimatedTime + " seconds"
                         );
@@ -558,7 +558,7 @@ public class TranscriptionViewController implements Initializable {
         scrollButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
                 "images/icons/PNGs/" + theme.shortName + "/footsteps-outline.png"
         )));
-        placeNotesButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+        editNotesButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
                 "images/icons/PNGs/" + theme.shortName + "/musical-notes-outline.png"
         )));
         volumeButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
@@ -1268,9 +1268,6 @@ public class TranscriptionViewController implements Initializable {
             spectrogramPaneAnchor.setPrefWidth(finalWidth);
             spectrogramPaneAnchor.setPrefHeight(finalHeight);
 
-            noteRectanglesPane.setPrefWidth(finalWidth);
-            noteRectanglesPane.setPrefHeight(finalHeight);
-
             bottomPane.setFitToHeight(true);
             bottomPaneAnchor.setPrefWidth(finalWidth);
 
@@ -1513,7 +1510,7 @@ public class TranscriptionViewController implements Initializable {
 
                         // Bottom Hbox
                         playButton, stopButton, playSkipBackButton, playSkipForwardButton,
-                        scrollButton, placeNotesButton,
+                        scrollButton, editNotesButton,
                         volumeButton, volumeSlider
                 };
 
@@ -1608,29 +1605,31 @@ public class TranscriptionViewController implements Initializable {
     }
 
     /**
-     * Helper method that toggles the place notes button.
+     * Helper method that toggles the edit notes button.
      */
-    private void togglePlaceNotesButton() {
-        if (placeNotes) {
-            // Change the icon of the place notes button from filled to non-filled
-            placeNotesButtonImage.setImage(
+    private void toggleEditNotesButton() {
+        if (canEditNotes) {
+            // Change the icon of the edit notes button from filled to non-filled
+            editNotesButtonImage.setImage(
                     new Image(IOMethods.getFileURLAsString(
                             "images/icons/PNGs/" + theme.shortName + "/musical-notes-outline.png"
                     ))
             );
+
         } else {
-            // Change the icon of the place notes button from non-filled to filled
-            placeNotesButtonImage.setImage(
+            // Change the icon of the edit notes button from non-filled to filled
+            editNotesButtonImage.setImage(
                     new Image(IOMethods.getFileURLAsString(
                             "images/icons/PNGs/" + theme.shortName + "/musical-notes.png"
                     ))
             );
         }
 
-        // Toggle the `placeNotes` flag
-        placeNotes = !placeNotes;
+        // Toggle the `canEditNotes` flag
+        canEditNotes = !canEditNotes;
+        NoteRectangle.setCanEdit(canEditNotes);
 
-        logger.log(Level.FINE, "Toggled place notes (place notes is now " + placeNotes + ")");
+        logger.log(Level.FINE, "Toggled editing notes (editing notes is now " + canEditNotes + ")");
     }
 
     /**
@@ -1731,9 +1730,9 @@ public class TranscriptionViewController implements Initializable {
             keyEvent.consume();
             toggleScrollButton();
 
-        } else if (code == KeyCode.N) {  // N key is to toggle placement of notes
+        } else if (code == KeyCode.N) {  // N key is to toggle editing of notes
             keyEvent.consume();
-            togglePlaceNotesButton();
+            toggleEditNotesButton();
 
         } else if (NEW_PROJECT_COMBINATION.match(keyEvent)) {  // Create a new project
             // Consume the key event

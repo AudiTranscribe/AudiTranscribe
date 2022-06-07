@@ -11,6 +11,7 @@ package site.overwrite.auditranscribe.notes;
 
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.scene.Cursor;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -31,6 +32,7 @@ public class NoteRectangle extends StackPane {
     public static double offDuration;  // In seconds
 
     public static double pixelsPerSecond = Double.NaN;
+    public static boolean canEdit = false;
 
     private final double duration;
     private final int noteNum;
@@ -88,39 +90,59 @@ public class NoteRectangle extends StackPane {
         this.setTranslateX(xCoord);
         this.setTranslateY(yCoord);
 
+        // Set cursor handlers on hover
+        this.mainRectangle.hoverProperty().addListener((observable, oldValue, newValue) -> {
+            if (canEdit && newValue) this.setCursor(Cursor.OPEN_HAND);
+        });
+
         // Set mouse events for the main rectangle
         EventHandler<ScrollEvent> cancelScroll = Event::consume;
 
         // Todo: disable dragging off the edge of the spectrogram (i.e. exceeding x = 0 and max x as well as y = 0 and max y)
         this.mainRectangle.setOnMouseDragged(event -> {
-            // Move the note rectangle horizontally
-            this.setTranslateX(event.getSceneX() - initXDiff);
+            // Check if editing is enabled
+            if (canEdit) {
+                // Set cursor
+                this.setCursor(Cursor.CLOSED_HAND);
 
-            // If the difference in Y coordinates are greater than the height of the note rectangle,
-            // then move the note rectangle vertically
-            double diffY = event.getSceneY() - initYEvent;
-            int numIncrements = (int) (diffY / rectHeight);
-            this.setTranslateY(numIncrements * rectHeight + initYTrans);
+                // Move the note rectangle horizontally
+                this.setTranslateX(event.getSceneX() - initXDiff);
 
-            // Prevent default scrolling action
-            event.consume();
+                // If the difference in Y coordinates are greater than the height of the note rectangle,
+                // then move the note rectangle vertically
+                double diffY = event.getSceneY() - initYEvent;
+                int numIncrements = (int) (diffY / rectHeight);
+                this.setTranslateY(numIncrements * rectHeight + initYTrans);
+
+                // Prevent default scrolling action
+                event.consume();
+            }
         });
 
         this.mainRectangle.setOnMousePressed(event -> {
-            // Set initial values
-            initXDiff = event.getSceneX() - this.getTranslateX();
+            // Check if editing is enabled
+            if (canEdit) {
+                // Set initial values
+                initXDiff = event.getSceneX() - this.getTranslateX();
 
-            initYTrans = this.getTranslateY();
-            initYEvent = event.getSceneY();
+                initYTrans = this.getTranslateY();
+                initYEvent = event.getSceneY();
 
-            // Disable scrolling
-            this.getParent().addEventHandler(ScrollEvent.ANY, cancelScroll);
+                // Disable scrolling
+                this.getParent().addEventHandler(ScrollEvent.ANY, cancelScroll);
 
-            // Prevent default action
-            event.consume();
+                // Prevent default action
+                event.consume();
+            }
         });
 
-        this.mainRectangle.setOnMouseReleased(event -> this.getParent().removeEventHandler(ScrollEvent.ANY, cancelScroll));
+        this.mainRectangle.setOnMouseReleased(event -> {
+            // Remove the scroll cancelling effect
+            this.getParent().removeEventHandler(ScrollEvent.ANY, cancelScroll);
+
+            // Revert cursor
+            if (canEdit) this.setCursor(Cursor.OPEN_HAND);
+        });
     }
 
     // Setter methods
@@ -158,6 +180,10 @@ public class NoteRectangle extends StackPane {
 
     public static void setOffDuration(double offDuration) {
         NoteRectangle.offDuration = offDuration;
+    }
+
+    public static void setCanEdit(boolean canEdit) {
+        NoteRectangle.canEdit = canEdit;
     }
 
     // Public methods
