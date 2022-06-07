@@ -125,3 +125,20 @@
 .volume-slider .track {
     -fx-background-color: linear-gradient(to right, -slider-filled-colour 50%, -slider-unfilled-colour 50%);
 }
+
+/* Note rectangles */
+.note-rectangles-pane {
+    -fx-background-color: #00000000;
+}
+
+.note-rectangle {
+    -fx-border-width: 3px;
+    -fx-border-radius: 5px;
+    -fx-border-color: #ffa0ffff;
+    -fx-background-radius: 5px;
+    -fx-background-color: #ff80ffb0;
+}
+
+.note-label {
+    -fx-fill: #444444ff !important;
+}

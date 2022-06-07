@@ -63,15 +63,6 @@
     -slider-filled-colour: #6caad9ff;
 }
 
-/* Note rectangles */
-.note-rectangle {
-    -fx-background-color: #ff80ff80;
-}
-
-.note-duration-label {
-    -fx-text-fill: #000000ff;
-}
-
 /* PREFERENCES PAGE */
 /* Labels */
 .warning-label {

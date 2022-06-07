@@ -46,6 +46,7 @@ import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObje
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.ProjectDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
+import site.overwrite.auditranscribe.notes.NoteRectangle;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 import site.overwrite.auditranscribe.plotting.PlottingStuffHandler;
 import site.overwrite.auditranscribe.spectrogram.*;
@@ -128,6 +129,8 @@ public class TranscriptionViewController implements Initializable {
     private double volume = 0.5;
     private double audioDuration = 0;  // Will be updated upon scene initialization
     private double currTime = 0;
+
+    private List<NoteRectangle> noteRectangles = new ArrayList<>();
 
     // Other attributes
     Stage mainStage;
@@ -220,7 +223,7 @@ public class TranscriptionViewController implements Initializable {
     private AnchorPane leftPaneAnchor, spectrogramPaneAnchor, bottomPaneAnchor;
 
     @FXML
-    private Pane notePane, barNumberPane, clickableProgressPane, colouredProgressPane;
+    private Pane notePane, barNumberPane, noteRectanglesPane, clickableProgressPane, colouredProgressPane;
 
     @FXML
     private ImageView spectrogramImage;
@@ -414,7 +417,7 @@ public class TranscriptionViewController implements Initializable {
 
         // Set spectrogram pane click method
         spectrogramPaneAnchor.setOnMouseClicked(event -> {
-            if (isEverythingReady && !placeNotes) {  // Not in note placing mode
+            if (isEverythingReady) {
                 // Ensure that the click is within the pane
                 double clickX = event.getX();
                 double clickY = event.getY();
@@ -433,16 +436,35 @@ public class TranscriptionViewController implements Initializable {
                     // Now estimate the note number
                     int estimatedNoteNum = (int) Math.round(UnitConversionUtils.freqToNoteNumber(estimatedFreq));
 
-                    // Play the note
-                    try {
-                        logger.log(Level.FINE, "Playing " + UnitConversionUtils.noteNumberToNote(
-                                estimatedNoteNum, false
-                        ));
-                        notePlayer.playNoteForDuration(
-                                estimatedNoteNum, NOTE_PLAYING_ON_VELOCITY, NOTE_PLAYING_OFF_VELOCITY,
-                                NOTE_PLAYING_ON_DURATION, NOTE_PLAYING_OFF_DURATION
+                    if (placeNotes) {
+                        // Compute the time that the mouse click would correspond to
+                        double estimatedTime = clickX / finalWidth * audioDuration;
+
+                        // Compute the duration of one beat
+                        double beatDuration = 60 / bpm;
+
+                        // Create a new note rectangle and add it to the note rectangles list
+                        NoteRectangle noteRect = new NoteRectangle(estimatedTime, beatDuration, estimatedNoteNum);
+                        noteRectangles.add(noteRect);
+
+                        // Add the note rectangle to the spectrogram pane
+                        noteRectanglesPane.getChildren().add(noteRect);
+                        logger.log(Level.FINE,
+                                "Placed note " + estimatedNoteNum + " at " + estimatedTime + " seconds"
                         );
-                    } catch (InvalidParameterException ignored) {
+
+                    } else {
+                        // Play the note
+                        try {
+                            logger.log(Level.FINE, "Playing " + UnitConversionUtils.noteNumberToNote(
+                                    estimatedNoteNum, false
+                            ));
+                            notePlayer.playNoteForDuration(
+                                    estimatedNoteNum, NOTE_PLAYING_ON_VELOCITY, NOTE_PLAYING_OFF_VELOCITY,
+                                    NOTE_PLAYING_ON_DURATION, NOTE_PLAYING_OFF_DURATION
+                            );
+                        } catch (InvalidParameterException ignored) {
+                        }
                     }
                 }
             }
@@ -1248,6 +1270,9 @@ public class TranscriptionViewController implements Initializable {
             spectrogramPaneAnchor.setPrefWidth(finalWidth);
             spectrogramPaneAnchor.setPrefHeight(finalHeight);
 
+            noteRectanglesPane.setPrefWidth(finalWidth);
+            noteRectanglesPane.setPrefHeight(finalHeight);
+
             bottomPane.setFitToHeight(true);
             bottomPaneAnchor.setPrefWidth(finalWidth);
 
@@ -1353,6 +1378,17 @@ public class TranscriptionViewController implements Initializable {
             // Resize spectrogram pane
             spectrogramPane.setPrefWidth(finalWidth);
             spectrogramPane.setPrefHeight(finalHeight);
+
+            // Set `NoteRectangle` static attributes
+            NoteRectangle.setSpectrogramWidth(finalWidth);
+            NoteRectangle.setSpectrogramHeight(finalHeight);
+            NoteRectangle.setMinNoteNum(MIN_NOTE_NUMBER);
+            NoteRectangle.setMaxNoteNum(MAX_NOTE_NUMBER);
+            NoteRectangle.setTotalDuration(audioDuration);
+            NoteRectangle.setNotePlayer(notePlayer);
+            NoteRectangle.setOnVelocity(NOTE_PLAYING_ON_VELOCITY);
+            NoteRectangle.setOffVelocity(NOTE_PLAYING_OFF_VELOCITY);
+            NoteRectangle.setOffDuration(NOTE_PLAYING_OFF_DURATION);
 
             // Settle layout of the main pane
             mainPane.layout();

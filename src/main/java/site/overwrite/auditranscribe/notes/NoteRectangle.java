@@ -9,29 +9,32 @@
 
 package site.overwrite.auditranscribe.notes;
 
+import javafx.geometry.Insets;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import javafx.scene.shape.Rectangle;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
-import site.overwrite.auditranscribe.utils.MathUtils;
+import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 public class NoteRectangle extends StackPane {
     // Attributes
-    private static double spectrogramWidth;
-    private static double spectrogramHeight;
-    private static int minNoteNum;
-    private static int maxNoteNum;
-    private static double totalDuration;
+    public static double spectrogramWidth;
+    public static double spectrogramHeight;
+    public static int minNoteNum;
+    public static int maxNoteNum;
+    public static double totalDuration;
 
-    private static NotePlayer notePlayer;
-    private static int onVelocity;
-    private static int offVelocity;
-    private static double offDuration;  // In seconds
+    public static NotePlayer notePlayer;
+    public static int onVelocity;
+    public static int offVelocity;
+    public static double offDuration;  // In seconds
+
+    public static double pixelsPerSecond = Double.NaN;
 
     private final double duration;
     private final int noteNum;
 
-    private final Rectangle rectangle;  // Base rectangle to be used for the note
+    private final Region region;  // Base region to be used for the note
 
     /**
      * Initialization method for a <code>NoteRectangle</code> object.
@@ -47,17 +50,17 @@ public class NoteRectangle extends StackPane {
         this.noteNum = noteNum;
 
         // Define the nodes
-        this.rectangle = new Rectangle();
-        // Label to show how long this note will play for, in seconds
-        Label durationLabel = new Label();
+        this.region = new Region();  // Region to show where the note rectangle is
+        Label noteLabel = new Label();  // Label to show what note this is
 
         // Make the text label's width and height follow the note rectangle's width and height
-        durationLabel.prefWidthProperty().bind(rectangle.widthProperty());
-        durationLabel.prefHeightProperty().bind(rectangle.heightProperty());
+        noteLabel.prefWidthProperty().bind(region.widthProperty().subtract(3));
+        noteLabel.prefHeightProperty().bind(region.heightProperty());
+        noteLabel.setPadding(new Insets(0, 0, 0, 3));  // 3px left padding
 
-        // Update their style classes
-        this.rectangle.getStyleClass().add("note-rectangle");
-        durationLabel.getStyleClass().add("note-duration-label");
+        // Update the nodes' style classes
+        this.region.getStyleClass().add("note-rectangle");
+        noteLabel.getStyleClass().add("note-label");
 
         // Calculate the pixels per second for the spectrogram
         double pixelsPerSecond = spectrogramWidth / totalDuration;
@@ -66,88 +69,55 @@ public class NoteRectangle extends StackPane {
         double xCoord = timeToPlaceRect * pixelsPerSecond;
         double rectWidth = duration * pixelsPerSecond;
 
-        // Determine y-coordinate and height to place the rectangle
-        double yCoord = PlottingHelpers.noteNumToHeight(noteNum, minNoteNum, maxNoteNum, spectrogramHeight);
+        // Calculate y-coordinate and height to place the rectangle
+        double yCoord = PlottingHelpers.noteNumToHeight(noteNum, minNoteNum, maxNoteNum, spectrogramHeight) -
+                PlottingHelpers.getHeightDifference(spectrogramHeight, minNoteNum, maxNoteNum) / 2;
         double rectHeight = PlottingHelpers.getHeightDifference(spectrogramHeight, minNoteNum, maxNoteNum);
 
-        // Now set the rectangle's attributes
-        this.rectangle.setX(xCoord);
-        this.rectangle.setY(yCoord);
-        this.rectangle.setWidth(rectWidth);
-        this.rectangle.setHeight(rectHeight);
+        // Now set the region's attributes
+        this.region.setPrefWidth(rectWidth);
+        this.region.setPrefHeight(rectHeight);
 
         // Update the duration label
-        durationLabel.setText(MathUtils.round(duration, 2) + "s");
+        noteLabel.setText(UnitConversionUtils.noteNumberToNote(noteNum, true));
+
+        // Update the stack pane
+        this.getChildren().addAll(this.region, noteLabel);
+        this.setTranslateX(xCoord);
+        this.setTranslateY(yCoord);
     }
 
-    // Getter/Setter methods
-
-    public static double getSpectrogramWidth() {
-        return spectrogramWidth;
-    }
-
+    // Setter methods
     public static void setSpectrogramWidth(double spectrogramWidth) {
         NoteRectangle.spectrogramWidth = spectrogramWidth;
-    }
-
-    public static double getSpectrogramHeight() {
-        return spectrogramHeight;
     }
 
     public static void setSpectrogramHeight(double spectrogramHeight) {
         NoteRectangle.spectrogramHeight = spectrogramHeight;
     }
 
-    public static int getMinNoteNum() {
-        return minNoteNum;
-    }
-
     public static void setMinNoteNum(int minNoteNum) {
         NoteRectangle.minNoteNum = minNoteNum;
-    }
-
-    public static int getMaxNoteNum() {
-        return maxNoteNum;
     }
 
     public static void setMaxNoteNum(int maxNoteNum) {
         NoteRectangle.maxNoteNum = maxNoteNum;
     }
 
-    public static double getTotalDuration() {
-        return totalDuration;
-    }
-
     public static void setTotalDuration(double totalDuration) {
         NoteRectangle.totalDuration = totalDuration;
-    }
-
-    public static NotePlayer getNotePlayer() {
-        return notePlayer;
     }
 
     public static void setNotePlayer(NotePlayer notePlayer) {
         NoteRectangle.notePlayer = notePlayer;
     }
 
-    public static int getOnVelocity() {
-        return onVelocity;
-    }
-
     public static void setOnVelocity(int onVelocity) {
         NoteRectangle.onVelocity = onVelocity;
     }
 
-    public static int getOffVelocity() {
-        return offVelocity;
-    }
-
     public static void setOffVelocity(int offVelocity) {
         NoteRectangle.offVelocity = offVelocity;
-    }
-
-    public static double getOffDuration() {
-        return offDuration;
     }
 
     public static void setOffDuration(double offDuration) {
@@ -162,16 +132,16 @@ public class NoteRectangle extends StackPane {
      * @param durationOfNote The duration (in seconds) of the note.
      */
     public void extendWidthFromLeft(double durationOfNote) {
-        // Calculate the pixels per second for the spectrogram
-        double pixelsPerSecond = spectrogramWidth / totalDuration;
+        // Calculate the pixels per second for the spectrogram, if not set already
+        if (Double.isNaN(pixelsPerSecond)) pixelsPerSecond = spectrogramWidth / totalDuration;
 
         // Simultaneously update the x-coordinate and width of rectangle
-        double xCoord = rectangle.getX() - durationOfNote * pixelsPerSecond;
-        double rectWidth = rectangle.getWidth() + durationOfNote * pixelsPerSecond;
+        double xCoord = this.getTranslateX() - durationOfNote * pixelsPerSecond;
+        double rectWidth = region.getWidth() + durationOfNote * pixelsPerSecond;
 
         // Update the rectangle's attributes
-        this.rectangle.setX(xCoord);
-        this.rectangle.setWidth(rectWidth);
+        this.setTranslateX(xCoord);
+        this.region.setPrefWidth(rectWidth);
     }
 
     /**
@@ -180,17 +150,20 @@ public class NoteRectangle extends StackPane {
      * @param durationOfNote The duration (in seconds) of the note.
      */
     public void extendWidthFromRight(double durationOfNote) {
-        // Calculate the pixels per second for the spectrogram
-        double pixelsPerSecond = spectrogramWidth / totalDuration;
+        // Calculate the pixels per second for the spectrogram, if not set already
+        if (Double.isNaN(pixelsPerSecond)) pixelsPerSecond = spectrogramWidth / totalDuration;
 
         // Update width of rectangle
-        double rectWidth = rectangle.getWidth() + durationOfNote * pixelsPerSecond;
+        double rectWidth = region.getWidth() + durationOfNote * pixelsPerSecond;
 
         // Update the rectangle's attributes
-        this.rectangle.setWidth(rectWidth);
+        this.region.setPrefWidth(rectWidth);
     }
 
-    public void playRectangle() {
+    /**
+     * Method that plays the note that is defined by this note rectangle.
+     */
+    public void playNote() {
         notePlayer.playNoteForDuration(
                 this.noteNum, onVelocity, offVelocity, (long) duration * 1000,
                 (long) offDuration * 1000

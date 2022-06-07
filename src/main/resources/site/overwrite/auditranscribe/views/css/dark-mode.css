@@ -177,15 +177,6 @@
     -fx-background-color: #5d6266ff;
 }
 
-/* Note rectangles */
-.note-rectangle {
-    -fx-background-color: #b359b380;
-}
-
-.note-duration-label {
-    -fx-text-fill: #bbbbbbff;
-}
-
 /* Others */
 .progress-bar > .bar {
     -fx-background-color: #31578cff;
