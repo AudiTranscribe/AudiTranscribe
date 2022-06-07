@@ -93,6 +93,12 @@
     -fx-background-insets: 0, 0 0 1 0, 0 0 2 0;
 }
 
+.separator *.line {
+    -fx-border-color: #45494aff;
+    -fx-border-style: solid;
+    -fx-border-width: 1px;
+}
+
 /* MAIN PAGE */
 /* Text */
 .short-name-text {

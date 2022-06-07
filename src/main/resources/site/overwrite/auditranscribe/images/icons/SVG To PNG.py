@@ -2,7 +2,7 @@
 SVG To PNG.py
 
 Created on 2022-04-23
-Updated on 2022-05-29
+Updated on 2022-06-07
 
 Description: Python file that converts SVG files into PNG files.
 """
@@ -49,7 +49,8 @@ for pngPath in glob.glob("temp/*.png"):
         im.save(pngPath)
 
     # Move the PNG file to the "PNGs" directory
-    os.rename(pngPath, "PNGs/" + os.path.basename(pngPath))
+    subPath = "light-mode" if not FOR_DARK_MODE else "dark-mode"
+    os.rename(pngPath, os.path.join("PNGs", subPath, os.path.basename(pngPath)))
 
 # Delete the temporary directory
 os.rmdir("temp")

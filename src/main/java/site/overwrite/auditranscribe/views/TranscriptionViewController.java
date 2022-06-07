@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-06
+ * Updated on 2022-06-07
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -158,7 +158,9 @@ public class TranscriptionViewController implements Initializable {
     private int beatsPerBar = 4;
     private boolean isPaused = true;
     private boolean isMuted = false;
+
     private boolean scrollToPlayhead = false;
+    private boolean placeNotes = false;
 
     private double finalWidth;
     private double finalHeight;
@@ -230,11 +232,12 @@ public class TranscriptionViewController implements Initializable {
     private Label currTimeLabel, totalTimeLabel;
 
     @FXML
-    private Button playButton, stopButton, playSkipBackButton, playSkipForwardButton, scrollButton, volumeButton;
+    private Button playButton, stopButton, playSkipBackButton, playSkipForwardButton, scrollButton, placeNotesButton,
+            volumeButton;
 
     @FXML
     private ImageView playButtonImage, stopButtonImage, playSkipBackButtonImage, playSkipForwardButtonImage,
-            scrollButtonImage, volumeButtonImage;
+            placeNotesButtonImage, scrollButtonImage, volumeButtonImage;
 
     @FXML
     private Slider volumeSlider;
@@ -403,13 +406,15 @@ public class TranscriptionViewController implements Initializable {
             isPaused = togglePaused(true);
         });
 
-        volumeButton.setOnAction(event -> toggleMuteButton());
-
         scrollButton.setOnAction(event -> toggleScrollButton());
+
+        placeNotesButton.setOnAction(event -> togglePlaceNotesButton());
+
+        volumeButton.setOnAction(event -> toggleMuteButton());
 
         // Set spectrogram pane click method
         spectrogramPaneAnchor.setOnMouseClicked(event -> {
-            if (isEverythingReady) {
+            if (isEverythingReady && !placeNotes) {  // Not in note placing mode
                 // Ensure that the click is within the pane
                 double clickX = event.getX();
                 double clickY = event.getY();
@@ -532,6 +537,9 @@ public class TranscriptionViewController implements Initializable {
         )));
         scrollButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
                 "images/icons/PNGs/" + theme.shortName + "/footsteps-outline.png"
+        )));
+        placeNotesButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/icons/PNGs/" + theme.shortName + "/musical-notes-outline.png"
         )));
         volumeButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
                 "images/icons/PNGs/" + theme.shortName + "/volume-high.png"
@@ -1471,7 +1479,7 @@ public class TranscriptionViewController implements Initializable {
 
                         // Bottom Hbox
                         playButton, stopButton, playSkipBackButton, playSkipForwardButton,
-                        scrollButton,
+                        scrollButton, placeNotesButton,
                         volumeButton, volumeSlider
                 };
 
@@ -1550,7 +1558,6 @@ public class TranscriptionViewController implements Initializable {
                             "images/icons/PNGs/" + theme.shortName + "/footsteps-outline.png"
                     ))
             );
-
         } else {
             // Change the icon of the scroll button from non-filled to filled
             scrollButtonImage.setImage(
@@ -1564,6 +1571,32 @@ public class TranscriptionViewController implements Initializable {
         scrollToPlayhead = !scrollToPlayhead;
 
         logger.log(Level.FINE, "Toggled scroll (scroll is now " + scrollToPlayhead + ")");
+    }
+
+    /**
+     * Helper method that toggles the place notes button.
+     */
+    private void togglePlaceNotesButton() {
+        if (placeNotes) {
+            // Change the icon of the place notes button from filled to non-filled
+            placeNotesButtonImage.setImage(
+                    new Image(IOMethods.getFileURLAsString(
+                            "images/icons/PNGs/" + theme.shortName + "/musical-notes-outline.png"
+                    ))
+            );
+        } else {
+            // Change the icon of the place notes button from non-filled to filled
+            placeNotesButtonImage.setImage(
+                    new Image(IOMethods.getFileURLAsString(
+                            "images/icons/PNGs/" + theme.shortName + "/musical-notes.png"
+                    ))
+            );
+        }
+
+        // Toggle the `placeNotes` flag
+        placeNotes = !placeNotes;
+
+        logger.log(Level.FINE, "Toggled place notes (place notes is now " + placeNotes + ")");
     }
 
     /**
@@ -1663,6 +1696,10 @@ public class TranscriptionViewController implements Initializable {
         } else if (code == KeyCode.PERIOD) {  // Period key ('.') is to toggle seeking to playhead
             keyEvent.consume();
             toggleScrollButton();
+
+        } else if (code == KeyCode.N) {  // N key is to toggle placement of notes
+            keyEvent.consume();
+            togglePlaceNotesButton();
 
         } else if (NEW_PROJECT_COMBINATION.match(keyEvent)) {  // Create a new project
             // Consume the key event
