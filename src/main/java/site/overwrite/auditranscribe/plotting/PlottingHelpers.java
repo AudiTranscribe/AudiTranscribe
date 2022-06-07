@@ -75,4 +75,16 @@ public class PlottingHelpers {
         // Now get the assigned height
         return freqToHeight(freq, minFreq, maxFreq, maxHeight);
     }
+
+    /**
+     * Calculates the difference in height between two consecutive notes.
+     *
+     * @param height     Height of the pane.
+     * @param minNoteNum Smallest note number.
+     * @param maxNoteNum Largest note number.
+     * @return Difference in height between two consecutive notes.
+     */
+    public static double getHeightDifference(double height, double minNoteNum, double maxNoteNum) {
+        return height / (maxNoteNum - minNoteNum);
+    }
 }

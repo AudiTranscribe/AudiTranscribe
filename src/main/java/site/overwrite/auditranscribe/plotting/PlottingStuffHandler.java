@@ -2,7 +2,7 @@
  * PlottingStuffHandler.java
  *
  * Created on 2022-03-20
- * Updated on 2022-05-28
+ * Updated on 2022-06-07
  *
  * Description: Class that adds the notes' stuff to the spectrogram area.
  */
@@ -49,7 +49,7 @@ public class PlottingStuffHandler {
         for (int i = minNoteNumber; i <= maxNoteNumber; i++) {
             // Calculate the height to move the pointer to
             double placementHeight = PlottingHelpers.noteNumToHeight(i, minNoteNumber, maxNoteNumber, height);
-            placementHeight += getHeightDifference(height, minNoteNumber, maxNoteNumber) / 2;
+            placementHeight += PlottingHelpers.getHeightDifference(height, minNoteNumber, maxNoteNumber) / 2;
 
             // Create the line
             Line noteLine = new Line(0, placementHeight, width, placementHeight);
@@ -153,7 +153,7 @@ public class PlottingStuffHandler {
         int highestNoteNum = lowestNoteNum + 11;  // Highest note is B{octave}, e.g. B4 if octave is 4
 
         // Get the height difference between two adjacent notes
-        double heightDelta = getHeightDifference(height, minNoteNumber, maxNoteNumber);
+        double heightDelta = PlottingHelpers.getHeightDifference(height, minNoteNumber, maxNoteNumber);
 
         // Calculate the starting and ending Y positions of the rectangle
         double startY = PlottingHelpers.noteNumToHeight(lowestNoteNum, minNoteNumber, maxNoteNumber, height) +
@@ -188,7 +188,7 @@ public class PlottingStuffHandler {
         int highestNoteNum = octave * 12 + 11;  // Highest note is B{octave}, e.g. B4 if octave is 4
 
         // Get the height difference between two adjacent notes
-        double heightDelta = getHeightDifference(height, minNoteNumber, maxNoteNumber);
+        double heightDelta = PlottingHelpers.getHeightDifference(height, minNoteNumber, maxNoteNumber);
 
         // Calculate the ending Y position of the rectangle
         double endY = PlottingHelpers.noteNumToHeight(highestNoteNum, minNoteNumber, maxNoteNumber, height) -
@@ -502,24 +502,12 @@ public class PlottingStuffHandler {
     // Private methods
 
     /**
-     * Calculates the difference in height between two consecutive notes.
-     *
-     * @param height     Height of the pane.
-     * @param minNoteNum Smallest note number.
-     * @param maxNoteNum Largest note number.
-     * @return Difference in height between two consecutive notes.
-     */
-    static double getHeightDifference(double height, double minNoteNum, double maxNoteNum) {
-        return height / (maxNoteNum - minNoteNum);
-    }
-
-    /**
      * Calculates the number of seconds needed to finish one beat.
      *
      * @param bpm Beats per minute.
      * @return Seconds per beat.
      */
-    static double secondsPerBeat(double bpm) {
+    private static double secondsPerBeat(double bpm) {
         return 1. / (bpm / 60.);  // BPM / 60 = Beats per second, so 1 / Beats Per Second = Seconds per Beat
     }
 
@@ -535,7 +523,7 @@ public class PlottingStuffHandler {
      * @param offset      Number of seconds to wait before the actual audio <em>starts</em>.
      * @return A <code>Line</code> object representing the beat line.
      */
-    static Line generateBeatLine(
+    private static Line generateBeatLine(
             int beatNum, int beatsPerBar, int pxPerSecond, double height, double zoomScaleX, double spb, double offset
     ) {
         // Calculate position to place the line
@@ -565,7 +553,7 @@ public class PlottingStuffHandler {
      * @param offset      Number of seconds to wait before the actual audio <em>starts</em>.
      * @return A <code>StackPane</code> object representing the ellipse.
      */
-    static StackPane generateEllipse(
+    private static StackPane generateEllipse(
             int barNum, int beatsPerBar, int pxPerSecond, double height, double zoomScaleX, double spb, double offset
     ) {
         // Calculate position to place the ellipse
