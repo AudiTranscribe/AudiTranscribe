@@ -35,22 +35,24 @@ public class NoteRectangle extends StackPane {
     public static int offVelocity;
     public static double offDuration;  // In seconds
 
-    public static double pixelsPerSecond = Double.NaN;
     public static boolean canEdit = false;
 
     private final double duration;
     private final int noteNum;
 
+    private final double rectangleWidth, rectangleHeight;
+
+    private final Region bordersRegion;  // Region that shows the borders of the note rectangle
+
+    // Helper attributes
+    // (Note: "initial" refers to initial value before *resizing*, not when the object is created)
+    private double initXTrans; // Initial x-translation of the note
     private double initXDiff;  // Initial difference between the mouse's x-coordinate and the note's x-coordinate
-    private double initYTrans;  // Initial translation of the note's y-coordinate
+
+    private double initYTrans;  // Initial y-translation of the note
     private double initYEvent;  // Initial difference between the mouse's y-coordinate and the note's y-coordinate
 
-    private final Region bordersRegion;    // Region for the borders
-    private final Rectangle mainRectangle;  // Base rectangle to be used for the note
-    private final Region resizeLeftRegion;  // Region that permits left-side resizing
-    private final Region resizeRightRegion;  // Region that permits right-side resizing
-
-    private final double rectangleWidth, rectangleHeight;
+    private double initWidth;  // Initial width of the note before resizing
 
     /**
      * Initialization method for a <code>NoteRectangle</code> object.
@@ -67,9 +69,9 @@ public class NoteRectangle extends StackPane {
 
         // Define the nodes
         bordersRegion = new Region();
-        mainRectangle = new Rectangle();
-        resizeLeftRegion = new Region();
-        resizeRightRegion = new Region();
+        Rectangle mainRectangle = new Rectangle();  // Base rectangle to be used for the note
+        Region resizeLeftRegion = new Region();  // Region that permits left-side resizing
+        Region resizeRightRegion = new Region();  // Region that permits right-side resizing
 
         // Update properties of the main rectangle
         mainRectangle.widthProperty().bind(bordersRegion.prefWidthProperty().subtract(BORDER_WIDTH));
@@ -96,12 +98,12 @@ public class NoteRectangle extends StackPane {
         bordersRegion.setPrefHeight(rectangleHeight);
 
         // Update properties of the resizing regions
-        resizeLeftRegion.setTranslateX(-rectangleWidth / 2);
+        resizeLeftRegion.translateXProperty().bind(bordersRegion.widthProperty().divide(-2));
         resizeLeftRegion.prefHeightProperty().bind(bordersRegion.prefHeightProperty());
         resizeLeftRegion.setPrefWidth(EXTEND_REGIONS_WIDTH);
         resizeLeftRegion.setMaxWidth(EXTEND_REGIONS_WIDTH);
 
-        resizeRightRegion.setTranslateX(rectangleWidth / 2);
+        resizeRightRegion.translateXProperty().bind(bordersRegion.widthProperty().divide(2));
         resizeRightRegion.prefHeightProperty().bind(bordersRegion.prefHeightProperty());
         resizeRightRegion.setPrefWidth(EXTEND_REGIONS_WIDTH);
         resizeRightRegion.setMaxWidth(EXTEND_REGIONS_WIDTH);
@@ -136,9 +138,10 @@ public class NoteRectangle extends StackPane {
             }
         });
 
-        // Set mouse events for the main rectangle
-        EventHandler<ScrollEvent> cancelScroll = Event::consume;  // To handle disabling/enabling of scrolling
+        // Define scroll event disabler
+        EventHandler<ScrollEvent> cancelScroll = Event::consume;  // To be used so that we can remove this handler
 
+        // Set mouse events for the main rectangle
         mainRectangle.setOnMouseDragged(event -> {
             // Check if editing is enabled
             if (canEdit) {
@@ -191,6 +194,86 @@ public class NoteRectangle extends StackPane {
             // Revert cursor
             if (canEdit) this.setCursor(Cursor.OPEN_HAND);
         });
+
+        // Set mouse events for the resizing regions
+        resizeLeftRegion.setOnMouseDragged(event -> {
+            // Check if editing is enabled
+            if (canEdit) {
+                // Get the new X position
+                double newX = event.getSceneX() - initXDiff;
+
+                // Update the width of the note rectangle
+                double newWidth = initWidth + (initXTrans - newX);
+
+                if (newWidth >= EXTEND_REGIONS_WIDTH) {
+                    this.setTranslateX(newX);
+                    bordersRegion.setPrefWidth(newWidth);
+                }
+
+                // Prevent default action
+                event.consume();
+            }
+        });
+
+        resizeLeftRegion.setOnMousePressed(event -> {
+            // Check if editing is enabled
+            if (canEdit) {
+                // Set initial values
+                initXTrans = this.getTranslateX();
+                initXDiff = event.getSceneX() - this.getTranslateX();
+                initWidth = bordersRegion.getPrefWidth();
+
+                // Disable scrolling
+                this.getParent().addEventHandler(ScrollEvent.ANY, cancelScroll);
+
+                // Prevent default action
+                event.consume();
+            }
+        });
+
+        resizeLeftRegion.setOnMouseReleased(event -> {
+            // Remove the scroll cancelling effect
+            this.getParent().removeEventHandler(ScrollEvent.ANY, cancelScroll);
+        });
+
+        resizeRightRegion.setOnMouseDragged(event -> {
+            // Check if editing is enabled
+            if (canEdit) {
+                // Get the new X position
+                double newX = event.getSceneX() - initXDiff;
+
+                // Update the width of the note rectangle
+                double newWidth = initWidth + (newX - initXTrans);
+
+                if (newWidth >= EXTEND_REGIONS_WIDTH) {
+                    bordersRegion.setPrefWidth(newWidth);
+                }
+
+                // Prevent default action
+                event.consume();
+            }
+        });
+
+        resizeRightRegion.setOnMousePressed(event -> {
+            // Check if editing is enabled
+            if (canEdit) {
+                // Set initial values
+                initXTrans = this.getTranslateX();
+                initXDiff = event.getSceneX() - this.getTranslateX();
+                initWidth = bordersRegion.getPrefWidth();
+
+                // Disable scrolling
+                this.getParent().addEventHandler(ScrollEvent.ANY, cancelScroll);
+
+                // Prevent default action
+                event.consume();
+            }
+        });
+
+        resizeRightRegion.setOnMouseReleased(event -> {
+            // Remove the scroll cancelling effect
+            this.getParent().removeEventHandler(ScrollEvent.ANY, cancelScroll);
+        });
     }
 
     // Setter methods
@@ -235,42 +318,6 @@ public class NoteRectangle extends StackPane {
     }
 
     // Public methods
-
-    /**
-     * Change the note rectangle's width from the left (i.e. right-most side's position is
-     * unchanged).
-     *
-     * @param durationOfNote The duration (in seconds) of the note.
-     */
-    public void changeWidthFromLeft(double durationOfNote) {
-        // Calculate the pixels per second for the spectrogram, if not set already
-        if (Double.isNaN(pixelsPerSecond)) pixelsPerSecond = spectrogramWidth / totalDuration;
-
-        // Simultaneously update the x-coordinate and width of rectangle
-        double xCoord = this.getTranslateX() - durationOfNote * pixelsPerSecond;
-        double rectWidth = bordersRegion.getWidth() + durationOfNote * pixelsPerSecond;
-
-        // Update the rectangle's attributes
-        setTranslateX(xCoord);
-        bordersRegion.setPrefWidth(rectWidth);
-    }
-
-    /**
-     * Change the note rectangle's width from the right (i.e. left-most side's position is
-     * unchanged).
-     *
-     * @param durationOfNote The duration (in seconds) of the note.
-     */
-    public void changeWidthFromRight(double durationOfNote) {
-        // Calculate the pixels per second for the spectrogram, if not set already
-        if (Double.isNaN(pixelsPerSecond)) pixelsPerSecond = spectrogramWidth / totalDuration;
-
-        // Update width of rectangle
-        double rectWidth = bordersRegion.getWidth() + durationOfNote * pixelsPerSecond;
-
-        // Update the rectangle's attributes
-        bordersRegion.setPrefWidth(rectWidth);
-    }
 
     /**
      * Method that plays the note that is defined by this note rectangle.
