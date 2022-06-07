@@ -13,6 +13,7 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
@@ -173,23 +174,31 @@ public class NoteRectangle extends StackPane {
         mainRectangle.setOnMousePressed(event -> {
             // Check if editing is enabled
             if (canEdit) {
-                // Set initial values
-                initXDiff = event.getSceneX() - this.getTranslateX();
+                // Determine if the secondary mouse button was pressed
+                if (event.isSecondaryButtonDown()) {
+                    // Remove the note rectangle from the parent pane
+                    ((Pane) this.getParent()).getChildren().remove(this);
+                } else {
+                    // Set initial values
+                    initXDiff = event.getSceneX() - this.getTranslateX();
 
-                initYTrans = this.getTranslateY();
-                initYEvent = event.getSceneY();
+                    initYTrans = this.getTranslateY();
+                    initYEvent = event.getSceneY();
 
-                // Disable scrolling
-                this.getParent().addEventHandler(ScrollEvent.ANY, cancelScroll);
+                    // Disable scrolling
+                    this.getParent().addEventHandler(ScrollEvent.ANY, cancelScroll);
 
-                // Prevent default action
-                event.consume();
+                    // Prevent default action
+                    event.consume();
+                }
             }
         });
 
         mainRectangle.setOnMouseReleased(event -> {
-            // Remove the scroll cancelling effect
-            this.getParent().removeEventHandler(ScrollEvent.ANY, cancelScroll);
+            // Remove the scroll cancelling effect (if it still exists)
+            if (this.getParent() != null) {
+                this.getParent().removeEventHandler(ScrollEvent.ANY, cancelScroll);
+            }
 
             // Revert cursor
             if (canEdit) this.setCursor(Cursor.OPEN_HAND);

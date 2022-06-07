@@ -128,7 +128,7 @@ public class TranscriptionViewController implements Initializable {
     private double audioDuration = 0;  // Will be updated upon scene initialization
     private double currTime = 0;
 
-    private final List<NoteRectangle> noteRectangles = new ArrayList<>();
+    // Todo: add attribute that arranges the note rectangles according to their times
 
     // Other attributes
     Stage mainStage;
@@ -439,24 +439,27 @@ public class TranscriptionViewController implements Initializable {
                         // Compute the time that the mouse click would correspond to
                         double estimatedTime = clickX / finalWidth * audioDuration;
 
-                        // Compute the duration of one beat
-                        double beatDuration = 60 / bpm;
+                        // Determine if it is a left click or a right click
+                        if (event.getButton() == MouseButton.PRIMARY) {
+                            // Compute the duration of one beat
+                            double beatDuration = 60 / bpm;
 
-                        // Ignore any clicks that are too close to the boundary
-                        if (estimatedTime > audioDuration - beatDuration ||
-                                estimatedNoteNum < MIN_NOTE_NUMBER + 1 ||
-                                estimatedNoteNum > MAX_NOTE_NUMBER - 1
-                        ) return;
+                            // Ignore any clicks that are too close to the boundary
+                            if (estimatedTime > audioDuration - beatDuration ||
+                                    estimatedNoteNum < MIN_NOTE_NUMBER + 1 ||
+                                    estimatedNoteNum > MAX_NOTE_NUMBER - 1
+                            ) return;
 
-                        // Create a new note rectangle and add it to the note rectangles list
-                        NoteRectangle noteRect = new NoteRectangle(estimatedTime, beatDuration, estimatedNoteNum);
-                        noteRectangles.add(noteRect);
+                            // Create a new note rectangle and add it to the note rectangles list
+                            NoteRectangle noteRect = new NoteRectangle(estimatedTime, beatDuration, estimatedNoteNum);
 
-                        // Add the note rectangle to the spectrogram pane
-                        spectrogramPaneAnchor.getChildren().add(noteRect);
-                        logger.log(Level.FINE,
-                                "Placed note " + estimatedNoteNum + " at " + estimatedTime + " seconds"
-                        );
+                            // Add the note rectangle to the spectrogram pane
+                            spectrogramPaneAnchor.getChildren().add(noteRect);
+                            logger.log(
+                                    Level.FINE,
+                                    "Placed note " + estimatedNoteNum + " at " + estimatedTime + " seconds"
+                            );
+                        }
 
                     } else {
                         // Play the note
@@ -1315,7 +1318,11 @@ public class TranscriptionViewController implements Initializable {
 
                     // Check if the current time has exceeded and is not paused
                     if (currTime >= audioDuration) {
-                        logger.log(Level.FINE, "Playback reached end of audio, will start from beginning upon play");
+                        logger.log(
+                                Level.FINE,
+                                "Playback reached end of audio, will start from beginning upon play"
+                        );
+
                         // Pause the audio
                         isPaused = togglePaused(false);
 
@@ -1461,7 +1468,7 @@ public class TranscriptionViewController implements Initializable {
                 ExecutorService executor = Executors.newFixedThreadPool(
                         tasks.length, runnable -> {
                             Thread thread = Executors.defaultThreadFactory().newThread(runnable);
-                            thread.setDaemon(true);  // Make it so that it can shut down gracefully by placing it in background
+                            thread.setDaemon(true);  // Place thread in background so it can shut down gracefully
                             return thread;
                         }
                 );
@@ -1471,7 +1478,10 @@ public class TranscriptionViewController implements Initializable {
 
                 taskList.forEach(task -> task.setOnFailed(event -> {
                     // Log the error
-                    logger.log(Level.SEVERE, "Task \"" + task.name + "\" failed: " + task.getException().getMessage());
+                    logger.log(
+                            Level.SEVERE,
+                            "Task \"" + task.name + "\" failed: " + task.getException().getMessage()
+                    );
                     task.getException().printStackTrace();
 
                     // Show error dialog
