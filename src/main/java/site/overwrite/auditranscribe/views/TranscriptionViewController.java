@@ -98,7 +98,7 @@ public class TranscriptionViewController implements Initializable {
     final double NUM_PX_PER_OCTAVE = 72;
 
     final int MIN_NOTE_NUMBER = 0;  // C0
-    final int MAX_NOTE_NUMBER = 119;  // B9
+    final int MAX_NOTE_NUMBER = 107;  // B8
 
     final long UPDATE_PLAYBACK_SCHEDULER_PERIOD = 50;  // In milliseconds
 
