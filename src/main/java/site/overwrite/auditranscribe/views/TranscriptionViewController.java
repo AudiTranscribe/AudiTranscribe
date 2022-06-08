@@ -441,29 +441,31 @@ public class TranscriptionViewController implements Initializable {
                     int estimatedNoteNum = (int) Math.round(UnitConversionUtils.freqToNoteNumber(estimatedFreq));
 
                     if (canEditNotes) {
-                        // Compute the time that the mouse click would correspond to
-                        double estimatedTime = clickX / finalWidth * audioDuration;
+                        if (isPaused) {  // Permit note placement only when paused
+                            // Compute the time that the mouse click would correspond to
+                            double estimatedTime = clickX / finalWidth * audioDuration;
 
-                        // Determine if it is a left click or a right click
-                        if (event.getButton() == MouseButton.PRIMARY) {
-                            // Compute the duration of one beat
-                            double beatDuration = 60 / bpm;
+                            // Determine if it is a left click or a right click
+                            if (event.getButton() == MouseButton.PRIMARY) {
+                                // Compute the duration of one beat
+                                double beatDuration = 60 / bpm;
 
-                            // Ignore any clicks that are too close to the boundary
-                            if (estimatedTime > audioDuration - beatDuration ||
-                                    estimatedNoteNum < MIN_NOTE_NUMBER + 1 ||
-                                    estimatedNoteNum > MAX_NOTE_NUMBER - 1
-                            ) return;
+                                // Ignore any clicks that are too close to the boundary
+                                if (estimatedTime > audioDuration - beatDuration ||
+                                        estimatedNoteNum < MIN_NOTE_NUMBER + 1 ||
+                                        estimatedNoteNum > MAX_NOTE_NUMBER - 1
+                                ) return;
 
-                            // Create a new note rectangle and add it to the note rectangles list
-                            NoteRectangle noteRect = new NoteRectangle(estimatedTime, beatDuration, estimatedNoteNum);
+                                // Create a new note rectangle and add it to the note rectangles list
+                                NoteRectangle noteRect = new NoteRectangle(estimatedTime, beatDuration, estimatedNoteNum);
 
-                            // Add the note rectangle to the spectrogram pane
-                            spectrogramPaneAnchor.getChildren().add(noteRect);
-                            logger.log(
-                                    Level.FINE,
-                                    "Placed note " + estimatedNoteNum + " at " + estimatedTime + " seconds"
-                            );
+                                // Add the note rectangle to the spectrogram pane
+                                spectrogramPaneAnchor.getChildren().add(noteRect);
+                                logger.log(
+                                        Level.FINE,
+                                        "Placed note " + estimatedNoteNum + " at " + estimatedTime + " seconds"
+                                );
+                            }
                         }
 
                     } else {
@@ -1212,6 +1214,9 @@ public class TranscriptionViewController implements Initializable {
                 throw new RuntimeException(e);
             }
         }
+
+        // Toggle paused state for note rectangles
+        NoteRectangle.setIsPaused(!isPaused);
 
         // Return the toggled version of the `isPaused` flag
         logger.log(Level.FINE, "Toggled pause state from " + isPaused + " to " + !isPaused);

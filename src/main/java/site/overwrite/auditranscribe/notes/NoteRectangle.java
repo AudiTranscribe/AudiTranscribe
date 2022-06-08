@@ -23,7 +23,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
-import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -50,6 +49,7 @@ public class NoteRectangle extends StackPane {
     public static int offVelocity;
     public static double offDuration;  // In seconds
 
+    public static boolean isPaused = true;
     public static boolean canEdit = false;
 
     // Instance attributes
@@ -84,6 +84,7 @@ public class NoteRectangle extends StackPane {
     public NoteRectangle(double timeToPlaceRect, double duration, int noteNum) {
         // Update properties
         this.noteNum = noteNum;
+
         this.noteOnsetTime = new SimpleDoubleProperty(timeToPlaceRect);
         this.duration = new SimpleDoubleProperty(duration);
 
@@ -139,7 +140,7 @@ public class NoteRectangle extends StackPane {
 
         // Set cursor handlers on hover
         mainRectangle.hoverProperty().addListener((observable, oldValue, newValue) -> {
-            if (canEdit && newValue) {
+            if (canEdit && isPaused && newValue) {
                 this.setCursor(Cursor.OPEN_HAND);
             } else {
                 this.setCursor(Cursor.DEFAULT);
@@ -147,7 +148,7 @@ public class NoteRectangle extends StackPane {
         });
 
         resizeLeftRegion.hoverProperty().addListener((observable, oldValue, newValue) -> {
-            if (canEdit && newValue) {
+            if (canEdit && isPaused && newValue) {
                 this.setCursor(Cursor.W_RESIZE);
             } else {
                 this.setCursor(Cursor.DEFAULT);
@@ -155,7 +156,7 @@ public class NoteRectangle extends StackPane {
         });
 
         resizeRightRegion.hoverProperty().addListener((observable, oldValue, newValue) -> {
-            if (canEdit && newValue) {
+            if (canEdit && isPaused && newValue) {
                 this.setCursor(Cursor.E_RESIZE);
             } else {
                 this.setCursor(Cursor.DEFAULT);
@@ -167,8 +168,8 @@ public class NoteRectangle extends StackPane {
 
         // Set mouse events for the main rectangle
         mainRectangle.setOnMouseDragged(event -> {
-            // Check if editing is enabled
-            if (canEdit) {
+            // Check if editing is permitted
+            if (canEdit && isPaused) {
                 // Set cursor
                 this.setCursor(Cursor.CLOSED_HAND);
 
@@ -196,8 +197,8 @@ public class NoteRectangle extends StackPane {
         });
 
         mainRectangle.setOnMousePressed(event -> {
-            // Check if editing is enabled
-            if (canEdit) {
+            // Check if editing is permitted
+            if (canEdit && isPaused) {
                 // Determine if the secondary mouse button was pressed
                 if (event.isSecondaryButtonDown()) {
                     // Remove the note rectangle from the parent pane
@@ -230,13 +231,13 @@ public class NoteRectangle extends StackPane {
             }
 
             // Revert cursor
-            if (canEdit) this.setCursor(Cursor.OPEN_HAND);
+            if (canEdit && isPaused) this.setCursor(Cursor.OPEN_HAND);
         });
 
         // Set mouse events for the resizing regions
         resizeLeftRegion.setOnMouseDragged(event -> {
-            // Check if editing is enabled
-            if (canEdit) {
+            // Check if editing is permitted
+            if (canEdit && isPaused) {
                 // Get the new X position
                 double newX = event.getSceneX() - initXDiff;
 
@@ -254,8 +255,8 @@ public class NoteRectangle extends StackPane {
         });
 
         resizeLeftRegion.setOnMousePressed(event -> {
-            // Check if editing is enabled
-            if (canEdit) {
+            // Check if editing is permitted
+            if (canEdit && isPaused) {
                 // Set initial values
                 initXTrans = this.getTranslateX();
                 initXDiff = event.getSceneX() - this.getTranslateX();
@@ -275,8 +276,8 @@ public class NoteRectangle extends StackPane {
         });
 
         resizeRightRegion.setOnMouseDragged(event -> {
-            // Check if editing is enabled
-            if (canEdit) {
+            // Check if editing is permitted
+            if (canEdit && isPaused) {
                 // Get the new X position
                 double newX = event.getSceneX() - initXDiff;
 
@@ -293,8 +294,8 @@ public class NoteRectangle extends StackPane {
         });
 
         resizeRightRegion.setOnMousePressed(event -> {
-            // Check if editing is enabled
-            if (canEdit) {
+            // Check if editing is permitted
+            if (canEdit && isPaused) {
                 // Set initial values
                 initXTrans = this.getTranslateX();
                 initXDiff = event.getSceneX() - this.getTranslateX();
@@ -356,6 +357,10 @@ public class NoteRectangle extends StackPane {
 
     public static void setCanEdit(boolean canEdit) {
         NoteRectangle.canEdit = canEdit;
+    }
+
+    public static void setIsPaused(boolean isPaused) {
+        NoteRectangle.isPaused = isPaused;
     }
 
     // Public methods
