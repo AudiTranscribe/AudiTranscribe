@@ -2,7 +2,7 @@
  * AudioConverter.java
  *
  * Created on 2022-05-06
- * Updated on 2022-06-06
+ * Updated on 2022-06-08
  *
  * Description: Methods that help to convert audio files to the correct format.
  */
@@ -79,7 +79,7 @@ public class AudioConverter {
 
                 .addOutput(filePath + extension)
                 .setFormat(EXTENSION_TO_CODEC.get(extension))
-                .setAudioBitRate(FFmpeg.AUDIO_SAMPLE_96000)  // Specify constant bitrate for MP3 and related files
+                .setAudioBitRate(96000)  // Specify constant bitrate for MP3 and related files
 
                 .done();
 

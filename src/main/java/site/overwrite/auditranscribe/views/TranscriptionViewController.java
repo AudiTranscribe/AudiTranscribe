@@ -1266,9 +1266,13 @@ public class TranscriptionViewController implements Initializable {
             scheduler.scheduleAtFixedRate(() -> {
                 // Nothing really changes if the audio is paused
                 if (!isPaused) {
+                    // Todo: fix current audio time not being the seeked time
+//                    System.out.println("Saved current time: " + currTime);
+
                     // Get the current audio time
                     try {
                         currTime = audio.getCurrAudioTime();
+//                        System.out.println("Current audio time: " + audio.getCurrAudioTime());
                     } catch (InvalidObjectException e) {
                         throw new RuntimeException(e);
                     }

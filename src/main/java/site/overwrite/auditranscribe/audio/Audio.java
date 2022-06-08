@@ -2,7 +2,7 @@
  * Audio.java
  *
  * Created on 2022-02-13
- * Updated on 2022-06-06
+ * Updated on 2022-06-08
  *
  * Description: Class that handles audio processing and audio playback.
  */
@@ -38,8 +38,6 @@ public class Audio {
     public AudioProcessingMode audioProcessingMode;
 
     private final String audioFileName;
-    private final String mp3FilePath;
-    private final String wavFilePath;
 
     private final AudioInputStream audioStream;
     private final AudioFormat audioFormat;
@@ -83,8 +81,6 @@ public class Audio {
 
         // Update attributes
         audioFileName = originalFileName;
-        mp3FilePath = mp3File != null ? mp3File.getAbsolutePath() : null;
-        wavFilePath = wavFile != null ? wavFile.getAbsolutePath() : null;
 
         // Create the media player object if needed
         if (mp3File != null) {

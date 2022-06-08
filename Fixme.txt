@@ -3,3 +3,7 @@ Fixme:
       stereo, 4 bytes/frame, little-endian is supported.
     - Playhead doesn't move sometimes.
         - Hard to recreate, but still possible to happen. Need further investigation.
+    - Note playing is delayed.
+        - Temporary fix is to add a constant that plays the note early, but this is not addressing the root cause.
+        - Possible permanent fix: https://stackoverflow.com/questions/69909883/using-midi-in-java
+    - MP3 file causes issues with seeking, current time determination, and playback.

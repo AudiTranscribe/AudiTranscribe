@@ -2,7 +2,7 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-06-06
+ * Updated on 2022-06-08
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
@@ -77,6 +77,7 @@ public class ProjectIOHandlers {
 
                 // Attempt creation of temporary folder if it doesn't exist
                 IOMethods.createFolder(IOConstants.TEMP_FOLDER);
+                logger.log(Level.FINE, "Temporary folder: " + IOConstants.TEMP_FOLDER);
 
                 // Get the base path for the auxiliary files
                 String baseName = IOConstants.TEMP_FOLDER + file.getName().replace(fileExt, "");
@@ -95,7 +96,7 @@ public class ProjectIOHandlers {
                 // (Failure to read will throw exceptions)
                 Audio audio = new Audio(auxiliaryWAVFile, auxiliaryMP3File, file.getName());
 
-                // Delete auxiliary files if original file is not a WAV file
+                // Delete auxiliary files
                 boolean successfullyDeleted = auxiliaryWAVFile.delete();
                 if (successfullyDeleted) {
                     logger.log(Level.FINE, "Successfully deleted auxiliary WAV file.");
@@ -150,9 +151,9 @@ public class ProjectIOHandlers {
 
             } catch (UnsupportedAudioFileException | IOException e) {
                 Popups.showExceptionAlert(
-                        "Failed to read '" + file.getName() + "' as a WAV file.",
+                        "Failed to read '" + file.getName() + "' as an audio file.",
                         "The program failed to read '" + file.getName() +
-                                "' as a WAV file. Please check if " + "this is a valid WAV file.",
+                                "' as an audio file. Please check if " + "this is a valid audio file.",
                         e
                 );
                 e.printStackTrace();
