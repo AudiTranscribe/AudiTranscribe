@@ -2,13 +2,18 @@
  * NoteRectangle.java
  *
  * Created on 2022-06-07
- * Updated on 2022-06-07
+ * Updated on 2022-06-08
  *
  * Description: A `StackPane` object that is used to denote a note in the transcription view.
  */
 
 package site.overwrite.auditranscribe.notes;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
@@ -18,13 +23,22 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
+import site.overwrite.auditranscribe.utils.UnitConversionUtils;
+
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class NoteRectangle extends StackPane {
     // Constants
     private static final double BORDER_WIDTH = 3;  // In pixels
     private static final double EXTEND_REGIONS_WIDTH = 8;  // In pixels
 
-    // Static attributes
+    // Static
+    public static ObservableList<NoteRectangle> noteRectangles = FXCollections.observableArrayList();
+    public static SortedList<NoteRectangle> noteRectanglesSorted =
+            new SortedList<>(noteRectangles, new SortByTimeToPlace());
+
     public static double spectrogramWidth;
     public static double spectrogramHeight;
     public static int minNoteNum;
@@ -39,9 +53,10 @@ public class NoteRectangle extends StackPane {
     public static boolean canEdit = false;
 
     // Instance attributes
-    public final double timeToPlaceRect;
-    private final double duration;
-    private final int noteNum;
+    private int noteNum;
+
+    public final DoubleProperty noteOnsetTime;
+    private final DoubleProperty duration;
 
     private final double rectangleWidth, rectangleHeight;
 
@@ -55,7 +70,8 @@ public class NoteRectangle extends StackPane {
     private double initYTrans;  // Initial y-translation of the note
     private double initYEvent;  // Initial difference between the mouse's y-coordinate and the note's y-coordinate
 
-    private double initWidth;  // Initial width of the note before resizing
+    private double initWidth;  // Initial width of the note
+    private int initNoteNum;  // Initial note number
 
     /**
      * Initialization method for a <code>NoteRectangle</code> object.
@@ -66,10 +82,14 @@ public class NoteRectangle extends StackPane {
      * @param noteNum         The note number of the note.
      */
     public NoteRectangle(double timeToPlaceRect, double duration, int noteNum) {
-        // Update attributes
-        this.timeToPlaceRect = timeToPlaceRect;
-        this.duration = duration;
+        // Update properties
         this.noteNum = noteNum;
+        this.noteOnsetTime = new SimpleDoubleProperty(timeToPlaceRect);
+        this.duration = new SimpleDoubleProperty(duration);
+
+        // Bind properties
+        this.noteOnsetTime.bind(this.translateXProperty().multiply(totalDuration / spectrogramWidth));
+        this.duration.bind(this.widthProperty().multiply(totalDuration / spectrogramWidth));
 
         // Define the nodes
         bordersRegion = new Region();
@@ -167,6 +187,7 @@ public class NoteRectangle extends StackPane {
 
                 if (newY >= 0 && newY + rectangleHeight <= spectrogramHeight) {
                     this.setTranslateY(newY);
+                    this.noteNum = initNoteNum - numIncrements;  // Higher Y -> Lower on screen => need to subtract
                 }
 
                 // Prevent default scrolling action
@@ -181,12 +202,17 @@ public class NoteRectangle extends StackPane {
                 if (event.isSecondaryButtonDown()) {
                     // Remove the note rectangle from the parent pane
                     ((Pane) this.getParent()).getChildren().remove(this);
+
+                    // Remove the note rectangle from the list of note rectangles
+                    noteRectangles.remove(this);
                 } else {
                     // Set initial values
                     initXDiff = event.getSceneX() - this.getTranslateX();
 
                     initYTrans = this.getTranslateY();
                     initYEvent = event.getSceneY();
+
+                    initNoteNum = noteNum;
 
                     // Disable scrolling
                     this.getParent().addEventHandler(ScrollEvent.ANY, cancelScroll);
@@ -286,6 +312,9 @@ public class NoteRectangle extends StackPane {
             // Remove the scroll cancelling effect
             this.getParent().removeEventHandler(ScrollEvent.ANY, cancelScroll);
         });
+
+        // Add this new note rectangle into the list of all note rectangles
+        noteRectangles.add(this);
     }
 
     // Setter methods
@@ -335,9 +364,77 @@ public class NoteRectangle extends StackPane {
      * Method that plays the note that is defined by this note rectangle.
      */
     public void playNote() {
+        System.out.println("Playing note: " + noteNum + " for " + duration.getValue() + " seconds");
         notePlayer.playNoteForDuration(
-                noteNum, onVelocity, offVelocity, (long) duration * 1000,
-                (long) offDuration * 1000
+                noteNum, onVelocity, offVelocity, (long) (duration.getValue() * 1000),
+                (long) (offDuration * 1000)
         );
+    }
+
+    /**
+     * Method that gets the note rectangles with a <code>timeToPlaceRect</code> of more than the
+     * specified <code>currTime</code>.
+     *
+     * @param currTime The current time of the audio.
+     * @return A queue of note rectangles with a <code>timeToPlaceRect</code> of more than the
+     * specified <code>currTime</code>.
+     */
+    public static Queue<NoteRectangle> getRelevantNoteRectangles(double currTime) {
+        // Get number of note rectangles
+        int n = noteRectanglesSorted.size();
+
+        // Perform trivial checks
+        if (n == 0) {
+            // No rectangles
+            return new LinkedList<>();
+        } else if (currTime <= noteRectanglesSorted.get(0).noteOnsetTime.getValue()) {
+            // All rectangles have playing time of more than current time => all rectangles are relevant
+            return new LinkedList<>(noteRectanglesSorted);
+        } else if (currTime > noteRectanglesSorted.get(noteRectanglesSorted.size() - 1).noteOnsetTime.getValue()) {
+            // All rectangles have playing time of less than current time => no rectangles are relevant
+            return new LinkedList<>();
+        }
+
+        // Find the first rectangle in the sorted list where its `timeToPlaceRect` is greater than the current time
+        // (Use binary search on the sorted list)
+        int targetIndex;
+
+        int left = 0;
+        int right = n - 1;
+        int middle;
+
+        while (left < right) {
+            // Calculate middle index
+            middle = (left + right) / 2;
+
+            // Get middle rectangle's `timeToPlaceRect`
+            double middleVal = noteRectanglesSorted.get(middle).noteOnsetTime.getValue();
+
+            // Compare 'middle' value with the current time
+            if (middleVal < currTime) {
+                left = middle + 1;
+            } else {
+                right = middle;
+            }
+        }
+
+        targetIndex = (left + right) / 2;
+
+        // Keep all rectangles with an index that is at least the target index
+        Queue<NoteRectangle> relevantNoteRectangles = new LinkedList<>();
+        for (int i = targetIndex; i < n; i++) {
+            relevantNoteRectangles.add(noteRectanglesSorted.get(i));
+        }
+
+        // Return the relevant note rectangles
+        return relevantNoteRectangles;
+    }
+
+    // Helper classes
+    static class SortByTimeToPlace implements Comparator<NoteRectangle> {
+        @Override
+        public int compare(NoteRectangle o1, NoteRectangle o2) {
+            return Double.compare(o1.noteOnsetTime.getValue(), o2.noteOnsetTime.getValue());
+        }
     }
 }

@@ -9,6 +9,7 @@
 
 package site.overwrite.auditranscribe.notes;
 
+import javafx.application.Platform;
 import site.overwrite.auditranscribe.exceptions.ValueException;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
@@ -165,6 +166,7 @@ public class NotePlayer {
      * @param onDuration  How long this note should be played, in <b>milliseconds</b>.
      * @param offDuration How long this note should be offed, in <b>milliseconds</b>.
      * @throws ValueException If the note number is invalid (i.e. cannot be played in MIDI).
+     * // Fixme: why is the audio delayed?
      */
     public void playNoteForDuration(
             int noteNumber, int onVelocity, int offVelocity, long onDuration, long offDuration
@@ -195,7 +197,7 @@ public class NotePlayer {
             } catch (InterruptedException ignored) {
             }
         });
-        playSoundThread.setDaemon(true);
+//        playSoundThread.setDaemon(true);
         playSoundThread.start();
     }
 }

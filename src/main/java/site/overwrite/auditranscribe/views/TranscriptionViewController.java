@@ -128,8 +128,8 @@ public class TranscriptionViewController implements Initializable {
     private double audioDuration = 0;  // Will be updated upon scene initialization
     private double currTime = 0;
 
-    private double notesVolume = 0.5;  // Todo: add this to file
-    // Todo: add attribute that arranges the note rectangles according to their times
+    private int notesVolume = 64;  // Todo: add this to file
+    // Todo: share `NoteRectangle`'s `noteRectanglesSorted` with this class
 
     // Other attributes
     Stage mainStage;
@@ -138,6 +138,7 @@ public class TranscriptionViewController implements Initializable {
     Theme theme;
 
     NotePlayer notePlayer;
+    Queue<NoteRectangle> relevantNoteRectangles;
 
     private boolean isEverythingReady = false;
 
@@ -604,12 +605,13 @@ public class TranscriptionViewController implements Initializable {
      * Method that sets the notes' volume slider's CSS.
      */
     public void updateNotesVolumeSliderCSS() {
-        // Generate the style of the volume slider for the current volume value
+        // Generate the style of the notes' volume slider for the current notes' volume value
+        double notesVolumePercentage = (double) (notesVolume - 33) / 94 * 100;
         String style = String.format(
                 "-fx-background-color: linear-gradient(" +
                         "to right, -slider-filled-colour %f%%, -slider-unfilled-colour %f%%" +
                         ");",
-                notesVolume * 100, notesVolume * 100);
+                notesVolumePercentage, notesVolumePercentage);
 
         // Apply the style to the volume slider's track (if available)
         StackPane track = (StackPane) notesVolumeSlider.lookup(".track");
@@ -684,7 +686,10 @@ public class TranscriptionViewController implements Initializable {
 
         notesVolumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             // Update the notes volume value
-            notesVolume = newValue.doubleValue();
+            notesVolume = newValue.intValue();
+
+            // Update the note rectangles' playback volume
+            NoteRectangle.setOnVelocity(notesVolume);
 
             // Change the icon of the notes' volume button from off to on
             if (areNotesMuted) {
@@ -695,9 +700,6 @@ public class TranscriptionViewController implements Initializable {
                 );
                 isAudioMuted = false;
             }
-
-            // Update notes volume
-            // Todo: update notes' volume
 
             // Update CSS
             updateNotesVolumeSliderCSS();
@@ -945,6 +947,9 @@ public class TranscriptionViewController implements Initializable {
         } catch (InvalidObjectException e) {
             throw new RuntimeException(e);
         }
+
+        // Clear the note rectangles
+        relevantNoteRectangles.clear();
     }
 
     // Private methods
@@ -1394,6 +1399,13 @@ public class TranscriptionViewController implements Initializable {
                     if (scrollToPlayhead) {
                         updateScrollPosition(newPosX, spectrogramPane.getWidth());
                     }
+
+                    // Update notes that are played
+                    while (relevantNoteRectangles.size() != 0 && relevantNoteRectangles.peek().noteOnsetTime.getValue() < currTime) {
+                        // Play the note rectangle if notes can be played
+                        NoteRectangle noteRectangle = relevantNoteRectangles.poll();
+                        if (!areNotesMuted && noteRectangle != null) noteRectangle.playNote();
+                    }
                 }
             }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);
 
@@ -1442,7 +1454,7 @@ public class TranscriptionViewController implements Initializable {
             NoteRectangle.setMaxNoteNum(MAX_NOTE_NUMBER);
             NoteRectangle.setTotalDuration(audioDuration);
             NoteRectangle.setNotePlayer(notePlayer);
-            NoteRectangle.setOnVelocity(NOTE_PLAYING_ON_VELOCITY);
+            NoteRectangle.setOnVelocity(notesVolume);
             NoteRectangle.setOffVelocity(NOTE_PLAYING_OFF_VELOCITY);
             NoteRectangle.setOffDuration(NOTE_PLAYING_OFF_DURATION);
 
@@ -1463,9 +1475,11 @@ public class TranscriptionViewController implements Initializable {
                 throw new RuntimeException(e);
             }
 
-            // Update volume slider
+            // Update volume sliders
             audioVolumeSlider.setValue(audioVolume);
+            notesVolumeSlider.setValue(notesVolume);
             updateAudioVolumeSliderCSS();
+            updateNotesVolumeSliderCSS();
 
             // Ensure main pane is in focus
             rootPane.requestFocus();
@@ -1630,6 +1644,7 @@ public class TranscriptionViewController implements Initializable {
      * Helper method that toggles the play button.
      */
     private void togglePlayButton() {
+        // Toggle audio paused state
         if (currTime == audioDuration) {
             try {
                 audio.setAudioPlaybackTime(0);
@@ -1638,6 +1653,13 @@ public class TranscriptionViewController implements Initializable {
             }
         }
         isPaused = togglePaused(isPaused);
+
+        // Get relevant note rectangles as a queue if playback is unpaused
+        if (!isPaused) {
+            relevantNoteRectangles = NoteRectangle.getRelevantNoteRectangles(currTime);
+        } else {
+            relevantNoteRectangles.clear();
+        }
 
         logger.log(Level.FINE, "Toggled pause state (paused is now " + isPaused + ")");
     }
@@ -1748,8 +1770,6 @@ public class TranscriptionViewController implements Initializable {
                     ))
             );
 
-            // Todo: enable note playback
-
         } else {
             // Change the icon of the notes button from on to off
             notesVolumeButtonImage.setImage(
@@ -1757,8 +1777,6 @@ public class TranscriptionViewController implements Initializable {
                             "images/icons/PNGs/" + theme.shortName + "/musical-notes-outline.png"
                     ))
             );
-
-            // Todo: disable note playback
         }
 
         // Toggle the `areNotesMuted` flag

@@ -3,3 +3,4 @@ Fixme:
       stereo, 4 bytes/frame, little-endian is supported.
     - Playhead doesn't move sometimes.
         - Hard to recreate, but still possible to happen. Need further investigation.
+    - Note playing is delayed.
