@@ -113,6 +113,9 @@ public class TranscriptionViewController implements Initializable {
     final long NOTE_PLAYING_ON_DURATION = 75;  // In milliseconds
     final long NOTE_PLAYING_OFF_DURATION = 925;  // In milliseconds
 
+    // Todo: add to settings
+    final double NOTE_PLAYING_DELAY_OFFSET = 0.2;  // In seconds; to account for note playing delay
+
     final KeyCodeCombination NEW_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN);
     final KeyCodeCombination OPEN_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN);
     final KeyCodeCombination SAVE_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN);
@@ -951,6 +954,7 @@ public class TranscriptionViewController implements Initializable {
         }
 
         // Clear the note rectangles
+        NoteRectangle.noteRectangles.clear();
         relevantNoteRectangles.clear();
     }
 
@@ -1411,7 +1415,10 @@ public class TranscriptionViewController implements Initializable {
                     }
 
                     // Update notes that are played
-                    while (relevantNoteRectangles.size() != 0 && relevantNoteRectangles.peek().noteOnsetTime.getValue() < currTime) {
+                    while (relevantNoteRectangles.size() != 0 &&
+                            relevantNoteRectangles.peek().noteOnsetTime.getValue() <
+                                    currTime + NOTE_PLAYING_DELAY_OFFSET
+                    ) {
                         // Play the note rectangle if notes can be played
                         NoteRectangle noteRectangle = relevantNoteRectangles.poll();
                         if (!areNotesMuted && noteRectangle != null) noteRectangle.playNote();

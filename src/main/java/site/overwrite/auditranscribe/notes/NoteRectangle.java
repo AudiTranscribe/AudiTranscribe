@@ -369,7 +369,6 @@ public class NoteRectangle extends StackPane {
      * Method that plays the note that is defined by this note rectangle.
      */
     public void playNote() {
-        System.out.println("Playing note: " + noteNum + " for " + duration.getValue() + " seconds");
         notePlayer.playNoteForDuration(
                 noteNum, onVelocity, offVelocity, (long) (duration.getValue() * 1000),
                 (long) (offDuration * 1000)
