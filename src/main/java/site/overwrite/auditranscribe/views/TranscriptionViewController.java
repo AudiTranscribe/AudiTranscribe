@@ -136,6 +136,7 @@ public class TranscriptionViewController implements Initializable {
 
     NotePlayer notePlayer;
     Queue<NoteRectangle> relevantNoteRectangles;
+    MusicNotesDataObject musicNotesData;
 
     private boolean isEverythingReady = false;
 
@@ -252,6 +253,14 @@ public class TranscriptionViewController implements Initializable {
         if (os != null && os.startsWith("Mac")) {
             menuBar.useSystemMenuBarProperty().set(true);
         }
+
+        // Clear the note rectangles
+        NoteRectangle.noteRectangles.clear();
+        if (relevantNoteRectangles != null) relevantNoteRectangles.clear();
+
+        // Reset note rectangles settings
+        NoteRectangle.setIsPaused(isPaused);
+        NoteRectangle.setCanEdit(canEditNotes);
 
         // Set the width and height of the root pane
         masterVBox.prefWidthProperty().bind(rootPane.widthProperty());
@@ -740,6 +749,9 @@ public class TranscriptionViewController implements Initializable {
         audioVolume = projectData.guiData.playbackVolume;
         currTime = projectData.guiData.currTimeInMS / 1000.;
 
+        // Set the music notes data attribute
+        this.musicNotesData = projectData.musicNotesData;
+
         // Set the AudiTranscribe file's file path and file name
         this.audtFilePath = audtFilePath;
         this.audtFileName = audtFileName;
@@ -760,21 +772,6 @@ public class TranscriptionViewController implements Initializable {
         // Update music key and beats per bar
         musicKey = MUSIC_KEYS[musicKeyIndex];
         beatsPerBar = TIME_SIGNATURE_TO_BEATS_PER_BAR.get(TIME_SIGNATURES[timeSignatureIndex]);
-
-        // Set up note rectangles
-        int numNoteRectangles = projectData.musicNotesData.noteNums.length;
-        for (int i = 0; i < numNoteRectangles; i++) {
-            // Get the note rectangle data
-            double timeToPlaceRectangle = projectData.musicNotesData.timesToPlaceRectangles[i];
-            double noteDuration = projectData.musicNotesData.noteDurations[i];
-            int noteNum = projectData.musicNotesData.noteNums[i];
-
-            // Create a new note rectangle and add it to the note rectangles list
-            NoteRectangle noteRect = new NoteRectangle(timeToPlaceRectangle, noteDuration, noteNum);
-
-            // Add the note rectangle to the spectrogram pane
-            spectrogramPaneAnchor.getChildren().add(noteRect);
-        }
 
         // Attempt to add this project to the projects' database
         try {
@@ -1511,17 +1508,6 @@ public class TranscriptionViewController implements Initializable {
             // Show the spectrogram from the middle
             spectrogramPane.setVvalue(0.5);
 
-            // Update playhead position
-            try {
-                seekToTime(currTime);
-                updateScrollPosition(
-                        currTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X,
-                        spectrogramPane.getWidth()
-                );
-            } catch (InvalidObjectException e) {
-                throw new RuntimeException(e);
-            }
-
             // Update volume sliders
             audioVolumeSlider.setValue(audioVolume);
             notesVolumeSlider.setValue(notesVolume);
@@ -1627,6 +1613,41 @@ public class TranscriptionViewController implements Initializable {
         masterTask.setOnSucceeded(event -> {
             // Check if all tasks are completed
             if (masterTask.getValue()) {
+                // Update the `isEverythingReady` flag
+                isEverythingReady = true;
+
+                // Update playhead position
+                try {
+                    seekToTime(currTime);
+                    updateScrollPosition(
+                            currTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X,
+                            spectrogramPane.getWidth()
+                    );
+                } catch (InvalidObjectException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // Set up note rectangles
+                int numNoteRectangles = musicNotesData.noteNums.length;
+                for (int i = 0; i < numNoteRectangles; i++) {
+                    // Get the note rectangle data
+                    double timeToPlaceRectangle = musicNotesData.timesToPlaceRectangles[i];
+                    double noteDuration = musicNotesData.noteDurations[i];
+                    int noteNum = musicNotesData.noteNums[i];
+
+                    // Create a new note rectangle and add it to the note rectangles list
+                    NoteRectangle noteRect = new NoteRectangle(timeToPlaceRectangle, noteDuration, noteNum);
+
+                    // Add the note rectangle to the spectrogram pane
+                    spectrogramPaneAnchor.getChildren().add(noteRect);
+
+                    logger.log(
+                            Level.FINE,
+                            "Loaded note " + noteNum + " with " + noteDuration + " seconds duration at " +
+                                    timeToPlaceRectangle + " seconds"
+                    );
+                }
+
                 // Enable all disabled nodes
                 Node[] disabledNodes = new Node[]{
                         // Top Hbox
@@ -1642,9 +1663,6 @@ public class TranscriptionViewController implements Initializable {
                 for (Node node : disabledNodes) {
                     node.setDisable(false);
                 }
-
-                // Update the `isTranscriptionViewReady` flag
-                isEverythingReady = true;
             }
         });
 
