@@ -775,9 +775,10 @@ public class TranscriptionViewController implements Initializable {
 
         // Ensure that the temporary directory exists
         IOMethods.createFolder(IOConstants.TEMP_FOLDER);
+        logger.log(Level.FINE, "Temp folder " + IOConstants.TEMP_FOLDER);
 
         // Create an empty MP3 file in the temporary directory
-        File auxiliaryMP3File = new File(IOConstants.TEMP_FOLDER + audioFileName);
+        File auxiliaryMP3File = new File(IOConstants.TEMP_FOLDER + "temp.mp3");
         IOMethods.createFile(auxiliaryMP3File.getAbsolutePath());
 
         // Write the raw MP3 bytes into a temporary file
