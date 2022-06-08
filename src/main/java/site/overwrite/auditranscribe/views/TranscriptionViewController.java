@@ -1628,24 +1628,26 @@ public class TranscriptionViewController implements Initializable {
                 }
 
                 // Set up note rectangles
-                int numNoteRectangles = musicNotesData.noteNums.length;
-                for (int i = 0; i < numNoteRectangles; i++) {
-                    // Get the note rectangle data
-                    double timeToPlaceRectangle = musicNotesData.timesToPlaceRectangles[i];
-                    double noteDuration = musicNotesData.noteDurations[i];
-                    int noteNum = musicNotesData.noteNums[i];
+                if (musicNotesData != null) {
+                    int numNoteRectangles = musicNotesData.noteNums.length;
+                    for (int i = 0; i < numNoteRectangles; i++) {
+                        // Get the note rectangle data
+                        double timeToPlaceRectangle = musicNotesData.timesToPlaceRectangles[i];
+                        double noteDuration = musicNotesData.noteDurations[i];
+                        int noteNum = musicNotesData.noteNums[i];
 
-                    // Create a new note rectangle and add it to the note rectangles list
-                    NoteRectangle noteRect = new NoteRectangle(timeToPlaceRectangle, noteDuration, noteNum);
+                        // Create a new note rectangle and add it to the note rectangles list
+                        NoteRectangle noteRect = new NoteRectangle(timeToPlaceRectangle, noteDuration, noteNum);
 
-                    // Add the note rectangle to the spectrogram pane
-                    spectrogramPaneAnchor.getChildren().add(noteRect);
+                        // Add the note rectangle to the spectrogram pane
+                        spectrogramPaneAnchor.getChildren().add(noteRect);
 
-                    logger.log(
-                            Level.FINE,
-                            "Loaded note " + noteNum + " with " + noteDuration + " seconds duration at " +
-                                    timeToPlaceRectangle + " seconds"
-                    );
+                        logger.log(
+                                Level.FINE,
+                                "Loaded note " + noteNum + " with " + noteDuration + " seconds duration at " +
+                                        timeToPlaceRectangle + " seconds"
+                        );
+                    }
                 }
 
                 // Enable all disabled nodes
