@@ -995,6 +995,11 @@ public class TranscriptionViewController implements Initializable {
         colouredProgressPane.setPrefWidth(newXPos);
         if (isEverythingReady) PlottingStuffHandler.updatePlayheadLine(playheadLine, newXPos);
 
+        // Update relevant note rectangles upon seeking
+        if (!isPaused) {
+            relevantNoteRectangles = NoteRectangle.getRelevantNoteRectangles(currTime);
+        }
+
         logger.log(Level.FINE, "Seeked to " + seekTime + " seconds");
     }
 
