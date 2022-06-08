@@ -2,7 +2,7 @@
  * AUDTFileWriter.java
  *
  * Created on 2022-05-01
- * Updated on 2022-06-06
+ * Updated on 2022-06-08
  *
  * Description: Class that handles the writing of the AudiTranscribe (AUDT) file.
  */
@@ -10,8 +10,10 @@
 package site.overwrite.auditranscribe.io.audt_file;
 
 import site.overwrite.auditranscribe.io.IOConverters;
+import site.overwrite.auditranscribe.io.LZ4;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.MusicNotesDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
 
 import java.io.File;
@@ -105,6 +107,20 @@ public class AUDTFileWriter {
         writeEOSDelimiter();
     }
 
+    /**
+     * Method that writes the music notes data (<b>section number 4</b>) to file.
+     *
+     * @param musicNotesDataObj Data object that holds all the music notes data.
+     * @throws IOException If something went wrong when LZ4 compressing.
+     */
+    public void writeMusicNotesData(MusicNotesDataObject musicNotesDataObj) throws IOException {
+        writeSectionID(4);
+        write1DDoubleArray(musicNotesDataObj.timesToPlaceRectangles);
+        write1DDoubleArray(musicNotesDataObj.noteDurations);
+        write1DIntegerArray(musicNotesDataObj.noteNums);
+        writeEOSDelimiter();
+    }
+
     // Private methods
 
     /**
@@ -176,6 +192,46 @@ public class AUDTFileWriter {
     private void writeByteArray(byte[] array) {
         writeInteger(array.length);  // Write number of bytes present in the array
         AUDTFileHelpers.addBytesIntoBytesList(bytes, array);
+    }
+
+    /**
+     * Helper method that writes an 1D integer array into the byte list.
+     *
+     * @param array 1D array of integers.
+     */
+    private void write1DIntegerArray(int[] array) throws IOException {
+        // Convert the 1D array into its bytes
+        byte[] byteArray = IOConverters.oneDimensionalIntegerArrayToBytes(array);
+
+        // Compress the byte array
+        byte[] compressedBytes = LZ4.lz4Compress(byteArray);
+
+        // Get the number of compressed bytes
+        int numCompressedBytes = compressedBytes.length;
+
+        // Write to the byte list
+        writeInteger(numCompressedBytes);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, compressedBytes);
+    }
+
+    /**
+     * Helper method that writes an 1D double array into the byte list.
+     *
+     * @param array 1D array of doubles.
+     */
+    private void write1DDoubleArray(double[] array) throws IOException {
+        // Convert the 1D array into its bytes
+        byte[] byteArray = IOConverters.oneDimensionalDoubleArrayToBytes(array);
+
+        // Compress the byte array
+        byte[] compressedBytes = LZ4.lz4Compress(byteArray);
+
+        // Get the number of compressed bytes
+        int numCompressedBytes = compressedBytes.length;
+
+        // Write to the byte list
+        writeInteger(numCompressedBytes);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, compressedBytes);
     }
 
     /**

@@ -2,7 +2,7 @@
  * AUDTFileReader.java
  *
  * Created on 2022-05-02
- * Updated on 2022-06-06
+ * Updated on 2022-06-08
  *
  * Description: Class that handles the reading of the AudiTranscribe (AUDT) file.
  */
@@ -10,8 +10,10 @@
 package site.overwrite.auditranscribe.io.audt_file;
 
 import site.overwrite.auditranscribe.io.IOConverters;
+import site.overwrite.auditranscribe.io.LZ4;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.MusicNotesDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
 import site.overwrite.auditranscribe.exceptions.FailedToReadDataException;
 import site.overwrite.auditranscribe.exceptions.IncorrectFileFormatException;
@@ -137,7 +139,8 @@ public class AUDTFileReader {
     /**
      * Method that reads the GUI data from the file.
      *
-     * @return A <code>GUIDataObject</code> that encapsulates all the data that are needed by the GUI data.
+     * @return A <code>GUIDataObject</code> that encapsulates all the data that are needed by the
+     * GUI data.
      * @throws FailedToReadDataException If the program failed to read the data from the file.
      */
     public GUIDataObject readGUIData() throws FailedToReadDataException {
@@ -167,6 +170,37 @@ public class AUDTFileReader {
         return new GUIDataObject(
                 musicKeyIndex, timeSignatureIndex, bpm, offsetSeconds, playbackVolume, currTimeInMS
         );
+    }
+
+    /**
+     * Method that reads the music notes data from the file.
+     *
+     * @return A <code>MusicNotesDataObject</code> that encapsulates all the music notes data.
+     * @throws FailedToReadDataException If the program failed to read the data from the file.
+     * @throws IOException               If something went wrong during reading the file.
+     */
+    public MusicNotesDataObject readMusicNotesData() throws FailedToReadDataException, IOException {
+        // Ensure that the GUI data section ID is 4
+        int sectionID = readSectionID();
+        if (sectionID != 4) {
+            throw new FailedToReadDataException(
+                    "Failed to read music notes data; the music notes data section has the incorrect section ID of " +
+                            sectionID + " (expected: 4)"
+            );
+        }
+
+        // Read in the rest of the data first
+        double[] timesToPlaceRectangles = read1DDoubleArray();
+        double[] noteDurations = read1DDoubleArray();
+        int[] noteNums = read1DIntegerArray();
+
+        // Check if there is an EOS
+        if (!checkEOSDelimiter()) {
+            throw new FailedToReadDataException("Failed to read music notes data; end of section delimiter missing");
+        }
+
+        // Create and return a `MusicNotesDataObject`
+        return new MusicNotesDataObject(timesToPlaceRectangles, noteDurations, noteNums);
     }
 
     // Private methods
@@ -297,6 +331,46 @@ public class AUDTFileReader {
 
         // Return the byte array
         return byteArray;
+    }
+
+    /**
+     * Helper method that reads in a one-dimensional integer array from the byte array.
+     *
+     * @return One-dimensional integer array that was read in.
+     */
+    private int[] read1DIntegerArray() throws IOException {
+        // Get the number of bytes that stores the compressed 1D integer array
+        int numCompressedBytes = readInteger();
+
+        // Read in the compressed array's bytes
+        byte[] compressedBytes = Arrays.copyOfRange(bytes, bytePos, bytePos + numCompressedBytes);
+        bytePos += numCompressedBytes;
+
+        // Decompress the bytes
+        byte[] decompressedBytes = LZ4.lz4Decompress(compressedBytes);
+
+        // Convert these bytes back into the 1D array and return
+        return IOConverters.bytesToOneDimensionalIntegerArray(decompressedBytes);
+    }
+
+    /**
+     * Helper method that reads in a one-dimensional double array from the byte array.
+     *
+     * @return One-dimensional double array that was read in.
+     */
+    private double[] read1DDoubleArray() throws IOException {
+        // Get the number of bytes that stores the compressed 1D double array
+        int numCompressedBytes = readInteger();
+
+        // Read in the compressed array's bytes
+        byte[] compressedBytes = Arrays.copyOfRange(bytes, bytePos, bytePos + numCompressedBytes);
+        bytePos += numCompressedBytes;
+
+        // Decompress the bytes
+        byte[] decompressedBytes = LZ4.lz4Decompress(compressedBytes);
+
+        // Convert these bytes back into the 1D array and return
+        return IOConverters.bytesToOneDimensionalDoubleArray(decompressedBytes);
     }
 
     /**

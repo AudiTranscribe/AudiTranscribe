@@ -2,7 +2,7 @@
  * AUDTFileTest.java
  *
  * Created on 2022-05-01
- * Updated on 2022-06-06
+ * Updated on 2022-06-08
  *
  * Description: Test AUDT file reading and writing.
  */
@@ -18,6 +18,7 @@ import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.LZ4;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.MusicNotesDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
 import site.overwrite.auditranscribe.exceptions.FailedToReadDataException;
 import site.overwrite.auditranscribe.exceptions.IncorrectFileFormatException;
@@ -35,13 +36,17 @@ class AUDTFileTest {
     final String fileName =
             "src/main/resources/site/overwrite/auditranscribe/test-resources/file-io-directory/test-AUDTFileTest.audt";
 
-    // Define Q-Transform magnitude data
-    // (This is just an example array, not actual data)
+    // Define sample array data
+    // (These are example arrays, not actual data)
     double[][] qTransformMagnitudes = new double[][]{
             {65.43, -123.45, 9876.54321, 3.14159265, -0.000082147128481},
             {65.43, 9876.54321, 3.14159265, -0.000082147128481, -123.45},
             {65.43, -123.45, 3.14159265, -0.000082147128481, 9876.54321}
     };
+
+    double[] timesToPlaceRectangles = {1, 2, 3, 4.5, 6.7, 8.9};
+    double[] noteDurations = {0.5, 1, 1.5, 2.5, 3.5, 10};
+    int[] noteNums = {32, 41, 91, 82, 84, 55};
 
     // Convert the magnitude data to required form
     Triplet<Byte[], Double, Double> conversionTuple =
@@ -60,6 +65,9 @@ class AUDTFileTest {
     GUIDataObject guiDataObject = new GUIDataObject(
             11, 9, 123.45, 0.01, 0.55, 9000
     );
+    MusicNotesDataObject musicNotesDataObject = new MusicNotesDataObject(
+            timesToPlaceRectangles, noteDurations, noteNums
+    );
 
     // Initialization method
     AUDTFileTest() throws IOException {
@@ -76,6 +84,7 @@ class AUDTFileTest {
         fileWriter.writeQTransformData(qTransformDataObject);
         fileWriter.writeAudioData(audioDataObject);
         fileWriter.writeGUIData(guiDataObject);
+        fileWriter.writeMusicNotesData(musicNotesDataObject);
 
         // Write the bytes to file
         fileWriter.writeBytesToFile();
@@ -91,11 +100,13 @@ class AUDTFileTest {
         QTransformDataObject readQTransformData = fileReader.readQTransformData();
         AudioDataObject readAudioData = fileReader.readAudioData();
         GUIDataObject readGUIData = fileReader.readGUIData();
+        MusicNotesDataObject readMusicData = fileReader.readMusicNotesData();
 
         // Check if the read data are equal
         assertEquals(qTransformDataObject, readQTransformData);
         assertEquals(audioDataObject, readAudioData);
         assertEquals(guiDataObject, readGUIData);
+        assertEquals(musicNotesDataObject, readMusicData);
 
         // Check if the decompressed version of the Q-Transform magnitudes is the same
         double[][] array = QTransformDataObject.byteDataToQTransformMagnitudes(

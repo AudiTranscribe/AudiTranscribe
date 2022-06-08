@@ -2,7 +2,7 @@
  * IOConverters.java
  *
  * Created on 2022-05-01
- * Updated on 2022-05-25
+ * Updated on 2022-06-08
  *
  * Description: Methods that converts Java objects/data into bytes for storage.
  */
@@ -72,6 +72,39 @@ public class IOConverters {
      */
     public static byte[] stringToBytes(String str) {
         return str.getBytes();
+    }
+
+    /**
+     * Method that converts an 1D array of integers into a byte array.
+     *
+     * @param array 1D array of integers
+     * @return Byte array, representing the 1D array of integers.
+     */
+    public static byte[] oneDimensionalIntegerArrayToBytes(int[] array) {
+        // Get the length of the array
+        int len = array.length;
+
+        // Calculate the total number of bytes needed
+        int numBytes = 4 * len + 4;  // Each integer takes 4 bytes, and +4 for the length of array
+
+        // Create the byte array
+        byte[] bytes = new byte[numBytes];
+
+        // Write the length of the array into the bytes array
+        byte[] lengthBytes = intToBytes(len);
+        System.arraycopy(lengthBytes, 0, bytes, 0, 4);
+
+        // For each element, copy its bytes into the byte array
+        for (int i = 0; i < len; i++) {
+            // Get the bytes that represent the element
+            byte[] elemBytes = intToBytes(array[i]);
+
+            // Write the bytes into the byte array
+            System.arraycopy(elemBytes, 0, bytes, 4 * i + 4, 4);
+        }
+
+        // Return the byte array
+        return bytes;
     }
 
     /**
@@ -260,6 +293,33 @@ public class IOConverters {
 
         // Return the output string
         return output.toString();
+    }
+
+    /**
+     * Method that converts a byte array into a 1D integer array.
+     *
+     * @param bytes Byte array.
+     * @return 1D integer array that was represented by the byte array.
+     */
+    public static int[] bytesToOneDimensionalIntegerArray(byte[] bytes) {
+        // First 4 bytes represent the number of elements in the resulting array
+        byte[] numElemBytes = Arrays.copyOfRange(bytes, 0, 4);
+        int numElem = bytesToInt(numElemBytes);
+
+        // Create the double array
+        int[] array = new int[numElem];
+
+        // Go through the remaining bytes and retrieve the doubles
+        for (int i = 0; i < numElem; i++) {
+            // Get the bytes that represent the current element
+            byte[] currElemBytes = Arrays.copyOfRange(bytes, 4 * i + 4, 4 * (i + 1) + 4);
+
+            // Convert the bytes into an integer and place into the array
+            array[i] = bytesToInt(currElemBytes);
+        }
+
+        // Return the integer array
+        return array;
     }
 
     /**
