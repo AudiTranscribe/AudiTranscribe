@@ -169,6 +169,7 @@ public class TranscriptionViewController implements Initializable {
     private Line playheadLine;
 
     Queue<CustomTask<?>> ongoingTasks = new LinkedList<>();
+    ScheduledExecutorService scheduler;
 
     // FXML Elements
     // Menu bar
@@ -858,6 +859,9 @@ public class TranscriptionViewController implements Initializable {
         } catch (InvalidObjectException e) {
             throw new RuntimeException(e);
         }
+
+        // Shutdown the scheduler
+        scheduler.shutdown();
     }
 
     // Private methods
@@ -1253,7 +1257,7 @@ public class TranscriptionViewController implements Initializable {
             spectrogramPaneAnchor.getChildren().add(playheadLine);
 
             // Create a constantly-executing service
-            ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(0, runnable -> {
+            scheduler = Executors.newScheduledThreadPool(0, runnable -> {
                 Thread thread = Executors.defaultThreadFactory().newThread(runnable);
                 thread.setDaemon(true);  // Make it so that it can shut down gracefully by placing it in background
                 return thread;
