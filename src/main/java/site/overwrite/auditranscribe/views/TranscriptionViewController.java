@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-07
+ * Updated on 2022-06-08
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -124,10 +124,11 @@ public class TranscriptionViewController implements Initializable {
     private int timeSignatureIndex = 0;
     private double bpm = 120;
     private double offset = 0.;
-    private double volume = 0.5;
+    private double audioVolume = 0.5;
     private double audioDuration = 0;  // Will be updated upon scene initialization
     private double currTime = 0;
 
+    private double notesVolume = 0.5;  // Todo: add this to file
     // Todo: add attribute that arranges the note rectangles according to their times
 
     // Other attributes
@@ -158,7 +159,8 @@ public class TranscriptionViewController implements Initializable {
     private String musicKey = "C";
     private int beatsPerBar = 4;
     private boolean isPaused = true;
-    private boolean isMuted = false;
+    private boolean isAudioMuted = false;
+    private boolean areNotesMuted = false;
 
     private boolean scrollToPlayhead = false;
     private boolean canEditNotes = false;
@@ -233,15 +235,15 @@ public class TranscriptionViewController implements Initializable {
     private Label currTimeLabel, totalTimeLabel;
 
     @FXML
-    private Button playButton, stopButton, playSkipBackButton, playSkipForwardButton, scrollButton, editNotesButton,
-            volumeButton;
+    private Button audioVolumeButton, notesVolumeButton, playButton, stopButton, playSkipBackButton,
+            playSkipForwardButton, scrollButton, editNotesButton;
 
     @FXML
-    private ImageView playButtonImage, stopButtonImage, playSkipBackButtonImage, playSkipForwardButtonImage,
-            editNotesButtonImage, scrollButtonImage, volumeButtonImage;
+    private ImageView audioVolumeButtonImage, notesVolumeButtonImage, playButtonImage,
+            stopButtonImage, playSkipBackButtonImage, playSkipForwardButtonImage, editNotesButtonImage, scrollButtonImage;
 
     @FXML
-    private Slider volumeSlider;
+    private Slider audioVolumeSlider, notesVolumeSlider;
 
     // Initialization method
     @Override
@@ -411,7 +413,9 @@ public class TranscriptionViewController implements Initializable {
 
         editNotesButton.setOnAction(event -> toggleEditNotesButton());
 
-        volumeButton.setOnAction(event -> toggleMuteButton());
+        audioVolumeButton.setOnAction(event -> toggleAudioMuteButton());
+
+        notesVolumeButton.setOnAction(event -> toggleNoteMuteButton());
 
         // Set spectrogram pane mouse event handler
         spectrogramPaneAnchor.addEventHandler(MouseEvent.ANY, new MouseHandler(event -> {
@@ -569,26 +573,46 @@ public class TranscriptionViewController implements Initializable {
                 "images/icons/PNGs/" + theme.shortName + "/footsteps-outline.png"
         )));
         editNotesButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/musical-notes-outline.png"
+                "images/icons/PNGs/" + theme.shortName + "/edit-notes-outline.png"
         )));
-        volumeButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+
+        audioVolumeButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
                 "images/icons/PNGs/" + theme.shortName + "/volume-high.png"
+        )));
+        notesVolumeButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/icons/PNGs/" + theme.shortName + "/musical-notes.png"
         )));
     }
 
     /**
-     * Method that sets the volume slider's CSS.
+     * Method that sets the audio's volume slider's CSS.
      */
-    public void updateVolumeSliderCSS() {
+    public void updateAudioVolumeSliderCSS() {
         // Generate the style of the volume slider for the current volume value
         String style = String.format(
                 "-fx-background-color: linear-gradient(" +
                         "to right, -slider-filled-colour %f%%, -slider-unfilled-colour %f%%" +
                         ");",
-                volume * 100, volume * 100);
+                audioVolume * 100, audioVolume * 100);
 
         // Apply the style to the volume slider's track (if available)
-        StackPane track = (StackPane) volumeSlider.lookup(".track");
+        StackPane track = (StackPane) audioVolumeSlider.lookup(".track");
+        if (track != null) track.setStyle(style);
+    }
+
+    /**
+     * Method that sets the notes' volume slider's CSS.
+     */
+    public void updateNotesVolumeSliderCSS() {
+        // Generate the style of the volume slider for the current volume value
+        String style = String.format(
+                "-fx-background-color: linear-gradient(" +
+                        "to right, -slider-filled-colour %f%%, -slider-unfilled-colour %f%%" +
+                        ");",
+                notesVolume * 100, notesVolume * 100);
+
+        // Apply the style to the volume slider's track (if available)
+        StackPane track = (StackPane) notesVolumeSlider.lookup(".track");
         if (track != null) track.setStyle(style);
     }
 
@@ -630,32 +654,55 @@ public class TranscriptionViewController implements Initializable {
         bpmSpinner.setValueFactory(bpmSpinnerFactory);
         offsetSpinner.setValueFactory(offsetSpinnerFactory);
 
-        // Set method on the volume slider
-        volumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            // Update the volume value
-            volume = newValue.doubleValue();
+        // Set methods on the volume sliders
+        audioVolumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            // Update the audio volume value
+            audioVolume = newValue.doubleValue();
 
-            // Change the icon of the volume button from mute to non-mute
-            if (isMuted) {
-                volumeButtonImage.setImage(
+            // Change the icon of the audio volume button from mute to non-mute
+            if (isAudioMuted) {
+                audioVolumeButtonImage.setImage(
                         new Image(IOMethods.getFileURLAsString(
                                 "images/icons/PNGs/" + theme.shortName + "/volume-high.png"
                         ))
                 );
-                isMuted = false;
+                isAudioMuted = false;
             }
 
             // Update audio volume
             try {
-                audio.setPlaybackVolume(volume);
+                audio.setPlaybackVolume(audioVolume);
             } catch (InvalidObjectException e) {
                 throw new RuntimeException(e);
             }
 
             // Update CSS
-            updateVolumeSliderCSS();
+            updateAudioVolumeSliderCSS();
 
-            logger.log(Level.FINE, "Changed volume from " + oldValue + " to " + newValue);
+            logger.log(Level.FINE, "Changed audio volume from " + oldValue + " to " + newValue);
+        });
+
+        notesVolumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            // Update the notes volume value
+            notesVolume = newValue.doubleValue();
+
+            // Change the icon of the notes' volume button from off to on
+            if (areNotesMuted) {
+                notesVolumeButtonImage.setImage(
+                        new Image(IOMethods.getFileURLAsString(
+                                "images/icons/PNGs/" + theme.shortName + "/musical-notes.png"
+                        ))
+                );
+                isAudioMuted = false;
+            }
+
+            // Update notes volume
+            // Todo: update notes' volume
+
+            // Update CSS
+            updateNotesVolumeSliderCSS();
+
+            logger.log(Level.FINE, "Changed notes volume from " + oldValue + " to " + newValue);
         });
 
         // Update labels
@@ -686,7 +733,7 @@ public class TranscriptionViewController implements Initializable {
         timeSignatureIndex = projectData.guiData.timeSignatureIndex;
         bpm = projectData.guiData.bpm;
         offset = projectData.guiData.offsetSeconds;
-        volume = projectData.guiData.playbackVolume;
+        audioVolume = projectData.guiData.playbackVolume;
         currTime = projectData.guiData.currTimeInMS / 1000.;
 
         // Set the AudiTranscribe file's file path and file name
@@ -1085,7 +1132,7 @@ public class TranscriptionViewController implements Initializable {
                         compressedMP3Bytes, sampleRate, (int) audioDuration * 1000,
                         audioFileName);
                 GUIDataObject guiData = new GUIDataObject(
-                        musicKeyIndex, timeSignatureIndex, bpm, offset, volume,
+                        musicKeyIndex, timeSignatureIndex, bpm, offset, audioVolume,
                         (int) currTime * 1000
                 );
 
@@ -1417,8 +1464,8 @@ public class TranscriptionViewController implements Initializable {
             }
 
             // Update volume slider
-            volumeSlider.setValue(volume);
-            updateVolumeSliderCSS();
+            audioVolumeSlider.setValue(audioVolume);
+            updateAudioVolumeSliderCSS();
 
             // Ensure main pane is in focus
             rootPane.requestFocus();
@@ -1526,9 +1573,9 @@ public class TranscriptionViewController implements Initializable {
                         musicKeyChoice, bpmSpinner, timeSignatureChoice, offsetSpinner,
 
                         // Bottom Hbox
+                        audioVolumeButton, audioVolumeSlider, notesVolumeButton, notesVolumeSlider,
                         playButton, stopButton, playSkipBackButton, playSkipForwardButton,
-                        scrollButton, editNotesButton,
-                        volumeButton, volumeSlider
+                        scrollButton, editNotesButton
                 };
 
                 for (Node node : disabledNodes) {
@@ -1629,7 +1676,7 @@ public class TranscriptionViewController implements Initializable {
             // Change the icon of the edit notes button from filled to non-filled
             editNotesButtonImage.setImage(
                     new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/musical-notes-outline.png"
+                            "images/icons/PNGs/" + theme.shortName + "/edit-notes-outline.png"
                     ))
             );
 
@@ -1637,7 +1684,7 @@ public class TranscriptionViewController implements Initializable {
             // Change the icon of the edit notes button from non-filled to filled
             editNotesButtonImage.setImage(
                     new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/musical-notes.png"
+                            "images/icons/PNGs/" + theme.shortName + "/edit-notes.png"
                     ))
             );
         }
@@ -1650,12 +1697,12 @@ public class TranscriptionViewController implements Initializable {
     }
 
     /**
-     * Helper method that toggles the mute button.
+     * Helper method that toggles the audio mute button.
      */
-    private void toggleMuteButton() {
-        if (isMuted) {
+    private void toggleAudioMuteButton() {
+        if (isAudioMuted) {
             // Change the icon of the volume button from mute to non-mute
-            volumeButtonImage.setImage(
+            audioVolumeButtonImage.setImage(
                     new Image(IOMethods.getFileURLAsString(
                             "images/icons/PNGs/" + theme.shortName + "/volume-high.png"
                     ))
@@ -1663,13 +1710,13 @@ public class TranscriptionViewController implements Initializable {
 
             // Unmute the audio by setting the volume back to the value before the mute
             try {
-                audio.setPlaybackVolume(volume);
+                audio.setPlaybackVolume(audioVolume);
             } catch (InvalidObjectException e) {
                 throw new RuntimeException(e);
             }
         } else {
             // Change the icon of the volume button from non-mute to mute
-            volumeButtonImage.setImage(
+            audioVolumeButtonImage.setImage(
                     new Image(IOMethods.getFileURLAsString(
                             "images/icons/PNGs/" + theme.shortName + "/volume-mute.png"
                     ))
@@ -1683,10 +1730,41 @@ public class TranscriptionViewController implements Initializable {
             }
         }
 
-        // Toggle the `isMuted` flag
-        isMuted = !isMuted;
+        // Toggle the `isAudioMuted` flag
+        isAudioMuted = !isAudioMuted;
 
-        logger.log(Level.FINE, "Toggled mute button (muted is now " + isMuted + ")");
+        logger.log(Level.FINE, "Toggled audio mute button (audio muted is now " + isAudioMuted + ")");
+    }
+
+    /**
+     * Helper method that toggles the note mute button.
+     */
+    private void toggleNoteMuteButton() {
+        if (areNotesMuted) {
+            // Change the icon of the notes button from off to on
+            notesVolumeButtonImage.setImage(
+                    new Image(IOMethods.getFileURLAsString(
+                            "images/icons/PNGs/" + theme.shortName + "/musical-notes.png"
+                    ))
+            );
+
+            // Todo: enable note playback
+
+        } else {
+            // Change the icon of the notes button from on to off
+            notesVolumeButtonImage.setImage(
+                    new Image(IOMethods.getFileURLAsString(
+                            "images/icons/PNGs/" + theme.shortName + "/musical-notes-outline.png"
+                    ))
+            );
+
+            // Todo: disable note playback
+        }
+
+        // Toggle the `areNotesMuted` flag
+        areNotesMuted = !areNotesMuted;
+
+        logger.log(Level.FINE, "Toggled notes mute button (notes muted is now " + areNotesMuted + ")");
     }
 
     /**
@@ -1717,15 +1795,15 @@ public class TranscriptionViewController implements Initializable {
 
         } else if (code == KeyCode.UP) {  // Up arrow is to increase volume
             keyEvent.consume();
-            volumeSlider.setValue(volumeSlider.getValue() + VOLUME_VALUE_DELTA_ON_KEY_PRESS);
+            audioVolumeSlider.setValue(audioVolumeSlider.getValue() + VOLUME_VALUE_DELTA_ON_KEY_PRESS);
 
         } else if (code == KeyCode.DOWN) {  // Down arrow is to decrease volume
             keyEvent.consume();
-            volumeSlider.setValue(volumeSlider.getValue() - VOLUME_VALUE_DELTA_ON_KEY_PRESS);
+            audioVolumeSlider.setValue(audioVolumeSlider.getValue() - VOLUME_VALUE_DELTA_ON_KEY_PRESS);
 
         } else if (code == KeyCode.M) {  // M key is to toggle mute
             keyEvent.consume();
-            toggleMuteButton();
+            toggleAudioMuteButton();
 
         } else if (code == KeyCode.LEFT) {  // Left arrow is to seek 1 second before
             keyEvent.consume();

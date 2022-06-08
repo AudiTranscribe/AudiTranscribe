@@ -182,6 +182,32 @@
                                  </padding>
                               </HBox>
                               <Separator orientation="VERTICAL" prefHeight="200.0" />
+                              <HBox alignment="CENTER_LEFT" layoutX="421.0" layoutY="10.0" prefHeight="100.0" prefWidth="0.0" spacing="5.0" HBox.hgrow="NEVER">
+                                 <children>
+                                    <Button fx:id="scrollButton" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button">
+                                       <graphic>
+                                          <ImageView fx:id="scrollButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../../images/icons/PNGs/light-mode/footsteps-outline.png" />
+                                             </image>
+                                          </ImageView>
+                                       </graphic>
+                                    </Button>
+                                    <Button fx:id="editNotesButton" contentDisplay="CENTER" disable="true" layoutX="10.0" layoutY="23.0" mnemonicParsing="false" styleClass="image-button">
+                                       <graphic>
+                                          <ImageView fx:id="editNotesButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../../images/icons/PNGs/light-mode/edit-notes-outline.png" />
+                                             </image>
+                                          </ImageView>
+                                       </graphic>
+                                    </Button>
+                                 </children>
+                                 <padding>
+                                    <Insets left="10.0" right="10.0" />
+                                 </padding>
+                              </HBox>
+                              <Separator orientation="VERTICAL" prefHeight="200.0" />
                               <HBox alignment="CENTER" prefHeight="100.0" prefWidth="0.0" spacing="5.0" HBox.hgrow="NEVER">
                                  <children>
                                     <Button fx:id="playButton" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button">
@@ -226,44 +252,28 @@
                                  </padding>
                               </HBox>
                               <Separator orientation="VERTICAL" prefHeight="200.0" />
-                              <HBox alignment="CENTER_LEFT" layoutX="421.0" layoutY="10.0" prefHeight="100.0" prefWidth="0.0" spacing="5.0" HBox.hgrow="NEVER">
-                                 <children>
-                                    <Button fx:id="scrollButton" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button">
-                                       <graphic>
-                                          <ImageView fx:id="scrollButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@../../images/icons/PNGs/light-mode/footsteps-outline.png" />
-                                             </image>
-                                          </ImageView>
-                                       </graphic>
-                                    </Button>
-                                    <Button fx:id="editNotesButton" contentDisplay="CENTER" disable="true" layoutX="10.0" layoutY="23.0" mnemonicParsing="false" styleClass="image-button">
-                                       <graphic>
-                                          <ImageView fx:id="editNotesButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                                             <image>
-                                                <Image url="@../../images/icons/PNGs/light-mode/musical-notes-outline.png" />
-                                             </image>
-                                          </ImageView>
-                                       </graphic>
-                                    </Button>
-                                 </children>
-                                 <padding>
-                                    <Insets left="10.0" right="10.0" />
-                                 </padding>
-                              </HBox>
-                              <Separator orientation="VERTICAL" prefHeight="200.0" />
                               <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="0.0" spacing="5.0" HBox.hgrow="ALWAYS">
                                  <children>
-                                    <Button fx:id="volumeButton" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button">
+                                    <Button fx:id="audioVolumeButton" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button">
                                        <graphic>
-                                          <ImageView fx:id="volumeButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                                          <ImageView fx:id="audioVolumeButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
                                                 <Image url="@../../images/icons/PNGs/light-mode/volume-high.png" />
                                              </image>
                                           </ImageView>
                                        </graphic>
                                     </Button>
-                                    <Slider fx:id="volumeSlider" disable="true" max="1.0" styleClass="volume-slider" value="0.5" />
+                                    <Slider fx:id="audioVolumeSlider" disable="true" max="1.0" styleClass="volume-slider" value="0.5" />
+                                    <Button fx:id="notesVolumeButton" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button">
+                                       <graphic>
+                                          <ImageView fx:id="notesVolumeButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../../images/icons/PNGs/light-mode/musical-notes.png" />
+                                             </image>
+                                          </ImageView>
+                                       </graphic>
+                                    </Button>
+                                    <Slider fx:id="notesVolumeSlider" disable="true" max="1.0" styleClass="volume-slider" value="0.5" />
                                  </children>
                                  <padding>
                                     <Insets left="10.0" right="10.0" />
