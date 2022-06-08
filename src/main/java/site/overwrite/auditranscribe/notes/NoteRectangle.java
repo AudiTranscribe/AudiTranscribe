@@ -53,10 +53,10 @@ public class NoteRectangle extends StackPane {
     public static boolean canEdit = false;
 
     // Instance attributes
-    private int noteNum;
+    public int noteNum;
 
     public final DoubleProperty noteOnsetTime;
-    private final DoubleProperty duration;
+    public final DoubleProperty duration;
 
     private final double rectangleWidth, rectangleHeight;
 

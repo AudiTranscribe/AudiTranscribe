@@ -2,7 +2,7 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-06-06
+ * Updated on 2022-06-08
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
@@ -19,10 +19,7 @@ import site.overwrite.auditranscribe.audio.ffmpeg.AudioConverter;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.ProjectDataObject;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
 import site.overwrite.auditranscribe.exceptions.FailedToReadDataException;
 import site.overwrite.auditranscribe.exceptions.IncorrectFileFormatException;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileReader;
@@ -190,9 +187,12 @@ public class ProjectIOHandlers {
                 QTransformDataObject qTransformData = reader.readQTransformData();
                 AudioDataObject audioData = reader.readAudioData();
                 GUIDataObject guiData = reader.readGUIData();
+                MusicNotesDataObject musicNotesData = reader.readMusicNotesData();
 
                 // Pass these data into a `ProjectDataObject`
-                ProjectDataObject projectDataObject = new ProjectDataObject(qTransformData, audioData, guiData);
+                ProjectDataObject projectDataObject = new ProjectDataObject(
+                        qTransformData, audioData, guiData, musicNotesData
+                );
 
                 // Get the current scene and the spectrogram view controller
                 Pair<Scene, TranscriptionViewController> stageSceneAndController = getController(transcriptionStage);
@@ -271,6 +271,7 @@ public class ProjectIOHandlers {
         fileWriter.writeQTransformData(projectDataObject.qTransformData);
         fileWriter.writeAudioData(projectDataObject.audioData);
         fileWriter.writeGUIData(projectDataObject.guiData);
+        fileWriter.writeMusicNotesData(projectDataObject.musicNotesData);
 
         fileWriter.writeBytesToFile();
     }

@@ -31,6 +31,7 @@ import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.bpm_estimation.BPMEstimator;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.LZ4;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
@@ -38,10 +39,6 @@ import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.notes.NotePlayer;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.ProjectDataObject;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.notes.NoteRectangle;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
@@ -131,9 +128,6 @@ public class TranscriptionViewController implements Initializable {
     private double audioDuration = 0;  // Will be updated upon scene initialization
     private double currTime = 0;
 
-    private int notesVolume = 64;  // Todo: add this to file
-    // Todo: share `NoteRectangle`'s `noteRectanglesSorted` with this class
-
     // Other attributes
     Stage mainStage;
     MainViewController mainViewController;
@@ -173,6 +167,7 @@ public class TranscriptionViewController implements Initializable {
     private double finalHeight;
 
     private int octaveNum = 4;
+    private int notesVolume = 64;
 
     private Label[] noteLabels;
     private Line[] beatLines;
@@ -459,8 +454,10 @@ public class TranscriptionViewController implements Initializable {
                                         estimatedNoteNum > MAX_NOTE_NUMBER - 1
                                 ) return;
 
-                                // Create a new note rectangle and add it to the note rectangles list
-                                NoteRectangle noteRect = new NoteRectangle(estimatedTime, beatDuration, estimatedNoteNum);
+                                // Create a new note rectangle
+                                NoteRectangle noteRect = new NoteRectangle(
+                                        estimatedTime, beatDuration, estimatedNoteNum
+                                );
 
                                 // Add the note rectangle to the spectrogram pane
                                 spectrogramPaneAnchor.getChildren().add(noteRect);
@@ -764,6 +761,21 @@ public class TranscriptionViewController implements Initializable {
         musicKey = MUSIC_KEYS[musicKeyIndex];
         beatsPerBar = TIME_SIGNATURE_TO_BEATS_PER_BAR.get(TIME_SIGNATURES[timeSignatureIndex]);
 
+        // Set up note rectangles
+        int numNoteRectangles = projectData.musicNotesData.noteNums.length;
+        for (int i = 0; i < numNoteRectangles; i++) {
+            // Get the note rectangle data
+            double timeToPlaceRectangle = projectData.musicNotesData.timesToPlaceRectangles[i];
+            double noteDuration = projectData.musicNotesData.noteDurations[i];
+            int noteNum = projectData.musicNotesData.noteNums[i];
+
+            // Create a new note rectangle and add it to the note rectangles list
+            NoteRectangle noteRect = new NoteRectangle(timeToPlaceRectangle, noteDuration, noteNum);
+
+            // Add the note rectangle to the spectrogram pane
+            spectrogramPaneAnchor.getChildren().add(noteRect);
+        }
+
         // Attempt to add this project to the projects' database
         try {
             if (!projectsDB.checkIfProjectExists(audtFilePath)) {
@@ -955,7 +967,7 @@ public class TranscriptionViewController implements Initializable {
 
         // Clear the note rectangles
         NoteRectangle.noteRectangles.clear();
-        relevantNoteRectangles.clear();
+        if (relevantNoteRectangles != null) relevantNoteRectangles.clear();
     }
 
     // Private methods
@@ -1133,10 +1145,25 @@ public class TranscriptionViewController implements Initializable {
             @Override
             protected Void call() throws Exception {
                 // Compress the raw MP3 bytes
-                try {
-                    compressedMP3Bytes = LZ4.lz4Compress(audio.rawMP3Bytes, this);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                if (compressedMP3Bytes == null) {
+                    try {
+                        compressedMP3Bytes = LZ4.lz4Compress(audio.rawMP3Bytes, this);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                // Get data from the note rectangles
+                int numRectangles = NoteRectangle.noteRectangles.size();
+                double[] timesToPlaceRectangles = new double[numRectangles];
+                double[] noteDurations = new double[numRectangles];
+                int[] noteNums = new int[numRectangles];
+
+                for (int i = 0; i < numRectangles; i++) {
+                    NoteRectangle noteRectangle = NoteRectangle.noteRectangles.get(i);
+                    timesToPlaceRectangles[i] = noteRectangle.noteOnsetTime.getValue();
+                    noteDurations[i] = noteRectangle.duration.getValue();
+                    noteNums[i] = noteRectangle.noteNum;
                 }
 
                 // Package all the current data into a `ProjectDataObject`
@@ -1151,9 +1178,12 @@ public class TranscriptionViewController implements Initializable {
                         musicKeyIndex, timeSignatureIndex, bpm, offset, audioVolume,
                         (int) currTime * 1000
                 );
+                MusicNotesDataObject musicNotesData = new MusicNotesDataObject(
+                        timesToPlaceRectangles, noteDurations, noteNums
+                );
 
                 ProjectDataObject projectData = new ProjectDataObject(
-                        qTransformData, audioData, guiData
+                        qTransformData, audioData, guiData, musicNotesData
                 );
 
                 // Save the project
