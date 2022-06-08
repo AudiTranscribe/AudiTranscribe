@@ -2,7 +2,7 @@
  * AUDTFileConstants.java
  *
  * Created on 2022-05-01
- * Updated on 2022-06-06
+ * Updated on 2022-06-08
  *
  * Description: Constants that are needed when processing the AudiTranscribe file format.
  */
