@@ -31,6 +31,6 @@ public class AUDTFileConstants {
             (byte) 0xe0, (byte) 0xfe, (byte) 0x0f, (byte) 0xef
     };
 
-    public static final int FILE_VERSION_NUMBER = 301;  // Application version 0.3.0, revision 1 -> 0301 -> 301
+    public static final int FILE_VERSION_NUMBER = 302;  // Application version 0.3.0, revision 2 -> 0302 -> 302
     public static final int LZ4_VERSION_NUMBER = LZ4.LZ4_VERSION_NUMBER;  // Take from the LZ4 class
 }
