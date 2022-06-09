@@ -26,11 +26,15 @@ import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class NoteRectangle extends StackPane {
     // Constants
     private static final double BORDER_WIDTH = 3;  // In pixels
     private static final double EXTEND_REGIONS_WIDTH = 8;  // In pixels
+
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     // Static
     public static ObservableList<NoteRectangle> noteRectangles = FXCollections.observableArrayList();
@@ -212,7 +216,7 @@ public class NoteRectangle extends StackPane {
                     initYTrans = this.getTranslateY();
                     initYEvent = event.getSceneY();
 
-                    initNoteNum = noteNum;
+                    initNoteNum = this.noteNum;
 
                     // Disable scrolling
                     this.getParent().addEventHandler(ScrollEvent.ANY, cancelScroll);
@@ -231,6 +235,11 @@ public class NoteRectangle extends StackPane {
 
             // Revert cursor
             if (canEdit && isPaused) this.setCursor(Cursor.OPEN_HAND);
+
+            logger.log(
+                    Level.FINE,
+                    "Moved rectangle to " + getNoteOnsetTime() + " seconds with note number " + this.noteNum
+            );
         });
 
         // Set mouse events for the resizing regions
@@ -362,10 +371,6 @@ public class NoteRectangle extends StackPane {
         NoteRectangle.isPaused = isPaused;
     }
 
-    public int getNoteNum() {
-        return noteNum;
-    }
-
     public double getNoteOnsetTime() {
         return noteOnsetTime.get();
     }
@@ -386,10 +391,12 @@ public class NoteRectangle extends StackPane {
     }
 
     public void playNote() {
+        logger.log(Level.FINE, "Playing note " + noteNum + " at time " + noteOnsetTime.get());
         notePlayer.noteOn(noteNum, onVelocity);
     }
 
     public void stopNote() {
+        logger.log(Level.FINE, "Stopping note " + noteNum + " at time " + noteOnsetTime.get());
         notePlayer.noteOff(noteNum, offVelocity);
     }
 

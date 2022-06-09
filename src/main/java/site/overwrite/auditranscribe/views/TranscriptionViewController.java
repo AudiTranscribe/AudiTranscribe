@@ -1042,6 +1042,7 @@ public class TranscriptionViewController implements Initializable {
         // Update relevant note rectangles upon seeking
         if (!isPaused) {
             relevantNoteRectangles = NoteRectangle.getRelevantNoteRectangles(currTime);
+            noteRectanglesToRemove.clear();
         }
 
         logger.log(Level.FINE, "Seeked to " + seekTime + " seconds");
@@ -1773,7 +1774,7 @@ public class TranscriptionViewController implements Initializable {
             relevantNoteRectangles = NoteRectangle.getRelevantNoteRectangles(currTime);
         } else {
             // Otherwise, stop all notes
-            for (NoteRectangle noteRect : relevantNoteRectangles) {
+            for (NoteRectangle noteRect : NoteRectangle.noteRectangles) {
                 noteRect.stopNote();
             }
 
