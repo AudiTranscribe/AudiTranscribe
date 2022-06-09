@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-06
+ * Updated on 2022-06-09
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -28,6 +28,7 @@ import javafx.stage.Window;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
+import site.overwrite.auditranscribe.audio.ffmpeg.AudioConverter;
 import site.overwrite.auditranscribe.bpm_estimation.BPMEstimator;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.LZ4;
@@ -407,7 +408,8 @@ public class TranscriptionViewController implements Initializable {
         scrollButton.setOnAction(event -> toggleScrollButton());
 
         // Set spectrogram pane mouse event handler
-        spectrogramPaneAnchor.addEventHandler(MouseEvent.ANY, new MouseHandler(event -> {}, event -> {
+        spectrogramPaneAnchor.addEventHandler(MouseEvent.ANY, new MouseHandler(event -> {
+        }, event -> {
             if (isEverythingReady) {
                 // Ensure that the click is within the pane
                 double clickX = event.getX();
@@ -775,10 +777,10 @@ public class TranscriptionViewController implements Initializable {
 
         // Ensure that the temporary directory exists
         IOMethods.createFolder(IOConstants.TEMP_FOLDER);
-        logger.log(Level.FINE, "Temp folder " + IOConstants.TEMP_FOLDER);
+        logger.log(Level.FINE, "Temporary folder created: " + IOConstants.TEMP_FOLDER);
 
         // Create an empty MP3 file in the temporary directory
-        File auxiliaryMP3File = new File(IOConstants.TEMP_FOLDER + "temp.mp3");
+        File auxiliaryMP3File = new File(IOConstants.TEMP_FOLDER + "temp-1.mp3");
         IOMethods.createFile(auxiliaryMP3File.getAbsolutePath());
 
         // Write the raw MP3 bytes into a temporary file
@@ -786,11 +788,29 @@ public class TranscriptionViewController implements Initializable {
         fos.write(rawMP3Bytes);
         fos.close();
 
-        // Create the `Audio` object
-        audio = Audio.initAudio(auxiliaryMP3File, audioFileName, AudioProcessingMode.PLAYBACK_ONLY);
+        // Define a new audio converter
+        AudioConverter audioConverter = new AudioConverter(settingsFile.data.ffmpegInstallationPath);
 
-        // Delete the temporary file
+        // Generate the output path to the MP3 file
+        String outputPath = IOConstants.TEMP_FOLDER + "temp-2.wav";
+
+        // Convert the auxiliary MP3 file to a WAV file
+        outputPath = audioConverter.convertAudio(auxiliaryMP3File, outputPath);
+
+        // Read the newly created WAV file
+        File auxiliaryWAVFile = new File(outputPath);
+
+        // Create the `Audio` object
+        audio = new Audio(
+                auxiliaryWAVFile, audioFileName, AudioProcessingMode.PLAYBACK_ONLY
+        );
+
+        // Update the raw MP3 bytes of the audio object
+        audio.setRawMP3Bytes(rawMP3Bytes);  // This is to reduce the time needed to save the file later
+
+        // Delete the temporary files
         IOMethods.deleteFile(auxiliaryMP3File.getAbsolutePath());
+        IOMethods.deleteFile(auxiliaryWAVFile.getAbsolutePath());
 
         // Update the audio object's duration
         // (The `MediaPlayer` duration cannot be trusted)
@@ -1036,7 +1056,9 @@ public class TranscriptionViewController implements Initializable {
             protected Void call() throws Exception {
                 // Compress the raw MP3 bytes
                 try {
-                    compressedMP3Bytes = LZ4.lz4Compress(audio.rawMP3Bytes, this);
+                    compressedMP3Bytes = LZ4.lz4Compress(
+                            audio.wavBytesToMP3Bytes(settingsFile.data.ffmpegInstallationPath), this
+                    );
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -1266,13 +1288,9 @@ public class TranscriptionViewController implements Initializable {
             scheduler.scheduleAtFixedRate(() -> {
                 // Nothing really changes if the audio is paused
                 if (!isPaused) {
-                    // Todo: fix current audio time not being the seeked time
-//                    System.out.println("Saved current time: " + currTime);
-
                     // Get the current audio time
                     try {
                         currTime = audio.getCurrAudioTime();
-//                        System.out.println("Current audio time: " + audio.getCurrAudioTime());
                     } catch (InvalidObjectException e) {
                         throw new RuntimeException(e);
                     }

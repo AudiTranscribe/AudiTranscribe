@@ -2,7 +2,7 @@
  * VQTTest.java
  *
  * Created on 2022-04-10
- * Updated on 2022-06-06
+ * Updated on 2022-06-09
  *
  * Description: Test `VQT.java`.
  */
@@ -34,7 +34,7 @@ class VQTTest {
         // Run the test
         try {
             // Get the audio file
-            Audio audio = Audio.initAudio(
+            Audio audio = new Audio(
                     new File(IOMethods.getAbsoluteFilePath("testing-audio-files/Choice.wav")),
                     "Choice.wav",
                     AudioProcessingMode.SAMPLES_ONLY

@@ -2,7 +2,7 @@
  * Audio.java
  *
  * Created on 2022-02-13
- * Updated on 2022-06-08
+ * Updated on 2022-06-09
  *
  * Description: Class that handles audio processing and audio playback.
  */
@@ -10,7 +10,10 @@
 package site.overwrite.auditranscribe.audio;
 
 import javafx.util.Duration;
+import site.overwrite.auditranscribe.audio.ffmpeg.AudioConverter;
 import site.overwrite.auditranscribe.exceptions.ValueException;
+import site.overwrite.auditranscribe.io.IOConstants;
+import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
 
 import javafx.scene.media.MediaPlayer;
@@ -22,6 +25,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -35,8 +39,6 @@ public class Audio {
     public static final int SAMPLES_BUFFER_SIZE = 1024;  // In bits
 
     // Attributes
-    public AudioProcessingMode audioProcessingMode;
-
     private final String audioFileName;
 
     private final AudioInputStream audioStream;
@@ -44,69 +46,78 @@ public class Audio {
     private final double sampleRate;
     private double duration = 0;
 
+    private final byte[] rawWAVBytes;
+    private byte[] rawMP3Bytes;  // Would be empty unless set
+
     private int numSamples;
     private double[] audioSamples;
     private double[] monoAudioSamples;  // Average of stereo samples
 
-    public byte[] rawMP3Bytes;
-
     private final MediaPlayer mediaPlayer;
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     /**
      * Initializes an <code>Audio</code> object based on a file.
      *
-     * @param wavFile          File object representing the WAV file to be used when generating
-     *                         samples.
-     * @param mp3File          File object representing the MP3 file to be used when playing the
-     *                         audio.
-     * @param originalFileName The file name of the original audio file.
+     * @param wavFile        File object representing the WAV file to be used for both samples
+     *                       generation and audio playback.
+     * @param audioFileName  The file name of the original audio file.
+     * @param processingMode The processing mode when handling the audio file.
+     *                       <ul>
+     *                       <li>
+     *                           <code>SAMPLES_ONLY</code>: Only generate samples.
+     *                       </li>
+     *                       <li>
+     *                           <code>PLAYBACK_ONLY</code>: Only permit playback.
+     *                       </li>
+     *                       <li>
+     *                           <code>SAMPLES_AND_PLAYBACK</code>: Permit samples' generation and
+     *                           playback.
+     *                       </li>
+     *                       </ul>
      * @throws IOException                   If there was a problem reading in the audio stream.
      * @throws UnsupportedAudioFileException If there was a problem reading in the audio file.
-     * @throws ValueException                If both <code>wavFile</code> and <code>mp3File</code>
-     *                                       are <code>null</code>.
      */
     public Audio(
-            File wavFile, File mp3File, String originalFileName
+            File wavFile, String audioFileName, AudioProcessingMode processingMode
     ) throws UnsupportedAudioFileException, IOException {
-        // Determine the audio processing mode
-        if (wavFile != null && mp3File != null) {
-            audioProcessingMode = AudioProcessingMode.SAMPLES_AND_PLAYBACK;
-        } else if (wavFile == null) {
-            audioProcessingMode = AudioProcessingMode.SAMPLES_ONLY;
-        } else if (mp3File == null) {
-            audioProcessingMode = AudioProcessingMode.PLAYBACK_ONLY;
-        } else {
-            throw new ValueException("Both `wavFile` and `mp3File` cannot be null.");
+        // Update attributes
+        this.audioFileName = audioFileName;
+
+        // Set flags
+        boolean needPlayback = false;
+        boolean needSamples = false;
+
+        if (processingMode == AudioProcessingMode.SAMPLES_ONLY) {
+            needSamples = true;
+        } else if (processingMode == AudioProcessingMode.PLAYBACK_ONLY) {
+            needPlayback = true;
+        } else if (processingMode == AudioProcessingMode.SAMPLES_AND_PLAYBACK) {
+            needSamples = true;
+            needPlayback = true;
         }
 
-        // Update attributes
-        audioFileName = originalFileName;
-
         // Create the media player object if needed
-        if (mp3File != null) {
+        if (needPlayback) {
             // Get the media player for the audio file
             MediaPlayer tempMediaPlayer;
 
             try {
-                tempMediaPlayer = new MediaPlayer(new Media(mp3File.toURI().toString()));
+                tempMediaPlayer = new MediaPlayer(new Media(wavFile.toURI().toString()));
             } catch (IllegalStateException e) {
                 tempMediaPlayer = null;
 
-                Logger logger = Logger.getLogger(this.getClass().getName());
                 logger.log(Level.SEVERE, "JavaFX Toolkit not initialized. Audio playback will not work.");
             }
 
             mediaPlayer = tempMediaPlayer;
-
-            // Get the raw bytes from the MP3 file
-            rawMP3Bytes = Files.readAllBytes(mp3File.toPath());
 
         } else {
             mediaPlayer = null;
         }
 
         // Generate audio samples
-        if (wavFile != null) {
+        if (needSamples) {
             // Attempt to convert the input stream into an audio input stream
             InputStream bufferedIn = new BufferedInputStream(new FileInputStream(wavFile));
             audioStream = AudioSystem.getAudioInputStream(bufferedIn);
@@ -122,34 +133,9 @@ public class Audio {
             audioFormat = null;
             sampleRate = Double.NaN;
         }
-    }
 
-    /**
-     * Initializes an <code>Audio</code> object based on a file.
-     *
-     * @param audioFile      File object representing the audio file to be used.
-     * @param audioFileName  The file name of the original audio file.
-     * @param processingMode The processing mode when handling the audio file.
-     *                       <ul>
-     *                       <li><code>SAMPLES_ONLY</code>: Treat <code>audioFile</code> as a WAV file and only generate samples.</li>
-     *                       <li><code>PLAYBACK_ONLY</code>: Treat <code>audioFile</code> as a MP3 file and only permit playback.</li>
-     *                       </ul>
-     *                       Treat any other option as a <code>ValueException</code>.
-     * @throws ValueException                If the processing mode is not <code>SAMPLES_ONLY</code>
-     *                                       or <code>PLAYBACK_ONLY</code>.
-     * @throws IOException                   If there was a problem reading in the audio stream.
-     * @throws UnsupportedAudioFileException If there was a problem reading in the audio file.
-     */
-    public static Audio initAudio(
-            File audioFile, String audioFileName, AudioProcessingMode processingMode
-    ) throws UnsupportedAudioFileException, IOException {
-        if (processingMode == AudioProcessingMode.SAMPLES_ONLY) {
-            return new Audio(audioFile, null, audioFileName);
-        } else if (processingMode == AudioProcessingMode.PLAYBACK_ONLY) {
-            return new Audio(null, audioFile, audioFileName);
-        } else {
-            throw new ValueException("Invalid audio processing mode.");
-        }
+        // Save the audio file's raw WAV bytes
+        rawWAVBytes = Files.readAllBytes(wavFile.toPath());
     }
 
     // Getter/Setter methods
@@ -177,6 +163,10 @@ public class Audio {
 
     public double[] getMonoSamples() {
         return monoAudioSamples;
+    }
+
+    public void setRawMP3Bytes(byte[] rawMP3Bytes) {
+        this.rawMP3Bytes = rawMP3Bytes;
     }
 
     // Audio methods
@@ -256,7 +246,7 @@ public class Audio {
      */
     public double getCurrAudioTime() throws InvalidObjectException {
         if (mediaPlayer != null) {
-            return Math.min(mediaPlayer.getCurrentTime().toSeconds(), duration);
+            return mediaPlayer.getCurrentTime().toSeconds();
         } else {
             throw new InvalidObjectException("Media player was not initialised.");
         }
@@ -644,6 +634,50 @@ public class Audio {
         for (int i = 0; i < transfer.length; i++) {
             samples[i] = (float) transfer[i] / (float) fullScale;
         }
+    }
+
+    /**
+     * Helper method that converts the audio object into MP3 bytes.
+     *
+     * @param ffmpegPath The path to the ffmpeg executable.
+     */
+    public byte[] wavBytesToMP3Bytes(String ffmpegPath) throws IOException {
+        // Check if we have already processed the audio
+        if (rawMP3Bytes != null) {
+            logger.log(Level.FINE, "Returning previously processed MP3 bytes");
+            return rawMP3Bytes;
+        }
+
+        logger.log(Level.FINE, "Converting WAV bytes to MP3 bytes");
+
+        // Ensure that the temporary directory exists
+        IOMethods.createFolder(IOConstants.TEMP_FOLDER);
+        logger.log(Level.FINE, "Temporary folder created: " + IOConstants.TEMP_FOLDER);
+
+        // Define a new audio converter
+        AudioConverter audioConverter = new AudioConverter(ffmpegPath);
+
+        // Generate the output path to the MP3 file
+        String inputPath = IOConstants.TEMP_FOLDER + "temp-1.wav";
+        String outputPath = IOConstants.TEMP_FOLDER + "temp-2.mp3";
+
+        // Write WAV bytes into a file specified at the input path
+        IOMethods.createFile(inputPath);
+        Files.write(Path.of(inputPath), rawWAVBytes);
+
+        // Convert the original WAV file to a temporary MP3 file
+        outputPath = audioConverter.convertAudio(new File(inputPath), outputPath);
+
+        // Read the raw MP3 bytes into a temporary file
+        rawMP3Bytes = Files.readAllBytes(Path.of(outputPath));
+
+        // Delete the temporary files
+        IOMethods.deleteFile(inputPath);
+        IOMethods.deleteFile(outputPath);
+
+        // Return the raw MP3 bytes
+        logger.log(Level.FINE, "Done converting");
+        return rawMP3Bytes;
     }
 }
 

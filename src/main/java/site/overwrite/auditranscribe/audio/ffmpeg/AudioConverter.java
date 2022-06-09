@@ -2,7 +2,7 @@
  * AudioConverter.java
  *
  * Created on 2022-05-06
- * Updated on 2022-06-08
+ * Updated on 2022-06-09
  *
  * Description: Methods that help to convert audio files to the correct format.
  */
@@ -27,6 +27,8 @@ public class AudioConverter {
     public static final Map<String, String> EXTENSION_TO_CODEC = Map.ofEntries(
             entry(".wav", "wav"),
             entry(".mp3", "mp3"),
+
+            // Todo: these codecs may not work; need to check
             entry(".flac", "flac"),
             entry(".aif", "aac"),
             entry(".aiff", "aac")
