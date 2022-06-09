@@ -2,7 +2,7 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-06-08
+ * Updated on 2022-06-09
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
@@ -15,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.stage.*;
 import org.apache.commons.compress.utils.FileNameUtils;
 import org.javatuples.Pair;
+import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.audio.ffmpeg.AudioConverter;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.io.IOConstants;
@@ -74,37 +75,27 @@ public class ProjectIOHandlers {
 
                 // Attempt creation of temporary folder if it doesn't exist
                 IOMethods.createFolder(IOConstants.TEMP_FOLDER);
+                logger.log(Level.FINE, "Temporary folder: " + IOConstants.TEMP_FOLDER);
 
                 // Get the base path for the auxiliary files
                 String baseName = IOConstants.TEMP_FOLDER + file.getName().replace(fileExt, "");
 
-                // Check if the original file is a WAV file
+                // Generate a new WAV file
                 AudioConverter audioConverter = new AudioConverter(settingsFile.data.ffmpegInstallationPath);
-
                 File auxiliaryWAVFile = new File(
                         audioConverter.convertAudio(file, baseName + "-auxiliary-wav.wav")
                 );
-                File auxiliaryMP3File = new File(
-                        audioConverter.convertAudio(file, baseName + "-auxiliary-mp3.mp3")
-                );
 
-                // Try and read the auxiliary files as an `Audio` object
+                // Try and read the auxiliary WAV file as an `Audio` object
                 // (Failure to read will throw exceptions)
-                Audio audio = new Audio(auxiliaryWAVFile, auxiliaryMP3File, file.getName());
+                Audio audio = new Audio(auxiliaryWAVFile, file.getName(), AudioProcessingMode.SAMPLES_AND_PLAYBACK);
 
-                // Delete auxiliary files if original file is not a WAV file
+                // Delete auxiliary WAV file
                 boolean successfullyDeleted = auxiliaryWAVFile.delete();
                 if (successfullyDeleted) {
                     logger.log(Level.FINE, "Successfully deleted auxiliary WAV file.");
                 } else {
                     logger.log(Level.WARNING, "Failed to delete auxiliary WAV file.");
-                }
-
-                successfullyDeleted = auxiliaryMP3File.delete();
-                if (successfullyDeleted) {
-                    logger.log(Level.FINE, "Successfully deleted auxiliary MP3 file.");
-                } else {
-                    logger.log(Level.WARNING, "Failed to delete auxiliary MP3 file.");
                 }
 
                 // Get the current scene and the spectrogram view controller
@@ -147,9 +138,9 @@ public class ProjectIOHandlers {
 
             } catch (UnsupportedAudioFileException | IOException e) {
                 Popups.showExceptionAlert(
-                        "Failed to read '" + file.getName() + "' as a WAV file.",
+                        "Failed to read '" + file.getName() + "' as an audio file.",
                         "The program failed to read '" + file.getName() +
-                                "' as a WAV file. Please check if " + "this is a valid WAV file.",
+                                "' as an audio file. Please check if " + "this is a valid audio file.",
                         e
                 );
                 e.printStackTrace();

@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-08
+ * Updated on 2022-06-09
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -28,6 +28,7 @@ import javafx.stage.Window;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
+import site.overwrite.auditranscribe.audio.ffmpeg.AudioConverter;
 import site.overwrite.auditranscribe.bpm_estimation.BPMEstimator;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.LZ4;
@@ -176,6 +177,7 @@ public class TranscriptionViewController implements Initializable {
     private Line playheadLine;
 
     Queue<CustomTask<?>> ongoingTasks = new LinkedList<>();
+    ScheduledExecutorService scheduler;
 
     // FXML Elements
     // Menu bar
@@ -877,9 +879,10 @@ public class TranscriptionViewController implements Initializable {
 
         // Ensure that the temporary directory exists
         IOMethods.createFolder(IOConstants.TEMP_FOLDER);
+        logger.log(Level.FINE, "Temporary folder created: " + IOConstants.TEMP_FOLDER);
 
         // Create an empty MP3 file in the temporary directory
-        File auxiliaryMP3File = new File(IOConstants.TEMP_FOLDER + audioFileName);
+        File auxiliaryMP3File = new File(IOConstants.TEMP_FOLDER + "temp-1.mp3");
         IOMethods.createFile(auxiliaryMP3File.getAbsolutePath());
 
         // Write the raw MP3 bytes into a temporary file
@@ -887,11 +890,29 @@ public class TranscriptionViewController implements Initializable {
         fos.write(rawMP3Bytes);
         fos.close();
 
-        // Create the `Audio` object
-        audio = Audio.initAudio(auxiliaryMP3File, audioFileName, AudioProcessingMode.PLAYBACK_ONLY);
+        // Define a new audio converter
+        AudioConverter audioConverter = new AudioConverter(settingsFile.data.ffmpegInstallationPath);
 
-        // Delete the temporary file
+        // Generate the output path to the MP3 file
+        String outputPath = IOConstants.TEMP_FOLDER + "temp-2.wav";
+
+        // Convert the auxiliary MP3 file to a WAV file
+        outputPath = audioConverter.convertAudio(auxiliaryMP3File, outputPath);
+
+        // Read the newly created WAV file
+        File auxiliaryWAVFile = new File(outputPath);
+
+        // Create the `Audio` object
+        audio = new Audio(
+                auxiliaryWAVFile, audioFileName, AudioProcessingMode.PLAYBACK_ONLY
+        );
+
+        // Update the raw MP3 bytes of the audio object
+        audio.setRawMP3Bytes(rawMP3Bytes);  // This is to reduce the time needed to save the file later
+
+        // Delete the temporary files
         IOMethods.deleteFile(auxiliaryMP3File.getAbsolutePath());
+        IOMethods.deleteFile(auxiliaryWAVFile.getAbsolutePath());
 
         // Update the audio object's duration
         // (The `MediaPlayer` duration cannot be trusted)
@@ -965,6 +986,9 @@ public class TranscriptionViewController implements Initializable {
         // Clear the note rectangles
         NoteRectangle.noteRectangles.clear();
         if (relevantNoteRectangles != null) relevantNoteRectangles.clear();
+
+        // Shutdown the scheduler
+        scheduler.shutdown();
     }
 
     // Private methods
@@ -1144,7 +1168,9 @@ public class TranscriptionViewController implements Initializable {
                 // Compress the raw MP3 bytes
                 if (compressedMP3Bytes == null) {
                     try {
-                        compressedMP3Bytes = LZ4.lz4Compress(audio.rawMP3Bytes, this);
+                        compressedMP3Bytes = LZ4.lz4Compress(
+                                audio.wavBytesToMP3Bytes(settingsFile.data.ffmpegInstallationPath), this
+                        );
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -1386,7 +1412,7 @@ public class TranscriptionViewController implements Initializable {
             spectrogramPaneAnchor.getChildren().add(playheadLine);
 
             // Create a constantly-executing service
-            ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(0, runnable -> {
+            scheduler = Executors.newScheduledThreadPool(0, runnable -> {
                 Thread thread = Executors.defaultThreadFactory().newThread(runnable);
                 thread.setDaemon(true);  // Make it so that it can shut down gracefully by placing it in background
                 return thread;

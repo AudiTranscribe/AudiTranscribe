@@ -2,7 +2,7 @@
  * BPMEstimatorTest.java
  *
  * Created on 2022-06-02
- * Updated on 2022-06-06
+ * Updated on 2022-06-09
  *
  * Description: Test `BPMEstimator.java`.
  */
@@ -26,12 +26,12 @@ class BPMEstimatorTest {
     @Test
     void estimate() throws UnsupportedAudioFileException, IOException {
         // Get the audio files
-        Audio audio1 = Audio.initAudio(
+        Audio audio1 = new Audio(
                 new File(IOMethods.getAbsoluteFilePath("testing-audio-files/175bpm.wav")),
                 "175bpm.wav",
                 AudioProcessingMode.SAMPLES_ONLY
         );
-        Audio audio2 = Audio.initAudio(
+        Audio audio2 = new Audio(
                 new File(IOMethods.getAbsoluteFilePath("testing-audio-files/137bpmNoisy.wav")),
                 "137bpmNoisy.wav",
                 AudioProcessingMode.SAMPLES_ONLY
