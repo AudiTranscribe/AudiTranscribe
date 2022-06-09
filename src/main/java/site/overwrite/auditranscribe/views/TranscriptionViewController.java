@@ -10,6 +10,9 @@
 package site.overwrite.auditranscribe.views;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -42,6 +45,7 @@ import site.overwrite.auditranscribe.notes.NotePlayer;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.notes.NoteRectangle;
+import site.overwrite.auditranscribe.notes.SortByTimeToPlace;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 import site.overwrite.auditranscribe.plotting.PlottingStuffHandler;
 import site.overwrite.auditranscribe.spectrogram.*;
@@ -137,6 +141,9 @@ public class TranscriptionViewController implements Initializable {
 
     NotePlayer notePlayer;
     Queue<NoteRectangle> relevantNoteRectangles;
+    ObservableList<NoteRectangle> noteRectanglesToRemove = FXCollections.observableArrayList();
+    SortedList<NoteRectangle> sortedNoteRectanglesToRemove =
+            new SortedList<>(noteRectanglesToRemove, new SortByTimeToPlace());
     MusicNotesDataObject musicNotesData;
 
     private boolean isEverythingReady = false;
@@ -1184,8 +1191,8 @@ public class TranscriptionViewController implements Initializable {
 
                 for (int i = 0; i < numRectangles; i++) {
                     NoteRectangle noteRectangle = NoteRectangle.noteRectangles.get(i);
-                    timesToPlaceRectangles[i] = noteRectangle.noteOnsetTime.getValue();
-                    noteDurations[i] = noteRectangle.duration.getValue();
+                    timesToPlaceRectangles[i] = noteRectangle.getNoteOnsetTime();
+                    noteDurations[i] = noteRectangle.getDuration();
                     noteNums[i] = noteRectangle.noteNum;
                 }
 
@@ -1469,12 +1476,25 @@ public class TranscriptionViewController implements Initializable {
 
                     // Update notes that are played
                     while (relevantNoteRectangles.size() != 0 &&
-                            relevantNoteRectangles.peek().noteOnsetTime.getValue() <
-                                    currTime + NOTE_PLAYING_DELAY_OFFSET
+                            relevantNoteRectangles.peek().getNoteOnsetTime() < currTime + NOTE_PLAYING_DELAY_OFFSET
                     ) {
                         // Play the note rectangle if notes can be played
                         NoteRectangle noteRectangle = relevantNoteRectangles.poll();
                         if (!areNotesMuted && noteRectangle != null) noteRectangle.playNote();
+
+                        // Add it to the list of note rectangles to be removed
+                        noteRectanglesToRemove.add(noteRectangle);
+                    }
+
+                    // Update notes that are to be stopped
+                    while (sortedNoteRectanglesToRemove.size() != 0 &&
+                            sortedNoteRectanglesToRemove.get(0).getNoteOffTime() < currTime ) {
+                        // Stop the note rectangle
+                        NoteRectangle noteRectangle = sortedNoteRectanglesToRemove.get(0);
+                        if (noteRectangle != null) noteRectangle.stopNote();
+
+                        // Remove it from the list of note rectangles to be removed
+                        noteRectanglesToRemove.remove(noteRectangle);
                     }
                 }
             }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);
@@ -1747,11 +1767,19 @@ public class TranscriptionViewController implements Initializable {
         }
         isPaused = togglePaused(isPaused);
 
-        // Get relevant note rectangles as a queue if playback is unpaused
+        // Handle note rectangle operations when toggle paused
         if (!isPaused) {
+            // Get relevant note rectangles as a queue if playback is unpaused
             relevantNoteRectangles = NoteRectangle.getRelevantNoteRectangles(currTime);
         } else {
+            // Otherwise, stop all notes
+            for (NoteRectangle noteRect : relevantNoteRectangles) {
+                noteRect.stopNote();
+            }
+
+            // Clear the note rectangles' lists
             relevantNoteRectangles.clear();
+            noteRectanglesToRemove.clear();
         }
 
         logger.log(Level.FINE, "Toggled pause state (paused is now " + isPaused + ")");

@@ -2,7 +2,7 @@
  * NoteRectangle.java
  *
  * Created on 2022-06-07
- * Updated on 2022-06-08
+ * Updated on 2022-06-09
  *
  * Description: A `StackPane` object that is used to denote a note in the transcription view.
  */
@@ -24,7 +24,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -363,16 +362,35 @@ public class NoteRectangle extends StackPane {
         NoteRectangle.isPaused = isPaused;
     }
 
+    public int getNoteNum() {
+        return noteNum;
+    }
+
+    public double getNoteOnsetTime() {
+        return noteOnsetTime.get();
+    }
+
+    public double getDuration() {
+        return duration.get();
+    }
+
     // Public methods
 
     /**
-     * Method that plays the note that is defined by this note rectangle.
+     * Method that gets the time (in seconds) when the note rectangle is supposed to stop playing.
+     *
+     * @return The time when the note should stop playing.
      */
+    public double getNoteOffTime() {
+        return noteOnsetTime.get() + duration.get();
+    }
+
     public void playNote() {
-        notePlayer.playNoteForDuration(
-                noteNum, onVelocity, offVelocity, (long) (duration.getValue() * 1000),
-                (long) (offDuration * 1000)
-        );
+        notePlayer.noteOn(noteNum, onVelocity);
+    }
+
+    public void stopNote() {
+        notePlayer.noteOff(noteNum, offVelocity);
     }
 
     /**
@@ -432,13 +450,5 @@ public class NoteRectangle extends StackPane {
 
         // Return the relevant note rectangles
         return relevantNoteRectangles;
-    }
-
-    // Helper classes
-    static class SortByTimeToPlace implements Comparator<NoteRectangle> {
-        @Override
-        public int compare(NoteRectangle o1, NoteRectangle o2) {
-            return Double.compare(o1.noteOnsetTime.getValue(), o2.noteOnsetTime.getValue());
-        }
     }
 }
