@@ -9,7 +9,6 @@
 
 package site.overwrite.auditranscribe.notes;
 
-import javafx.application.Platform;
 import site.overwrite.auditranscribe.exceptions.ValueException;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
