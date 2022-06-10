@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-09
+ * Updated on 2022-06-10
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -41,11 +41,12 @@ import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.Theme;
-import site.overwrite.auditranscribe.notes.NotePlayer;
+import site.overwrite.auditranscribe.note_playback.MIDIInstrument;
+import site.overwrite.auditranscribe.note_playback.NotePlayerSynth;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
-import site.overwrite.auditranscribe.notes.NoteRectangle;
-import site.overwrite.auditranscribe.notes.SortByTimeToPlace;
+import site.overwrite.auditranscribe.note_playback.NoteRectangle;
+import site.overwrite.auditranscribe.note_playback.SortByTimeToPlace;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 import site.overwrite.auditranscribe.plotting.PlottingStuffHandler;
 import site.overwrite.auditranscribe.spectrogram.*;
@@ -108,7 +109,7 @@ public class TranscriptionViewController implements Initializable {
 
     final double VOLUME_VALUE_DELTA_ON_KEY_PRESS = 0.05;
 
-    final String NOTE_PLAYING_INSTRUMENT = "PIANO";
+    final MIDIInstrument NOTE_PLAYING_INSTRUMENT = MIDIInstrument.PIANO;
     final int MIDI_CHANNEL_NUM = 0;
     final int NOTE_PLAYING_ON_VELOCITY = 96;  // Within the range [0, 127]
     final int NOTE_PLAYING_OFF_VELOCITY = 10;   // Within the range [0, 127]
@@ -139,7 +140,7 @@ public class TranscriptionViewController implements Initializable {
     SettingsFile settingsFile;
     Theme theme;
 
-    NotePlayer notePlayer;
+    NotePlayerSynth notePlayerSynth;
     Queue<NoteRectangle> relevantNoteRectangles;
     ObservableList<NoteRectangle> noteRectanglesToRemove = FXCollections.observableArrayList();
     SortedList<NoteRectangle> sortedNoteRectanglesToRemove =
@@ -280,7 +281,7 @@ public class TranscriptionViewController implements Initializable {
 
         // Update any attributes
         try {
-            notePlayer = new NotePlayer(NOTE_PLAYING_INSTRUMENT, MIDI_CHANNEL_NUM);
+            notePlayerSynth = new NotePlayerSynth(NOTE_PLAYING_INSTRUMENT, MIDI_CHANNEL_NUM);
         } catch (MidiUnavailableException e) {
             throw new RuntimeException(e);
         }
@@ -492,7 +493,7 @@ public class TranscriptionViewController implements Initializable {
                             logger.log(Level.FINE, "Playing " + UnitConversionUtils.noteNumberToNote(
                                     estimatedNoteNum, false
                             ));
-                            notePlayer.playNoteForDuration(
+                            notePlayerSynth.playNoteForDuration(
                                     estimatedNoteNum, NOTE_PLAYING_ON_VELOCITY, NOTE_PLAYING_OFF_VELOCITY,
                                     NOTE_PLAYING_ON_DURATION, NOTE_PLAYING_OFF_DURATION
                             );
@@ -1543,7 +1544,7 @@ public class TranscriptionViewController implements Initializable {
             NoteRectangle.setMinNoteNum(MIN_NOTE_NUMBER);
             NoteRectangle.setMaxNoteNum(MAX_NOTE_NUMBER);
             NoteRectangle.setTotalDuration(audioDuration);
-            NoteRectangle.setNotePlayer(notePlayer);
+            NoteRectangle.setNotePlayer(notePlayerSynth);
             NoteRectangle.setOnVelocity(notesVolume);
             NoteRectangle.setOffVelocity(NOTE_PLAYING_OFF_VELOCITY);
             NoteRectangle.setOffDuration(NOTE_PLAYING_OFF_DURATION);
@@ -2009,7 +2010,7 @@ public class TranscriptionViewController implements Initializable {
 
         } else if (code == KeyCode.MINUS) {  // Increase playback octave number by 1
             keyEvent.consume();
-            notePlayer.silenceChannel();  // Stop any notes from playing
+            notePlayerSynth.silenceChannel();  // Stop any notes from playing
             if (octaveNum > 0) {
                 logger.log(Level.FINE, "Playback octave raised to " + octaveNum);
                 PlottingStuffHandler.updateCurrentOctaveRectangle(
@@ -2019,7 +2020,7 @@ public class TranscriptionViewController implements Initializable {
 
         } else if (code == KeyCode.EQUALS) {  // Decrease playback octave number by 1
             keyEvent.consume();
-            notePlayer.silenceChannel();  // Stop any notes from playing
+            notePlayerSynth.silenceChannel();  // Stop any notes from playing
             if (octaveNum < 9) {
                 logger.log(Level.FINE, "Playback octave lowered to " + octaveNum);
                 PlottingStuffHandler.updateCurrentOctaveRectangle(
@@ -2031,24 +2032,24 @@ public class TranscriptionViewController implements Initializable {
         // Note playing keyboard inputs
         else {
             switch (code) {
-                case A -> notePlayer.noteOn(octaveNum * 12, NOTE_PLAYING_ON_VELOCITY);  // C
-                case W -> notePlayer.noteOn(octaveNum * 12 + 1, NOTE_PLAYING_ON_VELOCITY);  // C#
-                case S -> notePlayer.noteOn(octaveNum * 12 + 2, NOTE_PLAYING_ON_VELOCITY);  // D
-                case E -> notePlayer.noteOn(octaveNum * 12 + 3, NOTE_PLAYING_ON_VELOCITY);  // D#
-                case D -> notePlayer.noteOn(octaveNum * 12 + 4, NOTE_PLAYING_ON_VELOCITY);  // E
-                case F -> notePlayer.noteOn(octaveNum * 12 + 5, NOTE_PLAYING_ON_VELOCITY);  // F
-                case T -> notePlayer.noteOn(octaveNum * 12 + 6, NOTE_PLAYING_ON_VELOCITY);  // F#
-                case G -> notePlayer.noteOn(octaveNum * 12 + 7, NOTE_PLAYING_ON_VELOCITY);  // G
-                case Y -> notePlayer.noteOn(octaveNum * 12 + 8, NOTE_PLAYING_ON_VELOCITY);  // G#
-                case H -> notePlayer.noteOn(octaveNum * 12 + 9, NOTE_PLAYING_ON_VELOCITY);  // A
-                case U -> notePlayer.noteOn(octaveNum * 12 + 10, NOTE_PLAYING_ON_VELOCITY);  // A#
-                case J -> notePlayer.noteOn(octaveNum * 12 + 11, NOTE_PLAYING_ON_VELOCITY);  // B
-                case K -> notePlayer.noteOn(octaveNum * 12 + 12, NOTE_PLAYING_ON_VELOCITY);  // C'
-                case O -> notePlayer.noteOn(octaveNum * 12 + 13, NOTE_PLAYING_ON_VELOCITY);  // C#'
-                case L -> notePlayer.noteOn(octaveNum * 12 + 14, NOTE_PLAYING_ON_VELOCITY);  // D'
-                case P -> notePlayer.noteOn(octaveNum * 12 + 15, NOTE_PLAYING_ON_VELOCITY);  // D#'
-                case SEMICOLON -> notePlayer.noteOn(octaveNum * 12 + 16, NOTE_PLAYING_ON_VELOCITY);  // E'
-                case QUOTE -> notePlayer.noteOn(octaveNum * 12 + 17, NOTE_PLAYING_ON_VELOCITY);  // F'
+                case A -> notePlayerSynth.noteOn(octaveNum * 12, NOTE_PLAYING_ON_VELOCITY);  // C
+                case W -> notePlayerSynth.noteOn(octaveNum * 12 + 1, NOTE_PLAYING_ON_VELOCITY);  // C#
+                case S -> notePlayerSynth.noteOn(octaveNum * 12 + 2, NOTE_PLAYING_ON_VELOCITY);  // D
+                case E -> notePlayerSynth.noteOn(octaveNum * 12 + 3, NOTE_PLAYING_ON_VELOCITY);  // D#
+                case D -> notePlayerSynth.noteOn(octaveNum * 12 + 4, NOTE_PLAYING_ON_VELOCITY);  // E
+                case F -> notePlayerSynth.noteOn(octaveNum * 12 + 5, NOTE_PLAYING_ON_VELOCITY);  // F
+                case T -> notePlayerSynth.noteOn(octaveNum * 12 + 6, NOTE_PLAYING_ON_VELOCITY);  // F#
+                case G -> notePlayerSynth.noteOn(octaveNum * 12 + 7, NOTE_PLAYING_ON_VELOCITY);  // G
+                case Y -> notePlayerSynth.noteOn(octaveNum * 12 + 8, NOTE_PLAYING_ON_VELOCITY);  // G#
+                case H -> notePlayerSynth.noteOn(octaveNum * 12 + 9, NOTE_PLAYING_ON_VELOCITY);  // A
+                case U -> notePlayerSynth.noteOn(octaveNum * 12 + 10, NOTE_PLAYING_ON_VELOCITY);  // A#
+                case J -> notePlayerSynth.noteOn(octaveNum * 12 + 11, NOTE_PLAYING_ON_VELOCITY);  // B
+                case K -> notePlayerSynth.noteOn(octaveNum * 12 + 12, NOTE_PLAYING_ON_VELOCITY);  // C'
+                case O -> notePlayerSynth.noteOn(octaveNum * 12 + 13, NOTE_PLAYING_ON_VELOCITY);  // C#'
+                case L -> notePlayerSynth.noteOn(octaveNum * 12 + 14, NOTE_PLAYING_ON_VELOCITY);  // D'
+                case P -> notePlayerSynth.noteOn(octaveNum * 12 + 15, NOTE_PLAYING_ON_VELOCITY);  // D#'
+                case SEMICOLON -> notePlayerSynth.noteOn(octaveNum * 12 + 16, NOTE_PLAYING_ON_VELOCITY);  // E'
+                case QUOTE -> notePlayerSynth.noteOn(octaveNum * 12 + 17, NOTE_PLAYING_ON_VELOCITY);  // F'
             }
         }
     }
@@ -2066,24 +2067,24 @@ public class TranscriptionViewController implements Initializable {
         KeyCode code = keyEvent.getCode();
 
         switch (code) {
-            case A -> notePlayer.noteOff(octaveNum * 12, NOTE_PLAYING_OFF_VELOCITY);  // C
-            case W -> notePlayer.noteOff(octaveNum * 12 + 1, NOTE_PLAYING_OFF_VELOCITY);  // C#
-            case S -> notePlayer.noteOff(octaveNum * 12 + 2, NOTE_PLAYING_OFF_VELOCITY);  // D
-            case E -> notePlayer.noteOff(octaveNum * 12 + 3, NOTE_PLAYING_OFF_VELOCITY);  // D#
-            case D -> notePlayer.noteOff(octaveNum * 12 + 4, NOTE_PLAYING_OFF_VELOCITY);  // E
-            case F -> notePlayer.noteOff(octaveNum * 12 + 5, NOTE_PLAYING_OFF_VELOCITY);  // F
-            case T -> notePlayer.noteOff(octaveNum * 12 + 6, NOTE_PLAYING_OFF_VELOCITY);  // F#
-            case G -> notePlayer.noteOff(octaveNum * 12 + 7, NOTE_PLAYING_OFF_VELOCITY);  // G
-            case Y -> notePlayer.noteOff(octaveNum * 12 + 8, NOTE_PLAYING_OFF_VELOCITY);  // G#
-            case H -> notePlayer.noteOff(octaveNum * 12 + 9, NOTE_PLAYING_OFF_VELOCITY);  // A
-            case U -> notePlayer.noteOff(octaveNum * 12 + 10, NOTE_PLAYING_OFF_VELOCITY);  // A#
-            case J -> notePlayer.noteOff(octaveNum * 12 + 11, NOTE_PLAYING_OFF_VELOCITY);  // B
-            case K -> notePlayer.noteOff(octaveNum * 12 + 12, NOTE_PLAYING_OFF_VELOCITY);  // C'
-            case O -> notePlayer.noteOff(octaveNum * 12 + 13, NOTE_PLAYING_OFF_VELOCITY);  // C#'
-            case L -> notePlayer.noteOff(octaveNum * 12 + 14, NOTE_PLAYING_OFF_VELOCITY);  // D'
-            case P -> notePlayer.noteOff(octaveNum * 12 + 15, NOTE_PLAYING_OFF_VELOCITY);  // D#'
-            case SEMICOLON -> notePlayer.noteOff(octaveNum * 12 + 16, NOTE_PLAYING_OFF_VELOCITY);  // E'
-            case QUOTE -> notePlayer.noteOff(octaveNum * 12 + 17, NOTE_PLAYING_OFF_VELOCITY);  // F'
+            case A -> notePlayerSynth.noteOff(octaveNum * 12, NOTE_PLAYING_OFF_VELOCITY);  // C
+            case W -> notePlayerSynth.noteOff(octaveNum * 12 + 1, NOTE_PLAYING_OFF_VELOCITY);  // C#
+            case S -> notePlayerSynth.noteOff(octaveNum * 12 + 2, NOTE_PLAYING_OFF_VELOCITY);  // D
+            case E -> notePlayerSynth.noteOff(octaveNum * 12 + 3, NOTE_PLAYING_OFF_VELOCITY);  // D#
+            case D -> notePlayerSynth.noteOff(octaveNum * 12 + 4, NOTE_PLAYING_OFF_VELOCITY);  // E
+            case F -> notePlayerSynth.noteOff(octaveNum * 12 + 5, NOTE_PLAYING_OFF_VELOCITY);  // F
+            case T -> notePlayerSynth.noteOff(octaveNum * 12 + 6, NOTE_PLAYING_OFF_VELOCITY);  // F#
+            case G -> notePlayerSynth.noteOff(octaveNum * 12 + 7, NOTE_PLAYING_OFF_VELOCITY);  // G
+            case Y -> notePlayerSynth.noteOff(octaveNum * 12 + 8, NOTE_PLAYING_OFF_VELOCITY);  // G#
+            case H -> notePlayerSynth.noteOff(octaveNum * 12 + 9, NOTE_PLAYING_OFF_VELOCITY);  // A
+            case U -> notePlayerSynth.noteOff(octaveNum * 12 + 10, NOTE_PLAYING_OFF_VELOCITY);  // A#
+            case J -> notePlayerSynth.noteOff(octaveNum * 12 + 11, NOTE_PLAYING_OFF_VELOCITY);  // B
+            case K -> notePlayerSynth.noteOff(octaveNum * 12 + 12, NOTE_PLAYING_OFF_VELOCITY);  // C'
+            case O -> notePlayerSynth.noteOff(octaveNum * 12 + 13, NOTE_PLAYING_OFF_VELOCITY);  // C#'
+            case L -> notePlayerSynth.noteOff(octaveNum * 12 + 14, NOTE_PLAYING_OFF_VELOCITY);  // D'
+            case P -> notePlayerSynth.noteOff(octaveNum * 12 + 15, NOTE_PLAYING_OFF_VELOCITY);  // D#'
+            case SEMICOLON -> notePlayerSynth.noteOff(octaveNum * 12 + 16, NOTE_PLAYING_OFF_VELOCITY);  // E'
+            case QUOTE -> notePlayerSynth.noteOff(octaveNum * 12 + 17, NOTE_PLAYING_OFF_VELOCITY);  // F'
         }
     }
 }

@@ -2,12 +2,12 @@
  * NoteRectangle.java
  *
  * Created on 2022-06-07
- * Updated on 2022-06-09
+ * Updated on 2022-06-10
  *
  * Description: A `StackPane` object that is used to denote a note in the transcription view.
  */
 
-package site.overwrite.auditranscribe.notes;
+package site.overwrite.auditranscribe.note_playback;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -43,7 +43,7 @@ public class NoteRectangle extends StackPane {
     public static int maxNoteNum;
     public static double totalDuration;
 
-    public static NotePlayer notePlayer;
+    public static NotePlayerSynth notePlayerSynth;
     public static int onVelocity;
     public static int offVelocity;
     public static double offDuration;  // In seconds
@@ -338,8 +338,8 @@ public class NoteRectangle extends StackPane {
         NoteRectangle.totalDuration = totalDuration;
     }
 
-    public static void setNotePlayer(NotePlayer notePlayer) {
-        NoteRectangle.notePlayer = notePlayer;
+    public static void setNotePlayer(NotePlayerSynth notePlayerSynth) {
+        NoteRectangle.notePlayerSynth = notePlayerSynth;
     }
 
     public static void setOnVelocity(int onVelocity) {
@@ -386,11 +386,11 @@ public class NoteRectangle extends StackPane {
     }
 
     public void playNote() {
-        notePlayer.noteOn(noteNum, onVelocity);
+        notePlayerSynth.noteOn(noteNum, onVelocity);
     }
 
     public void stopNote() {
-        notePlayer.noteOff(noteNum, offVelocity);
+        notePlayerSynth.noteOff(noteNum, offVelocity);
     }
 
     /**
