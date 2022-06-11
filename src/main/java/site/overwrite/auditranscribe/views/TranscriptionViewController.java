@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-09
+ * Updated on 2022-06-11
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -77,14 +77,14 @@ public class TranscriptionViewController implements Initializable {
             // Simple time signatures
             entry("4/4", 4),
             entry("2/2", 2),
-            entry("2/4", 4),
-            entry("3/4", 4),
-            entry("3/8", 8),
+            entry("2/4", 2),
+            entry("3/4", 3),
+            entry("3/8", 3),
 
             // Compound time signatures
-            entry("6/8", 8),
-            entry("9/8", 8),
-            entry("12/8", 8)
+            entry("6/8", 6),
+            entry("9/8", 9),
+            entry("12/8", 12)
     );  // See https://en.wikipedia.org/wiki/Time_signature#Characteristics
     final String[] TIME_SIGNATURES = {"4/4", "2/2", "2/4", "3/4", "3/8", "6/8", "9/8", "12/8"};
 
