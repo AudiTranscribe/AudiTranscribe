@@ -2,7 +2,7 @@
  * UnitConversionUtilsTest.java
  *
  * Created on 2022-03-12
- * Updated on 2022-06-01
+ * Updated on 2022-06-11
  *
  * Description: Test `UnitConversionUtils.java`.
  */
@@ -76,17 +76,33 @@ class UnitConversionUtilsTest {
 
     @Test
     void noteNumberToNote() {
-        assertEquals("C0", UnitConversionUtils.noteNumberToNote(0, false));
-        assertEquals("D#3", UnitConversionUtils.noteNumberToNote(39, false));
-        assertEquals("E5", UnitConversionUtils.noteNumberToNote(64, false));
-        assertEquals("A#7", UnitConversionUtils.noteNumberToNote(94, false));
-        assertEquals("B9", UnitConversionUtils.noteNumberToNote(119, false));
+        // Without flats, without fancy accidentals
+        assertEquals("C0", UnitConversionUtils.noteNumberToNote(0, false, false));
+        assertEquals("D#3", UnitConversionUtils.noteNumberToNote(39, false, false));
+        assertEquals("E5", UnitConversionUtils.noteNumberToNote(64, false, false));
+        assertEquals("A#7", UnitConversionUtils.noteNumberToNote(94, false, false));
+        assertEquals("B9", UnitConversionUtils.noteNumberToNote(119, false, false));
 
-        assertEquals("C0", UnitConversionUtils.noteNumberToNote(0, true));
-        assertEquals("D♯3", UnitConversionUtils.noteNumberToNote(39, true));
-        assertEquals("E5", UnitConversionUtils.noteNumberToNote(64, true));
-        assertEquals("A♯7", UnitConversionUtils.noteNumberToNote(94, true));
-        assertEquals("B9", UnitConversionUtils.noteNumberToNote(119, true));
+        // Without flats, with fancy accidentals
+        assertEquals("C0", UnitConversionUtils.noteNumberToNote(0, false, true));
+        assertEquals("D♯3", UnitConversionUtils.noteNumberToNote(39, false, true));
+        assertEquals("E5", UnitConversionUtils.noteNumberToNote(64, false, true));
+        assertEquals("A♯7", UnitConversionUtils.noteNumberToNote(94, false, true));
+        assertEquals("B9", UnitConversionUtils.noteNumberToNote(119, false, true));
+
+        // With flats, without fancy accidentals
+        assertEquals("C0", UnitConversionUtils.noteNumberToNote(0, true, false));
+        assertEquals("Eb3", UnitConversionUtils.noteNumberToNote(39, true, false));
+        assertEquals("E5", UnitConversionUtils.noteNumberToNote(64, true, false));
+        assertEquals("Bb7", UnitConversionUtils.noteNumberToNote(94, true, false));
+        assertEquals("B9", UnitConversionUtils.noteNumberToNote(119, true, false));
+
+        // With flats, with fancy accidentals
+        assertEquals("C0", UnitConversionUtils.noteNumberToNote(0, true, true));
+        assertEquals("E♭3", UnitConversionUtils.noteNumberToNote(39, true, true));
+        assertEquals("E5", UnitConversionUtils.noteNumberToNote(64, true, true));
+        assertEquals("B♭7", UnitConversionUtils.noteNumberToNote(94, true, true));
+        assertEquals("B9", UnitConversionUtils.noteNumberToNote(119, true, true));
     }
 
     @Test
