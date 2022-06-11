@@ -2,7 +2,7 @@
  * NoteRectangle.java
  *
  * Created on 2022-06-07
- * Updated on 2022-06-10
+ * Updated on 2022-06-11
  *
  * Description: A `StackPane` object that is used to denote a note in the transcription view.
  */
@@ -11,9 +11,6 @@ package site.overwrite.auditranscribe.note_playback;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
@@ -24,29 +21,22 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NoteRectangle extends StackPane {
     // Constants
     private static final double BORDER_WIDTH = 3;  // In pixels
     private static final double EXTEND_REGIONS_WIDTH = 8;  // In pixels
 
-    // Static
-    public static ObservableList<NoteRectangle> noteRectangles = FXCollections.observableArrayList();
-    public static SortedList<NoteRectangle> noteRectanglesSorted =
-            new SortedList<>(noteRectangles, new SortByTimeToPlace());
+    // Static attributes
+    public static List<NoteRectangle> noteRectangles = new ArrayList<>();
 
     public static double spectrogramWidth;
     public static double spectrogramHeight;
     public static int minNoteNum;
     public static int maxNoteNum;
     public static double totalDuration;
-
-    public static NotePlayerSynth notePlayerSynth;
-    public static int onVelocity;
-    public static int offVelocity;
-    public static double offDuration;  // In seconds
 
     public static boolean isPaused = true;
     public static boolean canEdit = false;
@@ -55,7 +45,7 @@ public class NoteRectangle extends StackPane {
     public int noteNum;
 
     public final DoubleProperty noteOnsetTime;
-    public final DoubleProperty duration;
+    public final DoubleProperty noteDuration;
 
     private final double rectangleWidth, rectangleHeight;
 
@@ -77,19 +67,19 @@ public class NoteRectangle extends StackPane {
      *
      * @param timeToPlaceRect The time (in seconds) at which the <b>start</b> of the note should be
      *                        placed.
-     * @param duration        The duration (in seconds) of the note.
+     * @param noteDuration    The duration (in seconds) of the note.
      * @param noteNum         The note number of the note.
      */
-    public NoteRectangle(double timeToPlaceRect, double duration, int noteNum) {
+    public NoteRectangle(double timeToPlaceRect, double noteDuration, int noteNum) {
         // Update properties
         this.noteNum = noteNum;
 
         this.noteOnsetTime = new SimpleDoubleProperty(timeToPlaceRect);
-        this.duration = new SimpleDoubleProperty(duration);
+        this.noteDuration = new SimpleDoubleProperty(noteDuration);
 
         // Bind properties
         this.noteOnsetTime.bind(this.translateXProperty().multiply(totalDuration / spectrogramWidth));
-        this.duration.bind(this.widthProperty().multiply(totalDuration / spectrogramWidth));
+        this.noteDuration.bind(this.widthProperty().multiply(totalDuration / spectrogramWidth));
 
         // Define the nodes
         bordersRegion = new Region();
@@ -109,7 +99,7 @@ public class NoteRectangle extends StackPane {
         double pixelsPerSecond = spectrogramWidth / totalDuration;
 
         // Calculate the x-coordinate of the note rectangle and the width of the note rectangle
-        rectangleWidth = duration * pixelsPerSecond;
+        rectangleWidth = noteDuration * pixelsPerSecond;
         double xCoord = timeToPlaceRect * pixelsPerSecond;
 
         // Calculate y-coordinate and height to place the rectangle
@@ -317,7 +307,7 @@ public class NoteRectangle extends StackPane {
         noteRectangles.add(this);
     }
 
-    // Setter methods
+    // Getter/Setter methods
     public static void setSpectrogramWidth(double spectrogramWidth) {
         NoteRectangle.spectrogramWidth = spectrogramWidth;
     }
@@ -338,22 +328,6 @@ public class NoteRectangle extends StackPane {
         NoteRectangle.totalDuration = totalDuration;
     }
 
-    public static void setNotePlayer(NotePlayerSynth notePlayerSynth) {
-        NoteRectangle.notePlayerSynth = notePlayerSynth;
-    }
-
-    public static void setOnVelocity(int onVelocity) {
-        NoteRectangle.onVelocity = onVelocity;
-    }
-
-    public static void setOffVelocity(int offVelocity) {
-        NoteRectangle.offVelocity = offVelocity;
-    }
-
-    public static void setOffDuration(double offDuration) {
-        NoteRectangle.offDuration = offDuration;
-    }
-
     public static void setCanEdit(boolean canEdit) {
         NoteRectangle.canEdit = canEdit;
     }
@@ -370,85 +344,7 @@ public class NoteRectangle extends StackPane {
         return noteOnsetTime.get();
     }
 
-    public double getDuration() {
-        return duration.get();
-    }
-
-    // Public methods
-
-    /**
-     * Method that gets the time (in seconds) when the note rectangle is supposed to stop playing.
-     *
-     * @return The time when the note should stop playing.
-     */
-    public double getNoteOffTime() {
-        return noteOnsetTime.get() + duration.get();
-    }
-
-    public void playNote() {
-        notePlayerSynth.noteOn(noteNum, onVelocity);
-    }
-
-    public void stopNote() {
-        notePlayerSynth.noteOff(noteNum, offVelocity);
-    }
-
-    /**
-     * Method that gets the note rectangles with a <code>timeToPlaceRect</code> of more than the
-     * specified <code>currTime</code>.
-     *
-     * @param currTime The current time of the audio.
-     * @return A queue of note rectangles with a <code>timeToPlaceRect</code> of more than the
-     * specified <code>currTime</code>.
-     */
-    public static Queue<NoteRectangle> getRelevantNoteRectangles(double currTime) {
-        // Get number of note rectangles
-        int n = noteRectanglesSorted.size();
-
-        // Perform trivial checks
-        if (n == 0) {
-            // No rectangles
-            return new LinkedList<>();
-        } else if (currTime <= noteRectanglesSorted.get(0).noteOnsetTime.getValue()) {
-            // All rectangles have playing time of more than current time => all rectangles are relevant
-            return new LinkedList<>(noteRectanglesSorted);
-        } else if (currTime > noteRectanglesSorted.get(noteRectanglesSorted.size() - 1).noteOnsetTime.getValue()) {
-            // All rectangles have playing time of less than current time => no rectangles are relevant
-            return new LinkedList<>();
-        }
-
-        // Find the first rectangle in the sorted list where its `timeToPlaceRect` is greater than the current time
-        // (Use binary search on the sorted list)
-        int targetIndex;
-
-        int left = 0;
-        int right = n - 1;
-        int middle;
-
-        while (left < right) {
-            // Calculate middle index
-            middle = (left + right) / 2;
-
-            // Get middle rectangle's `timeToPlaceRect`
-            double middleVal = noteRectanglesSorted.get(middle).noteOnsetTime.getValue();
-
-            // Compare 'middle' value with the current time
-            if (middleVal < currTime) {
-                left = middle + 1;
-            } else {
-                right = middle;
-            }
-        }
-
-        targetIndex = (left + right) / 2;
-
-        // Keep all rectangles with an index that is at least the target index
-        Queue<NoteRectangle> relevantNoteRectangles = new LinkedList<>();
-        for (int i = targetIndex; i < n; i++) {
-            relevantNoteRectangles.add(noteRectanglesSorted.get(i));
-        }
-
-        // Return the relevant note rectangles
-        return relevantNoteRectangles;
+    public double getNoteDuration() {
+        return noteDuration.get();
     }
 }

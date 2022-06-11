@@ -2,7 +2,7 @@
  * NotePlayerSequencer.java
  *
  * Created on 2022-06-09
- * Updated on 2022-06-10
+ * Updated on 2022-06-11
  *
  * Description: Class that handles the playing of notes as a MIDI sequence.
  */
@@ -16,23 +16,16 @@ import site.overwrite.auditranscribe.exceptions.ValueException;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 import javax.sound.midi.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class that handles the playing of notes as a MIDI sequence.
  */
-
-/*
- Todo: see
-     - https://www.cs.cmu.edu/~music/cmsip/readings/MIDI%20tutorial%20for%20programmers.html
-     - https://kevinboone.me/code/MidiFile.java
-     - https://www.geeksforgeeks.org/java-midi/
- */
-
 public class NotePlayerSequencer {
     // Constants
-    public static int TICKS_PER_QUARTER = 4;
+    public static int TICKS_PER_QUARTER = 100_000;
 
     // Attributes
     private Track track;  // Midi track
@@ -47,6 +40,9 @@ public class NotePlayerSequencer {
     public double bpm;
 
     private final Map<Triplet<Double, Double, Integer>, Pair<MidiEvent, MidiEvent>> allMIDIEventPairs = new HashMap<>();
+    public boolean areNotesSet = false;
+
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     /**
      * Initialization method for a multi-note player object.<br>
@@ -104,6 +100,7 @@ public class NotePlayerSequencer {
      */
     public void setCurrTime(double currTime) {
         sequencer.setMicrosecondPosition((long) (currTime * 1e6));
+        logger.log(Level.FINE, "Current time set to " + currTime);
     }
 
     /**
@@ -127,17 +124,24 @@ public class NotePlayerSequencer {
         for (int i = 0; i < n; i++) {
             addNote(noteOnsetTimes[i], durations[i], noteNums[i]);
         }
+
+        // Update the `areNotesSet` flag
+        areNotesSet = true;
+        logger.log(Level.FINE, "Notes set on track");
     }
 
     /**
      * Method that clears all the notes that are currently present on the track.
      */
     public void clearNotesOnTrack() {
-        for (Triplet<Double, Double, Integer> key : allMIDIEventPairs.keySet()) {
+        Set<Triplet<Double, Double, Integer>> keys = new HashSet<>(allMIDIEventPairs.keySet());  // Make copy
+
+        for (Triplet<Double, Double, Integer> key : keys) {
             removeNote(key.getValue0(), key.getValue1(), key.getValue2());
         }
         sequence.deleteTrack(track);
         track = sequence.createTrack();
+        logger.log(Level.FINE, "Notes cleared from track");
     }
 
     public void play() {
@@ -156,10 +160,12 @@ public class NotePlayerSequencer {
 
         // Start playback
         sequencer.start();
+        logger.log(Level.FINE, "Note sequence playback started");
     }
 
     public void stop() {
         sequencer.stop();
+        logger.log(Level.FINE, "Note sequence playback stopped");
     }
 
     // Private methods

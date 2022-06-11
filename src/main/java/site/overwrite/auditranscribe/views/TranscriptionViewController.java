@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-10
+ * Updated on 2022-06-11
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -10,9 +10,6 @@
 package site.overwrite.auditranscribe.views;
 
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -41,12 +38,9 @@ import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.Theme;
-import site.overwrite.auditranscribe.note_playback.MIDIInstrument;
-import site.overwrite.auditranscribe.note_playback.NotePlayerSynth;
+import site.overwrite.auditranscribe.note_playback.*;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
-import site.overwrite.auditranscribe.note_playback.NoteRectangle;
-import site.overwrite.auditranscribe.note_playback.SortByTimeToPlace;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 import site.overwrite.auditranscribe.plotting.PlottingStuffHandler;
 import site.overwrite.auditranscribe.spectrogram.*;
@@ -55,7 +49,6 @@ import site.overwrite.auditranscribe.views.helpers.MouseHandler;
 import site.overwrite.auditranscribe.views.helpers.Popups;
 import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
 
-import javax.sound.midi.MidiUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -141,10 +134,7 @@ public class TranscriptionViewController implements Initializable {
     Theme theme;
 
     NotePlayerSynth notePlayerSynth;
-    Queue<NoteRectangle> relevantNoteRectangles;
-    ObservableList<NoteRectangle> noteRectanglesToRemove = FXCollections.observableArrayList();
-    SortedList<NoteRectangle> sortedNoteRectanglesToRemove =
-            new SortedList<>(noteRectanglesToRemove, new SortByTimeToPlace());
+    NotePlayerSequencer notePlayerSequencer;
     MusicNotesDataObject musicNotesData;
 
     private boolean isEverythingReady = false;
@@ -177,7 +167,7 @@ public class TranscriptionViewController implements Initializable {
     private double finalHeight;
 
     private int octaveNum = 4;
-    private int notesVolume = 64;
+    private int notesVolume = 80;
 
     private Label[] noteLabels;
     private Line[] beatLines;
@@ -266,7 +256,6 @@ public class TranscriptionViewController implements Initializable {
 
         // Clear the note rectangles
         NoteRectangle.noteRectangles.clear();
-        if (relevantNoteRectangles != null) relevantNoteRectangles.clear();
 
         // Reset note rectangles settings
         NoteRectangle.setIsPaused(isPaused);
@@ -279,12 +268,9 @@ public class TranscriptionViewController implements Initializable {
         mainPane.prefWidthProperty().bind(rootPane.widthProperty());
         mainPane.prefHeightProperty().bind(rootPane.heightProperty().subtract(menuBar.heightProperty()));
 
-        // Update any attributes
-        try {
-            notePlayerSynth = new NotePlayerSynth(NOTE_PLAYING_INSTRUMENT, MIDI_CHANNEL_NUM);
-        } catch (MidiUnavailableException e) {
-            throw new RuntimeException(e);
-        }
+        // Update attributes
+        notePlayerSynth = new NotePlayerSynth(NOTE_PLAYING_INSTRUMENT, MIDI_CHANNEL_NUM);
+        notePlayerSequencer = new NotePlayerSequencer();
 
         // Update spinners' ranges
         SpinnerValueFactory.DoubleSpinnerValueFactory bpmSpinnerFactory =
@@ -709,9 +695,6 @@ public class TranscriptionViewController implements Initializable {
             // Update the notes volume value
             notesVolume = newValue.intValue();
 
-            // Update the note rectangles' playback volume
-            NoteRectangle.setOnVelocity(notesVolume);
-
             // Change the icon of the notes' volume button from off to on
             if (areNotesMuted) {
                 notesVolumeButtonImage.setImage(
@@ -993,7 +976,6 @@ public class TranscriptionViewController implements Initializable {
 
         // Clear the note rectangles
         NoteRectangle.noteRectangles.clear();
-        if (relevantNoteRectangles != null) relevantNoteRectangles.clear();
 
         // Shutdown the scheduler
         scheduler.shutdown();
@@ -1030,6 +1012,9 @@ public class TranscriptionViewController implements Initializable {
         // (We do this after updating start time to avoid pesky seeking issues)
         audio.setAudioPlaybackTime(seekTime);
 
+        // Update note sequencer current time
+        if (!areNotesMuted) notePlayerSequencer.setCurrTime(seekTime);
+
         // Update the current time and current time label
         currTime = seekTime;
         currTimeLabel.setText(UnitConversionUtils.secondsToTimeString(seekTime));
@@ -1039,11 +1024,6 @@ public class TranscriptionViewController implements Initializable {
 
         colouredProgressPane.setPrefWidth(newXPos);
         if (isEverythingReady) PlottingStuffHandler.updatePlayheadLine(playheadLine, newXPos);
-
-        // Update relevant note rectangles upon seeking
-        if (!isPaused) {
-            relevantNoteRectangles = NoteRectangle.getRelevantNoteRectangles(currTime);
-        }
 
         logger.log(Level.FINE, "Seeked to " + seekTime + " seconds");
     }
@@ -1193,7 +1173,7 @@ public class TranscriptionViewController implements Initializable {
                 for (int i = 0; i < numRectangles; i++) {
                     NoteRectangle noteRectangle = NoteRectangle.noteRectangles.get(i);
                     timesToPlaceRectangles[i] = noteRectangle.getNoteOnsetTime();
-                    noteDurations[i] = noteRectangle.getDuration();
+                    noteDurations[i] = noteRectangle.getNoteDuration();
                     noteNums[i] = noteRectangle.noteNum;
                 }
 
@@ -1474,29 +1454,6 @@ public class TranscriptionViewController implements Initializable {
                     if (scrollToPlayhead) {
                         updateScrollPosition(newPosX, spectrogramPane.getWidth());
                     }
-
-                    // Update notes that are played
-                    while (relevantNoteRectangles.size() != 0 &&
-                            relevantNoteRectangles.peek().getNoteOnsetTime() < currTime + NOTE_PLAYING_DELAY_OFFSET
-                    ) {
-                        // Play the note rectangle if notes can be played
-                        NoteRectangle noteRectangle = relevantNoteRectangles.poll();
-                        if (!areNotesMuted && noteRectangle != null) noteRectangle.playNote();
-
-                        // Add it to the list of note rectangles to be removed
-                        noteRectanglesToRemove.add(noteRectangle);
-                    }
-
-                    // Update notes that are to be stopped
-                    while (sortedNoteRectanglesToRemove.size() != 0 &&
-                            sortedNoteRectanglesToRemove.get(0).getNoteOffTime() < currTime ) {
-                        // Stop the note rectangle
-                        NoteRectangle noteRectangle = sortedNoteRectanglesToRemove.get(0);
-                        if (noteRectangle != null) noteRectangle.stopNote();
-
-                        // Remove it from the list of note rectangles to be removed
-                        noteRectanglesToRemove.remove(noteRectangle);
-                    }
                 }
             }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);
 
@@ -1544,10 +1501,6 @@ public class TranscriptionViewController implements Initializable {
             NoteRectangle.setMinNoteNum(MIN_NOTE_NUMBER);
             NoteRectangle.setMaxNoteNum(MAX_NOTE_NUMBER);
             NoteRectangle.setTotalDuration(audioDuration);
-            NoteRectangle.setNotePlayer(notePlayerSynth);
-            NoteRectangle.setOnVelocity(notesVolume);
-            NoteRectangle.setOffVelocity(NOTE_PLAYING_OFF_VELOCITY);
-            NoteRectangle.setOffDuration(NOTE_PLAYING_OFF_DURATION);
 
             // Settle layout of the main pane
             mainPane.layout();
@@ -1697,6 +1650,9 @@ public class TranscriptionViewController implements Initializable {
                     }
                 }
 
+                // Reset the sequencer
+                notePlayerSequencer.stop();
+
                 // Enable all disabled nodes
                 Node[] disabledNodes = new Node[]{
                         // Top Hbox
@@ -1770,17 +1726,38 @@ public class TranscriptionViewController implements Initializable {
 
         // Handle note rectangle operations when toggle paused
         if (!isPaused) {
-            // Get relevant note rectangles as a queue if playback is unpaused
-            relevantNoteRectangles = NoteRectangle.getRelevantNoteRectangles(currTime);
-        } else {
-            // Otherwise, stop all notes
-            for (NoteRectangle noteRect : relevantNoteRectangles) {
-                noteRect.stopNote();
+            // Get number of note rectangles
+            int numNoteRects = NoteRectangle.noteRectangles.size();
+
+            // Get the note onset times, note durations, and note numbers from the note rectangles
+            double[] noteOnsetTimes = new double[numNoteRects];
+            double[] noteDurations = new double[numNoteRects];
+            int[] noteNums = new int[numNoteRects];
+
+            for (int i = 0; i < numNoteRects; i++) {
+                noteOnsetTimes[i] = NoteRectangle.noteRectangles.get(i).getNoteOnsetTime();
+                noteDurations[i] = NoteRectangle.noteRectangles.get(i).getNoteDuration();
+                noteNums[i] = NoteRectangle.noteRectangles.get(i).getNoteNum();
             }
 
-            // Clear the note rectangles' lists
-            relevantNoteRectangles.clear();
-            noteRectanglesToRemove.clear();
+            // Setup note player sequencer
+            notePlayerSequencer.setOnVelocity(notesVolume);
+            notePlayerSequencer.setOffVelocity(NOTE_PLAYING_OFF_VELOCITY);
+            notePlayerSequencer.setBPM(bpm);
+            notePlayerSequencer.setInstrument(NOTE_PLAYING_INSTRUMENT);
+
+            // Set notes
+            notePlayerSequencer.setNotesOnTrack(noteOnsetTimes, noteDurations, noteNums);  // Will clear existing notes
+
+            // Set current time
+            notePlayerSequencer.setCurrTime(currTime);
+
+            // Start playback
+            notePlayerSequencer.play();
+
+        } else {  // Is paused
+            // Stop playback
+            notePlayerSequencer.stop();
         }
 
         logger.log(Level.FINE, "Toggled pause state (paused is now " + isPaused + ")");
