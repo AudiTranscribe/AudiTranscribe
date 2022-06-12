@@ -2,7 +2,7 @@
  * UnitConversionUtils.java
  *
  * Created on 2022-03-12
- * Updated on 2022-06-11
+ * Updated on 2022-06-12
  *
  * Description: Unit conversion methods.
  */
@@ -135,18 +135,44 @@ public class UnitConversionUtils {
      * from C0. For example, A4 has note number 57 as it is 57 notes away from C0.
      *
      * @param noteNumber       Note number for the given note.
-     * @param useFlats         Whether to use flats instead of sharps.
+     * @param musicKey         Music key, with both the key and the mode.
      * @param fancyAccidentals Whether <em>fancier accidentals</em> (i.e. ♯ instead of # and ♭
      *                         instead of b) should be used.
      * @return Note string.
      */
-    public static String noteNumberToNote(int noteNumber, boolean useFlats, boolean fancyAccidentals) {
-        // Constant array of note strings
+    public static String noteNumberToNote(int noteNumber, String musicKey, boolean fancyAccidentals) {
+        // Fancify music key
+        musicKey = MusicUtils.fancifyMusicString(musicKey);
+
+        // Determine which set of note strings to use
         String[] noteStrings;
-        if (useFlats) {
+        if (MusicUtils.doesKeyUseFlats(musicKey)) {
             noteStrings = new String[]{"C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"};
         } else {
             noteStrings = new String[]{"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+        }
+
+        // Replace notes if the key demands it
+        if (musicKey.equals("G♭ Major") ||
+                musicKey.equals("C♭ Major") ||
+                musicKey.equals("E♭ Minor") ||
+                musicKey.equals("A♭ Minor")) {
+            noteStrings[11] = "Cb";  // Cb instead of B
+        }
+
+        if (musicKey.equals("C♭ Major") || musicKey.equals("A♭ Minor")) {
+            noteStrings[4] = "Fb";  // Fb instead of E
+        }
+
+        if (musicKey.equals("F♯ Major") ||
+                musicKey.equals("C♯ Major") ||
+                musicKey.equals("D♯ Minor") ||
+                musicKey.equals("A♯ Minor")) {
+            noteStrings[5] = "E#";  // E# instead of F
+        }
+
+        if (musicKey.equals("C♯ Major") || musicKey.equals("A♯ Minor")) {
+            noteStrings[0] = "B#";  // B# instead of C
         }
 
         // Check if we want to use fancy accidentals

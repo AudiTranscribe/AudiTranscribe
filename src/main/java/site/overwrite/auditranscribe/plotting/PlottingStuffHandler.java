@@ -2,7 +2,7 @@
  * PlottingStuffHandler.java
  *
  * Created on 2022-03-20
- * Updated on 2022-06-11
+ * Updated on 2022-06-12
  *
  * Description: Class that adds the notes' stuff to the spectrogram area.
  */
@@ -98,9 +98,7 @@ public class PlottingStuffHandler {
 
         for (int i = minNoteNumber; i <= maxNoteNumber; i++) {
             // Get the note's text
-            String note = UnitConversionUtils.noteNumberToNote(
-                    i, MusicUtils.doesKeyUseFlats(musicKey), fancyAccidentals
-            );
+            String note = UnitConversionUtils.noteNumberToNote(i, musicKey, fancyAccidentals);
 
             // Calculate the height to move the pointer to
             double placementHeight = PlottingHelpers.noteNumToHeight(i, minNoteNumber, maxNoteNumber, height);

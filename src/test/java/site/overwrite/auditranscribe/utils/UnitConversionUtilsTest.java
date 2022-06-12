@@ -2,7 +2,7 @@
  * UnitConversionUtilsTest.java
  *
  * Created on 2022-03-12
- * Updated on 2022-06-11
+ * Updated on 2022-06-12
  *
  * Description: Test `UnitConversionUtils.java`.
  */
@@ -76,33 +76,51 @@ class UnitConversionUtilsTest {
 
     @Test
     void noteNumberToNote() {
-        // Without flats, without fancy accidentals
-        assertEquals("C0", UnitConversionUtils.noteNumberToNote(0, false, false));
-        assertEquals("D#3", UnitConversionUtils.noteNumberToNote(39, false, false));
-        assertEquals("E5", UnitConversionUtils.noteNumberToNote(64, false, false));
-        assertEquals("A#7", UnitConversionUtils.noteNumberToNote(94, false, false));
-        assertEquals("B9", UnitConversionUtils.noteNumberToNote(119, false, false));
+        assertEquals("C0", UnitConversionUtils.noteNumberToNote(0, "C Major", false));
+        assertEquals("C4", UnitConversionUtils.noteNumberToNote(48, "C Major", false));
+        assertEquals("F5", UnitConversionUtils.noteNumberToNote(65, "C Major", false));
+        assertEquals("G#6", UnitConversionUtils.noteNumberToNote(80, "C Major", false));
+        assertEquals("B9", UnitConversionUtils.noteNumberToNote(119, "C Major", false));
 
-        // Without flats, with fancy accidentals
-        assertEquals("C0", UnitConversionUtils.noteNumberToNote(0, false, true));
-        assertEquals("D♯3", UnitConversionUtils.noteNumberToNote(39, false, true));
-        assertEquals("E5", UnitConversionUtils.noteNumberToNote(64, false, true));
-        assertEquals("A♯7", UnitConversionUtils.noteNumberToNote(94, false, true));
-        assertEquals("B9", UnitConversionUtils.noteNumberToNote(119, false, true));
+        assertEquals("C0", UnitConversionUtils.noteNumberToNote(0, "Gb Major", false));
+        assertEquals("E5", UnitConversionUtils.noteNumberToNote(64, "Gb Major", false));
+        assertEquals("F7", UnitConversionUtils.noteNumberToNote(89, "Gb Major", false));
+        assertEquals("Cb9", UnitConversionUtils.noteNumberToNote(119, "Gb Major", false));
 
-        // With flats, without fancy accidentals
-        assertEquals("C0", UnitConversionUtils.noteNumberToNote(0, true, false));
-        assertEquals("Eb3", UnitConversionUtils.noteNumberToNote(39, true, false));
-        assertEquals("E5", UnitConversionUtils.noteNumberToNote(64, true, false));
-        assertEquals("Bb7", UnitConversionUtils.noteNumberToNote(94, true, false));
-        assertEquals("B9", UnitConversionUtils.noteNumberToNote(119, true, false));
+        assertEquals("C0", UnitConversionUtils.noteNumberToNote(0, "Eb Minor", false));
+        assertEquals("E5", UnitConversionUtils.noteNumberToNote(64, "Eb Minor", false));
+        assertEquals("F7", UnitConversionUtils.noteNumberToNote(89, "Eb Minor", false));
+        assertEquals("Cb9", UnitConversionUtils.noteNumberToNote(119, "Eb Minor", false));
 
-        // With flats, with fancy accidentals
-        assertEquals("C0", UnitConversionUtils.noteNumberToNote(0, true, true));
-        assertEquals("E♭3", UnitConversionUtils.noteNumberToNote(39, true, true));
-        assertEquals("E5", UnitConversionUtils.noteNumberToNote(64, true, true));
-        assertEquals("B♭7", UnitConversionUtils.noteNumberToNote(94, true, true));
-        assertEquals("B9", UnitConversionUtils.noteNumberToNote(119, true, true));
+        assertEquals("C0", UnitConversionUtils.noteNumberToNote(0, "Cb Major", false));
+        assertEquals("Fb5", UnitConversionUtils.noteNumberToNote(64, "Cb Major", false));
+        assertEquals("F7", UnitConversionUtils.noteNumberToNote(89, "Cb Major", false));
+        assertEquals("Cb9", UnitConversionUtils.noteNumberToNote(119, "Cb Major", false));
+
+        assertEquals("C0", UnitConversionUtils.noteNumberToNote(0, "A♭ Minor", true));
+        assertEquals("F♭5", UnitConversionUtils.noteNumberToNote(64, "A♭ Minor", true));
+        assertEquals("F7", UnitConversionUtils.noteNumberToNote(89, "A♭ Minor", true));
+        assertEquals("C♭9", UnitConversionUtils.noteNumberToNote(119, "A♭ Minor", true));
+
+        assertEquals("C0", UnitConversionUtils.noteNumberToNote(0, "F♯ Major", true));
+        assertEquals("E5", UnitConversionUtils.noteNumberToNote(64, "F♯ Major", true));
+        assertEquals("E♯7", UnitConversionUtils.noteNumberToNote(89, "F♯ Major", true));
+        assertEquals("B9", UnitConversionUtils.noteNumberToNote(119, "F♯ Major", true));
+
+        assertEquals("C0", UnitConversionUtils.noteNumberToNote(0, "D♯ Minor", true));
+        assertEquals("E5", UnitConversionUtils.noteNumberToNote(64, "D♯ Minor", true));
+        assertEquals("E♯7", UnitConversionUtils.noteNumberToNote(89, "D♯ Minor", true));
+        assertEquals("B9", UnitConversionUtils.noteNumberToNote(119, "D♯ Minor", true));
+
+        assertEquals("B♯0", UnitConversionUtils.noteNumberToNote(0, "C♯ Major", true));
+        assertEquals("E5", UnitConversionUtils.noteNumberToNote(64, "C♯ Major", true));
+        assertEquals("E♯7", UnitConversionUtils.noteNumberToNote(89, "C♯ Major", true));
+        assertEquals("B9", UnitConversionUtils.noteNumberToNote(119, "C♯ Major", true));
+
+        assertEquals("B#0", UnitConversionUtils.noteNumberToNote(0, "A# Minor", false));
+        assertEquals("E5", UnitConversionUtils.noteNumberToNote(64, "A♯ Minor", true));
+        assertEquals("E♯7", UnitConversionUtils.noteNumberToNote(89, "A♯ Minor", true));
+        assertEquals("B9", UnitConversionUtils.noteNumberToNote(119, "A# Minor", false));
     }
 
     @Test
@@ -129,9 +147,9 @@ class UnitConversionUtilsTest {
     @Test
     void powerToDecibel() {
         // With `refVal` equals to 1
-        assertEquals(3.010, UnitConversionUtils.powerToDecibel(2, 1), 0.001);
-        assertEquals(10, UnitConversionUtils.powerToDecibel(10, 1), 0.001);
-        assertEquals(10.915, UnitConversionUtils.powerToDecibel(12.345, 1), 0.001);
+        assertEquals(3.010, UnitConversionUtils.powerToDecibel(2), 0.001);
+        assertEquals(10, UnitConversionUtils.powerToDecibel(10), 0.001);
+        assertEquals(10.915, UnitConversionUtils.powerToDecibel(12.345), 0.001);
 
         // With variable `refVal`
         assertEquals(-7.782, UnitConversionUtils.powerToDecibel(2, 12), 0.001);
@@ -139,7 +157,10 @@ class UnitConversionUtilsTest {
         assertEquals(2.597, UnitConversionUtils.powerToDecibel(12.345, 6.789), 0.001);
 
         // With matrix
-        assertArrayEquals(new double[][] {{-60, 0}, {10, 20}, {20, 10}}, UnitConversionUtils.powerToDecibel(new double[][] {{0, 1}, {10, 100}, {100, 10}}, 1, 80));
+        assertArrayEquals(
+                new double[][]{{-60, 0}, {10, 20}, {20, 10}},
+                UnitConversionUtils.powerToDecibel(new double[][]{{0, 1}, {10, 100}, {100, 10}}, 1, 80)
+        );
     }
 
     @Test

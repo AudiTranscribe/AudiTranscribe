@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-11
+ * Updated on 2022-06-12
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -414,7 +414,7 @@ public class TranscriptionViewController implements Initializable {
                     // Play the note
                     try {
                         logger.log(Level.FINE, "Playing " + UnitConversionUtils.noteNumberToNote(
-                                estimatedNoteNum, false, false
+                                estimatedNoteNum, musicKey, false
                         ));
                         notePlayer.playNoteForDuration(
                                 estimatedNoteNum, NOTE_PLAYING_ON_VELOCITY, NOTE_PLAYING_OFF_VELOCITY,
