@@ -2,12 +2,14 @@
  * SQLiteDatabaseManager.java
  *
  * Created on 2022-05-11
- * Updated on 2022-05-12
+ * Updated on 2022-06-05
  *
  * Description: Class that helps manage the interactions with an SQLite3 database.
  */
 
 package site.overwrite.auditranscribe.io.db;
+
+import site.overwrite.auditranscribe.io.IOMethods;
 
 import java.sql.*;
 
@@ -28,7 +30,11 @@ public class SQLiteDatabaseManager {
      * @param databaseAbsolutePath Absolute file path to the SQLite3 database.
      */
     public SQLiteDatabaseManager(String databaseAbsolutePath) {
+        // Set path to the database
         this.databaseAbsolutePath = databaseAbsolutePath;
+
+        // Attempt creation of the database file
+        IOMethods.createFile(databaseAbsolutePath);
     }
 
     // Public methods

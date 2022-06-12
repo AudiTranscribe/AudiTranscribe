@@ -2,7 +2,7 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-05-29
+ * Updated on 2022-06-09
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
@@ -13,9 +13,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.stage.*;
+import org.apache.commons.compress.utils.FileNameUtils;
 import org.javatuples.Pair;
-import site.overwrite.auditranscribe.misc.CustomTask;
+import site.overwrite.auditranscribe.audio.AudioProcessingMode;
+import site.overwrite.auditranscribe.audio.ffmpeg.AudioConverter;
 import site.overwrite.auditranscribe.audio.Audio;
+import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
@@ -23,9 +26,9 @@ import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.ProjectData
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
 import site.overwrite.auditranscribe.exceptions.FailedToReadDataException;
 import site.overwrite.auditranscribe.exceptions.IncorrectFileFormatException;
-import site.overwrite.auditranscribe.io.audt_file.file_handers.AUDTFileReader;
-import site.overwrite.auditranscribe.io.audt_file.file_handers.AUDTFileWriter;
-import site.overwrite.auditranscribe.io.settings_file.SettingsFile;
+import site.overwrite.auditranscribe.io.audt_file.AUDTFileReader;
+import site.overwrite.auditranscribe.io.audt_file.AUDTFileWriter;
+import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.views.MainViewController;
 import site.overwrite.auditranscribe.views.TranscriptionViewController;
 
@@ -33,6 +36,8 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 // Main class
 
@@ -40,6 +45,9 @@ import java.util.List;
  * Methods that handle the IO operations for an AudiTranscribe project.
  */
 public class ProjectIOHandlers {
+    // Attributes
+    private static final Logger logger = Logger.getLogger(ProjectIOHandlers.class.getName());
+
     // Public methods
 
     /**
@@ -60,8 +68,38 @@ public class ProjectIOHandlers {
         // Verify that the user choose a file
         if (file != null) {
             try {
-                // Try and read the file as an audio file
-                Audio audio = new Audio(file);  // Failure to read will throw an exception
+                // Get the extension of the provided file
+                String fileExt = "." + FileNameUtils.getExtension(file.getName()).toLowerCase();
+
+                // Check if the file is supported
+                if (!AudioConverter.EXTENSION_TO_CODEC.containsKey(fileExt)) {
+                    throw new UnsupportedAudioFileException("The file extension is not supported.");
+                }
+
+                // Attempt creation of temporary folder if it doesn't exist
+                IOMethods.createFolder(IOConstants.TEMP_FOLDER);
+                logger.log(Level.FINE, "Temporary folder: " + IOConstants.TEMP_FOLDER);
+
+                // Get the base path for the auxiliary files
+                String baseName = IOConstants.TEMP_FOLDER + file.getName().replace(fileExt, "");
+
+                // Generate a new WAV file
+                AudioConverter audioConverter = new AudioConverter(settingsFile.data.ffmpegInstallationPath);
+                File auxiliaryWAVFile = new File(
+                        audioConverter.convertAudio(file, baseName + "-auxiliary-wav.wav")
+                );
+
+                // Try and read the auxiliary WAV file as an `Audio` object
+                // (Failure to read will throw exceptions)
+                Audio audio = new Audio(auxiliaryWAVFile, file.getName(), AudioProcessingMode.SAMPLES_AND_PLAYBACK);
+
+                // Delete auxiliary WAV file
+                boolean successfullyDeleted = auxiliaryWAVFile.delete();
+                if (successfullyDeleted) {
+                    logger.log(Level.FINE, "Successfully deleted auxiliary WAV file.");
+                } else {
+                    logger.log(Level.WARNING, "Failed to delete auxiliary WAV file.");
+                }
 
                 // Get the current scene and the spectrogram view controller
                 Pair<Scene, TranscriptionViewController> stageSceneAndController = getController(transcriptionStage);
@@ -102,17 +140,17 @@ public class ProjectIOHandlers {
                 }
 
             } catch (UnsupportedAudioFileException | IOException e) {
-                AlertMessages.showExceptionAlert(
-                        "Failed to read '" + file.getName() + "' as a WAV file.",
+                Popups.showExceptionAlert(
+                        "Failed to read '" + file.getName() + "' as an audio file.",
                         "The program failed to read '" + file.getName() +
-                                "' as a WAV file. Please check if " + "this is a valid WAV file.",
+                                "' as an audio file. Please check if " + "this is a valid audio file.",
                         e
                 );
                 e.printStackTrace();
             }
 
         } else {
-            AlertMessages.showInformationAlert("Info", "No file selected.");
+            Popups.showInformationAlert("Info", "No file selected.");
         }
     }
 
@@ -168,7 +206,7 @@ public class ProjectIOHandlers {
                 // Set new scene properties
                 transcriptionStage.setMaximized(true);
                 transcriptionStage.setResizable(true);
-                transcriptionStage.setTitle(guiData.audioFileName);
+                transcriptionStage.setTitle(audioData.audioFileName);
 
                 // Set width and height of the new scene
                 Rectangle2D screenBounds = Screen.getPrimary().getBounds();
@@ -194,7 +232,7 @@ public class ProjectIOHandlers {
                 }
 
             } catch (IOException | IncorrectFileFormatException | FailedToReadDataException e) {
-                AlertMessages.showExceptionAlert(
+                Popups.showExceptionAlert(
                         "Failed to read '" + file.getName() + "' as an AUDT ile.",
                         "The program failed to read '" + file.getName() +
                                 "' as an AUDT file. Please check if " + "this is a valid AUDT file.",
@@ -203,7 +241,7 @@ public class ProjectIOHandlers {
                 e.printStackTrace();
             }
         } else {
-            AlertMessages.showInformationAlert("Info", "No file selected.");
+            Popups.showInformationAlert("Info", "No file selected.");
         }
     }
 
@@ -215,10 +253,10 @@ public class ProjectIOHandlers {
      * @throws IOException If the writing to file encounters an error.
      */
     public static void saveProject(
-            String filepath, ProjectDataObject projectDataObject, CustomTask<?> task
+            String filepath, ProjectDataObject projectDataObject
     ) throws IOException {
         // Declare the file writer object
-        AUDTFileWriter fileWriter = new AUDTFileWriter(filepath, task);
+        AUDTFileWriter fileWriter = new AUDTFileWriter(filepath);
 
         // Write data to the file
         fileWriter.writeQTransformData(projectDataObject.qTransformData);
@@ -231,7 +269,7 @@ public class ProjectIOHandlers {
     /**
      * Method that helps show a file dialog for the user to select a file on.
      *
-     * @param window WindowFunction to show the file dialog on.
+     * @param window  WindowFunction to show the file dialog on.
      * @param filters Array of file filters to show in the file dialog.
      * @return A <code>File</code> object, representing the selected file.
      */

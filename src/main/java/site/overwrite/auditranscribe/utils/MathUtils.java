@@ -2,7 +2,7 @@
  * MathUtils.java
  *
  * Created on 2022-02-15
- * Updated on 2022-05-25
+ * Updated on 2022-05-30
  *
  * Description: Class containing useful mathematical utility functions.
  */
@@ -15,7 +15,7 @@ import site.overwrite.auditranscribe.exceptions.ValueException;
  * Class containing useful mathematical utility functions.
  */
 public class MathUtils {
-    // Arithmetic-Related methods
+    // General mathematical methods
 
     /**
      * Method to calculate the log base 2 of the number <code>x</code>.
@@ -78,7 +78,38 @@ public class MathUtils {
         return Math.sqrt(norm);
     }
 
-    // Data-related methods
+    /**
+     * Computes the arithmetic mean of the given array.
+     *
+     * @param array Array of numbers.
+     * @return Arithmetic mean of the array.
+     */
+    public static double mean(double[] array) {
+        double sum = 0;
+        for (double elem : array) {
+            sum += elem;
+        }
+
+        return sum / array.length;
+    }
+
+    /**
+     * Returns the index of the maximum value of an array.
+     * @param array Array of numbers.
+     * @return  Index of the maximum value of the array.
+     */
+    public static int argmax(double[] array) {
+        int argmax = 0;
+        double max = array[0];
+        for (int i = 1; i < array.length; i++) {
+            if (array[i] > max) {
+                max = array[i];
+                argmax = i;
+            }
+        }
+
+        return argmax;
+    }
 
     /**
      * Linearly interpolate the two values <code>a</code> and <code>b</code> by the scaling factor

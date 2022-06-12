@@ -5,6 +5,7 @@ module site.overwrite.auditranscribe {
     requires commons.exec;
     requires com.dlsc.formsfx;
     requires com.google.gson;
+    requires ffmpeg;
     requires org.apache.commons.compress;
     requires org.apache.commons.lang3;
     requires org.controlsfx.controls;
@@ -20,11 +21,14 @@ module site.overwrite.auditranscribe {
 
     exports site.overwrite.auditranscribe;
     exports site.overwrite.auditranscribe.audio;
+    exports site.overwrite.auditranscribe.audio.ffmpeg;
     exports site.overwrite.auditranscribe.audio.filters;
     exports site.overwrite.auditranscribe.audio.window_functions;
     exports site.overwrite.auditranscribe.exceptions;
     exports site.overwrite.auditranscribe.io.audt_file.data_encapsulators;
-    exports site.overwrite.auditranscribe.io.settings_file;
+    exports site.overwrite.auditranscribe.io.json_files;
+    exports site.overwrite.auditranscribe.io.json_files.data_encapsulators;
+    exports site.overwrite.auditranscribe.io.json_files.file_classes;
     exports site.overwrite.auditranscribe.misc;
     exports site.overwrite.auditranscribe.spectrogram;
     exports site.overwrite.auditranscribe.utils;

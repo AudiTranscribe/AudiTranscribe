@@ -2,7 +2,7 @@
  * Audio.java
  *
  * Created on 2022-02-13
- * Updated on 2022-05-27
+ * Updated on 2022-06-09
  *
  * Description: Class that handles audio processing and audio playback.
  */
@@ -10,7 +10,10 @@
 package site.overwrite.auditranscribe.audio;
 
 import javafx.util.Duration;
+import site.overwrite.auditranscribe.audio.ffmpeg.AudioConverter;
 import site.overwrite.auditranscribe.exceptions.ValueException;
+import site.overwrite.auditranscribe.io.IOConstants;
+import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
 
 import javafx.scene.media.MediaPlayer;
@@ -21,6 +24,8 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -34,151 +39,134 @@ public class Audio {
     public static final int SAMPLES_BUFFER_SIZE = 1024;  // In bits
 
     // Attributes
-    private final String audioFilePath;
     private final String audioFileName;
 
     private final AudioInputStream audioStream;
     private final AudioFormat audioFormat;
     private final double sampleRate;
-    private double duration;
+    private double duration = 0;
+
+    private final byte[] rawWAVBytes;
+    private byte[] rawMP3Bytes;  // Would be empty unless set
 
     private int numSamples;
     private double[] audioSamples;
-
-    private int numMonoSamples;
-    private double[] monoAudioSamples;
+    private double[] monoAudioSamples;  // Average of stereo samples
 
     private final MediaPlayer mediaPlayer;
-
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     /**
      * Initializes an <code>Audio</code> object based on a file.
      *
-     * @param file           File object, representing the audio file.
-     * @param useMediaPlayer Whether to use the media player to play the audio.
+     * @param wavFile        File object representing the WAV file to be used for both samples
+     *                       generation and audio playback.
+     * @param audioFileName  The file name of the original audio file.
+     * @param processingMode The processing mode when handling the audio file.
+     *                       <ul>
+     *                       <li>
+     *                           <code>SAMPLES_ONLY</code>: Only generate samples.
+     *                       </li>
+     *                       <li>
+     *                           <code>PLAYBACK_ONLY</code>: Only permit playback.
+     *                       </li>
+     *                       <li>
+     *                           <code>SAMPLES_AND_PLAYBACK</code>: Permit samples' generation and
+     *                           playback.
+     *                       </li>
+     *                       </ul>
      * @throws IOException                   If there was a problem reading in the audio stream.
      * @throws UnsupportedAudioFileException If there was a problem reading in the audio file.
      */
-    public Audio(File file, boolean useMediaPlayer) throws UnsupportedAudioFileException, IOException {
-        // Set the audio file path and file name
-        audioFileName = file.getName();
-        audioFilePath = file.getAbsolutePath();
+    public Audio(
+            File wavFile, String audioFileName, AudioProcessingMode processingMode
+    ) throws UnsupportedAudioFileException, IOException {
+        // Update attributes
+        this.audioFileName = audioFileName;
 
-        // Attempt to convert the input stream into an audio input stream
-        InputStream bufferedIn = new BufferedInputStream(new FileInputStream(file));
-        audioStream = AudioSystem.getAudioInputStream(bufferedIn);
+        // Set flags
+        boolean needPlayback = false;
+        boolean needSamples = false;
 
-        // Get the audio file's audio format and audio file's sample rate
-        audioFormat = audioStream.getFormat();
-        sampleRate = audioFormat.getSampleRate();
+        if (processingMode == AudioProcessingMode.SAMPLES_ONLY) {
+            needSamples = true;
+        } else if (processingMode == AudioProcessingMode.PLAYBACK_ONLY) {
+            needPlayback = true;
+        } else if (processingMode == AudioProcessingMode.SAMPLES_AND_PLAYBACK) {
+            needSamples = true;
+            needPlayback = true;
+        }
 
         // Create the media player object if needed
-        if (useMediaPlayer) {
+        if (needPlayback) {
             // Get the media player for the audio file
             MediaPlayer tempMediaPlayer;
 
             try {
-                tempMediaPlayer = new MediaPlayer(new Media(file.toURI().toString()));
+                tempMediaPlayer = new MediaPlayer(new Media(wavFile.toURI().toString()));
             } catch (IllegalStateException e) {
                 tempMediaPlayer = null;
+
                 logger.log(Level.SEVERE, "JavaFX Toolkit not initialized. Audio playback will not work.");
             }
 
             mediaPlayer = tempMediaPlayer;
+
         } else {
             mediaPlayer = null;
         }
 
         // Generate audio samples
-        generateSamples();
-    }
+        if (needSamples) {
+            // Attempt to convert the input stream into an audio input stream
+            InputStream bufferedIn = new BufferedInputStream(new FileInputStream(wavFile));
+            audioStream = AudioSystem.getAudioInputStream(bufferedIn);
 
-    /**
-     * Initializes an <code>Audio</code> object based on a file.
-     *
-     * @param file File object, representing the audio file.
-     * @throws IOException                   If there was a problem reading in the audio stream.
-     * @throws UnsupportedAudioFileException If there was a problem reading in the audio file.
-     */
-    public Audio(File file) throws UnsupportedAudioFileException, IOException {
-        this(file, true);
+            // Get the audio file's audio format and audio file's sample rate
+            audioFormat = audioStream.getFormat();
+            sampleRate = audioFormat.getSampleRate();
+
+            // Generate audio samples
+            generateSamples();
+        } else {
+            audioStream = null;
+            audioFormat = null;
+            sampleRate = Double.NaN;
+        }
+
+        // Save the audio file's raw WAV bytes
+        rawWAVBytes = Files.readAllBytes(wavFile.toPath());
     }
 
     // Getter/Setter methods
 
-    /**
-     * Getter method that returns the <b>absolute</b> audio file path.
-     *
-     * @return <b>Absolute</b> path to the audio file.
-     */
-    public String getAudioFilePath() {
-        return audioFilePath;
-    }
-
-    /**
-     * Getter method that returns the audio file's name.
-     *
-     * @return Name of the audio file.
-     */
     public String getAudioFileName() {
         return audioFileName;
     }
 
-    /**
-     * Getter method that returns the sample rate of the audio file.
-     *
-     * @return Float of the number of samples per second.
-     */
     public double getSampleRate() {
         return sampleRate;
     }
 
-    /**
-     * Getter method for the duration of the audio in seconds.
-     *
-     * @return Duration of audio in seconds.
-     */
     public double getDuration() {
+        if (duration == 0) {
+            duration = mediaPlayer.getTotalDuration().toSeconds();
+        }
+
         return duration;
     }
 
-    /**
-     * Getter method for the total number of samples in the audio object.<br>
-     * See {@link #getNumMonoSamples()} to get the number of <b>mono</b> samples.
-     *
-     * @return Total number of samples.
-     */
-    public int getNumSamples() {
-        return numSamples;
+    public void setDuration(double duration) {
+        if (duration <= 0) throw new ValueException("Duration must be greater than 0.");
+        this.duration = duration;
     }
 
-    /**
-     * Getter method that returns all the samples of the audio object.<br>
-     * See {@link #getMonoSamples()} to get the <b>mono</b>samples.
-     *
-     * @return All the samples of the audio object.
-     */
-    public double[] getSamples() {
-        return audioSamples;
-    }
-
-    /**
-     * Getter method for the number of <b>mono</b> samples in the audio object.
-     *
-     * @return Number of <b>mono</b> samples.
-     */
-    public int getNumMonoSamples() {
-        return numMonoSamples;
-    }
-
-    /**
-     * Getter method that returns the <b>mono</b> samples of the audio object.
-     *
-     * @return The <b>mono</b> samples of the audio object.
-     */
     public double[] getMonoSamples() {
         return monoAudioSamples;
+    }
+
+    public void setRawMP3Bytes(byte[] rawMP3Bytes) {
+        this.rawMP3Bytes = rawMP3Bytes;
     }
 
     // Audio methods
@@ -188,7 +176,7 @@ public class Audio {
      *
      * @throws InvalidObjectException If the media player was not initialized.
      */
-    public void playAudio() throws InvalidObjectException {
+    public void play() throws InvalidObjectException {
         if (mediaPlayer != null) {
             mediaPlayer.play();
         } else {
@@ -201,7 +189,7 @@ public class Audio {
      *
      * @throws InvalidObjectException If the media player was not initialized.
      */
-    public void pauseAudio() throws InvalidObjectException {
+    public void pause() throws InvalidObjectException {
         if (mediaPlayer != null) {
             mediaPlayer.pause();
         } else {
@@ -214,7 +202,7 @@ public class Audio {
      *
      * @throws InvalidObjectException If the media player was not initialized.
      */
-    public void stopAudio() throws InvalidObjectException {
+    public void stop() throws InvalidObjectException {
         if (mediaPlayer != null) {
             mediaPlayer.stop();
         } else {
@@ -303,7 +291,9 @@ public class Audio {
      * @see <a href="https://github.com/bmcfee/resampy/blob/ccb8557/resampy/core.py">Resampy</a>,
      * where the main core of the code was taken from.
      */
-    public static double[] resample(double[] x, double srOrig, double srFinal, Filter resType, boolean scale) throws ValueException {
+    public static double[] resample(
+            double[] x, double srOrig, double srFinal, Filter resType, boolean scale
+    ) throws ValueException {
         // Validate sample rates
         if (srOrig <= 0) throw new ValueException("Invalid original sample rate " + srOrig);
         if (srFinal <= 0) throw new ValueException("Invalid final sample rate " + srFinal);
@@ -493,6 +483,7 @@ public class Audio {
             e.printStackTrace();
         } finally {
             // Remove stereo samples if they are there
+            int numMonoSamples;
             if (audioFormat.getChannels() == 2) {  // Stereo
                 // Calculate the number of mono samples there are
                 numMonoSamples = numSamples / 2;
@@ -512,7 +503,7 @@ public class Audio {
             }
 
             // Calculate the duration of the audio
-            duration = numMonoSamples / sampleRate;
+            if (duration == 0) duration = numMonoSamples / sampleRate;
 
             // Close the audio stream
             if (audioStream != null) {
@@ -643,6 +634,50 @@ public class Audio {
         for (int i = 0; i < transfer.length; i++) {
             samples[i] = (float) transfer[i] / (float) fullScale;
         }
+    }
+
+    /**
+     * Helper method that converts the audio object into MP3 bytes.
+     *
+     * @param ffmpegPath The path to the ffmpeg executable.
+     */
+    public byte[] wavBytesToMP3Bytes(String ffmpegPath) throws IOException {
+        // Check if we have already processed the audio
+        if (rawMP3Bytes != null) {
+            logger.log(Level.FINE, "Returning previously processed MP3 bytes");
+            return rawMP3Bytes;
+        }
+
+        logger.log(Level.FINE, "Converting WAV bytes to MP3 bytes");
+
+        // Ensure that the temporary directory exists
+        IOMethods.createFolder(IOConstants.TEMP_FOLDER);
+        logger.log(Level.FINE, "Temporary folder created: " + IOConstants.TEMP_FOLDER);
+
+        // Define a new audio converter
+        AudioConverter audioConverter = new AudioConverter(ffmpegPath);
+
+        // Generate the output path to the MP3 file
+        String inputPath = IOConstants.TEMP_FOLDER + "temp-1.wav";
+        String outputPath = IOConstants.TEMP_FOLDER + "temp-2.mp3";
+
+        // Write WAV bytes into a file specified at the input path
+        IOMethods.createFile(inputPath);
+        Files.write(Path.of(inputPath), rawWAVBytes);
+
+        // Convert the original WAV file to a temporary MP3 file
+        outputPath = audioConverter.convertAudio(new File(inputPath), outputPath);
+
+        // Read the raw MP3 bytes into a temporary file
+        rawMP3Bytes = Files.readAllBytes(Path.of(outputPath));
+
+        // Delete the temporary files
+        IOMethods.deleteFile(inputPath);
+        IOMethods.deleteFile(outputPath);
+
+        // Return the raw MP3 bytes
+        logger.log(Level.FINE, "Done converting");
+        return rawMP3Bytes;
     }
 }
 
