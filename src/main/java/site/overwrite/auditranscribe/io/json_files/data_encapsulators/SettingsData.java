@@ -2,7 +2,7 @@
  * SettingsData.java
  *
  * Created on 2022-05-22
- * Updated on 2022-06-06
+ * Updated on 2022-06-12
  *
  * Description: Class that contains the settings data.
  */
@@ -24,6 +24,9 @@ public class SettingsData {
     // Spectrogram data
     public int colourScaleEnumOrdinal  = ColourScale.VIRIDIS.ordinal();  // Ordinal of the `ColourScale` enum value
     public int windowFunctionEnumOrdinal = WindowFunction.HANN_WINDOW.ordinal();  // Ordinal of the `WindowFunction` enum value
+
+    // I/O data
+    public int autosaveDelay = 5;  // Autosave delay in minutes
 
     // Audio data
     public String ffmpegInstallationPath = null;  // Path to the ffmpeg installation
