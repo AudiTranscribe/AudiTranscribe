@@ -2,7 +2,7 @@
  * PreferencesViewController.java
  *
  * Created on 2022-05-22
- * Updated on 2022-05-30
+ * Updated on 2022-06-12
  *
  * Description: Contains the preferences view's controller class.
  */
@@ -15,6 +15,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -47,6 +49,9 @@ public class PreferencesViewController implements Initializable {
 
     @FXML
     private ChoiceBox<Theme> themeChoiceBox;
+
+    @FXML
+    private Spinner<Integer> autosaveIntervalSpinner;
 
     @FXML
     private Button cancelButton, applyButton, okButton;
@@ -105,10 +110,10 @@ public class PreferencesViewController implements Initializable {
     }
 
     /**
-     * Method that sets up the choice boxes <b>after</b> the <code>settingsFile</code> attribute has
-     * been set.
+     * Method that sets up the fields <b>after</b> the <code>settingsFile</code> attribute has been
+     * set.
      */
-    public void setUpChoiceBoxes() {
+    public void setUpFields() {
         // Set choice box values
         themeChoiceBox.setValue(Theme.values()[settingsFile.data.themeEnumOrdinal]);
 
@@ -123,6 +128,15 @@ public class PreferencesViewController implements Initializable {
         themeChoiceBox.setOnAction(event -> {
             applyButton.setDisable(false);
             setThemeOnScene(themeChoiceBox.getValue());
+        });
+
+        // Set spinner factories and methods
+        autosaveIntervalSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(
+                1, Integer.MAX_VALUE, settingsFile.data.autosaveInterval, 1
+        ));
+
+        autosaveIntervalSpinner.valueProperty().addListener((observable, oldValue, newValue) -> {
+            applyButton.setDisable(false);
         });
     }
 
@@ -148,7 +162,7 @@ public class PreferencesViewController implements Initializable {
             controller.setThemeOnScene();
 
             // Set choice boxes' values
-            controller.setUpChoiceBoxes();
+            controller.setUpFields();
 
             // Set stage properties
             Stage preferencesStage = new Stage();
@@ -182,6 +196,8 @@ public class PreferencesViewController implements Initializable {
 
         settingsFile.data.colourScaleEnumOrdinal = colourScaleChoiceBox.getValue().ordinal();
         settingsFile.data.windowFunctionEnumOrdinal = windowFunctionChoiceBox.getValue().ordinal();
+
+        settingsFile.data.autosaveInterval = autosaveIntervalSpinner.getValue();
 
         // Apply settings to the settings file
         settingsFile.saveFile();
