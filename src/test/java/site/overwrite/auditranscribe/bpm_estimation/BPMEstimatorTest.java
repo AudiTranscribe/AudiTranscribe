@@ -2,13 +2,14 @@
  * BPMEstimatorTest.java
  *
  * Created on 2022-06-02
- * Updated on 2022-06-09
+ * Updated on 2022-06-12
  *
  * Description: Test `BPMEstimator.java`.
  */
 
 package site.overwrite.auditranscribe.bpm_estimation;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
@@ -22,7 +23,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BPMEstimatorTest {
-
+    @Disabled
     @Test
     void estimate() throws UnsupportedAudioFileException, IOException {
         // Get the audio files

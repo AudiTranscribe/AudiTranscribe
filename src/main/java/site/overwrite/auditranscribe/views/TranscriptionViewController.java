@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-11
+ * Updated on 2022-06-12
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -68,26 +68,8 @@ import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static java.util.Map.entry;
-
 public class TranscriptionViewController implements Initializable {
     // Constants
-    final String[] MUSIC_KEYS = {"C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"};
-    final Map<String, Integer> TIME_SIGNATURE_TO_BEATS_PER_BAR = Map.ofEntries(
-            // Simple time signatures
-            entry("4/4", 4),
-            entry("2/2", 2),
-            entry("2/4", 2),
-            entry("3/4", 3),
-            entry("3/8", 3),
-
-            // Compound time signatures
-            entry("6/8", 6),
-            entry("9/8", 9),
-            entry("12/8", 12)
-    );  // See https://en.wikipedia.org/wiki/Time_signature#Characteristics
-    final String[] TIME_SIGNATURES = {"4/4", "2/2", "2/4", "3/4", "3/8", "6/8", "9/8", "12/8"};
-
     final Pair<Integer, Integer> BPM_RANGE = new Pair<>(1, 512);  // In the format [min, max]
     final Pair<Double, Double> OFFSET_RANGE = new Pair<>(-15., 15.);  // In the format [min, max]
 
@@ -163,7 +145,7 @@ public class TranscriptionViewController implements Initializable {
     private double minQTransformMagnitude;
     private double maxQTransformMagnitude;
 
-    private String musicKey = "C";
+    private String musicKey = "C Major";
     private int beatsPerBar = 4;
     private boolean isPaused = true;
     private boolean isAudioMuted = false;
@@ -299,8 +281,8 @@ public class TranscriptionViewController implements Initializable {
         offsetSpinner.setValueFactory(offsetSpinnerFactory);
 
         // Set the choice boxes' choices
-        for (String musicKey : MUSIC_KEYS) musicKeyChoice.getItems().add(musicKey);
-        for (String timeSignature : TIME_SIGNATURES) timeSignatureChoice.getItems().add(timeSignature);
+        for (String musicKey : MusicUtils.MUSIC_KEYS) musicKeyChoice.getItems().add(musicKey);
+        for (String timeSignature : MusicUtils.TIME_SIGNATURES) timeSignatureChoice.getItems().add(timeSignature);
 
         // Set methods on spinners
         bpmSpinner.valueProperty().addListener((observable, oldValue, newValue) -> updateBPMValue(newValue));
@@ -332,7 +314,7 @@ public class TranscriptionViewController implements Initializable {
 
             // Update the music key value and music key index
             musicKey = newValue;
-            musicKeyIndex = ArrayUtils.findIndex(MUSIC_KEYS, newValue);
+            musicKeyIndex = ArrayUtils.findIndex(MusicUtils.MUSIC_KEYS, newValue);
         });
 
         timeSignatureChoice.getSelectionModel().selectedItemProperty()
@@ -342,9 +324,9 @@ public class TranscriptionViewController implements Initializable {
                     // Get the old and new beats per bar
                     int oldBeatsPerBar = 0;
                     if (oldValue != null) {
-                        oldBeatsPerBar = TIME_SIGNATURE_TO_BEATS_PER_BAR.get(oldValue);
+                        oldBeatsPerBar = MusicUtils.TIME_SIGNATURE_TO_BEATS_PER_BAR.get(oldValue);
                     }
-                    int newBeatsPerBar = TIME_SIGNATURE_TO_BEATS_PER_BAR.get(newValue);
+                    int newBeatsPerBar = MusicUtils.TIME_SIGNATURE_TO_BEATS_PER_BAR.get(newValue);
 
                     // Update the beat lines and bar number ellipses, if the spectrogram is ready
                     if (isEverythingReady) {
@@ -361,7 +343,7 @@ public class TranscriptionViewController implements Initializable {
                     }
 
                     // Update the time signature index
-                    timeSignatureIndex = ArrayUtils.findIndex(TIME_SIGNATURES, newValue);
+                    timeSignatureIndex = ArrayUtils.findIndex(MusicUtils.TIME_SIGNATURES, newValue);
 
                     // Update the beats per bar
                     beatsPerBar = newBeatsPerBar;
@@ -490,7 +472,7 @@ public class TranscriptionViewController implements Initializable {
                         // Play the note
                         try {
                             logger.log(Level.FINE, "Playing " + UnitConversionUtils.noteNumberToNote(
-                                    estimatedNoteNum, false
+                                estimatedNoteNum, musicKey, false
                             ));
                             notePlayer.playNoteForDuration(
                                     estimatedNoteNum, NOTE_PLAYING_ON_VELOCITY, NOTE_PLAYING_OFF_VELOCITY,
@@ -657,8 +639,8 @@ public class TranscriptionViewController implements Initializable {
         allAudio.add(audio);
 
         // Set choices
-        musicKeyChoice.setValue(MUSIC_KEYS[musicKeyIndex]);
-        timeSignatureChoice.setValue(TIME_SIGNATURES[timeSignatureIndex]);
+        musicKeyChoice.setValue(MusicUtils.MUSIC_KEYS[musicKeyIndex]);
+        timeSignatureChoice.setValue(MusicUtils.TIME_SIGNATURES[timeSignatureIndex]);
 
         // Update spinners' initial values
         updateBPMValue(bpm, true);
@@ -779,8 +761,8 @@ public class TranscriptionViewController implements Initializable {
         }
 
         // Update music key and beats per bar
-        musicKey = MUSIC_KEYS[musicKeyIndex];
-        beatsPerBar = TIME_SIGNATURE_TO_BEATS_PER_BAR.get(TIME_SIGNATURES[timeSignatureIndex]);
+        musicKey = MusicUtils.MUSIC_KEYS[musicKeyIndex];
+        beatsPerBar = MusicUtils.TIME_SIGNATURE_TO_BEATS_PER_BAR.get(MusicUtils.TIME_SIGNATURES[timeSignatureIndex]);
 
         // Attempt to add this project to the projects' database
         try {

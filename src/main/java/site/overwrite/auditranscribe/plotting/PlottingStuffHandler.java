@@ -2,7 +2,7 @@
  * PlottingStuffHandler.java
  *
  * Created on 2022-03-20
- * Updated on 2022-06-07
+ * Updated on 2022-06-12
  *
  * Description: Class that adds the notes' stuff to the spectrogram area.
  */
@@ -19,7 +19,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.*;
-import site.overwrite.auditranscribe.utils.MiscUtils;
+import site.overwrite.auditranscribe.utils.MusicUtils;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 import java.util.HashSet;
@@ -68,24 +68,24 @@ public class PlottingStuffHandler {
     /**
      * Method that adds the note labels to the note pane.
      *
-     * @param notePane      Note pane.
-     * @param noteLabels    Note label array.
-     * @param musicKey      Key for the music piece.
-     * @param height        (Final) height of the note pane.
-     * @param minNoteNumber Minimum note number.
-     * @param maxNoteNumber Maximum note number.
-     * @param fancySharps   Whether <em>fancier sharps</em> (i.e. ♯ instead of #) should be used for
-     *                      the note labels.
+     * @param notePane         Note pane.
+     * @param noteLabels       Note label array.
+     * @param musicKey         Key for the music piece.
+     * @param height           (Final) height of the note pane.
+     * @param minNoteNumber    Minimum note number.
+     * @param maxNoteNumber    Maximum note number.
+     * @param fancyAccidentals Whether <em>fancier accidentals</em> (i.e. ♯ instead of # and ♭
+     *                         instead of b) should be used.
      */
     public static Label[] addNoteLabels(
             Pane notePane, Label[] noteLabels, String musicKey, double height, int minNoteNumber,
-            int maxNoteNumber, boolean fancySharps
+            int maxNoteNumber, boolean fancyAccidentals
     ) {
         // Get the width of the note pane
         double width = notePane.getPrefWidth();
 
         // Get the note offsets that are in the key
-        HashSet<Integer> noteOffsets = MiscUtils.getNotesInKey(musicKey);
+        HashSet<Integer> noteOffsets = MusicUtils.getNotesInKey(musicKey);
 
         // Check if there are existing note labels
         if (noteLabels != null) {
@@ -98,7 +98,7 @@ public class PlottingStuffHandler {
 
         for (int i = minNoteNumber; i <= maxNoteNumber; i++) {
             // Get the note's text
-            String note = UnitConversionUtils.noteNumberToNote(i, fancySharps);
+            String note = UnitConversionUtils.noteNumberToNote(i, musicKey, fancyAccidentals);
 
             // Calculate the height to move the pointer to
             double placementHeight = PlottingHelpers.noteNumToHeight(i, minNoteNumber, maxNoteNumber, height);
