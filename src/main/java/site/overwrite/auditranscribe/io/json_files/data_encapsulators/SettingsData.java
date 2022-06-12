@@ -26,7 +26,7 @@ public class SettingsData {
     public int windowFunctionEnumOrdinal = WindowFunction.HANN_WINDOW.ordinal();  // Ordinal of the `WindowFunction` enum value
 
     // I/O data
-    public int autosaveDelay = 5;  // Autosave delay in minutes
+    public int autosaveInterval = 5;  // Autosave interval in minutes
 
     // Audio data
     public String ffmpegInstallationPath = null;  // Path to the ffmpeg installation

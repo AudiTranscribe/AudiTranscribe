@@ -1331,7 +1331,7 @@ public class TranscriptionViewController implements Initializable {
                 } else {
                     logger.log(Level.INFO, "Autosave skipped, no project loaded");
                 }
-            }), settingsFile.data.autosaveDelay, settingsFile.data.autosaveDelay, TimeUnit.MINUTES);
+            }), settingsFile.data.autosaveInterval, settingsFile.data.autosaveInterval, TimeUnit.MINUTES);
 
             // Set image on the spectrogram area
             spectrogramImage.setFitHeight(finalWidth);
