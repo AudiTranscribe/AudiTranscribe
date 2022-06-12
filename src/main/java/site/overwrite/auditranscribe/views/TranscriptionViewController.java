@@ -348,21 +348,14 @@ public class TranscriptionViewController implements Initializable {
         stopButton.setOnAction(event -> {
             logger.log(Level.FINE, "Pressed stop button");
 
-            // First stop the audio
-            try {
-                audio.stop();
-            } catch (InvalidObjectException e) {
-                throw new RuntimeException(e);
-            }
-
-            // Then update the timings shown on the GUI
+            // Seek to beginning of the audio
             try {
                 seekToTime(0);
             } catch (InvalidObjectException e) {
                 throw new RuntimeException(e);
             }
 
-            // Finally, toggle the paused flag
+            // Then trigger pause
             isPaused = togglePaused(false);
         });
 

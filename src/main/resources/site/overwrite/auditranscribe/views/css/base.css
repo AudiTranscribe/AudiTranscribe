@@ -92,6 +92,11 @@
     -fx-cursor: hand;
 }
 
+.project-list-cell {
+    -fx-pref-width: 765px;
+    -fx-max-width: 765px;
+}
+
 /* TRANSCRIPTION PAGE */
 /* Labels */
 .display-label {

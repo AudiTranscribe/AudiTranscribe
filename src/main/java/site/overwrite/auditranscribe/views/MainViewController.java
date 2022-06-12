@@ -2,7 +2,7 @@
  * MainViewController.java
  *
  * Created on 2022-02-09
- * Updated on 2022-06-06
+ * Updated on 2022-06-12
  *
  * Description: Contains the main view's controller class.
  */
@@ -445,6 +445,7 @@ public class MainViewController implements Initializable {
             content.setPadding(
                     new Insets(0, 25, 0, 25)  // Although FXML file uses 30, use 25 because spacing is 10
             );
+            content.getStyleClass().add("project-list-cell");
         }
 
         @Override
