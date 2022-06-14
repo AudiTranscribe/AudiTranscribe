@@ -2,7 +2,7 @@
  * UnitConversionUtils.java
  *
  * Created on 2022-03-12
- * Updated on 2022-06-12
+ * Updated on 2022-06-14
  *
  * Description: Unit conversion methods.
  */
@@ -209,6 +209,21 @@ public class UnitConversionUtils {
     }
 
     /**
+     * Converts a MIDI number to its corresponding note number (as defined by AudiTranscribe).
+     *
+     * @param midiNumber MIDI number.
+     * @return Corresponding note number. Note that this will return <code>-1</code> is there is no
+     * corresponding note number (say below C0).
+     */
+    public static int midiNumberToNoteNumber(int midiNumber) {
+        // If the note number is less than 12 (i.e. below C0) there is no note number equivalent
+        if (midiNumber < 12) return -1;
+
+        // Otherwise, subtract 12 from the MIDI number to get the note number
+        return midiNumber - 12;
+    }
+
+    /**
      * Converts a note string to its corresponding MIDI number.
      *
      * @param note Note string. Notes may be spelled out with optional accidentals or octave
@@ -220,6 +235,18 @@ public class UnitConversionUtils {
      */
     public static int noteToMIDINumber(String note) {
         return noteNumberToMIDINumber(noteToNoteNumber(note));
+    }
+
+    /**
+     * Converts a MIDI number to its corresponding note string.
+     *
+     * @param midiNumber       MIDI number.
+     * @param fancyAccidentals Whether <em>fancier accidentals</em> (i.e. ♯ instead of # and ♭
+     *                         instead of b) should be used.
+     * @return Corresponding note string.
+     */
+    public static String midiNumberToNote(int midiNumber, boolean fancyAccidentals) {
+        return noteNumberToNote(midiNumberToNoteNumber(midiNumber), "C Major", fancyAccidentals);
     }
 
     // Audio unit conversion

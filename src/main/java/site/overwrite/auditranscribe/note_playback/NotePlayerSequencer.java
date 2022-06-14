@@ -100,7 +100,11 @@ public class NotePlayerSequencer {
      */
     public void setCurrTime(double currTime) {
         sequencer.setMicrosecondPosition((long) (currTime * 1e6));
-        logger.log(Level.FINE, "Current time set to " + currTime);
+        logger.log(
+                Level.FINE,
+                "Provided current time is " + currTime + " seconds; actually set to " +
+                        sequencer.getMicrosecondPosition() + " microseconds"
+        );
     }
 
     /**
@@ -142,6 +146,35 @@ public class NotePlayerSequencer {
         sequence.deleteTrack(track);
         track = sequence.createTrack();
         logger.log(Level.FINE, "Notes cleared from track");
+    }
+
+    /**
+     * Method that returns strings that represent the events that are currently on the track.
+     *
+     * @return A string that represents the events on the track.
+     */
+    public String[] getEventsOnTrack() {
+        // Get all MIDI events
+        MidiEvent[] allEvents = getMidiEventsFromTrack();
+
+        // Convert each event into a string
+        String[] strings = new String[allEvents.length];
+        for (int i = 0; i < strings.length; i++) {
+            strings[i] = midiEventToHumanReadableString(allEvents[i]);
+        }
+
+        return strings;
+    }
+
+    /**
+     * Method that neatly organizes the events on the track as a string.
+     */
+    public String eventsOnTrackToString() {
+        StringBuilder sb = new StringBuilder();
+        for (String s : getEventsOnTrack()) {
+            sb.append(s).append("\n");
+        }
+        return sb.toString();
     }
 
     public void play() {
@@ -262,9 +295,15 @@ public class NotePlayerSequencer {
     private void setInstrumentOfNotePlayer(int instrumentNum) {
         try {
             // Define messages to set the instrument
-            ShortMessage bankSelect = new ShortMessage(ShortMessage.CONTROL_CHANGE, 0, 0, instrumentNum >> 7);
-            ShortMessage bankSelectLSB = new ShortMessage(ShortMessage.CONTROL_CHANGE, 0, 32, instrumentNum & 0x7F);
-            ShortMessage changeInstrumentMessage = new ShortMessage(ShortMessage.PROGRAM_CHANGE, 0, instrumentNum, 0);
+            ShortMessage bankSelect = new ShortMessage(
+                    ShortMessage.CONTROL_CHANGE, 0, 0, instrumentNum >> 7
+            );
+            ShortMessage bankSelectLSB = new ShortMessage(
+                    ShortMessage.CONTROL_CHANGE, 0, 32, instrumentNum & 0x7F
+            );
+            ShortMessage changeInstrumentMessage = new ShortMessage(
+                    ShortMessage.PROGRAM_CHANGE, 0, instrumentNum, 0
+            );
 
             // Add to track
             track.add(new MidiEvent(bankSelect, 0));
@@ -274,6 +313,40 @@ public class NotePlayerSequencer {
         } catch (InvalidMidiDataException e) {
             throw new RuntimeException(e);
         }
+    }
 
+    /**
+     * Helper method that gets the MIDI events from the track.
+     *
+     * @return An array of MIDI events.
+     */
+    private MidiEvent[] getMidiEventsFromTrack() {
+        // Get size of the track
+        int n = track.size();
+
+        // Create array of `MidiEvents` and return
+        MidiEvent[] midiEvents = new MidiEvent[n];
+        for (int i = 0; i < n; i++) {
+            midiEvents[i] = track.get(i);
+        }
+        return midiEvents;
+    }
+
+    /**
+     * Helper method that converts a MIDI event into a human-readable string.
+     *
+     * @param midiEvent The MIDI event to convert.
+     * @return A string representation of the MIDI event.
+     */
+    private String midiEventToHumanReadableString(MidiEvent midiEvent) {
+        // Get the MIDI message and tick from the `midiEvent`
+        MidiMessage midiMessage = midiEvent.getMessage();
+        long tick = midiEvent.getTick();
+
+        // Convert the MIDI message to a human-readable string
+        String messageString = MIDIMessageDecoder.midiMessageToString(midiMessage);
+
+        // Return the string
+        return messageString + " at " + tick + " µs";
     }
 }

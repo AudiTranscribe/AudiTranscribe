@@ -2,7 +2,7 @@
  * UnitConversionUtilsTest.java
  *
  * Created on 2022-03-12
- * Updated on 2022-06-12
+ * Updated on 2022-06-14
  *
  * Description: Test `UnitConversionUtils.java`.
  */
@@ -134,6 +134,16 @@ class UnitConversionUtilsTest {
     }
 
     @Test
+    void midiNumberToNoteNumber() {
+        assertEquals(0, UnitConversionUtils.midiNumberToNoteNumber(12));     // C0
+        assertEquals(115, UnitConversionUtils.midiNumberToNoteNumber(127));  // G9
+        assertEquals(48, UnitConversionUtils.midiNumberToNoteNumber(60));    // C4
+        assertEquals(101, UnitConversionUtils.midiNumberToNoteNumber(113));  // F8
+        assertEquals(56, UnitConversionUtils.midiNumberToNoteNumber(68));    // G#4
+        assertEquals(-1, UnitConversionUtils.midiNumberToNoteNumber(-12));   // C-1
+    }
+
+    @Test
     void noteToMIDINumber() {
         assertEquals(12, UnitConversionUtils.noteToMIDINumber("C0"));
         assertEquals(127, UnitConversionUtils.noteToMIDINumber("G9"));
@@ -141,6 +151,17 @@ class UnitConversionUtilsTest {
         assertEquals(113, UnitConversionUtils.noteToMIDINumber("F8"));
         assertEquals(68, UnitConversionUtils.noteToMIDINumber("G#4"));
         assertEquals(-1, UnitConversionUtils.noteToMIDINumber("B9"));
+    }
+
+    @Test
+    void midiNumberToNote() {
+        assertEquals("C0", UnitConversionUtils.midiNumberToNote(12, false));
+        assertEquals("G9", UnitConversionUtils.midiNumberToNote(127, false));
+        assertEquals("C4", UnitConversionUtils.midiNumberToNote(60, false));
+        assertEquals("F8", UnitConversionUtils.midiNumberToNote(113, false));
+
+        assertEquals("G#4", UnitConversionUtils.midiNumberToNote(68, false));
+        assertEquals("G♯4", UnitConversionUtils.midiNumberToNote(68, true));
     }
 
     // Audio unit conversion
