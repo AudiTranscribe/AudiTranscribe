@@ -1,6 +1,3 @@
 Fixme:
     - Issue on Windows: no line matching interface SourceDataLine supporting format PCM_SIGNED 44100.0 Hz, 16 bit,
       stereo, 4 bytes/frame, little-endian is supported.
-    - Note playing is delayed.
-        - Temporary fix is to add a constant that plays the note early, but this is not addressing the root cause.
-        - Possible permanent fix: https://stackoverflow.com/questions/69909883/using-midi-in-java
