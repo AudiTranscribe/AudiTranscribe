@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-12
+ * Updated on 2022-06-14
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -1220,11 +1220,14 @@ public class TranscriptionViewController implements Initializable {
             )));
 
             // Unpause the audio (i.e. play the audio)
-            try {
-                audio.play();
-            } catch (InvalidObjectException e) {
-                throw new RuntimeException(e);
-            }
+            Platform.runLater(() -> {
+                try {
+                    Thread.sleep((long) (NOTE_PLAYING_DELAY_OFFSET * 1000));
+                    audio.play();
+                } catch (InterruptedException | InvalidObjectException e) {
+                    throw new RuntimeException(e);
+                }
+            });
 
         } else {
             // Change the icon of the play button from the paused icon to the play icon
@@ -1712,7 +1715,7 @@ public class TranscriptionViewController implements Initializable {
             for (int i = 0; i < numNoteRects; i++) {
                 noteOnsetTimes[i] = NoteRectangle.noteRectangles.get(i).getNoteOnsetTime();
                 noteDurations[i] = NoteRectangle.noteRectangles.get(i).getNoteDuration();
-                noteNums[i] = NoteRectangle.noteRectangles.get(i).getNoteNum();
+                noteNums[i] = NoteRectangle.noteRectangles.get(i).noteNum;
             }
 
             // Setup note player sequencer

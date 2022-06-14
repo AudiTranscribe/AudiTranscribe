@@ -23,6 +23,8 @@ import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class NoteRectangle extends StackPane {
     // Constants
@@ -50,6 +52,8 @@ public class NoteRectangle extends StackPane {
     private final double rectangleWidth, rectangleHeight;
 
     private final Region bordersRegion;  // Region that shows the borders of the note rectangle
+
+    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     // Helper attributes
     // (Note: "initial" refers to initial value before *resizing*, not when the object is created)
@@ -202,7 +206,7 @@ public class NoteRectangle extends StackPane {
                     initYTrans = this.getTranslateY();
                     initYEvent = event.getSceneY();
 
-                    initNoteNum = noteNum;
+                    initNoteNum = this.noteNum;
 
                     // Disable scrolling
                     this.getParent().addEventHandler(ScrollEvent.ANY, cancelScroll);
@@ -221,6 +225,11 @@ public class NoteRectangle extends StackPane {
 
             // Revert cursor
             if (canEdit && isPaused) this.setCursor(Cursor.OPEN_HAND);
+
+            logger.log(
+                    Level.FINE,
+                    "Moved rectangle to " + getNoteOnsetTime() + " seconds with note number " + this.noteNum
+            );
         });
 
         // Set mouse events for the resizing regions
@@ -334,10 +343,6 @@ public class NoteRectangle extends StackPane {
 
     public static void setIsPaused(boolean isPaused) {
         NoteRectangle.isPaused = isPaused;
-    }
-
-    public int getNoteNum() {
-        return noteNum;
     }
 
     public double getNoteOnsetTime() {
