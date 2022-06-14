@@ -123,7 +123,9 @@ public class TranscriptionViewController implements Initializable {
 
     private final Logger logger = Logger.getLogger(this.getClass().getName());
     private ProjectsDB projectsDB;
+
     private List<Audio> allAudio;
+    private List<NotePlayerSequencer> allSequencers;
 
     private String audtFilePath;
     private String audtFileName;
@@ -607,16 +609,23 @@ public class TranscriptionViewController implements Initializable {
      *
      * @param mainStage          Main stage.
      * @param allAudio           List of all opened <code>Audio</code> objects.
+     * @param allSequencers      List of all opened <code>NotePlayerSequencer</code> objects.
      * @param mainViewController Controller object of the main class.
      */
-    public void finishSetup(Stage mainStage, List<Audio> allAudio, MainViewController mainViewController) {
+    public void finishSetup(
+            Stage mainStage, List<Audio> allAudio, List<NotePlayerSequencer> allSequencers,
+            MainViewController mainViewController
+    ) {
         // Update attributes
         this.mainStage = mainStage;
         this.mainViewController = mainViewController;
-        this.allAudio = allAudio;
 
-        // Append the current audio to the list of all audio
-        allAudio.add(audio);
+        this.allAudio = allAudio;
+        this.allSequencers = allSequencers;
+
+        // Append the current audio and sequencer to the appropriate lists
+        this.allAudio.add(audio);
+        this.allSequencers.add(notePlayerSequencer);
 
         // Set choices
         musicKeyChoice.setValue(MusicUtils.MUSIC_KEYS[musicKeyIndex]);
@@ -954,6 +963,10 @@ public class TranscriptionViewController implements Initializable {
 
         // Shutdown the scheduler
         scheduler.shutdown();
+
+        // Stop and close the note player sequencer
+        notePlayerSequencer.stop();
+        notePlayerSequencer.close();
     }
 
     // Private methods
@@ -1015,6 +1028,9 @@ public class TranscriptionViewController implements Initializable {
         // Pause the current audio
         isPaused = togglePaused(false);
 
+        // Stop note sequencer playback
+        notePlayerSequencer.stop();
+
         // Get the current window
         Window window = rootPane.getScene().getWindow();
 
@@ -1036,7 +1052,8 @@ public class TranscriptionViewController implements Initializable {
 
         // Create the new project
         ProjectIOHandlers.newProject(
-                mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController
+                mainStage, (Stage) window, file, settingsFile, allAudio, allSequencers,
+                mainViewController
         );
     }
 
@@ -1072,8 +1089,8 @@ public class TranscriptionViewController implements Initializable {
 
         // Open the existing project
         ProjectIOHandlers.openProject(
-                mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController
-        );
+                mainStage, (Stage) window, file, settingsFile, allAudio, allSequencers,
+                mainViewController);
     }
 
     /**
@@ -1939,7 +1956,8 @@ public class TranscriptionViewController implements Initializable {
 
             // Create the new project
             ProjectIOHandlers.newProject(
-                    mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController
+                    mainStage, (Stage) window, file, settingsFile, allAudio, allSequencers,
+                    mainViewController
             );
 
         } else if (OPEN_PROJECT_COMBINATION.match(keyEvent)) {  // Open a project
@@ -1957,8 +1975,8 @@ public class TranscriptionViewController implements Initializable {
 
             // Open the existing project
             ProjectIOHandlers.openProject(
-                    mainStage, (Stage) window, file, settingsFile, allAudio, mainViewController
-            );
+                    mainStage, (Stage) window, file, settingsFile, allAudio, allSequencers,
+                    mainViewController);
 
         } else if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {  // Save current project
             handleSavingProject(false);

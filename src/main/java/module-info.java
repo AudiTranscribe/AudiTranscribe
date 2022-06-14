@@ -30,6 +30,7 @@ module site.overwrite.auditranscribe {
     exports site.overwrite.auditranscribe.io.json_files.data_encapsulators;
     exports site.overwrite.auditranscribe.io.json_files.file_classes;
     exports site.overwrite.auditranscribe.misc;
+    exports site.overwrite.auditranscribe.note_playback;
     exports site.overwrite.auditranscribe.spectrogram;
     exports site.overwrite.auditranscribe.utils;
     exports site.overwrite.auditranscribe.views;

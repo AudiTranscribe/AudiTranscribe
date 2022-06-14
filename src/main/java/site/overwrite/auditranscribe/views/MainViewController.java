@@ -2,7 +2,7 @@
  * MainViewController.java
  *
  * Created on 2022-02-09
- * Updated on 2022-06-12
+ * Updated on 2022-06-14
  *
  * Description: Contains the main view's controller class.
  */
@@ -36,6 +36,7 @@ import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.io.json_files.data_encapsulators.SettingsData;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.Theme;
+import site.overwrite.auditranscribe.note_playback.NotePlayerSequencer;
 import site.overwrite.auditranscribe.utils.MiscUtils;
 import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
 
@@ -60,7 +61,9 @@ public class MainViewController implements Initializable {
     Stage transcriptionStage = new Stage();  // Will be used and shown later
 
     FilteredList<Quartet<Long, String, String, String>> filteredList;  // List of project records
-    private final List<Audio> allAudio = new ArrayList<>(0);  // List of all opened `Audio` objects
+
+    private final List<Audio> allAudio = new ArrayList<>();
+    private final List<NotePlayerSequencer> allSequencers = new ArrayList<>();
 
     private SettingsFile settingsFile;
     private final Logger logger = Logger.getLogger(this.getClass().getName());
@@ -148,9 +151,8 @@ public class MainViewController implements Initializable {
 
                 // Open the project with the filepath
                 ProjectIOHandlers.openProject(
-                        (Stage) window, transcriptionStage, file, settingsFile, allAudio,
-                        this
-                );
+                        (Stage) window, transcriptionStage, file, settingsFile, allAudio, allSequencers,
+                        this);
             }
         });
 
@@ -266,9 +268,10 @@ public class MainViewController implements Initializable {
     }
 
     /**
-     * Method that stops all the audio objects that have been loaded.
+     * Method that stops all the audio objects and <code>NotePlayerSequencer</code>s that have been
+     * loaded in the transcription views.
      */
-    public void stopAllAudioObjects() {
+    public void stopAllPlayableObjects() {
         // Stop all `Audio` objects
         for (Audio audio: allAudio) {
             try {
@@ -279,8 +282,15 @@ public class MainViewController implements Initializable {
             }
         }
 
-        // Clear the `allAudio` list
+        // Stop and close all `NotePlayerSequencer` objects
+        for (NotePlayerSequencer notePlayerSequencer: allSequencers) {
+            notePlayerSequencer.stop();
+            notePlayerSequencer.close();
+        }
+
+        // Clear the lists
         allAudio.clear();
+        allSequencers.clear();
     }
 
     // Private methods
@@ -303,7 +313,7 @@ public class MainViewController implements Initializable {
 
         // Create the new project
         ProjectIOHandlers.newProject(
-                (Stage) window, transcriptionStage, file, settingsFile, allAudio,
+                (Stage) window, transcriptionStage, file, settingsFile, allAudio, allSequencers,
                 this);
     }
 
@@ -324,9 +334,8 @@ public class MainViewController implements Initializable {
 
         // Open the existing project
         ProjectIOHandlers.openProject(
-                (Stage) window, transcriptionStage, file, settingsFile, allAudio,
-                this
-        );
+                (Stage) window, transcriptionStage, file, settingsFile, allAudio, allSequencers,
+                this);
     }
 
     // Helper classes

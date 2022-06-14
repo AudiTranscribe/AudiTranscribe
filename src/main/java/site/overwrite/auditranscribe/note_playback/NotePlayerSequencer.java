@@ -2,7 +2,7 @@
  * NotePlayerSequencer.java
  *
  * Created on 2022-06-09
- * Updated on 2022-06-11
+ * Updated on 2022-06-14
  *
  * Description: Class that handles the playing of notes as a MIDI sequence.
  */
@@ -164,8 +164,22 @@ public class NotePlayerSequencer {
     }
 
     public void stop() {
-        sequencer.stop();
-        logger.log(Level.FINE, "Note sequence playback stopped");
+        if (sequencer.isRunning()) {
+            sequencer.stop();
+            logger.log(Level.FINE, "Note sequence playback stopped");
+        } else {
+            logger.log(Level.FINE, "Note sequence playback is not running, not stopping");
+        }
+    }
+
+    public void close() {
+        if (sequencer.isRunning()) {
+            sequencer.stop();
+            sequencer.close();
+            logger.log(Level.FINE, "Note sequence playback closed");
+        } else {
+            logger.log(Level.FINE, "Note sequence playback is not running, not closing");
+        }
     }
 
     // Private methods

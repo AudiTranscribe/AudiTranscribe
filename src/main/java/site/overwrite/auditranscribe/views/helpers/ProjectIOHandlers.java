@@ -2,7 +2,7 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-06-09
+ * Updated on 2022-06-14
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
@@ -26,6 +26,7 @@ import site.overwrite.auditranscribe.exceptions.IncorrectFileFormatException;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileReader;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileWriter;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
+import site.overwrite.auditranscribe.note_playback.NotePlayerSequencer;
 import site.overwrite.auditranscribe.views.MainViewController;
 import site.overwrite.auditranscribe.views.TranscriptionViewController;
 
@@ -56,11 +57,12 @@ public class ProjectIOHandlers {
      * @param settingsFile       The <code>SettingsFile</code> object that handles the reading and
      *                           writing of settings.
      * @param allAudio           List of all opened <code>Audio</code> objects.
+     * @param allSequencers      List of all opened <code>NotePlayerSequencer</code> objects.
      * @param mainViewController Controller object of the main class.
      */
     public static void newProject(
             Stage mainStage, Stage transcriptionStage, File file, SettingsFile settingsFile,
-            List<Audio> allAudio, MainViewController mainViewController
+            List<Audio> allAudio, List<NotePlayerSequencer> allSequencers, MainViewController mainViewController
     ) {
         // Verify that the user choose a file
         if (file != null) {
@@ -111,7 +113,7 @@ public class ProjectIOHandlers {
 
                 // Set the project data for the existing project
                 controller.setAudioAndSpectrogramData(audio);
-                controller.finishSetup(mainStage, allAudio, mainViewController);
+                controller.finishSetup(mainStage, allAudio, allSequencers, mainViewController);
 
                 // Set the scene for the transcription page
                 transcriptionStage.setScene(scene);
@@ -132,7 +134,7 @@ public class ProjectIOHandlers {
                     transcriptionStage.showAndWait();
                     controller.handleSceneClosing();
                     mainViewController.refreshProjectsListView();
-                    mainViewController.stopAllAudioObjects();
+                    mainViewController.stopAllPlayableObjects();
                     mainStage.show();  // Show the main scene upon the spectrogram scene's closure
                 }
 
@@ -160,11 +162,12 @@ public class ProjectIOHandlers {
      * @param settingsFile       The <code>SettingsFile</code> object that handles the reading and
      *                           writing of settings.
      * @param allAudio           List of all opened <code>Audio</code> objects.
+     * @param allSequencers      List of all opened <code>NotePlayerSequencer</code> objects.
      * @param mainViewController Controller object of the main class.
      */
     public static void openProject(
             Stage mainStage, Stage transcriptionStage, File file, SettingsFile settingsFile,
-            List<Audio> allAudio, MainViewController mainViewController
+            List<Audio> allAudio, List<NotePlayerSequencer> allSequencers, MainViewController mainViewController
     ) {
         // Verify that the user choose a file
         if (file != null) {
@@ -198,7 +201,7 @@ public class ProjectIOHandlers {
 
                 // Set the project data for the existing project
                 controller.useExistingData(audtFilePath, audtFileName, projectDataObject);
-                controller.finishSetup(mainStage, allAudio, mainViewController);
+                controller.finishSetup(mainStage, allAudio, allSequencers, mainViewController);
 
                 // Set the scene for the transcription page
                 transcriptionStage.setScene(scene);
@@ -227,7 +230,7 @@ public class ProjectIOHandlers {
                     transcriptionStage.showAndWait();
                     controller.handleSceneClosing();
                     mainViewController.refreshProjectsListView();
-                    mainViewController.stopAllAudioObjects();
+                    mainViewController.stopAllPlayableObjects();
                     mainStage.show();  // Show the main scene upon the spectrogram scene's closure
                 }
 
