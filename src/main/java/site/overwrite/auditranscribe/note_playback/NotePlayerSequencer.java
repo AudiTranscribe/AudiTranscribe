@@ -2,7 +2,7 @@
  * NotePlayerSequencer.java
  *
  * Created on 2022-06-09
- * Updated on 2022-06-14
+ * Updated on 2022-06-15
  *
  * Description: Class that handles the playing of notes as a MIDI sequence.
  */
@@ -102,10 +102,20 @@ public class NotePlayerSequencer {
         sequencer.setMicrosecondPosition((long) (currTime * 1e6));
         logger.log(
                 Level.FINE,
-                "Provided current time is " + currTime + " seconds; actually set to " +
-                        sequencer.getMicrosecondPosition() + " microseconds"
+                "Set note sequencer current time to " + sequencer.getMicrosecondPosition() + " µs"
         );
     }
+
+    /**
+     * Method that gets the current time of the MIDI sequencer playback.
+     *
+     * @return Current time of the sequencer, <b>in seconds</b>.
+     */
+    public double getCurrTime() {
+        return sequencer.getMicrosecondPosition() / 1e6;
+    }
+
+    // Public methods
 
     /**
      * Method that sets notes on the track.
@@ -177,6 +187,9 @@ public class NotePlayerSequencer {
         return sb.toString();
     }
 
+    /**
+     * Start playback of the MIDI sequence.
+     */
     public void play() {
         // Set tempo
         sequencer.setTempoInBPM((float) bpm);
@@ -193,25 +206,31 @@ public class NotePlayerSequencer {
 
         // Start playback
         sequencer.start();
-        logger.log(Level.FINE, "Note sequence playback started");
+        logger.log(Level.FINE, "Note sequencer playback started");
     }
 
+    /**
+     * Stop playback of the MIDI sequence.
+     */
     public void stop() {
         if (sequencer.isRunning()) {
             sequencer.stop();
-            logger.log(Level.FINE, "Note sequence playback stopped");
+            logger.log(Level.FINE, "Note sequencer playback stopped");
         } else {
-            logger.log(Level.FINE, "Note sequence playback is not running, not stopping");
+            logger.log(Level.FINE, "Note sequencer playback is not running, not stopping");
         }
     }
 
+    /**
+     * Close the note sequencer.
+     */
     public void close() {
         if (sequencer.isRunning()) {
             sequencer.stop();
             sequencer.close();
-            logger.log(Level.FINE, "Note sequence playback closed");
+            logger.log(Level.FINE, "Note sequencer playback closed");
         } else {
-            logger.log(Level.FINE, "Note sequence playback is not running, not closing");
+            logger.log(Level.FINE, "Note sequencer playback is not running, not closing");
         }
     }
 

@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-14
+ * Updated on 2022-06-15
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -1239,14 +1239,11 @@ public class TranscriptionViewController implements Initializable {
             )));
 
             // Unpause the audio (i.e. play the audio)
-            Platform.runLater(() -> {
-                try {
-                    Thread.sleep((long) (NOTE_PLAYING_DELAY_OFFSET * 1000));
-                    audio.play();
-                } catch (InterruptedException | InvalidObjectException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            try {
+                audio.play();
+            } catch (InvalidObjectException e) {
+                throw new RuntimeException(e);
+            }
 
         } else {
             // Change the icon of the play button from the paused icon to the play icon
@@ -1266,7 +1263,10 @@ public class TranscriptionViewController implements Initializable {
         NoteRectangle.setIsPaused(!isPaused);
 
         // Return the toggled version of the `isPaused` flag
-        logger.log(Level.FINE, "Toggled pause state from " + isPaused + " to " + !isPaused);
+        logger.log(
+                Level.FINE,
+                "Toggled pause state; now is" + (!isPaused ? "paused" : "playing")
+        );
         return !isPaused;
     }
 
@@ -1747,7 +1747,7 @@ public class TranscriptionViewController implements Initializable {
             notePlayerSequencer.setNotesOnTrack(noteOnsetTimes, noteDurations, noteNums);  // Will clear existing notes
 
             // Set current time
-            notePlayerSequencer.setCurrTime(currTime);
+            notePlayerSequencer.setCurrTime(currTime + NOTE_PLAYING_DELAY_OFFSET);
 
             // Start playback
             notePlayerSequencer.play();
@@ -1757,7 +1757,7 @@ public class TranscriptionViewController implements Initializable {
             notePlayerSequencer.stop();
         }
 
-        logger.log(Level.FINE, "Toggled pause state (paused is now " + isPaused + ")");
+        logger.log(Level.FINE, "Toggled play button; audio is now " + (!isPaused ? "paused" : "playing"));
     }
 
     /**

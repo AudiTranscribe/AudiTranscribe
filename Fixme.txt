@@ -1,9 +1,13 @@
 Fixme:
     - Issue on Windows: no line matching interface SourceDataLine supporting format PCM_SIGNED 44100.0 Hz, 16 bit,
       stereo, 4 bytes/frame, little-endian is supported.
-    - MIDI player has several bugs to fix
-        - Current time determination still buggy
-        - Sometimes notes do not play
-        - Need to fix MIDI timing
-            - Some notes will not play if they are next to each other
-        - Prevent note rectangles from overlapping
+    - Note playing is delayed.
+        - Temporary fix is to implement a fixed constant to account for delay, but a more permanent fix is needed.
+        - This also causes some notes to not play at the start of playback.
+    - MIDI player has several bugs to fix.
+        - Current time determination still buggy.
+            - Especially first time playing the notes.
+        - Sometimes notes do not play.
+        - Need to fix MIDI timing.
+            - Some notes will not play if they are next to each other.
+        - Prevent note rectangles from overlapping.
