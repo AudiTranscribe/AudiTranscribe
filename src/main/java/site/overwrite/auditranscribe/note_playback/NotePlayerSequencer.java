@@ -218,10 +218,10 @@ public class NotePlayerSequencer {
      * Stop playback of the MIDI sequence.
      */
     public void stop() {
-        if (sequencer.isRunning()) {
+        try {
             sequencer.stop();
             logger.log(Level.FINE, "Note sequencer playback stopped");
-        } else {
+        } catch (IllegalStateException e) {
             logger.log(Level.FINE, "Note sequencer playback is not running, not stopping");
         }
     }
@@ -230,13 +230,12 @@ public class NotePlayerSequencer {
      * Close the note sequencer.
      */
     public void close() {
-        if (sequencer.isRunning()) {
-            sequencer.stop();
-            sequencer.close();
-            logger.log(Level.FINE, "Note sequencer playback closed");
-        } else {
-            logger.log(Level.FINE, "Note sequencer playback is not running, not closing");
-        }
+        // First stop the playback
+        stop();
+
+        // Then close sequencer
+        sequencer.close();
+        logger.log(Level.FINE, "Note sequencer playback closed");
     }
 
     // Private methods
