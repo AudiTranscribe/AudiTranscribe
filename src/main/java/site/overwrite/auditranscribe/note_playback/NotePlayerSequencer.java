@@ -189,8 +189,10 @@ public class NotePlayerSequencer {
 
     /**
      * Start playback of the MIDI sequence.
+     *
+     * @param currTime The time to start playback at, <b>in seconds</b>.
      */
-    public void play() {
+    public void play(double currTime) {
         // Set tempo
         sequencer.setTempoInBPM((float) bpm);
 
@@ -203,6 +205,9 @@ public class NotePlayerSequencer {
         } catch (InvalidMidiDataException e) {
             throw new RuntimeException(e);
         }
+
+        // Set current time
+        setCurrTime(currTime);
 
         // Start playback
         sequencer.start();

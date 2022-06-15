@@ -2,7 +2,7 @@
  * NotePlayerSequencerTest.java
  *
  * Created on 2022-06-09
- * Updated on 2022-06-10
+ * Updated on 2022-06-15
  *
  * Description: Test `NotePlayerSequencer.java`.
  */
@@ -51,7 +51,7 @@ class NotePlayerSequencerTest {
         notePlayerSequencer.setNotesOnTrack(noteOnsetTimes, noteDurations, noteNumbers);
 
         // Play the notes
-        notePlayerSequencer.play();
+        notePlayerSequencer.play(0);
 
         while (true) {
             // Exit the program when sequencer has stopped playing

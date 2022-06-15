@@ -1749,11 +1749,8 @@ public class TranscriptionViewController implements Initializable {
             // Set notes
             notePlayerSequencer.setNotesOnTrack(noteOnsetTimes, noteDurations, noteNums);  // Will clear existing notes
 
-            // Set current time
-            notePlayerSequencer.setCurrTime(currTime + NOTE_PLAYING_DELAY_OFFSET);
-
             // Start playback
-            notePlayerSequencer.play();
+            notePlayerSequencer.play(currTime + NOTE_PLAYING_DELAY_OFFSET);
 
         } else {  // Is paused
             // Stop playback
