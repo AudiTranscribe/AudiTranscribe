@@ -1071,6 +1071,9 @@ public class TranscriptionViewController implements Initializable {
         // Pause the current audio
         isPaused = togglePaused(false);
 
+        // Stop note sequencer playback
+        notePlayerSequencer.stop();
+
         // Get the current window
         Window window = rootPane.getScene().getWindow();
 
