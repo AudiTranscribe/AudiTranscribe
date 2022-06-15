@@ -91,7 +91,14 @@ public class NotePlayerSequencer {
         this.instrumentNum = instrument.midiNumber;
     }
 
-    // Public methods
+    /**
+     * Method that gets the current time of the MIDI sequencer playback.
+     *
+     * @return Current time of the sequencer, <b>in seconds</b>.
+     */
+    public double getCurrTime() {
+        return sequencer.getMicrosecondPosition() / 1e6;
+    }
 
     /**
      * Method that sets the current time of the MIDI sequencer playback.
@@ -104,15 +111,6 @@ public class NotePlayerSequencer {
                 Level.FINE,
                 "Set note sequencer current time to " + sequencer.getMicrosecondPosition() + " µs"
         );
-    }
-
-    /**
-     * Method that gets the current time of the MIDI sequencer playback.
-     *
-     * @return Current time of the sequencer, <b>in seconds</b>.
-     */
-    public double getCurrTime() {
-        return sequencer.getMicrosecondPosition() / 1e6;
     }
 
     // Public methods

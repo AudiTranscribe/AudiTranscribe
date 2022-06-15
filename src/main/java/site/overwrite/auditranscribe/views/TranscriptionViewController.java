@@ -1002,7 +1002,11 @@ public class TranscriptionViewController implements Initializable {
 
         // Update note sequencer current time
         if (!areNotesMuted) {
-            notePlayerSequencer.setCurrTime(seekTime + NOTE_PLAYING_DELAY_OFFSET);
+            if (!notePlayerSequencer.getSequencer().isRunning() && !isPaused) {  // Not running but unpaused
+                notePlayerSequencer.play(seekTime + NOTE_PLAYING_DELAY_OFFSET);
+            } else {
+                notePlayerSequencer.setCurrTime(seekTime + NOTE_PLAYING_DELAY_OFFSET);
+            }
         }
 
         // Update the current time and current time label

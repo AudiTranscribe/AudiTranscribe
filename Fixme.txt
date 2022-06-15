@@ -5,9 +5,7 @@ Fixme:
         - Temporary fix is to implement a fixed constant to account for delay, but a more permanent fix is needed.
         - This also causes some notes to not play at the start of playback.
     - MIDI player has several bugs to fix.
-        - Sometimes notes do not play.
-            - Attempting to play notes once the MIDI sequence ended (but before audio ends) will result in notes not
-              being played
+        - Seeking to beginning whilst still playing will pause audio BUT make MIDI playback restart.
         - Need to fix MIDI timing.
             - Some notes will not play if they are next to each other.
         - Prevent note rectangles from overlapping.
