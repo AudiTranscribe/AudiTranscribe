@@ -4,8 +4,7 @@ Fixme:
     - Note playing is delayed.
         - Temporary fix is to implement a fixed constant to account for delay, but a more permanent fix is needed.
         - This also causes some notes to not play at the start of playback.
-    - MIDI player has several bugs to fix.
-        - Seeking to beginning whilst still playing will pause audio BUT make MIDI playback restart.
+    - MIDI player has bugs to fix.
         - Need to fix MIDI timing.
             - Some notes will not play if they are next to each other.
         - Prevent note rectangles from overlapping.

@@ -1239,8 +1239,9 @@ public class TranscriptionViewController implements Initializable {
      * @return New paused state.
      */
     private boolean togglePaused(boolean isPaused) {
-        if (isPaused) {
+        if (isPaused) {  // Is currently paused; want to make audio play
             // Change the icon of the play button from the play icon to the paused icon
+            // (So that the user knows that the next interaction with button will pause audio)
             playButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
                     "images/icons/PNGs/" + theme.shortName + "/pause.png"
             )));
@@ -1252,8 +1253,9 @@ public class TranscriptionViewController implements Initializable {
                 throw new RuntimeException(e);
             }
 
-        } else {
+        } else {  // Is currently playing; want to make audio pause
             // Change the icon of the play button from the paused icon to the play icon
+            // (So that the user knows that the next interaction with button will play audio)
             playButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
                     "images/icons/PNGs/" + theme.shortName + "/play.png"
             )));
@@ -1264,6 +1266,9 @@ public class TranscriptionViewController implements Initializable {
             } catch (InvalidObjectException e) {
                 throw new RuntimeException(e);
             }
+
+            // Stop note sequencer playback
+            notePlayerSequencer.stop();
         }
 
         // Toggle paused state for note rectangles
@@ -1755,10 +1760,6 @@ public class TranscriptionViewController implements Initializable {
 
             // Start playback
             notePlayerSequencer.play(currTime + NOTE_PLAYING_DELAY_OFFSET);
-
-        } else {  // Is paused
-            // Stop playback
-            notePlayerSequencer.stop();
         }
 
         logger.log(Level.FINE, "Toggled play button; audio is now " + (!isPaused ? "paused" : "playing"));
