@@ -7,4 +7,5 @@ Fixme:
     - MIDI player has bugs to fix.
         - Need to fix MIDI timing.
             - Some notes will not play if they are next to each other.
-        - Prevent note rectangles from overlapping.
+        - Collision checks still has some bugs.
+            - Dragging a longer note onto a shorter note will result in overlapping notes.

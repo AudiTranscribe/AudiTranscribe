@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-15
+ * Updated on 2022-06-16
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -239,7 +239,8 @@ public class TranscriptionViewController implements Initializable {
         }
 
         // Clear the note rectangles
-        NoteRectangle.noteRectangles.clear();
+        NoteRectangle.allNoteRectangles.clear();
+        NoteRectangle.noteRectanglesByNoteNumber.clear();
 
         // Reset note rectangles settings
         NoteRectangle.setIsPaused(isPaused);
@@ -703,6 +704,9 @@ public class TranscriptionViewController implements Initializable {
         mainPane.getScene().addEventFilter(KeyEvent.KEY_PRESSED, this::keyPressEventHandler);
         mainPane.getScene().addEventFilter(KeyEvent.KEY_RELEASED, this::keyReleasedEventHandler);
 
+        // Define the lists note rectangles by note number
+        NoteRectangle.defineNoteRectanglesByNoteNumberLists(MAX_NOTE_NUMBER - MIN_NOTE_NUMBER + 1);
+
         // Report that the transcription view is ready to be shown
         logger.log(Level.INFO, "Transcription view ready to be shown");
     }
@@ -959,7 +963,7 @@ public class TranscriptionViewController implements Initializable {
         }
 
         // Clear the note rectangles
-        NoteRectangle.noteRectangles.clear();
+        NoteRectangle.allNoteRectangles.clear();
 
         // Shutdown the scheduler
         scheduler.shutdown();
@@ -1166,13 +1170,13 @@ public class TranscriptionViewController implements Initializable {
                 }
 
                 // Get data from the note rectangles
-                int numRectangles = NoteRectangle.noteRectangles.size();
+                int numRectangles = NoteRectangle.allNoteRectangles.size();
                 double[] timesToPlaceRectangles = new double[numRectangles];
                 double[] noteDurations = new double[numRectangles];
                 int[] noteNums = new int[numRectangles];
 
                 for (int i = 0; i < numRectangles; i++) {
-                    NoteRectangle noteRectangle = NoteRectangle.noteRectangles.get(i);
+                    NoteRectangle noteRectangle = NoteRectangle.allNoteRectangles.get(i);
                     timesToPlaceRectangles[i] = noteRectangle.getNoteOnsetTime();
                     noteDurations[i] = noteRectangle.getNoteDuration();
                     noteNums[i] = noteRectangle.noteNum;
@@ -1736,7 +1740,7 @@ public class TranscriptionViewController implements Initializable {
         // Handle note rectangle operations when toggle paused
         if (!isPaused) {
             // Get number of note rectangles
-            int numNoteRects = NoteRectangle.noteRectangles.size();
+            int numNoteRects = NoteRectangle.allNoteRectangles.size();
 
             // Get the note onset times, note durations, and note numbers from the note rectangles
             double[] noteOnsetTimes = new double[numNoteRects];
@@ -1744,9 +1748,9 @@ public class TranscriptionViewController implements Initializable {
             int[] noteNums = new int[numNoteRects];
 
             for (int i = 0; i < numNoteRects; i++) {
-                noteOnsetTimes[i] = NoteRectangle.noteRectangles.get(i).getNoteOnsetTime();
-                noteDurations[i] = NoteRectangle.noteRectangles.get(i).getNoteDuration();
-                noteNums[i] = NoteRectangle.noteRectangles.get(i).noteNum;
+                noteOnsetTimes[i] = NoteRectangle.allNoteRectangles.get(i).getNoteOnsetTime();
+                noteDurations[i] = NoteRectangle.allNoteRectangles.get(i).getNoteDuration();
+                noteNums[i] = NoteRectangle.allNoteRectangles.get(i).noteNum;
             }
 
             // Setup note player sequencer
@@ -1892,8 +1896,11 @@ public class TranscriptionViewController implements Initializable {
      * @param keyEvent Key press event.
      */
     private void keyPressEventHandler(KeyEvent keyEvent) {
-        // If the spectrogram is not ready do not do anything
-        if (!isEverythingReady) return;
+        // If the spectrogram is not ready or if in the middle of editing do not do anything
+        if (!isEverythingReady || NoteRectangle.isEditing) {
+            keyEvent.consume();
+            return;
+        }
 
         // Get the key event's target
         Node target = (Node) keyEvent.getTarget();
@@ -2040,8 +2047,11 @@ public class TranscriptionViewController implements Initializable {
      * @param keyEvent Key released event.
      */
     private void keyReleasedEventHandler(KeyEvent keyEvent) {
-        // If the spectrogram is not ready do not do anything
-        if (!isEverythingReady) return;
+        // If the spectrogram is not ready or if in the middle of editing do not do anything
+        if (!isEverythingReady || NoteRectangle.isEditing) {
+            keyEvent.consume();
+            return;
+        }
 
         // Handle key event
         KeyCode code = keyEvent.getCode();

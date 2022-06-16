@@ -2,7 +2,7 @@
  * ArrayUtilsTest.java
  *
  * Created on 2022-03-12
- * Updated on 2022-05-31
+ * Updated on 2022-06-16
  *
  * Description: Test `ArrayUtils.java`.
  */
@@ -129,6 +129,7 @@ class ArrayUtilsTest {
         // Define searching arrays
         double[] array1 = new double[]{1.23, 3.45, 5.67, 7.89, 9.01};
         double[] array2 = new double[]{1, 1, 2, 3, 5};
+        double[] array3 = new double[]{-10, 10};
 
         // Run tests
         assertEquals(0, ArrayUtils.searchSorted(array1, 0.12));
@@ -140,6 +141,14 @@ class ArrayUtilsTest {
         assertEquals(5, ArrayUtils.searchSorted(array2, 6));
         assertEquals(0, ArrayUtils.searchSorted(array2, 0));
         assertEquals(0, ArrayUtils.searchSorted(array2, 1));
+
+        assertEquals(0, ArrayUtils.searchSorted(array3, -11));
+        assertEquals(0, ArrayUtils.searchSorted(array3, -10));
+        assertEquals(1, ArrayUtils.searchSorted(array3, -9));
+        assertEquals(1, ArrayUtils.searchSorted(array3, 0));
+        assertEquals(1, ArrayUtils.searchSorted(array3, 9));
+        assertEquals(1, ArrayUtils.searchSorted(array3, 10));
+        assertEquals(2, ArrayUtils.searchSorted(array3, 11));
     }
 
     @Test
