@@ -8,4 +8,4 @@ Fixme:
         - Need to fix MIDI timing.
             - Some notes will not play if they are next to each other.
         - Collision checks still has some bugs.
-            - Dragging a longer note onto a shorter note will result in overlapping notes.
+            - Can still create a note on top of another note.

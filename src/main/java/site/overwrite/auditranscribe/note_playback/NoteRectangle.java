@@ -58,7 +58,8 @@ public class NoteRectangle extends StackPane {
     public final DoubleProperty noteOnsetTime;
     public final DoubleProperty noteDuration;
 
-    private final double rectangleWidth, rectangleHeight;
+    private final DoubleProperty rectangleWidth;
+    private final double rectangleHeight;  // The rectangle's height is fixed
 
     private final Region bordersRegion;  // Region that shows the borders of the note rectangle
 
@@ -79,7 +80,8 @@ public class NoteRectangle extends StackPane {
     private NoteRectangle rightBoundingRectangle;
 
     /**
-     * Initialization method for a <code>NoteRectangle</code> object.
+     * Initialization method for a <code>NoteRectangle</code> object.<br>
+     * Expects all required static values to be set.
      *
      * @param timeToPlaceRect The time (in seconds) at which the <b>start</b> of the note should be
      *                        placed.
@@ -87,15 +89,22 @@ public class NoteRectangle extends StackPane {
      * @param noteNum         The note number of the note.
      */
     public NoteRectangle(double timeToPlaceRect, double noteDuration, int noteNum) {
-        // Update properties
+        // Calculate the pixels per second for the spectrogram
+        double pixelsPerSecond = spectrogramWidth / totalDuration;
+        double secondsPerPixel = totalDuration / spectrogramWidth;
+
+        // Update non-property attributes
         this.noteNum = noteNum;
+        this.rectangleHeight = PlottingHelpers.getHeightDifference(spectrogramHeight, minNoteNum, maxNoteNum);
 
-        this.noteOnsetTime = new SimpleDoubleProperty(timeToPlaceRect);
-        this.noteDuration = new SimpleDoubleProperty(noteDuration);
+        // Define and bind properties
+        this.noteOnsetTime = new SimpleDoubleProperty();
+        this.noteDuration = new SimpleDoubleProperty();
+        this.rectangleWidth = new SimpleDoubleProperty();
 
-        // Bind properties
-        this.noteOnsetTime.bind(this.translateXProperty().multiply(totalDuration / spectrogramWidth));
-        this.noteDuration.bind(this.widthProperty().multiply(totalDuration / spectrogramWidth));
+        this.noteOnsetTime.bind(this.translateXProperty().multiply(secondsPerPixel));
+        this.noteDuration.bind(this.widthProperty().multiply(secondsPerPixel));
+        this.rectangleWidth.bind(this.widthProperty());
 
         // Define the nodes
         bordersRegion = new Region();
@@ -114,20 +123,15 @@ public class NoteRectangle extends StackPane {
         resizeLeftRegion.getStyleClass().add("note-resizing-region");
         resizeRightRegion.getStyleClass().add("note-resizing-region");
 
-        // Calculate the pixels per second for the spectrogram
-        double pixelsPerSecond = spectrogramWidth / totalDuration;
-
-        // Calculate the x-coordinate of the note rectangle and the width of the note rectangle
-        rectangleWidth = noteDuration * pixelsPerSecond;
+        // Calculate the x-coordinate of the note rectangle
         double xCoord = timeToPlaceRect * pixelsPerSecond;
 
-        // Calculate y-coordinate and height to place the rectangle
-        rectangleHeight = PlottingHelpers.getHeightDifference(spectrogramHeight, minNoteNum, maxNoteNum);
+        // Calculate the y-coordinate of the note rectangle
         double yCoord = PlottingHelpers.noteNumToHeight(noteNum, minNoteNum, maxNoteNum, spectrogramHeight) -
                 rectangleHeight / 2;
 
         // Set the borders' region's attributes
-        bordersRegion.setPrefWidth(rectangleWidth);
+        bordersRegion.setPrefWidth(noteDuration * pixelsPerSecond);
         bordersRegion.setPrefHeight(rectangleHeight);
 
         // Update properties of the resizing regions
@@ -191,9 +195,9 @@ public class NoteRectangle extends StackPane {
                 int newNoteNum = initNoteNum - numIncrements;  // Higher Y -> Lower on screen => need to subtract
 
                 // Check for collision
-                if (checkNonCollision(newX, rectangleWidth, newNoteNum, numIncrements != 0)) {
+                if (checkNonCollision(newX, getRectangleWidth(), newNoteNum, numIncrements != 0)) {
                     // Move the note rectangle if it is within range
-                    if (newX >= 0 && newX + rectangleWidth <= spectrogramWidth) {
+                    if (newX >= 0 && newX + getRectangleWidth() <= spectrogramWidth) {
                         this.setTranslateX(newX);
                     }
                     if (newY >= 0 && newY + rectangleHeight <= spectrogramHeight) {
@@ -450,8 +454,8 @@ public class NoteRectangle extends StackPane {
         return noteDuration.get();
     }
 
-    public double getNoteRectWidth() {
-        return bordersRegion.getPrefWidth();
+    public double getRectangleWidth() {
+        return rectangleWidth.get();
     }
 
     public double getStartX() {
@@ -459,7 +463,7 @@ public class NoteRectangle extends StackPane {
     }
 
     public double getEndX() {
-        return this.getStartX() + this.getNoteRectWidth();
+        return this.getStartX() + this.getRectangleWidth();
     }
 
     // Public methods
@@ -518,40 +522,25 @@ public class NoteRectangle extends StackPane {
             rightBoundingRectangle = rectangles.getValue1();
         }
 
-        // Check for non-collision and return
-        return !willCollideHorizontally(newXPos, newWidth);
-    }
-
-    /**
-     * Helper method that checks if the rectangle with the given X position, width, and note number
-     * will collide with another rectangle.<br>
-     * Assumes that the left and right rectangles 'bound' the new rectangle, i.e. the ending point
-     * of the rectangle is more than the start of the left rectangle, and the starting point of the
-     * rectangle is less thant the end of the right rectangle.
-     *
-     * @param newXPos  New X position of the rectangle.
-     * @param newWidth New width of the rectangle.
-     * @return A boolean; <code>true</code> if the rectangle will collide with another rectangle,
-     * <code>false</code> otherwise.
-     */
-    private boolean willCollideHorizontally(double newXPos, double newWidth) {
         // Handle edge cases
+        System.out.println("Left bounding rectangle: " + leftBoundingRectangle + "; Right bounding rectangle: " + rightBoundingRectangle);
         if (leftBoundingRectangle == null && rightBoundingRectangle == null) {
             // No rectangles present at all => no collision
-            return false;
+            return true;
         } else if (leftBoundingRectangle == null) {
             // No left rectangle; if the end of this rectangle is before the start of the right rectangle, then there is
             // no collision
-            return !(newXPos + newWidth < rightBoundingRectangle.getStartX());
+            System.out.println(newXPos + " " + newWidth + " " + (newXPos + newWidth) + " " + rightBoundingRectangle.getStartX());
+            return newXPos + newWidth < rightBoundingRectangle.getStartX();
 
         } else if (rightBoundingRectangle == null) {
             // No right rectangle; if the start of this rectangle is after the end of the left rectangle, then there is
             // no collision
-            return !(newXPos > leftBoundingRectangle.getEndX());
+            return newXPos > leftBoundingRectangle.getEndX();
         } else {
             // Check if start and end of this rectangle lies between the left and right rectangles. If so, there is no
             // collision; otherwise there is a collision.
-            return !(leftBoundingRectangle.getEndX() < newXPos) || !(newXPos + newWidth < rightBoundingRectangle.getStartX());
+            return leftBoundingRectangle.getEndX() < newXPos && newXPos + newWidth < rightBoundingRectangle.getStartX();
         }
     }
 
