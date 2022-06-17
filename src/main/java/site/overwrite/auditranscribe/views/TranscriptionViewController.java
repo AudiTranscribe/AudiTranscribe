@@ -92,9 +92,6 @@ public class TranscriptionViewController implements Initializable {
     final long NOTE_PLAYING_ON_DURATION = 75;  // In milliseconds
     final long NOTE_PLAYING_OFF_DURATION = 925;  // In milliseconds
 
-    // Todo: add to settings
-    final double NOTE_PLAYING_DELAY_OFFSET = 0.2;  // In seconds; to account for note playing delay
-
     final KeyCodeCombination NEW_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN);
     final KeyCodeCombination OPEN_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN);
     final KeyCodeCombination SAVE_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN);
@@ -1015,9 +1012,9 @@ public class TranscriptionViewController implements Initializable {
         // Update note sequencer current time
         if (!areNotesMuted) {
             if (!notePlayerSequencer.getSequencer().isRunning() && !isPaused) {  // Not running but unpaused
-                notePlayerSequencer.play(seekTime + NOTE_PLAYING_DELAY_OFFSET);
+                notePlayerSequencer.play(seekTime + settingsFile.data.notePlayingDelayOffset);
             } else {
-                notePlayerSequencer.setCurrTime(seekTime + NOTE_PLAYING_DELAY_OFFSET);
+                notePlayerSequencer.setCurrTime(seekTime + settingsFile.data.notePlayingDelayOffset);
             }
         }
 
@@ -1790,7 +1787,7 @@ public class TranscriptionViewController implements Initializable {
             notePlayerSequencer.setNotesOnTrack(noteOnsetTimes, noteDurations, noteNums);  // Will clear existing notes
 
             // Start playback
-            notePlayerSequencer.play(currTime + NOTE_PLAYING_DELAY_OFFSET);
+            notePlayerSequencer.play(currTime + settingsFile.data.notePlayingDelayOffset);
         }
 
         logger.log(Level.FINE, "Toggled play button; audio is now " + (!isPaused ? "paused" : "playing"));

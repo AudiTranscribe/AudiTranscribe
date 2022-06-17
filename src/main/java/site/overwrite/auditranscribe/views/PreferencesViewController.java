@@ -2,7 +2,7 @@
  * PreferencesViewController.java
  *
  * Created on 2022-05-22
- * Updated on 2022-06-12
+ * Updated on 2022-06-17
  *
  * Description: Contains the preferences view's controller class.
  */
@@ -52,6 +52,9 @@ public class PreferencesViewController implements Initializable {
 
     @FXML
     private Spinner<Integer> autosaveIntervalSpinner;
+
+    @FXML
+    private Spinner<Double> notePlayingDelayOffsetSpinner;
 
     @FXML
     private Button cancelButton, applyButton, okButton;
@@ -114,6 +117,10 @@ public class PreferencesViewController implements Initializable {
      * set.
      */
     public void setUpFields() {
+        // Arrays that store the fields that just need to disable the apply button
+        ChoiceBox<?>[] choiceBoxes = new ChoiceBox[]{colourScaleChoiceBox, windowFunctionChoiceBox};
+        Spinner<?>[] spinners = new Spinner[]{notePlayingDelayOffsetSpinner, autosaveIntervalSpinner};
+
         // Set choice box values
         themeChoiceBox.setValue(Theme.values()[settingsFile.data.themeEnumOrdinal]);
 
@@ -121,7 +128,7 @@ public class PreferencesViewController implements Initializable {
         windowFunctionChoiceBox.setValue(WindowFunction.values()[settingsFile.data.windowFunctionEnumOrdinal]);
 
         // Add methods to choice boxes
-        for (ChoiceBox<?> choiceBox : new ChoiceBox[]{colourScaleChoiceBox, windowFunctionChoiceBox}) {
+        for (ChoiceBox<?> choiceBox : choiceBoxes) {
             choiceBox.setOnAction(event -> applyButton.setDisable(false));
         }
 
@@ -131,13 +138,16 @@ public class PreferencesViewController implements Initializable {
         });
 
         // Set spinner factories and methods
+        notePlayingDelayOffsetSpinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(
+                -1, 1, settingsFile.data.notePlayingDelayOffset, 0.01
+        ));
         autosaveIntervalSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(
                 1, Integer.MAX_VALUE, settingsFile.data.autosaveInterval, 1
         ));
 
-        autosaveIntervalSpinner.valueProperty().addListener((observable, oldValue, newValue) -> {
-            applyButton.setDisable(false);
-        });
+        for (Spinner<?> spinner : spinners) {
+            spinner.valueProperty().addListener((observable, oldValue, newValue) -> applyButton.setDisable(false));
+        }
     }
 
     /**
@@ -194,10 +204,12 @@ public class PreferencesViewController implements Initializable {
         // Update settings' values
         settingsFile.data.themeEnumOrdinal = themeChoiceBox.getValue().ordinal();
 
-        settingsFile.data.colourScaleEnumOrdinal = colourScaleChoiceBox.getValue().ordinal();
-        settingsFile.data.windowFunctionEnumOrdinal = windowFunctionChoiceBox.getValue().ordinal();
+        settingsFile.data.notePlayingDelayOffset = notePlayingDelayOffsetSpinner.getValue();
 
         settingsFile.data.autosaveInterval = autosaveIntervalSpinner.getValue();
+
+        settingsFile.data.colourScaleEnumOrdinal = colourScaleChoiceBox.getValue().ordinal();
+        settingsFile.data.windowFunctionEnumOrdinal = windowFunctionChoiceBox.getValue().ordinal();
 
         // Apply settings to the settings file
         settingsFile.saveFile();
