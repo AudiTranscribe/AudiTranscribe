@@ -7,5 +7,3 @@ Fixme:
     - MIDI player has bugs to fix.
         - Need to fix MIDI timing.
             - Some notes will not play if they are next to each other.
-        - Collision checks still has some bugs.
-            - Can still create a note on top of another note.

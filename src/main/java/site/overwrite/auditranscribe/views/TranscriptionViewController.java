@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-16
+ * Updated on 2022-06-17
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -30,6 +30,7 @@ import org.javatuples.Triplet;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.audio.ffmpeg.AudioConverter;
 import site.overwrite.auditranscribe.bpm_estimation.BPMEstimator;
+import site.overwrite.auditranscribe.exceptions.NoteRectangleCollisionException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.LZ4;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
@@ -437,17 +438,21 @@ public class TranscriptionViewController implements Initializable {
                                         estimatedNoteNum > MAX_NOTE_NUMBER - 1
                                 ) return;
 
-                                // Create a new note rectangle
-                                NoteRectangle noteRect = new NoteRectangle(
-                                        estimatedTime, beatDuration, estimatedNoteNum
-                                );
+                                // Attempt to create a new note rectangle
+                                try {
+                                    // Create note rectangle
+                                    NoteRectangle noteRect = new NoteRectangle(
+                                            estimatedTime, beatDuration, estimatedNoteNum
+                                    );
 
-                                // Add the note rectangle to the spectrogram pane
-                                spectrogramPaneAnchor.getChildren().add(noteRect);
-                                logger.log(
-                                        Level.FINE,
-                                        "Placed note " + estimatedNoteNum + " at " + estimatedTime + " seconds"
-                                );
+                                    // Add the note rectangle to the spectrogram pane
+                                    spectrogramPaneAnchor.getChildren().add(noteRect);
+                                    logger.log(
+                                            Level.FINE,
+                                            "Placed note " + estimatedNoteNum + " at " + estimatedTime + " seconds"
+                                    );
+                                } catch (NoteRectangleCollisionException ignored) {
+                                }
                             }
                         }
 
@@ -1649,17 +1654,21 @@ public class TranscriptionViewController implements Initializable {
                         double noteDuration = musicNotesData.noteDurations[i];
                         int noteNum = musicNotesData.noteNums[i];
 
-                        // Create a new note rectangle and add it to the note rectangles list
-                        NoteRectangle noteRect = new NoteRectangle(timeToPlaceRectangle, noteDuration, noteNum);
+                        // Attempt to create a new note rectangle
+                        try {
+                            // Create the note rectangle
+                            NoteRectangle noteRect = new NoteRectangle(timeToPlaceRectangle, noteDuration, noteNum);
 
-                        // Add the note rectangle to the spectrogram pane
-                        spectrogramPaneAnchor.getChildren().add(noteRect);
+                            // Add the note rectangle to the spectrogram pane
+                            spectrogramPaneAnchor.getChildren().add(noteRect);
 
-                        logger.log(
-                                Level.FINE,
-                                "Loaded note " + noteNum + " with " + noteDuration + " seconds duration at " +
-                                        timeToPlaceRectangle + " seconds"
-                        );
+                            logger.log(
+                                    Level.FINE,
+                                    "Loaded note " + noteNum + " with " + noteDuration + " seconds duration at " +
+                                            timeToPlaceRectangle + " seconds"
+                            );
+                        } catch (NoteRectangleCollisionException ignored) {
+                        }
                     }
                 }
 

@@ -2,7 +2,7 @@
  * NoteRectangle.java
  *
  * Created on 2022-06-07
- * Updated on 2022-06-16
+ * Updated on 2022-06-17
  *
  * Description: A `StackPane` object that is used to denote a note in the transcription view.
  */
@@ -23,6 +23,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import org.javatuples.Pair;
+import site.overwrite.auditranscribe.exceptions.NoteRectangleCollisionException;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 
 import java.util.ArrayList;
@@ -87,11 +88,16 @@ public class NoteRectangle extends StackPane {
      *                        placed.
      * @param noteDuration    The duration (in seconds) of the note.
      * @param noteNum         The note number of the note.
+     * @throws NoteRectangleCollisionException If the creation of this note rectangle would cause a
+     *                                         collision with another note rectangle.
      */
-    public NoteRectangle(double timeToPlaceRect, double noteDuration, int noteNum) {
+    public NoteRectangle(double timeToPlaceRect, double noteDuration, int noteNum) throws NoteRectangleCollisionException {
         // Calculate the pixels per second for the spectrogram
         double pixelsPerSecond = spectrogramWidth / totalDuration;
         double secondsPerPixel = totalDuration / spectrogramWidth;
+
+        // Calculate the initial width of the rectangle
+        double initialRectangleWidth = noteDuration * pixelsPerSecond;
 
         // Update non-property attributes
         this.noteNum = noteNum;
@@ -130,8 +136,14 @@ public class NoteRectangle extends StackPane {
         double yCoord = PlottingHelpers.noteNumToHeight(noteNum, minNoteNum, maxNoteNum, spectrogramHeight) -
                 rectangleHeight / 2;
 
+        // Check for collision
+        if (checkCollision(xCoord, initialRectangleWidth, noteNum, false)) {
+            logger.log(Level.FINE, "Note rectangle collision detected; not placing note");
+            throw new NoteRectangleCollisionException("Note rectangle collision detected; not placing note");
+        }
+
         // Set the borders' region's attributes
-        bordersRegion.setPrefWidth(noteDuration * pixelsPerSecond);
+        bordersRegion.setPrefWidth(initialRectangleWidth);
         bordersRegion.setPrefHeight(rectangleHeight);
 
         // Update properties of the resizing regions
@@ -195,7 +207,7 @@ public class NoteRectangle extends StackPane {
                 int newNoteNum = initNoteNum - numIncrements;  // Higher Y -> Lower on screen => need to subtract
 
                 // Check for collision
-                if (checkNonCollision(newX, getRectangleWidth(), newNoteNum, numIncrements != 0)) {
+                if (!checkCollision(newX, getRectangleWidth(), newNoteNum, numIncrements != 0)) {
                     // Move the note rectangle if it is within range
                     if (newX >= 0 && newX + getRectangleWidth() <= spectrogramWidth) {
                         this.setTranslateX(newX);
@@ -289,7 +301,7 @@ public class NoteRectangle extends StackPane {
                 double newWidth = initWidth + (initXTrans - newX);
 
                 // Check if collision will occur
-                if (checkNonCollision(newX, newWidth, this.noteNum, false)) {
+                if (!checkCollision(newX, newWidth, this.noteNum, false)) {
                     // If the new width is at least the resizing regions' width then resize
                     if (newWidth >= EXTEND_REGIONS_WIDTH) {
                         this.setTranslateX(newX);
@@ -356,7 +368,7 @@ public class NoteRectangle extends StackPane {
                 double newWidth = initWidth + (newX - initXTrans);
 
                 // Check if collision will occur
-                if (checkNonCollision(newX, newWidth, this.noteNum, false)) {
+                if (!checkCollision(newX, newWidth, this.noteNum, false)) {
                     // If the new width is at least the resizing regions' width then resize
                     if (newWidth >= EXTEND_REGIONS_WIDTH) {
                         bordersRegion.setPrefWidth(newWidth);
@@ -498,70 +510,69 @@ public class NoteRectangle extends StackPane {
     }
 
     /**
-     * Helper method that checks if the proposed new position, new width, and new note number will
-     * result in <b>no collision</b> with other rectangles.
+     * Helper method that checks if the proposed X position, width, and note number will cause a
+     * collision with another note rectangle.
      *
-     * @param newXPos            New X position.
-     * @param newWidth           New width.
-     * @param newNoteNum         New note number.
+     * @param xPos               X position.
+     * @param rectangleWidth     Width of the rectangle.
+     * @param noteNumber         Note number.
      * @param isVerticalMovement Whether there is vertical movement.<br>
      *                           Vertical movement will result in recalculation of the bounding
      *                           rectangles.
-     * @return A boolean, <code>false</code> if there is a collision, and <code>true</code>
+     * @return A boolean, <code>true</code> if there is a collision, and <code>false</code>
      * otherwise.
      */
-    private boolean checkNonCollision(double newXPos, double newWidth, int newNoteNum, boolean isVerticalMovement) {
+    private boolean checkCollision(double xPos, double rectangleWidth, int noteNumber, boolean isVerticalMovement) {
         // Check if bounding rectangles need updating
         if ((leftBoundingRectangle == null && rightBoundingRectangle == null) ||
-                (leftBoundingRectangle != null && newXPos + newWidth < leftBoundingRectangle.getStartX()) ||
-                (rightBoundingRectangle != null && newXPos > rightBoundingRectangle.getEndX()) ||
+                (leftBoundingRectangle != null && xPos + rectangleWidth < leftBoundingRectangle.getStartX()) ||
+                (rightBoundingRectangle != null && xPos > rightBoundingRectangle.getEndX()) ||
                 isVerticalMovement) {
             // Update bounding rectangles
-            Pair<NoteRectangle, NoteRectangle> rectangles = getLeftAndRightRectangles(newXPos, newNoteNum);
+            Pair<NoteRectangle, NoteRectangle> rectangles = getLeftAndRightRectangles(xPos, noteNumber);
             leftBoundingRectangle = rectangles.getValue0();
             rightBoundingRectangle = rectangles.getValue1();
         }
 
         // Handle edge cases
-        System.out.println("Left bounding rectangle: " + leftBoundingRectangle + "; Right bounding rectangle: " + rightBoundingRectangle);
         if (leftBoundingRectangle == null && rightBoundingRectangle == null) {
-            // No rectangles present at all => no collision
-            return true;
+            // No rectangles present at all (other than itself) => no collision
+            return false;
         } else if (leftBoundingRectangle == null) {
             // No left rectangle; if the end of this rectangle is before the start of the right rectangle, then there is
             // no collision
-            System.out.println(newXPos + " " + newWidth + " " + (newXPos + newWidth) + " " + rightBoundingRectangle.getStartX());
-            return newXPos + newWidth < rightBoundingRectangle.getStartX();
+            return xPos + rectangleWidth >= rightBoundingRectangle.getStartX();
 
         } else if (rightBoundingRectangle == null) {
             // No right rectangle; if the start of this rectangle is after the end of the left rectangle, then there is
             // no collision
-            return newXPos > leftBoundingRectangle.getEndX();
+            return xPos <= leftBoundingRectangle.getEndX();
         } else {
             // Check if start and end of this rectangle lies between the left and right rectangles. If so, there is no
             // collision; otherwise there is a collision.
-            return leftBoundingRectangle.getEndX() < newXPos && newXPos + newWidth < rightBoundingRectangle.getStartX();
+            return (leftBoundingRectangle.getEndX() >= xPos ||
+                    xPos + rectangleWidth >= rightBoundingRectangle.getStartX());
         }
     }
 
     /**
      * Helper method that gets the left and right bounding rectangles.
      *
-     * @param newXPos    New X position of the note rectangle.
-     * @param newNoteNum New note number of the note rectangle.
+     * @param xPos       X position.
+     * @param noteNumber Note number.
      * @return A <code>Pair</code>, with the first value being the left bounding rectangle and the
      * second value being the right bounding rectangle. If no bounding rectangle exists, the
      * appropriate value will be <code>null</code>.
      */
-    private Pair<NoteRectangle, NoteRectangle> getLeftAndRightRectangles(double newXPos, int newNoteNum) {
+    private Pair<NoteRectangle, NoteRectangle> getLeftAndRightRectangles(double xPos, int noteNumber) {
         // Get relevant note rectangles to check
-        SortedList<NoteRectangle> relevantRectangles = sortedNoteRectanglesByNoteNumber.get(newNoteNum);
+        SortedList<NoteRectangle> relevantRectangles = sortedNoteRectanglesByNoteNumber.get(noteNumber);
 
         // Get number of relevant rectangles
-        int n = relevantRectangles.size();
+        int numRelevantRectangles = relevantRectangles.size();
 
         // Find left and right bounding rectangle indices
-        int leftIndex = getLeftSideRectangleIndex(n, newXPos, relevantRectangles);
+        int leftIndex = getLeftSideRectangleIndex(numRelevantRectangles, xPos, relevantRectangles);
         int rightIndex = leftIndex + 1;
 
         // Get the appropriate rectangles
@@ -572,7 +583,7 @@ public class NoteRectangle extends StackPane {
             left = relevantRectangles.get(leftIndex);
         }
 
-        if (rightIndex == n) {
+        if (rightIndex == numRelevantRectangles) {
             right = null;
         } else {
             right = relevantRectangles.get(rightIndex);
@@ -586,28 +597,30 @@ public class NoteRectangle extends StackPane {
      * Helper method that gets the index of the rectangle that is on the LEFT of the new X position
      * on the row corresponding to the new note number.
      *
-     * @param n                  Number of relevant rectangles.
-     * @param newXPos            New X position.
-     * @param relevantRectangles List of relevant rectangles. This must be a sorted list.
+     * @param numRelevantRectangles Number of relevant rectangles.
+     * @param xPos                  X position.
+     * @param relevantRectangles    List of relevant rectangles. This must be a sorted list.
      * @return Index of the rectangle that is on the LEFT of the new X position.
      */
-    private int getLeftSideRectangleIndex(int n, double newXPos, SortedList<NoteRectangle> relevantRectangles) {
+    private int getLeftSideRectangleIndex(
+            int numRelevantRectangles, double xPos, SortedList<NoteRectangle> relevantRectangles
+    ) {
         // Perform trivial checks
-        if (n == 0) {
+        if (numRelevantRectangles == 0) {
             // No rectangles
             return -1;
-        } else if (newXPos <= relevantRectangles.get(0).getStartX()) {
+        } else if (xPos <= relevantRectangles.get(0).getStartX()) {
             // All rectangles' starting X more than or equal to new X position => no left side rectangle
             return -1;
-        } else if (newXPos > relevantRectangles.get(n - 1).getEndX()) {
+        } else if (xPos > relevantRectangles.get(numRelevantRectangles - 1).getEndX()) {
             // All rectangles' ending X less than new X position => left side rectangle is last rectangle
-            return n - 1;
+            return numRelevantRectangles - 1;
         }
 
         // Find the last rectangle in the sorted list where its starting X is less than the new X position
         // (Use binary search on the sorted list)
         int left = 0;
-        int right = n - 1;
+        int right = numRelevantRectangles - 1;
         int middle;
 
         // Perform iterative binary search
@@ -619,9 +632,9 @@ public class NoteRectangle extends StackPane {
             double middleStartingX = relevantRectangles.get(middle).getStartX();
 
             // Compare 'middle' value with the target value
-            if (middleStartingX < newXPos) {
+            if (middleStartingX < xPos) {
                 left = middle + 1;
-            } else if (middleStartingX == newXPos) {
+            } else if (middleStartingX == xPos) {
                 return middle - 1;  // `middle` is insertion point; we want *left* element's index
             } else {
                 right = middle;
