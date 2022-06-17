@@ -2,7 +2,7 @@
  * MathUtilsTest.java
  *
  * Created on 2022-03-12
- * Updated on 2022-05-30
+ * Updated on 2022-06-17
  *
  * Description: Test `MathUtils.java`.
  */
@@ -10,6 +10,8 @@
 package site.overwrite.auditranscribe.utils;
 
 import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -123,5 +125,70 @@ class MathUtilsTest {
         assertEquals(4, MathUtils.numTwoFactors(16));
         assertEquals(4, MathUtils.numTwoFactors(80));
         assertEquals(0, MathUtils.numTwoFactors(-1));
+    }
+
+    @Test
+    void wrapValue() {
+        assertEquals(9, MathUtils.wrapValue(-1, 0, 10));
+        assertEquals(0, MathUtils.wrapValue(0, 0, 10));
+        assertEquals(1, MathUtils.wrapValue(1, 0, 10));
+        assertEquals(9, MathUtils.wrapValue(9, 0, 10));
+        assertEquals(0, MathUtils.wrapValue(10, 0, 10));
+        assertEquals(1, MathUtils.wrapValue(11, 0, 10));
+
+        assertEquals(
+                new BigDecimal("0").doubleValue(),
+                MathUtils.wrapValue(
+                        new BigDecimal("10.00000001"),
+                        new BigDecimal("0"),
+                        new BigDecimal("10")
+                ).doubleValue(),
+                1e-6
+        );
+        assertEquals(
+                new BigDecimal("10").doubleValue(),
+                MathUtils.wrapValue(
+                        new BigDecimal("10"),
+                        new BigDecimal("0"),
+                        new BigDecimal("10")
+                ).doubleValue(),
+                1e-6
+        );
+        assertEquals(
+                new BigDecimal("9.99999999").doubleValue(),
+                MathUtils.wrapValue(
+                        new BigDecimal("9.99999999"),
+                        new BigDecimal("0"),
+                        new BigDecimal("10")
+                ).doubleValue(),
+                1e-6
+        );
+        assertEquals(
+                new BigDecimal("0.000001").doubleValue(),
+                MathUtils.wrapValue(
+                        new BigDecimal("0.000001"),
+                        new BigDecimal("0"),
+                        new BigDecimal("10")
+                ).doubleValue(),
+                1e-6
+        );
+        assertEquals(
+                new BigDecimal("0").doubleValue(),
+                MathUtils.wrapValue(
+                        new BigDecimal("0"),
+                        new BigDecimal("0"),
+                        new BigDecimal("10")
+                ).doubleValue(),
+                1e-6
+        );
+        assertEquals(
+                new BigDecimal("10").doubleValue(),
+                MathUtils.wrapValue(
+                        new BigDecimal("-0.000001"),
+                        new BigDecimal("0"),
+                        new BigDecimal("10")
+                ).doubleValue(),
+                1e-6
+        );
     }
 }

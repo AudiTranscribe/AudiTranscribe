@@ -39,6 +39,7 @@ import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.Theme;
+import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
 import site.overwrite.auditranscribe.note_playback.*;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
@@ -258,17 +259,12 @@ public class TranscriptionViewController implements Initializable {
         notePlayerSequencer = new NotePlayerSequencer();
 
         // Update spinners' ranges
-        SpinnerValueFactory.DoubleSpinnerValueFactory bpmSpinnerFactory =
-                new SpinnerValueFactory.DoubleSpinnerValueFactory(
-                        BPM_RANGE.getValue0(), BPM_RANGE.getValue1(), 120, 0.1
-                );
-        SpinnerValueFactory.DoubleSpinnerValueFactory offsetSpinnerFactory =
-                new SpinnerValueFactory.DoubleSpinnerValueFactory(
-                        OFFSET_RANGE.getValue0(), OFFSET_RANGE.getValue1(), 0, 0.01
-                );
-
-        bpmSpinner.setValueFactory(bpmSpinnerFactory);
-        offsetSpinner.setValueFactory(offsetSpinnerFactory);
+        bpmSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
+                BPM_RANGE.getValue0(), BPM_RANGE.getValue1(), 120, 0.1, 2
+        ));
+        offsetSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
+                OFFSET_RANGE.getValue0(), OFFSET_RANGE.getValue1(), 0, 0.01, 2
+        ));
 
         // Set the choice boxes' choices
         for (String musicKey : MusicUtils.MUSIC_KEYS) musicKeyChoice.getItems().add(musicKey);
@@ -640,17 +636,12 @@ public class TranscriptionViewController implements Initializable {
         updateBPMValue(bpm, true);
         updateOffsetValue(offset, true);
 
-        SpinnerValueFactory.DoubleSpinnerValueFactory bpmSpinnerFactory =
-                new SpinnerValueFactory.DoubleSpinnerValueFactory(
-                        BPM_RANGE.getValue0(), BPM_RANGE.getValue1(), bpm, 0.1
-                );
-        SpinnerValueFactory.DoubleSpinnerValueFactory offsetSpinnerFactory =
-                new SpinnerValueFactory.DoubleSpinnerValueFactory(
-                        OFFSET_RANGE.getValue0(), OFFSET_RANGE.getValue1(), offset, 0.01
-                );
-
-        bpmSpinner.setValueFactory(bpmSpinnerFactory);
-        offsetSpinner.setValueFactory(offsetSpinnerFactory);
+        bpmSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
+                BPM_RANGE.getValue0(), BPM_RANGE.getValue1(), bpm, 0.1, 2
+        ));
+        offsetSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
+                OFFSET_RANGE.getValue0(), OFFSET_RANGE.getValue1(), offset, 0.01, 2
+        ));
 
         // Set methods on the volume sliders
         audioVolumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -1571,8 +1562,8 @@ public class TranscriptionViewController implements Initializable {
             updateBPMValue(MathUtils.round(task.getValue(), 1));
 
             // Update BPM spinner initial value
-            bpmSpinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(
-                    BPM_RANGE.getValue0(), BPM_RANGE.getValue1(), bpm, 0.1
+            bpmSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
+                    BPM_RANGE.getValue0(), BPM_RANGE.getValue1(), bpm, 0.1, 2
             ));
 
             // Mark the task as completed

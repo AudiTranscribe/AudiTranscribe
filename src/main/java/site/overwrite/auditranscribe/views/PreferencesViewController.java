@@ -16,7 +16,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -24,6 +23,8 @@ import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.Theme;
+import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
+import site.overwrite.auditranscribe.misc.spinners.CustomIntegerSpinnerValueFactory;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
 
 import java.io.IOException;
@@ -138,10 +139,10 @@ public class PreferencesViewController implements Initializable {
         });
 
         // Set spinner factories and methods
-        notePlayingDelayOffsetSpinner.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(
-                -1, 1, settingsFile.data.notePlayingDelayOffset, 0.01
+        notePlayingDelayOffsetSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
+                -1, 1, settingsFile.data.notePlayingDelayOffset, 0.01, 2
         ));
-        autosaveIntervalSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(
+        autosaveIntervalSpinner.setValueFactory(new CustomIntegerSpinnerValueFactory(
                 1, Integer.MAX_VALUE, settingsFile.data.autosaveInterval, 1
         ));
 
