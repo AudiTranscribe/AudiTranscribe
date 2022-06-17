@@ -160,7 +160,9 @@ public class TranscriptionViewController implements Initializable {
     private Line playheadLine;
 
     Queue<CustomTask<?>> ongoingTasks = new LinkedList<>();
+
     ScheduledExecutorService scheduler;
+    ScheduledExecutorService autosaveScheduler;
 
     // FXML Elements
     // Menu bar
@@ -970,8 +972,9 @@ public class TranscriptionViewController implements Initializable {
         // Clear the note rectangles
         NoteRectangle.allNoteRectangles.clear();
 
-        // Shutdown the scheduler
+        // Shutdown the schedulers
         scheduler.shutdown();
+        autosaveScheduler.shutdown();
 
         // Stop and close the note player sequencer
         notePlayerSequencer.stop();
@@ -1417,7 +1420,7 @@ public class TranscriptionViewController implements Initializable {
             playheadLine = PlottingStuffHandler.createPlayheadLine(finalHeight);
             spectrogramPaneAnchor.getChildren().add(playheadLine);
 
-            // Create a constantly-executing service
+            // Create a constantly-executing service for playback functionality
             scheduler = Executors.newScheduledThreadPool(0, runnable -> {
                 Thread thread = Executors.defaultThreadFactory().newThread(runnable);
                 thread.setDaemon(true);  // Make it so that it can shut down gracefully by placing it in background
@@ -1474,6 +1477,21 @@ public class TranscriptionViewController implements Initializable {
                     }
                 }
             }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);
+
+            // Create another constantly-executing service for autosaving
+            autosaveScheduler = Executors.newScheduledThreadPool(0, runnable -> {
+                Thread thread = Executors.defaultThreadFactory().newThread(runnable);
+                thread.setDaemon(true);
+                return thread;
+            });
+            autosaveScheduler.scheduleAtFixedRate(() -> Platform.runLater(() -> {
+                if (audtFilePath != null) {
+                    handleSavingProject(false);
+                    logger.log(Level.INFO, "Autosaved project");
+                } else {
+                    logger.log(Level.INFO, "Autosave skipped, no project loaded");
+                }
+            }), settingsFile.data.autosaveInterval, settingsFile.data.autosaveInterval, TimeUnit.MINUTES);
 
             // Set image on the spectrogram area
             spectrogramImage.setFitHeight(finalWidth);
