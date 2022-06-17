@@ -34,7 +34,7 @@ import java.util.logging.Logger;
 public class NoteRectangle extends StackPane {
     // Constants
     private static final double BORDER_WIDTH = 3;  // In pixels
-    private static final double EXTEND_REGIONS_WIDTH = 8;  // In pixels
+    private static final double RESIZING_REGIONS_WIDTH = 8;  // In pixels
 
     // Static attributes
     public static List<NoteRectangle> allNoteRectangles = new ArrayList<>();
@@ -149,13 +149,13 @@ public class NoteRectangle extends StackPane {
         // Update properties of the resizing regions
         resizeLeftRegion.translateXProperty().bind(bordersRegion.widthProperty().divide(-2));
         resizeLeftRegion.prefHeightProperty().bind(bordersRegion.prefHeightProperty());
-        resizeLeftRegion.setPrefWidth(EXTEND_REGIONS_WIDTH);
-        resizeLeftRegion.setMaxWidth(EXTEND_REGIONS_WIDTH);
+        resizeLeftRegion.setPrefWidth(RESIZING_REGIONS_WIDTH);
+        resizeLeftRegion.setMaxWidth(RESIZING_REGIONS_WIDTH);
 
         resizeRightRegion.translateXProperty().bind(bordersRegion.widthProperty().divide(2));
         resizeRightRegion.prefHeightProperty().bind(bordersRegion.prefHeightProperty());
-        resizeRightRegion.setPrefWidth(EXTEND_REGIONS_WIDTH);
-        resizeRightRegion.setMaxWidth(EXTEND_REGIONS_WIDTH);
+        resizeRightRegion.setPrefWidth(RESIZING_REGIONS_WIDTH);
+        resizeRightRegion.setMaxWidth(RESIZING_REGIONS_WIDTH);
 
         // Update the stack pane
         this.getChildren().addAll(bordersRegion, mainRectangle, resizeLeftRegion, resizeRightRegion);
@@ -303,7 +303,7 @@ public class NoteRectangle extends StackPane {
                 // Check if collision will occur
                 if (!checkCollision(newX, newWidth, this.noteNum, false)) {
                     // If the new width is at least the resizing regions' width then resize
-                    if (newWidth >= EXTEND_REGIONS_WIDTH) {
+                    if (newWidth >= RESIZING_REGIONS_WIDTH) {
                         this.setTranslateX(newX);
                         bordersRegion.setPrefWidth(newWidth);
                     }
@@ -370,7 +370,7 @@ public class NoteRectangle extends StackPane {
                 // Check if collision will occur
                 if (!checkCollision(newX, newWidth, this.noteNum, false)) {
                     // If the new width is at least the resizing regions' width then resize
-                    if (newWidth >= EXTEND_REGIONS_WIDTH) {
+                    if (newWidth >= RESIZING_REGIONS_WIDTH) {
                         bordersRegion.setPrefWidth(newWidth);
                     }
                 }
