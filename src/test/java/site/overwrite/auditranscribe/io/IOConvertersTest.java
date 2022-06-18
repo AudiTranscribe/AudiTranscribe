@@ -2,7 +2,7 @@
  * IOConvertersTest.java
  *
  * Created on 2022-05-01
- * Updated on 2022-05-21
+ * Updated on 2022-06-08
  *
  * Description: Test `IOConverters.java`.
  */
@@ -11,6 +11,7 @@ package site.overwrite.auditranscribe.io;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.HexFormat;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -47,6 +48,27 @@ class IOConvertersTest {
     @Test
     void stringToBytes() {
         assertArrayEquals(new byte[]{(byte) 0x41, (byte) 0x7a, (byte) 0x20, (byte) 0x3f, (byte) 0x35}, IOConverters.stringToBytes("Az ?5"));
+    }
+
+    @Test
+    void oneDimensionalIntegerArrayToBytes() {
+        // Define the integer array
+        int[] array = {0, 1234, 1234567890, 2147483647, -1234567890, -2147483647};
+
+        // Define the correct hexadecimal string
+        String hexStr = "00000006" +
+                "00000000" +
+                "000004d2" +
+                "499602d2" +
+                "7fffffff" +
+                "b669fd2e" +
+                "80000001";
+
+        // Run test
+        assertArrayEquals(
+                HexFormat.of().parseHex(hexStr),
+                IOConverters.oneDimensionalIntegerArrayToBytes(array)
+        );
     }
 
     @Test
@@ -144,6 +166,27 @@ class IOConvertersTest {
     @Test
     void bytesToString() {
         assertEquals("Az ?5", IOConverters.bytesToString(new byte[]{(byte) 0x41, (byte) 0x7a, (byte) 0x20, (byte) 0x3f, (byte) 0x35}));
+    }
+
+    @Test
+    void bytesToOneDimensionalIntegerArray() {
+        // Define the hexadecimal string
+        String hexStr = "00000006" +
+                "00000000" +
+                "000004d2" +
+                "499602d2" +
+                "7fffffff" +
+                "b669fd2e" +
+                "80000001";
+
+        // Define the correct integer array
+        int[] array = {0, 1234, 1234567890, 2147483647, -1234567890, -2147483647};
+
+        // Run test
+        assertArrayEquals(
+                array,
+                IOConverters.bytesToOneDimensionalIntegerArray(HexFormat.of().parseHex(hexStr))
+        );
     }
 
     @Test

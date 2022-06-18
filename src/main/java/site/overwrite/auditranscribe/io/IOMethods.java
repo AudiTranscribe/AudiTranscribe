@@ -2,7 +2,7 @@
  * IOMethods.java
  *
  * Created on 2022-03-15
- * Updated on 2022-05-28
+ * Updated on 2022-06-06
  *
  * Description: Input/Output methods that are used in the AudiTranscribe project.
  */
@@ -20,12 +20,6 @@ import java.nio.file.Path;
  * Input/Output methods that are used in the AudiTranscribe project.
  */
 public class IOMethods {
-    // Constants
-    public static final Path APP_DATA_FOLDER_PATH = Path.of(
-            ApplicationDirectory.getUserDataDirectory("AudiTranscribe", null)
-    );
-    public static final String APP_DATA_FOLDER_PATH_STRING = APP_DATA_FOLDER_PATH + "/";
-
     // Public methods
 
     /**
@@ -106,15 +100,17 @@ public class IOMethods {
     }
 
     /**
-     * Method that creates the AudiTranscribe app data folder, if it doesn't already exist.
+     * Method that creates a folder, if it does not already exist, at the specified
+     * <code>absolutePath</code>.
      *
+     * @param absolutePath Absolute path to the folder.
      * @return Boolean. Is <code>true</code> is the folder was created and <code>false</code>
      * otherwise.
      */
-    public static boolean createAppDataFolder() {
+    public static boolean createFolder(Path absolutePath) {
         try {
-            // Try to create the app data folder
-            Files.createDirectory(APP_DATA_FOLDER_PATH);
+            // Try to create the folder
+            Files.createDirectory(absolutePath);
 
             // Return `true` for successful directory creation
             return true;
@@ -122,5 +118,27 @@ public class IOMethods {
         } catch (IOException e) {
             return false;
         }
+    }
+
+    /**
+     * Method that creates a folder, if it does not already exist, at the specified
+     * <code>absolutePath</code>.
+     *
+     * @param absolutePath Absolute path to the folder.
+     * @return Boolean. Is <code>true</code> is the folder was created and <code>false</code>
+     * otherwise.
+     */
+    public static boolean createFolder(String absolutePath) {
+        return createFolder(Path.of(absolutePath));
+    }
+
+    /**
+     * Method that creates the AudiTranscribe app data folder, if it doesn't already exist.
+     *
+     * @return Boolean. Is <code>true</code> is the folder was created and <code>false</code>
+     * otherwise.
+     */
+    public static boolean createAppDataFolder() {
+        return createFolder(IOConstants.APP_DATA_FOLDER_PATH);
     }
 }

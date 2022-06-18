@@ -2,7 +2,7 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-06-04
+ * Updated on 2022-06-14
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
@@ -15,20 +15,18 @@ import javafx.scene.Scene;
 import javafx.stage.*;
 import org.apache.commons.compress.utils.FileNameUtils;
 import org.javatuples.Pair;
+import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.audio.ffmpeg.AudioConverter;
-import site.overwrite.auditranscribe.io.json_files.file_classes.PersistentDataFile;
-import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
+import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.ProjectDataObject;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
 import site.overwrite.auditranscribe.exceptions.FailedToReadDataException;
 import site.overwrite.auditranscribe.exceptions.IncorrectFileFormatException;
-import site.overwrite.auditranscribe.io.audt_file.file_handers.AUDTFileReader;
-import site.overwrite.auditranscribe.io.audt_file.file_handers.AUDTFileWriter;
+import site.overwrite.auditranscribe.io.audt_file.AUDTFileReader;
+import site.overwrite.auditranscribe.io.audt_file.AUDTFileWriter;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
+import site.overwrite.auditranscribe.note_playback.NotePlayerSequencer;
 import site.overwrite.auditranscribe.views.MainViewController;
 import site.overwrite.auditranscribe.views.TranscriptionViewController;
 
@@ -36,6 +34,8 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 // Main class
 
@@ -43,6 +43,9 @@ import java.util.List;
  * Methods that handle the IO operations for an AudiTranscribe project.
  */
 public class ProjectIOHandlers {
+    // Attributes
+    private static final Logger logger = Logger.getLogger(ProjectIOHandlers.class.getName());
+
     // Public methods
 
     /**
@@ -53,14 +56,13 @@ public class ProjectIOHandlers {
      * @param file               File to open.
      * @param settingsFile       The <code>SettingsFile</code> object that handles the reading and
      *                           writing of settings.
-     * @param persistentDataFile The <code>PersistentDataFile</code> object that handles the
-     *                           persistent data of the application.
      * @param allAudio           List of all opened <code>Audio</code> objects.
+     * @param allSequencers      List of all opened <code>NotePlayerSequencer</code> objects.
      * @param mainViewController Controller object of the main class.
      */
     public static void newProject(
             Stage mainStage, Stage transcriptionStage, File file, SettingsFile settingsFile,
-            PersistentDataFile persistentDataFile, List<Audio> allAudio, MainViewController mainViewController
+            List<Audio> allAudio, List<NotePlayerSequencer> allSequencers, MainViewController mainViewController
     ) {
         // Verify that the user choose a file
         if (file != null) {
@@ -73,56 +75,45 @@ public class ProjectIOHandlers {
                     throw new UnsupportedAudioFileException("The file extension is not supported.");
                 }
 
-                // Check if the original file is a WAV file
-                AudioConverter audioConverter = new AudioConverter(persistentDataFile.data.ffmpegInstallationPath);
-                boolean originalFileIsWAV = false;
-                File axillaryAudioFile;
+                // Attempt creation of temporary folder if it doesn't exist
+                IOMethods.createFolder(IOConstants.TEMP_FOLDER);
+                logger.log(Level.FINE, "Temporary folder: " + IOConstants.TEMP_FOLDER);
 
-                if (fileExt.equals(".wav")) {
-                    // Set auxiliary file to the current file
-                    axillaryAudioFile = file;
+                // Get the base path for the auxiliary files
+                String baseName = IOConstants.TEMP_FOLDER + file.getName().replace(fileExt, "");
 
-                    // Update the flag
-                    originalFileIsWAV = true;
+                // Generate a new WAV file
+                AudioConverter audioConverter = new AudioConverter(settingsFile.data.ffmpegInstallationPath);
+                File auxiliaryWAVFile = new File(
+                        audioConverter.convertAudio(file, baseName + "-auxiliary-wav.wav")
+                );
+
+                // Try and read the auxiliary WAV file as an `Audio` object
+                // (Failure to read will throw exceptions)
+                Audio audio = new Audio(auxiliaryWAVFile, file.getName(), AudioProcessingMode.SAMPLES_AND_PLAYBACK);
+
+                // Delete auxiliary WAV file
+                boolean successfullyDeleted = auxiliaryWAVFile.delete();
+                if (successfullyDeleted) {
+                    logger.log(Level.FINE, "Successfully deleted auxiliary WAV file.");
                 } else {
-                    // Convert original file to a WAV file
-                    axillaryAudioFile = new File(
-                            audioConverter.convertAudio(
-                                    file,
-                                    file.getAbsolutePath().replace(fileExt, "") + "-converted.wav"
-                            )
-                    );
+                    logger.log(Level.WARNING, "Failed to delete auxiliary WAV file.");
                 }
-
-                // Try and read the auxiliary file as an audio file
-                Audio audio = new Audio(axillaryAudioFile);  // Failure to read will throw an exception
-
-                // Delete auxiliary file if it is not a WAV file
-                // Todo: implement when we have properly optimised the file saving
-//                if (!originalFileIsWAV) {
-//                    boolean successfullyDeleted = axillaryAudioFile.delete();
-//                    if (successfullyDeleted) {
-//                        System.out.println("Successfully deleted auxiliary audio file.");
-//                    } else {
-//                        System.out.println("Failed to delete auxiliary audio file.");
-//                    }
-//                }
 
                 // Get the current scene and the spectrogram view controller
                 Pair<Scene, TranscriptionViewController> stageSceneAndController = getController(transcriptionStage);
                 Scene scene = stageSceneAndController.getValue0();
                 TranscriptionViewController controller = stageSceneAndController.getValue1();
 
-                // Update the `settingsFile` and `persistentDataFile` attributes
+                // Update the `settingsFile` attribute
                 controller.setSettingsFile(settingsFile);
-                controller.setPersistentDataFile(persistentDataFile);
 
                 // Set the theme of the scene
                 controller.setThemeOnScene();
 
                 // Set the project data for the existing project
                 controller.setAudioAndSpectrogramData(audio);
-                controller.finishSetup(mainStage, allAudio, mainViewController);
+                controller.finishSetup(mainStage, allAudio, allSequencers, mainViewController);
 
                 // Set the scene for the transcription page
                 transcriptionStage.setScene(scene);
@@ -143,15 +134,15 @@ public class ProjectIOHandlers {
                     transcriptionStage.showAndWait();
                     controller.handleSceneClosing();
                     mainViewController.refreshProjectsListView();
-                    mainViewController.stopAllAudioObjects();
+                    mainViewController.stopAllPlayableObjects();
                     mainStage.show();  // Show the main scene upon the spectrogram scene's closure
                 }
 
             } catch (UnsupportedAudioFileException | IOException e) {
                 Popups.showExceptionAlert(
-                        "Failed to read '" + file.getName() + "' as a WAV file.",
+                        "Failed to read '" + file.getName() + "' as an audio file.",
                         "The program failed to read '" + file.getName() +
-                                "' as a WAV file. Please check if " + "this is a valid WAV file.",
+                                "' as an audio file. Please check if " + "this is a valid audio file.",
                         e
                 );
                 e.printStackTrace();
@@ -170,14 +161,13 @@ public class ProjectIOHandlers {
      * @param file               File to open.
      * @param settingsFile       The <code>SettingsFile</code> object that handles the reading and
      *                           writing of settings.
-     * @param persistentDataFile The <code>PersistentDataFile</code> object that handles the
-     *                           persistent data of the application.
      * @param allAudio           List of all opened <code>Audio</code> objects.
+     * @param allSequencers      List of all opened <code>NotePlayerSequencer</code> objects.
      * @param mainViewController Controller object of the main class.
      */
     public static void openProject(
             Stage mainStage, Stage transcriptionStage, File file, SettingsFile settingsFile,
-            PersistentDataFile persistentDataFile, List<Audio> allAudio, MainViewController mainViewController
+            List<Audio> allAudio, List<NotePlayerSequencer> allSequencers, MainViewController mainViewController
     ) {
         // Verify that the user choose a file
         if (file != null) {
@@ -191,25 +181,27 @@ public class ProjectIOHandlers {
                 QTransformDataObject qTransformData = reader.readQTransformData();
                 AudioDataObject audioData = reader.readAudioData();
                 GUIDataObject guiData = reader.readGUIData();
+                MusicNotesDataObject musicNotesData = reader.readMusicNotesData();
 
                 // Pass these data into a `ProjectDataObject`
-                ProjectDataObject projectDataObject = new ProjectDataObject(qTransformData, audioData, guiData);
+                ProjectDataObject projectDataObject = new ProjectDataObject(
+                        qTransformData, audioData, guiData, musicNotesData
+                );
 
                 // Get the current scene and the spectrogram view controller
                 Pair<Scene, TranscriptionViewController> stageSceneAndController = getController(transcriptionStage);
                 Scene scene = stageSceneAndController.getValue0();
                 TranscriptionViewController controller = stageSceneAndController.getValue1();
 
-                // Update the `settingsFile` and `persistentDataFile` attributes
+                // Update the `settingsFile` attribute
                 controller.setSettingsFile(settingsFile);
-                controller.setPersistentDataFile(persistentDataFile);
 
                 // Set the theme of the scene
                 controller.setThemeOnScene();
 
                 // Set the project data for the existing project
                 controller.useExistingData(audtFilePath, audtFileName, projectDataObject);
-                controller.finishSetup(mainStage, allAudio, mainViewController);
+                controller.finishSetup(mainStage, allAudio, allSequencers, mainViewController);
 
                 // Set the scene for the transcription page
                 transcriptionStage.setScene(scene);
@@ -217,7 +209,7 @@ public class ProjectIOHandlers {
                 // Set new scene properties
                 transcriptionStage.setMaximized(true);
                 transcriptionStage.setResizable(true);
-                transcriptionStage.setTitle(guiData.audioFileName);
+                transcriptionStage.setTitle(audioData.audioFileName);
 
                 // Set width and height of the new scene
                 Rectangle2D screenBounds = Screen.getPrimary().getBounds();
@@ -238,7 +230,7 @@ public class ProjectIOHandlers {
                     transcriptionStage.showAndWait();
                     controller.handleSceneClosing();
                     mainViewController.refreshProjectsListView();
-                    mainViewController.stopAllAudioObjects();
+                    mainViewController.stopAllPlayableObjects();
                     mainStage.show();  // Show the main scene upon the spectrogram scene's closure
                 }
 
@@ -264,15 +256,16 @@ public class ProjectIOHandlers {
      * @throws IOException If the writing to file encounters an error.
      */
     public static void saveProject(
-            String filepath, ProjectDataObject projectDataObject, CustomTask<?> task
+            String filepath, ProjectDataObject projectDataObject
     ) throws IOException {
         // Declare the file writer object
-        AUDTFileWriter fileWriter = new AUDTFileWriter(filepath, task);
+        AUDTFileWriter fileWriter = new AUDTFileWriter(filepath);
 
         // Write data to the file
         fileWriter.writeQTransformData(projectDataObject.qTransformData);
         fileWriter.writeAudioData(projectDataObject.audioData);
         fileWriter.writeGUIData(projectDataObject.guiData);
+        fileWriter.writeMusicNotesData(projectDataObject.musicNotesData);
 
         fileWriter.writeBytesToFile();
     }

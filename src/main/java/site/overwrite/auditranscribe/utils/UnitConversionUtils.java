@@ -2,7 +2,7 @@
  * UnitConversionUtils.java
  *
  * Created on 2022-03-12
- * Updated on 2022-06-01
+ * Updated on 2022-06-14
  *
  * Description: Unit conversion methods.
  */
@@ -134,30 +134,63 @@ public class UnitConversionUtils {
      * Note that the note number for C0 is 0 and subsequent note numbers are given by their offset
      * from C0. For example, A4 has note number 57 as it is 57 notes away from C0.
      *
-     * @param noteNumber  Note number for the given note.
-     * @param fancySharps Whether <em>fancier sharps</em> (i.e. ♯ instead of #) should be used.
-     * @return Note string. Note that all notes with accidentals will be changed to those with
-     * <b>sharps (# or ♯) only</b>.
+     * @param noteNumber       Note number for the given note.
+     * @param musicKey         Music key, with both the key and the mode.
+     * @param fancyAccidentals Whether <em>fancier accidentals</em> (i.e. ♯ instead of # and ♭
+     *                         instead of b) should be used.
+     * @return Note string.
      */
-    // Todo: incorporate correct note conversion with scale/key consideration (i.e. add flats as well)
-    public static String noteNumberToNote(int noteNumber, boolean fancySharps) {
-        // Constant array of note strings
+    public static String noteNumberToNote(int noteNumber, String musicKey, boolean fancyAccidentals) {
+        // Fancify music key
+        musicKey = MusicUtils.fancifyMusicString(musicKey);
+
+        // Determine which set of note strings to use
         String[] noteStrings;
-        if (fancySharps) {
-            noteStrings = new String[]{"C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"};
+        if (MusicUtils.doesKeyUseFlats(musicKey)) {
+            noteStrings = new String[]{"C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"};
         } else {
             noteStrings = new String[]{"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
         }
 
+        // Replace notes if the key demands it
+        if (musicKey.equals("G♭ Major") ||
+                musicKey.equals("C♭ Major") ||
+                musicKey.equals("E♭ Minor") ||
+                musicKey.equals("A♭ Minor")) {
+            noteStrings[11] = "Cb";  // Cb instead of B
+        }
+
+        if (musicKey.equals("C♭ Major") || musicKey.equals("A♭ Minor")) {
+            noteStrings[4] = "Fb";  // Fb instead of E
+        }
+
+        if (musicKey.equals("F♯ Major") ||
+                musicKey.equals("C♯ Major") ||
+                musicKey.equals("D♯ Minor") ||
+                musicKey.equals("A♯ Minor")) {
+            noteStrings[5] = "E#";  // E# instead of F
+        }
+
+        if (musicKey.equals("C♯ Major") || musicKey.equals("A♯ Minor")) {
+            noteStrings[0] = "B#";  // B# instead of C
+        }
+
+        // Check if we want to use fancy accidentals
+        if (fancyAccidentals) {
+            for (int i = 0; i < noteStrings.length; i++) {
+                noteStrings[i] = MusicUtils.fancifyMusicString(noteStrings[i]);
+            }
+        }
+
         // Compute the octave and the key value
         int octave = Math.floorDiv(noteNumber, 12);  // Note that C0 has note number 0, C1 is 12, C2 is 24 etc.
-        int key = noteNumber % 12;  // 0 = C, 1 = C#, 2 = D, 3 = D# etc.
+        int key = noteNumber % 12;  // 0 = C, 1 = C#/Db, 2 = D, 3 = D#/Eb etc.
 
         // Get the pitch/offset string
         String noteString = noteStrings[key];
 
         // Return the full string
-        return noteString + octave;  // Example: C0, D#3, E5 etc.
+        return noteString + octave;  // Example: C0, D#3, Eb5 etc.
     }
 
     /**
@@ -176,6 +209,21 @@ public class UnitConversionUtils {
     }
 
     /**
+     * Converts a MIDI number to its corresponding note number (as defined by AudiTranscribe).
+     *
+     * @param midiNumber MIDI number.
+     * @return Corresponding note number. Note that this will return <code>-1</code> is there is no
+     * corresponding note number (say below C0).
+     */
+    public static int midiNumberToNoteNumber(int midiNumber) {
+        // If the note number is less than 12 (i.e. below C0) there is no note number equivalent
+        if (midiNumber < 12) return -1;
+
+        // Otherwise, subtract 12 from the MIDI number to get the note number
+        return midiNumber - 12;
+    }
+
+    /**
      * Converts a note string to its corresponding MIDI number.
      *
      * @param note Note string. Notes may be spelled out with optional accidentals or octave
@@ -187,6 +235,18 @@ public class UnitConversionUtils {
      */
     public static int noteToMIDINumber(String note) {
         return noteNumberToMIDINumber(noteToNoteNumber(note));
+    }
+
+    /**
+     * Converts a MIDI number to its corresponding note string.
+     *
+     * @param midiNumber       MIDI number.
+     * @param fancyAccidentals Whether <em>fancier accidentals</em> (i.e. ♯ instead of # and ♭
+     *                         instead of b) should be used.
+     * @return Corresponding note string.
+     */
+    public static String midiNumberToNote(int midiNumber, boolean fancyAccidentals) {
+        return noteNumberToNote(midiNumberToNoteNumber(midiNumber), "C Major", fancyAccidentals);
     }
 
     // Audio unit conversion
@@ -218,7 +278,7 @@ public class UnitConversionUtils {
     /**
      * Convert a power value (amplitude squared) to decibel (dB) units.
      *
-     * @param power  Input power.
+     * @param power Input power.
      * @return Decibel value for the given power.
      * @implNote See
      * <a href="https://librosa.org/doc/main/_modules/librosa/core/spectrum.html#power_to_db">
@@ -230,13 +290,14 @@ public class UnitConversionUtils {
 
     /**
      * Convert a power value (amplitude squared) to decibel (dB) units.
-     * @param S  Spectrogram of input powers.
+     *
+     * @param S      Spectrogram of input powers.
      * @param refVal Value such that the amplitude <code>abs(power)</code> is scaled relative to
      *               <code>refVal</code> using the formula
      *               <code>10 * log10(power / refVal)</code>.
-     * @param topDB Threshold the output at <code>topDB</code> below the peak:<br>
-     *              <code>max(10 * log10(S / ref)) - topDB</code>.
-     * @return  Spectrogram of decibel values for the given powers.
+     * @param topDB  Threshold the output at <code>topDB</code> below the peak:<br>
+     *               <code>max(10 * log10(S / ref)) - topDB</code>.
+     * @return Spectrogram of decibel values for the given powers.
      * @throws ValueException If the value of <code>topDB</code> is negative.
      */
     public static double[][] powerToDecibel(double[][] S, double refVal, double topDB) {

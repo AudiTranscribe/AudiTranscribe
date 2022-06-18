@@ -12,6 +12,28 @@ package site.overwrite.auditranscribe.misc;
 import javafx.concurrent.Task;
 
 public abstract class CustomTask<V> extends Task<V> {
+    // Attributes
+    public String name;
+
+    // Constructors
+
+    /**
+     * Initializes a new instance of the <code>CustomTask</code> class.
+     *
+     * @param name Name of the task.
+     */
+    public CustomTask(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Initializes a new instance of the <code>CustomTask</code> class.<br>
+     * This assumes that the name of the task is the message of the task.
+     */
+    public CustomTask() {
+        this.name = this.getMessage();
+    }
+
     // Public methods
 
     /**

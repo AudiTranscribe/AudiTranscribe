@@ -2,7 +2,7 @@
  * AudioConverterTest.java
  *
  * Created on 2022-05-06
- * Updated on 2022-06-04
+ * Updated on 2022-06-06
  *
  * Description: Test `AudioConverter.java`.
  */
@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AudioConverterTest {
     @Test
-    void convertAudio() throws IOException, NoSuchAlgorithmException, FFmpegNotFound {
+    void convertAudio() throws IOException, NoSuchAlgorithmException {
         // Get a testing MP3 file
         File testFile = new File(IOMethods.getAbsoluteFilePath("testing-audio-files/A440.mp3"));
 

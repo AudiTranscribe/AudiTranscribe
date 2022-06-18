@@ -2,18 +2,18 @@
  * AUDTFileWriter.java
  *
  * Created on 2022-05-01
- * Updated on 2022-05-28
+ * Updated on 2022-06-08
  *
  * Description: Class that handles the writing of the AudiTranscribe (AUDT) file.
  */
 
-package site.overwrite.auditranscribe.io.audt_file.file_handers;
+package site.overwrite.auditranscribe.io.audt_file;
 
-import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.io.IOConverters;
 import site.overwrite.auditranscribe.io.LZ4;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.MusicNotesDataObject;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
 
 import java.io.File;
@@ -27,8 +27,6 @@ public class AUDTFileWriter {
     public final String filepath;
     private final List<Byte> bytes = new ArrayList<>();
 
-    private final CustomTask<?> task;
-
     /**
      * Initialization method to make an <code>AUDTFileWriter</code> object.
      *
@@ -38,24 +36,6 @@ public class AUDTFileWriter {
     public AUDTFileWriter(String filepath) {
         // Update attributes
         this.filepath = filepath;
-        this.task = null;
-
-        // Write the header section
-        writeHeaderSection();
-    }
-
-    /**
-     * Initialization method to make an <code>AUDTFileWriter</code> object.
-     *
-     * @param filepath Path to the AUDT file. The file name at the end of the file path should
-     *                 <b>include</b> the extension of the AUDT file.
-     * @param task     The <code>CustomTask</code> object that is handling the generation. Pass in
-     *                 <code>null</code> if no such task is being used.
-     */
-    public AUDTFileWriter(String filepath, CustomTask<?> task) {
-        // Update attributes
-        this.filepath = filepath;
-        this.task = task;
 
         // Write the header section
         writeHeaderSection();
@@ -89,11 +69,11 @@ public class AUDTFileWriter {
      *
      * @param qTransformDataObj Data object that holds all the Q-Transform data.
      */
-    public void writeQTransformData(QTransformDataObject qTransformDataObj) throws IOException {
+    public void writeQTransformData(QTransformDataObject qTransformDataObj) {
         writeSectionID(1);
         writeDouble(qTransformDataObj.minMagnitude);
         writeDouble(qTransformDataObj.maxMagnitude);
-        write2DIntegerArray(qTransformDataObj.getIntegerMagnitudeValues());
+        writeByteArray(qTransformDataObj.qTransformBytes);
         writeEOSDelimiter();
     }
 
@@ -104,8 +84,10 @@ public class AUDTFileWriter {
      */
     public void writeAudioData(AudioDataObject audioDataObj) {
         writeSectionID(2);
-        writeString(audioDataObj.audioFilePath);
+        writeByteArray(audioDataObj.compressedMP3Bytes);
         writeDouble(audioDataObj.sampleRate);
+        writeInteger(audioDataObj.totalDurationInMS);
+        writeString(audioDataObj.audioFileName);
         writeEOSDelimiter();
     }
 
@@ -121,9 +103,21 @@ public class AUDTFileWriter {
         writeDouble(guiDataObj.bpm);
         writeDouble(guiDataObj.offsetSeconds);
         writeDouble(guiDataObj.playbackVolume);
-        writeString(guiDataObj.audioFileName);
-        writeInteger(guiDataObj.totalDurationInMS);
         writeInteger(guiDataObj.currTimeInMS);
+        writeEOSDelimiter();
+    }
+
+    /**
+     * Method that writes the music notes data (<b>section number 4</b>) to file.
+     *
+     * @param musicNotesDataObj Data object that holds all the music notes data.
+     * @throws IOException If something went wrong when LZ4 compressing.
+     */
+    public void writeMusicNotesData(MusicNotesDataObject musicNotesDataObj) throws IOException {
+        writeSectionID(4);
+        write1DDoubleArray(musicNotesDataObj.timesToPlaceRectangles);
+        write1DDoubleArray(musicNotesDataObj.noteDurations);
+        write1DIntegerArray(musicNotesDataObj.noteNums);
         writeEOSDelimiter();
     }
 
@@ -134,14 +128,14 @@ public class AUDTFileWriter {
      */
     private void writeHeaderSection() {
         // Write the file header
-        FileHandlersHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_FILE_HEADER);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_FILE_HEADER);
 
         // Write version numbers
         byte[] fileVersionBytes = IOConverters.intToBytes(AUDTFileConstants.FILE_VERSION_NUMBER);
         byte[] lz4VersionBytes = IOConverters.intToBytes(AUDTFileConstants.LZ4_VERSION_NUMBER);
 
-        FileHandlersHelpers.addBytesIntoBytesList(bytes, fileVersionBytes);
-        FileHandlersHelpers.addBytesIntoBytesList(bytes, lz4VersionBytes);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, fileVersionBytes);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, lz4VersionBytes);
 
         // Write the end-of-section delimiter
         writeEOSDelimiter();
@@ -157,7 +151,7 @@ public class AUDTFileWriter {
         byte[] byteArray = IOConverters.intToBytes(integer);
 
         // Write to the byte list
-        FileHandlersHelpers.addBytesIntoBytesList(bytes, byteArray);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, byteArray);
     }
 
     /**
@@ -170,7 +164,7 @@ public class AUDTFileWriter {
         byte[] byteArray = IOConverters.doubleToBytes(dbl);
 
         // Write to the byte list
-        FileHandlersHelpers.addBytesIntoBytesList(bytes, byteArray);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, byteArray);
     }
 
     /**
@@ -187,7 +181,37 @@ public class AUDTFileWriter {
 
         // Write to the byte list
         writeInteger(numBytes);
-        FileHandlersHelpers.addBytesIntoBytesList(bytes, byteArray);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, byteArray);
+    }
+
+    /**
+     * Helper method that writes a byte array to the byte list.
+     *
+     * @param array Byte array to write.
+     */
+    private void writeByteArray(byte[] array) {
+        writeInteger(array.length);  // Write number of bytes present in the array
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, array);
+    }
+
+    /**
+     * Helper method that writes an 1D integer array into the byte list.
+     *
+     * @param array 1D array of integers.
+     */
+    private void write1DIntegerArray(int[] array) throws IOException {
+        // Convert the 1D array into its bytes
+        byte[] byteArray = IOConverters.oneDimensionalIntegerArrayToBytes(array);
+
+        // Compress the byte array
+        byte[] compressedBytes = LZ4.lz4Compress(byteArray);
+
+        // Get the number of compressed bytes
+        int numCompressedBytes = compressedBytes.length;
+
+        // Write to the byte list
+        writeInteger(numCompressedBytes);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, compressedBytes);
     }
 
     /**
@@ -200,54 +224,14 @@ public class AUDTFileWriter {
         byte[] byteArray = IOConverters.oneDimensionalDoubleArrayToBytes(array);
 
         // Compress the byte array
-        byte[] compressedBytes = LZ4.lz4Compress(byteArray, task);
+        byte[] compressedBytes = LZ4.lz4Compress(byteArray);
 
         // Get the number of compressed bytes
         int numCompressedBytes = compressedBytes.length;
 
         // Write to the byte list
         writeInteger(numCompressedBytes);
-        FileHandlersHelpers.addBytesIntoBytesList(bytes, compressedBytes);
-    }
-
-    /**
-     * Helper method that writes a 2D double array into the byte list.
-     *
-     * @param array 2D array of doubles.
-     */
-    private void write2DDoubleArray(double[][] array) throws IOException {
-        // Convert the 2D array into its bytes
-        byte[] byteArray = IOConverters.twoDimensionalDoubleArrayToBytes(array);
-
-        // Compress the byte array
-        byte[] compressedBytes = LZ4.lz4Compress(byteArray, task);
-
-        // Get the number of compressed bytes
-        int numCompressedBytes = compressedBytes.length;
-
-        // Write to the byte list
-        writeInteger(numCompressedBytes);
-        FileHandlersHelpers.addBytesIntoBytesList(bytes, compressedBytes);
-    }
-
-    /**
-     * Helper method that writes a 2D integer array into the byte list.
-     *
-     * @param array 2D array of integers.
-     */
-    private void write2DIntegerArray(int[][] array) throws IOException {
-        // Convert the 2D array into its bytes
-        byte[] byteArray = IOConverters.twoDimensionalIntegerArrayToBytes(array);
-
-        // Compress the byte array
-        byte[] compressedBytes = LZ4.lz4Compress(byteArray, task);
-
-        // Get the number of compressed bytes
-        int numCompressedBytes = compressedBytes.length;
-
-        // Write to the byte list
-        writeInteger(numCompressedBytes);
-        FileHandlersHelpers.addBytesIntoBytesList(bytes, compressedBytes);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, compressedBytes);
     }
 
     /**
@@ -264,7 +248,7 @@ public class AUDTFileWriter {
      * Helper method that writes the end-of-section delimiter.
      */
     private void writeEOSDelimiter() {
-        FileHandlersHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_SECTION_DELIMITER);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_SECTION_DELIMITER);
     }
 
     /**
@@ -272,7 +256,7 @@ public class AUDTFileWriter {
      */
     private void writeEOFDelimiter() {
         // Write the EOF delimiter bytes
-        FileHandlersHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_END_OF_FILE_DELIMITER);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_END_OF_FILE_DELIMITER);
 
         // Sum all the bytes inside the file as a checksum
         // (The checksum will overflow if the sum exceeds 2^31; this is okay as we only want the bytes' values)

@@ -92,6 +92,11 @@
     -fx-cursor: hand;
 }
 
+.project-list-cell {
+    -fx-pref-width: 765px;
+    -fx-max-width: 765px;
+}
+
 /* TRANSCRIPTION PAGE */
 /* Labels */
 .display-label {
@@ -125,3 +130,24 @@
 .volume-slider .track {
     -fx-background-color: linear-gradient(to right, -slider-filled-colour 50%, -slider-unfilled-colour 50%);
 }
+
+/* Note rectangles */
+.note-rectangles-pane {
+    -fx-background-color: #00000000;
+}
+
+.note-borders-region {
+    -fx-border-width: 3px;
+    -fx-border-radius: 5px;
+    -fx-border-color: #ffa0ffff;
+}
+
+.note-main-rectangle {
+    -fx-border-radius: 5px;
+    -fx-fill: #ff80ffb0;
+}
+
+/*.note-resizing-region {*/
+/*    -fx-border-width: 1px;*/
+/*    -fx-border-color: #ff0000ff;*/
+/*}*/

@@ -2,7 +2,7 @@
  * PlottingStuffHandler.java
  *
  * Created on 2022-03-20
- * Updated on 2022-05-28
+ * Updated on 2022-06-12
  *
  * Description: Class that adds the notes' stuff to the spectrogram area.
  */
@@ -19,7 +19,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.*;
-import site.overwrite.auditranscribe.utils.MiscUtils;
+import site.overwrite.auditranscribe.utils.MusicUtils;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 import java.util.HashSet;
@@ -49,7 +49,7 @@ public class PlottingStuffHandler {
         for (int i = minNoteNumber; i <= maxNoteNumber; i++) {
             // Calculate the height to move the pointer to
             double placementHeight = PlottingHelpers.noteNumToHeight(i, minNoteNumber, maxNoteNumber, height);
-            placementHeight += getHeightDifference(height, minNoteNumber, maxNoteNumber) / 2;
+            placementHeight += PlottingHelpers.getHeightDifference(height, minNoteNumber, maxNoteNumber) / 2;
 
             // Create the line
             Line noteLine = new Line(0, placementHeight, width, placementHeight);
@@ -68,24 +68,24 @@ public class PlottingStuffHandler {
     /**
      * Method that adds the note labels to the note pane.
      *
-     * @param notePane      Note pane.
-     * @param noteLabels    Note label array.
-     * @param musicKey      Key for the music piece.
-     * @param height        (Final) height of the note pane.
-     * @param minNoteNumber Minimum note number.
-     * @param maxNoteNumber Maximum note number.
-     * @param fancySharps   Whether <em>fancier sharps</em> (i.e. ♯ instead of #) should be used for
-     *                      the note labels.
+     * @param notePane         Note pane.
+     * @param noteLabels       Note label array.
+     * @param musicKey         Key for the music piece.
+     * @param height           (Final) height of the note pane.
+     * @param minNoteNumber    Minimum note number.
+     * @param maxNoteNumber    Maximum note number.
+     * @param fancyAccidentals Whether <em>fancier accidentals</em> (i.e. ♯ instead of # and ♭
+     *                         instead of b) should be used.
      */
     public static Label[] addNoteLabels(
             Pane notePane, Label[] noteLabels, String musicKey, double height, int minNoteNumber,
-            int maxNoteNumber, boolean fancySharps
+            int maxNoteNumber, boolean fancyAccidentals
     ) {
         // Get the width of the note pane
         double width = notePane.getPrefWidth();
 
         // Get the note offsets that are in the key
-        HashSet<Integer> noteOffsets = MiscUtils.getNotesInKey(musicKey);
+        HashSet<Integer> noteOffsets = MusicUtils.getNotesInKey(musicKey);
 
         // Check if there are existing note labels
         if (noteLabels != null) {
@@ -98,7 +98,7 @@ public class PlottingStuffHandler {
 
         for (int i = minNoteNumber; i <= maxNoteNumber; i++) {
             // Get the note's text
-            String note = UnitConversionUtils.noteNumberToNote(i, fancySharps);
+            String note = UnitConversionUtils.noteNumberToNote(i, musicKey, fancyAccidentals);
 
             // Calculate the height to move the pointer to
             double placementHeight = PlottingHelpers.noteNumToHeight(i, minNoteNumber, maxNoteNumber, height);
@@ -153,7 +153,7 @@ public class PlottingStuffHandler {
         int highestNoteNum = lowestNoteNum + 11;  // Highest note is B{octave}, e.g. B4 if octave is 4
 
         // Get the height difference between two adjacent notes
-        double heightDelta = getHeightDifference(height, minNoteNumber, maxNoteNumber);
+        double heightDelta = PlottingHelpers.getHeightDifference(height, minNoteNumber, maxNoteNumber);
 
         // Calculate the starting and ending Y positions of the rectangle
         double startY = PlottingHelpers.noteNumToHeight(lowestNoteNum, minNoteNumber, maxNoteNumber, height) +
@@ -188,7 +188,7 @@ public class PlottingStuffHandler {
         int highestNoteNum = octave * 12 + 11;  // Highest note is B{octave}, e.g. B4 if octave is 4
 
         // Get the height difference between two adjacent notes
-        double heightDelta = getHeightDifference(height, minNoteNumber, maxNoteNumber);
+        double heightDelta = PlottingHelpers.getHeightDifference(height, minNoteNumber, maxNoteNumber);
 
         // Calculate the ending Y position of the rectangle
         double endY = PlottingHelpers.noteNumToHeight(highestNoteNum, minNoteNumber, maxNoteNumber, height) -
@@ -498,20 +498,7 @@ public class PlottingStuffHandler {
         playheadLine.setEndX(newXPos);
     }
 
-
     // Private methods
-
-    /**
-     * Calculates the difference in height between two consecutive notes.
-     *
-     * @param height     Height of the pane.
-     * @param minNoteNum Smallest note number.
-     * @param maxNoteNum Largest note number.
-     * @return Difference in height between two consecutive notes.
-     */
-    static double getHeightDifference(double height, double minNoteNum, double maxNoteNum) {
-        return height / (maxNoteNum - minNoteNum);
-    }
 
     /**
      * Calculates the number of seconds needed to finish one beat.
@@ -519,7 +506,7 @@ public class PlottingStuffHandler {
      * @param bpm Beats per minute.
      * @return Seconds per beat.
      */
-    static double secondsPerBeat(double bpm) {
+    private static double secondsPerBeat(double bpm) {
         return 1. / (bpm / 60.);  // BPM / 60 = Beats per second, so 1 / Beats Per Second = Seconds per Beat
     }
 
@@ -535,7 +522,7 @@ public class PlottingStuffHandler {
      * @param offset      Number of seconds to wait before the actual audio <em>starts</em>.
      * @return A <code>Line</code> object representing the beat line.
      */
-    static Line generateBeatLine(
+    private static Line generateBeatLine(
             int beatNum, int beatsPerBar, int pxPerSecond, double height, double zoomScaleX, double spb, double offset
     ) {
         // Calculate position to place the line
@@ -565,7 +552,7 @@ public class PlottingStuffHandler {
      * @param offset      Number of seconds to wait before the actual audio <em>starts</em>.
      * @return A <code>StackPane</code> object representing the ellipse.
      */
-    static StackPane generateEllipse(
+    private static StackPane generateEllipse(
             int barNum, int beatsPerBar, int pxPerSecond, double height, double zoomScaleX, double spb, double offset
     ) {
         // Calculate position to place the ellipse

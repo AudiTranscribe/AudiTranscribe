@@ -75,4 +75,35 @@ public class PlottingHelpers {
         // Now get the assigned height
         return freqToHeight(freq, minFreq, maxFreq, maxHeight);
     }
+
+    /**
+     * Converts a height on the spectrogram to a note number.
+     *
+     * @param height     Height on the spectrogram pane.
+     * @param minNoteNum Smallest note number. This will be assigned height 0.
+     * @param maxNoteNum Highest note number. This will be assigned the maximum height.
+     * @param maxHeight  Maximum height.
+     * @return Integer representing the note number.
+     */
+    public static double heightToNoteNum(double height, int minNoteNum, int maxNoteNum, double maxHeight) {
+        // Convert all the notes to frequencies
+        double minFreq = UnitConversionUtils.noteNumberToFreq(minNoteNum);
+        double maxFreq = UnitConversionUtils.noteNumberToFreq(maxNoteNum);
+        double freq = heightToFreq(height, minFreq, maxFreq, maxHeight);
+
+        // Now get the estimated note number
+        return UnitConversionUtils.freqToNoteNumber(freq);
+    }
+
+    /**
+     * Calculates the difference in height between two consecutive notes.
+     *
+     * @param height     Height of the pane.
+     * @param minNoteNum Smallest note number.
+     * @param maxNoteNum Largest note number.
+     * @return Difference in height between two consecutive notes.
+     */
+    public static double getHeightDifference(double height, double minNoteNum, double maxNoteNum) {
+        return height / (maxNoteNum - minNoteNum);
+    }
 }

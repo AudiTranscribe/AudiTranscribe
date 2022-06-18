@@ -2,7 +2,7 @@
  * MainViewController.java
  *
  * Created on 2022-02-09
- * Updated on 2022-06-04
+ * Updated on 2022-06-14
  *
  * Description: Contains the main view's controller class.
  */
@@ -34,9 +34,9 @@ import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.PropertyFile;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.io.json_files.data_encapsulators.SettingsData;
-import site.overwrite.auditranscribe.io.json_files.file_classes.PersistentDataFile;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.Theme;
+import site.overwrite.auditranscribe.note_playback.NotePlayerSequencer;
 import site.overwrite.auditranscribe.utils.MiscUtils;
 import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
 
@@ -61,11 +61,11 @@ public class MainViewController implements Initializable {
     Stage transcriptionStage = new Stage();  // Will be used and shown later
 
     FilteredList<Quartet<Long, String, String, String>> filteredList;  // List of project records
-    private final List<Audio> allAudio = new ArrayList<>(0);  // List of all opened `Audio` objects
+
+    private final List<Audio> allAudio = new ArrayList<>();
+    private final List<NotePlayerSequencer> allSequencers = new ArrayList<>();
 
     private SettingsFile settingsFile;
-    private PersistentDataFile persistentDataFile;
-
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     // FXML Elements
@@ -151,9 +151,8 @@ public class MainViewController implements Initializable {
 
                 // Open the project with the filepath
                 ProjectIOHandlers.openProject(
-                        (Stage) window, transcriptionStage, file, settingsFile, persistentDataFile, allAudio,
-                        this
-                );
+                        (Stage) window, transcriptionStage, file, settingsFile, allAudio, allSequencers,
+                        this);
             }
         });
 
@@ -176,10 +175,6 @@ public class MainViewController implements Initializable {
 
     public void setSettingsFile(SettingsFile settingsFile) {
         this.settingsFile = settingsFile;
-    }
-
-    public void setPersistentDataFile(PersistentDataFile persistentDataFile) {
-        this.persistentDataFile = persistentDataFile;
     }
 
     // Public methods
@@ -273,21 +268,29 @@ public class MainViewController implements Initializable {
     }
 
     /**
-     * Method that stops all the audio objects that have been loaded.
+     * Method that stops all the audio objects and <code>NotePlayerSequencer</code>s that have been
+     * loaded in the transcription views.
      */
-    public void stopAllAudioObjects() {
+    public void stopAllPlayableObjects() {
         // Stop all `Audio` objects
         for (Audio audio: allAudio) {
             try {
-                audio.stopAudio();
+                audio.stop();
                 logger.log(Level.FINE, "Stopped audio: " + audio.getAudioFileName());
             } catch (InvalidObjectException e) {
                 throw new RuntimeException(e);
             }
         }
 
-        // Clear the `allAudio` list
+        // Stop and close all `NotePlayerSequencer` objects
+        for (NotePlayerSequencer notePlayerSequencer: allSequencers) {
+            notePlayerSequencer.stop();
+            notePlayerSequencer.close();
+        }
+
+        // Clear the lists
         allAudio.clear();
+        allSequencers.clear();
     }
 
     // Private methods
@@ -310,7 +313,7 @@ public class MainViewController implements Initializable {
 
         // Create the new project
         ProjectIOHandlers.newProject(
-                (Stage) window, transcriptionStage, file, settingsFile, persistentDataFile, allAudio,
+                (Stage) window, transcriptionStage, file, settingsFile, allAudio, allSequencers,
                 this);
     }
 
@@ -331,9 +334,8 @@ public class MainViewController implements Initializable {
 
         // Open the existing project
         ProjectIOHandlers.openProject(
-                (Stage) window, transcriptionStage, file, settingsFile, persistentDataFile, allAudio,
-                this
-        );
+                (Stage) window, transcriptionStage, file, settingsFile, allAudio, allSequencers,
+                this);
     }
 
     // Helper classes
@@ -452,6 +454,7 @@ public class MainViewController implements Initializable {
             content.setPadding(
                     new Insets(0, 25, 0, 25)  // Although FXML file uses 30, use 25 because spacing is 10
             );
+            content.getStyleClass().add("project-list-cell");
         }
 
         @Override

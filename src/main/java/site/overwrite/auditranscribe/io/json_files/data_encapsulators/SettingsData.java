@@ -2,7 +2,7 @@
  * SettingsData.java
  *
  * Created on 2022-05-22
- * Updated on 2022-05-30
+ * Updated on 2022-06-17
  *
  * Description: Class that contains the settings data.
  */
@@ -19,9 +19,16 @@ import site.overwrite.auditranscribe.spectrogram.ColourScale;
 public class SettingsData {
     // Attributes
     // Appearance data
-    public int themeEnumOrdinal = Theme.LIGHT_MODE.ordinal();  // Ordinal of the `Theme` enum value
+    public int themeEnumOrdinal = Theme.LIGHT_MODE.ordinal();
 
     // Spectrogram data
-    public int colourScaleEnumOrdinal  = ColourScale.VIRIDIS.ordinal();  // Ordinal of the `ColourScale` enum value
-    public int windowFunctionEnumOrdinal = WindowFunction.HANN_WINDOW.ordinal();  // Ordinal of the `WindowFunction` enum value
+    public int colourScaleEnumOrdinal  = ColourScale.VIRIDIS.ordinal();
+    public int windowFunctionEnumOrdinal = WindowFunction.HANN_WINDOW.ordinal();
+
+    // I/O data
+    public int autosaveInterval = 5;  // In minutes
+
+    // Audio data
+    public double notePlayingDelayOffset = 0.2;  // In seconds; to account for note playing delay
+    public String ffmpegInstallationPath = null;  // Path to the ffmpeg installation; todo: add to settings page
 }

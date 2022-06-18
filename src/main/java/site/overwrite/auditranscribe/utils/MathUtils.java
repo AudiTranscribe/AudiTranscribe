@@ -2,7 +2,7 @@
  * MathUtils.java
  *
  * Created on 2022-02-15
- * Updated on 2022-05-30
+ * Updated on 2022-06-17
  *
  * Description: Class containing useful mathematical utility functions.
  */
@@ -10,6 +10,8 @@
 package site.overwrite.auditranscribe.utils;
 
 import site.overwrite.auditranscribe.exceptions.ValueException;
+
+import java.math.BigDecimal;
 
 /**
  * Class containing useful mathematical utility functions.
@@ -95,8 +97,9 @@ public class MathUtils {
 
     /**
      * Returns the index of the maximum value of an array.
+     *
      * @param array Array of numbers.
-     * @return  Index of the maximum value of the array.
+     * @return Index of the maximum value of the array.
      */
     public static int argmax(double[] array) {
         int argmax = 0;
@@ -225,5 +228,48 @@ public class MathUtils {
 
         // Return the number of factors of two
         return numTwos;
+    }
+
+    /**
+     * Method that wraps a value to the appropriate value within the range <code>min</code> to
+     * <code>max</code>, where <code>min</code> is inclusive and <code>max</code> is exclusive.
+     *
+     * @param value Value to wrap.
+     * @param min   Minimum value.
+     * @param max   Maximum value.
+     * @return Wrapped value.
+     */
+    public static int wrapValue(int value, int min, int max) {
+        if (max == 0) {
+            throw new RuntimeException();
+        }
+
+        int r = value % max;
+        if ((r > min && max < min) || (r < min && max > min)) {
+            r += max - min;
+        }
+        return r;
+    }
+
+    /**
+     * Method that wraps a value to the maximum value if the value is smaller than the maximum value
+     * and wraps to the minimum if the value is larger than the minimum value.
+     *
+     * @param value Value to wrap.
+     * @param min   Minimum value.
+     * @param max   Maximum value.
+     * @return Wrapped value.
+     */
+    public static BigDecimal wrapValue(BigDecimal value, BigDecimal min, BigDecimal max) {
+        if (max.doubleValue() == 0) {
+            throw new RuntimeException();
+        }
+
+        if (value.compareTo(min) < 0) {
+            return max;
+        } else if (value.compareTo(max) > 0) {
+            return min;
+        }
+        return value;
     }
 }
