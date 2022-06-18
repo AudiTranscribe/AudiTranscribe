@@ -498,7 +498,6 @@ public class PlottingStuffHandler {
         playheadLine.setEndX(newXPos);
     }
 
-
     // Private methods
 
     /**
