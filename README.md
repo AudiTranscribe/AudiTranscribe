@@ -33,7 +33,7 @@ The software is not perfect. There are a few limitations with the software in it
   dependency is only temporarily required.
 
 # Licence
-This project is licensed under the [GNU General Public Licence v3 licence](LICENSE).
+This project is licensed under the [GNU General Public Licence V3](LICENSE).
 
 # Security Policy
 Read AudiTranscribe's security policy at [SECURITY.md](.github/SECURITY.md).
