@@ -50,9 +50,9 @@ you could submit an issue instead of a pull request.
 
 **Note:**
 
-- (Development) changes to *AudiTranscribe* should _never_ be pushed to the `main` branch**. The `main` branch
-  should be reserved for production builds. Instead, push changes to the `staging` branch.
-- Make pull requests instead of directly editing files on the `staging` branch.
+- (Development) changes to *AudiTranscribe* should be pushed to the `main` branch**. The `staging`
+  branch should be reserved for production builds. Never push any changes to the `staging` branch.
+- Make pull requests instead of directly editing files on the `main` branch.
 
 ## Reporting Bugs
 
