@@ -2,7 +2,7 @@
  * NotePlayerSequencerTest.java
  *
  * Created on 2022-06-09
- * Updated on 2022-06-15
+ * Updated on 2022-06-19
  *
  * Description: Test `NotePlayerSequencer.java`.
  */
@@ -37,28 +37,33 @@ class NotePlayerSequencerTest {
         // Create a multi-note player object
         NotePlayerSequencer notePlayerSequencer = new NotePlayerSequencer();
 
-        // Set velocities
-        notePlayerSequencer.setOnVelocity(94);
-        notePlayerSequencer.setOffVelocity(64);
+        // Check if the sequencer is available
+        if (notePlayerSequencer.isSequencerAvailable()) {
+            // Set velocities
+            notePlayerSequencer.setOnVelocity(94);
+            notePlayerSequencer.setOffVelocity(64);
 
-        // Set BPM
-        notePlayerSequencer.setBPM(100);
+            // Set BPM
+            notePlayerSequencer.setBPM(100);
 
-        // Set instrument
-        notePlayerSequencer.setInstrument(MIDIInstrument.FLUTE);
+            // Set instrument
+            notePlayerSequencer.setInstrument(MIDIInstrument.FLUTE);
 
-        // Set the notes
-        notePlayerSequencer.setNotesOnTrack(noteOnsetTimes, noteDurations, noteNumbers);
+            // Set the notes
+            notePlayerSequencer.setNotesOnTrack(noteOnsetTimes, noteDurations, noteNumbers);
 
-        // Play the notes
-        notePlayerSequencer.play(0);
+            // Play the notes
+            notePlayerSequencer.play(0);
 
-        while (true) {
-            // Exit the program when sequencer has stopped playing
-            if (!notePlayerSequencer.getSequencer().isRunning()) {
-                notePlayerSequencer.stop();
-                break;
+            while (true) {
+                // Exit the program when sequencer has stopped playing
+                if (!notePlayerSequencer.getSequencer().isRunning()) {
+                    notePlayerSequencer.stop();
+                    break;
+                }
             }
+        } else {
+            System.out.println("Sequencer is not available, skipping test.");
         }
     }
 }

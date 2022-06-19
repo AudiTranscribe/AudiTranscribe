@@ -2,7 +2,7 @@
  * Popups.java
  *
  * Created on 2022-05-26
- * Updated on 2022-06-04
+ * Updated on 2022-06-19
  *
  * Description: Class that handles the popups and dialogs.
  */
@@ -31,13 +31,17 @@ public class Popups {
      * @param content Content of the information alert.
      */
     public static void showInformationAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.initStyle(StageStyle.UTILITY);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
+        showGenericAlert(title, content, Alert.AlertType.INFORMATION);
+    }
 
-        alert.showAndWait();
+    /**
+     * Method that shows a warning alert.
+     *
+     * @param title   Title of the alert box.
+     * @param content Content of the information alert.
+     */
+    public static void showWarningAlert(String title, String content) {
+        showGenericAlert(title, content, Alert.AlertType.WARNING);
     }
 
     /**
@@ -153,5 +157,24 @@ public class Popups {
         dialog.setContentText(contentText);
 
         return dialog.showAndWait();
+    }
+
+    // Private methods
+
+    /**
+     * Helper method that shows a generic alert.
+     *
+     * @param title   Title of the alert box.
+     * @param content Content of the information alert.
+     * @param type    Type of the alert box.
+     */
+    private static void showGenericAlert(String title, String content, Alert.AlertType type) {
+        Alert alert = new Alert(type);
+        alert.initStyle(StageStyle.UTILITY);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+
+        alert.showAndWait();
     }
 }

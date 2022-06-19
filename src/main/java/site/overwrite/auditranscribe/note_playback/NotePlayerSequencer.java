@@ -46,7 +46,9 @@ public class NotePlayerSequencer {
 
     /**
      * Initialization method for a multi-note player object.<br>
-     * This object is able to handle MIDI data and play multiple notes.
+     * This object is able to handle MIDI data and play multiple notes.<br>
+     * Ensure that code checks if the sequencer is available before attempting to play the sequence
+     * of MIDI notes.
      */
     public NotePlayerSequencer() {
         // Get MIDI sequencer
@@ -118,6 +120,16 @@ public class NotePlayerSequencer {
     }
 
     // Public methods
+
+    /**
+     * Method that checks if the sequencer is available.
+     *
+     * @return A boolean, <code>true</code> if the sequencer is available, <code>false</code>
+     * otherwise.
+     */
+    public boolean isSequencerAvailable() {
+        return sequencer != null;
+    }
 
     /**
      * Method that sets notes on the track.

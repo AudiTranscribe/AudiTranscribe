@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-17
+ * Updated on 2022-06-19
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -1676,6 +1676,16 @@ public class TranscriptionViewController implements Initializable {
                         } catch (NoteRectangleCollisionException ignored) {
                         }
                     }
+                }
+
+                // Check if the sequencer is available
+                if (!notePlayerSequencer.isSequencerAvailable()) {
+                    // Show a warning message to the user
+                    Popups.showWarningAlert(
+                            "MIDI Playback Unavailable",
+                            "The MIDI playback is not available on your system. Playback of created notes " +
+                                    "will not work."
+                    );
                 }
 
                 // Reset the sequencer
