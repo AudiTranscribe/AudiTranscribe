@@ -2,7 +2,7 @@
  * MainApplication.java
  *
  * Created on 2022-02-09
- * Updated on 2022-06-06
+ * Updated on 2022-06-20
  *
  * Description: Contains the main application class.
  */
@@ -15,8 +15,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
-import site.overwrite.auditranscribe.views.helpers.FFmpegInstallationPopupsHandler;
 import site.overwrite.auditranscribe.views.MainViewController;
+import site.overwrite.auditranscribe.views.helpers.SetupWizardHelper;
 
 import java.io.IOException;
 
@@ -30,8 +30,9 @@ public class MainApplication extends Application {
         // Ensure that an application folder exists
         IOMethods.createAppDataFolder();
 
-        // Ask user for FFmpeg installation
-        FFmpegInstallationPopupsHandler.showFFmpegInstallationView(settingsFile);
+        // Run setup wizard
+        SetupWizardHelper setupWizardHelper = new SetupWizardHelper(settingsFile);
+        setupWizardHelper.showSetupWizard();
 
         // Load the FXML file into the scene
         FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/main-view.fxml"));

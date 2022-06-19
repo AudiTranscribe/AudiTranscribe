@@ -40,4 +40,5 @@ module site.overwrite.auditranscribe {
     opens site.overwrite.auditranscribe.misc to javafx.fxml;
     opens site.overwrite.auditranscribe.views to javafx.fxml;
     opens site.overwrite.auditranscribe.views.helpers to javafx.fxml;
+    opens site.overwrite.auditranscribe.views.setup_wizard_views to javafx.fxml;
 }
