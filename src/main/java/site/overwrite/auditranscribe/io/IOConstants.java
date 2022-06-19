@@ -26,5 +26,5 @@ public class IOConstants {
     public static final String RESOURCES_FOLDER_PATH_STRING =
             "src" + SEPARATOR + "main" + SEPARATOR + "resources" + SEPARATOR + "site" + SEPARATOR +
                     "overwrite" + SEPARATOR + "auditranscribe" + SEPARATOR;
-    public static final String TEMP_FOLDER = System.getProperty("java.io.tmpdir") + SEPARATOR;
+    public static final String TEMP_FOLDER = System.getProperty("java.io.tmpdir");
 }
