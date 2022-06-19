@@ -2,7 +2,7 @@
  * SettingsData.java
  *
  * Created on 2022-05-22
- * Updated on 2022-06-17
+ * Updated on 2022-06-19
  *
  * Description: Class that contains the settings data.
  */
@@ -17,7 +17,9 @@ import site.overwrite.auditranscribe.spectrogram.ColourScale;
  * Class that contains the settings data.
  */
 public class SettingsData {
-    // Attributes
+    // Overarching data
+    public boolean isSetupCompleted = false;
+
     // Appearance data
     public int themeEnumOrdinal = Theme.LIGHT_MODE.ordinal();
 
@@ -30,5 +32,5 @@ public class SettingsData {
 
     // Audio data
     public double notePlayingDelayOffset = 0.2;  // In seconds; to account for note playing delay
-    public String ffmpegInstallationPath = null;  // Path to the ffmpeg installation; todo: add to settings page
+    public String ffmpegInstallationPath = null;  // Path to the ffmpeg installation
 }
