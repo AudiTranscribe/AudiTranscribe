@@ -2,7 +2,7 @@
  * NotePlayerSequencer.java
  *
  * Created on 2022-06-09
- * Updated on 2022-06-15
+ * Updated on 2022-06-19
  *
  * Description: Class that handles the playing of notes as a MIDI sequence.
  */
@@ -49,13 +49,17 @@ public class NotePlayerSequencer {
      * This object is able to handle MIDI data and play multiple notes.
      */
     public NotePlayerSequencer() {
-        // Get default sequencer
+        // Get MIDI sequencer
+        Sequencer tempSequencer;  // So that we may assign null later
+
         try {
-            sequencer = MidiSystem.getSequencer();
-            sequencer.open();
+            tempSequencer = MidiSystem.getSequencer();
+            tempSequencer.open();
         } catch (MidiUnavailableException e) {
-            throw new RuntimeException("MIDI is unavailable on this system");
+            tempSequencer = null;
         }
+
+        sequencer = tempSequencer;
 
         // Create the sequence and track to use
         sequence = null;
@@ -191,6 +195,12 @@ public class NotePlayerSequencer {
      * @param currTime The time to start playback at, <b>in seconds</b>.
      */
     public void play(double currTime) {
+        // Check if there is a sequencer to use in the first place
+        if (sequencer == null) {
+            logger.log(Level.INFO, "No sequencer to use, so not playing");
+            return;
+        }
+
         // Set tempo
         sequencer.setTempoInBPM((float) bpm);
 
@@ -216,6 +226,13 @@ public class NotePlayerSequencer {
      * Stop playback of the MIDI sequence.
      */
     public void stop() {
+        // Check if there is a sequencer to use in the first place
+        if (sequencer == null) {
+            logger.log(Level.INFO, "No sequencer to use, so not stopping");
+            return;
+        }
+
+        // Attempt to stop the sequencer
         try {
             sequencer.stop();
             logger.log(Level.FINE, "Note sequencer playback stopped");
@@ -228,6 +245,12 @@ public class NotePlayerSequencer {
      * Close the note sequencer.
      */
     public void close() {
+        // Check if there is a sequencer to use in the first place
+        if (sequencer == null) {
+            logger.log(Level.INFO, "No sequencer to use, so not closing");
+            return;
+        }
+
         // First stop the playback
         stop();
 
