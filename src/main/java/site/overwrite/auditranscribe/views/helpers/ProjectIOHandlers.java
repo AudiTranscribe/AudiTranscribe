@@ -2,7 +2,7 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-06-14
+ * Updated on 2022-06-20
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
@@ -16,8 +16,9 @@ import javafx.stage.*;
 import org.apache.commons.compress.utils.FileNameUtils;
 import org.javatuples.Pair;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
-import site.overwrite.auditranscribe.audio.ffmpeg.AudioConverter;
+import site.overwrite.auditranscribe.audio.FFmpegHandler;
 import site.overwrite.auditranscribe.audio.Audio;
+import site.overwrite.auditranscribe.exceptions.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
@@ -71,7 +72,7 @@ public class ProjectIOHandlers {
                 String fileExt = "." + FileNameUtils.getExtension(file.getName()).toLowerCase();
 
                 // Check if the file is supported
-                if (!AudioConverter.EXTENSION_TO_CODEC.containsKey(fileExt)) {
+                if (!FFmpegHandler.VALID_EXTENSIONS.contains(fileExt)) {
                     throw new UnsupportedAudioFileException("The file extension is not supported.");
                 }
 
@@ -83,9 +84,9 @@ public class ProjectIOHandlers {
                 String baseName = IOConstants.TEMP_FOLDER + file.getName().replace(fileExt, "");
 
                 // Generate a new WAV file
-                AudioConverter audioConverter = new AudioConverter(settingsFile.data.ffmpegInstallationPath);
+                FFmpegHandler FFmpegHandler = new FFmpegHandler(settingsFile.data.ffmpegInstallationPath);
                 File auxiliaryWAVFile = new File(
-                        audioConverter.convertAudio(file, baseName + "-auxiliary-wav.wav")
+                        FFmpegHandler.convertAudio(file, baseName + "-auxiliary-wav.wav")
                 );
 
                 // Try and read the auxiliary WAV file as an `Audio` object
@@ -138,7 +139,7 @@ public class ProjectIOHandlers {
                     mainStage.show();  // Show the main scene upon the spectrogram scene's closure
                 }
 
-            } catch (UnsupportedAudioFileException | IOException e) {
+            } catch (IOException | FFmpegNotFoundException | UnsupportedAudioFileException e) {
                 Popups.showExceptionAlert(
                         "Failed to read '" + file.getName() + "' as an audio file.",
                         "The program failed to read '" + file.getName() +

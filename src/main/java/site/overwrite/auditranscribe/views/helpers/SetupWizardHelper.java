@@ -2,7 +2,7 @@
  * SetupWizardHelper.java
  *
  * Created on 2022-06-19
- * Updated on 2022-06-19
+ * Updated on 2022-06-20
  *
  * Description: Class that handles the setup wizard.
  */
@@ -13,8 +13,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import net.bramp.ffmpeg.FFmpeg;
-import site.overwrite.auditranscribe.audio.ffmpeg.FFmpegNotFound;
+import site.overwrite.auditranscribe.audio.FFmpegHandler;
+import site.overwrite.auditranscribe.exceptions.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.StreamGobbler;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
@@ -74,7 +74,7 @@ public class SetupWizardHelper {
             try {
                 // Immediately throw an exception if the program can't find FFmpeg in previous loop
                 if (!canFindFFmpeg) {
-                    throw new FFmpegNotFound("FFmpeg not found at manually specified path.");
+                    throw new FFmpegNotFoundException("FFmpeg not found at manually specified path.");
                 }
 
                 // Attempt to get the path to the FFmpeg binary and save to persistent data file
@@ -83,7 +83,7 @@ public class SetupWizardHelper {
                 // Update the `isFFmpegInstalled` flag
                 isFFmpegInstalled = true;
 
-            } catch (FFmpegNotFound e) {
+            } catch (FFmpegNotFoundException e) {
                 // Show view reporting that FFmpeg could not be found
                 boolean isSpecifyManually = showCannotFindFFmpegView();
 
@@ -105,10 +105,9 @@ public class SetupWizardHelper {
 
                 // Check the custom FFmpeg path for the FFmpeg binary
                 if (ffmpegPath != null) {
-                    try {
-                        new FFmpeg(ffmpegPath);
+                    if (FFmpegHandler.checkFFmpegPath(ffmpegPath)) {
                         isFFmpegInstalled = true;
-                    } catch (IOException e1) {
+                    } else {
                         // Note that FFmpeg cannot be found
                         canFindFFmpeg = false;
                     }
@@ -287,9 +286,9 @@ public class SetupWizardHelper {
      * command-line interface of FFmpeg.
      *
      * @return A string, representing the FFmpeg installation path.
-     * @throws FFmpegNotFound If the program fails to find the FFmpeg installation.
+     * @throws FFmpegNotFoundException If the program fails to find the FFmpeg installation.
      */
-    private static String getPathToFFmpeg() throws FFmpegNotFound {
+    private static String getPathToFFmpeg() throws FFmpegNotFoundException {
         // Check the operating system
         boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
 
@@ -318,7 +317,7 @@ public class SetupWizardHelper {
 
             // Check exit code of the command
             int exitCode = process.waitFor();
-            if (exitCode != 0) throw new FFmpegNotFound("FFmpeg binary cannot be located.\n" + ffmpegPath[0]);
+            if (exitCode != 0) throw new FFmpegNotFoundException("FFmpeg binary cannot be located.\n" + ffmpegPath[0]);
 
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);

@@ -2,7 +2,7 @@
  * PreferencesViewController.java
  *
  * Created on 2022-05-22
- * Updated on 2022-06-19
+ * Updated on 2022-06-20
  *
  * Description: Contains the preferences view's controller class.
  */
@@ -18,7 +18,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import net.bramp.ffmpeg.FFmpeg;
+import site.overwrite.auditranscribe.audio.FFmpegHandler;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
@@ -120,10 +120,7 @@ public class PreferencesViewController implements Initializable {
                 String ffmpegBinaryPath = ffmpegBinaryPathTextField.getText();
 
                 // Check if the FFmpeg binary is valid
-                try {
-                    // Try and create a new FFmpeg object
-                    new FFmpeg(ffmpegBinaryPath);
-
+                if (FFmpegHandler.checkFFmpegPath(ffmpegBinaryPath)) {
                     // Update the last valid FFmpeg path
                     lastValidFFmpegPath = ffmpegBinaryPath;
 
@@ -132,8 +129,7 @@ public class PreferencesViewController implements Initializable {
 
                     // Report success
                     logger.log(Level.INFO, "FFmpeg binary path updated to: " + ffmpegBinaryPath);
-
-                } catch (IOException ignored) {
+                } else {
                     // Reset the value of the text field to the last valid FFmpeg path
                     ffmpegBinaryPathTextField.setText(lastValidFFmpegPath);
 

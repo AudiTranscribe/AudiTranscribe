@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-19
+ * Updated on 2022-06-20
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -28,8 +28,9 @@ import javafx.stage.Window;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
-import site.overwrite.auditranscribe.audio.ffmpeg.AudioConverter;
+import site.overwrite.auditranscribe.audio.FFmpegHandler;
 import site.overwrite.auditranscribe.bpm_estimation.BPMEstimator;
+import site.overwrite.auditranscribe.exceptions.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.exceptions.NoteRectangleCollisionException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.LZ4;
@@ -735,7 +736,7 @@ public class TranscriptionViewController implements Initializable {
         // Set up Q-Transform data and audio data
         try {
             setAudioAndSpectrogramData(projectData.qTransformData, projectData.audioData);
-        } catch (IOException | UnsupportedAudioFileException e) {
+        } catch (IOException | FFmpegNotFoundException | UnsupportedAudioFileException e) {
             Popups.showExceptionAlert(
                     "Error loading audio data.",
                     "An error occurred when loading the audio data. Does the audio file " +
@@ -829,15 +830,16 @@ public class TranscriptionViewController implements Initializable {
      * @param qTransformData The Q-Transform data that will be used to set the spectrogram data.
      * @param audioData      The audio data that will be used in both the spectrogram data and
      *                       the audio data.
-     * @throws UnsupportedAudioFileException If the audio file path that was provided in
-     *                                       <code>audioData</code> points to an invalid audio file.
      * @throws IOException                   If the audio file path that was provided in
      *                                       <code>audioData</code> points to a file that is invalid
      *                                       (or does not exist).
+     * @throws FFmpegNotFoundException       If the FFmpeg binary could not be found.
+     * @throws UnsupportedAudioFileException If the audio file path that was provided in
+     *                                       <code>audioData</code> points to an invalid audio file.
      */
     public void setAudioAndSpectrogramData(
             QTransformDataObject qTransformData, AudioDataObject audioData
-    ) throws UnsupportedAudioFileException, IOException {
+    ) throws IOException, FFmpegNotFoundException, UnsupportedAudioFileException {
         // Set attributes
         compressedMP3Bytes = audioData.compressedMP3Bytes;
         sampleRate = audioData.sampleRate;
@@ -864,14 +866,14 @@ public class TranscriptionViewController implements Initializable {
         fos.write(rawMP3Bytes);
         fos.close();
 
-        // Define a new audio converter
-        AudioConverter audioConverter = new AudioConverter(settingsFile.data.ffmpegInstallationPath);
+        // Define a new FFmpeg handler
+        FFmpegHandler FFmpegHandler = new FFmpegHandler(settingsFile.data.ffmpegInstallationPath);
 
         // Generate the output path to the MP3 file
         String outputPath = IOConstants.TEMP_FOLDER + "temp-2.wav";
 
         // Convert the auxiliary MP3 file to a WAV file
-        outputPath = audioConverter.convertAudio(auxiliaryMP3File, outputPath);
+        outputPath = FFmpegHandler.convertAudio(auxiliaryMP3File, outputPath);
 
         // Read the newly created WAV file
         File auxiliaryWAVFile = new File(outputPath);
