@@ -10,7 +10,7 @@
 package site.overwrite.auditranscribe.audio;
 
 import javafx.util.Duration;
-import site.overwrite.auditranscribe.audio.ffmpeg.AudioConverter;
+import site.overwrite.auditranscribe.exceptions.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.exceptions.ValueException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
@@ -640,8 +640,10 @@ public class Audio {
      * Helper method that converts the audio object into MP3 bytes.
      *
      * @param ffmpegPath The path to the ffmpeg executable.
+     * @throws FFmpegNotFoundException If FFmpeg was not found at the specified path.
+     * @throws IOException             If writing to the final audio file encounters an error.
      */
-    public byte[] wavBytesToMP3Bytes(String ffmpegPath) throws IOException {
+    public byte[] wavBytesToMP3Bytes(String ffmpegPath) throws FFmpegNotFoundException, IOException {
         // Check if we have already processed the audio
         if (rawMP3Bytes != null) {
             logger.log(Level.FINE, "Returning previously processed MP3 bytes");
@@ -654,8 +656,8 @@ public class Audio {
         IOMethods.createFolder(IOConstants.TEMP_FOLDER);
         logger.log(Level.FINE, "Temporary folder created: " + IOConstants.TEMP_FOLDER);
 
-        // Define a new audio converter
-        AudioConverter audioConverter = new AudioConverter(ffmpegPath);
+        // Define a new FFmpeg handler
+        FFmpegHandler FFmpegHandler = new FFmpegHandler(ffmpegPath);
 
         // Generate the output path to the MP3 file
         String inputPath = IOConstants.TEMP_FOLDER + "temp-1.wav";
@@ -666,7 +668,7 @@ public class Audio {
         Files.write(Path.of(inputPath), rawWAVBytes);
 
         // Convert the original WAV file to a temporary MP3 file
-        outputPath = audioConverter.convertAudio(new File(inputPath), outputPath);
+        outputPath = FFmpegHandler.convertAudio(new File(inputPath), outputPath);
 
         // Read the raw MP3 bytes into a temporary file
         rawMP3Bytes = Files.readAllBytes(Path.of(outputPath));

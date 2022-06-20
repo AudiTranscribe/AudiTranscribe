@@ -2,7 +2,7 @@
  * JSONFile.java
  *
  * Created on 2022-05-30
- * Updated on 2022-06-06
+ * Updated on 2022-06-20
  *
  * Description: Handles interactions with JSON files.
  */
@@ -12,7 +12,6 @@ package site.overwrite.auditranscribe.io.json_files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import site.overwrite.auditranscribe.io.IOConstants;
-import site.overwrite.auditranscribe.io.IOMethods;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;

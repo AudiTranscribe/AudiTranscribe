@@ -84,6 +84,7 @@
     -fx-border-radius: 3px;
     -fx-background-color: #45494aff;
     -fx-prompt-text-fill: #777777ff;
+    -fx-text-fill: #bbbbbbff;;
 }
 
 /* Others */

@@ -2,7 +2,7 @@
  * PreferencesViewController.java
  *
  * Created on 2022-05-22
- * Updated on 2022-06-17
+ * Updated on 2022-06-20
  *
  * Description: Contains the preferences view's controller class.
  */
@@ -13,12 +13,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Spinner;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import site.overwrite.auditranscribe.audio.FFmpegHandler;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
@@ -26,7 +26,10 @@ import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
 import site.overwrite.auditranscribe.misc.spinners.CustomIntegerSpinnerValueFactory;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
+import site.overwrite.auditranscribe.views.helpers.Popups;
+import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -35,6 +38,8 @@ import java.util.logging.Logger;
 
 public class PreferencesViewController implements Initializable {
     // Attributes
+    private String lastValidFFmpegPath;
+
     private final Logger logger = Logger.getLogger(this.getClass().getName());
     private SettingsFile settingsFile;
 
@@ -58,6 +63,12 @@ public class PreferencesViewController implements Initializable {
     private Spinner<Double> notePlayingDelayOffsetSpinner;
 
     @FXML
+    private Button selectFFmpegBinaryButton;
+
+    @FXML
+    private TextField ffmpegBinaryPathTextField;
+
+    @FXML
     private Button cancelButton, applyButton, okButton;
 
     // Initialization method
@@ -71,6 +82,27 @@ public class PreferencesViewController implements Initializable {
             windowFunctionChoiceBox.getItems().add(windowFunction);
 
         // Add methods to buttons
+        selectFFmpegBinaryButton.setOnAction(event -> {
+            // Define file extension filter
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                    "FFmpeg binary",
+                    "*.exe", "*"  // Todo: check if works
+            );
+
+            // Get the file
+            File possibleFFmpegBinary = ProjectIOHandlers.getFileFromFileDialog(
+                    rootPane.getScene().getWindow(), extFilter
+            );
+
+            // Check if the FFmpeg binary is valid
+            if (possibleFFmpegBinary != null) {
+                // Update the value of the FFmpeg path text field
+                ffmpegBinaryPathTextField.setText(possibleFFmpegBinary.getAbsolutePath());
+            } else {
+                Popups.showInformationAlert("Info", "No file selected.");
+            }
+        });
+
         cancelButton.setOnAction(event -> closePreferencesPane());
 
         applyButton.setOnAction(event -> applySettings());
@@ -78,6 +110,39 @@ public class PreferencesViewController implements Initializable {
         okButton.setOnAction(event -> {
             applySettings();
             closePreferencesPane();
+        });
+
+        // Add methods to text fields
+        ffmpegBinaryPathTextField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            // Handle check for FFmpeg path only when unfocused
+            if (!newValue) {
+                // Get the absolute path to the FFmpeg binary
+                String ffmpegBinaryPath = ffmpegBinaryPathTextField.getText();
+
+                // Check if the FFmpeg binary is valid
+                if (FFmpegHandler.checkFFmpegPath(ffmpegBinaryPath)) {
+                    // Update the last valid FFmpeg path
+                    lastValidFFmpegPath = ffmpegBinaryPath;
+
+                    // Enable the apply button
+                    applyButton.setDisable(false);
+
+                    // Report success
+                    logger.log(Level.INFO, "FFmpeg binary path updated to: " + ffmpegBinaryPath);
+                } else {
+                    // Reset the value of the text field to the last valid FFmpeg path
+                    ffmpegBinaryPathTextField.setText(lastValidFFmpegPath);
+
+                    // Show a warning message
+                    Popups.showWarningAlert(
+                            "Invalid FFmpeg Binary Path",
+                            "The provided path does not seem to point to a valid FFmpeg binary."
+                    );
+
+                    // Report failure
+                    logger.log(Level.INFO, "Selected FFmpeg binary path \"" + ffmpegBinaryPath + "\" invalid");
+                }
+            }
         });
 
         // Report that the preferences view is ready to be shown
@@ -149,6 +214,10 @@ public class PreferencesViewController implements Initializable {
         for (Spinner<?> spinner : spinners) {
             spinner.valueProperty().addListener((observable, oldValue, newValue) -> applyButton.setDisable(false));
         }
+
+        // Update the last valid FFmpeg path, and set up the FFmpeg binary path text field
+        lastValidFFmpegPath = settingsFile.data.ffmpegInstallationPath;
+        ffmpegBinaryPathTextField.setText(lastValidFFmpegPath);
     }
 
     /**
@@ -206,6 +275,7 @@ public class PreferencesViewController implements Initializable {
         settingsFile.data.themeEnumOrdinal = themeChoiceBox.getValue().ordinal();
 
         settingsFile.data.notePlayingDelayOffset = notePlayingDelayOffsetSpinner.getValue();
+        settingsFile.data.ffmpegInstallationPath = ffmpegBinaryPathTextField.getText();
 
         settingsFile.data.autosaveInterval = autosaveIntervalSpinner.getValue();
 
