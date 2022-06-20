@@ -21,14 +21,15 @@ import site.overwrite.auditranscribe.views.helpers.SetupWizardHelper;
 import java.io.IOException;
 
 public class MainApplication extends Application {
-    // Attributes
-    private final SettingsFile settingsFile = new SettingsFile();
-
     // Initialization method
     @Override
     public void start(Stage stage) throws IOException {
         // Ensure that an application folder exists
         IOMethods.createAppDataFolder();
+
+        // Update the settings file attribute
+        // Attributes
+        SettingsFile settingsFile = new SettingsFile();
 
         // Run setup wizard
         SetupWizardHelper setupWizardHelper = new SetupWizardHelper(settingsFile);
