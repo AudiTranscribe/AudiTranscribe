@@ -36,6 +36,7 @@ out/
 converted.wav
 AudiTranscribe-Designs.key
 VQT_data.txt
+*.log
 
 auditranscribe.github.io alias
 resources alias
