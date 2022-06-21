@@ -344,7 +344,7 @@ public class TranscriptionViewController implements Initializable {
 
         openProjectButton.setOnAction(this::handleOpenProject);
 
-        saveProjectButton.setOnAction(event -> handleSavingProject(false));
+        saveProjectButton.setOnAction(event -> handleSavingProject(false, false));
 
         playButton.setOnAction(event -> togglePlayButton());
 
@@ -500,9 +500,9 @@ public class TranscriptionViewController implements Initializable {
 
         openProjectMenuItem.setOnAction(this::handleOpenProject);
 
-        saveProjectMenuItem.setOnAction(event -> handleSavingProject(false));
+        saveProjectMenuItem.setOnAction(event -> handleSavingProject(false, false));
 
-        saveAsMenuItem.setOnAction(event -> handleSavingProject(true));
+        saveAsMenuItem.setOnAction(event -> handleSavingProject(false, true));
 
         preferencesMenuItem.setOnAction(actionEvent -> PreferencesViewController.showPreferencesWindow(settingsFile));
 
@@ -1113,9 +1113,10 @@ public class TranscriptionViewController implements Initializable {
     /**
      * Helper method that handles the saving of the project.
      *
+     * @param isAutosave      Whether this is an autosave or not.
      * @param forceChooseFile Boolean whether to force the user to choose a file.
      */
-    private void handleSavingProject(boolean forceChooseFile) {
+    private void handleSavingProject(boolean isAutosave, boolean forceChooseFile) {
         // Do not do anything if the button is disabled
         if (saveProjectButton.isDisabled()) return;
 
@@ -1203,26 +1204,30 @@ public class TranscriptionViewController implements Initializable {
                 );
 
                 // Determine the number of skippable bytes
-                if (numSkippableBytes == 0) {
+                if (numSkippableBytes == 0 || forceChooseFile) {
+                    // Calculate the number of skippable bytes
                     numSkippableBytes = 32 +  // Header section
                             UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
                             qTransformData.numBytesNeeded() +
                             audioData.numBytesNeeded();
+
+                    // Update the unchanging data properties
+                    UnchangingDataPropertiesObject unchangingDataProperties = new UnchangingDataPropertiesObject(
+                            numSkippableBytes
+                    );
+
+                    // Package all the current data into a `ProjectData`
+                    ProjectData projectData = new ProjectData(
+                            unchangingDataProperties, qTransformData, audioData, guiData, musicNotesData
+                    );
+
+                    // Save the project
+                    ProjectIOHandlers.saveProject(finalSaveDest, projectData);
+
+                } else {
+                    ProjectIOHandlers.saveProject(finalSaveDest, numSkippableBytes, guiData, musicNotesData);
                 }
 
-                // Update the unchanging data properties
-                UnchangingDataPropertiesObject unchangingDataProperties = new UnchangingDataPropertiesObject(
-                        numSkippableBytes
-                );
-
-                // Package all the current data into a `ProjectData`
-                ProjectData projectData = new ProjectData(
-                        unchangingDataProperties, qTransformData, audioData, guiData, musicNotesData
-                );
-
-
-                // Save the project
-                ProjectIOHandlers.saveProject(finalSaveDest, projectData);
                 logger.log(Level.INFO, "File saved");
                 return null;
             }
@@ -1247,6 +1252,14 @@ public class TranscriptionViewController implements Initializable {
 
             // Hide the progress box
             progressBarHBox.setVisible(false);
+
+            // Show popup upon saving completion, if it is not an autosave
+            if (!isAutosave) {
+                Popups.showInformationAlert(
+                        "Saved Successfully",
+                        "Project was saved successfully."
+                );
+            }
         });
 
         // Start new thread to save the file
@@ -1497,7 +1510,7 @@ public class TranscriptionViewController implements Initializable {
             });
             autosaveScheduler.scheduleAtFixedRate(() -> Platform.runLater(() -> {
                 if (audtFilePath != null) {
-                    handleSavingProject(false);
+                    handleSavingProject(true, false);
                     logger.log(Level.INFO, "Autosaved project");
                 } else {
                     logger.log(Level.INFO, "Autosave skipped, no project loaded");
@@ -2041,7 +2054,7 @@ public class TranscriptionViewController implements Initializable {
                     mainViewController);
 
         } else if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {  // Save current project
-            handleSavingProject(false);
+            handleSavingProject(false, false);
 
         } else if (code == KeyCode.MINUS) {  // Increase playback octave number by 1
             keyEvent.consume();

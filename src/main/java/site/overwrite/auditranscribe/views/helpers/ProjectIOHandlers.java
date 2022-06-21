@@ -254,13 +254,33 @@ public class ProjectIOHandlers {
     /**
      * Method that handles the saving of an AudiTranscribe project.
      *
+     * @param filepath          <b>Absolute</b> path to the AUDT file.
+     * @param numSkippableBytes Number of bytes to skip before writing the data.
+     * @param guiData           <code>GUIDataObject</code> object that contains the GUI data.
+     * @param musicNotesData    <code>MusicNotesDataObject</code> object that contains the music data.
+     * @throws IOException If the writing to file encounters an error.
+     */
+    public static void saveProject(
+            String filepath, int numSkippableBytes, GUIDataObject guiData, MusicNotesDataObject musicNotesData
+    ) throws IOException {
+        // Declare the file writer object
+        AUDTFileWriter fileWriter = new AUDTFileWriter(filepath, numSkippableBytes);
+
+        // Write data to the file
+        fileWriter.writeGUIData(guiData);
+        fileWriter.writeMusicNotesData(musicNotesData);
+
+        fileWriter.writeBytesToFile();
+    }
+
+    /**
+     * Method that handles the saving of an AudiTranscribe project.
+     *
      * @param filepath    <b>Absolute</b> path to the AUDT file.
      * @param projectData Data object that stores all the data for the project.
      * @throws IOException If the writing to file encounters an error.
      */
-    public static void saveProject(
-            String filepath, ProjectData projectData
-    ) throws IOException {
+    public static void saveProject(String filepath, ProjectData projectData) throws IOException {
         // Declare the file writer object
         AUDTFileWriter fileWriter = new AUDTFileWriter(filepath);
 
