@@ -2,7 +2,7 @@
  * AUDTFileReader.java
  *
  * Created on 2022-05-02
- * Updated on 2022-06-08
+ * Updated on 2022-06-21
  *
  * Description: Class that handles the reading of the AudiTranscribe (AUDT) file.
  */
@@ -11,10 +11,7 @@ package site.overwrite.auditranscribe.io.audt_file;
 
 import site.overwrite.auditranscribe.io.IOConverters;
 import site.overwrite.auditranscribe.io.LZ4;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.MusicNotesDataObject;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
 import site.overwrite.auditranscribe.exceptions.FailedToReadDataException;
 import site.overwrite.auditranscribe.exceptions.IncorrectFileFormatException;
 
@@ -74,6 +71,38 @@ public class AUDTFileReader {
     // Public methods
 
     /**
+     * Method that reads the unchanging data properties from the file.
+     *
+     * @return A <code>UnchangingDataPropertiesObject</code> that encapsulates all the unchanging
+     * data's properties.
+     * @throws FailedToReadDataException If the program failed to read the data from the file.
+     */
+    public UnchangingDataPropertiesObject readUnchangingDataProperties() throws FailedToReadDataException {
+        // Ensure that the unchanging data properties section ID is correct
+        int sectionID = readSectionID();
+        if (sectionID != UnchangingDataPropertiesObject.SECTION_ID) {
+            throw new FailedToReadDataException(
+                    "Failed to read the unchanging data properties section; the unchanging data properties section " +
+                            "has the incorrect section ID of " + sectionID + " (expected: " +
+                            UnchangingDataPropertiesObject.SECTION_ID + ")"
+            );
+        }
+
+        // Read in the rest of the data
+        int numSkippableBytes = readInteger();
+
+        // Check if there is an EOS
+        if (!checkEOSDelimiter()) {
+            throw new FailedToReadDataException(
+                    "Failed to read unchanging data properties; end of section delimiter missing"
+            );
+        }
+
+        // Create and return a `UnchangingDataPropertiesObject`
+        return new UnchangingDataPropertiesObject(numSkippableBytes);
+    }
+
+    /**
      * Method that reads the Q-Transform data from the file.
      *
      * @return A <code>QTransformDataObject</code> that encapsulates all the data that are needed
@@ -82,12 +111,12 @@ public class AUDTFileReader {
      * @throws IOException               If something went wrong during reading the file.
      */
     public QTransformDataObject readQTransformData() throws FailedToReadDataException, IOException {
-        // Ensure that the Q-Transform data section ID is 1
+        // Ensure that the Q-Transform data section ID is correct
         int sectionID = readSectionID();
-        if (sectionID != 1) {
+        if (sectionID != QTransformDataObject.SECTION_ID) {
             throw new FailedToReadDataException(
                     "Failed to read Q-Transform data; the Q-Transform data section has the incorrect " +
-                            "section ID of " + sectionID + " (expected: 1)"
+                            "section ID of " + sectionID + " (expected: " + QTransformDataObject.SECTION_ID + ")"
             );
         }
 
@@ -112,12 +141,12 @@ public class AUDTFileReader {
      * @throws FailedToReadDataException If the program failed to read the data from the file.
      */
     public AudioDataObject readAudioData() throws FailedToReadDataException {
-        // Ensure that the audio data section ID is 2
+        // Ensure that the audio data section ID is correct
         int sectionID = readSectionID();
-        if (sectionID != 2) {
+        if (sectionID != AudioDataObject.SECTION_ID) {
             throw new FailedToReadDataException(
                     "Failed to read audio data; the audio data section has the incorrect section ID of " + sectionID +
-                            " (expected: 2)"
+                            " (expected: " + AudioDataObject.SECTION_ID + ")"
             );
         }
 
@@ -144,12 +173,12 @@ public class AUDTFileReader {
      * @throws FailedToReadDataException If the program failed to read the data from the file.
      */
     public GUIDataObject readGUIData() throws FailedToReadDataException {
-        // Ensure that the GUI data section ID is 3
+        // Ensure that the GUI data section ID is correct
         int sectionID = readSectionID();
-        if (sectionID != 3) {
+        if (sectionID != GUIDataObject.SECTION_ID) {
             throw new FailedToReadDataException(
                     "Failed to read GUI data; the GUI data section has the incorrect section ID of " + sectionID +
-                            " (expected: 3)"
+                            " (expected: " + GUIDataObject.SECTION_ID + ")"
             );
         }
 
@@ -180,12 +209,12 @@ public class AUDTFileReader {
      * @throws IOException               If something went wrong during reading the file.
      */
     public MusicNotesDataObject readMusicNotesData() throws FailedToReadDataException, IOException {
-        // Ensure that the GUI data section ID is 4
+        // Ensure that the GUI data section ID is correct
         int sectionID = readSectionID();
-        if (sectionID != 4) {
+        if (sectionID != MusicNotesDataObject.SECTION_ID) {
             throw new FailedToReadDataException(
                     "Failed to read music notes data; the music notes data section has the incorrect section ID of " +
-                            sectionID + " (expected: 4)"
+                            sectionID + " (expected: " + MusicNotesDataObject.SECTION_ID + ")"
             );
         }
 
@@ -408,22 +437,8 @@ public class AUDTFileReader {
         // Get the total number of bytes
         int numBytes = bytes.length;
 
-        // Check if the last 12th to last 4th bytes corresponds to the EOF bytes
-        byte[] eofBytes = Arrays.copyOfRange(bytes, numBytes - 12, numBytes - 4);
-        if (!checkBytesMatch(AUDTFileConstants.AUDT_END_OF_FILE_DELIMITER, eofBytes)) return false;
-
-        // Get the checksum value from the file
-        byte[] checksumBytes = Arrays.copyOfRange(bytes, numBytes - 4, numBytes);
-        int expectedChecksum = IOConverters.bytesToInt(checksumBytes);
-
-        // Sum all the bytes inside the file, excluding the checksum bytes, as the checksum
-        // (The checksum will overflow if the sum exceeds 2^31; this is okay as we only want the bytes' values)
-        int actualChecksum = 0;
-        for (byte b : Arrays.copyOfRange(bytes, 0, numBytes - 4)) {
-            actualChecksum += b;
-        }
-
-        // Check if the checksums match
-        return expectedChecksum == actualChecksum;
+        // Check if the last 8 bytes corresponds to the EOF bytes
+        byte[] eofBytes = Arrays.copyOfRange(bytes, numBytes - 8, numBytes);
+        return checkBytesMatch(AUDTFileConstants.AUDT_END_OF_FILE_DELIMITER, eofBytes);
     }
 }

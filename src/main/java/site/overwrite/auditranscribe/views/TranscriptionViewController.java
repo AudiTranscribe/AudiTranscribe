@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-20
+ * Updated on 2022-06-21
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -34,6 +34,7 @@ import site.overwrite.auditranscribe.exceptions.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.exceptions.NoteRectangleCollisionException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.LZ4;
+import site.overwrite.auditranscribe.io.audt_file.ProjectData;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
@@ -99,6 +100,8 @@ public class TranscriptionViewController implements Initializable {
     final KeyCodeCombination SAVE_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN);
 
     // File-Savable Attributes
+    private int numSkippableBytes;
+
     private double sampleRate;  // Sample rate of the audio
 
     private int musicKeyIndex = 0;  // Index of the music key chosen, according to the `MUSIC_KEYS` array
@@ -716,8 +719,11 @@ public class TranscriptionViewController implements Initializable {
      * @param projectData  The project data.
      */
     public void useExistingData(
-            String audtFilePath, String audtFileName, ProjectDataObject projectData
+            String audtFilePath, String audtFileName, ProjectData projectData
     ) {
+        // Get number of skippable bytes
+        numSkippableBytes = projectData.unchangingDataProperties.numSkippableBytes;
+
         // Set up GUI data
         musicKeyIndex = projectData.guiData.musicKeyIndex;
         timeSignatureIndex = projectData.guiData.timeSignatureIndex;
@@ -1180,7 +1186,7 @@ public class TranscriptionViewController implements Initializable {
                     noteNums[i] = noteRectangle.noteNum;
                 }
 
-                // Package all the current data into a `ProjectDataObject`
+                // Package data for saving
                 logger.log(Level.INFO, "Packaging data for saving");
                 QTransformDataObject qTransformData = new QTransformDataObject(
                         qTransformBytes, minQTransformMagnitude, maxQTransformMagnitude
@@ -1196,9 +1202,24 @@ public class TranscriptionViewController implements Initializable {
                         timesToPlaceRectangles, noteDurations, noteNums
                 );
 
-                ProjectDataObject projectData = new ProjectDataObject(
-                        qTransformData, audioData, guiData, musicNotesData
+                // Determine the number of skippable bytes
+                if (numSkippableBytes == 0) {
+                    numSkippableBytes = 32 +  // Header section
+                            UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
+                            qTransformData.numBytesNeeded() +
+                            audioData.numBytesNeeded();
+                }
+
+                // Update the unchanging data properties
+                UnchangingDataPropertiesObject unchangingDataProperties = new UnchangingDataPropertiesObject(
+                        numSkippableBytes
                 );
+
+                // Package all the current data into a `ProjectData`
+                ProjectData projectData = new ProjectData(
+                        unchangingDataProperties, qTransformData, audioData, guiData, musicNotesData
+                );
+
 
                 // Save the project
                 ProjectIOHandlers.saveProject(finalSaveDest, projectData);

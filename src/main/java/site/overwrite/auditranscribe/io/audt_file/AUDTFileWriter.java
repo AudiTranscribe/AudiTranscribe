@@ -2,7 +2,7 @@
  * AUDTFileWriter.java
  *
  * Created on 2022-05-01
- * Updated on 2022-06-08
+ * Updated on 2022-06-21
  *
  * Description: Class that handles the writing of the AudiTranscribe (AUDT) file.
  */
@@ -11,13 +11,11 @@ package site.overwrite.auditranscribe.io.audt_file;
 
 import site.overwrite.auditranscribe.io.IOConverters;
 import site.overwrite.auditranscribe.io.LZ4;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.MusicNotesDataObject;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +23,25 @@ import java.util.List;
 public class AUDTFileWriter {
     // Attributes
     public final String filepath;
+
     private final List<Byte> bytes = new ArrayList<>();
+    private final int numBytesToSkip;
+
+    /**
+     * Initialization method to make an <code>AUDTFileWriter</code> object.
+     *
+     * @param filepath       Path to the AUDT file. The file name at the end of the file path should
+     *                       <b>include</b> the extension of the AUDT file.
+     * @param numBytesToSkip Number of bytes to skip at the beginning of the file.
+     */
+    public AUDTFileWriter(String filepath, int numBytesToSkip) {
+        // Update attributes
+        this.filepath = filepath;
+        this.numBytesToSkip = numBytesToSkip;
+
+        // Write the header section if no bytes are to be skipped
+        if (numBytesToSkip == 0) writeHeaderSection();
+    }
 
     /**
      * Initialization method to make an <code>AUDTFileWriter</code> object.
@@ -36,6 +52,7 @@ public class AUDTFileWriter {
     public AUDTFileWriter(String filepath) {
         // Update attributes
         this.filepath = filepath;
+        this.numBytesToSkip = 0;
 
         // Write the header section
         writeHeaderSection();
@@ -60,17 +77,43 @@ public class AUDTFileWriter {
             byteArray[i] = bytes.get(i);
         }
 
-        // Write the byte array to file
-        Files.write(new File(filepath).toPath(), byteArray);
+        // Define the file path
+        File myFile = new File(filepath);
+
+        // Check if we need to skip bytes
+        if (numBytesToSkip == 0) {
+            // Write the byte array to the beginning of the file
+            Files.write(myFile.toPath(), byteArray);
+        } else {
+            // Define a random access file so that we can seek to a specific position
+            try (RandomAccessFile raf = new RandomAccessFile(myFile, "rw")) {  // Automatically closes file
+                // Seek to the correct position
+                raf.seek(numBytesToSkip);
+
+                // Write the byte array to the correct position
+                raf.write(byteArray);
+            }
+        }
     }
 
     /**
-     * Method that writes the Q-Transform data (<b>section number 1</b>) to file.
+     * Method that writes the unchanging data properties to file.
+     *
+     * @param unchangingDataProperties Data object that contains the unchanging data's properties.
+     */
+    public void writeUnchangingDataProperties(UnchangingDataPropertiesObject unchangingDataProperties) {
+        writeSectionID(UnchangingDataPropertiesObject.SECTION_ID);
+        writeInteger(unchangingDataProperties.numSkippableBytes);
+        writeEOSDelimiter();
+    }
+
+    /**
+     * Method that writes the Q-Transform data to file.
      *
      * @param qTransformDataObj Data object that holds all the Q-Transform data.
      */
     public void writeQTransformData(QTransformDataObject qTransformDataObj) {
-        writeSectionID(1);
+        writeSectionID(QTransformDataObject.SECTION_ID);
         writeDouble(qTransformDataObj.minMagnitude);
         writeDouble(qTransformDataObj.maxMagnitude);
         writeByteArray(qTransformDataObj.qTransformBytes);
@@ -78,12 +121,12 @@ public class AUDTFileWriter {
     }
 
     /**
-     * Method that writes the audio data (<b>section number 2</b>) to file.
+     * Method that writes the audio data to file.
      *
      * @param audioDataObj Data object that holds all the audio data.
      */
     public void writeAudioData(AudioDataObject audioDataObj) {
-        writeSectionID(2);
+        writeSectionID(AudioDataObject.SECTION_ID);
         writeByteArray(audioDataObj.compressedMP3Bytes);
         writeDouble(audioDataObj.sampleRate);
         writeInteger(audioDataObj.totalDurationInMS);
@@ -92,12 +135,12 @@ public class AUDTFileWriter {
     }
 
     /**
-     * Method that writes the GUI data (<b>section number 3</b>) to file.
+     * Method that writes the GUI data to file.
      *
      * @param guiDataObj Data object that holds all the GUI data.
      */
     public void writeGUIData(GUIDataObject guiDataObj) {
-        writeSectionID(3);
+        writeSectionID(GUIDataObject.SECTION_ID);
         writeInteger(guiDataObj.musicKeyIndex);
         writeInteger(guiDataObj.timeSignatureIndex);
         writeDouble(guiDataObj.bpm);
@@ -108,13 +151,13 @@ public class AUDTFileWriter {
     }
 
     /**
-     * Method that writes the music notes data (<b>section number 4</b>) to file.
+     * Method that writes the music notes data to file.
      *
      * @param musicNotesDataObj Data object that holds all the music notes data.
      * @throws IOException If something went wrong when LZ4 compressing.
      */
     public void writeMusicNotesData(MusicNotesDataObject musicNotesDataObj) throws IOException {
-        writeSectionID(4);
+        writeSectionID(MusicNotesDataObject.SECTION_ID);
         write1DDoubleArray(musicNotesDataObj.timesToPlaceRectangles);
         write1DDoubleArray(musicNotesDataObj.noteDurations);
         write1DIntegerArray(musicNotesDataObj.noteNums);
@@ -255,17 +298,6 @@ public class AUDTFileWriter {
      * Helper method that writes the end-of-file delimiter.
      */
     private void writeEOFDelimiter() {
-        // Write the EOF delimiter bytes
         AUDTFileHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_END_OF_FILE_DELIMITER);
-
-        // Sum all the bytes inside the file as a checksum
-        // (The checksum will overflow if the sum exceeds 2^31; this is okay as we only want the bytes' values)
-        int checksum = 0;
-        for (byte b : bytes) {
-            checksum += b;
-        }
-
-        // Write the checksum to the file as the last 4 bytes
-        writeInteger(checksum);
     }
 }

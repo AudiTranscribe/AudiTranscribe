@@ -2,7 +2,7 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-06-20
+ * Updated on 2022-06-21
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
@@ -21,6 +21,7 @@ import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.exceptions.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.io.audt_file.ProjectData;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
 import site.overwrite.auditranscribe.exceptions.FailedToReadDataException;
 import site.overwrite.auditranscribe.exceptions.IncorrectFileFormatException;
@@ -179,14 +180,15 @@ public class ProjectIOHandlers {
                 AUDTFileReader reader = new AUDTFileReader(audtFilePath);
 
                 // Read the data from the file
+                UnchangingDataPropertiesObject unchangingDataProperties = reader.readUnchangingDataProperties();
                 QTransformDataObject qTransformData = reader.readQTransformData();
                 AudioDataObject audioData = reader.readAudioData();
                 GUIDataObject guiData = reader.readGUIData();
                 MusicNotesDataObject musicNotesData = reader.readMusicNotesData();
 
-                // Pass these data into a `ProjectDataObject`
-                ProjectDataObject projectDataObject = new ProjectDataObject(
-                        qTransformData, audioData, guiData, musicNotesData
+                // Pass these data into a `ProjectData`
+                ProjectData projectData = new ProjectData(
+                        unchangingDataProperties, qTransformData, audioData, guiData, musicNotesData
                 );
 
                 // Get the current scene and the spectrogram view controller
@@ -201,7 +203,7 @@ public class ProjectIOHandlers {
                 controller.setThemeOnScene();
 
                 // Set the project data for the existing project
-                controller.useExistingData(audtFilePath, audtFileName, projectDataObject);
+                controller.useExistingData(audtFilePath, audtFileName, projectData);
                 controller.finishSetup(mainStage, allAudio, allSequencers, mainViewController);
 
                 // Set the scene for the transcription page
@@ -219,7 +221,7 @@ public class ProjectIOHandlers {
 
                 // Update scroll position
                 controller.updateScrollPosition(
-                        projectDataObject.guiData.currTimeInMS / 1000. *
+                        projectData.guiData.currTimeInMS / 1000. *
                                 controller.PX_PER_SECOND *
                                 controller.SPECTROGRAM_ZOOM_SCALE_X,
                         screenBounds.getWidth()
@@ -252,21 +254,22 @@ public class ProjectIOHandlers {
     /**
      * Method that handles the saving of an AudiTranscribe project.
      *
-     * @param filepath          <b>Absolute</b> path to the AUDT file.
-     * @param projectDataObject Data object that stores all the data for the project.
+     * @param filepath    <b>Absolute</b> path to the AUDT file.
+     * @param projectData Data object that stores all the data for the project.
      * @throws IOException If the writing to file encounters an error.
      */
     public static void saveProject(
-            String filepath, ProjectDataObject projectDataObject
+            String filepath, ProjectData projectData
     ) throws IOException {
         // Declare the file writer object
         AUDTFileWriter fileWriter = new AUDTFileWriter(filepath);
 
         // Write data to the file
-        fileWriter.writeQTransformData(projectDataObject.qTransformData);
-        fileWriter.writeAudioData(projectDataObject.audioData);
-        fileWriter.writeGUIData(projectDataObject.guiData);
-        fileWriter.writeMusicNotesData(projectDataObject.musicNotesData);
+        fileWriter.writeUnchangingDataProperties(projectData.unchangingDataProperties);
+        fileWriter.writeQTransformData(projectData.qTransformData);
+        fileWriter.writeAudioData(projectData.audioData);
+        fileWriter.writeGUIData(projectData.guiData);
+        fileWriter.writeMusicNotesData(projectData.musicNotesData);
 
         fileWriter.writeBytesToFile();
     }

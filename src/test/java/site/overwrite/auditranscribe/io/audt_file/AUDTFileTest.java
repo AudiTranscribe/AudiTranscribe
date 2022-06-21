@@ -2,7 +2,7 @@
  * AUDTFileTest.java
  *
  * Created on 2022-05-01
- * Updated on 2022-06-08
+ * Updated on 2022-06-21
  *
  * Description: Test AUDT file reading and writing.
  */
@@ -10,16 +10,10 @@
 package site.overwrite.auditranscribe.io.audt_file;
 
 import org.javatuples.Triplet;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.LZ4;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.AudioDataObject;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.GUIDataObject;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.MusicNotesDataObject;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.QTransformDataObject;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
 import site.overwrite.auditranscribe.exceptions.FailedToReadDataException;
 import site.overwrite.auditranscribe.exceptions.IncorrectFileFormatException;
 import site.overwrite.auditranscribe.utils.TypeConversionUtils;
@@ -33,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class AUDTFileTest {
     // Define the file name
-    final String fileName =
+    static final String FILE_NAME =
             "src/main/resources/site/overwrite/auditranscribe/test-resources/file-io-directory/test-AUDTFileTest.audt";
 
     // Define sample array data
@@ -44,9 +38,13 @@ class AUDTFileTest {
             {65.43, -123.45, 3.14159265, -0.000082147128481, 9876.54321}
     };
 
-    double[] timesToPlaceRectangles = {1, 2, 3, 4.5, 6.7, 8.9};
-    double[] noteDurations = {0.5, 1, 1.5, 2.5, 3.5, 10};
-    int[] noteNums = {32, 41, 91, 82, 84, 55};
+    double[] timesToPlaceRectangles1 = {1, 2, 3, 4.5, 6.7, 8.9};
+    double[] noteDurations1 = {0.5, 1, 1.5, 2.5, 3.5, 10};
+    int[] noteNums1 = {32, 41, 91, 82, 84, 55};
+
+    double[] timesToPlaceRectangles2 = {0, 0.9, 1.2, 1.8, 2.4, 3.3, 3.6, 4.2};
+    double[] noteDurations2 = {0.9, 0.3, 0.6, 0.6, 0.9, 0.3, 0.6, 0.6};
+    int[] noteNums2 = {64, 62, 53, 55, 60, 59, 52, 53};
 
     // Convert the magnitude data to required form
     Triplet<Byte[], Double, Double> conversionTuple =
@@ -62,11 +60,26 @@ class AUDTFileTest {
     AudioDataObject audioDataObject = new AudioDataObject(
             LZ4.lz4Compress(Files.readAllBytes(Path.of(IOMethods.getAbsoluteFilePath("testing-audio-files/A440.mp3")))),
             44100, 120000, "A440.wav");
-    GUIDataObject guiDataObject = new GUIDataObject(
+
+    GUIDataObject guiDataObject1 = new GUIDataObject(
             11, 9, 123.45, 0.01, 0.55, 9000
     );
-    MusicNotesDataObject musicNotesDataObject = new MusicNotesDataObject(
-            timesToPlaceRectangles, noteDurations, noteNums
+    GUIDataObject guiDataObject2 = new GUIDataObject(
+            15, 14, 67.89, -1.23, 0.124, 2048
+    );
+
+    MusicNotesDataObject musicNotesDataObject1 = new MusicNotesDataObject(
+            timesToPlaceRectangles1, noteDurations1, noteNums1
+    );
+    MusicNotesDataObject musicNotesDataObject2 = new MusicNotesDataObject(
+            timesToPlaceRectangles2, noteDurations2, noteNums2
+    );
+
+    UnchangingDataPropertiesObject unchangingDataPropertiesObject = new UnchangingDataPropertiesObject(
+            32 +  // Header section
+                    UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
+                    qTransformDataObject.numBytesNeeded() +
+                    audioDataObject.numBytesNeeded()
     );
 
     // Initialization method
@@ -76,15 +89,16 @@ class AUDTFileTest {
     // Tests
     @Test
     @Order(1)
-    void fileWriterTest() throws IOException {
+    void fileWriterTestOne() throws IOException {
         // Create a filewriter object
-        AUDTFileWriter fileWriter = new AUDTFileWriter(fileName);
+        AUDTFileWriter fileWriter = new AUDTFileWriter(FILE_NAME);
 
         // Test writing some data
+        fileWriter.writeUnchangingDataProperties(unchangingDataPropertiesObject);
         fileWriter.writeQTransformData(qTransformDataObject);
         fileWriter.writeAudioData(audioDataObject);
-        fileWriter.writeGUIData(guiDataObject);
-        fileWriter.writeMusicNotesData(musicNotesDataObject);
+        fileWriter.writeGUIData(guiDataObject1);
+        fileWriter.writeMusicNotesData(musicNotesDataObject1);
 
         // Write the bytes to file
         fileWriter.writeBytesToFile();
@@ -92,21 +106,23 @@ class AUDTFileTest {
 
     @Test
     @Order(2)
-    void fileReaderTest() throws IOException, IncorrectFileFormatException, FailedToReadDataException {
+    void fileReaderTestOne() throws IOException, IncorrectFileFormatException, FailedToReadDataException {
         // Create a filereader object
-        AUDTFileReader fileReader = new AUDTFileReader(fileName);
+        AUDTFileReader fileReader = new AUDTFileReader(FILE_NAME);
 
         // Test reading some data
+        UnchangingDataPropertiesObject readUnchangingDataProperties = fileReader.readUnchangingDataProperties();
         QTransformDataObject readQTransformData = fileReader.readQTransformData();
         AudioDataObject readAudioData = fileReader.readAudioData();
         GUIDataObject readGUIData = fileReader.readGUIData();
         MusicNotesDataObject readMusicData = fileReader.readMusicNotesData();
 
         // Check if the read data are equal
+        assertEquals(unchangingDataPropertiesObject, readUnchangingDataProperties);
         assertEquals(qTransformDataObject, readQTransformData);
         assertEquals(audioDataObject, readAudioData);
-        assertEquals(guiDataObject, readGUIData);
-        assertEquals(musicNotesDataObject, readMusicData);
+        assertEquals(guiDataObject1, readGUIData);
+        assertEquals(musicNotesDataObject1, readMusicData);
 
         // Check if the decompressed version of the Q-Transform magnitudes is the same
         double[][] array = QTransformDataObject.byteDataToQTransformMagnitudes(
@@ -119,5 +135,57 @@ class AUDTFileTest {
         for (int i = 0; i < array.length; i++) {
             assertArrayEquals(array[i], qTransformMagnitudes[i], 1e-5);
         }
+    }
+
+    @Test
+    @Order(3)
+    void fileWriterTestTwo() throws IOException {
+        // Create a filewriter object
+        AUDTFileWriter fileWriter = new AUDTFileWriter(FILE_NAME, unchangingDataPropertiesObject.numSkippableBytes);
+
+        // Test writing only the GUI and music notes data
+        fileWriter.writeGUIData(guiDataObject2);
+        fileWriter.writeMusicNotesData(musicNotesDataObject2);
+
+        // Write the bytes to file
+        fileWriter.writeBytesToFile();
+    }
+
+    @Test
+    @Order(4)
+    void fileReaderTestTwo() throws IOException, IncorrectFileFormatException, FailedToReadDataException {
+        // Create a filereader object
+        AUDTFileReader fileReader = new AUDTFileReader(FILE_NAME);
+
+        // Test reading some data
+        UnchangingDataPropertiesObject readUnchangingDataProperties = fileReader.readUnchangingDataProperties();
+        QTransformDataObject readQTransformData = fileReader.readQTransformData();
+        AudioDataObject readAudioData = fileReader.readAudioData();
+        GUIDataObject readGUIData = fileReader.readGUIData();
+        MusicNotesDataObject readMusicData2 = fileReader.readMusicNotesData();
+
+        // Check if the read data are equal
+        assertEquals(unchangingDataPropertiesObject, readUnchangingDataProperties);
+        assertEquals(qTransformDataObject, readQTransformData);
+        assertEquals(audioDataObject, readAudioData);
+        assertEquals(guiDataObject2, readGUIData);
+        assertEquals(musicNotesDataObject2, readMusicData2);
+
+        // Check if the decompressed version of the Q-Transform magnitudes is the same
+        double[][] array = QTransformDataObject.byteDataToQTransformMagnitudes(
+                qTransformDataObject.qTransformBytes,
+                qTransformDataObject.minMagnitude,
+                qTransformDataObject.maxMagnitude
+        );
+
+        assertEquals(array.length, qTransformMagnitudes.length);
+        for (int i = 0; i < array.length; i++) {
+            assertArrayEquals(array[i], qTransformMagnitudes[i], 1e-5);
+        }
+    }
+
+    @AfterAll
+    static void deleteTestingFile() throws IOException {
+        Files.deleteIfExists(Path.of(FILE_NAME));
     }
 }
