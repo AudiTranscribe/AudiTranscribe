@@ -30,8 +30,7 @@ import org.javatuples.Triplet;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.audio.FFmpegHandler;
 import site.overwrite.auditranscribe.bpm_estimation.BPMEstimator;
-import site.overwrite.auditranscribe.exceptions.FFmpegNotFoundException;
-import site.overwrite.auditranscribe.exceptions.NoteRectangleCollisionException;
+import site.overwrite.auditranscribe.exceptions.*;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.LZ4;
 import site.overwrite.auditranscribe.io.audt_file.ProjectData;
@@ -742,11 +741,25 @@ public class TranscriptionViewController implements Initializable {
         // Set up Q-Transform data and audio data
         try {
             setAudioAndSpectrogramData(projectData.qTransformData, projectData.audioData);
-        } catch (IOException | FFmpegNotFoundException | UnsupportedAudioFileException e) {
+        } catch (IOException | UnsupportedAudioFileException e) {
             Popups.showExceptionAlert(
                     "Error loading audio data.",
                     "An error occurred when loading the audio data. Does the audio file " +
                             "still exist at the original location?",
+                    e
+            );
+            throw new RuntimeException(e);
+        } catch (FFmpegNotFoundException e) {
+            Popups.showExceptionAlert(
+                    "Error loading audio data.",
+                    "FFmpeg was not found. Please install it and try again.",
+                    e
+            );
+            throw new RuntimeException(e);
+        } catch (AudioTooLongException e) {
+            Popups.showExceptionAlert(
+                    "Error loading audio data.",
+                    "The audio file is too long. Please select a shorter audio file.",
                     e
             );
             throw new RuntimeException(e);
@@ -842,10 +855,11 @@ public class TranscriptionViewController implements Initializable {
      * @throws FFmpegNotFoundException       If the FFmpeg binary could not be found.
      * @throws UnsupportedAudioFileException If the audio file path that was provided in
      *                                       <code>audioData</code> points to an invalid audio file.
+     * @throws AudioTooLongException         If the audio file is too long.
      */
     public void setAudioAndSpectrogramData(
             QTransformDataObject qTransformData, AudioDataObject audioData
-    ) throws IOException, FFmpegNotFoundException, UnsupportedAudioFileException {
+    ) throws IOException, FFmpegNotFoundException, UnsupportedAudioFileException, AudioTooLongException {
         // Set attributes
         compressedMP3Bytes = audioData.compressedMP3Bytes;
         sampleRate = audioData.sampleRate;
@@ -969,8 +983,8 @@ public class TranscriptionViewController implements Initializable {
         NoteRectangle.allNoteRectangles.clear();
 
         // Shutdown the schedulers
-        scheduler.shutdown();
-        autosaveScheduler.shutdown();
+        if (scheduler != null) scheduler.shutdown();
+        if (autosaveScheduler != null) autosaveScheduler.shutdown();
 
         // Stop and close the note player sequencer
         notePlayerSequencer.stop();

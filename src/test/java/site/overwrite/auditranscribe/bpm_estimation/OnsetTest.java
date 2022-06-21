@@ -2,7 +2,7 @@
  * OnsetTest.java
  *
  * Created on 2022-05-31
- * Updated on 2022-06-09
+ * Updated on 2022-06-21
  *
  * Description: Test `Onset.java`.
  */
@@ -12,6 +12,7 @@ package site.overwrite.auditranscribe.bpm_estimation;
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
+import site.overwrite.auditranscribe.exceptions.AudioTooLongException;
 import site.overwrite.auditranscribe.io.IOMethods;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -22,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class OnsetTest {
     @Test
-    void onsetStrength() throws UnsupportedAudioFileException, IOException {
+    void onsetStrength() throws UnsupportedAudioFileException, IOException, AudioTooLongException {
         // Get the audio files
         Audio audio1 = new Audio(
                 new File(IOMethods.getAbsoluteFilePath("testing-audio-files/Choice.wav")),

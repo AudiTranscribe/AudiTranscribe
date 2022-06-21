@@ -2,7 +2,7 @@
  * Audio.java
  *
  * Created on 2022-02-13
- * Updated on 2022-06-09
+ * Updated on 2022-06-21
  *
  * Description: Class that handles audio processing and audio playback.
  */
@@ -10,8 +10,7 @@
 package site.overwrite.auditranscribe.audio;
 
 import javafx.util.Duration;
-import site.overwrite.auditranscribe.exceptions.FFmpegNotFoundException;
-import site.overwrite.auditranscribe.exceptions.ValueException;
+import site.overwrite.auditranscribe.exceptions.*;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
@@ -37,6 +36,7 @@ import java.util.logging.Logger;
 public class Audio {
     // Constants
     public static final int SAMPLES_BUFFER_SIZE = 1024;  // In bits
+    public static final double MAX_AUDIO_LENGTH_IN_MIN = 15;  // Maximum length of audio in minutes
 
     // Attributes
     private final String audioFileName;
@@ -77,10 +77,12 @@ public class Audio {
      *                       </ul>
      * @throws IOException                   If there was a problem reading in the audio stream.
      * @throws UnsupportedAudioFileException If there was a problem reading in the audio file.
+     * @throws AudioTooLongException         If the audio file exceeds the maximum audio duration
+     *                                       permitted.
      */
     public Audio(
             File wavFile, String audioFileName, AudioProcessingMode processingMode
-    ) throws UnsupportedAudioFileException, IOException {
+    ) throws UnsupportedAudioFileException, IOException, AudioTooLongException {
         // Update attributes
         this.audioFileName = audioFileName;
 
@@ -110,6 +112,7 @@ public class Audio {
                 logger.log(Level.SEVERE, "JavaFX Toolkit not initialized. Audio playback will not work.");
             }
 
+            // Update attributes
             mediaPlayer = tempMediaPlayer;
 
         } else {
@@ -125,6 +128,20 @@ public class Audio {
             // Get the audio file's audio format and audio file's sample rate
             audioFormat = audioStream.getFormat();
             sampleRate = audioFormat.getSampleRate();
+
+            // Compute the duration of the audio file
+            long frames = audioStream.getFrameLength();
+            duration = frames / audioFormat.getFrameRate();  // In seconds
+
+            // Check if duration is too long
+            double durationInMinutes = duration / 60;
+
+            if (durationInMinutes > MAX_AUDIO_LENGTH_IN_MIN) {
+                throw new AudioTooLongException(
+                        "Audio file is too long (audio was " + durationInMinutes + " minutes but maximum allowed " +
+                                "is " + MAX_AUDIO_LENGTH_IN_MIN + " minutes)"
+                );
+            }
 
             // Generate audio samples
             generateSamples();
@@ -497,13 +514,13 @@ public class Audio {
                 }
             } else {  // Mono
                 // Fill in the mono audio samples array
-                numMonoSamples = numSamples;
+//                numMonoSamples = numSamples;
                 monoAudioSamples = new double[numSamples];
                 System.arraycopy(audioSamples, 0, monoAudioSamples, 0, numSamples);
             }
 
             // Calculate the duration of the audio
-            if (duration == 0) duration = numMonoSamples / sampleRate;
+//            if (duration == 0) duration = numMonoSamples / sampleRate;
 
             // Close the audio stream
             if (audioStream != null) {

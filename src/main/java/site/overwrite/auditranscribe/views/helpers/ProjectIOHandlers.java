@@ -18,6 +18,7 @@ import org.javatuples.Pair;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.audio.FFmpegHandler;
 import site.overwrite.auditranscribe.audio.Audio;
+import site.overwrite.auditranscribe.exceptions.AudioTooLongException;
 import site.overwrite.auditranscribe.exceptions.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
@@ -140,11 +141,25 @@ public class ProjectIOHandlers {
                     mainStage.show();  // Show the main scene upon the spectrogram scene's closure
                 }
 
-            } catch (IOException | FFmpegNotFoundException | UnsupportedAudioFileException e) {
+            } catch (IOException | UnsupportedAudioFileException e) {
                 Popups.showExceptionAlert(
-                        "Failed to read '" + file.getName() + "' as an audio file.",
-                        "The program failed to read '" + file.getName() +
-                                "' as an audio file. Please check if " + "this is a valid audio file.",
+                        "Error loading audio data.",
+                        "An error occurred when loading the audio data. Does the audio file " +
+                                "still exist at the original location?",
+                        e
+                );
+                e.printStackTrace();
+            } catch (FFmpegNotFoundException e) {
+                Popups.showExceptionAlert(
+                        "Error loading audio data.",
+                        "FFmpeg was not found. Please install it and try again.",
+                        e
+                );
+                e.printStackTrace();
+            } catch (AudioTooLongException e) {
+                Popups.showExceptionAlert(
+                        "Error loading audio data.",
+                        "The audio file is too long. Please select a shorter audio file.",
                         e
                 );
                 e.printStackTrace();
