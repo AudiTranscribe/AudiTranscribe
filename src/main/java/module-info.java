@@ -29,15 +29,15 @@ module site.overwrite.auditranscribe {
     exports site.overwrite.auditranscribe.io.json_files.data_encapsulators;
     exports site.overwrite.auditranscribe.io.json_files.file_classes;
     exports site.overwrite.auditranscribe.misc;
+    exports site.overwrite.auditranscribe.misc.view_helpers;
     exports site.overwrite.auditranscribe.note_playback;
     exports site.overwrite.auditranscribe.spectrogram;
     exports site.overwrite.auditranscribe.utils;
     exports site.overwrite.auditranscribe.views;
-    exports site.overwrite.auditranscribe.views.helpers;
 
     opens site.overwrite.auditranscribe to javafx.fxml;
     opens site.overwrite.auditranscribe.misc to javafx.fxml;
+    opens site.overwrite.auditranscribe.misc.view_helpers to javafx.fxml;
     opens site.overwrite.auditranscribe.views to javafx.fxml;
-    opens site.overwrite.auditranscribe.views.helpers to javafx.fxml;
     opens site.overwrite.auditranscribe.views.setup_wizard_views to javafx.fxml;
 }

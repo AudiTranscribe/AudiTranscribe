@@ -2,7 +2,7 @@
  * MainApplication.java
  *
  * Created on 2022-02-09
- * Updated on 2022-06-20
+ * Updated on 2022-06-21
  *
  * Description: Contains the main application class.
  */
@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.views.MainViewController;
-import site.overwrite.auditranscribe.views.helpers.SetupWizardHelper;
+import site.overwrite.auditranscribe.misc.view_helpers.SetupWizardHelper;
 
 import java.io.IOException;
 

@@ -7,7 +7,7 @@
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
 
-package site.overwrite.auditranscribe.views.helpers;
+package site.overwrite.auditranscribe.misc.view_helpers;
 
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;

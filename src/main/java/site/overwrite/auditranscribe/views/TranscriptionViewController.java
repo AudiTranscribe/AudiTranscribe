@@ -48,9 +48,9 @@ import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 import site.overwrite.auditranscribe.plotting.PlottingStuffHandler;
 import site.overwrite.auditranscribe.spectrogram.*;
 import site.overwrite.auditranscribe.utils.*;
-import site.overwrite.auditranscribe.views.helpers.MouseHandler;
-import site.overwrite.auditranscribe.views.helpers.Popups;
-import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
+import site.overwrite.auditranscribe.misc.MouseHandler;
+import site.overwrite.auditranscribe.misc.view_helpers.Popups;
+import site.overwrite.auditranscribe.misc.view_helpers.ProjectIOHandlers;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;

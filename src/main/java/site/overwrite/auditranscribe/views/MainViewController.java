@@ -2,7 +2,7 @@
  * MainViewController.java
  *
  * Created on 2022-02-09
- * Updated on 2022-06-14
+ * Updated on 2022-06-21
  *
  * Description: Contains the main view's controller class.
  */
@@ -38,7 +38,7 @@ import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.note_playback.NotePlayerSequencer;
 import site.overwrite.auditranscribe.utils.MiscUtils;
-import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
+import site.overwrite.auditranscribe.misc.view_helpers.ProjectIOHandlers;
 
 import java.io.File;
 import java.io.IOException;

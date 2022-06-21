@@ -2,7 +2,7 @@
  * PreferencesViewController.java
  *
  * Created on 2022-05-22
- * Updated on 2022-06-20
+ * Updated on 2022-06-21
  *
  * Description: Contains the preferences view's controller class.
  */
@@ -26,8 +26,8 @@ import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
 import site.overwrite.auditranscribe.misc.spinners.CustomIntegerSpinnerValueFactory;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
-import site.overwrite.auditranscribe.views.helpers.Popups;
-import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
+import site.overwrite.auditranscribe.misc.view_helpers.Popups;
+import site.overwrite.auditranscribe.misc.view_helpers.ProjectIOHandlers;
 
 import java.io.File;
 import java.io.IOException;

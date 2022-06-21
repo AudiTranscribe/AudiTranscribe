@@ -2,12 +2,12 @@
  * MouseHandler.java
  *
  * Created on 2022-06-07
- * Updated on 2022-06-07
+ * Updated on 2022-06-21
  *
  * Description: Handler that handles a mouse click event and a mouse drag event separately.
  */
 
-package site.overwrite.auditranscribe.views.helpers;
+package site.overwrite.auditranscribe.misc;
 
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
