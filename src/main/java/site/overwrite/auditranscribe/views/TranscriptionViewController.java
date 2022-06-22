@@ -1765,7 +1765,7 @@ public class TranscriptionViewController implements Initializable {
         isPaused = togglePaused(isPaused);
 
         // Handle note rectangle operations when toggle paused
-        if (!isPaused) {
+        if (!isPaused && !areNotesMuted) {
             // Get number of note rectangles
             int numNoteRects = NoteRectangle.allNoteRectangles.size();
 
