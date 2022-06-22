@@ -10,41 +10,41 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="rootPane" prefHeight="300.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="site.overwrite.auditranscribe.views.main_views.AboutViewController">
+<AnchorPane fx:id="rootPane" prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="site.overwrite.auditranscribe.views.main_views.AboutViewController">
    <children>
-      <ImageView fx:id="bannerImage" fitHeight="125.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <ImageView fx:id="bannerImage" fitHeight="167.0" fitWidth="400.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <image>
             <Image url="@../../../images/logo-and-banner/banner-light-mode.png" />
          </image>
       </ImageView>
-      <Label fx:id="versionLabel" alignment="CENTER" layoutX="-1.0" layoutY="103.0" prefHeight="20.0" text="Version: X.Y.Z" textAlignment="CENTER" AnchorPane.leftAnchor="-1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="100.0">
+      <Label fx:id="versionLabel" alignment="CENTER" layoutX="-1.0" layoutY="103.0" prefHeight="30.0" text="Version: X.Y.Z" textAlignment="CENTER" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="130.0">
          <padding>
             <Insets left="10.0" right="10.0" />
          </padding>
          <font>
-            <Font size="14.0" />
+            <Font size="20.0" />
          </font>
       </Label>
-      <VBox prefWidth="100.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="125.0">
+      <VBox prefWidth="400.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="160.0">
          <children>
-            <HBox alignment="TOP_CENTER" prefWidth="200.0">
+            <HBox alignment="TOP_CENTER" prefWidth="400.0">
                <children>
-                  <Label prefHeight="20.0" text="Visit">
+                  <Label alignment="CENTER" prefHeight="30.0" text="Visit">
                      <padding>
                         <Insets left="10.0" />
                      </padding>
                      <font>
-                        <Font size="11.0" />
+                        <Font size="14.0" />
                      </font>
                   </Label>
-                  <Hyperlink fx:id="websiteHyperlink" text="auditranscribe.app">
+                  <Hyperlink fx:id="websiteHyperlink" alignment="CENTER" prefHeight="30.0" text="auditranscribe.app">
                      <font>
-                        <Font size="11.0" />
+                        <Font size="14.0" />
                      </font>
                   </Hyperlink>
-                  <Label prefHeight="20.0" text="for new versions and more">
+                  <Label alignment="CENTER" prefHeight="30.0" text="for new versions and more">
                      <font>
-                        <Font size="11.0" />
+                        <Font size="14.0" />
                      </font>
                   </Label>
                </children>
@@ -52,9 +52,9 @@
                   <Insets left="10.0" right="10.0" />
                </padding>
             </HBox>
-            <Label alignment="TOP_CENTER" prefHeight="20.0" prefWidth="300.0" text="infomation about AudiTranscribe." textAlignment="CENTER">
+            <Label alignment="CENTER" prefHeight="30.0" prefWidth="400.0" text="infomation about AudiTranscribe." textAlignment="CENTER" translateY="-15.0">
                <font>
-                  <Font size="11.0" />
+                  <Font size="14.0" />
                </font>
                <padding>
                   <Insets left="10.0" right="10.0" />
@@ -62,28 +62,42 @@
             </Label>
          </children>
       </VBox>
-      <VBox layoutX="10.0" layoutY="135.0" prefHeight="50.0" prefWidth="100.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="175.0">
+      <VBox layoutX="10.0" layoutY="135.0" prefHeight="50.0" prefWidth="100.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="210.0">
          <children>
-            <Label alignment="BOTTOM_CENTER" prefHeight="20.0" prefWidth="300.0" text="AudiTranscribe's Licence and dependants' licences" textAlignment="CENTER">
+            <Label alignment="CENTER" prefHeight="30.0" prefWidth="400.0" text="AudiTranscribe's Licence and dependants' licences" textAlignment="CENTER">
                <padding>
                   <Insets left="10.0" right="10.0" />
                </padding>
                <font>
-                  <Font size="11.0" />
+                  <Font size="14.0" />
                </font>
             </Label>
-            <HBox alignment="TOP_CENTER" prefWidth="200.0">
+            <HBox alignment="TOP_CENTER" prefWidth="400.0" translateY="-10.0">
                <children>
-                  <Label prefHeight="20.0" text="can be found at">
+                  <Label alignment="CENTER" prefHeight="30.0" text="can be found at" HBox.hgrow="ALWAYS">
                      <font>
-                        <Font size="11.0" />
+                        <Font size="14.0" />
                      </font>
+                     <padding>
+                        <Insets left="10.0" />
+                     </padding>
                   </Label>
-                  <Hyperlink fx:id="licencesHyperlink" text="auditranscribe.app/licences">
+                  <Hyperlink fx:id="licencesHyperlink" alignment="CENTER" prefHeight="30.0" text="auditranscribe.app/licences" HBox.hgrow="ALWAYS">
                      <font>
-                        <Font size="11.0" />
+                        <Font size="14.0" />
                      </font>
+                     <padding>
+                        <Insets left="3.0" right="-1.0" />
+                     </padding>
                   </Hyperlink>
+                  <Label prefHeight="30.0" text=".">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                     <padding>
+                        <Insets right="10.0" />
+                     </padding>
+                  </Label>
                </children>
                <padding>
                   <Insets left="10.0" right="10.0" />
@@ -91,15 +105,11 @@
             </HBox>
          </children>
       </VBox>
-      <Label alignment="CENTER" prefWidth="300.0" text="Copyright © AudiTranscribe Team" AnchorPane.bottomAnchor="35.0">
+      <Label alignment="CENTER" prefWidth="400.0" text="Copyright © AudiTranscribe Team" AnchorPane.bottomAnchor="35.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <font>
-            <Font size="12.0" />
+            <Font size="14.0" />
          </font>
       </Label>
-      <Label alignment="CENTER" layoutX="10.0" layoutY="10.0" prefWidth="300.0" text="Published under the GNU General Public Licence 3.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
-         <font>
-            <Font size="11.0" />
-         </font>
-      </Label>
+      <Label alignment="CENTER" layoutX="10.0" layoutY="10.0" prefWidth="400.0" text="Published under the GNU General Public Licence 3.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
    </children>
 </AnchorPane>
