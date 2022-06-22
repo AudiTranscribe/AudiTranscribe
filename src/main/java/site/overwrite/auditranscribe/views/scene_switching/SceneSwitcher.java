@@ -121,7 +121,7 @@ public class SceneSwitcher {
         try {
             // Load the FXML file into the scene
             FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL(
-                    "views/fxml/main-views/main-view.fxml"
+                    "views/fxml/main/main-view.fxml"
             ));
             Scene scene = new Scene(fxmlLoader.load());
 
@@ -370,7 +370,7 @@ public class SceneSwitcher {
 
         // Get the FXML loader for the spectrogram view
         FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL(
-                "views/fxml/main-views/transcription-view.fxml"
+                "views/fxml/main/transcription-view.fxml"
         ));
 
         // Get the spectrogram view scene

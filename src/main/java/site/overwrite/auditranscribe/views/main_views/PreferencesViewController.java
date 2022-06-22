@@ -229,7 +229,7 @@ public class PreferencesViewController implements Initializable {
     public static void showPreferencesWindow(SettingsFile settingsFile) {
         try {
             // Load the FXML file into the scene
-            FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/main-views/preferences-view.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/main/preferences-view.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
 
             // Get the view controller

@@ -111,7 +111,7 @@ public class AboutViewController implements Initializable {
     public static void showAboutWindow(SettingsFile settingsFile) {
         try {
             // Load the FXML file into the scene
-            FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/main-views/about-view.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/main/about-view.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
 
             // Get the view controller

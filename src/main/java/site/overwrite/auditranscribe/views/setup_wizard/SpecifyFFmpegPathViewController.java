@@ -8,7 +8,7 @@
  *              FFmpeg.
  */
 
-package site.overwrite.auditranscribe.views.setup_wizard_views;
+package site.overwrite.auditranscribe.views.setup_wizard;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

@@ -2,12 +2,12 @@
  * InitialViewController.java
  *
  * Created on 2022-06-19
- * Updated on 2022-06-19
+ * Updated on 2022-06-22
  *
  * Description: View controller that handles the initial view for the setup wizard.
  */
 
-package site.overwrite.auditranscribe.views.setup_wizard_views;
+package site.overwrite.auditranscribe.views.setup_wizard;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

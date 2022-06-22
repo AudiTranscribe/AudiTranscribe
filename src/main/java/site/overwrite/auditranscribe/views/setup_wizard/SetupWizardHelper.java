@@ -7,7 +7,7 @@
  * Description: Class that handles the setup wizard.
  */
 
-package site.overwrite.auditranscribe.views;
+package site.overwrite.auditranscribe.views.setup_wizard;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -19,7 +19,7 @@ import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.StreamGobbler;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.Theme;
-import site.overwrite.auditranscribe.views.setup_wizard_views.*;
+import site.overwrite.auditranscribe.views.setup_wizard.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -278,7 +278,7 @@ public class SetupWizardHelper {
      * @return The URL of the view file.
      */
     private URL getSetupWizardView(String viewFile) {
-        return IOMethods.getFileURL("views/fxml/setup-wizard-views/" + viewFile);
+        return IOMethods.getFileURL("views/fxml/setup-wizard/" + viewFile);
     }
 
     /**
