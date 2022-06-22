@@ -35,6 +35,7 @@ module site.overwrite.auditranscribe {
     exports site.overwrite.auditranscribe.views;
     exports site.overwrite.auditranscribe.views.helpers;
     exports site.overwrite.auditranscribe.views.main_views;
+    exports site.overwrite.auditranscribe.views.scene_switching;
     exports site.overwrite.auditranscribe.views.setup_wizard_views;
 
     opens site.overwrite.auditranscribe to javafx.fxml;
@@ -42,5 +43,6 @@ module site.overwrite.auditranscribe {
     opens site.overwrite.auditranscribe.views to javafx.fxml;
     opens site.overwrite.auditranscribe.views.helpers to javafx.fxml;
     opens site.overwrite.auditranscribe.views.main_views to javafx.fxml;
+    opens site.overwrite.auditranscribe.views.scene_switching to javafx.fxml;
     opens site.overwrite.auditranscribe.views.setup_wizard_views to javafx.fxml;
 }

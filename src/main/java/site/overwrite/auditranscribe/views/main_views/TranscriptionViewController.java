@@ -51,6 +51,7 @@ import site.overwrite.auditranscribe.utils.*;
 import site.overwrite.auditranscribe.misc.MouseHandler;
 import site.overwrite.auditranscribe.views.helpers.Popups;
 import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
+import site.overwrite.auditranscribe.views.scene_switching.SceneSwitchingState;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
@@ -112,8 +113,6 @@ public class TranscriptionViewController implements Initializable {
     private double currTime = 0;
 
     // Other attributes
-    Stage mainStage;
-    MainViewController mainViewController;
     SettingsFile settingsFile;
     Theme theme;
 
@@ -125,9 +124,6 @@ public class TranscriptionViewController implements Initializable {
 
     private final Logger logger = Logger.getLogger(this.getClass().getName());
     private ProjectsDB projectsDB;
-
-    private List<Audio> allAudio;
-    private List<NotePlayerSequencer> allSequencers;
 
     private String audtFilePath;
     private String audtFileName;
@@ -161,6 +157,9 @@ public class TranscriptionViewController implements Initializable {
     private Line playheadLine;
 
     Queue<CustomTask<?>> ongoingTasks = new LinkedList<>();
+
+    private SceneSwitchingState sceneSwitchingState = SceneSwitchingState.SHOW_MAIN_SCENE;
+    private File selectedFile = null;
 
     ScheduledExecutorService scheduler;
     ScheduledExecutorService autosaveScheduler;
@@ -515,9 +514,18 @@ public class TranscriptionViewController implements Initializable {
         }
     }
 
-    // Setter methods
+    // Getter/Setter methods
     public void setSettingsFile(SettingsFile settingsFile) {
         this.settingsFile = settingsFile;
+    }
+
+    public SceneSwitchingState getSceneSwitchingState() {
+        if (sceneSwitchingState == null) return SceneSwitchingState.SHOW_MAIN_SCENE;
+        return sceneSwitchingState;
+    }
+
+    public File getSelectedFile() {
+        return selectedFile;
     }
 
     // Public methods
@@ -610,27 +618,8 @@ public class TranscriptionViewController implements Initializable {
      * Method that finishes the setting up of the transcription view controller.<br>
      * Note that this method has to be called <b>last</b>, after all other spectrogram things have
      * been set up.
-     *
-     * @param mainStage          Main stage.
-     * @param allAudio           List of all opened <code>Audio</code> objects.
-     * @param allSequencers      List of all opened <code>NotePlayerSequencer</code> objects.
-     * @param mainViewController Controller object of the main class.
      */
-    public void finishSetup(
-            Stage mainStage, List<Audio> allAudio, List<NotePlayerSequencer> allSequencers,
-            MainViewController mainViewController
-    ) {
-        // Update attributes
-        this.mainStage = mainStage;
-        this.mainViewController = mainViewController;
-
-        this.allAudio = allAudio;
-        this.allSequencers = allSequencers;
-
-        // Append the current audio and sequencer to the appropriate lists
-        this.allAudio.add(audio);
-        this.allSequencers.add(notePlayerSequencer);
-
+    public void finishSetup() {
         // Set choices
         musicKeyChoice.setValue(MusicUtils.MUSIC_KEYS[musicKeyIndex]);
         timeSignatureChoice.setValue(MusicUtils.TIME_SIGNATURES[timeSignatureIndex]);
@@ -1078,11 +1067,17 @@ public class TranscriptionViewController implements Initializable {
             }
         }
 
-        // Create the new project
-        ProjectIOHandlers.newProject(
-                mainStage, (Stage) window, file, settingsFile, allAudio, allSequencers,
-                mainViewController
-        );
+        // Verify that the user actually chose a file
+        if (file == null) {
+            Popups.showInformationAlert("Info", "No file selected.");
+        } else {
+            // Set the scene switching status and the selected file
+            sceneSwitchingState = SceneSwitchingState.NEW_PROJECT;
+            selectedFile = file;
+
+            // Close this stage
+            ((Stage) rootPane.getScene().getWindow()).close();
+        }
     }
 
     /**
@@ -1118,10 +1113,17 @@ public class TranscriptionViewController implements Initializable {
             }
         }
 
-        // Open the existing project
-        ProjectIOHandlers.openProject(
-                mainStage, (Stage) window, file, settingsFile, allAudio, allSequencers,
-                mainViewController);
+        // Verify that the user actually chose a file
+        if (file == null) {
+            Popups.showInformationAlert("Info", "No file selected.");
+        } else {
+            // Set the scene switching status and the selected file
+            sceneSwitchingState = SceneSwitchingState.OPEN_PROJECT;
+            selectedFile = file;
+
+            // Close this stage
+            ((Stage) rootPane.getScene().getWindow()).close();
+        }
     }
 
     /**
@@ -2043,11 +2045,17 @@ public class TranscriptionViewController implements Initializable {
             );
             File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
 
-            // Create the new project
-            ProjectIOHandlers.newProject(
-                    mainStage, (Stage) window, file, settingsFile, allAudio, allSequencers,
-                    mainViewController
-            );
+            // Verify that the user actually chose a file
+            if (file == null) {
+                Popups.showInformationAlert("Info", "No file selected.");
+            } else {
+                // Set the scene switching status and the selected file
+                sceneSwitchingState = SceneSwitchingState.NEW_PROJECT;
+                selectedFile = file;
+
+                // Close this stage
+                ((Stage) rootPane.getScene().getWindow()).close();
+            }
 
         } else if (OPEN_PROJECT_COMBINATION.match(keyEvent)) {  // Open a project
             // Consume the key event
@@ -2062,10 +2070,17 @@ public class TranscriptionViewController implements Initializable {
             );
             File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
 
-            // Open the existing project
-            ProjectIOHandlers.openProject(
-                    mainStage, (Stage) window, file, settingsFile, allAudio, allSequencers,
-                    mainViewController);
+            // Verify that the user actually chose a file
+            if (file == null) {
+                Popups.showInformationAlert("Info", "No file selected.");
+            } else {
+                // Set the scene switching status and the selected file
+                sceneSwitchingState = SceneSwitchingState.OPEN_PROJECT;
+                selectedFile = file;
+
+                // Close this stage
+                ((Stage) rootPane.getScene().getWindow()).close();
+            }
 
         } else if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {  // Save current project
             handleSavingProject(false, false);

@@ -29,20 +29,19 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.javatuples.Pair;
 import org.javatuples.Quartet;
-import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.PropertyFile;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.io.json_files.data_encapsulators.SettingsData;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.Theme;
-import site.overwrite.auditranscribe.note_playback.NotePlayerSequencer;
 import site.overwrite.auditranscribe.utils.MiscUtils;
+import site.overwrite.auditranscribe.views.helpers.Popups;
 import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
+import site.overwrite.auditranscribe.views.scene_switching.SceneSwitchingState;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InvalidObjectException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -58,15 +57,14 @@ import java.util.logging.Logger;
 public class MainViewController implements Initializable {
     // Attributes
     ProjectsDB projectsDB;
-    Stage transcriptionStage = new Stage();  // Will be used and shown later
 
     FilteredList<Quartet<Long, String, String, String>> filteredList;  // List of project records
 
-    private final List<Audio> allAudio = new ArrayList<>();
-    private final List<NotePlayerSequencer> allSequencers = new ArrayList<>();
-
     private SettingsFile settingsFile;
     private final Logger logger = Logger.getLogger(this.getClass().getName());
+
+    private SceneSwitchingState sceneSwitchingState = SceneSwitchingState.CLOSE_SCENE;
+    private File selectedFile = null;
 
     // FXML Elements
     // Menu bar items
@@ -146,13 +144,12 @@ public class MainViewController implements Initializable {
                 String filepath = selectedItem.getValue2();
                 File file = new File(filepath);
 
-                // Get the window
-                Window window = rootPane.getScene().getWindow();
+                // Set the scene switching status and the selected file
+                sceneSwitchingState = SceneSwitchingState.OPEN_PROJECT;
+                selectedFile = file;
 
-                // Open the project with the filepath
-                ProjectIOHandlers.openProject(
-                        (Stage) window, transcriptionStage, file, settingsFile, allAudio, allSequencers,
-                        this);
+                // Close this stage
+                ((Stage) rootPane.getScene().getWindow()).close();
             }
         });
 
@@ -175,6 +172,15 @@ public class MainViewController implements Initializable {
 
     public void setSettingsFile(SettingsFile settingsFile) {
         this.settingsFile = settingsFile;
+    }
+
+    public SceneSwitchingState getSceneSwitchingState() {
+        if (sceneSwitchingState == null) return SceneSwitchingState.CLOSE_SCENE;
+        return sceneSwitchingState;
+    }
+
+    public File getSelectedFile() {
+        return selectedFile;
     }
 
     // Public methods
@@ -267,32 +273,6 @@ public class MainViewController implements Initializable {
         }
     }
 
-    /**
-     * Method that stops all the audio objects and <code>NotePlayerSequencer</code>s that have been
-     * loaded in the transcription views.
-     */
-    public void stopAllPlayableObjects() {
-        // Stop all `Audio` objects
-        for (Audio audio : allAudio) {
-            try {
-                audio.stop();
-                logger.log(Level.FINE, "Stopped audio: " + audio.getAudioFileName());
-            } catch (InvalidObjectException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        // Stop and close all `NotePlayerSequencer` objects
-        for (NotePlayerSequencer notePlayerSequencer : allSequencers) {
-            notePlayerSequencer.stop();
-            notePlayerSequencer.close();
-        }
-
-        // Clear the lists
-        allAudio.clear();
-        allSequencers.clear();
-    }
-
     // Private methods
 
     /**
@@ -311,10 +291,17 @@ public class MainViewController implements Initializable {
         );
         File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
 
-        // Create the new project
-        ProjectIOHandlers.newProject(
-                (Stage) window, transcriptionStage, file, settingsFile, allAudio, allSequencers,
-                this);
+        // Verify that the user actually chose a file
+        if (file == null) {
+            Popups.showInformationAlert("Info", "No file selected.");
+        } else {
+            // Set the scene switching status and the selected file
+            sceneSwitchingState = SceneSwitchingState.NEW_PROJECT;
+            selectedFile = file;
+
+            // Close this stage
+            ((Stage) rootPane.getScene().getWindow()).close();
+        }
     }
 
     /**
@@ -332,10 +319,17 @@ public class MainViewController implements Initializable {
         );
         File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
 
-        // Open the existing project
-        ProjectIOHandlers.openProject(
-                (Stage) window, transcriptionStage, file, settingsFile, allAudio, allSequencers,
-                this);
+        // Verify that the user actually chose a file
+        if (file == null) {
+            Popups.showInformationAlert("Info", "No file selected.");
+        } else {
+            // Set the scene switching status and the selected file
+            sceneSwitchingState = SceneSwitchingState.OPEN_PROJECT;
+            selectedFile = file;
+
+            // Close this stage
+            ((Stage) window).close();
+        }
     }
 
     // Helper classes
