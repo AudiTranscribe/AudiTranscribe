@@ -2,7 +2,7 @@
  * MainApplication.java
  *
  * Created on 2022-02-09
- * Updated on 2022-06-21
+ * Updated on 2022-06-22
  *
  * Description: Contains the main application class.
  */
@@ -15,8 +15,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
-import site.overwrite.auditranscribe.views.MainViewController;
-import site.overwrite.auditranscribe.misc.view_helpers.SetupWizardHelper;
+import site.overwrite.auditranscribe.views.main_views.MainViewController;
+import site.overwrite.auditranscribe.views.SetupWizardHelper;
 
 import java.io.IOException;
 
@@ -36,7 +36,7 @@ public class MainApplication extends Application {
         setupWizardHelper.showSetupWizard();
 
         // Load the FXML file into the scene
-        FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/main-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/main-views/main-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
 
         // Get the view controller

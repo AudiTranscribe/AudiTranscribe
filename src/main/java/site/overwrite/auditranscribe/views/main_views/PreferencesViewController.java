@@ -2,12 +2,12 @@
  * PreferencesViewController.java
  *
  * Created on 2022-05-22
- * Updated on 2022-06-21
+ * Updated on 2022-06-22
  *
  * Description: Contains the preferences view's controller class.
  */
 
-package site.overwrite.auditranscribe.views;
+package site.overwrite.auditranscribe.views.main_views;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -26,8 +26,8 @@ import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
 import site.overwrite.auditranscribe.misc.spinners.CustomIntegerSpinnerValueFactory;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
-import site.overwrite.auditranscribe.misc.view_helpers.Popups;
-import site.overwrite.auditranscribe.misc.view_helpers.ProjectIOHandlers;
+import site.overwrite.auditranscribe.views.helpers.Popups;
+import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
 
 import java.io.File;
 import java.io.IOException;
@@ -229,7 +229,7 @@ public class PreferencesViewController implements Initializable {
     public static void showPreferencesWindow(SettingsFile settingsFile) {
         try {
             // Load the FXML file into the scene
-            FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/preferences-view.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/main-views/preferences-view.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
 
             // Get the view controller

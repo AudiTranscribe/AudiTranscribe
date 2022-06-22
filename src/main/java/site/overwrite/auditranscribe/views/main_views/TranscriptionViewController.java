@@ -2,12 +2,12 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-21
+ * Updated on 2022-06-22
  *
  * Description: Contains the transcription view's controller class.
  */
 
-package site.overwrite.auditranscribe.views;
+package site.overwrite.auditranscribe.views.main_views;
 
 import javafx.application.Platform;
 import javafx.event.Event;
@@ -49,8 +49,8 @@ import site.overwrite.auditranscribe.plotting.PlottingStuffHandler;
 import site.overwrite.auditranscribe.spectrogram.*;
 import site.overwrite.auditranscribe.utils.*;
 import site.overwrite.auditranscribe.misc.MouseHandler;
-import site.overwrite.auditranscribe.misc.view_helpers.Popups;
-import site.overwrite.auditranscribe.misc.view_helpers.ProjectIOHandlers;
+import site.overwrite.auditranscribe.views.helpers.Popups;
+import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;

@@ -10,11 +10,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="rootPane" prefHeight="300.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="site.overwrite.auditranscribe.views.AboutViewController">
+<AnchorPane fx:id="rootPane" prefHeight="300.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="site.overwrite.auditranscribe.views.main_views.AboutViewController">
    <children>
       <ImageView fx:id="bannerImage" fitHeight="125.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <image>
-            <Image url="@../../images/logo-and-banner/banner-light-mode.png" />
+            <Image url="@../../../images/logo-and-banner/banner-light-mode.png" />
          </image>
       </ImageView>
       <Label fx:id="versionLabel" alignment="CENTER" layoutX="-1.0" layoutY="103.0" prefHeight="20.0" text="Version: X.Y.Z" textAlignment="CENTER" AnchorPane.leftAnchor="-1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="100.0">

@@ -2,12 +2,12 @@
  * MainViewController.java
  *
  * Created on 2022-02-09
- * Updated on 2022-06-21
+ * Updated on 2022-06-22
  *
  * Description: Contains the main view's controller class.
  */
 
-package site.overwrite.auditranscribe.views;
+package site.overwrite.auditranscribe.views.main_views;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -38,7 +38,7 @@ import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.note_playback.NotePlayerSequencer;
 import site.overwrite.auditranscribe.utils.MiscUtils;
-import site.overwrite.auditranscribe.misc.view_helpers.ProjectIOHandlers;
+import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
 
 import java.io.File;
 import java.io.IOException;
@@ -273,7 +273,7 @@ public class MainViewController implements Initializable {
      */
     public void stopAllPlayableObjects() {
         // Stop all `Audio` objects
-        for (Audio audio: allAudio) {
+        for (Audio audio : allAudio) {
             try {
                 audio.stop();
                 logger.log(Level.FINE, "Stopped audio: " + audio.getAudioFileName());
@@ -283,7 +283,7 @@ public class MainViewController implements Initializable {
         }
 
         // Stop and close all `NotePlayerSequencer` objects
-        for (NotePlayerSequencer notePlayerSequencer: allSequencers) {
+        for (NotePlayerSequencer notePlayerSequencer : allSequencers) {
             notePlayerSequencer.stop();
             notePlayerSequencer.close();
         }

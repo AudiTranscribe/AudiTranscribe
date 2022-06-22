@@ -2,12 +2,12 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-06-21
+ * Updated on 2022-06-22
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
 
-package site.overwrite.auditranscribe.misc.view_helpers;
+package site.overwrite.auditranscribe.views.helpers;
 
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
@@ -30,8 +30,8 @@ import site.overwrite.auditranscribe.io.audt_file.AUDTFileReader;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileWriter;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.note_playback.NotePlayerSequencer;
-import site.overwrite.auditranscribe.views.MainViewController;
-import site.overwrite.auditranscribe.views.TranscriptionViewController;
+import site.overwrite.auditranscribe.views.main_views.MainViewController;
+import site.overwrite.auditranscribe.views.main_views.TranscriptionViewController;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
@@ -343,7 +343,7 @@ public class ProjectIOHandlers {
         transcriptionStage.setFullScreen(false);
 
         // Get the FXML loader for the spectrogram view
-        FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/transcription-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/main-views/transcription-view.fxml"));
 
         // Get the spectrogram view scene
         Scene scene = new Scene(fxmlLoader.load());

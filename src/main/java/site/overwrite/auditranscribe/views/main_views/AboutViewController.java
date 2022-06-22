@@ -2,12 +2,12 @@
  * AboutViewController.java
  *
  * Created on 2022-05-08
- * Updated on 2022-06-19
+ * Updated on 2022-06-22
  *
  * Description: View controller for the "about" window.
  */
 
-package site.overwrite.auditranscribe.views;
+package site.overwrite.auditranscribe.views.main_views;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -111,7 +111,7 @@ public class AboutViewController implements Initializable {
     public static void showAboutWindow(SettingsFile settingsFile) {
         try {
             // Load the FXML file into the scene
-            FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/about-view.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/main-views/about-view.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
 
             // Get the view controller
