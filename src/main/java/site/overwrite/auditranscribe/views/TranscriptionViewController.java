@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-20
+ * Updated on 2022-06-22
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -1763,6 +1763,10 @@ public class TranscriptionViewController implements Initializable {
             }
         }
         isPaused = togglePaused(isPaused);
+
+        // Disable note volume slider and note muting button if playing
+        notesVolumeButton.setDisable(!isPaused);
+        notesVolumeSlider.setDisable(!isPaused);
 
         // Handle note rectangle operations when toggle paused
         if (!isPaused && !areNotesMuted) {
