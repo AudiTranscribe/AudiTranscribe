@@ -23,6 +23,7 @@ import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
 import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.exceptions.io.audt_file.FailedToReadDataException;
 import site.overwrite.auditranscribe.exceptions.io.audt_file.IncorrectFileFormatException;
+import site.overwrite.auditranscribe.exceptions.io.audt_file.OutdatedFileFormatException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileReader;
@@ -352,11 +353,19 @@ public class SceneSwitcher {
                     e
             );
             e.printStackTrace();
+        } catch (OutdatedFileFormatException e) {
+            Popups.showExceptionAlert(
+                    "File version mismatch in '" + audtFile.getName() + "'.",
+                    "The AUDT file '" + audtFile.getName() + "' is outdated, or is not current. Please " +
+                            "check the version the file was saved in.",
+                    e
+            );
+            e.printStackTrace();
         } catch (IOException | IncorrectFileFormatException | FailedToReadDataException e) {
             Popups.showExceptionAlert(
                     "Failed to read '" + audtFile.getName() + "' as an AUDT ile.",
                     "The program failed to read '" + audtFile.getName() +
-                            "' as an AUDT file. Please check if it is a valid AUDT file.",
+                            "' as an AUDT file. Is the file format correct?",
                     e
             );
             e.printStackTrace();

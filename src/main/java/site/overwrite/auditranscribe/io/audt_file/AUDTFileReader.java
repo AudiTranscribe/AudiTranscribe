@@ -9,6 +9,7 @@
 
 package site.overwrite.auditranscribe.io.audt_file;
 
+import site.overwrite.auditranscribe.exceptions.io.audt_file.OutdatedFileFormatException;
 import site.overwrite.auditranscribe.io.IOConverters;
 import site.overwrite.auditranscribe.io.LZ4;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
@@ -34,8 +35,12 @@ public class AUDTFileReader {
      *
      * @param filepath Path to the AUDT file. The file name at the end of the file path should
      *                 <b>include</b> the extension of the AUDT file.
+     * @throws IOException                  If something went wrong when reading the AUDT file.
+     * @throws IncorrectFileFormatException If the file was formatted incorrectly.
+     * @throws OutdatedFileFormatException  If the file is outdated.
      */
-    public AUDTFileReader(String filepath) throws IOException, IncorrectFileFormatException {
+    public AUDTFileReader(String filepath) throws IOException, IncorrectFileFormatException,
+            OutdatedFileFormatException {
         // Update attributes
         this.filepath = filepath;
 
@@ -263,10 +268,10 @@ public class AUDTFileReader {
      *
      * @return Boolean, where <code>true</code> means that the file format is correct and
      * <code>false</code> otherwise.
-     * @throws IncorrectFileFormatException If the file version is not correct, or if the LZ4
-     *                                      version is not current.
+     * @throws OutdatedFileFormatException If the file version is not current, or if the LZ4 version
+     *                                     is not current.
      */
-    private boolean verifyHeaderSection() throws IncorrectFileFormatException {
+    private boolean verifyHeaderSection() throws OutdatedFileFormatException {
         // Check if the first 20 bytes follows the AUDT file header
         byte[] first20Bytes = Arrays.copyOfRange(bytes, 0, 20);
         if (!checkBytesMatch(AUDTFileConstants.AUDT_FILE_HEADER, first20Bytes)) {
@@ -282,15 +287,15 @@ public class AUDTFileReader {
 
         // Check if the file format is the current version
         if (fileFormatVersion != AUDTFileConstants.FILE_VERSION_NUMBER) {
-            throw new IncorrectFileFormatException(
-                    "Reading in outdated AUDT file (file: " + fileFormatVersion +
+            throw new OutdatedFileFormatException(
+                    "Reading in outdated AUDT file (file version is " + fileFormatVersion +
                             " but current version is " + AUDTFileConstants.FILE_VERSION_NUMBER + ")"
             );
         }
 
         // Check if the LZ4 version is *exactly* the current version
         if (lz4Version != AUDTFileConstants.LZ4_VERSION_NUMBER) {
-            throw new IncorrectFileFormatException(
+            throw new OutdatedFileFormatException(
                     "LZ4 version mismatch (file: " + " but current version is " +
                             AUDTFileConstants.LZ4_VERSION_NUMBER + ")"
             );

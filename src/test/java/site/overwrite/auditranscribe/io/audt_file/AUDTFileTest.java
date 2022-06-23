@@ -2,7 +2,7 @@
  * AUDTFileTest.java
  *
  * Created on 2022-05-01
- * Updated on 2022-06-21
+ * Updated on 2022-06-23
  *
  * Description: Test AUDT file reading and writing.
  */
@@ -11,11 +11,12 @@ package site.overwrite.auditranscribe.io.audt_file;
 
 import org.javatuples.Triplet;
 import org.junit.jupiter.api.*;
+import site.overwrite.auditranscribe.exceptions.io.audt_file.FailedToReadDataException;
+import site.overwrite.auditranscribe.exceptions.io.audt_file.IncorrectFileFormatException;
+import site.overwrite.auditranscribe.exceptions.io.audt_file.OutdatedFileFormatException;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.LZ4;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
-import site.overwrite.auditranscribe.exceptions.io.audt_file.FailedToReadDataException;
-import site.overwrite.auditranscribe.exceptions.io.audt_file.IncorrectFileFormatException;
 import site.overwrite.auditranscribe.utils.TypeConversionUtils;
 
 import java.io.IOException;
@@ -106,7 +107,8 @@ class AUDTFileTest {
 
     @Test
     @Order(2)
-    void fileReaderTestOne() throws IOException, IncorrectFileFormatException, FailedToReadDataException {
+    void fileReaderTestOne() throws IOException, IncorrectFileFormatException, OutdatedFileFormatException,
+            FailedToReadDataException {
         // Create a filereader object
         AUDTFileReader fileReader = new AUDTFileReader(FILE_NAME);
 
@@ -153,7 +155,8 @@ class AUDTFileTest {
 
     @Test
     @Order(4)
-    void fileReaderTestTwo() throws IOException, IncorrectFileFormatException, FailedToReadDataException {
+    void fileReaderTestTwo() throws IOException, IncorrectFileFormatException, OutdatedFileFormatException,
+            FailedToReadDataException {
         // Create a filereader object
         AUDTFileReader fileReader = new AUDTFileReader(FILE_NAME);
 
