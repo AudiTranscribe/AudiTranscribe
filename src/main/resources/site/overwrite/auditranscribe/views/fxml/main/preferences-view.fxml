@@ -12,6 +12,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
 <AnchorPane fx:id="rootPane" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="site.overwrite.auditranscribe.views.main_views.PreferencesViewController">
    <children>
@@ -23,15 +24,24 @@
                      <children>
                         <HBox prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
-                              <VBox alignment="TOP_RIGHT" prefHeight="200.0" prefWidth="100.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                              <VBox alignment="TOP_RIGHT" prefHeight="200.0" prefWidth="300.0" spacing="10.0" HBox.hgrow="ALWAYS">
                                  <padding>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                  </padding>
                                  <children>
-                                    <Label prefHeight="30.0" text="Application Theme" />
+                                    <VBox alignment="TOP_RIGHT" prefHeight="30.0">
+                                       <children>
+                                          <Label styleClass="setting-label" text="Application Theme" />
+                                          <Label layoutX="10.0" layoutY="10.0" styleClass="setting-caption" text="Theme to use for the application">
+                                             <font>
+                                                <Font size="11.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </VBox>
                                  </children>
                               </VBox>
-                              <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                              <VBox prefHeight="200.0" prefWidth="300.0" spacing="10.0" HBox.hgrow="ALWAYS">
                                  <padding>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                  </padding>
@@ -50,17 +60,26 @@
                      <children>
                         <HBox prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
-                              <VBox alignment="TOP_RIGHT" prefHeight="200.0" prefWidth="100.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                              <VBox alignment="TOP_RIGHT" prefHeight="200.0" prefWidth="300.0" spacing="10.0" HBox.hgrow="ALWAYS">
                                  <padding>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                  </padding>
                                  <children>
-                                    <Label prefHeight="30.0" text="Note playing delay offset" />
-                                    <Label layoutX="158.0" layoutY="20.0" prefHeight="30.0" text="FFmpeg Binary" />
-                                    <Label prefHeight="30.0" />
+                                    <VBox alignment="TOP_RIGHT" prefHeight="30.0">
+                                       <children>
+                                          <Label alignment="CENTER_RIGHT" styleClass="setting-label" text="Note playing delay offset" />
+                                          <Label alignment="CENTER_RIGHT" styleClass="setting-caption" text="To account for note playing delay" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="TOP_RIGHT" prefHeight="60.0">
+                                       <children>
+                                          <Label prefHeight="0.0" styleClass="setting-label" text="FFmpeg Binary" />
+                                          <Label layoutX="201.0" layoutY="10.0" prefHeight="0.0" styleClass="setting-caption" text="Path to the FFmpeg binary" />
+                                       </children>
+                                    </VBox>
                                  </children>
                               </VBox>
-                              <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                              <VBox prefHeight="200.0" prefWidth="300.0" spacing="10.0" HBox.hgrow="ALWAYS">
                                  <padding>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                  </padding>
@@ -69,7 +88,7 @@
                                     <VBox prefHeight="200.0" prefWidth="100.0">
                                        <children>
                                           <Button fx:id="selectFFmpegBinaryButton" mnemonicParsing="false" prefHeight="30.0" text="Choose Binary" />
-                                          <TextField fx:id="ffmpegBinaryPathTextField" prefHeight="30.0" />
+                                          <TextField fx:id="ffmpegBinaryPathTextField" prefHeight="30.0" promptText="Path to FFmpeg binary" />
                                        </children>
                                     </VBox>
                                  </children>
@@ -86,15 +105,20 @@
                      <children>
                         <HBox prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
-                              <VBox alignment="TOP_RIGHT" prefHeight="200.0" prefWidth="100.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                              <VBox alignment="TOP_RIGHT" prefHeight="200.0" prefWidth="300.0" spacing="10.0" HBox.hgrow="ALWAYS">
                                  <padding>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                  </padding>
                                  <children>
-                                    <Label prefHeight="30.0" text="Autosave Interval" />
+                                    <VBox alignment="TOP_RIGHT" prefHeight="30.0">
+                                       <children>
+                                          <Label styleClass="setting-label" text="Autosave Interval" />
+                                          <Label layoutX="190.0" layoutY="10.0" styleClass="setting-caption" text="In minutes" />
+                                       </children>
+                                    </VBox>
                                  </children>
                               </VBox>
-                              <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                              <VBox prefHeight="200.0" prefWidth="300.0" spacing="10.0" HBox.hgrow="ALWAYS">
                                  <padding>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                  </padding>
@@ -114,16 +138,26 @@
                      <children>
                         <HBox prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
-                              <VBox alignment="TOP_RIGHT" prefHeight="200.0" prefWidth="100.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                              <VBox alignment="TOP_RIGHT" prefHeight="200.0" prefWidth="300.0" spacing="10.0" HBox.hgrow="ALWAYS">
                                  <padding>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                  </padding>
                                  <children>
-                                    <Label prefHeight="30.0" text="Colour Scale" />
-                                    <Label layoutX="148.0" layoutY="20.0" prefHeight="30.0" text="Windowing Function" />
+                                    <VBox alignment="TOP_RIGHT" prefHeight="30.0">
+                                       <children>
+                                          <Label styleClass="setting-label" text="Colour Scale" />
+                                          <Label layoutX="216.0" layoutY="10.0" styleClass="setting-caption" text="Colour palette to use on the spectrogram" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="TOP_RIGHT" prefHeight="30.0">
+                                       <children>
+                                          <Label styleClass="setting-label" text="Windowing Function" />
+                                          <Label styleClass="setting-caption" text="Function to generate the spectrogram windows" />
+                                       </children>
+                                    </VBox>
                                  </children>
                               </VBox>
-                              <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                              <VBox prefHeight="200.0" prefWidth="300.0" spacing="10.0" HBox.hgrow="ALWAYS">
                                  <padding>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                  </padding>
