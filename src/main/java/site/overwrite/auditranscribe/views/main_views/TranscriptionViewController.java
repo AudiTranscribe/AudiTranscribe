@@ -2273,6 +2273,9 @@ public class TranscriptionViewController implements Initializable {
             ProjectIOHandlers.saveProject(saveDest, numSkippableBytes, guiData, musicNotesData);
         }
 
+        // Set the `hasUnsavedChanges` flag to false
+        hasUnsavedChanges = false;
+
         logger.log(Level.INFO, "File saved");
     }
 
