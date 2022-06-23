@@ -2,7 +2,7 @@
  * MainViewController.java
  *
  * Created on 2022-02-09
- * Updated on 2022-06-22
+ * Updated on 2022-06-23
  *
  * Description: Contains the main view's controller class.
  */
@@ -56,9 +56,9 @@ import java.util.logging.Logger;
 // Main class
 public class MainViewController implements Initializable {
     // Attributes
-    ProjectsDB projectsDB;
+    private ProjectsDB projectsDB;
 
-    FilteredList<Quartet<Long, String, String, String>> filteredList;  // List of project records
+    private FilteredList<Quartet<Long, String, String, String>> filteredList;  // List of project records
 
     private SettingsFile settingsFile;
     private final Logger logger = Logger.getLogger(this.getClass().getName());

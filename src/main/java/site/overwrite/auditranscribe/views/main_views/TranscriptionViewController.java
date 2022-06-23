@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-22
+ * Updated on 2022-06-23
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -68,36 +68,36 @@ import java.util.logging.Logger;
 
 public class TranscriptionViewController implements Initializable {
     // Constants
-    final Pair<Integer, Integer> BPM_RANGE = new Pair<>(1, 512);  // In the format [min, max]
-    final Pair<Double, Double> OFFSET_RANGE = new Pair<>(-15., 15.);  // In the format [min, max]
+    private final Pair<Integer, Integer> BPM_RANGE = new Pair<>(1, 512);  // In the format [min, max]
+    private final Pair<Double, Double> OFFSET_RANGE = new Pair<>(-15., 15.);  // In the format [min, max]
 
     public final double SPECTROGRAM_ZOOM_SCALE_X = 2;
     public final double SPECTROGRAM_ZOOM_SCALE_Y = 5;
 
     public final int PX_PER_SECOND = 120;
-    final int BINS_PER_OCTAVE = 60;
-    final int SPECTROGRAM_HOP_LENGTH = 1024;  // Needs to be a power of 2
-    final double NUM_PX_PER_OCTAVE = 72;
+    private final int BINS_PER_OCTAVE = 60;
+    private final int SPECTROGRAM_HOP_LENGTH = 1024;  // Needs to be a power of 2
+    private final double NUM_PX_PER_OCTAVE = 72;
 
-    final int MIN_NOTE_NUMBER = 0;  // C0
-    final int MAX_NOTE_NUMBER = 107;  // B8
+    private final int MIN_NOTE_NUMBER = 0;  // C0
+    private final int MAX_NOTE_NUMBER = 107;  // B8
 
-    final long UPDATE_PLAYBACK_SCHEDULER_PERIOD = 50;  // In milliseconds
+    private final long UPDATE_PLAYBACK_SCHEDULER_PERIOD = 50;  // In milliseconds
 
-    final boolean USE_FANCY_SHARPS_FOR_NOTE_LABELS = true;
+    private final boolean USE_FANCY_SHARPS_FOR_NOTE_LABELS = true;
 
-    final double VOLUME_VALUE_DELTA_ON_KEY_PRESS = 0.05;
+    public final double VOLUME_VALUE_DELTA_ON_KEY_PRESS = 0.05;
 
-    final MIDIInstrument NOTE_PLAYING_INSTRUMENT = MIDIInstrument.PIANO;
-    final int MIDI_CHANNEL_NUM = 0;
-    final int NOTE_PLAYING_ON_VELOCITY = 96;  // Within the range [0, 127]
-    final int NOTE_PLAYING_OFF_VELOCITY = 10;   // Within the range [0, 127]
-    final long NOTE_PLAYING_ON_DURATION = 75;  // In milliseconds
-    final long NOTE_PLAYING_OFF_DURATION = 925;  // In milliseconds
+    private final MIDIInstrument NOTE_PLAYING_INSTRUMENT = MIDIInstrument.PIANO;
+    public final int MIDI_CHANNEL_NUM = 0;
+    private final int NOTE_PLAYING_ON_VELOCITY = 96;  // Within the range [0, 127]
+    private final int NOTE_PLAYING_OFF_VELOCITY = 10;   // Within the range [0, 127]
+    private final long NOTE_PLAYING_ON_DURATION = 75;  // In milliseconds
+    private final long NOTE_PLAYING_OFF_DURATION = 925;  // In milliseconds
 
-    final KeyCodeCombination NEW_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN);
-    final KeyCodeCombination OPEN_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN);
-    final KeyCodeCombination SAVE_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN);
+    private final KeyCodeCombination NEW_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN);
+    private final KeyCodeCombination OPEN_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN);
+    private final KeyCodeCombination SAVE_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN);
 
     // File-Savable Attributes
     private int numSkippableBytes;
@@ -113,12 +113,12 @@ public class TranscriptionViewController implements Initializable {
     private double currTime = 0;
 
     // Other attributes
-    SettingsFile settingsFile;
-    Theme theme;
+    private SettingsFile settingsFile;
+    private Theme theme;
 
-    NotePlayerSynth notePlayerSynth;
-    NotePlayerSequencer notePlayerSequencer;
-    MusicNotesDataObject musicNotesData;
+    private NotePlayerSynth notePlayerSynth;
+    private NotePlayerSequencer notePlayerSequencer;
+    private MusicNotesDataObject musicNotesData;
 
     private boolean isEverythingReady = false;
 
@@ -156,13 +156,13 @@ public class TranscriptionViewController implements Initializable {
     private StackPane[] barNumberEllipses;
     private Line playheadLine;
 
-    Queue<CustomTask<?>> ongoingTasks = new LinkedList<>();
+    public Queue<CustomTask<?>> ongoingTasks = new LinkedList<>();
 
     private SceneSwitchingState sceneSwitchingState = SceneSwitchingState.SHOW_MAIN_SCENE;
     private File selectedFile = null;
 
-    ScheduledExecutorService scheduler;
-    ScheduledExecutorService autosaveScheduler;
+    private ScheduledExecutorService scheduler;
+    private ScheduledExecutorService autosaveScheduler;
 
     // FXML Elements
     // Menu bar

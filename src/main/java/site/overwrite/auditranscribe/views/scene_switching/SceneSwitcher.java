@@ -2,7 +2,7 @@
  * SceneSwitcher.java
  *
  * Created on 2022-06-22
- * Updated on 2022-06-22
+ * Updated on 2022-06-23
  *
  * Description: Class that handles the switching between the main scene and transcription scenes.
  */
@@ -44,14 +44,14 @@ import java.util.logging.Logger;
  */
 public class SceneSwitcher {
     // Attributes
-    SettingsFile settingsFile;
+    private final SettingsFile settingsFile;
 
-    Stage mainStage = new Stage();
-    Stage transcriptionStage = new Stage();
+    private final Stage mainStage = new Stage();
+    private final Stage transcriptionStage = new Stage();
 
-    Pair<SceneSwitchingState, File> returnedPair = null;
-    SceneSwitchingState state = SceneSwitchingState.SHOW_MAIN_SCENE;
-    File selectedFile = null;
+    private Pair<SceneSwitchingState, File> returnedPair = null;
+    private SceneSwitchingState state = SceneSwitchingState.SHOW_MAIN_SCENE;
+    private File selectedFile = null;
 
     private static final Logger logger = Logger.getLogger(SceneSwitcher.class.getName());
 
