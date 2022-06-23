@@ -4,6 +4,3 @@ Fixme:
     - Note playing is delayed.
         - Temporary fix is to implement a fixed constant to account for delay, but a more permanent fix is needed.
         - This also causes some notes to not play at the start of playback.
-    - Sometimes confirmation of the "unsaved changes" dialog appears more than once.
-    - Memory leak issue may not be completely fixed.
-        - Does this cause the above issue?

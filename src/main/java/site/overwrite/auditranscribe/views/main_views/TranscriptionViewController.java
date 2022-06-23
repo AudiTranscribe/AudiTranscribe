@@ -25,7 +25,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import javafx.stage.WindowEvent;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
@@ -1754,7 +1753,7 @@ public class TranscriptionViewController implements Initializable {
                 }
 
                 // Handle attempt to close the window
-                rootPane.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, (windowEvent) -> {
+                rootPane.getScene().getWindow().setOnCloseRequest((windowEvent) -> {
                     // Deal with possible unsaved changes
                     boolean canCloseWindow = handleUnsavedChanges();
                     if (!canCloseWindow) windowEvent.consume();
