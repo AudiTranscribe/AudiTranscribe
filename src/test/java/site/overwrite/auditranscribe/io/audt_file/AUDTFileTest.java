@@ -14,6 +14,7 @@ import org.junit.jupiter.api.*;
 import site.overwrite.auditranscribe.exceptions.io.audt_file.FailedToReadDataException;
 import site.overwrite.auditranscribe.exceptions.io.audt_file.IncorrectFileFormatException;
 import site.overwrite.auditranscribe.exceptions.io.audt_file.OutdatedFileFormatException;
+import site.overwrite.auditranscribe.io.IOHelpers;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.LZ4;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
@@ -28,8 +29,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class AUDTFileTest {
     // Define the file name
-    static final String FILE_NAME =
-            "src/main/resources/site/overwrite/auditranscribe/test-resources/file-io-directory/test-AUDTFileTest.audt";
+    static final String FILE_NAME = IOHelpers.joinPaths(
+            "src", "main", "resources", "site", "overwrite", "auditranscribe", "tests-output-directory",
+            "file-io-directory", "test-AUDTFileTest.audt"
+    );
 
     // Define sample array data
     // (These are example arrays, not actual data)

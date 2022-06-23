@@ -2,7 +2,7 @@
  * SQLiteDatabaseManagerTest.java
  *
  * Created on 2022-05-11
- * Updated on 2022-06-06
+ * Updated on 2022-06-23
  *
  * Description: Test `SQLiteDatabaseManager.java`.
  */
@@ -61,7 +61,8 @@ class SQLiteDatabaseManagerTest {
     void setUpDatabase() {
         // Set up the SQLite database manager for the tests
         manager = new SQLiteDatabaseManager(
-                IOConstants.RESOURCES_FOLDER_PATH_STRING + "test-resources" + IOConstants.SEPARATOR +
+                IOConstants.RESOURCES_FOLDER_PATH_STRING +
+                        "tests-output-directory" + IOConstants.SEPARATOR +
                         "database" + IOConstants.SEPARATOR +
                         "test-database.db"
         );
