@@ -78,35 +78,44 @@ public class SceneSwitcher {
         boolean shutdown = false;
 
         while (!shutdown) {
-            // Handle the different cases of the returned state
-            switch (state) {
-                case NEW_PROJECT -> returnedPair = newProjectInTranscriptionScene(selectedFile);
-                case OPEN_PROJECT -> returnedPair = openProjectInTranscriptionScene(selectedFile);
-                case SHOW_MAIN_SCENE -> returnedPair = showMainScene();
-                case CLOSE_SCENE -> {
-                    // Since close scene was called, shutdown scene handler
-                    shutdown = true;
-                    continue;
-                }
-            }
-
-            // Check if the returned pair is null
-            if (returnedPair == null) {
-                // If the returned pair is `null`, that means something went wrong
-                // If we are currently in the transcription scene, then the next state is `SHOW_MAIN_SCENE`
-                if (state == SceneSwitchingState.NEW_PROJECT || state == SceneSwitchingState.OPEN_PROJECT) {
-                    state = SceneSwitchingState.SHOW_MAIN_SCENE;
-                } else {  // State has to be `SHOW_MAIN_SCENE` now because `CLOSE_SCENE` immediately exits
-                    // The next state will be `CLOSE_SCENE`
-                    state = SceneSwitchingState.CLOSE_SCENE;
+            try {
+                // Handle the different cases of the returned state
+                switch (state) {
+                    case NEW_PROJECT -> returnedPair = newProjectInTranscriptionScene(selectedFile);
+                    case OPEN_PROJECT -> returnedPair = openProjectInTranscriptionScene(selectedFile);
+                    case SHOW_MAIN_SCENE -> returnedPair = showMainScene();
+                    case CLOSE_SCENE -> {
+                        // Since close scene was called, shutdown scene handler
+                        shutdown = true;
+                        continue;
+                    }
                 }
 
-                // Regardless of the state, the newly selected file will be `null`
-                selectedFile = null;
-            } else {
-                // Otherwise get the state and the selected file
-                state = returnedPair.getValue0();
-                selectedFile = returnedPair.getValue1();
+                // Check if the returned pair is null
+                if (returnedPair == null) {
+                    // If the returned pair is `null`, that means something went wrong
+                    // If we are currently in the transcription scene, then the next state is `SHOW_MAIN_SCENE`
+                    if (state == SceneSwitchingState.NEW_PROJECT || state == SceneSwitchingState.OPEN_PROJECT) {
+                        state = SceneSwitchingState.SHOW_MAIN_SCENE;
+                    } else {  // State has to be `SHOW_MAIN_SCENE` now because `CLOSE_SCENE` immediately exits
+                        // The next state will be `CLOSE_SCENE`
+                        state = SceneSwitchingState.CLOSE_SCENE;
+                    }
+
+                    // Regardless of the state, the newly selected file will be `null`
+                    selectedFile = null;
+                } else {
+                    // Otherwise get the state and the selected file
+                    state = returnedPair.getValue0();
+                    selectedFile = returnedPair.getValue1();
+                }
+            } catch (Exception e) {  // Catch any alert that was not handled correctly
+                Popups.showExceptionAlert(
+                        "An Exception Occurred",
+                        "An exception occurred during the execution of the program.",
+                        e
+                );
+                e.printStackTrace();
             }
         }
     }
