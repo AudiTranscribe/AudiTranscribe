@@ -25,7 +25,7 @@ public class IOConverters {
      * Method that converts the integer <code>x</code> into an array of 4 bytes.
      *
      * @param x Integer to convert.
-     * @return Array of four bytes, representing the integer.
+     * @return Array of 4 bytes, representing the integer.
      */
     public static byte[] intToBytes(int x) {
         return ByteBuffer.allocate(4).order(ByteOrder.BIG_ENDIAN).putInt(x).array();
@@ -35,7 +35,7 @@ public class IOConverters {
      * Method that converts the double <code>x</code> into an array of 8 bytes.
      *
      * @param x Double to convert.
-     * @return Array of eight bytes, representing the double.
+     * @return Array of 8 bytes, representing the double.
      * @see <a href="https://stackoverflow.com/a/13072387">This StackOverflow answer</a> for the
      * original implementation.
      */
@@ -58,7 +58,7 @@ public class IOConverters {
      * Method that converts a character into its byte representation.
      *
      * @param c Character.
-     * @return Byte representing the character <code>c</code>.
+     * @return One byte representing the character <code>c</code>.
      */
     public static byte charToByte(char c) {
         return (byte) c;
@@ -68,7 +68,7 @@ public class IOConverters {
      * Method that converts a string into its bytes.
      *
      * @param str String to convert.
-     * @return Byte array, representing the characters of the string.
+     * @return Array of bytes, representing the characters of the string.
      */
     public static byte[] stringToBytes(String str) {
         return str.getBytes();
@@ -78,7 +78,7 @@ public class IOConverters {
      * Method that converts an 1D array of integers into a byte array.
      *
      * @param array 1D array of integers
-     * @return Byte array, representing the 1D array of integers.
+     * @return Array of bytes, representing the 1D array of integers.
      */
     public static byte[] oneDimensionalIntegerArrayToBytes(int[] array) {
         // Get the length of the array
@@ -111,7 +111,7 @@ public class IOConverters {
      * Method that converts an 1D array of doubles into a byte array.
      *
      * @param array 1D array of doubles.
-     * @return Byte array, representing the 1D array of doubles.
+     * @return Array of bytes, representing the 1D array of doubles.
      */
     public static byte[] oneDimensionalDoubleArrayToBytes(double[] array) {
         // Get the length of the array
@@ -144,7 +144,7 @@ public class IOConverters {
      * Method that converts an 2D array of doubles into a byte array.
      *
      * @param array 2D array of doubles. <b>This assumes that each subarray has the same length.</b>
-     * @return Byte array, representing the 2D array of doubles.
+     * @return Array of bytes, representing the 2D array of doubles.
      */
     public static byte[] twoDimensionalDoubleArrayToBytes(double[][] array) {
         // Get the number of 1D arrays present in the main array
@@ -193,7 +193,7 @@ public class IOConverters {
      * Method that converts an 2D array of integers into a byte array.
      *
      * @param array 2D array of integers. <b>This assumes that each subarray has the same length.</b>
-     * @return Byte array, representing the 2D array of integers.
+     * @return Array of bytes, representing the 2D array of integers.
      */
     public static byte[] twoDimensionalIntegerArrayToBytes(int[][] array) {
         // Get the number of 1D arrays present in the main array
@@ -271,7 +271,7 @@ public class IOConverters {
     /**
      * Method that converts a byte into its character representation.
      *
-     * @param b Byte.
+     * @param b The byte to convert.
      * @return Character representation of the byte <code>b</code>.
      */
     public static char byteToChar(byte b) {

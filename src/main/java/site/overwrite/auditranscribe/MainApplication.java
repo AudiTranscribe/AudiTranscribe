@@ -2,7 +2,7 @@
  * MainApplication.java
  *
  * Created on 2022-02-09
- * Updated on 2022-06-22
+ * Updated on 2022-06-23
  *
  * Description: Contains the main application class.
  */
@@ -26,7 +26,6 @@ public class MainApplication extends Application {
         IOMethods.createAppDataFolder();
 
         // Update the settings file attribute
-        // Attributes
         SettingsFile settingsFile = new SettingsFile();
 
         // Run setup wizard

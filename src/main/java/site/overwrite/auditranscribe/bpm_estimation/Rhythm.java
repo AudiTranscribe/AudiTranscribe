@@ -29,6 +29,8 @@ public class Rhythm {
      * @param winLength  Length of the onset autocorrelation window (in frames/onset measurements).
      * @return Localized autocorrelation of the onset strength envelope.
      * @throws ValueException If the window length is not a positive integer.
+     * @see <a href="https://librosa.org/doc/0.9.1/_modules/librosa/feature/rhythm.html#tempogram">
+     * Librosa's Implementation</a> of the tempogram.
      */
     public static double[][] tempogram(double[] x, double sampleRate, int hopLength, int winLength) {
         // Ascertain that the `winLength` is a positive integer

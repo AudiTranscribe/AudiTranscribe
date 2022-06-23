@@ -2,7 +2,7 @@
  * JSONFile.java
  *
  * Created on 2022-05-30
- * Updated on 2022-06-20
+ * Updated on 2022-06-23
  *
  * Description: Handles interactions with JSON files.
  */
@@ -30,6 +30,9 @@ public abstract class JSONFile<T> {
 
     /**
      * Initialization method for a <code>JSONFile</code> object.
+     *
+     * @param fileName File name of for the new JSON file. <b>Includes the extension</b>.
+     * @param cls      Class to use.
      */
     public JSONFile(String fileName, Class<T> cls) {
         // Update attributes

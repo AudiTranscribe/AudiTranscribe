@@ -2,7 +2,7 @@
  * SpectralHelpers.java
  *
  * Created on 2022-03-07
- * Updated on 2022-03-15
+ * Updated on 2022-06-23
  *
  * Description: Helper methods for the spectral representation functions.
  */
@@ -10,7 +10,7 @@
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
 /**
- * Spectral representation helper functions.
+ * Helper methods for the spectral representation functions.
  */
 public class SpectralHelpers {
     /**

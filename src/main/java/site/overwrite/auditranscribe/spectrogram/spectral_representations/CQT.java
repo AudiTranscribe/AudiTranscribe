@@ -55,7 +55,7 @@ public class CQT {
             double[] y, double sr, int hopLength, double fmin, int numBins, int binsPerOctave,
             WindowFunction windowFunction, CustomTask<?> task
     ) {
-        // CQT is the special case of VQT with gamma = 0
+        // CQT is the special case of VQT where `gamma` is zero
         return VQT.vqt(y, sr, hopLength, fmin, numBins, binsPerOctave, true, 0, windowFunction, task);
     }
 }

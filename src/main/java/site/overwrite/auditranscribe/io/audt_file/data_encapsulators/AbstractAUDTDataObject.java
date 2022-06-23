@@ -2,20 +2,17 @@
  * AbstractAUDTDataObject.java
  *
  * Created on 2022-05-02
- * Updated on 2022-06-21
+ * Updated on 2022-06-23
  *
- * Description: Abstract data object class that stores the data needed.
+ * Description: Abstract AUDT data object class that stores the data needed.
  */
 
 package site.overwrite.auditranscribe.io.audt_file.data_encapsulators;
 
 /**
- * Abstract data object class that stores the data needed.
+ * Abstract AUDT data object class that stores the data needed.
  */
 public abstract class AbstractAUDTDataObject {
-    // Constants
-    public static final int SECTION_ID = -1;
-
     // Abstract methods
 
     /**

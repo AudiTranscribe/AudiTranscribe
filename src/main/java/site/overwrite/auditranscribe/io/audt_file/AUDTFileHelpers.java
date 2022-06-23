@@ -2,7 +2,7 @@
  * AUDTFileHelpers.java
  *
  * Created on 2022-05-01
- * Updated on 2022-06-05
+ * Updated on 2022-06-23
  *
  * Description: Helper methods for writing to / reading from AUDT files.
  */
@@ -76,7 +76,7 @@ public class AUDTFileHelpers {
 
     /**
      * Method that converts a 2D integer array into a 2D double array to retrieve the
-     * psuedo-original data before conversion.
+     * pseudo-original data before conversion.
      *
      * @param array    2D integer array to convert.
      * @param minValue Minimum value of the original doubles array.

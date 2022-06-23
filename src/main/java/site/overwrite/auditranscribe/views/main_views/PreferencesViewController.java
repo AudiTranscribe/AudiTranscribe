@@ -2,7 +2,7 @@
  * PreferencesViewController.java
  *
  * Created on 2022-05-22
- * Updated on 2022-06-22
+ * Updated on 2022-06-23
  *
  * Description: Contains the preferences view's controller class.
  */
@@ -229,7 +229,9 @@ public class PreferencesViewController implements Initializable {
     public static void showPreferencesWindow(SettingsFile settingsFile) {
         try {
             // Load the FXML file into the scene
-            FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/main/preferences-view.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL(
+                    "views/fxml/main/preferences-view.fxml"
+            ));
             Scene scene = new Scene(fxmlLoader.load());
 
             // Get the view controller

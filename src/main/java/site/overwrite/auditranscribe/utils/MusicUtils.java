@@ -2,9 +2,9 @@
  * MusicUtils.java
  *
  * Created on 2022-06-11
- * Updated on 2022-06-11
+ * Updated on 2022-06-23
  *
- * Description: Utilities for music.
+ * Description: Musical utility methods.
  */
 
 package site.overwrite.auditranscribe.utils;
@@ -17,7 +17,7 @@ import java.util.Set;
 import static java.util.Map.entry;
 
 /**
- * Utilities for music.
+ * Musical utility methods.
  */
 public class MusicUtils {
     // Constants
@@ -46,6 +46,7 @@ public class MusicUtils {
     public static final String[] TIME_SIGNATURES = {"4/4", "2/2", "2/4", "3/4", "3/8", "6/8", "9/8", "12/8"};
 
     // Public methods
+
     /**
      * Gets the notes in the music key <code>key</code>.
      *
@@ -119,6 +120,7 @@ public class MusicUtils {
     /**
      * Method that converts all <code>#</code> to <code>♯</code> and all <code>b</code> to
      * <code>♭</code>.
+     *
      * @param string The string to fancify.
      * @return The fancified string.
      */

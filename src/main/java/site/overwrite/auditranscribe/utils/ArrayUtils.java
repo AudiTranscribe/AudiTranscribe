@@ -4,7 +4,7 @@
  * Created on 2022-02-16
  * Updated on 2022-06-23
  *
- * Description: Array utilities to modify, change, and search within arrays.
+ * Description: Array utility methods to modify, change, and search within arrays.
  */
 
 package site.overwrite.auditranscribe.utils;
@@ -18,7 +18,7 @@ import java.util.Deque;
 import java.util.NoSuchElementException;
 
 /**
- * Array utilities to modify, change, and search within arrays.
+ * Array utility methods to modify, change, and search within arrays.
  */
 public class ArrayUtils {
     // Public methods
@@ -30,7 +30,7 @@ public class ArrayUtils {
      *
      * @param array Array of items.
      * @param elem  Element to get the index of.
-     * @param <T>   Type parameter of the array.
+     * @param <T>   Type of the array.
      * @return Integer representing the index of the element in the array.
      * @throws NoSuchElementException If the element <code>elem</code> does not appear in the
      *                                array <code>array</code>.
@@ -630,7 +630,6 @@ public class ArrayUtils {
 
     /**
      * Matrix multiply two complex numbered matrices.
-     * Todo: see if can make this more efficient.
      *
      * @param A The first matrix.
      * @param B The second matrix.
@@ -639,6 +638,7 @@ public class ArrayUtils {
      * @see <a href="https://en.wikipedia.org/wiki/Matrix_multiplication_algorithm">This article</a>
      * on the naiive implementation on the Matrix Multiplication algorithm.
      */
+    // Todo: see if can make this more efficient.
     public static Complex[][] matmul(Complex[][] A, Complex[][] B) {
         // Check if the matrices can be multiplied
         if (A[0].length != B.length) {
@@ -670,7 +670,6 @@ public class ArrayUtils {
 
     /**
      * Matrix multiply two real-numbered matrices.
-     * Todo: see if can make this more efficient.
      *
      * @param A The first matrix.
      * @param B The second matrix.
@@ -679,6 +678,7 @@ public class ArrayUtils {
      * @see <a href="https://en.wikipedia.org/wiki/Matrix_multiplication_algorithm">This article</a>
      * on the naiive implementation on the Matrix Multiplication algorithm.
      */
+    // Todo: see if can make this more efficient.
     public static double[][] matmul(double[][] A, double[][] B) {
         // Check if the matrices can be multiplied
         if (A[0].length != B.length) {

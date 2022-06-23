@@ -2,7 +2,7 @@
  * IOMethods.java
  *
  * Created on 2022-03-15
- * Updated on 2022-06-06
+ * Updated on 2022-06-23
  *
  * Description: Input/Output methods that are used in the AudiTranscribe project.
  */
@@ -125,11 +125,9 @@ public class IOMethods {
      * <code>absolutePath</code>.
      *
      * @param absolutePath Absolute path to the folder.
-     * @return Boolean. Is <code>true</code> is the folder was created and <code>false</code>
-     * otherwise.
      */
-    public static boolean createFolder(String absolutePath) {
-        return createFolder(Path.of(absolutePath));
+    public static void createFolder(String absolutePath) {
+        createFolder(Path.of(absolutePath));
     }
 
     /**

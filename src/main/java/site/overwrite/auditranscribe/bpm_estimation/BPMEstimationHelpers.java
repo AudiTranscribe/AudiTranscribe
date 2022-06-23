@@ -2,7 +2,7 @@
  * BPMEstimationHelpers.java
  *
  * Created on 2022-05-31
- * Updated on 2022-05-31
+ * Updated on 2022-06-23
  *
  * Description: Class containing helper methods for BPM estimation.
  */
@@ -32,5 +32,4 @@ public class BPMEstimationHelpers {
         }
         return binFreqs;
     }
-
 }

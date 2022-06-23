@@ -2,7 +2,7 @@
  * AbstractFilter.java
  *
  * Created on 2022-03-07
- * Updated on 2022-05-25
+ * Updated on 2022-06-23
  *
  * Description: `AbstractFilter` class for resampling filters.
  */
@@ -21,21 +21,20 @@ import java.io.Reader;
  */
 public abstract class AbstractFilter {
     // Attributes
-    private double[] halfWin;
+    private double[] halfWindow;
     private int precision;
-    private double rolloff;
 
     // Public methods
 
     /**
-     * Gets the right wing of the interpolation filter.
+     * Gets the right wing (i.e. right side window) of the interpolation filter.
      *
      * @return The right wing of the interpolation filter.
      */
-    public double[] getHalfWin() {
+    public double[] getHalfWindow() {
         // Create a copy of the original
-        double[] halfWinCopy = new double[halfWin.length];
-        System.arraycopy(halfWin, 0, halfWinCopy, 0, halfWin.length);
+        double[] halfWinCopy = new double[halfWindow.length];
+        System.arraycopy(halfWindow, 0, halfWinCopy, 0, halfWindow.length);
 
         // Return the copy
         return halfWinCopy;
@@ -49,16 +48,6 @@ public abstract class AbstractFilter {
     public int getPrecision() {
         return precision;
     }
-
-    /**
-     * Gets the rolloff factor of the filter.
-     *
-     * @return The roll-off frequency of the filter as a fraction of the Nyquist frequency.
-     */
-    public double getRolloff() {
-        return rolloff;
-    }
-
 
     // Private methods
 
@@ -80,9 +69,8 @@ public abstract class AbstractFilter {
             FilterData filterData = gson.fromJson(reader, FilterData.class);
 
             // Set attributes
-            halfWin = filterData.halfWin;
+            halfWindow = filterData.halfWindow;
             precision = filterData.precision;
-            rolloff = filterData.rolloff;
 
         } catch (IOException e) {
             e.printStackTrace();

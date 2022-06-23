@@ -4,7 +4,7 @@
  * Created on 2022-03-14
  * Updated on 2022-06-23
  *
- * Description: Class containing interpolation functions.
+ * Description: Class that handles the interpolation of a 2D array.
  */
 
 package site.overwrite.auditranscribe.plotting;
@@ -12,18 +12,17 @@ package site.overwrite.auditranscribe.plotting;
 import site.overwrite.auditranscribe.exceptions.generic.LengthException;
 
 /**
- * Class containing interpolation functions.
+ * Class that handles the interpolation of a 2D array.
  */
 public class Interpolation {
     /**
-     * Interpolate the array <code>array</code> to have the new shape <code>(lengthXNew,
-     * lengthYNew)</code>.
+     * Interpolate <code>array</code> to have the new shape <code>(lengthXNew, lengthYNew)</code>.
      *
      * @param array         Original array of values.
      * @param lengthXNew    New number of sub-arrays present in the 2D array.
      * @param lengthYNew    New length of one subarray.
-     * @param interpolation Interpolation method.
-     * @return Interpolated version of the array.
+     * @param interpolation The interpolation method to use.
+     * @return Interpolated array.
      * @throws LengthException If the new lengths specified are shorter than the original lengths.
      */
     public static double[][] interpolate(

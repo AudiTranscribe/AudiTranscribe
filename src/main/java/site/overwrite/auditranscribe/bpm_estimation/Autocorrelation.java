@@ -2,7 +2,7 @@
  * Autocorrelation.java
  *
  * Created on 2022-06-02
- * Updated on 2022-06-02
+ * Updated on 2022-06-23
  *
  * Description: Class that handles audio autocorrelation methods.
  */
@@ -70,7 +70,13 @@ public class Autocorrelation {
         // Slice down to `maxSize`
         Complex[][] autocorrelationTransposed = new Complex[y[0].length][maxSize];
         for (int i = 0; i < y[0].length; i++) {
-            System.arraycopy(rawAutocorrelationTransposed[i], 0, autocorrelationTransposed[i], 0, maxSize);
+            System.arraycopy(
+                    rawAutocorrelationTransposed[i],
+                    0,
+                    autocorrelationTransposed[i],
+                    0,
+                    maxSize
+            );
         }
 
         // Now transpose back and return

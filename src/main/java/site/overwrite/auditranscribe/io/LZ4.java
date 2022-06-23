@@ -2,9 +2,9 @@
  * LZ4.java
  *
  * Created on 2022-05-04
- * Updated on 2022-05-28
+ * Updated on 2022-06-23
  *
- * Description: Class that encapsulates LZ4 compression/decompression on byte arrays.
+ * Description: Class that handles LZ4 compression/decompression on byte arrays.
  */
 
 package site.overwrite.auditranscribe.io;
@@ -18,7 +18,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
- * Class that encapsulates LZ4 compression/decompression on byte arrays.
+ * Class that handles LZ4 compression/decompression on byte arrays.
  */
 public class LZ4 {
     // Constants
@@ -32,7 +32,7 @@ public class LZ4 {
      * Method that returns an LZ4 compressed version of the bytes array.
      *
      * @param bytes Bytes array to be LZ4 compressed.
-     * @return LZ4 compressed bytes.
+     * @return Compressed bytes.
      * @throws IOException If something went wrong when compressing the bytes.
      */
     public static byte[] lz4Compress(byte[] bytes) throws IOException {
@@ -45,7 +45,7 @@ public class LZ4 {
      * @param bytes Bytes array to be LZ4 compressed.
      * @param task  The <code>CustomTask</code> object that is handling the generation. Pass in
      *              <code>null</code> if no such task is being used.
-     * @return LZ4 compressed bytes.
+     * @return Compressed bytes.
      * @throws IOException If something went wrong when compressing the bytes.
      */
     public static byte[] lz4Compress(byte[] bytes, CustomTask<?> task) throws IOException {

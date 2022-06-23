@@ -2,7 +2,7 @@
  * IOHelpers.java
  *
  * Created on 2022-05-28
- * Updated on 2022-05-28
+ * Updated on 2022-06-23
  *
  * Description: Helper methods for I/O methods.
  */
@@ -20,7 +20,7 @@ public class IOHelpers {
      *
      * @return The home directory of the user.
      */
-    public static String getHome() {
+    public static String getHomeDir() {
         return System.getProperty("user.home");
     }
 
@@ -32,7 +32,7 @@ public class IOHelpers {
      */
     public static String buildPath(String... elems) {
         // Get the file separator
-        String separator = System.getProperty("file.separator");
+        String separator = IOConstants.SEPARATOR;
 
         // Build the path
         StringBuilder buffer = new StringBuilder();
@@ -69,7 +69,7 @@ public class IOHelpers {
      */
     public static String joinPaths(String... paths) {
         // Get the file separator
-        String separator = System.getProperty("path.separator");
+        String separator = IOConstants.SEPARATOR;
 
         // Build the joined path
         StringBuilder buffer = new StringBuilder();

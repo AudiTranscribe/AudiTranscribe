@@ -4,7 +4,7 @@
  * Created on 2022-03-12
  * Updated on 2022-06-23
  *
- * Description: Unit conversion methods.
+ * Description: Unit conversion utility methods.
  */
 
 package site.overwrite.auditranscribe.utils;
@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 import static java.util.Map.entry;
 
 /**
- * Unit conversion methods.
+ * Unit conversion utility methods.
  */
 public class UnitConversionUtils {
     // Constants

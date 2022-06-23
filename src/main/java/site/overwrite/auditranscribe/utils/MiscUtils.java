@@ -2,7 +2,7 @@
  * MiscUtils.java
  *
  * Created on 2022-04-30
- * Updated on 2022-06-19
+ * Updated on 2022-06-23
  *
  * Description: Miscellaneous utility methods.
  */
@@ -23,27 +23,6 @@ import java.util.List;
  */
 public class MiscUtils {
     // Time utils
-
-    /**
-     * Gets the number of seconds from the Java epoch of 1970-01-01T00:00:00Z.<br>
-     * The epoch second count is a simple incrementing count of seconds where second 0 is
-     * 1970-01-01T00:00:00Z (i.e. Unix Epoch).
-     *
-     * @return Double representing the number of seconds. Decimal part is the fractional second
-     * part.
-     * @implNote The fractional part cannot be fully trusted; precision may only be accurate up to
-     * 10 milliseconds (i.e. up to 0.01 s).
-     */
-    public static double getUnixTimestamp() {
-        // Get both the current epoch second and the nanosecond part
-        Instant now = Instant.now();  // Get current time
-
-        long epochSecond = now.getEpochSecond();
-        int epochNanoseconds = now.getNano();
-
-        // Combine into a single double object and return
-        return Double.parseDouble(epochSecond + "." + epochNanoseconds);
-    }
 
     /**
      * Method that formats the given date according to the format.

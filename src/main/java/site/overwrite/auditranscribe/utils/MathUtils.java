@@ -4,7 +4,7 @@
  * Created on 2022-02-15
  * Updated on 2022-06-23
  *
- * Description: Class containing useful mathematical utility functions.
+ * Description: Mathematical utility methods.
  */
 
 package site.overwrite.auditranscribe.utils;
@@ -14,7 +14,7 @@ import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import java.math.BigDecimal;
 
 /**
- * Class containing useful mathematical utility functions.
+ * Mathematical utility methods.
  */
 public class MathUtils {
     // General mathematical methods

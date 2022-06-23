@@ -2,19 +2,17 @@
  * ProjectData.java
  *
  * Created on 2022-05-07
- * Updated on 2022-06-21
+ * Updated on 2022-06-23
  *
- * Description: Data object that stores all the project's data.
+ * Description: Class that stores all the project's data.
  */
 
 package site.overwrite.auditranscribe.io.audt_file;
 
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
 
-import java.util.Objects;
-
 /**
- * Data object that stores all the project's data.
+ * Class that stores all the project's data.
  */
 public class ProjectData {
     // Attributes
@@ -46,25 +44,5 @@ public class ProjectData {
         this.audioData = audioData;
         this.guiData = guiData;
         this.musicNotesData = musicNotesData;
-    }
-
-    // Overwritten methods
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ProjectData that = (ProjectData) o;
-        return (
-                unchangingDataProperties.equals(that.unchangingDataProperties) &&
-                        qTransformData.equals(that.qTransformData) &&
-                        audioData.equals(that.audioData) &&
-                        guiData.equals(that.guiData) &&
-                        musicNotesData.equals(that.musicNotesData)
-        );
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(unchangingDataProperties, qTransformData, audioData, guiData, musicNotesData);
     }
 }

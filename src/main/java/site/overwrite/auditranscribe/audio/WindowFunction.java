@@ -2,9 +2,9 @@
  * WindowFunction.java
  *
  * Created on 2022-03-11
- * Updated on 2022-05-22
+ * Updated on 2022-06-23
  *
- * Description: Enum that contains windowing functions.
+ * Description: Enum that contains windowing functions to be used when windowing the audio signal.
  */
 
 package site.overwrite.auditranscribe.audio;
@@ -13,8 +13,7 @@ import site.overwrite.auditranscribe.audio.window_functions.*;
 import site.overwrite.auditranscribe.audio.window_functions.AbstractWindow;
 
 /**
- * WindowFunction enum.<br>
- * Contains windowing functions to be used when windowing the audio signal.
+ * Enum that contains windowing functions to be used when windowing the audio signal.
  */
 public enum WindowFunction {
     // Enum values

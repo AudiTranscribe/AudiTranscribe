@@ -47,10 +47,8 @@ public class AUDTFileReader {
         // Check extension
         // (For simplicity assume the last 5 characters of the file path forms the extension)
         int filepathLength = filepath.length();
-        if (!(
-                filepathLength >= 5 &&
-                        filepath.substring(filepathLength - 5, filepathLength).equalsIgnoreCase(".audt")
-        )) {
+        if (filepathLength < 5 ||
+                !filepath.substring(filepathLength - 5, filepathLength).equalsIgnoreCase(".audt")) {
             throw new IncorrectFileFormatException("The file is not an AUDT file. Is the extension correct?");
         }
 

@@ -2,7 +2,7 @@
  * Complex.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-28
+ * Updated on 2022-06-23
  *
  * Description: Complex number class.
  */
@@ -14,8 +14,7 @@ import site.overwrite.auditranscribe.utils.MathUtils;
 import java.util.Objects;
 
 /**
- * Complex number class.<br>
- * Class that helps create complex numbers and perform operations on them.
+ * Complex number class.
  */
 public class Complex {
     // Useful constants
@@ -28,15 +27,14 @@ public class Complex {
     private double im;  // Imaginary part of the complex number
 
     /**
-     * Creates a complex number with real part <code>real</code> and imaginary part
-     * <code>imag</code>.
+     * Creates a complex number with real part <code>re</code> and imaginary part <code>im</code>.
      *
-     * @param real The real part of the complex number.
-     * @param imag The imaginary part of the complex number.
+     * @param re The real part of the complex number.
+     * @param im The imaginary part of the complex number.
      */
-    public Complex(double real, double imag) {
-        re = real;
-        im = imag;
+    public Complex(double re, double im) {
+        this.re = re;
+        this.im = im;
     }
 
     /**
@@ -47,6 +45,20 @@ public class Complex {
     public Complex(double real) {
         re = real;
         im = 0;
+    }
+
+    // Overwritten methods
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Complex that = (Complex) o;
+        return (this.re == that.re) && (this.im == that.im);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(re, im);
     }
 
     // Standard methods
@@ -72,8 +84,9 @@ public class Complex {
     // Standard `Object` methods
 
     /**
-     * Generates a string representation of the complex number.
-     * Note: we use "j" for the imaginary unit to follow Python's convention.
+     * Generates a string representation of the complex number.<br>
+     * Note that we use "j" for the imaginary unit to follow Python's convention of the imaginary
+     * unit.
      *
      * @return String representation of the complex number.
      */
@@ -82,28 +95,6 @@ public class Complex {
         if (re == 0) return im + "j";
         if (im < 0) return re + " - " + (-im) + "j";
         return re + " + " + im + "j";
-    }
-
-    /**
-     * Generates a hash code for this object.
-     *
-     * @return Integer representing the hash of this complex number.
-     */
-    public int hashCode() {
-        return Objects.hash(re, im);
-    }
-
-    /**
-     * Checks if this complex number is equivalent to the other object.
-     *
-     * @param x The other object to compare to.
-     * @return Boolean representing whether this complex number is equal to <code>x</code> or not.
-     */
-    public boolean equals(Object x) {
-        if (x == null) return false;
-        if (this.getClass() != x.getClass()) return false;
-        Complex that = (Complex) x;
-        return (this.re == that.re) && (this.im == that.im);
     }
 
     // Assertion methods
@@ -332,7 +323,7 @@ public class Complex {
         return complexPart.scale(mod);
     }
 
-    // 'Treatment' Methods
+    // Misc Methods
 
     /**
      * Rounds both the real and imaginary part of this complex number nicely to a certain number

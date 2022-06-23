@@ -25,11 +25,11 @@ import java.util.logging.Logger;
  */
 public class NotePlayerSequencer {
     // Constants
-    public static int TICKS_PER_QUARTER = 100_000;
+    public static int TICKS_PER_QUARTER = 100_000;  // Number of ticks per quarter note
 
     // Attributes
-    private Track track;  // Midi track
-    private Sequence sequence;  // Midi sequence
+    private Track track;
+    private Sequence sequence;
     private final Sequencer sequencer;
 
     public int onVelocity;
@@ -95,15 +95,6 @@ public class NotePlayerSequencer {
 
     public void setInstrument(MIDIInstrument instrument) {
         this.instrumentNum = instrument.midiNumber;
-    }
-
-    /**
-     * Method that gets the current time of the MIDI sequencer playback.
-     *
-     * @return Current time of the sequencer, <b>in seconds</b>.
-     */
-    public double getCurrTime() {
-        return sequencer.getMicrosecondPosition() / 1e6;
     }
 
     /**

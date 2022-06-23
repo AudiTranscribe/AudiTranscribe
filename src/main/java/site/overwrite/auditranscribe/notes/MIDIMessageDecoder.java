@@ -12,10 +12,7 @@ package site.overwrite.auditranscribe.notes;
 import site.overwrite.auditranscribe.utils.MathUtils;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
-import javax.sound.midi.MetaMessage;
-import javax.sound.midi.MidiMessage;
-import javax.sound.midi.ShortMessage;
-import javax.sound.midi.SysexMessage;
+import javax.sound.midi.*;
 import java.util.HexFormat;
 
 /**
@@ -197,14 +194,14 @@ public class MIDIMessageDecoder {
         String output;
 
         switch (message.getType()) {
-            case 0 -> output = "Sequence Number: " + (((msgData[0] & 0xFF) << 8) | (msgData[1] & 0xFF));
-            case 1 -> output = "Text Event: " + new String(msgData);
-            case 2 -> output = "Copyright Notice: " + new String(msgData);
-            case 3 -> output = "Track Name: " + new String(msgData);
-            case 4 -> output = "Instrument Name: " + new String(msgData);
-            case 5 -> output = "Lyric: " + new String(msgData);
-            case 6 -> output = "Marker: " + new String(msgData);
-            case 7 -> output = "Cue Point: " + new String(msgData);
+            case 0x00 -> output = "Sequence Number: " + (((msgData[0] & 0xFF) << 8) | (msgData[1] & 0xFF));
+            case 0x01 -> output = "Text Event: " + new String(msgData);
+            case 0x02 -> output = "Copyright Notice: " + new String(msgData);
+            case 0x03 -> output = "Track Name: " + new String(msgData);
+            case 0x04 -> output = "Instrument Name: " + new String(msgData);
+            case 0x05 -> output = "Lyric: " + new String(msgData);
+            case 0x06 -> output = "Marker: " + new String(msgData);
+            case 0x07 -> output = "Cue Point: " + new String(msgData);
             case 0x20 -> output = "Channel Prefix: " + (msgData[0] & 0xFF);
             case 0x2F -> output = "End of Track";
             case 0x51 -> {

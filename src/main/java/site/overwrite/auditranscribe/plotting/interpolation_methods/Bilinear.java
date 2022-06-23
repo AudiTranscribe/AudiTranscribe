@@ -2,9 +2,9 @@
  * Bilinear.java
  *
  * Created on 2022-04-12
- * Updated on 2022-06-03
+ * Updated on 2022-06-23
  *
- * Description: Helper class that contains the bilinear interpolation method.
+ * Description: Class that handles the bilinear interpolation method.
  */
 
 package site.overwrite.auditranscribe.plotting.interpolation_methods;
@@ -12,7 +12,7 @@ package site.overwrite.auditranscribe.plotting.interpolation_methods;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
 
 /**
- * Helper class that contains the bilinear interpolation method.
+ * Class that handles the bilinear interpolation method.
  */
 public class Bilinear extends AbstractInterpolation {
     /**
@@ -51,7 +51,6 @@ public class Bilinear extends AbstractInterpolation {
 
                 // Find the index of the closest element to `xNew` and `yNew` that is smaller than
                 // them in their respective arrays
-                // Todo: this seems inefficient; is there a better way?
                 int i = ArrayUtils.searchSorted(X, xNew) - 1;  // Minus one to take the element replaced
                 int j = ArrayUtils.searchSorted(Y, yNew) - 1;
 
