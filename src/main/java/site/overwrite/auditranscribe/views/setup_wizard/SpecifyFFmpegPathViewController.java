@@ -2,13 +2,13 @@
  * SpecifyFFmpegPathViewController.java
  *
  * Created on 2022-06-19
- * Updated on 2022-06-19
+ * Updated on 2022-06-22
  *
  * Description: View controller of the view that allows the user to manually specify the path to
  *              FFmpeg.
  */
 
-package site.overwrite.auditranscribe.views.setup_wizard_views;
+package site.overwrite.auditranscribe.views.setup_wizard;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

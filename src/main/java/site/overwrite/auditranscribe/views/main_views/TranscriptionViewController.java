@@ -2,12 +2,12 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-21
+ * Updated on 2022-06-23
  *
  * Description: Contains the transcription view's controller class.
  */
 
-package site.overwrite.auditranscribe.views;
+package site.overwrite.auditranscribe.views.main_views;
 
 import javafx.application.Platform;
 import javafx.event.Event;
@@ -48,9 +48,10 @@ import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 import site.overwrite.auditranscribe.plotting.PlottingStuffHandler;
 import site.overwrite.auditranscribe.spectrogram.*;
 import site.overwrite.auditranscribe.utils.*;
-import site.overwrite.auditranscribe.views.helpers.MouseHandler;
+import site.overwrite.auditranscribe.misc.MouseHandler;
 import site.overwrite.auditranscribe.views.helpers.Popups;
 import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
+import site.overwrite.auditranscribe.views.scene_switching.SceneSwitchingState;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
@@ -67,36 +68,36 @@ import java.util.logging.Logger;
 
 public class TranscriptionViewController implements Initializable {
     // Constants
-    final Pair<Integer, Integer> BPM_RANGE = new Pair<>(1, 512);  // In the format [min, max]
-    final Pair<Double, Double> OFFSET_RANGE = new Pair<>(-15., 15.);  // In the format [min, max]
+    private final Pair<Integer, Integer> BPM_RANGE = new Pair<>(1, 512);  // In the format [min, max]
+    private final Pair<Double, Double> OFFSET_RANGE = new Pair<>(-15., 15.);  // In the format [min, max]
 
     public final double SPECTROGRAM_ZOOM_SCALE_X = 2;
     public final double SPECTROGRAM_ZOOM_SCALE_Y = 5;
 
     public final int PX_PER_SECOND = 120;
-    final int BINS_PER_OCTAVE = 60;
-    final int SPECTROGRAM_HOP_LENGTH = 1024;  // Needs to be a power of 2
-    final double NUM_PX_PER_OCTAVE = 72;
+    private final int BINS_PER_OCTAVE = 60;
+    private final int SPECTROGRAM_HOP_LENGTH = 1024;  // Needs to be a power of 2
+    private final double NUM_PX_PER_OCTAVE = 72;
 
-    final int MIN_NOTE_NUMBER = 0;  // C0
-    final int MAX_NOTE_NUMBER = 107;  // B8
+    private final int MIN_NOTE_NUMBER = 0;  // C0
+    private final int MAX_NOTE_NUMBER = 107;  // B8
 
-    final long UPDATE_PLAYBACK_SCHEDULER_PERIOD = 50;  // In milliseconds
+    private final long UPDATE_PLAYBACK_SCHEDULER_PERIOD = 50;  // In milliseconds
 
-    final boolean USE_FANCY_SHARPS_FOR_NOTE_LABELS = true;
+    private final boolean USE_FANCY_SHARPS_FOR_NOTE_LABELS = true;
 
-    final double VOLUME_VALUE_DELTA_ON_KEY_PRESS = 0.05;
+    public final double VOLUME_VALUE_DELTA_ON_KEY_PRESS = 0.05;
 
-    final MIDIInstrument NOTE_PLAYING_INSTRUMENT = MIDIInstrument.PIANO;
-    final int MIDI_CHANNEL_NUM = 0;
-    final int NOTE_PLAYING_ON_VELOCITY = 96;  // Within the range [0, 127]
-    final int NOTE_PLAYING_OFF_VELOCITY = 10;   // Within the range [0, 127]
-    final long NOTE_PLAYING_ON_DURATION = 75;  // In milliseconds
-    final long NOTE_PLAYING_OFF_DURATION = 925;  // In milliseconds
+    private final MIDIInstrument NOTE_PLAYING_INSTRUMENT = MIDIInstrument.PIANO;
+    public final int MIDI_CHANNEL_NUM = 0;
+    private final int NOTE_PLAYING_ON_VELOCITY = 96;  // Within the range [0, 127]
+    private final int NOTE_PLAYING_OFF_VELOCITY = 10;   // Within the range [0, 127]
+    private final long NOTE_PLAYING_ON_DURATION = 75;  // In milliseconds
+    private final long NOTE_PLAYING_OFF_DURATION = 925;  // In milliseconds
 
-    final KeyCodeCombination NEW_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN);
-    final KeyCodeCombination OPEN_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN);
-    final KeyCodeCombination SAVE_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN);
+    private final KeyCodeCombination NEW_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN);
+    private final KeyCodeCombination OPEN_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.O, KeyCombination.SHORTCUT_DOWN);
+    private final KeyCodeCombination SAVE_PROJECT_COMBINATION = new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN);
 
     // File-Savable Attributes
     private int numSkippableBytes;
@@ -112,22 +113,19 @@ public class TranscriptionViewController implements Initializable {
     private double currTime = 0;
 
     // Other attributes
-    Stage mainStage;
-    MainViewController mainViewController;
-    SettingsFile settingsFile;
-    Theme theme;
+    private boolean hasUnsavedChanges = true;
 
-    NotePlayerSynth notePlayerSynth;
-    NotePlayerSequencer notePlayerSequencer;
-    MusicNotesDataObject musicNotesData;
+    private SettingsFile settingsFile;
+    private Theme theme;
+
+    private NotePlayerSynth notePlayerSynth;
+    private NotePlayerSequencer notePlayerSequencer;
+    private MusicNotesDataObject musicNotesData;
 
     private boolean isEverythingReady = false;
 
     private final Logger logger = Logger.getLogger(this.getClass().getName());
     private ProjectsDB projectsDB;
-
-    private List<Audio> allAudio;
-    private List<NotePlayerSequencer> allSequencers;
 
     private String audtFilePath;
     private String audtFileName;
@@ -160,10 +158,13 @@ public class TranscriptionViewController implements Initializable {
     private StackPane[] barNumberEllipses;
     private Line playheadLine;
 
-    Queue<CustomTask<?>> ongoingTasks = new LinkedList<>();
+    public Queue<CustomTask<?>> ongoingTasks = new LinkedList<>();
 
-    ScheduledExecutorService scheduler;
-    ScheduledExecutorService autosaveScheduler;
+    private SceneSwitchingState sceneSwitchingState = SceneSwitchingState.SHOW_MAIN_SCENE;
+    private File selectedFile = null;
+
+    private ScheduledExecutorService scheduler;
+    private ScheduledExecutorService autosaveScheduler;
 
     // FXML Elements
     // Menu bar
@@ -293,6 +294,9 @@ public class TranscriptionViewController implements Initializable {
         musicKeyChoice.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             logger.log(Level.FINE, "Changed music key from " + oldValue + " to " + newValue);
 
+            // Update the `hasUnsavedChanges` flag
+            hasUnsavedChanges = true;
+
             // Update note pane and note labels
             if (isEverythingReady) {
                 noteLabels = PlottingStuffHandler.addNoteLabels(
@@ -309,6 +313,9 @@ public class TranscriptionViewController implements Initializable {
         timeSignatureChoice.getSelectionModel().selectedItemProperty()
                 .addListener((observable, oldValue, newValue) -> {
                     logger.log(Level.FINE, "Changed time signature from " + oldValue + " to " + newValue);
+
+                    // Update the `hasUnsavedChanges` flag
+                    hasUnsavedChanges = true;
 
                     // Get the old and new beats per bar
                     int oldBeatsPerBar = 0;
@@ -449,6 +456,9 @@ public class TranscriptionViewController implements Initializable {
                                             Level.FINE,
                                             "Placed note " + estimatedNoteNum + " at " + estimatedTime + " seconds"
                                     );
+
+                                    // Update the `hasUnsavedChanges` flag
+                                    hasUnsavedChanges = true;
                                 } catch (NoteRectangleCollisionException ignored) {
                                 }
                             }
@@ -515,9 +525,18 @@ public class TranscriptionViewController implements Initializable {
         }
     }
 
-    // Setter methods
+    // Getter/Setter methods
     public void setSettingsFile(SettingsFile settingsFile) {
         this.settingsFile = settingsFile;
+    }
+
+    public SceneSwitchingState getSceneSwitchingState() {
+        if (sceneSwitchingState == null) return SceneSwitchingState.SHOW_MAIN_SCENE;
+        return sceneSwitchingState;
+    }
+
+    public File getSelectedFile() {
+        return selectedFile;
     }
 
     // Public methods
@@ -610,27 +629,8 @@ public class TranscriptionViewController implements Initializable {
      * Method that finishes the setting up of the transcription view controller.<br>
      * Note that this method has to be called <b>last</b>, after all other spectrogram things have
      * been set up.
-     *
-     * @param mainStage          Main stage.
-     * @param allAudio           List of all opened <code>Audio</code> objects.
-     * @param allSequencers      List of all opened <code>NotePlayerSequencer</code> objects.
-     * @param mainViewController Controller object of the main class.
      */
-    public void finishSetup(
-            Stage mainStage, List<Audio> allAudio, List<NotePlayerSequencer> allSequencers,
-            MainViewController mainViewController
-    ) {
-        // Update attributes
-        this.mainStage = mainStage;
-        this.mainViewController = mainViewController;
-
-        this.allAudio = allAudio;
-        this.allSequencers = allSequencers;
-
-        // Append the current audio and sequencer to the appropriate lists
-        this.allAudio.add(audio);
-        this.allSequencers.add(notePlayerSequencer);
-
+    public void finishSetup() {
         // Set choices
         musicKeyChoice.setValue(MusicUtils.MUSIC_KEYS[musicKeyIndex]);
         timeSignatureChoice.setValue(MusicUtils.TIME_SIGNATURES[timeSignatureIndex]);
@@ -648,6 +648,9 @@ public class TranscriptionViewController implements Initializable {
 
         // Set methods on the volume sliders
         audioVolumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            // Update the `hasUnsavedChanges` flag
+            hasUnsavedChanges = true;
+
             // Update the audio volume value
             audioVolume = newValue.doubleValue();
 
@@ -717,9 +720,7 @@ public class TranscriptionViewController implements Initializable {
      * @param audtFileName The name of the AUDT file.
      * @param projectData  The project data.
      */
-    public void useExistingData(
-            String audtFilePath, String audtFileName, ProjectData projectData
-    ) {
+    public void useExistingData(String audtFilePath, String audtFileName, ProjectData projectData) {
         // Get number of skippable bytes
         numSkippableBytes = projectData.unchangingDataProperties.numSkippableBytes;
 
@@ -991,6 +992,71 @@ public class TranscriptionViewController implements Initializable {
         notePlayerSequencer.close();
     }
 
+    /**
+     * Helper method that handles the unsaved changes.
+     *
+     * @return A boolean, <code>true</code> if the window should be closed, and <code>false</code>
+     * if not.
+     */
+    public boolean handleUnsavedChanges() {
+        // Do not do anything if the save button is disabled
+        if (saveProjectButton.isDisabled()) return false;
+
+        // Now check if there are unsaved changes
+        if (hasUnsavedChanges) {
+            // Prompt user to save work first
+            ButtonType saveAndExit = new ButtonType("Save And Leave");
+            ButtonType dontSaveButExit = new ButtonType("Don't Save, But Leave");
+            ButtonType dontSaveDontExit = new ButtonType("Don't Save, Don't Leave");
+
+            Optional<ButtonType> selectedButton = Popups.showMultiButtonAlert(
+                    "Unsaved Changes",
+                    "You Have Unsaved Changes",
+                    "Do you want to save your work?",
+                    saveAndExit, dontSaveButExit, dontSaveDontExit
+            );
+
+            // Handle different cases
+            if (selectedButton.isPresent()) {
+                // Don't save and don't exit
+                if (selectedButton.get() == saveAndExit) {
+                    // Determine the save location
+                    String saveDest = getSaveDestination(false);
+
+                    // Try to save the project
+                    try {
+                        saveData(false, saveDest, null);
+                        return true;  // Can exit silently
+                    } catch (IOException | FFmpegNotFoundException e) {
+                        // Show exception that was thrown
+                        Popups.showExceptionAlert(
+                                "File Saving Failure",
+                                "AudiTranscribe failed to save the file.",
+                                e
+                        );
+                        return false;  // Cannot exit
+                    }
+
+                } else if (selectedButton.get() == dontSaveButExit) {
+                    // We just want to exit
+                    return true;
+                } else if (selectedButton.get() == dontSaveDontExit) {
+                    // Don't want to exit
+                    return false;
+                } else {
+                    // Assume default is don't want to leave
+                    return false;
+                }
+            } else {
+                // Assume don't want to save and don't want to exit
+                return false;
+            }
+        } else {
+            // If there are no unsaved changes, then closing window is permitted
+            return true;
+        }
+    }
+
     // Private methods
 
     /**
@@ -1001,6 +1067,9 @@ public class TranscriptionViewController implements Initializable {
      *                                audio object.
      */
     private void seekToTime(double seekTime) throws InvalidObjectException {
+        // Update the `hasUnsavedChanges` flag
+        hasUnsavedChanges = true;
+
         // Ensure that the `seekTime` stays within range
         if (seekTime < 0 && currTime <= 0) return;  // Do nothing in this case
         else if (seekTime < 0) seekTime = 0;
@@ -1059,30 +1128,40 @@ public class TranscriptionViewController implements Initializable {
         // Stop note sequencer playback
         notePlayerSequencer.stop();
 
-        // Get the current window
-        Window window = rootPane.getScene().getWindow();
+        // Deal with possible unsaved changes
+        boolean canCloseWindow = handleUnsavedChanges();
+        if (canCloseWindow) {
+            // Get the current window
+            Window window = rootPane.getScene().getWindow();
 
-        // Get user to select an audio file
-        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
-                "Audio files (*.wav, *.mp3, *.flac, *.aif, *.aiff)",
-                "*.wav", "*.mp3", "*.flac", "*.aif", "*.aiff"
-        );
-        File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
+            // Get user to select an audio file
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                    "Audio files (*.wav, *.mp3, *.flac, *.aif, *.aiff)",
+                    "*.wav", "*.mp3", "*.flac", "*.aif", "*.aiff"
+            );
+            File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
 
-        // If a file was selected, stop the audio completely
-        if (file != null) {
-            try {
-                audio.stop();
-            } catch (InvalidObjectException e) {
-                throw new RuntimeException(e);
+            // If a file was selected, stop the audio completely
+            if (file != null) {
+                try {
+                    audio.stop();
+                } catch (InvalidObjectException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            // Verify that the user actually chose a file
+            if (file == null) {
+                Popups.showInformationAlert("Info", "No file selected.");
+            } else {
+                // Set the scene switching status and the selected file
+                sceneSwitchingState = SceneSwitchingState.NEW_PROJECT;
+                selectedFile = file;
+
+                // Close this stage
+                ((Stage) rootPane.getScene().getWindow()).close();
             }
         }
-
-        // Create the new project
-        ProjectIOHandlers.newProject(
-                mainStage, (Stage) window, file, settingsFile, allAudio, allSequencers,
-                mainViewController
-        );
     }
 
     /**
@@ -1100,28 +1179,39 @@ public class TranscriptionViewController implements Initializable {
         // Stop note sequencer playback
         notePlayerSequencer.stop();
 
-        // Get the current window
-        Window window = rootPane.getScene().getWindow();
+        // Deal with possible unsaved changes
+        boolean canCloseWindow = handleUnsavedChanges();
+        if (canCloseWindow) {
+            // Get the current window
+            Window window = rootPane.getScene().getWindow();
 
-        // Get user to select an AUDT file
-        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
-                "AudiTranscribe files (*.audt)", "*.audt"
-        );
-        File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
+            // Get user to select an AUDT file
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                    "AudiTranscribe files (*.audt)", "*.audt"
+            );
+            File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
 
-        // If a file was selected, stop the audio completely
-        if (file != null) {
-            try {
-                audio.stop();
-            } catch (InvalidObjectException e) {
-                throw new RuntimeException(e);
+            // If a file was selected, stop the audio completely
+            if (file != null) {
+                try {
+                    audio.stop();
+                } catch (InvalidObjectException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            // Verify that the user actually chose a file
+            if (file == null) {
+                Popups.showInformationAlert("Info", "No file selected.");
+            } else {
+                // Set the scene switching status and the selected file
+                sceneSwitchingState = SceneSwitchingState.OPEN_PROJECT;
+                selectedFile = file;
+
+                // Close this stage
+                ((Stage) rootPane.getScene().getWindow()).close();
             }
         }
-
-        // Open the existing project
-        ProjectIOHandlers.openProject(
-                mainStage, (Stage) window, file, settingsFile, allAudio, allSequencers,
-                mainViewController);
     }
 
     /**
@@ -1134,115 +1224,14 @@ public class TranscriptionViewController implements Initializable {
         // Do not do anything if the button is disabled
         if (saveProjectButton.isDisabled()) return;
 
-        // Allow user to select save location
-        String saveDest, saveName;
-
-        if (audtFilePath == null || forceChooseFile) {
-            logger.log(Level.FINE, "AUDT file destination not yet set; asking now");
-
-            // Get current window
-            Window window = rootPane.getScene().getWindow();
-
-            // Ask user to choose a file
-            FileChooser fileChooser = new FileChooser();
-            File file = fileChooser.showSaveDialog(window);
-
-            // If operation was cancelled return
-            if (file == null) return;
-
-            // Set the actual destination to save the file
-            saveDest = file.getAbsolutePath();
-            saveName = file.getName();
-
-            if (!saveDest.toLowerCase().endsWith(".audt")) saveDest += ".audt";
-            if (!saveName.toLowerCase().endsWith(".audt")) saveName += ".audt";
-
-            // Update the file path and file name
-            if (audtFilePath == null) {
-                audtFilePath = saveDest;
-                audtFileName = saveName;
-            }
-
-            logger.log(Level.FINE, "AUDT file destination set to " + saveDest);
-        } else {
-            // Use the existing file path and file name
-            saveDest = audtFilePath;
-            saveName = audtFileName;
-
-            logger.log(Level.FINE, "Saving " + saveName + " to " + saveDest);
-        }
+        // Get the save destination
+        String saveDest = getSaveDestination(forceChooseFile);
 
         // Set up task to run in alternate thread
-        String finalSaveDest = saveDest;
         CustomTask<Void> task = new CustomTask<>("Save Project") {
             @Override
             protected Void call() throws Exception {
-                // Compress the raw MP3 bytes
-                if (compressedMP3Bytes == null) {
-                    try {
-                        compressedMP3Bytes = LZ4.lz4Compress(
-                                audio.wavBytesToMP3Bytes(settingsFile.data.ffmpegInstallationPath), this
-                        );
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-
-                // Get data from the note rectangles
-                int numRectangles = NoteRectangle.allNoteRectangles.size();
-                double[] timesToPlaceRectangles = new double[numRectangles];
-                double[] noteDurations = new double[numRectangles];
-                int[] noteNums = new int[numRectangles];
-
-                for (int i = 0; i < numRectangles; i++) {
-                    NoteRectangle noteRectangle = NoteRectangle.allNoteRectangles.get(i);
-                    timesToPlaceRectangles[i] = noteRectangle.getNoteOnsetTime();
-                    noteDurations[i] = noteRectangle.getNoteDuration();
-                    noteNums[i] = noteRectangle.noteNum;
-                }
-
-                // Package data for saving
-                logger.log(Level.INFO, "Packaging data for saving");
-                QTransformDataObject qTransformData = new QTransformDataObject(
-                        qTransformBytes, minQTransformMagnitude, maxQTransformMagnitude
-                );
-                AudioDataObject audioData = new AudioDataObject(
-                        compressedMP3Bytes, sampleRate, (int) audioDuration * 1000,
-                        audioFileName);
-                GUIDataObject guiData = new GUIDataObject(
-                        musicKeyIndex, timeSignatureIndex, bpm, offset, audioVolume,
-                        (int) currTime * 1000
-                );
-                MusicNotesDataObject musicNotesData = new MusicNotesDataObject(
-                        timesToPlaceRectangles, noteDurations, noteNums
-                );
-
-                // Determine the number of skippable bytes
-                if (numSkippableBytes == 0 || forceChooseFile) {
-                    // Calculate the number of skippable bytes
-                    numSkippableBytes = 32 +  // Header section
-                            UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
-                            qTransformData.numBytesNeeded() +
-                            audioData.numBytesNeeded();
-
-                    // Update the unchanging data properties
-                    UnchangingDataPropertiesObject unchangingDataProperties = new UnchangingDataPropertiesObject(
-                            numSkippableBytes
-                    );
-
-                    // Package all the current data into a `ProjectData`
-                    ProjectData projectData = new ProjectData(
-                            unchangingDataProperties, qTransformData, audioData, guiData, musicNotesData
-                    );
-
-                    // Save the project
-                    ProjectIOHandlers.saveProject(finalSaveDest, projectData);
-
-                } else {
-                    ProjectIOHandlers.saveProject(finalSaveDest, numSkippableBytes, guiData, musicNotesData);
-                }
-
-                logger.log(Level.INFO, "File saved");
+                saveData(forceChooseFile, saveDest, this);
                 return null;
             }
         };
@@ -1339,6 +1328,9 @@ public class TranscriptionViewController implements Initializable {
      * @param forceUpdate Whether to force an update to the BPM value.
      */
     private void updateBPMValue(double newBPM, boolean forceUpdate) {
+        // Update the `hasUnsavedChanges` flag
+        hasUnsavedChanges = true;
+
         // Get the previous BPM value
         double oldBPM = forceUpdate ? -1 : bpm;
 
@@ -1382,6 +1374,9 @@ public class TranscriptionViewController implements Initializable {
      * @param forceUpdate Whether to force an update to the offset value.
      */
     private void updateOffsetValue(double newOffset, boolean forceUpdate) {
+        // Update the `hasUnsavedChanges` flag
+        hasUnsavedChanges = true;
+
         // Get the previous offset value
         double oldOffset = forceUpdate ? OFFSET_RANGE.getValue0() - 1 : offset;  // Make it 1 less than permitted
 
@@ -1756,6 +1751,17 @@ public class TranscriptionViewController implements Initializable {
                 for (Node node : disabledNodes) {
                     node.setDisable(false);
                 }
+
+                // Handle attempt to close the window
+                rootPane.getScene().getWindow().setOnCloseRequest((windowEvent) -> {
+                    // Deal with possible unsaved changes
+                    boolean canCloseWindow = handleUnsavedChanges();
+                    if (!canCloseWindow) windowEvent.consume();
+                });
+
+                // If we are using existing data (i.e., AUDT file path was already set), then initially there are no
+                // unsaved changes
+                hasUnsavedChanges = false;
             }
         });
 
@@ -1802,6 +1808,9 @@ public class TranscriptionViewController implements Initializable {
      * Helper method that toggles the play button.
      */
     private void togglePlayButton() {
+        // Update the `hasUnsavedChanges` flag
+        hasUnsavedChanges = true;
+
         // Toggle audio paused state
         if (currTime == audioDuration) {
             try {
@@ -2034,38 +2043,60 @@ public class TranscriptionViewController implements Initializable {
             // Consume the key event
             keyEvent.consume();
 
-            // Get the current window
-            Window window = rootPane.getScene().getWindow();
+            // Deal with possible unsaved changes
+            boolean canCloseWindow = handleUnsavedChanges();
+            if (canCloseWindow) {
+                // Get the current window
+                Window window = rootPane.getScene().getWindow();
 
-            // Get user to select a WAV file
-            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
-                    "WAV files (*.wav)", "*.wav"
-            );
-            File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
+                // Get user to select a WAV file
+                FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                        "WAV files (*.wav)", "*.wav"
+                );
+                File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
 
-            // Create the new project
-            ProjectIOHandlers.newProject(
-                    mainStage, (Stage) window, file, settingsFile, allAudio, allSequencers,
-                    mainViewController
-            );
+                // Verify that the user actually chose a file
+                if (file == null) {
+                    Popups.showInformationAlert("Info", "No file selected.");
+                } else {
+                    // Set the scene switching status and the selected file
+                    sceneSwitchingState = SceneSwitchingState.NEW_PROJECT;
+                    selectedFile = file;
+
+                    // Close this stage
+                    ((Stage) rootPane.getScene().getWindow()).close();
+                }
+            }
 
         } else if (OPEN_PROJECT_COMBINATION.match(keyEvent)) {  // Open a project
             // Consume the key event
             keyEvent.consume();
 
-            // Get the current window
-            Window window = rootPane.getScene().getWindow();
+            // Deal with possible unsaved changes
+            boolean canCloseWindow = handleUnsavedChanges();
+            if (canCloseWindow) {
 
-            // Get user to select an AUDT file
-            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
-                    "AudiTranscribe files (*.audt)", "*.audt"
-            );
-            File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
+                // Get the current window
+                Window window = rootPane.getScene().getWindow();
 
-            // Open the existing project
-            ProjectIOHandlers.openProject(
-                    mainStage, (Stage) window, file, settingsFile, allAudio, allSequencers,
-                    mainViewController);
+                // Get user to select an AUDT file
+                FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                        "AudiTranscribe files (*.audt)", "*.audt"
+                );
+                File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
+
+                // Verify that the user actually chose a file
+                if (file == null) {
+                    Popups.showInformationAlert("Info", "No file selected.");
+                } else {
+                    // Set the scene switching status and the selected file
+                    sceneSwitchingState = SceneSwitchingState.OPEN_PROJECT;
+                    selectedFile = file;
+
+                    // Close this stage
+                    ((Stage) rootPane.getScene().getWindow()).close();
+                }
+            }
 
         } else if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {  // Save current project
             handleSavingProject(false, false);
@@ -2151,5 +2182,136 @@ public class TranscriptionViewController implements Initializable {
             case SEMICOLON -> notePlayerSynth.noteOff(octaveNum * 12 + 16, NOTE_PLAYING_OFF_VELOCITY);  // E'
             case QUOTE -> notePlayerSynth.noteOff(octaveNum * 12 + 17, NOTE_PLAYING_OFF_VELOCITY);  // F'
         }
+    }
+
+    /**
+     * Helper method that helps save the data into an AUDT file.
+     *
+     * @param forceChooseFile Whether the file was forcibly chosen.
+     * @param saveDest        The destination to save the file to.
+     * @param task            The <code>CustomTask</code> object that will handle the saving of the
+     *                        file.
+     * @throws FFmpegNotFoundException If the FFmpeg binary could not be found.
+     * @throws IOException             If the saving to the AUDT file failed.
+     */
+    private void saveData(
+            boolean forceChooseFile, String saveDest, CustomTask<?> task
+    ) throws FFmpegNotFoundException, IOException {
+        // Compress the raw MP3 bytes
+        if (compressedMP3Bytes == null) {
+            try {
+                compressedMP3Bytes = LZ4.lz4Compress(
+                        audio.wavBytesToMP3Bytes(settingsFile.data.ffmpegInstallationPath),
+                        task
+                );
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        // Get data from the note rectangles
+        int numRectangles = NoteRectangle.allNoteRectangles.size();
+        double[] timesToPlaceRectangles = new double[numRectangles];
+        double[] noteDurations = new double[numRectangles];
+        int[] noteNums = new int[numRectangles];
+
+        for (int i = 0; i < numRectangles; i++) {
+            NoteRectangle noteRectangle = NoteRectangle.allNoteRectangles.get(i);
+            timesToPlaceRectangles[i] = noteRectangle.getNoteOnsetTime();
+            noteDurations[i] = noteRectangle.getNoteDuration();
+            noteNums[i] = noteRectangle.noteNum;
+        }
+
+        // Package data for saving
+        logger.log(Level.INFO, "Packaging data for saving");
+        QTransformDataObject qTransformData = new QTransformDataObject(
+                qTransformBytes, minQTransformMagnitude, maxQTransformMagnitude
+        );
+        AudioDataObject audioData = new AudioDataObject(
+                compressedMP3Bytes, sampleRate, (int) audioDuration * 1000,
+                audioFileName);
+        GUIDataObject guiData = new GUIDataObject(
+                musicKeyIndex, timeSignatureIndex, bpm, offset, audioVolume,
+                (int) currTime * 1000
+        );
+        MusicNotesDataObject musicNotesData = new MusicNotesDataObject(
+                timesToPlaceRectangles, noteDurations, noteNums
+        );
+
+        // Determine the number of skippable bytes
+        if (numSkippableBytes == 0 || forceChooseFile) {
+            // Calculate the number of skippable bytes
+            numSkippableBytes = 32 +  // Header section
+                    UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
+                    qTransformData.numBytesNeeded() +
+                    audioData.numBytesNeeded();
+
+            // Update the unchanging data properties
+            UnchangingDataPropertiesObject unchangingDataProperties = new UnchangingDataPropertiesObject(
+                    numSkippableBytes
+            );
+
+            // Package all the current data into a `ProjectData`
+            ProjectData projectData = new ProjectData(
+                    unchangingDataProperties, qTransformData, audioData, guiData, musicNotesData
+            );
+
+            // Save the project
+            ProjectIOHandlers.saveProject(saveDest, projectData);
+
+        } else {
+            ProjectIOHandlers.saveProject(saveDest, numSkippableBytes, guiData, musicNotesData);
+        }
+
+        logger.log(Level.INFO, "File saved");
+    }
+
+    /**
+     * Helper method that gets the save destination.
+     *
+     * @param forceChooseFile Whether the save destination must be forcibly chosen.
+     * @return String representing the save destination.
+     */
+    private String getSaveDestination(boolean forceChooseFile) {
+        String saveDest, saveName;
+
+        // Check if there already exist a place to save
+        if (audtFilePath == null || forceChooseFile) {
+            logger.log(Level.FINE, "AUDT file destination not yet set; asking now");
+
+            // Get current window
+            Window window = rootPane.getScene().getWindow();
+
+            // Ask user to choose a file
+            FileChooser fileChooser = new FileChooser();
+            File file = fileChooser.showSaveDialog(window);
+
+            // If operation was cancelled return
+            if (file == null) return null;
+
+            // Set the actual destination to save the file
+            saveDest = file.getAbsolutePath();
+            saveName = file.getName();
+
+            if (!saveDest.toLowerCase().endsWith(".audt")) saveDest += ".audt";
+            if (!saveName.toLowerCase().endsWith(".audt")) saveName += ".audt";
+
+            // Update the file path and file name
+            if (audtFilePath == null) {
+                audtFilePath = saveDest;
+                audtFileName = saveName;
+            }
+
+            logger.log(Level.FINE, "AUDT file destination set to " + saveDest);
+        } else {
+            // Use the existing file path and file name
+            saveDest = audtFilePath;
+            saveName = audtFileName;
+
+            logger.log(Level.FINE, "Saving " + saveName + " to " + saveDest);
+        }
+
+        // Return the needed data
+        return saveDest;
     }
 }

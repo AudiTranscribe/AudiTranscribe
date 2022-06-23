@@ -2,12 +2,12 @@
  * SetupWizardHelper.java
  *
  * Created on 2022-06-19
- * Updated on 2022-06-20
+ * Updated on 2022-06-23
  *
  * Description: Class that handles the setup wizard.
  */
 
-package site.overwrite.auditranscribe.views.helpers;
+package site.overwrite.auditranscribe.views.setup_wizard;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -19,7 +19,6 @@ import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.StreamGobbler;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.Theme;
-import site.overwrite.auditranscribe.views.setup_wizard_views.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,9 +30,9 @@ import java.util.concurrent.Executors;
  */
 public class SetupWizardHelper {
     // Attributes
-    Stage stage;
-    SettingsFile settingsFile;
-    Theme theme;
+    private final Stage stage;
+    private final SettingsFile settingsFile;
+    private final Theme theme;
 
     /**
      * Initializes the setup wizard helper.
@@ -278,7 +277,7 @@ public class SetupWizardHelper {
      * @return The URL of the view file.
      */
     private URL getSetupWizardView(String viewFile) {
-        return IOMethods.getFileURL("views/fxml/setup-wizard-views/" + viewFile);
+        return IOMethods.getFileURL("views/fxml/setup-wizard/" + viewFile);
     }
 
     /**

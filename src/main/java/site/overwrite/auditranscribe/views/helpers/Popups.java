@@ -2,7 +2,7 @@
  * Popups.java
  *
  * Created on 2022-05-26
- * Updated on 2022-06-19
+ * Updated on 2022-06-22
  *
  * Description: Class that handles the popups and dialogs.
  */

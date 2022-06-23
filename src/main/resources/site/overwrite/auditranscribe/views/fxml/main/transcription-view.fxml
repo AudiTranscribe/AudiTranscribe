@@ -22,7 +22,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="rootPane" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="site.overwrite.auditranscribe.views.TranscriptionViewController">
+<AnchorPane fx:id="rootPane" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="site.overwrite.auditranscribe.views.main_views.TranscriptionViewController">
    <children>
       <VBox fx:id="masterVBox" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -59,7 +59,7 @@
                                        <graphic>
                                           <ImageView fx:id="newProjectButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
-                                                <Image url="@../../images/icons/PNGs/light-mode/create.png" />
+                                                <Image url="@../../../images/icons/PNGs/light-mode/create.png" />
                                              </image>
                                           </ImageView>
                                        </graphic>
@@ -68,7 +68,7 @@
                                        <graphic>
                                           <ImageView fx:id="openProjectButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
-                                                <Image url="@../../images/icons/PNGs/light-mode/folder-open.png" />
+                                                <Image url="@../../../images/icons/PNGs/light-mode/folder-open.png" />
                                              </image>
                                           </ImageView>
                                        </graphic>
@@ -77,7 +77,7 @@
                                        <graphic>
                                           <ImageView fx:id="saveProjectButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
-                                                <Image url="@../../images/icons/PNGs/light-mode/save.png" />
+                                                <Image url="@../../../images/icons/PNGs/light-mode/save.png" />
                                              </image>
                                           </ImageView>
                                        </graphic>
@@ -188,7 +188,7 @@
                                        <graphic>
                                           <ImageView fx:id="scrollButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
-                                                <Image url="@../../images/icons/PNGs/light-mode/footsteps-outline.png" />
+                                                <Image url="@../../../images/icons/PNGs/light-mode/footsteps-outline.png" />
                                              </image>
                                           </ImageView>
                                        </graphic>
@@ -197,7 +197,7 @@
                                        <graphic>
                                           <ImageView fx:id="editNotesButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
-                                                <Image url="@../../images/icons/PNGs/light-mode/edit-notes-outline.png" />
+                                                <Image url="@../../../images/icons/PNGs/light-mode/edit-notes-outline.png" />
                                              </image>
                                           </ImageView>
                                        </graphic>
@@ -214,7 +214,7 @@
                                        <graphic>
                                           <ImageView fx:id="playButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
-                                                <Image url="@../../images/icons/PNGs/light-mode/play.png" />
+                                                <Image url="@../../../images/icons/PNGs/light-mode/play.png" />
                                              </image>
                                           </ImageView>
                                        </graphic>
@@ -223,7 +223,7 @@
                                        <graphic>
                                           <ImageView fx:id="stopButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
-                                                <Image url="@../../images/icons/PNGs/light-mode/stop.png" />
+                                                <Image url="@../../../images/icons/PNGs/light-mode/stop.png" />
                                              </image>
                                           </ImageView>
                                        </graphic>
@@ -232,7 +232,7 @@
                                        <graphic>
                                           <ImageView fx:id="playSkipBackButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
-                                                <Image url="@../../images/icons/PNGs/light-mode/play-skip-back.png" />
+                                                <Image url="@../../../images/icons/PNGs/light-mode/play-skip-back.png" />
                                              </image>
                                           </ImageView>
                                        </graphic>
@@ -241,7 +241,7 @@
                                        <graphic>
                                           <ImageView fx:id="playSkipForwardButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
-                                                <Image url="@../../images/icons/PNGs/light-mode/play-skip-forward.png" />
+                                                <Image url="@../../../images/icons/PNGs/light-mode/play-skip-forward.png" />
                                              </image>
                                           </ImageView>
                                        </graphic>
@@ -258,7 +258,7 @@
                                        <graphic>
                                           <ImageView fx:id="audioVolumeButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
-                                                <Image url="@../../images/icons/PNGs/light-mode/volume-high.png" />
+                                                <Image url="@../../../images/icons/PNGs/light-mode/volume-high.png" />
                                              </image>
                                           </ImageView>
                                        </graphic>
@@ -268,7 +268,7 @@
                                        <graphic>
                                           <ImageView fx:id="notesVolumeButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
-                                                <Image url="@../../images/icons/PNGs/light-mode/musical-notes.png" />
+                                                <Image url="@../../../images/icons/PNGs/light-mode/musical-notes.png" />
                                              </image>
                                           </ImageView>
                                        </graphic>
@@ -289,7 +289,7 @@
       </VBox>
    </children>
    <stylesheets>
-      <URL value="@../css/base.css" />
-      <URL value="@../css/light-mode.css" />
+      <URL value="@../../css/base.css" />
+      <URL value="@../../css/light-mode.css" />
    </stylesheets>
 </AnchorPane>
