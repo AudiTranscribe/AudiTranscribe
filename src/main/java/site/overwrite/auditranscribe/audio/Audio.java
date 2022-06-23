@@ -2,7 +2,7 @@
  * Audio.java
  *
  * Created on 2022-02-13
- * Updated on 2022-06-21
+ * Updated on 2022-06-23
  *
  * Description: Class that handles audio processing and audio playback.
  */
@@ -10,7 +10,9 @@
 package site.overwrite.auditranscribe.audio;
 
 import javafx.util.Duration;
-import site.overwrite.auditranscribe.exceptions.*;
+import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
+import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
+import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.utils.ArrayUtils;

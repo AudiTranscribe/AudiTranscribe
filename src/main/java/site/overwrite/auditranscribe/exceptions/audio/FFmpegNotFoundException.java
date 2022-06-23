@@ -2,12 +2,12 @@
  * FFmpegNotFoundException.java
  *
  * Created on 2022-06-03
- * Updated on 2022-06-20
+ * Updated on 2022-06-23
  *
  * Description: Exception that is thrown when the ffmpeg binary path is not found.
  */
 
-package site.overwrite.auditranscribe.exceptions;
+package site.overwrite.auditranscribe.exceptions.audio;
 
 /**
  * Exception that is thrown when the ffmpeg binary path is not found.

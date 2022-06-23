@@ -2,15 +2,15 @@
  * ArrayUtils.java
  *
  * Created on 2022-02-16
- * Updated on 2022-06-01
+ * Updated on 2022-06-23
  *
  * Description: Array utilities to modify, change, and search within arrays.
  */
 
 package site.overwrite.auditranscribe.utils;
 
-import site.overwrite.auditranscribe.exceptions.LengthException;
-import site.overwrite.auditranscribe.exceptions.ValueException;
+import site.overwrite.auditranscribe.exceptions.generic.LengthException;
+import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.misc.Complex;
 
 import java.util.ArrayDeque;

@@ -14,8 +14,8 @@ import org.junit.jupiter.api.*;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.LZ4;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
-import site.overwrite.auditranscribe.exceptions.FailedToReadDataException;
-import site.overwrite.auditranscribe.exceptions.IncorrectFileFormatException;
+import site.overwrite.auditranscribe.exceptions.io.audt_file.FailedToReadDataException;
+import site.overwrite.auditranscribe.exceptions.io.audt_file.IncorrectFileFormatException;
 import site.overwrite.auditranscribe.utils.TypeConversionUtils;
 
 import java.io.IOException;

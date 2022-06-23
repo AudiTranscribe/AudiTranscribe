@@ -2,7 +2,7 @@
  * Rhythm.java
  *
  * Created on 2022-06-02
- * Updated on 2022-06-02
+ * Updated on 2022-06-23
  *
  * Description: Rhythmic feature extraction methods.
  */
@@ -10,7 +10,7 @@
 package site.overwrite.auditranscribe.bpm_estimation;
 
 import site.overwrite.auditranscribe.audio.WindowFunction;
-import site.overwrite.auditranscribe.exceptions.ValueException;
+import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
 import site.overwrite.auditranscribe.utils.MathUtils;
 

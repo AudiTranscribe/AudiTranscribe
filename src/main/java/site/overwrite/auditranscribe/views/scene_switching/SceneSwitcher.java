@@ -19,10 +19,10 @@ import org.javatuples.Pair;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.audio.FFmpegHandler;
-import site.overwrite.auditranscribe.exceptions.AudioTooLongException;
-import site.overwrite.auditranscribe.exceptions.FFmpegNotFoundException;
-import site.overwrite.auditranscribe.exceptions.FailedToReadDataException;
-import site.overwrite.auditranscribe.exceptions.IncorrectFileFormatException;
+import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
+import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
+import site.overwrite.auditranscribe.exceptions.io.audt_file.FailedToReadDataException;
+import site.overwrite.auditranscribe.exceptions.io.audt_file.IncorrectFileFormatException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileReader;
@@ -35,6 +35,7 @@ import site.overwrite.auditranscribe.views.main_views.TranscriptionViewControlle
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -343,6 +344,14 @@ public class SceneSwitcher {
                     controller.getSelectedFile()
             );
 
+        } catch (FileNotFoundException e) {
+            Popups.showExceptionAlert(
+                    "Failed to find '" + audtFile.getName() + "'.",
+                    "The program failed to find'" + audtFile.getName() +
+                            "' at its designated location. Please check if it is still there.",
+                    e
+            );
+            e.printStackTrace();
         } catch (IOException | IncorrectFileFormatException | FailedToReadDataException e) {
             Popups.showExceptionAlert(
                     "Failed to read '" + audtFile.getName() + "' as an AUDT ile.",

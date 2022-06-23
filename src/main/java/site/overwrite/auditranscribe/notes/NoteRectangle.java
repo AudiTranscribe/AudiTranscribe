@@ -2,12 +2,12 @@
  * NoteRectangle.java
  *
  * Created on 2022-06-07
- * Updated on 2022-06-17
+ * Updated on 2022-06-23
  *
  * Description: A `StackPane` object that is used to denote a note in the transcription view.
  */
 
-package site.overwrite.auditranscribe.note_playback;
+package site.overwrite.auditranscribe.notes;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -23,7 +23,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import org.javatuples.Pair;
-import site.overwrite.auditranscribe.exceptions.NoteRectangleCollisionException;
+import site.overwrite.auditranscribe.exceptions.notes.NoteRectangleCollisionException;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 
 import java.util.ArrayList;

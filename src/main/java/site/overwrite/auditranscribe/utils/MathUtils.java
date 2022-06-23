@@ -2,14 +2,14 @@
  * MathUtils.java
  *
  * Created on 2022-02-15
- * Updated on 2022-06-17
+ * Updated on 2022-06-23
  *
  * Description: Class containing useful mathematical utility functions.
  */
 
 package site.overwrite.auditranscribe.utils;
 
-import site.overwrite.auditranscribe.exceptions.ValueException;
+import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 
 import java.math.BigDecimal;
 

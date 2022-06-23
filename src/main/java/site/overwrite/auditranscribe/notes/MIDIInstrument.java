@@ -2,12 +2,12 @@
  * MIDIInstrument.java
  *
  * Created on 2022-06-10
- * Updated on 2022-06-10
+ * Updated on 2022-06-23
  *
  * Description: Enum that contains the MIDI values of the instruments.
  */
 
-package site.overwrite.auditranscribe.note_playback;
+package site.overwrite.auditranscribe.notes;
 
 /**
  * Enum that contains the MIDI values of the instruments.

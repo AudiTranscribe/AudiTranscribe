@@ -2,14 +2,14 @@
  * FFmpegHandler.java
  *
  * Created on 2022-05-06
- * Updated on 2022-06-20
+ * Updated on 2022-06-23
  *
  * Description: Methods that help handle the FFmpeg commands and methods.
  */
 
 package site.overwrite.auditranscribe.audio;
 
-import site.overwrite.auditranscribe.exceptions.FFmpegNotFoundException;
+import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 
 import java.io.File;
 import java.io.IOException;

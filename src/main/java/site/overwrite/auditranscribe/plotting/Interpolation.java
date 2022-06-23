@@ -2,14 +2,14 @@
  * Interpolation.java
  *
  * Created on 2022-03-14
- * Updated on 2022-05-25
+ * Updated on 2022-06-23
  *
  * Description: Class containing interpolation functions.
  */
 
 package site.overwrite.auditranscribe.plotting;
 
-import site.overwrite.auditranscribe.exceptions.LengthException;
+import site.overwrite.auditranscribe.exceptions.generic.LengthException;
 
 /**
  * Class containing interpolation functions.

@@ -2,12 +2,12 @@
  * MIDIMessageDecoder.java
  *
  * Created on 2022-06-14
- * Updated on 2022-06-14
+ * Updated on 2022-06-23
  *
  * Description: Class that contains methods to decode MIDI messages.
  */
 
-package site.overwrite.auditranscribe.note_playback;
+package site.overwrite.auditranscribe.notes;
 
 import site.overwrite.auditranscribe.utils.MathUtils;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;

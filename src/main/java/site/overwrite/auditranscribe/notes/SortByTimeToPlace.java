@@ -2,12 +2,12 @@
  * SortByTimeToPlace.java
  *
  * Created on 2022-06-09
- * Updated on 2022-06-10
+ * Updated on 2022-06-23
  *
  * Description: Comparator class that compares two notes by their time to place.
  */
 
-package site.overwrite.auditranscribe.note_playback;
+package site.overwrite.auditranscribe.notes;
 
 import java.util.Comparator;
 

@@ -2,12 +2,12 @@
  * AudioTooLongException.java
  *
  * Created on 2022-06-21
- * Updated on 2022-06-21
+ * Updated on 2022-06-23
  *
  * Description: Exception thrown when an audio file is too long.
  */
 
-package site.overwrite.auditranscribe.exceptions;
+package site.overwrite.auditranscribe.exceptions.audio;
 
 /**
  * Exception thrown when an audio file is too long.

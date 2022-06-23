@@ -2,12 +2,12 @@
  * NoSuchPropertyException.java
  *
  * Created on 2022-05-25
- * Updated on 2022-05-25
+ * Updated on 2022-06-23
  *
  * Description: Exception to mark when a property file does not have the specified property.
  */
 
-package site.overwrite.auditranscribe.exceptions;
+package site.overwrite.auditranscribe.exceptions.io;
 
 /**
  * Exception to mark when a property file does not have the specified property.

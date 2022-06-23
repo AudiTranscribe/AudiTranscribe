@@ -10,7 +10,7 @@
 package site.overwrite.auditranscribe.audio;
 
 import org.junit.jupiter.api.Test;
-import site.overwrite.auditranscribe.exceptions.FFmpegNotFoundException;
+import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.io.IOMethods;
 
 import java.io.File;

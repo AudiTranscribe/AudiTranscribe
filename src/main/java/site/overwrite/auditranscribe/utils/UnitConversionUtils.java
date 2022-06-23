@@ -2,15 +2,15 @@
  * UnitConversionUtils.java
  *
  * Created on 2022-03-12
- * Updated on 2022-06-14
+ * Updated on 2022-06-23
  *
  * Description: Unit conversion methods.
  */
 
 package site.overwrite.auditranscribe.utils;
 
-import site.overwrite.auditranscribe.exceptions.FormatException;
-import site.overwrite.auditranscribe.exceptions.ValueException;
+import site.overwrite.auditranscribe.exceptions.generic.FormatException;
+import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 
 import java.util.Map;
 import java.util.Objects;

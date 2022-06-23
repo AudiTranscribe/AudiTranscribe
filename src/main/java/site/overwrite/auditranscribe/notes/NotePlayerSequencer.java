@@ -2,17 +2,17 @@
  * NotePlayerSequencer.java
  *
  * Created on 2022-06-09
- * Updated on 2022-06-19
+ * Updated on 2022-06-23
  *
  * Description: Class that handles the playing of notes as a MIDI sequence.
  */
 
-package site.overwrite.auditranscribe.note_playback;
+package site.overwrite.auditranscribe.notes;
 
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
-import site.overwrite.auditranscribe.exceptions.LengthException;
-import site.overwrite.auditranscribe.exceptions.ValueException;
+import site.overwrite.auditranscribe.exceptions.generic.LengthException;
+import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 import javax.sound.midi.*;

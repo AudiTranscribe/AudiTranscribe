@@ -2,14 +2,14 @@
  * ValueException.java
  *
  * Created on 2022-05-25
- * Updated on 2022-05-25
+ * Updated on 2022-06-23
  *
  * Description: Exception to mark when an operation or function receives an argument that has the
  *              right type but an inappropriate value, and the situation is not described by a more
  *              precise exception such as `IndexOutOfBoundsException`.
  */
 
-package site.overwrite.auditranscribe.exceptions;
+package site.overwrite.auditranscribe.exceptions.generic;
 
 /**
  * Exception to mark when an operation or function receives an argument that has the right type but

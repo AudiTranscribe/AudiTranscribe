@@ -2,14 +2,14 @@
  * IOConverters.java
  *
  * Created on 2022-05-01
- * Updated on 2022-06-08
+ * Updated on 2022-06-23
  *
  * Description: Methods that converts Java objects/data into bytes for storage.
  */
 
 package site.overwrite.auditranscribe.io;
 
-import site.overwrite.auditranscribe.exceptions.LengthException;
+import site.overwrite.auditranscribe.exceptions.generic.LengthException;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

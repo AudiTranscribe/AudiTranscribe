@@ -2,12 +2,12 @@
  * FormatException.java
  *
  * Created on 2022-05-25
- * Updated on 2022-05-25
+ * Updated on 2022-06-23
  *
  * Description: Exception to mark when a string does not have the correct format.
  */
 
-package site.overwrite.auditranscribe.exceptions;
+package site.overwrite.auditranscribe.exceptions.generic;
 
 /**
  * Exception to mark when a string does not have the correct format.

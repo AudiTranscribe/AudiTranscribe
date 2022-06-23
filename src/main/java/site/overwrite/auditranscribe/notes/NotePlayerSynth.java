@@ -2,14 +2,14 @@
  * NotePlayerSynth.java
  *
  * Created on 2022-05-14
- * Updated on 2022-06-11
+ * Updated on 2022-06-23
  *
  * Description: Class that handles the playing of notes using the synthesizer.
  */
 
-package site.overwrite.auditranscribe.note_playback;
+package site.overwrite.auditranscribe.notes;
 
-import site.overwrite.auditranscribe.exceptions.ValueException;
+import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 import javax.sound.midi.*;

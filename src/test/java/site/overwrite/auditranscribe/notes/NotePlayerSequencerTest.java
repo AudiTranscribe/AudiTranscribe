@@ -7,7 +7,7 @@
  * Description: Test `NotePlayerSequencer.java`.
  */
 
-package site.overwrite.auditranscribe.note_playback;
+package site.overwrite.auditranscribe.notes;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
