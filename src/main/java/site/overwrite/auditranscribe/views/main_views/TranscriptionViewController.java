@@ -1827,8 +1827,12 @@ public class TranscriptionViewController implements Initializable {
         }
         isPaused = togglePaused(isPaused);
 
+        // Disable note volume slider and note muting button if playing
+        notesVolumeButton.setDisable(!isPaused);
+        notesVolumeSlider.setDisable(!isPaused);
+
         // Handle note rectangle operations when toggle paused
-        if (!isPaused) {
+        if (!isPaused && !areNotesMuted) {
             // Get number of note rectangles
             int numNoteRects = NoteRectangle.allNoteRectangles.size();
 
