@@ -17,4 +17,4 @@ jobs:
       - uses: FedericoCarboni/setup-ffmpeg@v1
         id: setup-ffmpeg
       - name: Test with Maven
-        run: mvn clean test
+        run: mvn --batch-mode clean test
