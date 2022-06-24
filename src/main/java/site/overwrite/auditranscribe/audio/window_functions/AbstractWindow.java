@@ -2,14 +2,14 @@
  * AbstractWindow.java
  *
  * Created on 2022-03-11
- * Updated on 2022-05-25
+ * Updated on 2022-06-24
  *
  * Description: Abstract window class that implements most methods needed by window classes.
  */
 
 package site.overwrite.auditranscribe.audio.window_functions;
 
-import javafx.util.Pair;
+import org.javatuples.Pair;
 
 /**
  * Abstract window class that implements most methods needed by window classes.
@@ -49,8 +49,8 @@ public abstract class AbstractWindow {
 
         // Check if we need to extend the window
         Pair<Integer, Boolean> extendResponse = extend(length, symmetric);
-        int newLength = extendResponse.getKey();
-        boolean truncateNeeded = extendResponse.getValue();
+        int newLength = extendResponse.getValue0();
+        boolean truncateNeeded = extendResponse.getValue1();
 
         // Generate the window
         double[] window = new double[newLength];
@@ -71,9 +71,7 @@ public abstract class AbstractWindow {
      * @param length Total length of the window.
      * @return Double representing the window value at index <code>k</code>.
      */
-    double windowFunc(int k, int length) {
-        return 0;
-    }
+    abstract double windowFunc(int k, int length);
 
     /**
      * Helper function to handle small or incorrect window lengths.
@@ -85,7 +83,7 @@ public abstract class AbstractWindow {
         if (length < 0) {
             throw new NegativeArraySizeException("Window length must be a non-negative integer");
         } else {
-            return (length <= 1);
+            return (length <= 1);  // So it returns `true` if length is 0 or 1
         }
     }
 

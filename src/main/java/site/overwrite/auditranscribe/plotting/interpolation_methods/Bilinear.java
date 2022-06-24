@@ -2,7 +2,7 @@
  * Bilinear.java
  *
  * Created on 2022-04-12
- * Updated on 2022-06-23
+ * Updated on 2022-06-24
  *
  * Description: Class that handles the bilinear interpolation method.
  */
@@ -57,7 +57,7 @@ public class Bilinear extends AbstractInterpolation {
                 // Calculate actual indices
                 int i1, i2, j1, j2;
 
-                if (i < 0 || i >= lengthX - 1) {  // Handle weird index case
+                if (i < 0) {  // Handle weird index case; note `i` != `lengthX - 1` as `xNew` is bounded by max X
                     i1 = lengthX - 1;
                     i2 = 0;
                 } else {
@@ -65,7 +65,7 @@ public class Bilinear extends AbstractInterpolation {
                     i2 = i + 1;
                 }
 
-                if (j < 0 || j >= lengthY - 1) {  // Handle weird index case
+                if (j < 0) {  // Handle weird index case
                     j1 = lengthY - 1;
                     j2 = 0;
                 } else {

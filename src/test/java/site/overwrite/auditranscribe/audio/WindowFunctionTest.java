@@ -1,8 +1,8 @@
 /*
- * WindowFunctionTests.java
+ * WindowFunctionTest.java
  *
  * Created on 2022-04-15
- * Updated on 2022-05-14
+ * Updated on 2022-06-24
  *
  * Description: Test the windowing functions.
  */
@@ -17,7 +17,7 @@ import site.overwrite.auditranscribe.audio.window_functions.OnesWindow;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class WindowFunctionTests {
+class WindowFunctionTest {
     @Test
     void onesWindow() {
         // Define window object
@@ -35,6 +35,8 @@ class WindowFunctionTests {
         double[] windowArr8 = window.generateWindow(2, true);
         double[] windowArr9 = window.generateWindow(3, false);
         double[] windowArr10 = window.generateWindow(3, true);
+        double[] windowArr11 = window.generateWindow(0, false);
+        double[] windowArr12 = window.generateWindow(0, true);
 
         // Define the correct window arrays
         double[] correctWindowArr1 = {1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1., 1.};
@@ -48,6 +50,8 @@ class WindowFunctionTests {
         double[] correctWindowArr8 = {1., 1.};
         double[] correctWindowArr9 = {1., 1., 1.};
         double[] correctWindowArr10 = {1., 1., 1.};
+        double[] correctWindowArr11 = {};
+        double[] correctWindowArr12 = {};
 
         // Assertions
         assertArrayEquals(correctWindowArr1, windowArr1);
@@ -60,6 +64,13 @@ class WindowFunctionTests {
         assertArrayEquals(correctWindowArr8, windowArr8);
         assertArrayEquals(correctWindowArr9, windowArr9);
         assertArrayEquals(correctWindowArr10, windowArr10);
+        assertArrayEquals(correctWindowArr11, windowArr11);
+        assertArrayEquals(correctWindowArr12, windowArr12);
+
+        assertThrows(NegativeArraySizeException.class, () -> window.generateWindow(-1, false));
+        assertThrows(NegativeArraySizeException.class, () -> window.generateWindow(-1, true));
+        assertThrows(NegativeArraySizeException.class, () -> window.generateWindow(-12, false));
+        assertThrows(NegativeArraySizeException.class, () -> window.generateWindow(-12, true));
     }
 
     @Test
@@ -79,6 +90,8 @@ class WindowFunctionTests {
         double[] windowArr8 = window.generateWindow(2, true);
         double[] windowArr9 = window.generateWindow(3, false);
         double[] windowArr10 = window.generateWindow(3, true);
+        double[] windowArr11 = window.generateWindow(0, false);
+        double[] windowArr12 = window.generateWindow(0, true);
 
         // Define the correct window arrays
         double[] correctWindowArr1 = {0.08000000000000007, 0.14162831425915828, 0.30999999999999994, 0.54, 0.77, 0.9383716857408417, 1.0, 0.9383716857408417, 0.7700000000000002, 0.54, 0.3100000000000003, 0.14162831425915834};
@@ -92,6 +105,8 @@ class WindowFunctionTests {
         double[] correctWindowArr8 = {0.08, 0.08};
         double[] correctWindowArr9 = {0.08, 0.77, 0.77};
         double[] correctWindowArr10 = {0.08, 1., 0.08};
+        double[] correctWindowArr11 = {};
+        double[] correctWindowArr12 = {};
 
         // Assertions
         assertArrayEquals(correctWindowArr1, windowArr1, 1e-10);
@@ -104,6 +119,14 @@ class WindowFunctionTests {
         assertArrayEquals(correctWindowArr8, windowArr8, 1e-10);
         assertArrayEquals(correctWindowArr9, windowArr9, 1e-10);
         assertArrayEquals(correctWindowArr10, windowArr10, 1e-10);
+        assertArrayEquals(correctWindowArr11, windowArr11, 1e-10);
+        assertArrayEquals(correctWindowArr12, windowArr12, 1e-10);
+
+
+        assertThrows(NegativeArraySizeException.class, () -> window.generateWindow(-1, false));
+        assertThrows(NegativeArraySizeException.class, () -> window.generateWindow(-1, true));
+        assertThrows(NegativeArraySizeException.class, () -> window.generateWindow(-12, false));
+        assertThrows(NegativeArraySizeException.class, () -> window.generateWindow(-12, true));
     }
 
     @Test
@@ -123,6 +146,8 @@ class WindowFunctionTests {
         double[] windowArr8 = window.generateWindow(2, true);
         double[] windowArr9 = window.generateWindow(3, false);
         double[] windowArr10 = window.generateWindow(3, true);
+        double[] windowArr11 = window.generateWindow(0, false);
+        double[] windowArr12 = window.generateWindow(0, true);
 
         // Define the correct window arrays
         double[] correctWindowArr1 = {0.0, 0.06698729810778065, 0.2499999999999999, 0.5, 0.75, 0.9330127018922192, 1.0, 0.9330127018922194, 0.7500000000000002, 0.5, 0.2500000000000003, 0.06698729810778076};
@@ -136,6 +161,8 @@ class WindowFunctionTests {
         double[] correctWindowArr8 = {0., 0.};
         double[] correctWindowArr9 = {0., 0.75, 0.75};
         double[] correctWindowArr10 = {0., 1., 0.};
+        double[] correctWindowArr11 = {};
+        double[] correctWindowArr12 = {};
 
         // Assertions
         assertArrayEquals(correctWindowArr1, windowArr1, 1e-10);
@@ -148,5 +175,12 @@ class WindowFunctionTests {
         assertArrayEquals(correctWindowArr8, windowArr8, 1e-10);
         assertArrayEquals(correctWindowArr9, windowArr9, 1e-10);
         assertArrayEquals(correctWindowArr10, windowArr10, 1e-10);
+        assertArrayEquals(correctWindowArr11, windowArr11, 1e-10);
+        assertArrayEquals(correctWindowArr12, windowArr12, 1e-10);
+
+        assertThrows(NegativeArraySizeException.class, () -> window.generateWindow(-1, false));
+        assertThrows(NegativeArraySizeException.class, () -> window.generateWindow(-1, true));
+        assertThrows(NegativeArraySizeException.class, () -> window.generateWindow(-12, false));
+        assertThrows(NegativeArraySizeException.class, () -> window.generateWindow(-12, true));
     }
 }
