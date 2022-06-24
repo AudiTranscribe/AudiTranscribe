@@ -37,7 +37,7 @@ public abstract class JSONFile<T> {
     public JSONFile(String fileName, Class<T> cls) {
         // Update attributes
         this.cls = cls;
-        filePath = IOMethods.joinPaths(IOConstants.APP_DATA_FOLDER_PATH_STRING, fileName);
+        filePath = IOMethods.joinPaths(IOConstants.APP_DATA_FOLDER_PATH, fileName);
 
         // Create the GSON object
         Gson gson = new Gson();

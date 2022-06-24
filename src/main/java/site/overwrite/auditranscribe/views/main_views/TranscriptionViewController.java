@@ -881,11 +881,11 @@ public class TranscriptionViewController implements Initializable {
         byte[] rawMP3Bytes = LZ4.lz4Decompress(compressedMP3Bytes);
 
         // Ensure that the temporary directory exists
-        IOMethods.createFolder(IOConstants.TEMP_FOLDER);
-        logger.log(Level.FINE, "Temporary folder created: " + IOConstants.TEMP_FOLDER);
+        IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
+        logger.log(Level.FINE, "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH);
 
         // Create an empty MP3 file in the temporary directory
-        File auxiliaryMP3File = new File(IOConstants.TEMP_FOLDER + "temp-1.mp3");
+        File auxiliaryMP3File = new File(IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-1.mp3"));
         IOMethods.createFile(auxiliaryMP3File.getAbsolutePath());
 
         // Write the raw MP3 bytes into a temporary file
@@ -897,7 +897,7 @@ public class TranscriptionViewController implements Initializable {
         FFmpegHandler FFmpegHandler = new FFmpegHandler(settingsFile.data.ffmpegInstallationPath);
 
         // Generate the output path to the MP3 file
-        String outputPath = IOConstants.TEMP_FOLDER + "temp-2.wav";
+        String outputPath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-2.wav");
 
         // Convert the auxiliary MP3 file to a WAV file
         outputPath = FFmpegHandler.convertAudio(auxiliaryMP3File, outputPath);

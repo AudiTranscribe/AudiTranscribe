@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class IOMethodsTest {
     // Define the file path
     static final String FILE_PATH = IOMethods.joinPaths(
-            IOConstants.ROOT_ABSOLUTE_PATH_STRING, IOConstants.RESOURCES_FOLDER_PATH_STRING,
+            IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
             "tests-output-directory", "file-io-directory", "testFile.txt"
     );
 

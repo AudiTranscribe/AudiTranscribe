@@ -668,15 +668,15 @@ public class Audio {
         logger.log(Level.FINE, "Converting WAV bytes to MP3 bytes");
 
         // Ensure that the temporary directory exists
-        IOMethods.createFolder(IOConstants.TEMP_FOLDER);
-        logger.log(Level.FINE, "Temporary folder created: " + IOConstants.TEMP_FOLDER);
+        IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
+        logger.log(Level.FINE, "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH);
 
         // Define a new FFmpeg handler
         FFmpegHandler FFmpegHandler = new FFmpegHandler(ffmpegPath);
 
         // Generate the output path to the MP3 file
-        String inputPath = IOConstants.TEMP_FOLDER + "temp-1.wav";
-        String outputPath = IOConstants.TEMP_FOLDER + "temp-2.mp3";
+        String inputPath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-1.wav");
+        String outputPath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-2.mp3");
 
         // Write WAV bytes into a file specified at the input path
         IOMethods.createFile(inputPath);

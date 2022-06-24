@@ -55,7 +55,7 @@ public class ProjectsDB {
     // Constants
     public static String PROJECT_FILE_LIST_DB_NAME = "Projects.db";
     public static String PROJECT_FILE_LIST_DB_PATH = IOMethods.joinPaths(
-            IOConstants.APP_DATA_FOLDER_PATH_STRING, PROJECT_FILE_LIST_DB_NAME
+            IOConstants.APP_DATA_FOLDER_PATH, PROJECT_FILE_LIST_DB_NAME
     );
 
     // Attributes

@@ -23,13 +23,17 @@ public class ApplicationDirectory {
     public static String getUserDataDirectory(String appName, String appVersion) {
         String os = System.getProperty("os.name").toUpperCase();
         if (os.startsWith("MAC OS X")) {
-            return IOMethods.buildPath(IOMethods.getHomeDir(), "/Library/Application Support", appName, appVersion);
+            return IOMethods.buildPath(
+                    IOConstants.USER_HOME_PATH, "/Library/Application Support", appName, appVersion
+            );
         } else if (os.startsWith("WINDOWS")) {
             return System.getenv("AppData");
         } else {
             // Assume other *nix
             String dir = IOMethods.getOrDefault(
-                    "XDG_DATA_HOME", IOMethods.buildPath(IOMethods.getHomeDir(), "/.local/share")
+                    "XDG_DATA_HOME", IOMethods.buildPath(
+                            IOConstants.USER_HOME_PATH, "/.local/share"
+                    )
             );
             return IOMethods.buildPath(dir, appName, appVersion);
         }

@@ -128,16 +128,7 @@ public class IOMethods {
      * Method that creates the AudiTranscribe app data folder, if it doesn't already exist.
      */
     public static void createAppDataFolder() {
-        createFolder(IOConstants.APP_DATA_FOLDER_PATH);
-    }
-
-    /**
-     * Method that gets the home directory of the user.
-     *
-     * @return The home directory of the user.
-     */
-    public static String getHomeDir() {
-        return System.getProperty("user.home");
+        createFolder(Path.of(IOConstants.APP_DATA_FOLDER_PATH));
     }
 
     /**
@@ -147,10 +138,6 @@ public class IOMethods {
      * @return The full path.
      */
     public static String buildPath(String... elems) {
-        // Get the file separator
-        String separator = IOConstants.SEPARATOR;
-
-        // Build the path
         StringBuilder buffer = new StringBuilder();
         String lastElem = null;
         for (String elem : elems) {
@@ -160,20 +147,19 @@ public class IOMethods {
 
             if (lastElem == null) {  // Handle the first element
                 buffer.append(elem);
-            } else if (lastElem.endsWith(separator)) {  // Check if the last path ends with the separator
-                buffer.append(elem.startsWith(separator) ? elem.substring(1) : elem);
+            } else if (lastElem.endsWith(IOConstants.SEPARATOR)) {  // Check if the last path ends with the separator
+                buffer.append(elem.startsWith(IOConstants.SEPARATOR) ? elem.substring(1) : elem);
             } else {
-                if (!elem.startsWith(separator)) {
-                    buffer.append(separator);  // Append the separator first...
+                if (!elem.startsWith(IOConstants.SEPARATOR)) {
+                    buffer.append(IOConstants.SEPARATOR);  // Append the separator first...
                 }
-                buffer.append(elem);           // ...before appending the element
+                buffer.append(elem);                       // ...before appending the element
             }
 
             // Update the last element
             lastElem = elem;
         }
 
-        // Return the built path
         return buffer.toString();
     }
 
@@ -184,23 +170,18 @@ public class IOMethods {
      * @return The joined path.
      */
     public static String joinPaths(String... paths) {
-        // Get the file separator
-        String separator = IOConstants.SEPARATOR;
-
-        // Build the joined path
         StringBuilder buffer = new StringBuilder();
         for (String path : paths) {
             if (path == null) {  // Skip any empty/null paths
                 continue;
             }
 
-            if (buffer.length() > 0) {      // If there is something in the buffer
-                buffer.append(separator);   // Append the separator first...
+            if (buffer.length() > 0) {                  // If there is something in the buffer
+                buffer.append(IOConstants.SEPARATOR);   // Append the separator first...
             }
-            buffer.append(path);            // ...before appending the path
+            buffer.append(path);                        // ...before appending the path
         }
 
-        // Return the joined path
         return buffer.toString();
     }
 
@@ -211,9 +192,7 @@ public class IOMethods {
      * @return The split paths.
      */
     public static String[] splitPaths(String paths) {
-        // Split the paths by the path separator
-        String separator = System.getProperty("path.separator");
-        return paths.split(separator);
+        return paths.split(IOConstants.SEPARATOR);
     }
 
     /**

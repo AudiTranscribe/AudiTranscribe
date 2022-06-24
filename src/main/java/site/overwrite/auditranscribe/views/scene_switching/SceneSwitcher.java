@@ -2,7 +2,7 @@
  * SceneSwitcher.java
  *
  * Created on 2022-06-22
- * Updated on 2022-06-23
+ * Updated on 2022-06-24
  *
  * Description: Class that handles the switching between the main scene and transcription scenes.
  */
@@ -182,11 +182,14 @@ public class SceneSwitcher {
             }
 
             // Attempt creation of temporary folder if it doesn't exist
-            IOMethods.createFolder(IOConstants.TEMP_FOLDER);
-            logger.log(Level.FINE, "Temporary folder: " + IOConstants.TEMP_FOLDER);
+            IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
+            logger.log(Level.FINE, "Temporary folder: " + IOConstants.TEMP_FOLDER_PATH);
 
             // Get the base path for the auxiliary files
-            String baseName = IOConstants.TEMP_FOLDER + audioFile.getName().replace(fileExt, "");
+            String baseName = IOMethods.joinPaths(
+                    IOConstants.TEMP_FOLDER_PATH,
+                    audioFile.getName().replace(fileExt, "")
+            );
 
             // Generate a new WAV file
             FFmpegHandler FFmpegHandler = new FFmpegHandler(settingsFile.data.ffmpegInstallationPath);
