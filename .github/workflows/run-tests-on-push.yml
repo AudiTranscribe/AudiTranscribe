@@ -16,6 +16,7 @@ jobs:
           cache: maven
       - uses: FedericoCarboni/setup-ffmpeg@v1
         id: setup-ffmpeg
+      - name: Test with Maven
         run: mvn --batch-mode clean test
       - name: Upload coverage report to CodeCov
         uses: codecov/codecov-action@v2
