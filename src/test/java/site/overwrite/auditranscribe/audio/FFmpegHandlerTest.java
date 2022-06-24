@@ -9,7 +9,6 @@
 
 package site.overwrite.auditranscribe.audio;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.io.IOMethods;
@@ -27,7 +26,6 @@ import java.util.HexFormat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FFmpegHandlerTest {
-    @Disabled
     @Test
     void convertAudio() throws IOException, FFmpegNotFoundException, NoSuchAlgorithmException {
         // Get a testing MP3 file
