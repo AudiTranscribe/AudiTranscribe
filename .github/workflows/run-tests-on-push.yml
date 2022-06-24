@@ -13,6 +13,7 @@ jobs:
         with:
           java-version: "17"
           distribution: "adopt"
+          cache: maven
       - uses: FedericoCarboni/setup-ffmpeg@v1
         id: setup-ffmpeg
       - name: Test with Maven
