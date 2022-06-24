@@ -1103,7 +1103,7 @@ public class TranscriptionViewController implements Initializable {
         audio.setAudioPlaybackTime(seekTime);
 
         // Update note sequencer current time
-        if (!areNotesMuted) {
+        if (!areNotesMuted && notePlayerSequencer.isSequencerAvailable()) {
             if (!notePlayerSequencer.getSequencer().isRunning() && !isPaused) {  // Not running but unpaused
                 notePlayerSequencer.play(seekTime + settingsFile.data.notePlayingDelayOffset);
             } else {
