@@ -14,20 +14,12 @@ import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.io.IOMethods;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.HexFormat;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class FFmpegHandlerTest {
     @Test
-    void convertAudio() throws IOException, FFmpegNotFoundException, NoSuchAlgorithmException {
+    void convertAudio() throws FFmpegNotFoundException {
         // Get a testing MP3 file
         File testFile = new File(IOMethods.getAbsoluteFilePath("testing-audio-files/A440.mp3"));
 
@@ -41,31 +33,10 @@ class FFmpegHandlerTest {
         // Check the output file path, and ensure that the extension is no longer in capitals
         assertEquals(testingFolderPath + "test-converted.wav", outputFilePath);
 
-        // Compute file hash
-        byte[] buff = new byte[1024];
-        int bytesCount;
-
-        MessageDigest md = MessageDigest.getInstance("MD5");
-        try (InputStream is = Files.newInputStream(Path.of(testingFolderPath + "test-converted.wav"));
-             DigestInputStream dis = new DigestInputStream(is, md)) {
-            while ((bytesCount = dis.read(buff)) != -1) {
-                md.update(buff, 0, bytesCount);
-            }
-        }
-        byte[] digest = md.digest();
-        String md5HashInHex = HexFormat.of().formatHex(digest);
-
         // Remove the file
         assertTrue(
                 (new File(testingFolderPath + "test-converted.wav")).delete(),
                 "Failed to delete the converted file."
-        );
-
-        // Compare the hash
-        assertEquals(
-                "d2abaeb87297ef6137616953829d8922",
-                md5HashInHex,
-                "Converted file hash incorrect."
         );
     }
 }
