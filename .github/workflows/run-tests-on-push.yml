@@ -14,7 +14,11 @@ jobs:
           java-version: "17"
           distribution: "adopt"
           cache: maven
+      - name: Setup FFmpeg
       - uses: FedericoCarboni/setup-ffmpeg@v1
-        id: setup-ffmpeg
       - name: Test with Maven
         run: mvn --batch-mode clean test
+      - name: Upload coverage report to CodeCov
+        uses: codecov/codecov-action@v2
+        with:
+          files: target/site/jacoco/jacoco.xml
