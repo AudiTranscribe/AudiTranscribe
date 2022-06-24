@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-23
+ * Updated on 2022-06-24
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -55,6 +55,7 @@ import site.overwrite.auditranscribe.views.helpers.Popups;
 import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
 import site.overwrite.auditranscribe.views.scene_switching.SceneSwitchingState;
 
+import javax.sound.midi.MidiUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -264,7 +265,11 @@ public class TranscriptionViewController implements Initializable {
         mainPane.prefHeightProperty().bind(rootPane.heightProperty().subtract(menuBar.heightProperty()));
 
         // Update attributes
-        notePlayerSynth = new NotePlayerSynth(NOTE_PLAYING_INSTRUMENT, MIDI_CHANNEL_NUM);
+        try {
+            notePlayerSynth = new NotePlayerSynth(NOTE_PLAYING_INSTRUMENT, MIDI_CHANNEL_NUM);
+        } catch (MidiUnavailableException ignored) {  // We will notify the user that MIDI unavailable later
+        }
+
         notePlayerSequencer = new NotePlayerSequencer();
 
         // Update spinners' ranges

@@ -34,13 +34,13 @@ public class NotePlayerSynth {
      * @param instrument Instrument to play.
      * @param channelNum MIDI channel number to play the note on.
      */
-    public NotePlayerSynth(MIDIInstrument instrument, int channelNum) {
+    public NotePlayerSynth(MIDIInstrument instrument, int channelNum) throws MidiUnavailableException {
         // Get the MIDI synthesizer and open the device
         try {
             midiSynth = MidiSystem.getSynthesizer();
             midiSynth.open();
         } catch (MidiUnavailableException e) {
-            throw new RuntimeException("MIDI is unavailable on this system");
+            throw new MidiUnavailableException("MIDI is unavailable on this system");
         }
 
         // Get the soundbank, instruments, and channels available to the MIDI synthesizer
