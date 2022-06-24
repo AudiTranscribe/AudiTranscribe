@@ -2,9 +2,10 @@
  * InterpolationMethod.java
  *
  * Created on 2022-04-12
- * Updated on 2022-04-13
+ * Updated on 2022-06-23
  *
- * Description: Interpolation methods enumerator.
+ * Description: Enum that contains the different interpolation methods that can be used on a 2D
+ *              array.
  */
 
 package site.overwrite.auditranscribe.plotting;
@@ -14,8 +15,7 @@ import site.overwrite.auditranscribe.plotting.interpolation_methods.AbstractInte
 import site.overwrite.auditranscribe.plotting.interpolation_methods.NearestNeighbour;
 
 /**
- * Interpolation method enum.<br>
- * Contains some interpolation methods to help adjust the image size.
+ * Enum that contains the different interpolation methods that can be used on a 2D array.
  */
 public enum InterpolationMethod {
     // Enum values

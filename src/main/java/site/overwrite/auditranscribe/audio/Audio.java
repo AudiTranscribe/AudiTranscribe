@@ -2,7 +2,7 @@
  * Audio.java
  *
  * Created on 2022-02-13
- * Updated on 2022-06-09
+ * Updated on 2022-06-23
  *
  * Description: Class that handles audio processing and audio playback.
  */
@@ -10,8 +10,9 @@
 package site.overwrite.auditranscribe.audio;
 
 import javafx.util.Duration;
-import site.overwrite.auditranscribe.exceptions.FFmpegNotFoundException;
-import site.overwrite.auditranscribe.exceptions.ValueException;
+import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
+import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
+import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
@@ -36,7 +37,8 @@ import java.util.logging.Logger;
  */
 public class Audio {
     // Constants
-    public static final int SAMPLES_BUFFER_SIZE = 1024;  // In bits
+    public static final int SAMPLES_BUFFER_SIZE = 1024;  // In bits; 1024 = 2^10
+    public static final double MAX_AUDIO_LENGTH_IN_MIN = 15;  // Maximum length of audio in minutes
 
     // Attributes
     private final String audioFileName;
@@ -44,10 +46,10 @@ public class Audio {
     private final AudioInputStream audioStream;
     private final AudioFormat audioFormat;
     private final double sampleRate;
-    private double duration = 0;
+    private double duration = 0;  // In seconds
 
-    private final byte[] rawWAVBytes;
-    private byte[] rawMP3Bytes;  // Would be empty unless set
+    private final byte[] rawWAVBytes;  // Would be an empty array unless set
+    private byte[] rawMP3Bytes;
 
     private int numSamples;
     private double[] audioSamples;
@@ -77,10 +79,12 @@ public class Audio {
      *                       </ul>
      * @throws IOException                   If there was a problem reading in the audio stream.
      * @throws UnsupportedAudioFileException If there was a problem reading in the audio file.
+     * @throws AudioTooLongException         If the audio file exceeds the maximum audio duration
+     *                                       permitted.
      */
     public Audio(
             File wavFile, String audioFileName, AudioProcessingMode processingMode
-    ) throws UnsupportedAudioFileException, IOException {
+    ) throws UnsupportedAudioFileException, IOException, AudioTooLongException {
         // Update attributes
         this.audioFileName = audioFileName;
 
@@ -110,6 +114,7 @@ public class Audio {
                 logger.log(Level.SEVERE, "JavaFX Toolkit not initialized. Audio playback will not work.");
             }
 
+            // Update attributes
             mediaPlayer = tempMediaPlayer;
 
         } else {
@@ -125,6 +130,20 @@ public class Audio {
             // Get the audio file's audio format and audio file's sample rate
             audioFormat = audioStream.getFormat();
             sampleRate = audioFormat.getSampleRate();
+
+            // Compute the duration of the audio file
+            long frames = audioStream.getFrameLength();
+            duration = frames / audioFormat.getFrameRate();  // In seconds
+
+            // Check if duration is too long
+            double durationInMinutes = duration / 60;
+
+            if (durationInMinutes > MAX_AUDIO_LENGTH_IN_MIN) {
+                throw new AudioTooLongException(
+                        "Audio file is too long (audio was " + durationInMinutes + " minutes but maximum allowed " +
+                                "is " + MAX_AUDIO_LENGTH_IN_MIN + " minutes)"
+                );
+            }
 
             // Generate audio samples
             generateSamples();
@@ -313,36 +332,36 @@ public class Audio {
         double[] y = new double[finalLength];
 
         // Get the interpolation window and precision of the specified `resType`
-        double[] interpWin = resType.filter.getHalfWin();
+        double[] interpWin = resType.filter.getHalfWindow();
         int precision = resType.filter.getPrecision();
 
-        int interpWinLen = interpWin.length;
+        int interpWinLength = interpWin.length;
 
         // Treat the interpolation window
         if (sampleRatio < 1) {
             // Multiply every element in the window by `sampleRatio`
-            for (int i = 0; i < interpWinLen; i++) {
+            for (int i = 0; i < interpWinLength; i++) {
                 interpWin[i] *= sampleRatio;
             }
         }
 
         // Calculate interpolation deltas
-        double[] interpDeltas = new double[interpWinLen];
+        double[] interpDeltas = new double[interpWinLength];
 
-        for (int i = 0; i < interpWinLen - 1; i++) {
+        for (int i = 0; i < interpWinLength - 1; i++) {
             interpDeltas[i] = interpWin[i + 1] - interpWin[i];
         }
 
         // Run resampling
-        resampleF(x, y, sampleRatio, interpWin, interpDeltas, precision);
+        resamplingHelper(x, y, sampleRatio, interpWin, interpDeltas, precision);
 
         // Fix the length of the samples array
-        int correctNumSamples = (int) Math.ceil(sampleRatio * x.length);
-        double[] yHat = ArrayUtils.fixLength(y, correctNumSamples);
+        int correctedNumSamples = (int) Math.ceil(sampleRatio * x.length);
+        double[] yHat = ArrayUtils.fixLength(y, correctedNumSamples);
 
         // Handle rescaling
         if (scale) {
-            for (int i = 0; i < correctNumSamples; i++) {
+            for (int i = 0; i < correctedNumSamples; i++) {
                 yHat[i] /= Math.sqrt(sampleRatio);
             }
         }
@@ -366,7 +385,7 @@ public class Audio {
      * @implNote See <a href="https://github.com/bmcfee/resampy/blob/ccb8557/resampy/interpn.py">
      * Resampy's Source Code</a> for the original implementation of this function in Python.
      */
-    private static void resampleF(
+    private static void resamplingHelper(
             double[] x, double[] y, double sampleRatio, double[] interpWin,
             double[] interpDeltas, int precision
     ) {
@@ -458,7 +477,7 @@ public class Audio {
             int cycleNum = 0;  // Number of times we read from the audio stream
             while ((numBytesRead = audioStream.read(bytes)) != -1) {
                 // Unpack the bytes into samples
-                unpack(samples, transfer, bytes, numBytesRead);
+                unpackBytes(samples, transfer, bytes, numBytesRead);
 
                 // Add it to the master list of samples
                 if (numBytesRead / bytesPerSample >= 0) {
@@ -497,13 +516,9 @@ public class Audio {
                 }
             } else {  // Mono
                 // Fill in the mono audio samples array
-                numMonoSamples = numSamples;
                 monoAudioSamples = new double[numSamples];
                 System.arraycopy(audioSamples, 0, monoAudioSamples, 0, numSamples);
             }
-
-            // Calculate the duration of the audio
-            if (duration == 0) duration = numMonoSamples / sampleRate;
 
             // Close the audio stream
             if (audioStream != null) {
@@ -542,7 +557,7 @@ public class Audio {
      * @see <a href="https://tinyurl.com/stefanSpectrogramOriginal">Original implementation on
      * GitHub</a>. This code was largely adapted from that source.
      */
-    private void unpack(float[] samples, long[] transfer, byte[] bytes, int numValidBytes) {
+    private void unpackBytes(float[] samples, long[] transfer, byte[] bytes, int numValidBytes) {
         if (audioFormat.getEncoding() != AudioFormat.Encoding.PCM_SIGNED
                 && audioFormat.getEncoding() != AudioFormat.Encoding.PCM_UNSIGNED) {
             // `samples` is already good; no need to process
@@ -653,15 +668,15 @@ public class Audio {
         logger.log(Level.FINE, "Converting WAV bytes to MP3 bytes");
 
         // Ensure that the temporary directory exists
-        IOMethods.createFolder(IOConstants.TEMP_FOLDER);
-        logger.log(Level.FINE, "Temporary folder created: " + IOConstants.TEMP_FOLDER);
+        IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
+        logger.log(Level.FINE, "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH);
 
         // Define a new FFmpeg handler
         FFmpegHandler FFmpegHandler = new FFmpegHandler(ffmpegPath);
 
         // Generate the output path to the MP3 file
-        String inputPath = IOConstants.TEMP_FOLDER + "temp-1.wav";
-        String outputPath = IOConstants.TEMP_FOLDER + "temp-2.mp3";
+        String inputPath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-1.wav");
+        String outputPath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-2.mp3");
 
         // Write WAV bytes into a file specified at the input path
         IOMethods.createFile(inputPath);

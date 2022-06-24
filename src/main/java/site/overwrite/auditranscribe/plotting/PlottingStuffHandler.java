@@ -2,9 +2,9 @@
  * PlottingStuffHandler.java
  *
  * Created on 2022-03-20
- * Updated on 2022-06-12
+ * Updated on 2022-06-23
  *
- * Description: Class that adds the notes' stuff to the spectrogram area.
+ * Description: Class that helps adds stuff to the spectrogram area.
  */
 
 package site.overwrite.auditranscribe.plotting;
@@ -25,7 +25,7 @@ import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 import java.util.HashSet;
 
 /**
- * Class that adds the notes' stuff to the spectrogram area.
+ * Class that helps adds stuff to the spectrogram area.
  */
 public class PlottingStuffHandler {
     // Attributes
@@ -41,7 +41,9 @@ public class PlottingStuffHandler {
      * @param minNoteNumber   Lowest permitted note number.
      * @param maxNoteNumber   Highest permitted note number.
      */
-    public static void addNoteLines(Pane spectrogramPane, double height, int minNoteNumber, int maxNoteNumber) {
+    public static void addNoteLines(
+            Pane spectrogramPane, double height, int minNoteNumber, int maxNoteNumber
+    ) {
         // Get the width of the note pane
         double width = spectrogramPane.getPrefWidth();
 
@@ -350,7 +352,8 @@ public class PlottingStuffHandler {
      * @return Array of <code>StackPane</code>s, representing the generated ellipses.
      */
     public static StackPane[] getBarNumberEllipses(
-            double bpm, int beatsPerBar, int pxPerSecond, double height, double duration, double offset, double zoomScaleX
+            double bpm, int beatsPerBar, int pxPerSecond, double height, double duration, double offset,
+            double zoomScaleX
     ) {
         // Calculate the number of bars
         double spb = secondsPerBeat(bpm);

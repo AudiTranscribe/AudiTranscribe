@@ -2,7 +2,7 @@
  * AudioDataObject.java
  *
  * Created on 2022-05-06
- * Updated on 2022-06-06
+ * Updated on 2022-06-21
  *
  * Description: Data object that stores the audio data.
  */
@@ -15,7 +15,10 @@ import java.util.Objects;
 /**
  * Data object that stores the audio data.
  */
-public class AudioDataObject extends AbstractDataObject {
+public class AudioDataObject extends AbstractAUDTDataObject {
+    // Constants
+    public static final int SECTION_ID = 3;
+
     // Attributes
     public byte[] compressedMP3Bytes;
     public double sampleRate;
@@ -38,6 +41,17 @@ public class AudioDataObject extends AbstractDataObject {
     }
 
     // Overwritten methods
+
+    @Override
+    public int numBytesNeeded() {
+        return 4 +  // Section ID
+                (4 + compressedMP3Bytes.length) +  // +4 for the length of the MP3 audio data
+                8 +   // Sample rate
+                4 +   // Total duration in milliseconds
+                (4 + audioFileName.getBytes().length) +  // String length + string bytes of audio file name
+                4;    // EOS delimiter
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

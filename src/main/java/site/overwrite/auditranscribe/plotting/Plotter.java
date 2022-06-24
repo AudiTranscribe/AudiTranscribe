@@ -2,7 +2,7 @@
  * Plotter.java
  *
  * Created on 2022-02-18
- * Updated on 2022-06-03
+ * Updated on 2022-06-23
  *
  * Description: Class that contains plotting functions.
  */
@@ -49,7 +49,7 @@ public class Plotter {
      *                           intensity of the spectrogram data. For example, 0.01 means a
      *                           precision of 0.01 for intensity (i.e. 1/0.01 = 100 different
      *                           interpolated colours will be used to represent the different
-     *                           intensities)
+     *                           intensities).
      */
     public Plotter(ColourScale colourScale, double intensityPrecision) {
         // Update attributes
@@ -171,7 +171,7 @@ public class Plotter {
                 colourIndex++;
             }
 
-            // Calculate how far between the two colours we are
+            // Calculate how far we are between the two colours
             // (0 means entirely `colour1`; 1 means entirely `colour2`)
             double x = (double) (i % amount) / amount;
 

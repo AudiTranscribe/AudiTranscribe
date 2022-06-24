@@ -2,15 +2,15 @@
  * TypeConversionUtils.java
  *
  * Created on 2022-06-05
- * Updated on 2022-06-05
+ * Updated on 2022-06-23
  *
- * Description: Type conversion methods.
+ * Description: Type conversion utility methods.
  */
 
 package site.overwrite.auditranscribe.utils;
 
 /**
- * Type conversion methods.
+ * Type conversion utility methods.
  */
 public class TypeConversionUtils {
     // Public methods

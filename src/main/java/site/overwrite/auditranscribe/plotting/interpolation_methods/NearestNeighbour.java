@@ -2,15 +2,15 @@
  * NearestNeighbour.java
  *
  * Created on 2022-04-13
- * Updated on 2022-04-13
+ * Updated on 2022-06-23
  *
- * Description: Helper class that contains the nearest neighbour interpolation method.
+ * Description: Class that handles the nearest neighbour interpolation method.
  */
 
 package site.overwrite.auditranscribe.plotting.interpolation_methods;
 
 /**
- * Helper class that contains the nearest neighbour interpolation method.
+ * Class that handles the nearest neighbour interpolation method.
  */
 public class NearestNeighbour extends AbstractInterpolation {
     // Overridden methods
@@ -28,7 +28,9 @@ public class NearestNeighbour extends AbstractInterpolation {
      * a value of <code>Z_new[i][j]</code>.
      */
     @Override
-    public double[][] interpolationHelper(double[] X, double[] Y, double[][] Z, double[] XNew, double[] YNew) {
+    public double[][] interpolationHelper(
+            double[] X, double[] Y, double[][] Z, double[] XNew, double[] YNew
+    ) {
         // Get the lengths of the arrays
         int lengthXNew = XNew.length;
         int lengthYNew = YNew.length;

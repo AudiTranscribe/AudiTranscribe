@@ -2,7 +2,7 @@
  * Rhythm.java
  *
  * Created on 2022-06-02
- * Updated on 2022-06-02
+ * Updated on 2022-06-23
  *
  * Description: Rhythmic feature extraction methods.
  */
@@ -10,7 +10,7 @@
 package site.overwrite.auditranscribe.bpm_estimation;
 
 import site.overwrite.auditranscribe.audio.WindowFunction;
-import site.overwrite.auditranscribe.exceptions.ValueException;
+import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
 import site.overwrite.auditranscribe.utils.MathUtils;
 
@@ -29,6 +29,8 @@ public class Rhythm {
      * @param winLength  Length of the onset autocorrelation window (in frames/onset measurements).
      * @return Localized autocorrelation of the onset strength envelope.
      * @throws ValueException If the window length is not a positive integer.
+     * @see <a href="https://librosa.org/doc/0.9.1/_modules/librosa/feature/rhythm.html#tempogram">
+     * Librosa's Implementation</a> of the tempogram.
      */
     public static double[][] tempogram(double[] x, double sampleRate, int hopLength, int winLength) {
         // Ascertain that the `winLength` is a positive integer

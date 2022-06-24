@@ -2,7 +2,7 @@
  * CustomTask.java
  *
  * Created on 2022-05-25
- * Updated on 2022-06-03
+ * Updated on 2022-06-23
  *
  * Description: A custom task class where some protected methods are made public.
  */
@@ -11,6 +11,11 @@ package site.overwrite.auditranscribe.misc;
 
 import javafx.concurrent.Task;
 
+/**
+ * A custom task class where some protected methods are made public.
+ *
+ * @param <V> Value that is returned by the custom task.
+ */
 public abstract class CustomTask<V> extends Task<V> {
     // Attributes
     public String name;

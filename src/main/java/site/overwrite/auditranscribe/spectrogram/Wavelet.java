@@ -2,9 +2,9 @@
  * Wavelet.java
  *
  * Created on 2022-02-13
- * Updated on 2022-05-31
+ * Updated on 2022-06-23
  *
- * Description: Class to implement audio windowing functions.
+ * Description: Class that implements wavelet methods.
  */
 
 package site.overwrite.auditranscribe.spectrogram;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Class to implement audio windowing functions.
+ * Class that implements wavelet methods.
  */
 public class Wavelet {
     // Public methods
@@ -142,8 +142,8 @@ public class Wavelet {
      * from notched-noise data." Hearing research 47.1-2 (1990): 103-138.
      */
     public static Pair<Complex[][], double[]> computeWaveletBasis(
-            double[] freqs, double sr, WindowFunction windowFunction, double filterScale, boolean padFFT, double norm, boolean isCQT,
-            double gamma, double alpha
+            double[] freqs, double sr, WindowFunction windowFunction, double filterScale, boolean padFFT, double norm,
+            boolean isCQT, double gamma, double alpha
     ) {
         // Pass-through parameters to get the filter lengths
         Pair<double[], Double> waveletLengthsResult = computeWaveletLengths(

@@ -2,7 +2,7 @@
  * VQT.java
  *
  * Created on 2022-03-11
- * Updated on 2022-06-01
+ * Updated on 2022-06-23
  *
  * Description: Class that implements the Variable Q-Transform (VQT) algorithm.
  */
@@ -16,7 +16,7 @@ import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.Filter;
 import site.overwrite.auditranscribe.audio.WindowFunction;
-import site.overwrite.auditranscribe.exceptions.ValueException;
+import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.spectrogram.Wavelet;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
 import site.overwrite.auditranscribe.misc.Complex;
@@ -29,7 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * VQT class that contains Variable-Q Transform methods.
+ * Class that implements the Variable Q-Transform (VQT) algorithm.
  *
  * @implNote Adapted largely from
  * <a href="https://librosa.org/doc/main/_modules/librosa/core/constantq.html#vqt">Librosa's
@@ -190,7 +190,7 @@ public class VQT {
         // Handle first octave specially if the filter type is NOT `KAISER_FAST`
         int startingOctave = 0;
 
-        if (filter != Filter.KAISER_FAST) {  // Todo: we haven't exactly debugged this code block
+        if (filter != Filter.KAISER_FAST) {
             // Get the frequencies of the top octave
             double[] freqsOct = new double[binsPerOctave];
             System.arraycopy(freqs, numBins - binsPerOctave, freqsOct, 0, binsPerOctave);
@@ -436,11 +436,23 @@ public class VQT {
             // If the whole octave is more than we can fit, take the highest bins from `response`
             if (end < numOctaves) {
                 for (int i = 0; i < end; i++) {
-                    System.arraycopy(response[numOctaves - end + i], 0, vqtOut[i], 0, maxPermittedNumCol);
+                    System.arraycopy(
+                            response[numOctaves - end + i],
+                            0,
+                            vqtOut[i],
+                            0,
+                            maxPermittedNumCol
+                    );
                 }
             } else {
                 for (int i = 0; i < numOctaves; i++) {
-                    System.arraycopy(response[i], 0, vqtOut[end - numOctaves + i], 0, maxPermittedNumCol);
+                    System.arraycopy(
+                            response[i],
+                            0,
+                            vqtOut[end - numOctaves + i],
+                            0,
+                            maxPermittedNumCol
+                    );
                 }
             }
 

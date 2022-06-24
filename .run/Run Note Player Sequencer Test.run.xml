@@ -3,12 +3,12 @@
     <module name="AudiTranscribe" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="site.overwrite.auditranscribe.note_playback.*" />
+        <option name="PATTERN" value="site.overwrite.auditranscribe.notes.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
-    <option name="PACKAGE_NAME" value="site.overwrite.auditranscribe.note_playback" />
-    <option name="MAIN_CLASS_NAME" value="site.overwrite.auditranscribe.note_playback.NotePlayerSequencerTest" />
+    <option name="PACKAGE_NAME" value="site.overwrite.auditranscribe.notes" />
+    <option name="MAIN_CLASS_NAME" value="site.overwrite.auditranscribe.notes.NotePlayerSequencerTest" />
     <option name="METHOD_NAME" value="testNotePlayerSequencer" />
     <option name="TEST_OBJECT" value="method" />
     <method v="2">

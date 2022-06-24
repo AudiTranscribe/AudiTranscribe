@@ -2,7 +2,7 @@
  * BPMEstimatorTest.java
  *
  * Created on 2022-06-02
- * Updated on 2022-06-12
+ * Updated on 2022-06-21
  *
  * Description: Test `BPMEstimator.java`.
  */
@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
+import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
 import site.overwrite.auditranscribe.io.IOMethods;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -25,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class BPMEstimatorTest {
     @Disabled
     @Test
-    void estimate() throws UnsupportedAudioFileException, IOException {
+    void estimate() throws UnsupportedAudioFileException, IOException, AudioTooLongException {
         // Get the audio files
         Audio audio1 = new Audio(
                 new File(IOMethods.getAbsoluteFilePath("testing-audio-files/175bpm.wav")),

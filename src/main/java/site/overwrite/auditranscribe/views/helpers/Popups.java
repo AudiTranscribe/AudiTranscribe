@@ -2,9 +2,9 @@
  * Popups.java
  *
  * Created on 2022-05-26
- * Updated on 2022-06-19
+ * Updated on 2022-06-23
  *
- * Description: Class that handles the popups and dialogs.
+ * Description: Class that handles the showing of popups and dialogs to the user.
  */
 
 package site.overwrite.auditranscribe.views.helpers;
@@ -19,7 +19,7 @@ import java.io.StringWriter;
 import java.util.Optional;
 
 /**
- * Class that handles the popups and dialogs.
+ * Class that handles the showing of popups and dialogs to the user.
  */
 public class Popups {
     // Public methods
@@ -62,19 +62,6 @@ public class Popups {
         alert.getButtonTypes().setAll(buttonTypes);
 
         return alert.showAndWait();
-    }
-
-    /**
-     * Method that shows a confirmation alert.<br>
-     * This confirmation alert only has two buttons: an OK button and a Cancel button.
-     *
-     * @param title       Title of the confirmation alert.
-     * @param headerText  Header text for the confirmation alert.
-     * @param contentText Content of the confirmation alert.
-     * @return A <code>ButtonType</code> value.
-     */
-    public static Optional<ButtonType> showConfirmationAlert(String title, String headerText, String contentText) {
-        return showMultiButtonAlert(title, headerText, contentText, ButtonType.OK, ButtonType.CANCEL);
     }
 
     /**
@@ -121,42 +108,6 @@ public class Popups {
 
         // Show the alert
         alert.showAndWait();
-    }
-
-    /**
-     * Method that shows a text input dialog.
-     *
-     * @param title        Title of the text input dialog.
-     * @param headerText   Header text for the text input dialog.
-     * @param contentText  Content text for the text input dialog.
-     * @param defaultValue Default value for the text input dialog.
-     * @return A <code>String</code> value.
-     */
-    public static Optional<String> showTextInputDialog(String title, String headerText, String contentText, String defaultValue) {
-        TextInputDialog dialog = new TextInputDialog(defaultValue);
-        dialog.setTitle(title);
-        dialog.setHeaderText(headerText);
-        dialog.setContentText(contentText);
-
-        return dialog.showAndWait();
-    }
-
-    /**
-     * Method that shows a choice dialog.
-     *
-     * @param title       Title of the choice dialog.
-     * @param headerText  Header text for the choice dialog.
-     * @param contentText Content text for the choice dialog.
-     * @param choices     Choices for the choice dialog.
-     * @return A <code>String</code> value.
-     */
-    public static Optional<String> showChoiceDialog(String title, String headerText, String contentText, String... choices) {
-        ChoiceDialog<String> dialog = new ChoiceDialog<>(choices[0], choices);
-        dialog.setTitle(title);
-        dialog.setHeaderText(headerText);
-        dialog.setContentText(contentText);
-
-        return dialog.showAndWait();
     }
 
     // Private methods

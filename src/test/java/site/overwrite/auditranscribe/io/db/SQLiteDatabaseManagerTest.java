@@ -2,7 +2,7 @@
  * SQLiteDatabaseManagerTest.java
  *
  * Created on 2022-05-11
- * Updated on 2022-06-06
+ * Updated on 2022-06-24
  *
  * Description: Test `SQLiteDatabaseManager.java`.
  */
@@ -11,6 +11,7 @@ package site.overwrite.auditranscribe.io.db;
 
 import org.junit.jupiter.api.*;
 import site.overwrite.auditranscribe.io.IOConstants;
+import site.overwrite.auditranscribe.io.IOMethods;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -61,9 +62,10 @@ class SQLiteDatabaseManagerTest {
     void setUpDatabase() {
         // Set up the SQLite database manager for the tests
         manager = new SQLiteDatabaseManager(
-                IOConstants.RESOURCES_FOLDER_PATH_STRING + "test-resources" + IOConstants.SEPARATOR +
-                        "database" + IOConstants.SEPARATOR +
+                IOMethods.joinPaths(
+                        IOConstants.RESOURCES_FOLDER_PATH, "tests-output-directory", "database",
                         "test-database.db"
+                )
         );
 
         // Connect to the database

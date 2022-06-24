@@ -2,7 +2,7 @@
  * FFT.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-01
+ * Updated on 2022-06-23
  *
  * Description: Class that implements Fast Fourier Transform (FFT) algorithms.
  *
@@ -13,7 +13,7 @@
 
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
-import site.overwrite.auditranscribe.exceptions.ValueException;
+import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.misc.Complex;
 import site.overwrite.auditranscribe.utils.MiscUtils;
 
@@ -27,6 +27,13 @@ import java.util.Arrays;
  */
 public class FFT {
     // Public methods
+
+    /**
+     * Computes the Fast Fourier Transform (FFT) of the input array <code>x</code>.
+     *
+     * @param x The complex array <code>x</code> representing the data source.
+     * @return An array of <code>Complex</code> objects representing the FFT of the data source.
+     */
     public static Complex[] fft(Complex[] x) {
         // Get length fo input array
         int length = x.length;
@@ -147,7 +154,7 @@ public class FFT {
         return ifft(extended);
     }
 
-    // Public methods
+    // Private methods
 
     /**
      * Helper method that computes the FFT of the input array <code>x</code> using the Radix-2

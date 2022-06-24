@@ -2,7 +2,7 @@
  * JSONFile.java
  *
  * Created on 2022-05-30
- * Updated on 2022-06-20
+ * Updated on 2022-06-24
  *
  * Description: Handles interactions with JSON files.
  */
@@ -12,6 +12,7 @@ package site.overwrite.auditranscribe.io.json_files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import site.overwrite.auditranscribe.io.IOConstants;
+import site.overwrite.auditranscribe.io.IOMethods;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -20,26 +21,28 @@ import java.lang.reflect.InvocationTargetException;
  * Handles interactions with JSON files.
  */
 public abstract class JSONFile<T> {
-    // Constants
-    public final String FILE_PATH;
-
     // Attributes
+    public final String filePath;
+
     public Class<T> cls;
 
     public T data;
 
     /**
      * Initialization method for a <code>JSONFile</code> object.
+     *
+     * @param fileName File name of for the new JSON file. <b>Includes the extension</b>.
+     * @param cls      Class to use.
      */
     public JSONFile(String fileName, Class<T> cls) {
         // Update attributes
         this.cls = cls;
-        FILE_PATH = IOConstants.APP_DATA_FOLDER_PATH_STRING + fileName;
+        filePath = IOMethods.joinPaths(IOConstants.APP_DATA_FOLDER_PATH, fileName);
 
         // Create the GSON object
         Gson gson = new Gson();
 
-        try (Reader reader = new FileReader(FILE_PATH)) {
+        try (Reader reader = new FileReader(filePath)) {
             // Try loading the settings data
             data = gson.fromJson(reader, cls);
 
@@ -64,7 +67,7 @@ public abstract class JSONFile<T> {
         // Create the GSON object
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-        try (Writer writer = new FileWriter(FILE_PATH)) {
+        try (Writer writer = new FileWriter(filePath)) {
             // Try writing to the settings data file
             gson.toJson(data, writer);
 

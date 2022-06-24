@@ -2,7 +2,7 @@
  * ProjectsDB.java
  *
  * Created on 2022-05-11
- * Updated on 2022-06-06
+ * Updated on 2022-06-24
  *
  * Description: Class that interfaces with the projects' database.
  */
@@ -11,6 +11,7 @@ package site.overwrite.auditranscribe.io.db;
 
 import org.javatuples.Pair;
 import site.overwrite.auditranscribe.io.IOConstants;
+import site.overwrite.auditranscribe.io.IOMethods;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -46,12 +47,6 @@ public class ProjectsDB {
             INSERT INTO "Projects" ("filepath", "filename")
             VALUES (?, ?);
             """;
-    public static String SQL_UPDATE_PROJECT_RECORD = """
-            UPDATE "Projects" SET
-                "filepath" = ?,
-                "filename" = ?
-            WHERE "id" = ?;
-            """;
     public static String SQL_DELETE_PROJECT_RECORD = """
             DELETE FROM "Projects"
             WHERE "id" = ?;
@@ -59,7 +54,9 @@ public class ProjectsDB {
 
     // Constants
     public static String PROJECT_FILE_LIST_DB_NAME = "Projects.db";
-    public static String PROJECT_FILE_LIST_DB_PATH = IOConstants.APP_DATA_FOLDER_PATH_STRING + PROJECT_FILE_LIST_DB_NAME;
+    public static String PROJECT_FILE_LIST_DB_PATH = IOMethods.joinPaths(
+            IOConstants.APP_DATA_FOLDER_PATH, PROJECT_FILE_LIST_DB_NAME
+    );
 
     // Attributes
     final SQLiteDatabaseManager dbManager;
@@ -147,34 +144,34 @@ public class ProjectsDB {
     }
 
     /**
-     * Method that checks if the project with the specified file path already exists within the
+     * Method that checks if the project with the specified file path does not exist within the
      * database.
      *
      * @param filepath <b>Absolute</b> path to the project file.
-     * @return Boolean. Is <code>true</code> if the project already exists, and <code>false</code>
-     * if it does not.
+     * @return Boolean. Is <code>true</code> if the project does not exist, and <code>false</code>
+     * if it is already present in the database.
      * @throws SQLException If something went wrong when executing the SQL query.
      */
-    public boolean checkIfProjectExists(String filepath) throws SQLException {
+    public boolean checkIfProjectDoesNotExist(String filepath) throws SQLException {
         // Start connection with the database
         dbManager.dbConnect();
 
-        boolean projectExists = false;
+        boolean projectDoesNotExist = true;
         try (PreparedStatement checkProjectStatement = dbManager.prepareStatement(SQL_CHECK_IF_PROJECT_EXISTS)) {
             // Prepare the statement for execution
             checkProjectStatement.setString(1, filepath);
 
             // Execute the statement
             try (ResultSet resultSet = dbManager.executeGetQuery(checkProjectStatement)) {
-                if (resultSet.next()) projectExists = true;
+                if (resultSet.next()) projectDoesNotExist = false;
             }
         }
 
         // Close connection with database
         dbManager.dbDisconnect();
 
-        // Return the `projectExists` flag
-        return projectExists;
+        // Return the `projectDoesNotExist` flag
+        return projectDoesNotExist;
     }
 
     /**
@@ -198,32 +195,6 @@ public class ProjectsDB {
 
             // Execute the statement
             dbManager.executeUpdate(insertProjectStatement);
-        }
-
-        // Close connection with database
-        dbManager.dbDisconnect();
-    }
-
-    /**
-     * Method that updates a specific project's record.
-     *
-     * @param key      Public key of the record in the database.
-     * @param filepath <b>Absolute </b> path to the project file.
-     * @param filename Project file's name.
-     * @throws SQLException If something went wrong when executing the SQL query.
-     */
-    public void updateProjectRecord(int key, String filepath, String filename) throws SQLException {
-        // Start connection with the database
-        dbManager.dbConnect();
-
-        try (PreparedStatement updateProjectStatement = dbManager.prepareStatement(SQL_UPDATE_PROJECT_RECORD)) {
-            // Prepare the statement for execution
-            updateProjectStatement.setString(1, filepath);
-            updateProjectStatement.setString(2, filename);
-            updateProjectStatement.setInt(3, key);
-
-            // Execute the statement
-            dbManager.executeUpdate(updateProjectStatement);
         }
 
         // Close connection with database

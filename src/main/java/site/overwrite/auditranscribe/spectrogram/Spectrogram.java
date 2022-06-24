@@ -2,9 +2,9 @@
  * Spectrogram.java
  *
  * Created on 2022-02-12
- * Updated on 2022-05-31
+ * Updated on 2022-06-23
  *
- * Description: Spectrogram class.
+ * Description: Class that handles the creation of the spectrogram image.
  */
 
 package site.overwrite.auditranscribe.spectrogram;
@@ -13,7 +13,7 @@ import javafx.scene.image.WritableImage;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
-import site.overwrite.auditranscribe.exceptions.ValueException;
+import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.plotting.Plotter;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.CQT;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.FrequencyBins;
@@ -25,7 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Spectrogram class to handle spectrogram creation.
+ * Class that handles the creation of the spectrogram image.
  */
 public class Spectrogram {
     // Constants
@@ -61,7 +61,7 @@ public class Spectrogram {
     final CustomTask<?> task;
 
     /**
-     * Creates a spectrogram object.
+     * Initialization method for a <code>Spectrogram</code> object.
      *
      * @param audioObj       The audio object.
      * @param minNoteNumber  Smallest note number.
@@ -103,13 +103,13 @@ public class Spectrogram {
 
         this.task = task;
 
-        logger.log(Level.FINE, "Audio sample rate = " + sampleRate);
+        logger.log(Level.FINE, "Audio sample rate is " + sampleRate);
 
         // Set the width and height of the image
         width = (int) (audioObj.getDuration() * numPxPerSecond);
         height = (int) (numOctaves * numPxPerOctave);
 
-        logger.log(Level.FINE, "Spectrogram width = " + width + " and height = " + height);
+        logger.log(Level.FINE, "Spectrogram width is " + width + " and height is " + height);
 
         // Get the mono samples
         samples = audioObj.getMonoSamples();
@@ -165,13 +165,13 @@ public class Spectrogram {
 
         this.task = task;
 
-        logger.log(Level.FINE, "Audio sample rate = " + sampleRate);
+        logger.log(Level.FINE, "Audio sample rate is " + sampleRate);
 
         // Set the width and height of the image
         width = (int) (duration * numPxPerSecond);
         height = (int) (numOctaves * numPxPerOctave);
 
-        logger.log(Level.FINE, "Spectrogram width = " + width + " and height = " + height);
+        logger.log(Level.FINE, "Spectrogram width is " + width + " and height is " + height);
 
         // We don't need samples in this case
         samples = null;
@@ -207,7 +207,8 @@ public class Spectrogram {
         }
 
         // Get also the frequency bins of the VQT
-        double[] freqBins = FrequencyBins.getQTFreqBins(numFreqBins, binsPerOctave, minFreq);  // CQT and VQT bins are the same
+        // (Note that CQT and VQT frequency bins are the same)
+        double[] freqBins = FrequencyBins.getQTFreqBins(numFreqBins, binsPerOctave, minFreq);
 
         // Find the highest permitted frequency bin
         int highestPermittedIndex = -1;

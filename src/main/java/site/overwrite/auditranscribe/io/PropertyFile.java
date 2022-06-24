@@ -2,22 +2,21 @@
  * PropertyFile.java
  *
  * Created on 2022-05-02
- * Updated on 2022-05-25
+ * Updated on 2022-06-23
  *
- * Description: Property file object to handle the loading and retrieval of data from a property
- *              file.
+ * Description: Class that handles the retrieval of data from a property file.
  */
 
 package site.overwrite.auditranscribe.io;
 
 import site.overwrite.auditranscribe.MainApplication;
-import site.overwrite.auditranscribe.exceptions.NoSuchPropertyException;
+import site.overwrite.auditranscribe.exceptions.io.NoSuchPropertyException;
 
 import java.io.IOException;
 import java.util.Properties;
 
 /**
- * Property file object to handle the loading and retrieval of data from a property file.
+ * Class that handles the retrieval of data from a property file.
  */
 public class PropertyFile {
     // Attributes

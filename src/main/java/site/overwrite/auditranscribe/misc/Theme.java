@@ -2,13 +2,16 @@
  * Theme.java
  *
  * Created on 2022-05-28
- * Updated on 2022-05-29
+ * Updated on 2022-06-23
  *
- * Description: Theme enum.
+ * Description: Enum that contains the different possible themes that AudiTranscribe supports.
  */
 
 package site.overwrite.auditranscribe.misc;
 
+/**
+ * Enum that contains the different possible themes that AudiTranscribe supports.
+ */
 public enum Theme {
     // Enum values
     LIGHT_MODE("Light Mode", "light-mode"),

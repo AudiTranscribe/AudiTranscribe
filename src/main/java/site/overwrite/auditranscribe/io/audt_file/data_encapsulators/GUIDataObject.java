@@ -2,7 +2,7 @@
  * GUIDataObject.java
  *
  * Created on 2022-05-02
- * Updated on 2022-06-06
+ * Updated on 2022-06-21
  *
  * Description: Data object that stores the GUI data.
  */
@@ -14,7 +14,10 @@ import java.util.Objects;
 /**
  * Data object that stores the GUI data.
  */
-public class GUIDataObject extends AbstractDataObject {
+public class GUIDataObject extends AbstractAUDTDataObject {
+    // Constants
+    public static final int SECTION_ID = 4;
+
     // Attributes
     public int musicKeyIndex;
     public int timeSignatureIndex;
@@ -47,6 +50,18 @@ public class GUIDataObject extends AbstractDataObject {
     }
 
     // Overwritten methods
+    @Override
+    public int numBytesNeeded() {
+        return 4 +   // Section ID
+                4 +  // Music key index
+                4 +  // Time signature index
+                8 +  // BPM
+                8 +  // Offset seconds
+                8 +  // Playback volume
+                4 +  // Current time in milliseconds
+                4;   // EOS delimiter
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

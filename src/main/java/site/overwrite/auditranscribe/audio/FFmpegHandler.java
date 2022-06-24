@@ -2,14 +2,14 @@
  * FFmpegHandler.java
  *
  * Created on 2022-05-06
- * Updated on 2022-06-20
+ * Updated on 2022-06-23
  *
  * Description: Methods that help handle the FFmpeg commands and methods.
  */
 
 package site.overwrite.auditranscribe.audio;
 
-import site.overwrite.auditranscribe.exceptions.FFmpegNotFoundException;
+import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,7 +38,7 @@ public class FFmpegHandler {
         if (checkFFmpegPath(ffmpegPath)) {
             this.ffmpegPath = ffmpegPath;
         } else {
-            throw new FFmpegNotFoundException("Could not find FFmpeg at " + ffmpegPath);
+            throw new FFmpegNotFoundException("Could not find FFmpeg at '" + ffmpegPath + "'.");
         }
     }
 
@@ -78,7 +78,7 @@ public class FFmpegHandler {
      * Method that converts the original audio file <code>file</code> into a new audio file with
      * extension <code>extension</code>.<br>
      * Note that this method produces a new audio file, <code>converted.ext</code> (with the
-     * provided extension <code>.ext</code>).
+     * extension <code>.ext</code>).
      *
      * @param file           File object representing the original audio file.
      * @param outputFilePath Absolute path to the output file, <b>including the extension</b>.
@@ -115,7 +115,7 @@ public class FFmpegHandler {
 
             // Check exit code of the command
             int exitCode = process.waitFor();
-            if (exitCode == 0) return outputFilePath;  // Exited successfully
+            if (exitCode == 0) return outputFilePath;  // Exit code 0 => exited successfully => can return
 
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("FFmpeg command " + builder.command() + " failed");
