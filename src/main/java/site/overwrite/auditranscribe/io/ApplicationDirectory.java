@@ -2,7 +2,7 @@
  * ApplicationDirectory.java
  *
  * Created on 2022-05-28
- * Updated on 2022-06-23
+ * Updated on 2022-06-24
  *
  * Description: Application directory factory class.
  */
@@ -23,15 +23,15 @@ public class ApplicationDirectory {
     public static String getUserDataDirectory(String appName, String appVersion) {
         String os = System.getProperty("os.name").toUpperCase();
         if (os.startsWith("MAC OS X")) {
-            return IOHelpers.buildPath(IOHelpers.getHomeDir(), "/Library/Application Support", appName, appVersion);
+            return IOMethods.buildPath(IOMethods.getHomeDir(), "/Library/Application Support", appName, appVersion);
         } else if (os.startsWith("WINDOWS")) {
             return System.getenv("AppData");
         } else {
             // Assume other *nix
-            String dir = IOHelpers.getOrDefault(
-                    "XDG_DATA_HOME", IOHelpers.buildPath(IOHelpers.getHomeDir(), "/.local/share")
+            String dir = IOMethods.getOrDefault(
+                    "XDG_DATA_HOME", IOMethods.buildPath(IOMethods.getHomeDir(), "/.local/share")
             );
-            return IOHelpers.buildPath(dir, appName, appVersion);
+            return IOMethods.buildPath(dir, appName, appVersion);
         }
     }
 }

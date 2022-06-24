@@ -2,7 +2,7 @@
  * AUDTFileTest.java
  *
  * Created on 2022-05-01
- * Updated on 2022-06-23
+ * Updated on 2022-06-24
  *
  * Description: Test AUDT file reading and writing.
  */
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.*;
 import site.overwrite.auditranscribe.exceptions.io.audt_file.FailedToReadDataException;
 import site.overwrite.auditranscribe.exceptions.io.audt_file.IncorrectFileFormatException;
 import site.overwrite.auditranscribe.exceptions.io.audt_file.OutdatedFileFormatException;
-import site.overwrite.auditranscribe.io.IOHelpers;
+import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.LZ4;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
@@ -28,10 +28,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class AUDTFileTest {
-    // Define the file name
-    static final String FILE_NAME = IOHelpers.joinPaths(
-            "src", "main", "resources", "site", "overwrite", "auditranscribe", "tests-output-directory",
-            "file-io-directory", "test-AUDTFileTest.audt"
+    // Define the file path
+    static final String FILE_PATH = IOMethods.joinPaths(
+            IOConstants.RESOURCES_FOLDER_PATH_STRING, "tests-output-directory", "file-io-directory",
+            "test-AUDTFileTest.audt"
     );
 
     // Define sample array data
@@ -95,7 +95,7 @@ class AUDTFileTest {
     @Order(1)
     void fileWriterTestOne() throws IOException {
         // Create a filewriter object
-        AUDTFileWriter fileWriter = new AUDTFileWriter(FILE_NAME);
+        AUDTFileWriter fileWriter = new AUDTFileWriter(FILE_PATH);
 
         // Test writing some data
         fileWriter.writeUnchangingDataProperties(unchangingDataPropertiesObject);
@@ -113,7 +113,7 @@ class AUDTFileTest {
     void fileReaderTestOne() throws IOException, IncorrectFileFormatException, OutdatedFileFormatException,
             FailedToReadDataException {
         // Create a filereader object
-        AUDTFileReader fileReader = new AUDTFileReader(FILE_NAME);
+        AUDTFileReader fileReader = new AUDTFileReader(FILE_PATH);
 
         // Test reading some data
         UnchangingDataPropertiesObject readUnchangingDataProperties = fileReader.readUnchangingDataProperties();
@@ -146,7 +146,7 @@ class AUDTFileTest {
     @Order(3)
     void fileWriterTestTwo() throws IOException {
         // Create a filewriter object
-        AUDTFileWriter fileWriter = new AUDTFileWriter(FILE_NAME, unchangingDataPropertiesObject.numSkippableBytes);
+        AUDTFileWriter fileWriter = new AUDTFileWriter(FILE_PATH, unchangingDataPropertiesObject.numSkippableBytes);
 
         // Test writing only the GUI and music notes data
         fileWriter.writeGUIData(guiDataObject2);
@@ -161,7 +161,7 @@ class AUDTFileTest {
     void fileReaderTestTwo() throws IOException, IncorrectFileFormatException, OutdatedFileFormatException,
             FailedToReadDataException {
         // Create a filereader object
-        AUDTFileReader fileReader = new AUDTFileReader(FILE_NAME);
+        AUDTFileReader fileReader = new AUDTFileReader(FILE_PATH);
 
         // Test reading some data
         UnchangingDataPropertiesObject readUnchangingDataProperties = fileReader.readUnchangingDataProperties();
@@ -192,6 +192,6 @@ class AUDTFileTest {
 
     @AfterAll
     static void deleteTestingFile() throws IOException {
-        Files.deleteIfExists(Path.of(FILE_NAME));
+        Files.deleteIfExists(Path.of(FILE_PATH));
     }
 }

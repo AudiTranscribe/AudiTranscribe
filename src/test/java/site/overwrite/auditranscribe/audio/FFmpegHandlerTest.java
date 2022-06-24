@@ -2,13 +2,14 @@
  * FFmpegHandlerTest.java
  *
  * Created on 2022-05-06
- * Updated on 2022-06-20
+ * Updated on 2022-06-24
  *
  * Description: Test `FFmpegHandler.java`.
  */
 
 package site.overwrite.auditranscribe.audio;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.io.IOMethods;
@@ -26,6 +27,7 @@ import java.util.HexFormat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FFmpegHandlerTest {
+    @Disabled
     @Test
     void convertAudio() throws IOException, FFmpegNotFoundException, NoSuchAlgorithmException {
         // Get a testing MP3 file

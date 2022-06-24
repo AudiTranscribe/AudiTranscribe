@@ -2,7 +2,7 @@
  * ProjectsDB.java
  *
  * Created on 2022-05-11
- * Updated on 2022-06-23
+ * Updated on 2022-06-24
  *
  * Description: Class that interfaces with the projects' database.
  */
@@ -11,6 +11,7 @@ package site.overwrite.auditranscribe.io.db;
 
 import org.javatuples.Pair;
 import site.overwrite.auditranscribe.io.IOConstants;
+import site.overwrite.auditranscribe.io.IOMethods;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -53,7 +54,9 @@ public class ProjectsDB {
 
     // Constants
     public static String PROJECT_FILE_LIST_DB_NAME = "Projects.db";
-    public static String PROJECT_FILE_LIST_DB_PATH = IOConstants.APP_DATA_FOLDER_PATH_STRING + PROJECT_FILE_LIST_DB_NAME;
+    public static String PROJECT_FILE_LIST_DB_PATH = IOMethods.joinPaths(
+            IOConstants.APP_DATA_FOLDER_PATH_STRING, PROJECT_FILE_LIST_DB_NAME
+    );
 
     // Attributes
     final SQLiteDatabaseManager dbManager;
