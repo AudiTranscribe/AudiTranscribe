@@ -225,8 +225,10 @@ public class IOMethods {
      */
     public static String treatPath(String path) {
         if (getOSName().startsWith("WINDOWS")) {
-            // Remove all instances of "C:/" or something like that
-            path = path.replaceAll("([A-Z]):/", "");
+            // If the path starts with something like "/C:", remove the first slash
+            if (path.matches("^/([A-Z]):")) {
+                path = path.substring(1);
+            }
 
             // Now treat all the escaped characters
             path = path.replace("%20", " ");
