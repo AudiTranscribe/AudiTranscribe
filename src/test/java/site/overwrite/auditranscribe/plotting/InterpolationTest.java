@@ -51,6 +51,10 @@ class InterpolationTest {
         double[][] H = new double[][]{
                 {123.456}
         };
+        double[][] I = new double[][]{
+                {1, 2, 3},
+                {4, 5, 6}
+        };
 
         // Define correct interpolation results
         double[][] interpACorrect = new double[][]{
@@ -97,6 +101,10 @@ class InterpolationTest {
         double[][] interpHCorrect = new double[][]{
                 {123.456}
         };
+        double[][] interpICorrect = new double[][]{
+                {1, 2, 3},
+                {4, 5, 6}
+        };
 
         // Perform interpolation
         double[][] interpA = Interpolation.interpolate(A, 3, 7, InterpolationMethod.NEAREST_NEIGHBOUR);
@@ -107,6 +115,7 @@ class InterpolationTest {
         double[][] interpF = Interpolation.interpolate(F, 1, 8, InterpolationMethod.NEAREST_NEIGHBOUR);
         double[][] interpG = Interpolation.interpolate(G, 6, 1, InterpolationMethod.NEAREST_NEIGHBOUR);
         double[][] interpH = Interpolation.interpolate(H, 1, 1, InterpolationMethod.NEAREST_NEIGHBOUR);
+        double[][] interpI = Interpolation.interpolate(I, 2, 3, InterpolationMethod.NEAREST_NEIGHBOUR);
 
         // Assertions
         assertArrayEquals(interpACorrect, interpA);
@@ -117,6 +126,7 @@ class InterpolationTest {
         assertArrayEquals(interpFCorrect, interpF);
         assertArrayEquals(interpGCorrect, interpG);
         assertArrayEquals(interpHCorrect, interpH);
+        assertArrayEquals(interpICorrect, interpI);
     }
 
     @Test
@@ -154,6 +164,10 @@ class InterpolationTest {
         };
         double[][] H = new double[][]{
                 {123.456}
+        };
+        double[][] I = new double[][]{
+                {1, 2, 3},
+                {4, 5, 6}
         };
 
         // Define correct interpolation results
@@ -201,6 +215,10 @@ class InterpolationTest {
         double[][] interpHCorrect = new double[][]{
                 {123.456}
         };
+        double[][] interpICorrect = new double[][]{
+                {1, 2, 3},
+                {4, 5, 6}
+        };
 
         // Perform interpolation
         double[][] interpA = Interpolation.interpolate(A, 3, 7, InterpolationMethod.BILINEAR);
@@ -211,6 +229,7 @@ class InterpolationTest {
         double[][] interpF = Interpolation.interpolate(F, 1, 8, InterpolationMethod.BILINEAR);
         double[][] interpG = Interpolation.interpolate(G, 6, 1, InterpolationMethod.BILINEAR);
         double[][] interpH = Interpolation.interpolate(H, 1, 1, InterpolationMethod.BILINEAR);
+        double[][] interpI = Interpolation.interpolate(I, 2, 3, InterpolationMethod.BILINEAR);
 
         // Assertions
         assertArrayEquals(interpACorrect, interpA);
@@ -228,5 +247,6 @@ class InterpolationTest {
         assertArrayEquals(ArrayUtils.transpose(interpGCorrect)[0], ArrayUtils.transpose(interpG)[0], 1e-5);
 
         assertArrayEquals(interpHCorrect, interpH);
+        assertArrayEquals(interpICorrect, interpI);
     }
 }

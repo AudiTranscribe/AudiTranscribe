@@ -20,7 +20,7 @@ class IOMethodsTest {
     // Define the file path
     static final String FILE_PATH = IOMethods.joinPaths(
             IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-            "tests-output-directory", "file-io-directory", "testFile.txt"
+            "io-testing-directory", "files", "testFile.txt"
     );
 
     @Test

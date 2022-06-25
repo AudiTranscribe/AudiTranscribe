@@ -2,12 +2,14 @@
  * KaiserFast.java
  *
  * Created on 2022-03-07
- * Updated on 2022-05-25
+ * Updated on 2022-06-24
  *
  * Description: Kaiser Fast resampling filter.
  */
 
 package site.overwrite.auditranscribe.audio.filters;
+
+import java.io.IOException;
 
 /**
  * Kaiser Fast resampling filter.
@@ -17,6 +19,9 @@ package site.overwrite.auditranscribe.audio.filters;
  */
 public class KaiserFast extends AbstractFilter {
     public KaiserFast() {
-        defineAttributes("filter-data/kaiser-fast.json");
+        try {
+            defineAttributes("filter-data/kaiser-fast.json");
+        } catch (IOException ignored) {
+        }
     }
 }

@@ -2,7 +2,7 @@
  * AbstractFilter.java
  *
  * Created on 2022-03-07
- * Updated on 2022-06-23
+ * Updated on 2022-06-24
  *
  * Description: `AbstractFilter` class for resampling filters.
  */
@@ -10,9 +10,11 @@
 package site.overwrite.auditranscribe.audio.filters;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import site.overwrite.auditranscribe.io.IOMethods;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
@@ -23,6 +25,7 @@ public abstract class AbstractFilter {
     // Attributes
     private double[] halfWindow;
     private int precision;
+    private double rolloff;
 
     // Public methods
 
@@ -49,6 +52,15 @@ public abstract class AbstractFilter {
         return precision;
     }
 
+    /**
+     * Gets the rolloff factor of the filter.
+     *
+     * @return A double, representing the rolloff factor of the filter.
+     */
+    public double getRolloff() {
+        return rolloff;
+    }
+
     // Private methods
 
     /**
@@ -56,24 +68,29 @@ public abstract class AbstractFilter {
      *
      * @param dataFilePath Path (with reference to the resources' directory) to the JSON data file
      *                     that contains this data.
+     * @throws IOException         If the data file path is incorrect.
+     * @throws JsonSyntaxException If the syntax of the filter file is incorrect.
      */
-    public void defineAttributes(String dataFilePath) {
-        // Assert the file path entered is not empty
-        assert dataFilePath != null;
-
+    public void defineAttributes(String dataFilePath) throws IOException, JsonSyntaxException {
         // Create the GSON loader object
         Gson gson = new Gson();
 
-        try (Reader reader = new InputStreamReader(IOMethods.getInputStream(dataFilePath))) {
+        // Attempt to get the input stream
+        InputStream inputStream = IOMethods.getInputStream(dataFilePath);
+
+        // Check if the input stream is null or not
+        if (inputStream == null) {
+            throw new IOException("Cannot find the data file '" + dataFilePath + "'.");
+        }
+
+        try (Reader reader = new InputStreamReader(inputStream)) {
             // Try loading the filter data
             FilterData filterData = gson.fromJson(reader, FilterData.class);
 
             // Set attributes
             halfWindow = filterData.halfWindow;
             precision = filterData.precision;
-
-        } catch (IOException e) {
-            e.printStackTrace();
+            rolloff = filterData.rolloff;
         }
     }
 }

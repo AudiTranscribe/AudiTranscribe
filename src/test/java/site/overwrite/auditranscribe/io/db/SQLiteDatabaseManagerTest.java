@@ -63,7 +63,7 @@ class SQLiteDatabaseManagerTest {
         // Set up the SQLite database manager for the tests
         manager = new SQLiteDatabaseManager(
                 IOMethods.joinPaths(
-                        IOConstants.RESOURCES_FOLDER_PATH, "tests-output-directory", "database",
+                        IOConstants.RESOURCES_FOLDER_PATH, "io-testing-directory", "database",
                         "test-database.db"
                 )
         );

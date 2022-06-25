@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class AUDTFileTest {
     // Define the file path
     static final String FILE_PATH = IOMethods.joinPaths(
-            IOConstants.RESOURCES_FOLDER_PATH, "tests-output-directory", "file-io-directory",
+            IOConstants.RESOURCES_FOLDER_PATH, "io-testing-directory", "files",
             "test-AUDTFileTest.audt"
     );
 
