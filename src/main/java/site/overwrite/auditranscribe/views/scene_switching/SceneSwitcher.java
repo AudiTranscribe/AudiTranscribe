@@ -206,7 +206,9 @@ public class SceneSwitcher {
             if (successfullyDeleted) {
                 logger.log(Level.FINE, "Successfully deleted auxiliary WAV file.");
             } else {
-                logger.log(Level.WARNING, "Failed to delete auxiliary WAV file.");
+                logger.log(
+                        Level.WARNING, "Failed to delete auxiliary WAV file now; will attempt delete after exit."
+                );
             }
 
             // Get the current scene and the spectrogram view controller
