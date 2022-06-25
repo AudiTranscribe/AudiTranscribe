@@ -2,7 +2,7 @@
  * Bilinear.java
  *
  * Created on 2022-04-12
- * Updated on 2022-06-24
+ * Updated on 2022-06-25
  *
  * Description: Class that handles the bilinear interpolation method.
  */
@@ -10,6 +10,7 @@
 package site.overwrite.auditranscribe.plotting.interpolation_methods;
 
 import site.overwrite.auditranscribe.utils.ArrayUtils;
+import site.overwrite.auditranscribe.utils.MathUtils;
 
 /**
  * Class that handles the bilinear interpolation method.
@@ -46,8 +47,8 @@ public class Bilinear extends AbstractInterpolation {
         for (int iNew = 0; iNew < lengthXNew; iNew++) {
             for (int jNew = 0; jNew < lengthYNew; jNew++) {
                 // Get the new `x` and `y` values
-                double xNew = XNew[iNew];
-                double yNew = YNew[jNew];
+                double xNew = MathUtils.round(XNew[iNew], 10);  // Round to 10 dp to account for possible imprecision
+                double yNew = MathUtils.round(YNew[jNew], 10);  // Same goes for `yNew`
 
                 // Find the index of the closest element to `xNew` and `yNew` that is smaller than
                 // them in their respective arrays
