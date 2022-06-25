@@ -244,8 +244,8 @@ public class TranscriptionViewController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Make macOS systems use the system menu bar
-        final String os = System.getProperty("os.name");
-        if (os != null && os.startsWith("Mac")) {
+        String osName = IOMethods.getOSName();
+        if (osName.startsWith("MAC")) {
             menuBar.useSystemMenuBarProperty().set(true);
         }
 

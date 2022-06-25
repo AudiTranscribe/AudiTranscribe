@@ -20,7 +20,7 @@ import java.nio.file.Path;
  * Input/Output methods that are used in the AudiTranscribe project.
  */
 public class IOMethods {
-    // Public methods
+    // File path handling
 
     /**
      * Gets a file's URL.
@@ -51,6 +51,8 @@ public class IOMethods {
     public static String getAbsoluteFilePath(String filePath) {
         return getFileURL(filePath).getPath();
     }
+
+    // IO Handling
 
     /**
      * Gets the input stream of a file, with respect to the <b>root resource path</b>.
@@ -135,6 +137,8 @@ public class IOMethods {
         createFolder(Path.of(IOConstants.APP_DATA_FOLDER_PATH));
     }
 
+    // Path handling
+
     /**
      * Method that builds a full path from the individual folders.
      *
@@ -209,5 +213,14 @@ public class IOMethods {
     public static String getOrDefault(String key, String def) {
         String val = System.getenv().get(key);
         return val == null ? def : val;
+    }
+
+    /**
+     * Method that gets the operating system's name, <b>all in uppercase</b>.
+     *
+     * @return Operating system name in uppercase.
+     */
+    public static String getOSName() {
+        return System.getProperty("os.name").toUpperCase();
     }
 }
