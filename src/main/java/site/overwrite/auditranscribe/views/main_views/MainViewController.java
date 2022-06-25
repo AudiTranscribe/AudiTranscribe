@@ -45,7 +45,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.sql.SQLException;
@@ -232,7 +232,7 @@ public class MainViewController implements Initializable {
                 BasicFileAttributes attributes;
                 try {
                     // Get the last modified time of the file
-                    attributes = Files.readAttributes(Path.of(filepath), BasicFileAttributes.class);
+                    attributes = Files.readAttributes(Paths.get(filepath), BasicFileAttributes.class);
 
                     FileTime lastModifiedTime = attributes.lastModifiedTime();
                     long lastModifiedTimestamp = lastModifiedTime.toMillis();

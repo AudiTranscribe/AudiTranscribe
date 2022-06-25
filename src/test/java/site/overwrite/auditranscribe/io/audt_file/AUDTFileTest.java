@@ -22,7 +22,7 @@ import site.overwrite.auditranscribe.utils.TypeConversionUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -86,7 +86,7 @@ class AUDTFileTest {
                 qTransformBytes, minMagnitude, maxMagnitude
         );
         audioDataObject = new AudioDataObject(
-                LZ4.lz4Compress(Files.readAllBytes(Path.of(IOMethods.getAbsoluteFilePath("testing-audio-files/A440.mp3")))),
+                LZ4.lz4Compress(Files.readAllBytes(Paths.get(IOMethods.getAbsoluteFilePath("testing-audio-files/A440.mp3")))),
                 44100, 120000, "A440.wav");
 
         guiDataObject1 = new GUIDataObject(
@@ -213,6 +213,6 @@ class AUDTFileTest {
 
     @AfterAll
     static void deleteTestingFile() throws IOException {
-        Files.deleteIfExists(Path.of(FILE_PATH));
+        Files.deleteIfExists(Paths.get(FILE_PATH));
     }
 }

@@ -2,7 +2,7 @@
  * Audio.java
  *
  * Created on 2022-02-13
- * Updated on 2022-06-23
+ * Updated on 2022-06-25
  *
  * Description: Class that handles audio processing and audio playback.
  */
@@ -26,7 +26,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -680,13 +680,13 @@ public class Audio {
 
         // Write WAV bytes into a file specified at the input path
         IOMethods.createFile(inputPath);
-        Files.write(Path.of(inputPath), rawWAVBytes);
+        Files.write(Paths.get(inputPath), rawWAVBytes);
 
         // Convert the original WAV file to a temporary MP3 file
         outputPath = FFmpegHandler.convertAudio(new File(inputPath), outputPath);
 
         // Read the raw MP3 bytes into a temporary file
-        rawMP3Bytes = Files.readAllBytes(Path.of(outputPath));
+        rawMP3Bytes = Files.readAllBytes(Paths.get(outputPath));
 
         // Delete the temporary files
         IOMethods.deleteFile(inputPath);

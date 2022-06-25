@@ -15,6 +15,7 @@ import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Input/Output methods that are used in the AudiTranscribe project.
@@ -112,7 +113,7 @@ public class IOMethods {
      */
     public static boolean deleteFile(String absolutePath) throws IOException {
         try {
-            return Files.deleteIfExists(Path.of(absolutePath));
+            return Files.deleteIfExists(Paths.get(absolutePath));
         } catch (IOException e) {
             new File(absolutePath).deleteOnExit();
             return false;
@@ -141,14 +142,14 @@ public class IOMethods {
      * @param absolutePath Absolute path to the folder.
      */
     public static void createFolder(String absolutePath) {
-        createFolder(Path.of(absolutePath));
+        createFolder(Paths.get(absolutePath));
     }
 
     /**
      * Method that creates the AudiTranscribe app data folder, if it doesn't already exist.
      */
     public static void createAppDataFolder() {
-        createFolder(Path.of(IOConstants.APP_DATA_FOLDER_PATH));
+        createFolder(Paths.get(IOConstants.APP_DATA_FOLDER_PATH));
     }
 
     // Path handling
