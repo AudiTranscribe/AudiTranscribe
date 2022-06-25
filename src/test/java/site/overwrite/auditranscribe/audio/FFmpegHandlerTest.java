@@ -2,7 +2,7 @@
  * FFmpegHandlerTest.java
  *
  * Created on 2022-05-06
- * Updated on 2022-06-24
+ * Updated on 2022-06-25
  *
  * Description: Test `FFmpegHandler.java`.
  */
@@ -12,6 +12,7 @@ package site.overwrite.auditranscribe.audio;
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 
 import java.io.File;
 
@@ -26,8 +27,16 @@ class FFmpegHandlerTest {
         // Get the absolute path to the testing folder
         String testingFolderPath = testFile.getParent();
 
-        // Create a FFmpeg handler
-        FFmpegHandler handler = new FFmpegHandler("ffmpeg");
+        // Determine the FFmpeg path
+        FFmpegHandler handler;
+        try {
+            handler = new FFmpegHandler("ffmpeg");
+        } catch (FFmpegNotFoundException e) {
+            // Try to get the path from the settings file
+            handler = new FFmpegHandler(new SettingsFile().data.ffmpegInstallationPath);
+        }
+
+        // Determine the output path
         String outputFilePath = handler.convertAudio(testFile, testingFolderPath + "test-converted.WAV");
 
         // Check the output file path, and ensure that the extension is no longer in capitals
