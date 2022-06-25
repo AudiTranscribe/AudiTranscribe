@@ -2,14 +2,13 @@
  * FilterTest.java
  *
  * Created on 2022-06-24
- * Updated on 2022-06-24
+ * Updated on 2022-06-25
  *
  * Description: Test the audio filters.
  */
 
 package site.overwrite.auditranscribe.audio;
 
-import com.google.gson.JsonSyntaxException;
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.audio.filters.AbstractFilter;
 import site.overwrite.auditranscribe.audio.filters.KaiserBest;
@@ -38,7 +37,7 @@ public class FilterTest {
 
         // Assert that this will cause an exception
         assertThrows(IOException.class, MyInvalidTestFilter1::new);
-        assertThrows(JsonSyntaxException.class, MyInvalidTestFilter2::new);
+        assertThrows(IOException.class, MyInvalidTestFilter2::new);
     }
 
     @Test

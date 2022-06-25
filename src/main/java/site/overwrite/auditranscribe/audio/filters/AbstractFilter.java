@@ -2,7 +2,7 @@
  * AbstractFilter.java
  *
  * Created on 2022-03-07
- * Updated on 2022-06-24
+ * Updated on 2022-06-25
  *
  * Description: `AbstractFilter` class for resampling filters.
  */
@@ -71,7 +71,7 @@ public abstract class AbstractFilter {
      * @throws IOException         If the data file path is incorrect.
      * @throws JsonSyntaxException If the syntax of the filter file is incorrect.
      */
-    public void defineAttributes(String dataFilePath) throws IOException, JsonSyntaxException {
+    public void defineAttributes(String dataFilePath) throws IOException {
         // Create the GSON loader object
         Gson gson = new Gson();
 
@@ -91,6 +91,8 @@ public abstract class AbstractFilter {
             halfWindow = filterData.halfWindow;
             precision = filterData.precision;
             rolloff = filterData.rolloff;
+        } catch (JsonSyntaxException e) {
+            throw new IOException(e);
         }
     }
 }
