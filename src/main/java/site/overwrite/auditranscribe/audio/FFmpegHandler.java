@@ -11,10 +11,12 @@ package site.overwrite.auditranscribe.audio;
 
 import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.io.StreamGobbler;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 /**
  * Methods that help handle the FFmpeg commands and methods.
@@ -117,6 +119,12 @@ public class FFmpegHandler {
         try {
             // Build the process
             Process process = builder.start();
+
+            // Define stream gobbler
+            StreamGobbler streamGobbler = new StreamGobbler(process.getErrorStream(), s -> System.out.println("!!!!!!!!!! " + s));
+
+            // Start the process
+            Executors.newSingleThreadExecutor().submit(streamGobbler);
 
             // Check exit code of the command
             int exitCode = process.waitFor();
