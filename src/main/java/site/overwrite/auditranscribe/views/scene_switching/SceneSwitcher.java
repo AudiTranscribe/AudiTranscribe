@@ -202,7 +202,7 @@ public class SceneSwitcher {
             Audio audio = new Audio(auxiliaryWAVFile, audioFile.getName(), AudioProcessingMode.SAMPLES_AND_PLAYBACK);
 
             // Delete auxiliary WAV file
-            boolean successfullyDeleted = auxiliaryWAVFile.delete();
+            boolean successfullyDeleted = IOMethods.deleteFile(auxiliaryWAVFile.getAbsolutePath());
             if (successfullyDeleted) {
                 logger.log(Level.FINE, "Successfully deleted auxiliary WAV file.");
             } else {

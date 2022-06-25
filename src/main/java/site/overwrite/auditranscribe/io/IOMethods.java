@@ -2,7 +2,7 @@
  * IOMethods.java
  *
  * Created on 2022-03-15
- * Updated on 2022-06-24
+ * Updated on 2022-06-25
  *
  * Description: Input/Output methods that are used in the AudiTranscribe project.
  */
@@ -94,9 +94,8 @@ public class IOMethods {
      * @return Boolean. Is <code>true</code> is the file was deleted and <code>false</code>
      * otherwise.
      */
-    public static boolean deleteFile(String absolutePath) {
-        File myFile = new File(absolutePath);
-        return myFile.delete();
+    public static boolean deleteFile(String absolutePath) throws IOException {
+        return Files.deleteIfExists(Path.of(absolutePath));
     }
 
     /**

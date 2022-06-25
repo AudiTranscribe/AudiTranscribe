@@ -1035,17 +1035,22 @@ public class TranscriptionViewController implements Initializable {
                     String saveDest = getSaveDestination(false);
 
                     // Try to save the project
-                    try {
-                        saveData(false, saveDest, null);
-                        return true;  // Can exit silently
-                    } catch (IOException | FFmpegNotFoundException e) {
-                        // Show exception that was thrown
-                        Popups.showExceptionAlert(
-                                "File Saving Failure",
-                                "AudiTranscribe failed to save the file.",
-                                e
-                        );
-                        return false;  // Cannot exit
+                    if (saveDest != null) {
+                        try {
+                            saveData(false, saveDest, null);
+                            return true;  // Can exit silently
+                        } catch (IOException | FFmpegNotFoundException e) {
+                            // Show exception that was thrown
+                            Popups.showExceptionAlert(
+                                    "File Saving Failure",
+                                    "AudiTranscribe failed to save the file.",
+                                    e
+                            );
+                            return false;  // Cannot exit
+                        }
+                    } else {
+                        Popups.showInformationAlert("Info", "No destination specified.");
+                        return false;  // No file selected; cannot exit
                     }
 
                 } else if (selectedButton.get() == dontSaveButExit) {
@@ -1772,7 +1777,7 @@ public class TranscriptionViewController implements Initializable {
 
                 // If we are using existing data (i.e., AUDT file path was already set), then initially there are no
                 // unsaved changes
-                hasUnsavedChanges = false;
+                if (audtFilePath != null) hasUnsavedChanges = false;
             }
         });
 
