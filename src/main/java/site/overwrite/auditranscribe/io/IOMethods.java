@@ -95,7 +95,12 @@ public class IOMethods {
      * otherwise.
      */
     public static boolean deleteFile(String absolutePath) throws IOException {
-        return Files.deleteIfExists(Path.of(absolutePath));
+        try {
+            return Files.deleteIfExists(Path.of(absolutePath));
+        } catch (IOException e) {
+            new File(absolutePath).deleteOnExit();
+            return false;
+        }
     }
 
     /**

@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-24
+ * Updated on 2022-06-25
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -850,7 +850,7 @@ public class TranscriptionViewController implements Initializable {
         setupBPMEstimationTask(bpmTask);
 
         // Start the tasks
-        startTasks(null, spectrogramTask, bpmTask);
+        startTasks(spectrogramTask, bpmTask);
     }
 
     /**
@@ -918,8 +918,9 @@ public class TranscriptionViewController implements Initializable {
         // Update the raw MP3 bytes of the audio object
         audio.setRawMP3Bytes(rawMP3Bytes);  // This is to reduce the time needed to save the file later
 
-        // Delete the auxiliary MP3 file
+        // Delete the auxiliary files
         IOMethods.deleteFile(auxiliaryMP3File.getAbsolutePath());
+        IOMethods.deleteFile(auxiliaryWAVFile.getAbsolutePath());
 
         // Update the audio object's duration
         // (The `MediaPlayer` duration cannot be trusted)
@@ -949,7 +950,7 @@ public class TranscriptionViewController implements Initializable {
         setupSpectrogramTask(spectrogramTask, "Loading spectrogram...");
 
         // Start the tasks
-        startTasks(auxiliaryWAVFile.getAbsolutePath(), spectrogramTask);
+        startTasks(spectrogramTask);
     }
 
     /**
@@ -1635,10 +1636,9 @@ public class TranscriptionViewController implements Initializable {
     /**
      * Helper method that starts all the transcription view tasks.
      *
-     * @param auxiliaryWAVFilePath <b>Absolute</b> path to the auxiliary WAV file.
      * @param tasks The tasks to start.
      */
-    private void startTasks(String auxiliaryWAVFilePath, CustomTask<?>... tasks) {
+    private void startTasks(CustomTask<?>... tasks) {
         // Create a task that starts the tasks
         CustomTask<Boolean> masterTask = new CustomTask<>() {
             @Override
@@ -1774,15 +1774,6 @@ public class TranscriptionViewController implements Initializable {
                     boolean canCloseWindow = handleUnsavedChanges();
                     if (!canCloseWindow) windowEvent.consume();
                 });
-
-                // Attempt to delete the auxiliary WAV file
-                if (auxiliaryWAVFilePath != null) {
-                    try {
-                        IOMethods.deleteFile(auxiliaryWAVFilePath);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
 
                 // If we are using existing data (i.e., AUDT file path was already set), then initially there are no
                 // unsaved changes
