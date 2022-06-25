@@ -2,7 +2,7 @@
  * IOMethodsTest.java
  *
  * Created on 2022-05-10
- * Updated on 2022-06-24
+ * Updated on 2022-06-25
  *
  * Description: Test `IOMethods.java`.
  */
@@ -10,6 +10,8 @@
 package site.overwrite.auditranscribe.io;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 import java.io.IOException;
 
@@ -41,5 +43,14 @@ class IOMethodsTest {
 
         // Second time round, the file could not be deleted and thus returns `false`
         assertFalse(IOMethods.deleteFile(FILE_PATH));
+    }
+
+    @Test
+    @EnabledOnOs({OS.WINDOWS})
+    void treatPath() {
+        assertEquals("C:/testing/file/1/hello.txt", IOMethods.treatPath("/C:/testing/file/1/hello.txt"));
+        assertEquals("D:\\testing\\file\\2\\hello.txt", IOMethods.treatPath("\\D:\\testing\\file\\2\\hello.txt"));
+        assertEquals("/nothing/unusual/", IOMethods.treatPath("/nothing/unusual/"));
+        assertEquals("E:/there are now spaces/test.txt/", IOMethods.treatPath("/E:/there%20are%20now%20spaces/test.txt/"));
     }
 }

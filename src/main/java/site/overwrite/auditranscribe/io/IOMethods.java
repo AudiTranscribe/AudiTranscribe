@@ -226,8 +226,8 @@ public class IOMethods {
      */
     public static String treatPath(String path) {
         if (getOSName().startsWith("WINDOWS")) {
-            // If the path starts with something like "/C:", remove the first slash
-            if (path.matches("^/([A-Z]):")) {
+            // If the path starts with something like "/C:" or "\C:", remove the first slash
+            if (path.matches("[/\\\\][A-Z]:.*")) {
                 path = path.substring(1);
             }
 
