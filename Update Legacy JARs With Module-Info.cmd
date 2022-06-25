@@ -58,9 +58,10 @@ FOR /L %%i IN (1,1,5) DO (
     cd !moduleDir!
 
     :: Generate the module-info.java file
-    jdeps --generate-module-info . !moduleJar!
+    jdeps --generate-module-info . !moduleJar! | find /I "Missing dependencies"
 
-    IF %ERRORLEVEL% GEQ 1 (
+    :: Error level 0 means that "Missing dependencies" was found
+    IF %ERRORLEVEL% == 0 (
         :: Try again, but this time ignoring dependencies
         jdeps --ignore-missing-deps --generate-module-info . !moduleJar!
 
