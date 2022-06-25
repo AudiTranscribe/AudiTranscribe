@@ -2,6 +2,3 @@ Fixme:
     - Note playing is delayed.
         - Temporary fix is to implement a fixed constant to account for delay, but a more permanent fix is needed.
         - This also causes some notes to not play at the start of playback.
-    - Sometimes BPM does not update the note lines automatically.
-    - FFmpeg test fails on GitHub:
-      https://github.com/AudiTranscribe/AudiTranscribe/runs/7051888915?check_suite_focus=true#step:5:2245

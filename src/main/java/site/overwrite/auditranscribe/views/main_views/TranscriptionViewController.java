@@ -1701,6 +1701,9 @@ public class TranscriptionViewController implements Initializable {
                 // Update the `isEverythingReady` flag
                 isEverythingReady = true;
 
+                // Update the BPM value
+                updateBPMValue(bpm, true);
+
                 // Update playhead position
                 try {
                     seekToTime(currTime);
