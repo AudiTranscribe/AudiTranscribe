@@ -760,21 +760,21 @@ public class TranscriptionViewController implements Initializable {
                             "still exist at the original location?",
                     e
             );
-            throw new RuntimeException(e);
+            e.printStackTrace();
         } catch (FFmpegNotFoundException e) {
             Popups.showExceptionAlert(
                     "Error loading audio data.",
                     "FFmpeg was not found. Please install it and try again.",
                     e
             );
-            throw new RuntimeException(e);
+            e.printStackTrace();
         } catch (AudioTooLongException e) {
             Popups.showExceptionAlert(
                     "Error loading audio data.",
                     "The audio file is too long. Please select a shorter audio file.",
                     e
             );
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
         // Update music key and beats per bar
@@ -850,7 +850,7 @@ public class TranscriptionViewController implements Initializable {
         setupBPMEstimationTask(bpmTask);
 
         // Start the tasks
-        startTasks(spectrogramTask, bpmTask);
+        startTasks(null, spectrogramTask, bpmTask);
     }
 
     /**
@@ -918,9 +918,8 @@ public class TranscriptionViewController implements Initializable {
         // Update the raw MP3 bytes of the audio object
         audio.setRawMP3Bytes(rawMP3Bytes);  // This is to reduce the time needed to save the file later
 
-        // Delete the temporary files
+        // Delete the auxiliary MP3 file
         IOMethods.deleteFile(auxiliaryMP3File.getAbsolutePath());
-        IOMethods.deleteFile(auxiliaryWAVFile.getAbsolutePath());
 
         // Update the audio object's duration
         // (The `MediaPlayer` duration cannot be trusted)
@@ -950,7 +949,7 @@ public class TranscriptionViewController implements Initializable {
         setupSpectrogramTask(spectrogramTask, "Loading spectrogram...");
 
         // Start the tasks
-        startTasks(spectrogramTask);
+        startTasks(auxiliaryWAVFile.getAbsolutePath(), spectrogramTask);
     }
 
     /**
@@ -1636,9 +1635,10 @@ public class TranscriptionViewController implements Initializable {
     /**
      * Helper method that starts all the transcription view tasks.
      *
+     * @param auxiliaryWAVFilePath <b>Absolute</b> path to the auxiliary WAV file.
      * @param tasks The tasks to start.
      */
-    private void startTasks(CustomTask<?>... tasks) {
+    private void startTasks(String auxiliaryWAVFilePath, CustomTask<?>... tasks) {
         // Create a task that starts the tasks
         CustomTask<Boolean> masterTask = new CustomTask<>() {
             @Override
@@ -1774,6 +1774,15 @@ public class TranscriptionViewController implements Initializable {
                     boolean canCloseWindow = handleUnsavedChanges();
                     if (!canCloseWindow) windowEvent.consume();
                 });
+
+                // Attempt to delete the auxiliary WAV file
+                if (auxiliaryWAVFilePath != null) {
+                    try {
+                        IOMethods.deleteFile(auxiliaryWAVFilePath);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
 
                 // If we are using existing data (i.e., AUDT file path was already set), then initially there are no
                 // unsaved changes

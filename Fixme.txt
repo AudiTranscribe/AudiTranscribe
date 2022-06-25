@@ -6,3 +6,4 @@ Fixme:
         - This also causes some notes to not play at the start of playback.
     - Sometimes BPM does not update the note lines automatically.
     - Failure to delete auxiliary files on Windows (and on Linux).
+        - The process cannot access the file because it is being used by another process
