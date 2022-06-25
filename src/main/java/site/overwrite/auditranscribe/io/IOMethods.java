@@ -2,7 +2,7 @@
  * IOMethods.java
  *
  * Created on 2022-03-15
- * Updated on 2022-06-24
+ * Updated on 2022-06-25
  *
  * Description: Input/Output methods that are used in the AudiTranscribe project.
  */
@@ -20,7 +20,7 @@ import java.nio.file.Path;
  * Input/Output methods that are used in the AudiTranscribe project.
  */
 public class IOMethods {
-    // Public methods
+    // File path handling
 
     /**
      * Gets a file's URL.
@@ -46,11 +46,27 @@ public class IOMethods {
      * Gets the absolute path of a file.
      *
      * @param filePath Path to the file, with respect to the <b>root resource path</b>.
+     * @param shouldTreatPath   Whether this method should treat the path.
+     * @return A string representing the absolute path to the file.
+     */
+    public static String getAbsoluteFilePath(String filePath, boolean shouldTreatPath) {
+        String path = getFileURL(filePath).getPath();
+        if (shouldTreatPath) path = treatPath(path);
+        return path;
+    }
+
+    /**
+     * Gets the absolute path of a file.<br>
+     * This method will automatically treat the file path.
+     *
+     * @param filePath Path to the file, with respect to the <b>root resource path</b>.
      * @return A string representing the absolute path to the file.
      */
     public static String getAbsoluteFilePath(String filePath) {
-        return getFileURL(filePath).getPath();
+        return getAbsoluteFilePath(filePath, true);
     }
+
+    // IO Handling
 
     /**
      * Gets the input stream of a file, with respect to the <b>root resource path</b>.
@@ -94,9 +110,13 @@ public class IOMethods {
      * @return Boolean. Is <code>true</code> is the file was deleted and <code>false</code>
      * otherwise.
      */
-    public static boolean deleteFile(String absolutePath) {
-        File myFile = new File(absolutePath);
-        return myFile.delete();
+    public static boolean deleteFile(String absolutePath) throws IOException {
+        try {
+            return Files.deleteIfExists(Path.of(absolutePath));
+        } catch (IOException e) {
+            new File(absolutePath).deleteOnExit();
+            return false;
+        }
     }
 
     /**
@@ -130,6 +150,8 @@ public class IOMethods {
     public static void createAppDataFolder() {
         createFolder(Path.of(IOConstants.APP_DATA_FOLDER_PATH));
     }
+
+    // Path handling
 
     /**
      * Method that builds a full path from the individual folders.
@@ -196,6 +218,26 @@ public class IOMethods {
     }
 
     /**
+     * Method that treats a path so that it is correctly parsed by the operating system.
+     *
+     * @param path Path to treat.
+     * @return Treated path.
+     */
+    public static String treatPath(String path) {
+        if (getOSName().startsWith("WINDOWS")) {
+            // Remove all instances of "C:/" or something like that
+            path = path.replaceAll("([A-Z]):/", "");
+
+            // Now treat all the escaped characters
+            path = path.replace("%20", " ");
+        }
+
+        return path;
+    }
+
+    // Environment variable management
+
+    /**
      * Method that returns the value of the environment variable or the default value.
      *
      * @param key The environment variable key.
@@ -205,5 +247,14 @@ public class IOMethods {
     public static String getOrDefault(String key, String def) {
         String val = System.getenv().get(key);
         return val == null ? def : val;
+    }
+
+    /**
+     * Method that gets the operating system's name, <b>all in uppercase</b>.
+     *
+     * @return Operating system name in uppercase.
+     */
+    public static String getOSName() {
+        return System.getProperty("os.name").toUpperCase();
     }
 }

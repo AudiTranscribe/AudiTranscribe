@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-23
+ * Updated on 2022-06-25
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -55,6 +55,7 @@ import site.overwrite.auditranscribe.views.helpers.Popups;
 import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
 import site.overwrite.auditranscribe.views.scene_switching.SceneSwitchingState;
 
+import javax.sound.midi.MidiUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -243,8 +244,8 @@ public class TranscriptionViewController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Make macOS systems use the system menu bar
-        final String os = System.getProperty("os.name");
-        if (os != null && os.startsWith("Mac")) {
+        String osName = IOMethods.getOSName();
+        if (osName.startsWith("MAC")) {
             menuBar.useSystemMenuBarProperty().set(true);
         }
 
@@ -264,7 +265,11 @@ public class TranscriptionViewController implements Initializable {
         mainPane.prefHeightProperty().bind(rootPane.heightProperty().subtract(menuBar.heightProperty()));
 
         // Update attributes
-        notePlayerSynth = new NotePlayerSynth(NOTE_PLAYING_INSTRUMENT, MIDI_CHANNEL_NUM);
+        try {
+            notePlayerSynth = new NotePlayerSynth(NOTE_PLAYING_INSTRUMENT, MIDI_CHANNEL_NUM);
+        } catch (MidiUnavailableException ignored) {  // We will notify the user that MIDI unavailable later
+        }
+
         notePlayerSequencer = new NotePlayerSequencer();
 
         // Update spinners' ranges
@@ -755,21 +760,21 @@ public class TranscriptionViewController implements Initializable {
                             "still exist at the original location?",
                     e
             );
-            throw new RuntimeException(e);
+            e.printStackTrace();
         } catch (FFmpegNotFoundException e) {
             Popups.showExceptionAlert(
                     "Error loading audio data.",
                     "FFmpeg was not found. Please install it and try again.",
                     e
             );
-            throw new RuntimeException(e);
+            e.printStackTrace();
         } catch (AudioTooLongException e) {
             Popups.showExceptionAlert(
                     "Error loading audio data.",
                     "The audio file is too long. Please select a shorter audio file.",
                     e
             );
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
         // Update music key and beats per bar
@@ -913,7 +918,7 @@ public class TranscriptionViewController implements Initializable {
         // Update the raw MP3 bytes of the audio object
         audio.setRawMP3Bytes(rawMP3Bytes);  // This is to reduce the time needed to save the file later
 
-        // Delete the temporary files
+        // Delete the auxiliary files
         IOMethods.deleteFile(auxiliaryMP3File.getAbsolutePath());
         IOMethods.deleteFile(auxiliaryWAVFile.getAbsolutePath());
 
@@ -1030,17 +1035,22 @@ public class TranscriptionViewController implements Initializable {
                     String saveDest = getSaveDestination(false);
 
                     // Try to save the project
-                    try {
-                        saveData(false, saveDest, null);
-                        return true;  // Can exit silently
-                    } catch (IOException | FFmpegNotFoundException e) {
-                        // Show exception that was thrown
-                        Popups.showExceptionAlert(
-                                "File Saving Failure",
-                                "AudiTranscribe failed to save the file.",
-                                e
-                        );
-                        return false;  // Cannot exit
+                    if (saveDest != null) {
+                        try {
+                            saveData(false, saveDest, null);
+                            return true;  // Can exit silently
+                        } catch (IOException | FFmpegNotFoundException e) {
+                            // Show exception that was thrown
+                            Popups.showExceptionAlert(
+                                    "File Saving Failure",
+                                    "AudiTranscribe failed to save the file.",
+                                    e
+                            );
+                            return false;  // Cannot exit
+                        }
+                    } else {
+                        Popups.showInformationAlert("Info", "No destination specified.");
+                        return false;  // No file selected; cannot exit
                     }
 
                 } else if (selectedButton.get() == dontSaveButExit) {
@@ -1098,7 +1108,7 @@ public class TranscriptionViewController implements Initializable {
         audio.setAudioPlaybackTime(seekTime);
 
         // Update note sequencer current time
-        if (!areNotesMuted) {
+        if (!areNotesMuted && notePlayerSequencer.isSequencerAvailable()) {
             if (!notePlayerSequencer.getSequencer().isRunning() && !isPaused) {  // Not running but unpaused
                 notePlayerSequencer.play(seekTime + settingsFile.data.notePlayingDelayOffset);
             } else {
@@ -1767,7 +1777,7 @@ public class TranscriptionViewController implements Initializable {
 
                 // If we are using existing data (i.e., AUDT file path was already set), then initially there are no
                 // unsaved changes
-                hasUnsavedChanges = false;
+                if (audtFilePath != null) hasUnsavedChanges = false;
             }
         });
 

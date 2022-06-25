@@ -2,7 +2,7 @@
  * MainViewController.java
  *
  * Created on 2022-02-09
- * Updated on 2022-06-23
+ * Updated on 2022-06-25
  *
  * Description: Contains the main view's controller class.
  */
@@ -97,8 +97,8 @@ public class MainViewController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Make macOS systems use the system menu bar
-        final String os = System.getProperty("os.name");
-        if (os != null && os.startsWith("Mac")) {
+        String osName = IOMethods.getOSName();
+        if (osName.startsWith("MAC")) {
             menuBar.useSystemMenuBarProperty().set(true);
         }
 

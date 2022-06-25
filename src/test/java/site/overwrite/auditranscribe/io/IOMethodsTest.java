@@ -11,6 +11,8 @@ package site.overwrite.auditranscribe.io;
 
 import org.junit.jupiter.api.*;
 
+import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -33,7 +35,7 @@ class IOMethodsTest {
 
     @Test
     @Order(2)
-    void deleteFile() {
+    void deleteFile() throws IOException {
         // First time round, the file should be deleted successfully
         assertTrue(IOMethods.deleteFile(FILE_PATH));
 
