@@ -26,8 +26,6 @@
         </MavenRunnerParameters>
       </option>
     </MavenSettings>
-    <method v="2">
-      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Test All in AudiTranscribe" run_configuration_type="JUnit" />
-    </method>
+    <method v="2" />
   </configuration>
 </component>
