@@ -10,6 +10,7 @@
 package site.overwrite.auditranscribe.audio;
 
 import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
+import site.overwrite.auditranscribe.io.IOMethods;
 
 import java.io.File;
 import java.io.IOException;
@@ -95,14 +96,18 @@ public class FFmpegHandler {
         // Update the output file path
         outputFilePath = outputFilePath.substring(0, outputFilePath.length() - extension.length()) + extension;
 
+        // Treat the paths
+        String inputFilePath = IOMethods.treatPath(file.getAbsolutePath());
+        outputFilePath = IOMethods.treatPath(outputFilePath);
+
         // Generate the command to execute
         ProcessBuilder builder = new ProcessBuilder();
         builder.command(
                 ffmpegPath,
-                "-y",                          // Override output file
-                "-i", file.getAbsolutePath().replace("%20", " "),  // Specify input file
-                "-b:a", "96k",                 // Constant bitrate for MP3 and related files of 96,000 bits
-                outputFilePath.replace("%20", " ")                 // Specify output file
+                "-y",                 // Override output file
+                "-i", inputFilePath,  // Specify input file
+                "-b:a", "96k",        // Constant bitrate for MP3 and related files of 96,000 bits
+                outputFilePath        // Specify output file
         );
 
         // Specify the working directory
