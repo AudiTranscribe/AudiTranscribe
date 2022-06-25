@@ -38,11 +38,13 @@ class FFmpegHandlerTest {
         }
 
         // Determine the output path
-        String outputFilePath = handler.convertAudio(testFile, IOMethods.joinPaths(testingFolderPath, "test-converted.WAV"));
+//        String outputFilePath = handler.convertAudio(testFile, IOMethods.joinPaths(testingFolderPath, "test-converted.WAV"));
+        handler.convertAudio(testFile, IOMethods.joinPaths(testingFolderPath, "test-converted.WAV"));
 
         // Check the output file path, and ensure that the extension is no longer in capitals
         String correctOutputPath = IOMethods.joinPaths(testingFolderPath, "test-converted.wav");
-        assertEquals(correctOutputPath, outputFilePath);
+        assertTrue(new File(correctOutputPath).exists());
+//        assertEquals(correctOutputPath, outputFilePath);
 
         // Remove the file
         IOMethods.deleteFile(correctOutputPath);
