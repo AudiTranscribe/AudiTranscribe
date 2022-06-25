@@ -2,7 +2,7 @@
  * AUDTFileTest.java
  *
  * Created on 2022-05-01
- * Updated on 2022-06-24
+ * Updated on 2022-06-25
  *
  * Description: Test AUDT file reading and writing.
  */
@@ -30,64 +30,85 @@ import static org.junit.jupiter.api.Assertions.*;
 class AUDTFileTest {
     // Define the file path
     static final String FILE_PATH = IOMethods.joinPaths(
-            IOConstants.RESOURCES_FOLDER_PATH, "io-testing-directory", "files",
-            "test-AUDTFileTest.audt"
+            IOConstants.RESOURCES_FOLDER_PATH, "io-testing-directory", "files", "test-AUDTFileTest.audt"
     );
 
-    // Define sample array data
-    // (These are example arrays, not actual data)
-    double[][] qTransformMagnitudes = new double[][]{
-            {65.43, -123.45, 9876.54321, 3.14159265, -0.000082147128481},
-            {65.43, 9876.54321, 3.14159265, -0.000082147128481, -123.45},
-            {65.43, -123.45, 3.14159265, -0.000082147128481, 9876.54321}
-    };
+    // Define helper attributes
+    double[][] qTransformMagnitudes;
 
-    double[] timesToPlaceRectangles1 = {1, 2, 3, 4.5, 6.7, 8.9};
-    double[] noteDurations1 = {0.5, 1, 1.5, 2.5, 3.5, 10};
-    int[] noteNums1 = {32, 41, 91, 82, 84, 55};
+    double[] timesToPlaceRectangles1;
+    double[] noteDurations1;
+    int[] noteNums1;
 
-    double[] timesToPlaceRectangles2 = {0, 0.9, 1.2, 1.8, 2.4, 3.3, 3.6, 4.2};
-    double[] noteDurations2 = {0.9, 0.3, 0.6, 0.6, 0.9, 0.3, 0.6, 0.6};
-    int[] noteNums2 = {64, 62, 53, 55, 60, 59, 52, 53};
-
-    // Convert the magnitude data to required form
-    Triplet<Byte[], Double, Double> conversionTuple =
-            QTransformDataObject.qTransformMagnitudesToByteData(qTransformMagnitudes, null);
-    byte[] qTransformBytes = TypeConversionUtils.toByteArray(conversionTuple.getValue0());
-    double minMagnitude = conversionTuple.getValue1();
-    double maxMagnitude = conversionTuple.getValue2();
+    double[] timesToPlaceRectangles2;
+    double[] noteDurations2;
+    int[] noteNums2;
 
     // Define data to be used within the tests
-    QTransformDataObject qTransformDataObject = new QTransformDataObject(
-            qTransformBytes, minMagnitude, maxMagnitude
-    );
-    AudioDataObject audioDataObject = new AudioDataObject(
-            LZ4.lz4Compress(Files.readAllBytes(Path.of(IOMethods.getAbsoluteFilePath("testing-audio-files/A440.mp3")))),
-            44100, 120000, "A440.wav");
+    QTransformDataObject qTransformDataObject;
+    AudioDataObject audioDataObject;
 
-    GUIDataObject guiDataObject1 = new GUIDataObject(
-            11, 9, 123.45, 0.01, 0.55, 9000
-    );
-    GUIDataObject guiDataObject2 = new GUIDataObject(
-            15, 14, 67.89, -1.23, 0.124, 2048
-    );
+    GUIDataObject guiDataObject1;
+    GUIDataObject guiDataObject2;
 
-    MusicNotesDataObject musicNotesDataObject1 = new MusicNotesDataObject(
-            timesToPlaceRectangles1, noteDurations1, noteNums1
-    );
-    MusicNotesDataObject musicNotesDataObject2 = new MusicNotesDataObject(
-            timesToPlaceRectangles2, noteDurations2, noteNums2
-    );
+    MusicNotesDataObject musicNotesDataObject1;
+    MusicNotesDataObject musicNotesDataObject2;
 
-    UnchangingDataPropertiesObject unchangingDataPropertiesObject = new UnchangingDataPropertiesObject(
-            32 +  // Header section
-                    UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
-                    qTransformDataObject.numBytesNeeded() +
-                    audioDataObject.numBytesNeeded()
-    );
+    UnchangingDataPropertiesObject unchangingDataPropertiesObject;
 
     // Initialization method
     AUDTFileTest() throws IOException {
+        // Define sample array data
+        // (These are example arrays, not actual data)
+        qTransformMagnitudes = new double[][]{
+                {65.43, -123.45, 9876.54321, 3.14159265, -0.000082147128481},
+                {65.43, 9876.54321, 3.14159265, -0.000082147128481, -123.45},
+                {65.43, -123.45, 3.14159265, -0.000082147128481, 9876.54321}
+        };
+
+        timesToPlaceRectangles1 = new double[]{1, 2, 3, 4.5, 6.7, 8.9};
+        noteDurations1 = new double[]{0.5, 1, 1.5, 2.5, 3.5, 10};
+        noteNums1 = new int[]{32, 41, 91, 82, 84, 55};
+
+        timesToPlaceRectangles2 = new double[]{0, 0.9, 1.2, 1.8, 2.4, 3.3, 3.6, 4.2};
+        noteDurations2 = new double[]{0.9, 0.3, 0.6, 0.6, 0.9, 0.3, 0.6, 0.6};
+        noteNums2 = new int[]{64, 62, 53, 55, 60, 59, 52, 53};
+
+        // Convert the magnitude data to required form
+        Triplet<Byte[], Double, Double> conversionTuple =
+                QTransformDataObject.qTransformMagnitudesToByteData(qTransformMagnitudes, null);
+        byte[] qTransformBytes = TypeConversionUtils.toByteArray(conversionTuple.getValue0());
+        double minMagnitude = conversionTuple.getValue1();
+        double maxMagnitude = conversionTuple.getValue2();
+
+        // Define data to be used within the tests
+        qTransformDataObject = new QTransformDataObject(
+                qTransformBytes, minMagnitude, maxMagnitude
+        );
+        audioDataObject = new AudioDataObject(
+                LZ4.lz4Compress(Files.readAllBytes(Path.of(IOMethods.getAbsoluteFilePath("testing-audio-files/A440.mp3")))),
+                44100, 120000, "A440.wav");
+
+        guiDataObject1 = new GUIDataObject(
+                11, 9, 123.45, 0.01, 0.55, 9000
+        );
+        guiDataObject2 = new GUIDataObject(
+                15, 14, 67.89, -1.23, 0.124, 2048
+        );
+
+        musicNotesDataObject1 = new MusicNotesDataObject(
+                timesToPlaceRectangles1, noteDurations1, noteNums1
+        );
+        musicNotesDataObject2 = new MusicNotesDataObject(
+                timesToPlaceRectangles2, noteDurations2, noteNums2
+        );
+
+        unchangingDataPropertiesObject = new UnchangingDataPropertiesObject(
+                32 +  // Header section
+                        UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
+                        qTransformDataObject.numBytesNeeded() +
+                        audioDataObject.numBytesNeeded()
+        );
     }
 
     // Tests
