@@ -32,6 +32,9 @@ The software is not perfect. There are a few limitations with the software in it
 - Java 17.0.2: The language used to write the application. In the future, standalone builds would be provided, so this
   dependency is only temporarily required.
 
+**For Windows _developers_**: You will need to install the [WiX Toolset 3.0](https://wixtoolset.org/) or later in order
+to generate the AudiTranscribe executable.
+
 # Licence
 This project is licensed under the [GNU General Public Licence V3](LICENSE).
 
