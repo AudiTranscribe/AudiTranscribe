@@ -15,12 +15,13 @@ import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 
 import java.io.File;
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class FFmpegHandlerTest {
     @Test
-    void convertAudio() throws FFmpegNotFoundException {
+    void convertAudio() throws FFmpegNotFoundException, IOException {
         // Get a testing MP3 file
         File testFile = new File(IOMethods.getAbsoluteFilePath("testing-audio-files/A440.mp3"));
 
@@ -37,15 +38,13 @@ class FFmpegHandlerTest {
         }
 
         // Determine the output path
-        String outputFilePath = handler.convertAudio(testFile, testingFolderPath + "test-converted.WAV");
+        String outputFilePath = handler.convertAudio(testFile, IOMethods.joinPaths(testingFolderPath, "test-converted.WAV"));
 
         // Check the output file path, and ensure that the extension is no longer in capitals
-        assertEquals(testingFolderPath + "test-converted.wav", outputFilePath);
+        String correctOutputPath = IOMethods.joinPaths(testingFolderPath, "test-converted.wav");
+        assertEquals(correctOutputPath, outputFilePath);
 
         // Remove the file
-        assertTrue(
-                (new File(testingFolderPath + "test-converted.wav")).delete(),
-                "Failed to delete the converted file."
-        );
+        IOMethods.deleteFile(correctOutputPath);
     }
 }

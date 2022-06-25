@@ -2,7 +2,7 @@
  * FFmpegHandler.java
  *
  * Created on 2022-05-06
- * Updated on 2022-06-23
+ * Updated on 2022-06-25
  *
  * Description: Methods that help handle the FFmpeg commands and methods.
  */
@@ -100,9 +100,9 @@ public class FFmpegHandler {
         builder.command(
                 ffmpegPath,
                 "-y",                          // Override output file
-                "-i", file.getAbsolutePath(),  // Specify input file
+                "-i", file.getAbsolutePath().replace("%20", " "),  // Specify input file
                 "-b:a", "96k",                 // Constant bitrate for MP3 and related files of 96,000 bits
-                outputFilePath                 // Specify output file
+                outputFilePath.replace("%20", " ")                 // Specify output file
         );
 
         // Specify the working directory
