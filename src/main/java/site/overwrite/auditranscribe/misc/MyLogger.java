@@ -22,6 +22,9 @@ import java.util.logging.*;
  * Class that handles the loggers.
  */
 public class MyLogger {
+    // Constants
+    private static final long MAX_LOG_FILE_SIZE = 5_000_000;  // In bytes
+
     // Attributes
     private static Logger logger;
 
@@ -75,8 +78,9 @@ public class MyLogger {
                 // Create file handler
                 FileHandler fileHandler = new FileHandler(
                         IOMethods.joinPaths(loggingFolder, "Log-" + initTime + ".log"),
-                        50000,
-                        1
+                        MAX_LOG_FILE_SIZE,
+                        1,
+                        true
                 );
 
                 // Update attributes of the file handler
