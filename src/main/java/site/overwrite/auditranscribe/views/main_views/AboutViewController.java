@@ -2,7 +2,7 @@
  * AboutViewController.java
  *
  * Created on 2022-05-08
- * Updated on 2022-06-25
+ * Updated on 2022-06-26
  *
  * Description: View controller for the "about" window.
  */
@@ -71,6 +71,7 @@ public class AboutViewController implements Initializable {
             MyLogger.log(Level.INFO, "About view ready to be shown", this.getClass().toString());
 
         } catch (IOException e) {
+            MyLogger.logException(e);
             throw new RuntimeException(e);
         }
     }
@@ -132,6 +133,7 @@ public class AboutViewController implements Initializable {
             // Show the stage
             aboutStage.show();
         } catch (IOException e) {
+            MyLogger.logException(e);
             throw new RuntimeException(e);
         }
     }

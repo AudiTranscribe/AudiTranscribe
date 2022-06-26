@@ -63,7 +63,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.net.URL;
-import java.security.InvalidParameterException;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.*;
@@ -370,6 +369,7 @@ public class TranscriptionViewController implements Initializable {
             try {
                 seekToTime(0);
             } catch (InvalidObjectException e) {
+                MyLogger.logException(e);
                 throw new RuntimeException(e);
             }
 
@@ -384,6 +384,7 @@ public class TranscriptionViewController implements Initializable {
             try {
                 seekToTime(0);
             } catch (InvalidObjectException e) {
+                MyLogger.logException(e);
                 throw new RuntimeException(e);
             }
 
@@ -398,6 +399,7 @@ public class TranscriptionViewController implements Initializable {
             try {
                 seekToTime(audioDuration);
             } catch (InvalidObjectException e) {
+                MyLogger.logException(e);
                 throw new RuntimeException(e);
             }
 
@@ -476,16 +478,13 @@ public class TranscriptionViewController implements Initializable {
 
                     } else {
                         // Play the note
-                        try {
-                            MyLogger.log(Level.FINE, "Playing " + UnitConversionUtils.noteNumberToNote(
-                                    estimatedNoteNum, musicKey, false
-                            ), this.getClass().toString());
-                            notePlayerSynth.playNoteForDuration(
-                                    estimatedNoteNum, NOTE_PLAYING_ON_VELOCITY, NOTE_PLAYING_OFF_VELOCITY,
-                                    NOTE_PLAYING_ON_DURATION, NOTE_PLAYING_OFF_DURATION
-                            );
-                        } catch (InvalidParameterException ignored) {
-                        }
+                        MyLogger.log(Level.FINE, "Playing " + UnitConversionUtils.noteNumberToNote(
+                                estimatedNoteNum, musicKey, false
+                        ), this.getClass().toString());
+                        notePlayerSynth.playNoteForDuration(
+                                estimatedNoteNum, NOTE_PLAYING_ON_VELOCITY, NOTE_PLAYING_OFF_VELOCITY,
+                                NOTE_PLAYING_ON_DURATION, NOTE_PLAYING_OFF_DURATION
+                        );
                     }
                 }
             }
@@ -509,6 +508,7 @@ public class TranscriptionViewController implements Initializable {
                 try {
                     seekToTime(seekTime);
                 } catch (InvalidObjectException e) {
+                    MyLogger.logException(e);
                     throw new RuntimeException(e);
                 }
             }
@@ -531,6 +531,7 @@ public class TranscriptionViewController implements Initializable {
         try {
             projectsDB = new ProjectsDB();
         } catch (SQLException e) {
+            MyLogger.logException(e);
             throw new RuntimeException(e);
         }
     }
@@ -678,6 +679,7 @@ public class TranscriptionViewController implements Initializable {
             try {
                 audio.setPlaybackVolume(audioVolume);
             } catch (InvalidObjectException e) {
+                MyLogger.logException(e);
                 throw new RuntimeException(e);
             }
 
@@ -759,6 +761,7 @@ public class TranscriptionViewController implements Initializable {
                             "still exist at the original location?",
                     e
             );
+            MyLogger.logException(e);
             e.printStackTrace();
         } catch (FFmpegNotFoundException e) {
             Popups.showExceptionAlert(
@@ -766,6 +769,7 @@ public class TranscriptionViewController implements Initializable {
                     "FFmpeg was not found. Please install it and try again.",
                     e
             );
+            MyLogger.logException(e);
             e.printStackTrace();
         } catch (AudioTooLongException e) {
             Popups.showExceptionAlert(
@@ -773,6 +777,7 @@ public class TranscriptionViewController implements Initializable {
                     "The audio file is too long. Please select a shorter audio file.",
                     e
             );
+            MyLogger.logException(e);
             e.printStackTrace();
         }
 
@@ -787,6 +792,7 @@ public class TranscriptionViewController implements Initializable {
                 projectsDB.insertProjectRecord(audtFilePath, audtFileName);
             }
         } catch (SQLException e) {
+            MyLogger.logException(e);
             throw new RuntimeException(e);
         }
     }
@@ -987,6 +993,7 @@ public class TranscriptionViewController implements Initializable {
         try {
             audio.stop();
         } catch (InvalidObjectException e) {
+            MyLogger.logException(e);
             throw new RuntimeException(e);
         }
 
@@ -1045,6 +1052,7 @@ public class TranscriptionViewController implements Initializable {
                                     "AudiTranscribe failed to save the file.",
                                     e
                             );
+                            MyLogger.logException(e);
                             return false;  // Cannot exit
                         }
                     } else {
@@ -1161,6 +1169,7 @@ public class TranscriptionViewController implements Initializable {
                 try {
                     audio.stop();
                 } catch (InvalidObjectException e) {
+                    MyLogger.logException(e);
                     throw new RuntimeException(e);
                 }
             }
@@ -1211,6 +1220,7 @@ public class TranscriptionViewController implements Initializable {
                 try {
                     audio.stop();
                 } catch (InvalidObjectException e) {
+                    MyLogger.logException(e);
                     throw new RuntimeException(e);
                 }
             }
@@ -1265,6 +1275,7 @@ public class TranscriptionViewController implements Initializable {
                     projectsDB.insertProjectRecord(audtFilePath, audtFileName);
                 }
             } catch (SQLException e) {
+                MyLogger.logException(e);
                 throw new RuntimeException(e);
             }
 
@@ -1304,6 +1315,7 @@ public class TranscriptionViewController implements Initializable {
             try {
                 audio.play();
             } catch (InvalidObjectException e) {
+                MyLogger.logException(e);
                 throw new RuntimeException(e);
             }
 
@@ -1318,6 +1330,7 @@ public class TranscriptionViewController implements Initializable {
             try {
                 audio.pause();
             } catch (InvalidObjectException e) {
+                MyLogger.logException(e);
                 throw new RuntimeException(e);
             }
 
@@ -1481,6 +1494,7 @@ public class TranscriptionViewController implements Initializable {
                     try {
                         currTime = audio.getCurrAudioTime();
                     } catch (InvalidObjectException e) {
+                        MyLogger.logException(e);
                         throw new RuntimeException(e);
                     }
 
@@ -1507,6 +1521,7 @@ public class TranscriptionViewController implements Initializable {
                         try {
                             audio.setAudioStartTime(0);
                         } catch (InvalidObjectException e) {
+                            MyLogger.logException(e);
                             throw new RuntimeException(e);
                         }
 
@@ -1515,6 +1530,7 @@ public class TranscriptionViewController implements Initializable {
                             audio.stop();
                             audio.pause();
                         } catch (InvalidObjectException e) {
+                            MyLogger.logException(e);
                             throw new RuntimeException(e);
                         }
                     }
@@ -1687,6 +1703,7 @@ public class TranscriptionViewController implements Initializable {
                 try {
                     hasTerminated = executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
                 } catch (InterruptedException e) {
+                    MyLogger.logException(e);
                     throw new RuntimeException(e);
                 }
 
@@ -1711,6 +1728,7 @@ public class TranscriptionViewController implements Initializable {
                             spectrogramPane.getWidth()
                     );
                 } catch (InvalidObjectException e) {
+                    MyLogger.logException(e);
                     throw new RuntimeException(e);
                 }
 
@@ -1834,6 +1852,7 @@ public class TranscriptionViewController implements Initializable {
             try {
                 audio.setAudioPlaybackTime(0);
             } catch (InvalidObjectException e) {
+                MyLogger.logException(e);
                 throw new RuntimeException(e);
             }
         }
@@ -1945,6 +1964,7 @@ public class TranscriptionViewController implements Initializable {
             try {
                 audio.setPlaybackVolume(audioVolume);
             } catch (InvalidObjectException e) {
+                MyLogger.logException(e);
                 throw new RuntimeException(e);
             }
         } else {
@@ -1959,6 +1979,7 @@ public class TranscriptionViewController implements Initializable {
             try {
                 audio.setPlaybackVolume(0);
             } catch (InvalidObjectException e) {
+                MyLogger.logException(e);
                 throw new RuntimeException(e);
             }
         }
@@ -2042,6 +2063,7 @@ public class TranscriptionViewController implements Initializable {
             try {
                 seekToTime(currTime - 1);
             } catch (InvalidObjectException e) {
+                MyLogger.logException(e);
                 throw new RuntimeException(e);
             }
 
@@ -2050,6 +2072,7 @@ public class TranscriptionViewController implements Initializable {
             try {
                 seekToTime(currTime + 1);
             } catch (InvalidObjectException e) {
+                MyLogger.logException(e);
                 throw new RuntimeException(e);
             }
 
@@ -2227,6 +2250,7 @@ public class TranscriptionViewController implements Initializable {
                         task
                 );
             } catch (IOException e) {
+                MyLogger.logException(e);
                 throw new RuntimeException(e);
             }
         }

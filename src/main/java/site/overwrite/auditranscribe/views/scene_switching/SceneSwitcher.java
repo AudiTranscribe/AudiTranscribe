@@ -113,6 +113,7 @@ public class SceneSwitcher {
                         "An exception occurred during the execution of the program.",
                         e
                 );
+                MyLogger.logException(e);
                 e.printStackTrace();
             }
         }
@@ -156,7 +157,8 @@ public class SceneSwitcher {
                     controller.getSceneSwitchingState(),
                     controller.getSelectedFile()
             );
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            MyLogger.logException(e);
         }
 
         return null;
@@ -259,6 +261,7 @@ public class SceneSwitcher {
                             "still exist at the original location? Is the audio format supported?",
                     e
             );
+            MyLogger.logException(e);
             e.printStackTrace();
         } catch (FFmpegNotFoundException e) {
             Popups.showExceptionAlert(
@@ -266,6 +269,7 @@ public class SceneSwitcher {
                     "FFmpeg was not found. Please install it and try again.",
                     e
             );
+            MyLogger.logException(e);
             e.printStackTrace();
         } catch (AudioTooLongException e) {
             Popups.showExceptionAlert(
@@ -273,6 +277,7 @@ public class SceneSwitcher {
                     "The audio file is too long. Please select a shorter audio file.",
                     e
             );
+            MyLogger.logException(e);
             e.printStackTrace();
         }
 
@@ -364,6 +369,7 @@ public class SceneSwitcher {
                             "' at its designated location. Please check if it is still there.",
                     e
             );
+            MyLogger.logException(e);
             e.printStackTrace();
         } catch (OutdatedFileFormatException e) {
             Popups.showExceptionAlert(
@@ -372,6 +378,7 @@ public class SceneSwitcher {
                             "check the version the file was saved in.",
                     e
             );
+            MyLogger.logException(e);
             e.printStackTrace();
         } catch (IOException | IncorrectFileFormatException | FailedToReadDataException e) {
             Popups.showExceptionAlert(
@@ -380,6 +387,7 @@ public class SceneSwitcher {
                             "' as an AUDT file. Is the file format correct?",
                     e
             );
+            MyLogger.logException(e);
             e.printStackTrace();
         }
 

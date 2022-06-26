@@ -251,6 +251,7 @@ public class MainViewController implements Initializable {
             projects.sort(new SortByTimestamp());
 
         } catch (SQLException | IOException e) {
+            MyLogger.logException(e);
             throw new RuntimeException(e);
         }
 
@@ -408,6 +409,7 @@ public class MainViewController implements Initializable {
                 try {
                     pk = db.getIDOfProjectWithFilepath(filepath);
                 } catch (SQLException e) {
+                    MyLogger.logException(e);
                     throw new RuntimeException(e);
                 }
 
@@ -415,6 +417,7 @@ public class MainViewController implements Initializable {
                 try {
                     db.deleteProjectRecord(pk);
                 } catch (SQLException e) {
+                    MyLogger.logException(e);
                     throw new RuntimeException(e);
                 }
 

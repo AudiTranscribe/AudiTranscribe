@@ -254,6 +254,7 @@ public class PreferencesViewController implements Initializable {
             // Show the stage
             preferencesStage.show();
         } catch (IOException e) {
+            MyLogger.logException(e);
             throw new RuntimeException(e);
         }
     }

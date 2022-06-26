@@ -13,9 +13,7 @@ import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.utils.MiscUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.logging.*;
 
 /**
@@ -41,6 +39,21 @@ public class MyLogger {
      */
     public static void log(Level level, String msg, String callingClassName) {
         getLogger().log(level, String.format("%1$-80s (%2$s)", msg, callingClassName));
+    }
+
+    /**
+     * Method that logs an exception to file/console.
+     *
+     * @param e Exception to log.
+     */
+    public static void logException(Exception e) {
+        // Get the stack trace message
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+
+        // Log the error
+        getLogger().log(Level.SEVERE, sw.toString());
     }
 
     // Private methods
