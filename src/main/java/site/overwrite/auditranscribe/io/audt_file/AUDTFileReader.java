@@ -2,7 +2,7 @@
  * AUDTFileReader.java
  *
  * Created on 2022-05-02
- * Updated on 2022-06-23
+ * Updated on 2022-06-26
  *
  * Description: Class that handles the reading of the AudiTranscribe (AUDT) file.
  */
@@ -64,8 +64,7 @@ public class AUDTFileReader {
             // Verify that the last 4 bytes is the EOF delimiter
             if (!checkEOFDelimiter()) {
                 throw new IncorrectFileFormatException(
-                        "The file is not an AUDT file. Is the end-of-file delimiter correct? " +
-                                "Is the checksum value correct?"
+                        "The file is not an AUDT file. Is the end-of-file delimiter correct?"
                 );
             }
         }
