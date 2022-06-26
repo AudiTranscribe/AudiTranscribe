@@ -2,7 +2,7 @@
  * UnitConversionUtils.java
  *
  * Created on 2022-03-12
- * Updated on 2022-06-23
+ * Updated on 2022-06-26
  *
  * Description: Unit conversion utility methods.
  */
@@ -144,6 +144,10 @@ public class UnitConversionUtils {
         // Fancify music key
         musicKey = MusicUtils.fancifyMusicString(musicKey);
 
+        // Compute the octave and the key value
+        int octave = Math.floorDiv(noteNumber, 12);  // Note that C0 has note number 0, C1 is 12, C2 is 24 etc.
+        int key = noteNumber % 12;  // 0 = C, 1 = C#/Db, 2 = D, 3 = D#/Eb etc.
+
         // Determine which set of note strings to use
         String[] noteStrings;
         if (MusicUtils.doesKeyUseFlats(musicKey)) {
@@ -158,6 +162,8 @@ public class UnitConversionUtils {
                 musicKey.equals("E♭ Minor") ||
                 musicKey.equals("A♭ Minor")) {
             noteStrings[11] = "Cb";  // Cb instead of B
+
+            if (key == 11) octave++;  // Need to increase octave number by 1
         }
 
         if (musicKey.equals("C♭ Major") || musicKey.equals("A♭ Minor")) {
@@ -173,6 +179,7 @@ public class UnitConversionUtils {
 
         if (musicKey.equals("C♯ Major") || musicKey.equals("A♯ Minor")) {
             noteStrings[0] = "B#";  // B# instead of C
+            if (key == 0) octave--;  // Need to reduce octave number by 1
         }
 
         // Check if we want to use fancy accidentals
@@ -181,10 +188,6 @@ public class UnitConversionUtils {
                 noteStrings[i] = MusicUtils.fancifyMusicString(noteStrings[i]);
             }
         }
-
-        // Compute the octave and the key value
-        int octave = Math.floorDiv(noteNumber, 12);  // Note that C0 has note number 0, C1 is 12, C2 is 24 etc.
-        int key = noteNumber % 12;  // 0 = C, 1 = C#/Db, 2 = D, 3 = D#/Eb etc.
 
         // Get the pitch/offset string
         String noteString = noteStrings[key];
