@@ -2,7 +2,7 @@
  * PreferencesViewController.java
  *
  * Created on 2022-05-22
- * Updated on 2022-06-23
+ * Updated on 2022-06-26
  *
  * Description: Contains the preferences view's controller class.
  */
@@ -22,6 +22,7 @@ import site.overwrite.auditranscribe.audio.FFmpegHandler;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
+import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
 import site.overwrite.auditranscribe.misc.spinners.CustomIntegerSpinnerValueFactory;
@@ -34,13 +35,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class PreferencesViewController implements Initializable {
     // Attributes
     private String lastValidFFmpegPath;
-
-    private final Logger logger = Logger.getLogger(this.getClass().getName());
     private SettingsFile settingsFile;
 
     // FXML Elements
@@ -128,7 +126,7 @@ public class PreferencesViewController implements Initializable {
                     applyButton.setDisable(false);
 
                     // Report success
-                    logger.log(Level.INFO, "FFmpeg binary path updated to: " + ffmpegBinaryPath);
+                    MyLogger.log(Level.INFO, "FFmpeg binary path updated to: " + ffmpegBinaryPath, this.getClass().toString());
                 } else {
                     // Reset the value of the text field to the last valid FFmpeg path
                     ffmpegBinaryPathTextField.setText(lastValidFFmpegPath);
@@ -140,13 +138,13 @@ public class PreferencesViewController implements Initializable {
                     );
 
                     // Report failure
-                    logger.log(Level.INFO, "Selected FFmpeg binary path \"" + ffmpegBinaryPath + "\" invalid");
+                    MyLogger.log(Level.INFO, "Selected FFmpeg binary path \"" + ffmpegBinaryPath + "\" invalid", this.getClass().toString());
                 }
             }
         });
 
         // Report that the preferences view is ready to be shown
-        logger.log(Level.INFO, "Preferences view ready to be shown");
+        MyLogger.log(Level.INFO, "Preferences view ready to be shown", this.getClass().toString());
     }
 
     // Setter methods

@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
+import java.time.Clock;
 import java.time.Instant;
 import java.util.*;
 import java.util.List;
@@ -23,6 +24,42 @@ import java.util.List;
  */
 public class MiscUtils {
     // Time utils
+
+    /**
+     * Gets the number of seconds from the Java epoch of 1970-01-01T00:00:00Z.<br>
+     * The epoch second count is a simple incrementing count of seconds where second 0 is
+     * 1970-01-01T00:00:00Z (i.e. Unix Epoch).
+     *
+     * @param clock Clock to use for generating the Unix timestamp.
+     * @return Double representing the number of seconds. Decimal part is the fractional second
+     * part.
+     * @implNote The fractional part cannot be fully trusted; precision may only be accurate up to
+     * 10 milliseconds (i.e. up to 0.01 s).
+     */
+    public static double getUnixTimestamp(Clock clock) {
+        // Get both the current epoch second and the nanosecond part
+        Instant now = Instant.now(clock);  // Set the provided clock
+
+        long epochSecond = now.getEpochSecond();
+        int epochNanoseconds = now.getNano();
+
+        // Combine into a single double object and return
+        return Double.parseDouble(epochSecond + "." + epochNanoseconds);
+    }
+
+    /**
+     * Gets the number of seconds from the Java epoch of 1970-01-01T00:00:00Z.<br>
+     * The epoch second count is a simple incrementing count of seconds where second 0 is
+     * 1970-01-01T00:00:00Z (i.e. Unix Epoch).
+     *
+     * @return Double representing the number of seconds. Decimal part is the fractional second
+     * part.
+     * @implNote The fractional part cannot be fully trusted; precision may only be accurate up to
+     * 10 milliseconds (i.e. up to 0.01 s).
+     */
+    public static double getUnixTimestamp() {
+        return getUnixTimestamp(Clock.systemUTC());  // Query current system UTC clock
+    }
 
     /**
      * Method that formats the given date according to the format.

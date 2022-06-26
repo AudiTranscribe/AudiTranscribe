@@ -15,6 +15,7 @@ import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
 
 import javafx.scene.media.MediaPlayer;
@@ -30,7 +31,6 @@ import java.nio.file.Paths;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Audio class that handles audio processing and audio playback.
@@ -56,7 +56,6 @@ public class Audio {
     private double[] monoAudioSamples;  // Average of stereo samples
 
     private final MediaPlayer mediaPlayer;
-    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     /**
      * Initializes an <code>Audio</code> object based on a file.
@@ -111,7 +110,7 @@ public class Audio {
             } catch (IllegalStateException e) {
                 tempMediaPlayer = null;
 
-                logger.log(Level.SEVERE, "JavaFX Toolkit not initialized. Audio playback will not work.");
+                MyLogger.log(Level.SEVERE, "JavaFX Toolkit not initialized. Audio playback will not work.", this.getClass().toString());
             }
 
             // Update attributes
@@ -661,15 +660,15 @@ public class Audio {
     public byte[] wavBytesToMP3Bytes(String ffmpegPath) throws FFmpegNotFoundException, IOException {
         // Check if we have already processed the audio
         if (rawMP3Bytes != null) {
-            logger.log(Level.FINE, "Returning previously processed MP3 bytes");
+            MyLogger.log(Level.FINE, "Returning previously processed MP3 bytes", this.getClass().toString());
             return rawMP3Bytes;
         }
 
-        logger.log(Level.FINE, "Converting WAV bytes to MP3 bytes");
+        MyLogger.log(Level.FINE, "Converting WAV bytes to MP3 bytes", this.getClass().toString());
 
         // Ensure that the temporary directory exists
         IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
-        logger.log(Level.FINE, "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH);
+        MyLogger.log(Level.FINE, "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH, this.getClass().toString());
 
         // Define a new FFmpeg handler
         FFmpegHandler FFmpegHandler = new FFmpegHandler(ffmpegPath);
@@ -693,7 +692,7 @@ public class Audio {
         IOMethods.deleteFile(outputPath);
 
         // Return the raw MP3 bytes
-        logger.log(Level.FINE, "Done converting");
+        MyLogger.log(Level.FINE, "Done converting", this.getClass().toString());
         return rawMP3Bytes;
     }
 }

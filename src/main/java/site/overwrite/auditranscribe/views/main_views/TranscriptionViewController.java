@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-25
+ * Updated on 2022-06-26
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -41,6 +41,7 @@ import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
+import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
 import site.overwrite.auditranscribe.notes.*;
@@ -67,7 +68,6 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class TranscriptionViewController implements Initializable {
     // Constants
@@ -130,7 +130,6 @@ public class TranscriptionViewController implements Initializable {
 
     private boolean isEverythingReady = false;
 
-    private final Logger logger = Logger.getLogger(this.getClass().getName());
     private ProjectsDB projectsDB;
 
     private String audtFilePath;
@@ -302,7 +301,7 @@ public class TranscriptionViewController implements Initializable {
 
         // Set methods on choice box fields
         musicKeyChoice.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            logger.log(Level.FINE, "Changed music key from " + oldValue + " to " + newValue);
+            MyLogger.log(Level.FINE, "Changed music key from " + oldValue + " to " + newValue, this.getClass().toString());
 
             // Update the `hasUnsavedChanges` flag
             hasUnsavedChanges = true;
@@ -322,7 +321,7 @@ public class TranscriptionViewController implements Initializable {
 
         timeSignatureChoice.getSelectionModel().selectedItemProperty()
                 .addListener((observable, oldValue, newValue) -> {
-                    logger.log(Level.FINE, "Changed time signature from " + oldValue + " to " + newValue);
+                    MyLogger.log(Level.FINE, "Changed time signature from " + oldValue + " to " + newValue, this.getClass().toString());
 
                     // Update the `hasUnsavedChanges` flag
                     hasUnsavedChanges = true;
@@ -365,7 +364,7 @@ public class TranscriptionViewController implements Initializable {
         playButton.setOnAction(event -> togglePlayButton());
 
         stopButton.setOnAction(event -> {
-            logger.log(Level.FINE, "Pressed stop button");
+            MyLogger.log(Level.FINE, "Pressed stop button", this.getClass().toString());
 
             // Seek to beginning of the audio
             try {
@@ -379,7 +378,7 @@ public class TranscriptionViewController implements Initializable {
         });
 
         playSkipBackButton.setOnAction(event -> {
-            logger.log(Level.FINE, "Pressed skip back button");
+            MyLogger.log(Level.FINE, "Pressed skip back button", this.getClass().toString());
 
             // Seek to the start of the audio
             try {
@@ -393,7 +392,7 @@ public class TranscriptionViewController implements Initializable {
         });
 
         playSkipForwardButton.setOnAction(event -> {
-            logger.log(Level.FINE, "Pressed skip forward button");
+            MyLogger.log(Level.FINE, "Pressed skip forward button", this.getClass().toString());
 
             // Seek to the end of the audio
             try {
@@ -462,11 +461,11 @@ public class TranscriptionViewController implements Initializable {
 
                                     // Add the note rectangle to the spectrogram pane
                                     spectrogramPaneAnchor.getChildren().add(noteRect);
-                                    logger.log(
+                                    MyLogger.log(
                                             Level.FINE,
                                             "Placed note " + estimatedNoteNum + " at " + estimatedTime +
-                                                    " seconds"
-                                    );
+                                                    " seconds",
+                                            this.getClass().toString());
 
                                     // Update the `hasUnsavedChanges` flag
                                     hasUnsavedChanges = true;
@@ -478,9 +477,9 @@ public class TranscriptionViewController implements Initializable {
                     } else {
                         // Play the note
                         try {
-                            logger.log(Level.FINE, "Playing " + UnitConversionUtils.noteNumberToNote(
+                            MyLogger.log(Level.FINE, "Playing " + UnitConversionUtils.noteNumberToNote(
                                     estimatedNoteNum, musicKey, false
-                            ));
+                            ), this.getClass().toString());
                             notePlayerSynth.playNoteForDuration(
                                     estimatedNoteNum, NOTE_PLAYING_ON_VELOCITY, NOTE_PLAYING_OFF_VELOCITY,
                                     NOTE_PLAYING_ON_DURATION, NOTE_PLAYING_OFF_DURATION
@@ -685,7 +684,7 @@ public class TranscriptionViewController implements Initializable {
             // Update CSS
             updateAudioVolumeSliderCSS();
 
-            logger.log(Level.FINE, "Changed audio volume from " + oldValue + " to " + newValue);
+            MyLogger.log(Level.FINE, "Changed audio volume from " + oldValue + " to " + newValue, this.getClass().toString());
         });
 
         notesVolumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -705,7 +704,7 @@ public class TranscriptionViewController implements Initializable {
             // Update CSS
             updateNotesVolumeSliderCSS();
 
-            logger.log(Level.FINE, "Changed notes volume from " + oldValue + " to " + newValue);
+            MyLogger.log(Level.FINE, "Changed notes volume from " + oldValue + " to " + newValue, this.getClass().toString());
         });
 
         // Update labels
@@ -720,7 +719,7 @@ public class TranscriptionViewController implements Initializable {
         NoteRectangle.defineNoteRectanglesByNoteNumberLists(MAX_NOTE_NUMBER - MIN_NOTE_NUMBER + 1);
 
         // Report that the transcription view is ready to be shown
-        logger.log(Level.INFO, "Transcription view ready to be shown");
+        MyLogger.log(Level.INFO, "Transcription view ready to be shown", this.getClass().toString());
     }
 
     /**
@@ -887,7 +886,7 @@ public class TranscriptionViewController implements Initializable {
 
         // Ensure that the temporary directory exists
         IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
-        logger.log(Level.FINE, "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH);
+        MyLogger.log(Level.FINE, "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH, this.getClass().toString());
 
         // Create an empty MP3 file in the temporary directory
         File auxiliaryMP3File = new File(IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-1.mp3"));
@@ -1126,7 +1125,7 @@ public class TranscriptionViewController implements Initializable {
         colouredProgressPane.setPrefWidth(newXPos);
         if (isEverythingReady) PlottingStuffHandler.updatePlayheadLine(playheadLine, newXPos);
 
-        logger.log(Level.FINE, "Seeked to " + seekTime + " seconds");
+        MyLogger.log(Level.FINE, "Seeked to " + seekTime + " seconds", this.getClass().toString());
     }
 
     /**
@@ -1330,10 +1329,10 @@ public class TranscriptionViewController implements Initializable {
         NoteRectangle.setIsPaused(!isPaused);
 
         // Return the toggled version of the `isPaused` flag
-        logger.log(
+        MyLogger.log(
                 Level.FINE,
-                "Toggled pause state; now is" + (!isPaused ? "paused" : "playing")
-        );
+                "Toggled pause state; now is " + (!isPaused ? "paused" : "playing"),
+                this.getClass().toString());
         return !isPaused;
     }
 
@@ -1367,9 +1366,9 @@ public class TranscriptionViewController implements Initializable {
 
         // Update the BPM value
         if (!forceUpdate) {
-            logger.log(Level.FINE, "Updated BPM value from " + bpm + " to " + newBPM);
+            MyLogger.log(Level.FINE, "Updated BPM value from " + bpm + " to " + newBPM, this.getClass().toString());
         } else {
-            logger.log(Level.FINE, "Force update BPM value to " + newBPM);
+            MyLogger.log(Level.FINE, "Force update BPM value to " + newBPM, this.getClass().toString());
         }
         bpm = newBPM;
     }
@@ -1413,9 +1412,9 @@ public class TranscriptionViewController implements Initializable {
 
         // Update the offset value
         if (!forceUpdate) {
-            logger.log(Level.FINE, "Updated offset value from " + offset + " to " + newOffset);
+            MyLogger.log(Level.FINE, "Updated offset value from " + offset + " to " + newOffset, this.getClass().toString());
         } else {
-            logger.log(Level.FINE, "Force update offset value to " + newOffset);
+            MyLogger.log(Level.FINE, "Force update offset value to " + newOffset, this.getClass().toString());
         }
         offset = newOffset;
     }
@@ -1495,10 +1494,10 @@ public class TranscriptionViewController implements Initializable {
 
                     // Check if the current time has exceeded and is not paused
                     if (currTime >= audioDuration) {
-                        logger.log(
+                        MyLogger.log(
                                 Level.FINE,
-                                "Playback reached end of audio, will start from beginning upon play"
-                        );
+                                "Playback reached end of audio, will start from beginning upon play",
+                                this.getClass().toString());
 
                         // Pause the audio
                         isPaused = togglePaused(false);
@@ -1536,9 +1535,9 @@ public class TranscriptionViewController implements Initializable {
             autosaveScheduler.scheduleAtFixedRate(() -> Platform.runLater(() -> {
                 if (audtFilePath != null) {
                     handleSavingProject(true, false);
-                    logger.log(Level.INFO, "Autosaved project");
+                    MyLogger.log(Level.INFO, "Autosaved project", this.getClass().toString());
                 } else {
-                    logger.log(Level.INFO, "Autosave skipped, no project loaded");
+                    MyLogger.log(Level.INFO, "Autosave skipped, no project loaded", this.getClass().toString());
                 }
             }), settingsFile.data.autosaveInterval, settingsFile.data.autosaveInterval, TimeUnit.MINUTES);
 
@@ -1604,7 +1603,7 @@ public class TranscriptionViewController implements Initializable {
 
             // Mark the task as completed and report that the transcription view is ready to be shown
             markTaskAsCompleted(task);
-            logger.log(Level.INFO, "Spectrogram for " + audioFileName + " ready to be shown");
+            MyLogger.log(Level.INFO, "Spectrogram for " + audioFileName + " ready to be shown", this.getClass().toString());
         });
     }
 
@@ -1629,7 +1628,7 @@ public class TranscriptionViewController implements Initializable {
 
             // Mark the task as completed
             markTaskAsCompleted(task);
-            logger.log(Level.INFO, "BPM estimation task complete");
+            MyLogger.log(Level.INFO, "BPM estimation task complete", this.getClass().toString());
         });
     }
 
@@ -1657,10 +1656,10 @@ public class TranscriptionViewController implements Initializable {
 
                 taskList.forEach(task -> task.setOnFailed(event -> {
                     // Log the error
-                    logger.log(
+                    MyLogger.log(
                             Level.SEVERE,
-                            "Task \"" + task.name + "\" failed: " + task.getException().getMessage()
-                    );
+                            "Task \"" + task.name + "\" failed: " + task.getException().getMessage(),
+                            this.getClass().toString());
                     task.getException().printStackTrace();
 
                     // Show error dialog
@@ -1679,7 +1678,7 @@ public class TranscriptionViewController implements Initializable {
 
                 // Execute all tasks
                 taskList.forEach(executor::execute);
-                logger.log(Level.INFO, "Started all transcription view tasks");
+                MyLogger.log(Level.INFO, "Started all transcription view tasks", this.getClass().toString());
 
                 // Await for all tasks' completion
                 executor.shutdown();  // Prevent new tasks from being submitted
@@ -1691,7 +1690,7 @@ public class TranscriptionViewController implements Initializable {
                     throw new RuntimeException(e);
                 }
 
-                logger.log(Level.INFO, "All tasks have finished");
+                MyLogger.log(Level.INFO, "All tasks have finished", this.getClass().toString());
                 return hasTerminated;
             }
         };
@@ -1732,11 +1731,11 @@ public class TranscriptionViewController implements Initializable {
                             // Add the note rectangle to the spectrogram pane
                             spectrogramPaneAnchor.getChildren().add(noteRect);
 
-                            logger.log(
+                            MyLogger.log(
                                     Level.FINE,
                                     "Loaded note " + noteNum + " with " + noteDuration + " seconds duration at " +
-                                            timeToPlaceRectangle + " seconds"
-                            );
+                                            timeToPlaceRectangle + " seconds",
+                                    this.getClass().toString());
                         } catch (NoteRectangleCollisionException ignored) {
                         }
                     }
@@ -1873,7 +1872,7 @@ public class TranscriptionViewController implements Initializable {
             notePlayerSequencer.play(currTime + settingsFile.data.notePlayingDelayOffset);
         }
 
-        logger.log(Level.FINE, "Toggled play button; audio is now " + (!isPaused ? "paused" : "playing"));
+        MyLogger.log(Level.FINE, "Toggled play button; audio is now " + (!isPaused ? "paused" : "playing"), this.getClass().toString());
     }
 
     /**
@@ -1899,7 +1898,7 @@ public class TranscriptionViewController implements Initializable {
         // Toggle the `scrollToPlayhead` flag
         scrollToPlayhead = !scrollToPlayhead;
 
-        logger.log(Level.FINE, "Toggled scroll (scroll is now " + scrollToPlayhead + ")");
+        MyLogger.log(Level.FINE, "Toggled scroll (scroll is now " + scrollToPlayhead + ")", this.getClass().toString());
     }
 
     /**
@@ -1927,7 +1926,7 @@ public class TranscriptionViewController implements Initializable {
         canEditNotes = !canEditNotes;
         NoteRectangle.setCanEdit(canEditNotes);
 
-        logger.log(Level.FINE, "Toggled editing notes (editing notes is now " + canEditNotes + ")");
+        MyLogger.log(Level.FINE, "Toggled editing notes (editing notes is now " + canEditNotes + ")", this.getClass().toString());
     }
 
     /**
@@ -1967,7 +1966,7 @@ public class TranscriptionViewController implements Initializable {
         // Toggle the `isAudioMuted` flag
         isAudioMuted = !isAudioMuted;
 
-        logger.log(Level.FINE, "Toggled audio mute button (audio muted is now " + isAudioMuted + ")");
+        MyLogger.log(Level.FINE, "Toggled audio mute button (audio muted is now " + isAudioMuted + ")", this.getClass().toString());
     }
 
     /**
@@ -1994,7 +1993,7 @@ public class TranscriptionViewController implements Initializable {
         // Toggle the `areNotesMuted` flag
         areNotesMuted = !areNotesMuted;
 
-        logger.log(Level.FINE, "Toggled notes mute button (notes muted is now " + areNotesMuted + ")");
+        MyLogger.log(Level.FINE, "Toggled notes mute button (notes muted is now " + areNotesMuted + ")", this.getClass().toString());
     }
 
     /**
@@ -2128,7 +2127,7 @@ public class TranscriptionViewController implements Initializable {
             keyEvent.consume();
             notePlayerSynth.silenceChannel();  // Stop any notes from playing
             if (octaveNum > 0) {
-                logger.log(Level.FINE, "Playback octave raised to " + octaveNum);
+                MyLogger.log(Level.FINE, "Playback octave raised to " + octaveNum, this.getClass().toString());
                 PlottingStuffHandler.updateCurrentOctaveRectangle(
                         currentOctaveRectangle, finalHeight, --octaveNum, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER
                 );
@@ -2138,7 +2137,7 @@ public class TranscriptionViewController implements Initializable {
             keyEvent.consume();
             notePlayerSynth.silenceChannel();  // Stop any notes from playing
             if (octaveNum < 9) {
-                logger.log(Level.FINE, "Playback octave lowered to " + octaveNum);
+                MyLogger.log(Level.FINE, "Playback octave lowered to " + octaveNum, this.getClass().toString());
                 PlottingStuffHandler.updateCurrentOctaveRectangle(
                         currentOctaveRectangle, finalHeight, ++octaveNum, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER
                 );
@@ -2246,7 +2245,7 @@ public class TranscriptionViewController implements Initializable {
         }
 
         // Package data for saving
-        logger.log(Level.INFO, "Packaging data for saving");
+        MyLogger.log(Level.INFO, "Packaging data for saving", this.getClass().toString());
         QTransformDataObject qTransformData = new QTransformDataObject(
                 qTransformBytes, minQTransformMagnitude, maxQTransformMagnitude
         );
@@ -2289,7 +2288,7 @@ public class TranscriptionViewController implements Initializable {
         // Set the `hasUnsavedChanges` flag to false
         hasUnsavedChanges = false;
 
-        logger.log(Level.INFO, "File saved");
+        MyLogger.log(Level.INFO, "File saved", this.getClass().toString());
     }
 
     /**
@@ -2303,7 +2302,7 @@ public class TranscriptionViewController implements Initializable {
 
         // Check if there already exist a place to save
         if (audtFilePath == null || forceChooseFile) {
-            logger.log(Level.FINE, "AUDT file destination not yet set; asking now");
+            MyLogger.log(Level.FINE, "AUDT file destination not yet set; asking now", this.getClass().toString());
 
             // Get current window
             Window window = rootPane.getScene().getWindow();
@@ -2328,13 +2327,13 @@ public class TranscriptionViewController implements Initializable {
                 audtFileName = saveName;
             }
 
-            logger.log(Level.FINE, "AUDT file destination set to " + saveDest);
+            MyLogger.log(Level.FINE, "AUDT file destination set to " + saveDest, this.getClass().toString());
         } else {
             // Use the existing file path and file name
             saveDest = audtFilePath;
             saveName = audtFileName;
 
-            logger.log(Level.FINE, "Saving " + saveName + " to " + saveDest);
+            MyLogger.log(Level.FINE, "Saving " + saveName + " to " + saveDest, this.getClass().toString());
         }
 
         // Return the needed data

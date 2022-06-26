@@ -2,7 +2,7 @@
  * NoteRectangle.java
  *
  * Created on 2022-06-07
- * Updated on 2022-06-23
+ * Updated on 2022-06-26
  *
  * Description: A `StackPane` object that is used to denote a note in the transcription view.
  */
@@ -24,12 +24,12 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import org.javatuples.Pair;
 import site.overwrite.auditranscribe.exceptions.notes.NoteRectangleCollisionException;
+import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class NoteRectangle extends StackPane {
     // Constants
@@ -63,8 +63,6 @@ public class NoteRectangle extends StackPane {
     private final double rectangleHeight;  // The rectangle's height is fixed
 
     private final Region bordersRegion;  // Region that shows the borders of the note rectangle
-
-    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     // Helper attributes
     // (Note: "initial" refers to initial value before *resizing*, not when the object is created)
@@ -138,7 +136,7 @@ public class NoteRectangle extends StackPane {
 
         // Check for collision
         if (checkCollision(xCoord, initialRectangleWidth, noteNum, false)) {
-            logger.log(Level.FINE, "Note rectangle collision detected; not placing note");
+            MyLogger.log(Level.FINE, "Note rectangle collision detected; not placing note", this.getClass().toString());
             throw new NoteRectangleCollisionException("Note rectangle collision detected; not placing note");
         }
 
@@ -284,10 +282,10 @@ public class NoteRectangle extends StackPane {
                 isEditing = false;
             }
 
-            logger.log(
+            MyLogger.log(
                     Level.FINE,
-                    "Moved rectangle to " + getNoteOnsetTime() + " seconds with note number " + this.noteNum
-            );
+                    "Moved rectangle to " + getNoteOnsetTime() + " seconds with note number " + this.noteNum,
+                    this.getClass().toString());
         });
 
         // Set mouse events for the resizing regions

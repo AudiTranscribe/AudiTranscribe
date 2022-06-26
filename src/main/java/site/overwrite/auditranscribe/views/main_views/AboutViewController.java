@@ -2,7 +2,7 @@
  * AboutViewController.java
  *
  * Created on 2022-05-08
- * Updated on 2022-06-22
+ * Updated on 2022-06-25
  *
  * Description: View controller for the "about" window.
  */
@@ -23,6 +23,7 @@ import javafx.stage.StageStyle;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.PropertyFile;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
+import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.utils.MiscUtils;
 
@@ -30,11 +31,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class AboutViewController implements Initializable {
     // Attributes
-    private final Logger logger = Logger.getLogger(this.getClass().getName());
     private SettingsFile settingsFile;
 
     // FXML Elements
@@ -69,7 +68,7 @@ public class AboutViewController implements Initializable {
             );
 
             // Report that the "about" view is ready to be shown
-            logger.log(Level.INFO, "About view ready to be shown");
+            MyLogger.log(Level.INFO, "About view ready to be shown", this.getClass().toString());
 
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -2,7 +2,7 @@
  * NotePlayerSequencer.java
  *
  * Created on 2022-06-09
- * Updated on 2022-06-23
+ * Updated on 2022-06-26
  *
  * Description: Class that handles the playing of notes as a MIDI sequence.
  */
@@ -13,12 +13,12 @@ import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import site.overwrite.auditranscribe.exceptions.generic.LengthException;
 import site.overwrite.auditranscribe.exceptions.generic.ValueException;
+import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 import javax.sound.midi.*;
 import java.util.*;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Class that handles the playing of notes as a MIDI sequence.
@@ -41,8 +41,6 @@ public class NotePlayerSequencer {
 
     private final Map<Triplet<Double, Double, Integer>, Pair<MidiEvent, MidiEvent>> allMIDIEventPairs = new HashMap<>();
     public boolean areNotesSet = false;
-
-    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     /**
      * Initialization method for a multi-note player object.<br>
@@ -104,10 +102,10 @@ public class NotePlayerSequencer {
      */
     public void setCurrTime(double currTime) {
         sequencer.setMicrosecondPosition((long) (currTime * 1e6));
-        logger.log(
+        MyLogger.log(
                 Level.FINE,
-                "Set note sequencer current time to " + sequencer.getMicrosecondPosition() + " µs"
-        );
+                "Set note sequencer current time to " + sequencer.getMicrosecondPosition() + " µs",
+                this.getClass().toString());
     }
 
     // Public methods
@@ -146,7 +144,7 @@ public class NotePlayerSequencer {
 
         // Update the `areNotesSet` flag
         areNotesSet = true;
-        logger.log(Level.FINE, "Notes set on track");
+        MyLogger.log(Level.FINE, "Notes set on track", this.getClass().toString());
     }
 
     /**
@@ -160,7 +158,7 @@ public class NotePlayerSequencer {
         }
         sequence.deleteTrack(track);
         track = sequence.createTrack();
-        logger.log(Level.FINE, "Notes cleared from track");
+        MyLogger.log(Level.FINE, "Notes cleared from track", this.getClass().toString());
     }
 
     /**
@@ -200,7 +198,7 @@ public class NotePlayerSequencer {
     public void play(double currTime) {
         // Check if there is a sequencer to use in the first place
         if (sequencer == null) {
-            logger.log(Level.INFO, "No sequencer to use, so not playing");
+            MyLogger.log(Level.INFO, "No sequencer to use, so not playing", this.getClass().toString());
             return;
         }
 
@@ -222,7 +220,7 @@ public class NotePlayerSequencer {
 
         // Start playback
         sequencer.start();
-        logger.log(Level.FINE, "Note sequencer playback started");
+        MyLogger.log(Level.FINE, "Note sequencer playback started", this.getClass().toString());
     }
 
     /**
@@ -231,16 +229,16 @@ public class NotePlayerSequencer {
     public void stop() {
         // Check if there is a sequencer to use in the first place
         if (sequencer == null) {
-            logger.log(Level.INFO, "No sequencer to use, so not stopping");
+            MyLogger.log(Level.INFO, "No sequencer to use, so not stopping", this.getClass().toString());
             return;
         }
 
         // Attempt to stop the sequencer
         try {
             sequencer.stop();
-            logger.log(Level.FINE, "Note sequencer playback stopped");
+            MyLogger.log(Level.FINE, "Note sequencer playback stopped", this.getClass().toString());
         } catch (IllegalStateException e) {
-            logger.log(Level.FINE, "Note sequencer playback is not running, not stopping");
+            MyLogger.log(Level.FINE, "Note sequencer playback is not running, not stopping", this.getClass().toString());
         }
     }
 
@@ -250,7 +248,7 @@ public class NotePlayerSequencer {
     public void close() {
         // Check if there is a sequencer to use in the first place
         if (sequencer == null) {
-            logger.log(Level.INFO, "No sequencer to use, so not closing");
+            MyLogger.log(Level.INFO, "No sequencer to use, so not closing", this.getClass().toString());
             return;
         }
 
@@ -259,7 +257,7 @@ public class NotePlayerSequencer {
 
         // Then close sequencer
         sequencer.close();
-        logger.log(Level.FINE, "Note sequencer playback closed");
+        MyLogger.log(Level.FINE, "Note sequencer playback closed", this.getClass().toString());
     }
 
     // Private methods

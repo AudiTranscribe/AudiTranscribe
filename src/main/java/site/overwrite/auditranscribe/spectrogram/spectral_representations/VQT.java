@@ -2,7 +2,7 @@
  * VQT.java
  *
  * Created on 2022-03-11
- * Updated on 2022-06-23
+ * Updated on 2022-06-25
  *
  * Description: Class that implements the Variable Q-Transform (VQT) algorithm.
  */
@@ -17,6 +17,7 @@ import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.Filter;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.exceptions.generic.ValueException;
+import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.spectrogram.Wavelet;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
 import site.overwrite.auditranscribe.misc.Complex;
@@ -26,7 +27,6 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Class that implements the Variable Q-Transform (VQT) algorithm.
@@ -41,9 +41,6 @@ import java.util.logging.Logger;
 public class VQT {
     // Constants
     static final double BW_FASTEST = 0.85;
-
-    // Attributes
-    static final Logger logger = Logger.getLogger(VQT.class.getName());
 
     // Public methods
 
@@ -274,7 +271,11 @@ public class VQT {
         }
 
         // Return VQT matrix
-        logger.log(Level.FINE, "VQT Matrix generated; has shape (" + V.length + ", " + V[0].length + ")");
+        MyLogger.log(
+                Level.FINE,
+                "VQT Matrix generated; has shape (" + V.length + ", " + V[0].length + ")",
+                VQT.class.toString()
+        );
         return V;
     }
 

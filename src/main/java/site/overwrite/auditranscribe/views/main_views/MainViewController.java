@@ -2,7 +2,7 @@
  * MainViewController.java
  *
  * Created on 2022-02-09
- * Updated on 2022-06-25
+ * Updated on 2022-06-26
  *
  * Description: Contains the main view's controller class.
  */
@@ -34,6 +34,7 @@ import site.overwrite.auditranscribe.io.PropertyFile;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.io.json_files.data_encapsulators.SettingsData;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
+import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.utils.MiscUtils;
 import site.overwrite.auditranscribe.views.helpers.Popups;
@@ -51,7 +52,6 @@ import java.nio.file.attribute.FileTime;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 // Main class
 public class MainViewController implements Initializable {
@@ -61,7 +61,6 @@ public class MainViewController implements Initializable {
     private FilteredList<Quartet<Long, String, String, String>> filteredList;  // List of project records
 
     private SettingsFile settingsFile;
-    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     private SceneSwitchingState sceneSwitchingState = SceneSwitchingState.CLOSE_SCENE;
     private File selectedFile = null;
@@ -165,7 +164,7 @@ public class MainViewController implements Initializable {
         aboutMenuItem.setOnAction(actionEvent -> AboutViewController.showAboutWindow(settingsFile));
 
         // Report that the main view is ready to be shown
-        logger.log(Level.INFO, "Main view ready to be shown");
+        MyLogger.log(Level.INFO, "Main view ready to be shown", this.getClass().toString());
     }
 
     // Getter/Setter methods
@@ -268,7 +267,7 @@ public class MainViewController implements Initializable {
                     )
             );
         } else {
-            logger.log(Level.INFO, "No projects found");
+            MyLogger.log(Level.INFO, "No projects found", this.getClass().toString());
             projectsListView.opacityProperty().set(0);
         }
     }
@@ -337,7 +336,6 @@ public class MainViewController implements Initializable {
         // Attributes
         ProjectsDB db;
         ListView<?> projectsListView;
-        private final Logger logger = Logger.getLogger(this.getClass().getName());
 
         // FXML elements
         HBox content;
@@ -420,10 +418,10 @@ public class MainViewController implements Initializable {
                     throw new RuntimeException(e);
                 }
 
-                logger.log(
+                MyLogger.log(
                         Level.INFO,
-                        "Removed " + nameLabel.getText() + " with primary key " + pk + " from projects' database"
-                );
+                        "Removed " + nameLabel.getText() + " with primary key " + pk + " from projects' database",
+                        this.getClass().toString());
 
                 // Remove this list item from the list view
                 SortedList<?> sortedList = (SortedList<?>) getListView().getItems();

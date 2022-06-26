@@ -2,7 +2,7 @@
  * Spectrogram.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-23
+ * Updated on 2022-06-26
  *
  * Description: Class that handles the creation of the spectrogram image.
  */
@@ -14,6 +14,7 @@ import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.exceptions.generic.ValueException;
+import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.plotting.Plotter;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.CQT;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.FrequencyBins;
@@ -22,7 +23,6 @@ import site.overwrite.auditranscribe.misc.Complex;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Class that handles the creation of the spectrogram image.
@@ -55,8 +55,6 @@ public class Spectrogram {
     final int hopLength;
 
     public double[] frequencyBins;
-
-    final Logger logger = Logger.getLogger(this.getClass().getName());
 
     final CustomTask<?> task;
 
@@ -103,13 +101,13 @@ public class Spectrogram {
 
         this.task = task;
 
-        logger.log(Level.FINE, "Audio sample rate is " + sampleRate);
+        MyLogger.log(Level.FINE, "Audio sample rate is " + sampleRate, this.getClass().toString());
 
         // Set the width and height of the image
         width = (int) (audioObj.getDuration() * numPxPerSecond);
         height = (int) (numOctaves * numPxPerOctave);
 
-        logger.log(Level.FINE, "Spectrogram width is " + width + " and height is " + height);
+        MyLogger.log(Level.FINE, "Spectrogram width is " + width + " and height is " + height, this.getClass().toString());
 
         // Get the mono samples
         samples = audioObj.getMonoSamples();
@@ -165,17 +163,17 @@ public class Spectrogram {
 
         this.task = task;
 
-        logger.log(Level.FINE, "Audio sample rate is " + sampleRate);
+        MyLogger.log(Level.FINE, "Audio sample rate is " + sampleRate, this.getClass().toString());
 
         // Set the width and height of the image
         width = (int) (duration * numPxPerSecond);
         height = (int) (numOctaves * numPxPerOctave);
 
-        logger.log(Level.FINE, "Spectrogram width is " + width + " and height is " + height);
+        MyLogger.log(Level.FINE, "Spectrogram width is " + width + " and height is " + height, this.getClass().toString());
 
         // We don't need samples in this case
         samples = null;
-        logger.log(Level.FINE, "Spectrogram creation occurring WITHOUT audio file; samples not available");
+        MyLogger.log(Level.FINE, "Spectrogram creation occurring WITHOUT audio file; samples not available", this.getClass().toString());
 
         // Get the frequency bins
         frequencyBins = FrequencyBins.getQTFreqBins(numFreqBins, binsPerOctave, minFreq);
@@ -193,7 +191,7 @@ public class Spectrogram {
      */
     public double[][] getSpectrogramMagnitudes(WindowFunction windowFunction) throws NullPointerException {
         // Perform the spectrogram transform on the samples
-        logger.log(Level.FINE, "Starting spectral matrix generation");
+        MyLogger.log(Level.FINE, "Starting spectral matrix generation", this.getClass().toString());
 
         Complex[][] QTMatrix;
         if (IS_CQT) {
@@ -231,7 +229,7 @@ public class Spectrogram {
         }
 
         // Compute the magnitudes and return
-        logger.log(Level.FINE, "Calculating magnitudes");
+        MyLogger.log(Level.FINE, "Calculating magnitudes", this.getClass().toString());
         return calculateMagnitudes(QTMatrixFinal);
     }
 
@@ -244,12 +242,12 @@ public class Spectrogram {
      */
     public WritableImage generateSpectrogram(double[][] magnitudes, ColourScale colourScale) {
         // Plot spectrogram data
-        logger.log(Level.FINE, "Plotting data");
+        MyLogger.log(Level.FINE, "Plotting data", this.getClass().toString());
         Plotter plotter = new Plotter(colourScale, INTENSITY_PRECISION);
         plotter.plot(magnitudes, width, height);
 
         // Return the writable image
-        logger.log(Level.FINE, "Returning image");
+        MyLogger.log(Level.FINE, "Returning image", this.getClass().toString());
         return plotter.getImage();
     }
 

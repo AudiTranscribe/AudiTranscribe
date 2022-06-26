@@ -2,7 +2,7 @@
  * Plotter.java
  *
  * Created on 2022-02-18
- * Updated on 2022-06-23
+ * Updated on 2022-06-26
  *
  * Description: Class that contains plotting functions.
  */
@@ -11,6 +11,7 @@ package site.overwrite.auditranscribe.plotting;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.WritableImage;
+import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
 import site.overwrite.auditranscribe.utils.MathUtils;
@@ -18,7 +19,6 @@ import site.overwrite.auditranscribe.utils.MathUtils;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Class that contains plotting functions.<br>
@@ -36,8 +36,6 @@ public class Plotter {
     private int[] colourMap;
 
     private BufferedImage bufferedImage;
-
-    private final Logger logger = Logger.getLogger(this.getClass().getName());
 
     // Constructor
 
@@ -58,7 +56,7 @@ public class Plotter {
 
         // Generate the colourmap
         generateColourMap();
-        logger.log(Level.FINE, "Colourmap generated");
+        MyLogger.log(Level.FINE, "Colourmap generated", this.getClass().toString());
     }
 
     // Getter/setter methods
@@ -88,11 +86,11 @@ public class Plotter {
     public void plot(double[][] spectrogramMagnitudes, int imgWidth, int imgHeight) {
         // Define the image that will show the spectrogram
         bufferedImage = new BufferedImage(imgWidth, imgHeight, BufferedImage.TYPE_INT_RGB);
-        logger.log(Level.FINE, "Defined buffer image");
+        MyLogger.log(Level.FINE, "Defined buffer image", this.getClass().toString());
 
         // Get the pixels of the spectrogram image
         int[] pixels = ((DataBufferInt) bufferedImage.getRaster().getDataBuffer()).getData();
-        logger.log(Level.FINE, "Got pixels of buffer image");
+        MyLogger.log(Level.FINE, "Got pixels of buffer image", this.getClass().toString());
 
         // Generate the values of each packet on the image
         /*
@@ -102,12 +100,12 @@ public class Plotter {
          *   representing the relative 'intensity' that should be shown on the pixel.
          */
         double[][] packets = Interpolation.interpolate(spectrogramMagnitudes, imgHeight, imgWidth, interpolationMethod);
-        logger.log(Level.FINE, "Interpolated spectrogram magnitudes");
+        MyLogger.log(Level.FINE, "Interpolated spectrogram magnitudes", this.getClass().toString());
 
         // Transpose packets
         // (Make dimensions (width, height) instead of (height, width) for easier indexing)
         packets = ArrayUtils.transpose(packets);
-        logger.log(Level.FINE, "Image packets generated");
+        MyLogger.log(Level.FINE, "Image packets generated", this.getClass().toString());
 
         // Get min and max of packet values
         double minPacketVal = Double.MAX_VALUE;
@@ -119,7 +117,7 @@ public class Plotter {
                 if (maxPacketVal < packet) maxPacketVal = packet;
             }
         }
-        logger.log(Level.FINE, "Got min and max packet values");
+        MyLogger.log(Level.FINE, "Got min and max packet values", this.getClass().toString());
 
         // Normalise packet values
         for (int w = 0; w < imgWidth; w++) {
@@ -127,7 +125,7 @@ public class Plotter {
                 packets[w][h] = MathUtils.normalize(packets[w][h], minPacketVal, maxPacketVal);
             }
         }
-        logger.log(Level.FINE, "Image packets normalised");
+        MyLogger.log(Level.FINE, "Image packets normalised", this.getClass().toString());
 
         // Finally, modify the image according to the packet specifications
         for (int h = 0; h < imgHeight; h++) {
@@ -139,7 +137,7 @@ public class Plotter {
                 pixels[h * imgWidth + w] = colourMap[numDifferentColours - intensity - 1];  // Reverse intensity order
             }
         }
-        logger.log(Level.FINE, "Image pixels set");
+        MyLogger.log(Level.FINE, "Image pixels set", this.getClass().toString());
     }
 
     // Private methods

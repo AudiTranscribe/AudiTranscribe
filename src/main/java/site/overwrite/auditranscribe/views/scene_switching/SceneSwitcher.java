@@ -2,7 +2,7 @@
  * SceneSwitcher.java
  *
  * Created on 2022-06-22
- * Updated on 2022-06-24
+ * Updated on 2022-06-26
  *
  * Description: Class that handles the switching between the main scene and transcription scenes.
  */
@@ -30,6 +30,7 @@ import site.overwrite.auditranscribe.io.audt_file.AUDTFileReader;
 import site.overwrite.auditranscribe.io.audt_file.ProjectData;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
+import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.views.helpers.Popups;
 import site.overwrite.auditranscribe.views.main_views.MainViewController;
 import site.overwrite.auditranscribe.views.main_views.TranscriptionViewController;
@@ -39,7 +40,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Class that handles the switching between the main scene and transcription scenes.
@@ -54,8 +54,6 @@ public class SceneSwitcher {
     private Pair<SceneSwitchingState, File> returnedPair = null;
     private SceneSwitchingState state = SceneSwitchingState.SHOW_MAIN_SCENE;
     private File selectedFile = null;
-
-    private static final Logger logger = Logger.getLogger(SceneSwitcher.class.getName());
 
     /**
      * Initialization method for a <code>SceneSwitcher</code> object.
@@ -183,7 +181,7 @@ public class SceneSwitcher {
 
             // Attempt creation of temporary folder if it doesn't exist
             IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
-            logger.log(Level.FINE, "Temporary folder: " + IOConstants.TEMP_FOLDER_PATH);
+            MyLogger.log(Level.FINE, "Temporary folder: " + IOConstants.TEMP_FOLDER_PATH, this.getClass().toString());
 
             // Get the base path for the auxiliary files
             String baseName = IOMethods.joinPaths(
@@ -204,11 +202,11 @@ public class SceneSwitcher {
             // Delete auxiliary WAV file
             boolean successfullyDeleted = IOMethods.deleteFile(auxiliaryWAVFile.getAbsolutePath());
             if (successfullyDeleted) {
-                logger.log(Level.FINE, "Successfully deleted auxiliary WAV file.");
+                MyLogger.log(Level.FINE, "Successfully deleted auxiliary WAV file.", this.getClass().toString());
             } else {
-                logger.log(
-                        Level.WARNING, "Failed to delete auxiliary WAV file now; will attempt delete after exit."
-                );
+                MyLogger.log(
+                        Level.WARNING, "Failed to delete auxiliary WAV file now; will attempt delete after exit.",
+                        this.getClass().toString());
             }
 
             // Get the current scene and the spectrogram view controller
