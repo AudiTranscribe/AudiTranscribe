@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -152,6 +151,31 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.8</version>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            site/overwrite/auditranscribe/exceptions/**
+                        </exclude>
+                        <exclude>
+                            site/overwrite/auditranscribe/misc/spinners/*.java
+                        </exclude>
+                        <exclude>
+                            site/overwrite/auditranscribe/misc/spinners/CustomTask.java
+                        </exclude>
+                        <exclude>
+                            site/overwrite/auditranscribe/misc/spinners/MouseHandler.java
+                        </exclude>
+                        <exclude>
+                            site/overwrite/auditranscribe/plotting/Plot*.java
+                        </exclude>
+                        <exclude>
+                            site/overwrite/auditranscribe/spectrogram/Spectrogram.java
+                        </exclude>
+                        <exclude>
+                            site/overwrite/auditranscribe/views/**
+                        </exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
