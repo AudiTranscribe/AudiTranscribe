@@ -2,7 +2,7 @@
  * IOMethods.java
  *
  * Created on 2022-03-15
- * Updated on 2022-06-26
+ * Updated on 2022-06-27
  *
  * Description: Input/Output methods that are used in the AudiTranscribe project.
  */
@@ -127,16 +127,6 @@ public class IOMethods {
         } catch (IOException e) {
             return false;
         }
-    }
-
-    /**
-     * Method that creates the AudiTranscribe app data folder, if it doesn't already exist.
-     *
-     * @return A boolean. Returns <code>true</code> if the application data folder was created
-     * successfully, and <code>false</code> otherwise.
-     */
-    public static boolean createAppDataFolder() {
-        return createFolder(IOConstants.APP_DATA_FOLDER_PATH);
     }
 
     // File location handling

@@ -128,19 +128,6 @@ class IOMethodsTest {
         ));
     }
 
-    @Test
-    @Order(4)
-    void createAppDataFolder() {
-        // Check if the application data folder already exists
-        if (!IOMethods.isFileAt(IOConstants.APP_DATA_FOLDER_PATH)) {
-            // Create the application data folder
-            assertTrue(IOMethods.createAppDataFolder());
-        }
-
-        // Check if the second attempt at creating the folder will return `false`
-        assertFalse(IOMethods.createAppDataFolder());
-    }
-
     // Path handling
     @Test
     void buildPath() {

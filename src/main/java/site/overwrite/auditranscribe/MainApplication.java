@@ -2,7 +2,7 @@
  * MainApplication.java
  *
  * Created on 2022-02-09
- * Updated on 2022-06-23
+ * Updated on 2022-06-27
  *
  * Description: Contains the main application class.
  */
@@ -11,6 +11,7 @@ package site.overwrite.auditranscribe;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.views.setup_wizard.SetupWizardHelper;
@@ -23,7 +24,7 @@ public class MainApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         // Ensure that an application folder exists
-        IOMethods.createAppDataFolder();
+        IOMethods.createFolder(IOConstants.APP_DATA_FOLDER_PATH);
 
         // Update the settings file attribute
         SettingsFile settingsFile = new SettingsFile();
