@@ -228,7 +228,13 @@ public class IOMethods {
      * @return The split paths.
      */
     public static String[] splitPaths(String paths) {
-        return paths.split(IOConstants.SEPARATOR);
+        // Check if the separator contains backslash
+        // (Most relevant to Windows)
+        String separator = IOConstants.SEPARATOR;
+        if (separator.contains("\\")) separator = separator.replace("\\", "\\\\");
+        
+        // Then actually split by separator
+        return paths.split(separator);
     }
 
     /**
