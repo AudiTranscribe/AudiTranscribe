@@ -2,7 +2,7 @@
  * IOMethods.java
  *
  * Created on 2022-03-15
- * Updated on 2022-06-25
+ * Updated on 2022-06-26
  *
  * Description: Input/Output methods that are used in the AudiTranscribe project.
  */
@@ -14,7 +14,6 @@ import site.overwrite.auditranscribe.MainApplication;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
@@ -47,24 +46,17 @@ public class IOMethods {
      * Gets the absolute path of a file.
      *
      * @param filePath Path to the file, with respect to the <b>root resource path</b>.
-     * @param shouldTreatPath   Whether this method should treat the path.
-     * @return A string representing the absolute path to the file.
-     */
-    public static String getAbsoluteFilePath(String filePath, boolean shouldTreatPath) {
-        String path = getFileURL(filePath).getPath();
-        if (shouldTreatPath) path = treatPath(path);
-        return path;
-    }
-
-    /**
-     * Gets the absolute path of a file.<br>
-     * This method will automatically treat the file path.
-     *
-     * @param filePath Path to the file, with respect to the <b>root resource path</b>.
      * @return A string representing the absolute path to the file.
      */
     public static String getAbsoluteFilePath(String filePath) {
-        return getAbsoluteFilePath(filePath, true);
+        // Get the raw path to the file
+        String path = getFileURL(filePath).getPath();
+
+        // Handle the treatment of the path
+        path = treatPath(path);
+
+        // Return path
+        return path;
     }
 
     // IO Handling
@@ -111,7 +103,7 @@ public class IOMethods {
      * @return Boolean. Is <code>true</code> is the file was deleted and <code>false</code>
      * otherwise.
      */
-    public static boolean deleteFile(String absolutePath) throws IOException {
+    public static boolean deleteFile(String absolutePath) {
         try {
             return Files.deleteIfExists(Paths.get(absolutePath));
         } catch (IOException e) {
@@ -125,31 +117,62 @@ public class IOMethods {
      * <code>absolutePath</code>.
      *
      * @param absolutePath Absolute path to the folder.
+     * @return A boolean. Returns <code>true</code> if folder was created successfully, and
+     * <code>false</code> otherwise.
      */
-    public static void createFolder(Path absolutePath) {
+    public static boolean createFolder(String absolutePath) {
         try {
-            // Try to create the folder
-            Files.createDirectory(absolutePath);
-
-        } catch (IOException ignored) {
+            Files.createDirectory(Paths.get(absolutePath));
+            return true;
+        } catch (IOException e) {
+            return false;
         }
     }
 
     /**
-     * Method that creates a folder, if it does not already exist, at the specified
-     * <code>absolutePath</code>.
+     * Method that creates the AudiTranscribe app data folder, if it doesn't already exist.
      *
-     * @param absolutePath Absolute path to the folder.
+     * @return A boolean. Returns <code>true</code> if the application data folder was created
+     * successfully, and <code>false</code> otherwise.
      */
-    public static void createFolder(String absolutePath) {
-        createFolder(Paths.get(absolutePath));
+    public static boolean createAppDataFolder() {
+        return createFolder(IOConstants.APP_DATA_FOLDER_PATH);
+    }
+
+    // File location handling
+
+    /**
+     * Method that checks if a file is present at the specified path.
+     *
+     * @param absolutePath Path to check if a file exists at.
+     * @return Boolean. Returns <code>true</code> if the file exists at the specified path, an
+     * <code>false</code> otherwise.
+     */
+    public static boolean isFileAt(String absolutePath) {
+        return (new File(absolutePath)).exists();
     }
 
     /**
-     * Method that creates the AudiTranscribe app data folder, if it doesn't already exist.
+     * Method that moves the file to a new location.
+     *
+     * @param originalAbsolutePath Original path.
+     * @param newAbsolutePath      New path.
+     * @throws IOException If movement of the file fails.
      */
-    public static void createAppDataFolder() {
-        createFolder(Paths.get(IOConstants.APP_DATA_FOLDER_PATH));
+    public static void moveFile(String originalAbsolutePath, String newAbsolutePath) throws IOException {
+        // Check if the file exists first
+        File origFile = new File(originalAbsolutePath);
+
+        if (!origFile.exists()) {
+            throw new IOException("A file does not exist at '" + originalAbsolutePath + "'.");
+        }
+
+        // Rename file to the new absolute path
+        boolean success = origFile.renameTo(new File(newAbsolutePath));
+
+        if (!success) {
+            throw new IOException("Movement to the new location '" + newAbsolutePath + "' failed.");
+        }
     }
 
     // Path handling
@@ -171,7 +194,7 @@ public class IOMethods {
             if (lastElem == null) {  // Handle the first element
                 buffer.append(elem);
             } else if (lastElem.endsWith(IOConstants.SEPARATOR)) {  // Check if the last path ends with the separator
-                buffer.append(elem.startsWith(IOConstants.SEPARATOR) ? elem.substring(1) : elem);
+                buffer.append(elem.startsWith(IOConstants.SEPARATOR) ? elem.substring(IOConstants.SEPARATOR.length()) : elem);
             } else {
                 if (!elem.startsWith(IOConstants.SEPARATOR)) {
                     buffer.append(IOConstants.SEPARATOR);  // Append the separator first...
