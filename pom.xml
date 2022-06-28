@@ -145,22 +145,40 @@
                 <configuration>
                     <excludes>
                         <exclude>
+                            site/overwrite/auditranscribe/Launcher.class
+                        </exclude>
+                        <exclude>
+                            site/overwrite/auditranscribe/MainApplication.class
+                        </exclude>
+                        <exclude>
                             site/overwrite/auditranscribe/exceptions/**
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/misc/spinners/*.java
+                            site/overwrite/auditranscribe/io/db/ProjectsDB.class
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/misc/spinners/CustomTask.java
+                            site/overwrite/auditranscribe/io/json_files/**
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/misc/spinners/MouseHandler.java
+                            site/overwrite/auditranscribe/misc/spinners/**
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/plotting/Plot*.java
+                            site/overwrite/auditranscribe/misc/spinners/CustomTask.class
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/spectrogram/Spectrogram.java
+                            site/overwrite/auditranscribe/misc/spinners/MouseHandler.class
+                        </exclude>
+                        <exclude>
+                            site/overwrite/auditranscribe/plotting/Plotter.class
+                        </exclude>
+                        <exclude>
+                            site/overwrite/auditranscribe/plotting/PlottingStuffHandler.class
+                        </exclude>
+                        <exclude>
+                            site/overwrite/auditranscribe/spectrogram/ColourScale.class
+                        </exclude>
+                        <exclude>
+                            site/overwrite/auditranscribe/spectrogram/Spectrogram.class
                         </exclude>
                         <exclude>
                             site/overwrite/auditranscribe/views/**
