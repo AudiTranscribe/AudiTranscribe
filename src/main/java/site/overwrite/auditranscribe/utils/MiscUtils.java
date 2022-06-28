@@ -9,10 +9,6 @@
 
 package site.overwrite.auditranscribe.utils;
 
-import java.awt.*;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.time.Clock;
 import java.time.Instant;
@@ -189,24 +185,5 @@ public final class MiscUtils {
 
         // Return the shortened name
         return shortNameBuff.toString();
-    }
-
-    // Hyperlink utils
-
-    /**
-     * Method that opens the desired URL in the browser.
-     *
-     * @param url URL to open in the browser.
-     */
-    public static void openURLInBrowser(String url) {
-        // Get the desktop instance
-        Desktop desktop = Desktop.getDesktop();
-
-        // Try and browse to the URL
-        try {
-            desktop.browse(new URI(url));
-        } catch (IOException | URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

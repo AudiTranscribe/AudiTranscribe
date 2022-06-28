@@ -181,6 +181,9 @@
                             site/overwrite/auditranscribe/spectrogram/Spectrogram.class
                         </exclude>
                         <exclude>
+                            site/overwrite/auditranscribe/utils/GUIUtils.class
+                        </exclude>
+                        <exclude>
                             site/overwrite/auditranscribe/views/**
                         </exclude>
                     </excludes>

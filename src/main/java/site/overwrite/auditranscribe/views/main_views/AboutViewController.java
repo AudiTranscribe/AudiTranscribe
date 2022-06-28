@@ -2,7 +2,7 @@
  * AboutViewController.java
  *
  * Created on 2022-05-08
- * Updated on 2022-06-26
+ * Updated on 2022-06-28
  *
  * Description: View controller for the "about" window.
  */
@@ -25,7 +25,7 @@ import site.overwrite.auditranscribe.io.PropertyFile;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
-import site.overwrite.auditranscribe.utils.MiscUtils;
+import site.overwrite.auditranscribe.utils.GUIUtils;
 
 import java.io.IOException;
 import java.net.URL;
@@ -61,10 +61,10 @@ public class AboutViewController implements Initializable {
 
             // Set hyperlink methods
             websiteHyperlink.setOnAction(actionEvent ->
-                    MiscUtils.openURLInBrowser("https://auditranscribe.app")
+                    GUIUtils.openURLInBrowser("https://auditranscribe.app")
             );
             licencesHyperlink.setOnAction(actionEvent ->
-                    MiscUtils.openURLInBrowser("https://auditranscribe.app/licences")
+                    GUIUtils.openURLInBrowser("https://auditranscribe.app/licences")
             );
 
             // Report that the "about" view is ready to be shown
