@@ -13,7 +13,6 @@ Here's a list of all the dependencies that need updating, with any issues that y
 |:------------------------|:------------------------------|:------------------------------------------------|
 | Apache Commons Compress | `org.apache.commons.compress` | Missing dependencies error                      |
 | Apache Commons Exec     | `commons.exec`                |                                                 |
-| Apache Commons Lang     | `org.apache.commons.lang3`    | Warning: module name should avoid ending digits |
 | Javatuples              | `javatuples`                  |                                                 |
 | SQLite JDBC             | `org.xerial.sqlitejdbc`       |                                                 |
 

@@ -6,7 +6,6 @@ module site.overwrite.auditranscribe {
     requires com.dlsc.formsfx;
     requires com.google.gson;
     requires org.apache.commons.compress;
-    requires org.apache.commons.lang3;
     requires org.controlsfx.controls;
     requires org.kordamp.bootstrapfx.core;
     requires org.xerial.sqlitejdbc;
