@@ -2,7 +2,7 @@
  * ArrayUtilsTest.java
  *
  * Created on 2022-03-12
- * Updated on 2022-06-16
+ * Updated on 2022-06-28
  *
  * Description: Test `ArrayUtils.java`.
  */
@@ -10,6 +10,8 @@
 package site.overwrite.auditranscribe.utils;
 
 import org.junit.jupiter.api.Test;
+import site.overwrite.auditranscribe.exceptions.generic.LengthException;
+import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.misc.Complex;
 
 import java.util.NoSuchElementException;
@@ -57,17 +59,22 @@ class ArrayUtilsTest {
         double[] array1 = {1, 2, 4, 8, 16};
         double[] array2 = {1, 3, 9, 27, 81, 243};
         double[] array3 = {0, 1, 0, -2, 0, 3, 0};
-        double[] array4 = {0.1, -0.02, 0.003, -0.0004};
+        double[] array4 = {0.1, -0.02, 0.003, -0.0004, 0.05};
         double[] array5 = {219, 0.24, 9.14};
-        Complex[] array6 = {new Complex(1), new Complex(0, 1), new Complex(-1), new Complex(0, -1), new Complex(-1, 1)};
+        double[] array6 = {0, 0, 0};
+        Complex[] array7 = {
+                new Complex(1), new Complex(0, 1), new Complex(-1),
+                new Complex(0, -1), new Complex(-1, 1)
+        };
 
         // Define correct results
         double[] array1Normalized = {0.0625, 0.125, 0.25, 0.5, 1.};
         double[] array2Normalized = {0.00411183, 0.0123355, 0.0370065, 0.11101951, 0.33305853, 0.9991756};
         double[] array3Normalized = {0., 0.33333333, 0., -0.66666667, 0., 1., 0.};
-        double[] array4Normalized = {250., -50., 7.5, -1.};
+        double[] array4Normalized = {250., -50., 7.5, -1., 125};
         double[] array5Normalized = {219, 0.24, 9.14};
-        Complex[] array6Normalized = {
+        double[] array6Normalized = {Double.NaN, Double.NaN, Double.NaN};
+        Complex[] array7Normalized = {
                 new Complex(0.70710678), new Complex(0, 0.70710678),
                 new Complex(-0.70710678), new Complex(0, -0.70710678),
                 new Complex(-0.70710678, 0.70710678)
@@ -79,27 +86,89 @@ class ArrayUtilsTest {
         assertArrayEquals(array3Normalized, ArrayUtils.lpNormalize(array3, 0), 1e-4);
         assertArrayEquals(array4Normalized, ArrayUtils.lpNormalize(array4, Double.NEGATIVE_INFINITY), 1e-4);
         assertArrayEquals(array5Normalized, ArrayUtils.lpNormalize(array5, -1337), 1e-4);  // No change
+        assertArrayEquals(array6Normalized, ArrayUtils.lpNormalize(array6, 0), 1e-4);
 
-        Complex[] array6Computed = ArrayUtils.lpNormalize(array6, Double.POSITIVE_INFINITY);
-        assertEquals(array6Computed.length, array6Normalized.length);
-        for (int i = 0; i < array6Normalized.length; i++) {
-            assertEquals(array6Normalized[i].roundNicely(4), array6Computed[i].roundNicely(4));
+        Complex[] array7Computed = ArrayUtils.lpNormalize(array7, Double.POSITIVE_INFINITY);
+        assertEquals(array7Computed.length, array7Normalized.length);
+        for (int i = 0; i < array7Normalized.length; i++) {
+            assertEquals(array7Normalized[i].roundNicely(4), array7Computed[i].roundNicely(4));
         }
     }
 
     @Test
-    void padCenter() {
+    void fixLength() {
+        // Define the array for testing
+        double[] array = {1, 2, 3, 4, 5};
+
+        // Run tests
+        assertArrayEquals(new double[]{1, 2, 3, 4, 5, 0, 0, 0}, ArrayUtils.fixLength(array, 8));
+        assertArrayEquals(array, ArrayUtils.fixLength(array, 5));
+        assertArrayEquals(new double[]{1, 2, 3}, ArrayUtils.fixLength(array, 3));
+
+        assertThrowsExactly(ValueException.class, () -> ArrayUtils.fixLength(array, 0));
+        assertThrowsExactly(ValueException.class, () -> ArrayUtils.fixLength(array, -12));
+    }
+
+    @Test
+    void padCenterDouble() {
         // Define the arrays
         double[] array1 = {1, 2, 3, 4};
         double[] array2 = {1, 2, 3};
         double[] array3 = {5, 6};
         double[] array4 = {7};
 
+        // Define the correct arrays
+        double[] array1Correct = new double[]{0, 0, 1, 2, 3, 4, 0, 0};
+        double[] array2Correct = new double[]{0, 0, 0, 1, 2, 3, 0, 0, 0};
+        double[] array3Correct = new double[]{0, 0, 0, 0, 5, 6, 0, 0, 0, 0};
+        double[] array4Correct = new double[]{0, 0, 0, 7, 0, 0, 0};
+
         // Run tests
-        assertArrayEquals(new double[]{0, 0, 1, 2, 3, 4, 0, 0}, ArrayUtils.padCenter(array1, 8));
-        assertArrayEquals(new double[]{0, 0, 0, 1, 2, 3, 0, 0, 0}, ArrayUtils.padCenter(array2, 9));
-        assertArrayEquals(new double[]{0, 0, 0, 0, 5, 6, 0, 0, 0, 0}, ArrayUtils.padCenter(array3, 10));
-        assertArrayEquals(new double[]{0, 0, 0, 7, 0, 0, 0}, ArrayUtils.padCenter(array4, 7));
+        assertArrayEquals(array1Correct, ArrayUtils.padCenter(array1, 8));
+        assertArrayEquals(array2Correct, ArrayUtils.padCenter(array2, 9));
+        assertArrayEquals(array3Correct, ArrayUtils.padCenter(array3, 10));
+        assertArrayEquals(array4Correct, ArrayUtils.padCenter(array4, 7));
+
+        assertThrowsExactly(ValueException.class, () -> ArrayUtils.padCenter(array1, 3));
+    }
+
+    @Test
+    void padCenterComplex() {
+        // Define the arrays
+        Complex[] array1 = {new Complex(1), new Complex(2), new Complex(3), new Complex(4)};
+        Complex[] array2 = {new Complex(1), new Complex(2), new Complex(3)};
+        Complex[] array3 = {new Complex(5), new Complex(6)};
+        Complex[] array4 = {new Complex(7)};
+
+        // Define the correct arrays
+        Complex[] array1Correct = new Complex[]{
+                Complex.ZERO, Complex.ZERO,
+                new Complex(1), new Complex(2), new Complex(3), new Complex(4),
+                Complex.ZERO, Complex.ZERO
+        };
+        Complex[] array2Correct = new Complex[]{
+                Complex.ZERO, Complex.ZERO, Complex.ZERO,
+                new Complex(1), new Complex(2), new Complex(3),
+                Complex.ZERO, Complex.ZERO, Complex.ZERO
+        };
+        Complex[] array3Correct = new Complex[]{
+                Complex.ZERO, Complex.ZERO, Complex.ZERO, Complex.ZERO,
+                new Complex(5), new Complex(6),
+                Complex.ZERO, Complex.ZERO, Complex.ZERO, Complex.ZERO
+        };
+        Complex[] array4Correct = new Complex[]{
+                Complex.ZERO, Complex.ZERO, Complex.ZERO,
+                new Complex(7),
+                Complex.ZERO, Complex.ZERO, Complex.ZERO
+        };
+
+        // Run tests
+        assertArrayEquals(array1Correct, ArrayUtils.padCenter(array1, 8));
+        assertArrayEquals(array2Correct, ArrayUtils.padCenter(array2, 9));
+        assertArrayEquals(array3Correct, ArrayUtils.padCenter(array3, 10));
+        assertArrayEquals(array4Correct, ArrayUtils.padCenter(array4, 7));
+
+        assertThrowsExactly(ValueException.class, () -> ArrayUtils.padCenter(array1, 3));
     }
 
     @Test
@@ -117,6 +186,9 @@ class ArrayUtilsTest {
         assertArrayEquals(new double[]{5, 6, 6, 5, 5, 6, 6, 5, 5, 6}, ArrayUtils.padCenterReflect(array3, 10));
         assertArrayEquals(new double[]{8, 7, 7, 8, 8, 7, 7, 8, 8, 7, 7, 8, 8, 7}, ArrayUtils.padCenterReflect(array4, 14));
         assertArrayEquals(new double[]{9, 9, 9, 9, 9, 9, 9}, ArrayUtils.padCenterReflect(array5, 7));
+
+        assertThrowsExactly(ValueException.class, () -> ArrayUtils.padCenterReflect(array1, 0));  // Size is zero
+        assertThrowsExactly(ValueException.class, () -> ArrayUtils.padCenterReflect(array2, -1));  // Size is negative
     }
 
     @Test
@@ -285,6 +357,11 @@ class ArrayUtilsTest {
         assertArrayEquals(X, AA);
         assertArrayEquals(Y, BC);
         assertArrayEquals(Z, CB);
+
+        assertDoesNotThrow(() -> ArrayUtils.matmul(A, B));                          // Should execute fine...
+        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matmul(B, A));  // ...but not this
+        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matmul(A, C));  // Should not execute fine...
+        assertDoesNotThrow(() -> ArrayUtils.matmul(C, A));                          // ...but this should
     }
 
     @Test
@@ -337,5 +414,10 @@ class ArrayUtilsTest {
         assertArrayEquals(Z[0], CB[0], 0.001);
         assertArrayEquals(Z[1], CB[1], 0.001);
         assertArrayEquals(Z[2], CB[2], 0.001);
+
+        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matmul(A, B));  // Should not execute fine...
+        assertDoesNotThrow(() -> ArrayUtils.matmul(B, A));                          // ...but this should
+        assertDoesNotThrow(() -> ArrayUtils.matmul(A, C));                          // Should execute fine...
+        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matmul(C, A));  // ...but not this
     }
 }

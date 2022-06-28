@@ -218,13 +218,13 @@ public class ArrayUtils {
      * @throws ValueException If <code>size</code> is negative.
      */
     public static double[] padCenter(double[] array, int size) {
-        // Verify that `size` is positive
-        if (size <= 0) {
-            throw new ValueException("Invalid size " + size);
-        }
-
         // Get length of the array
         int n = array.length;
+
+        // Assert that the length of the data at least the desired size
+        if (size < n) {
+            throw new ValueException("Target size (" + size + ") must be at least input size (" + n + ")");
+        }
 
         // If `n` is `size` just return the array
         if (n == size) {
