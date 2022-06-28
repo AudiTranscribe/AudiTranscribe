@@ -2,7 +2,7 @@
  * MathUtilsTest.java
  *
  * Created on 2022-03-12
- * Updated on 2022-06-17
+ * Updated on 2022-06-28
  *
  * Description: Test `MathUtils.java`.
  */
@@ -10,6 +10,7 @@
 package site.overwrite.auditranscribe.utils;
 
 import org.junit.jupiter.api.Test;
+import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 
 import java.math.BigDecimal;
 
@@ -28,12 +29,19 @@ class MathUtilsTest {
         assertEquals(1, MathUtils.logN(Math.PI, Math.PI), 0.001);
         assertEquals(2.090, MathUtils.logN(123, 10), 0.001);
         assertEquals(1.272, MathUtils.logN(456, 123), 0.001);
+        assertEquals(-3.183, MathUtils.logN(789, 0.123), 0.001);
+
+        assertThrowsExactly(ValueException.class, () -> MathUtils.logN(123, 1));
+        assertThrowsExactly(ValueException.class, () -> MathUtils.logN(123, 0));
+        assertThrowsExactly(ValueException.class, () -> MathUtils.logN(123, -1.23));
     }
 
     @Test
     void modWithMersennePrime() {
+        assertEquals(1, MathUtils.modWithMersennePrime(10, 2));
         assertEquals(4, MathUtils.modWithMersennePrime(11, 3));
         assertEquals(67, MathUtils.modWithMersennePrime(1337, 7));
+        assertEquals(32, MathUtils.modWithMersennePrime(65536, 11));
         assertEquals(7382, MathUtils.modWithMersennePrime(-9000, 13));
     }
 
@@ -190,5 +198,13 @@ class MathUtilsTest {
                 ).doubleValue(),
                 1e-6
         );
+
+        assertThrowsExactly(ValueException.class, () -> MathUtils.wrapValue(1, -2, -1));
+        assertThrowsExactly(ValueException.class, () -> MathUtils.wrapValue(0, 2, 1));
+        assertThrowsExactly(ValueException.class, () -> MathUtils.wrapValue(0, 1, 1));
+
+        assertThrowsExactly(ValueException.class, () -> MathUtils.wrapValue(new BigDecimal("1.2"), new BigDecimal("-2"), new BigDecimal("-1")));
+        assertThrowsExactly(ValueException.class, () -> MathUtils.wrapValue(new BigDecimal("1.2"), new BigDecimal("2"), new BigDecimal("1")));
+        assertThrowsExactly(ValueException.class, () -> MathUtils.wrapValue(BigDecimal.ZERO, new BigDecimal("1"), new BigDecimal("1")));
     }
 }

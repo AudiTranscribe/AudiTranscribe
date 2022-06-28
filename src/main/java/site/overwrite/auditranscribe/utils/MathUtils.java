@@ -242,14 +242,28 @@ public final class MathUtils {
      * @param min   Minimum value.
      * @param max   Maximum value.
      * @return Wrapped value.
+     * @throws ValueException If:<ul>
+     *                        <li>
+     *                            The maximum value is not a positive integer.
+     *                        </li>
+     *                        <li>
+     *                            The minimum value is larger than or equal to the maximum value.
+     *                        </li>
+     *                        </ul>
      */
     public static int wrapValue(int value, int min, int max) {
-        if (max == 0) {
-            throw new RuntimeException();
+        // Check if the values are valid
+        if (max <= 0) {
+            throw new ValueException("The maximum value must be a positive integer.");
         }
 
+        if (min >= max) {
+            throw new ValueException("The minimum value must be smaller than the maximum value.");
+        }
+
+        // Perform actual computation
         int r = value % max;
-        if ((r > min && max < min) || (r < min && max > min)) {
+        if (r < min) {
             r += max - min;
         }
         return r;
@@ -263,12 +277,26 @@ public final class MathUtils {
      * @param min   Minimum value.
      * @param max   Maximum value.
      * @return Wrapped value.
+     * @throws ValueException If:<ul>
+     *                        <li>
+     *                            The maximum value is not a positive number.
+     *                        </li>
+     *                        <li>
+     *                            The minimum value is larger than the maximum value.
+     *                        </li>
+     *                        </ul>
      */
     public static BigDecimal wrapValue(BigDecimal value, BigDecimal min, BigDecimal max) {
-        if (max.doubleValue() == 0) {
-            throw new RuntimeException();
+        // Check if the values are valid
+        if (max.doubleValue() <= 0) {
+            throw new ValueException("The maximum value must be a positive number.");
         }
 
+        if (min.compareTo(max) >= 0) {
+            throw new ValueException("The minimum value must be smaller than to the maximum value.");
+        }
+
+        // Perform actual computation
         if (value.compareTo(min) < 0) {
             return max;
         } else if (value.compareTo(max) > 0) {
