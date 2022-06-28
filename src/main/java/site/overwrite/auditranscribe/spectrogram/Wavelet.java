@@ -9,7 +9,7 @@
 
 package site.overwrite.auditranscribe.spectrogram;
 
-import javafx.util.Pair;
+import org.javatuples.Pair;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.SpectralHelpers;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
@@ -153,7 +153,7 @@ public final class Wavelet {
         Pair<double[], Double> waveletLengthsResult = computeWaveletLengths(
                 freqs, sr, windowFunction, filterScale, isCQT, gamma, alpha
         );
-        double[] lengths = waveletLengthsResult.getKey();
+        double[] lengths = waveletLengthsResult.getValue0();
         int numLengths = lengths.length;
 
         // Build the filters

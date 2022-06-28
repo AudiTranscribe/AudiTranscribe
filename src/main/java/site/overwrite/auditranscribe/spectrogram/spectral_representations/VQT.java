@@ -9,9 +9,8 @@
 
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
-import javafx.util.Pair;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.apache.commons.lang3.tuple.Triple;
+import org.javatuples.Pair;
+import org.javatuples.Triplet;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.Filter;
@@ -157,7 +156,7 @@ public final class VQT {
         Pair<double[], Double> waveletLengthsResponse = Wavelet.computeWaveletLengths(
                 freqs, sr, windowFunction, 1., isCQT, gamma, alpha
         );
-        double filterCutoff = waveletLengthsResponse.getValue();
+        double filterCutoff = waveletLengthsResponse.getValue1();
 
         // Determine required resampling quality
         double nyquistFrequency = sr / 2;
@@ -178,12 +177,12 @@ public final class VQT {
             filter = Filter.KAISER_BEST;
         }
 
-        Triple<double[], Double, Integer> earlyDownsampleResponse = earlyDownsample(
+        Triplet<double[], Double, Integer> earlyDownsampleResponse = earlyDownsample(
                 y, sr, hopLength, filter, numOctaves, nyquistFrequency, filterCutoff
         );
-        y = earlyDownsampleResponse.getLeft();
-        sr = earlyDownsampleResponse.getMiddle();
-        hopLength = earlyDownsampleResponse.getRight();
+        y = earlyDownsampleResponse.getValue0();
+        sr = earlyDownsampleResponse.getValue1();
+        hopLength = earlyDownsampleResponse.getValue2();
 
         // Define VQT response array
         List<Complex[][]> vqtResponses = new ArrayList<>();
@@ -197,11 +196,11 @@ public final class VQT {
             System.arraycopy(freqs, numBins - binsPerOctave, freqsOct, 0, binsPerOctave);
 
             // Do the top octave before resampling to allow for fast resampling
-            Triple<Complex[][], Integer, double[]> fftFilterResponse = vqtFilterFFT(
+            Triplet<Complex[][], Integer, double[]> fftFilterResponse = vqtFilterFFT(
                     sr, freqsOct, windowFunction, isCQT, gamma, alpha
             );
-            Complex[][] fftBasis = fftFilterResponse.getLeft();
-            int numFFT = fftFilterResponse.getMiddle();
+            Complex[][] fftBasis = fftFilterResponse.getValue0();
+            int numFFT = fftFilterResponse.getValue1();
 
             // Compute the VQT filter response and append it to the list
             vqtResponses.add(vqtResponse(y, numFFT, hopLength, fftBasis));
@@ -225,11 +224,11 @@ public final class VQT {
             System.arraycopy(freqs, numBins - binsPerOctave * (octave + 1), freqsOct, 0, binsPerOctave);
 
             // Get the FFT basis and the `numFFT` for this octave
-            Triple<Complex[][], Integer, double[]> fftFilterResponse = vqtFilterFFT(
+            Triplet<Complex[][], Integer, double[]> fftFilterResponse = vqtFilterFFT(
                     mySR, freqsOct, windowFunction, isCQT, gamma, alpha
             );
-            Complex[][] fftBasis = fftFilterResponse.getLeft();
-            int numFFT = fftFilterResponse.getMiddle();
+            Complex[][] fftBasis = fftFilterResponse.getValue0();
+            int numFFT = fftFilterResponse.getValue1();
 
             // Re-scale the filters to compensate for downsampling
             for (int i = 0; i < fftBasis.length; i++) {
@@ -263,7 +262,7 @@ public final class VQT {
         waveletLengthsResponse = Wavelet.computeWaveletLengths(
                 freqs, sr, windowFunction, 1., isCQT, gamma, alpha
         );
-        double[] lengths = waveletLengthsResponse.getKey();
+        double[] lengths = waveletLengthsResponse.getValue0();
 
         // Scale `V` back to normal
         for (int i = 0; i < numBins; i++) {
@@ -312,7 +311,7 @@ public final class VQT {
      *                        <code>numOctaves</code>-octave VQT.
      */
 
-    private static Triple<double[], Double, Integer> earlyDownsample(
+    private static Triplet<double[], Double, Integer> earlyDownsample(
             double[] y, double sr, int hopLength, Filter filter, int numOctaves, double nyquist, double filterCutoff
     ) {
         // Compute the number of early downsampling operations
@@ -347,7 +346,7 @@ public final class VQT {
         }
 
         // Return needed values
-        return new ImmutableTriple<>(yNew, sr, hopLength);
+        return new Triplet<>(yNew, sr, hopLength);
     }
 
     /**
@@ -363,15 +362,15 @@ public final class VQT {
      * the FFT basis. Second value is an integer, representing the number of FFT frequency bins.
      * Third value is a double array, representing the filters' lengths.
      */
-    private static Triple<Complex[][], Integer, double[]> vqtFilterFFT(
+    private static Triplet<Complex[][], Integer, double[]> vqtFilterFFT(
             double sr, double[] freqs, WindowFunction windowFunction, boolean isCQT, double gamma, double alpha
     ) {
         // Get the frequency and lengths of the wavelet basis
         Pair<Complex[][], double[]> waveletBasisResponse = Wavelet.computeWaveletBasis(
                 freqs, sr, windowFunction, 1, true, 1, isCQT, gamma, alpha
         );
-        Complex[][] basis = waveletBasisResponse.getKey();
-        double[] lengths = waveletBasisResponse.getValue();
+        Complex[][] basis = waveletBasisResponse.getValue0();
+        double[] lengths = waveletBasisResponse.getValue1();
 
         // Number of FFT bins is the second element of the shape of the basis
         int fftWindowLength = basis.length;
@@ -393,7 +392,7 @@ public final class VQT {
         }
 
         // Return required data
-        return new ImmutableTriple<>(fftBasis, numFFT, lengths);
+        return new Triplet<>(fftBasis, numFFT, lengths);
     }
 
     /**

@@ -2,14 +2,14 @@
  * WaveletTest.java
  *
  * Created on 2022-04-15
- * Updated on 2022-05-28
+ * Updated on 2022-06-28
  *
  * Description: Test `Wavelet.java`.
  */
 
 package site.overwrite.auditranscribe.spectrogram;
 
-import javafx.util.Pair;
+import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.misc.Complex;
@@ -28,6 +28,7 @@ class WaveletTest {
                 17866.666666666667, 18933.333333333333, 20000.0
         };
         double[] freqs3 = {16., 160., 304., 448., 592., 736., 880., 1024.};  // Same as `freq1` but will have different sample rate
+        double[] freqs4 = {512.};
 
         // Define correct wavelet arrays
         double[] waveletLengthCorrect1 = {
@@ -50,24 +51,33 @@ class WaveletTest {
         };
         double freqCutoffCorrect3 = 1156.7200167930532;
 
+        double[] waveletLengthCorrect4 = {4.8404859267353615};
+        double freqCutoffCorrect4 = 6642.3043402777785;
+
         // Compute wavelet lengths
         Pair<double[], Double> waveletLengthsPair1 = Wavelet.computeWaveletLengths(
                 freqs1, 44100, WindowFunction.HANN_WINDOW, 1, false, 0, 0
         );
-        double[] waveletLengths1 = waveletLengthsPair1.getKey();
-        double freqCutoff1 = waveletLengthsPair1.getValue();
+        double[] waveletLengths1 = waveletLengthsPair1.getValue0();
+        double freqCutoff1 = waveletLengthsPair1.getValue1();
 
         Pair<double[], Double> waveletLengthsPair2 = Wavelet.computeWaveletLengths(
-                freqs2, 44100, WindowFunction.HANN_WINDOW, 1, false, 0, 0
+                freqs2, 44100, WindowFunction.HANN_WINDOW, 1, false, 0, 1.23
         );
-        double[] waveletLengths2 = waveletLengthsPair2.getKey();
-        double freqCutoff2 = waveletLengthsPair2.getValue();
+        double[] waveletLengths2 = waveletLengthsPair2.getValue0();
+        double freqCutoff2 = waveletLengthsPair2.getValue1();
 
         Pair<double[], Double> waveletLengthsPair3 = Wavelet.computeWaveletLengths(
                 freqs3, 441, WindowFunction.HANN_WINDOW, 1, false, 0, 0
         );
-        double[] waveletLengths3 = waveletLengthsPair3.getKey();
-        double freqCutoff3 = waveletLengthsPair3.getValue();
+        double[] waveletLengths3 = waveletLengthsPair3.getValue0();
+        double freqCutoff3 = waveletLengthsPair3.getValue1();
+
+        Pair<double[], Double> waveletLengthsPair4 = Wavelet.computeWaveletLengths(
+                freqs4, 44100, WindowFunction.HANN_WINDOW, 1, false, 0, 12.3
+        );
+        double[] waveletLengths4 = waveletLengthsPair4.getValue0();
+        double freqCutoff4 = waveletLengthsPair4.getValue1();
 
         // Assertions
         assertArrayEquals(waveletLengthCorrect1, waveletLengths1, 1e-10);
@@ -78,6 +88,9 @@ class WaveletTest {
 
         assertArrayEquals(waveletLengthCorrect3, waveletLengths3, 1e-10);
         assertEquals(freqCutoffCorrect3, freqCutoff3, 1e-10);
+
+        assertArrayEquals(waveletLengthCorrect4, waveletLengths4, 1e-10);
+        assertEquals(freqCutoffCorrect4, freqCutoff4, 1e-10);
     }
 
     @Test
@@ -89,6 +102,7 @@ class WaveletTest {
                 11466.666666666667, 12533.333333333333, 13600.0, 14666.666666666667, 15733.333333333333, 16800.0,
                 17866.666666666667, 18933.333333333333, 20000.0
         };
+        double[] freqs3 = {16., 160., 304., 448., 592., 736., 880., 1024.};  // Same as `freqs1` but with `padFFT = false`
 
         // Define correct wavelet arrays
         Complex[][] correctBasis1 = {
@@ -131,18 +145,39 @@ class WaveletTest {
                 0.8125744984891876
         };
 
+        Complex[][] correctBasis3 = {
+                {Complex.ZERO, new Complex(0.9741291403770447, -0.2259921133518219), Complex.ZERO},
+                {Complex.ZERO, new Complex(-0.650936484336853, -0.7591322064399719), Complex.ZERO},
+                {Complex.ZERO, new Complex(-0.3719630539417267, 0.9282475113868713), Complex.ZERO},
+                {Complex.ZERO, new Complex(0.49751538038253784, -0.04978392273187637), new Complex(0.5)},
+                {Complex.ZERO, new Complex(-0.2742583155632019, -0.41806983947753906), new Complex(0.5)},
+                {Complex.ZERO, new Complex(-0.24380545318126678, 0.43653053045272827), new Complex(0.5)},
+                {Complex.ZERO, new Complex(0.4997970163822174, 0.014245657250285149), new Complex(0.5)},
+                {Complex.ZERO, new Complex(-0.218545064330101, -0.44970884919166565), new Complex(0.5)},
+        };
+        double[] correctFilterLengthsArr3 = {
+                1.8385871733836014, 1.260600285850405, 1.7476882430647296, 2.027475233977342, 2.2090798321223892,
+                2.336468691212037, 2.430766661099045, 2.340678375835453
+        };
+
         // Compute wavelet bases
         Pair<Complex[][], double[]> waveletBasisPair1 = Wavelet.computeWaveletBasis(
                 freqs1, 441, WindowFunction.HANN_WINDOW, 1, true, 1, false, 0, 0
         );
-        Complex[][] basis1 = waveletBasisPair1.getKey();
-        double[] filterLengths1 = waveletBasisPair1.getValue();
+        Complex[][] basis1 = waveletBasisPair1.getValue0();
+        double[] filterLengths1 = waveletBasisPair1.getValue1();
 
         Pair<Complex[][], double[]> waveletBasisPair2 = Wavelet.computeWaveletBasis(
                 freqs2, 900, WindowFunction.HANN_WINDOW, 1, true, 1, false, 0, 0
         );
-        Complex[][] basis2 = waveletBasisPair2.getKey();
-        double[] filterLengths2 = waveletBasisPair2.getValue();
+        Complex[][] basis2 = waveletBasisPair2.getValue0();
+        double[] filterLengths2 = waveletBasisPair2.getValue1();
+
+        Pair<Complex[][], double[]> waveletBasisPair3 = Wavelet.computeWaveletBasis(
+                freqs3, 441, WindowFunction.HANN_WINDOW, 1, false, 1, false, 0, 0
+        );
+        Complex[][] basis3 = waveletBasisPair3.getValue0();
+        double[] filterLengths3 = waveletBasisPair3.getValue1();
 
         // Assertions
         assertEquals(correctBasis1.length, basis1.length, "Basis 1 shape incorrect");
@@ -162,5 +197,14 @@ class WaveletTest {
             }
         }
         assertArrayEquals(correctFilterLengthsArr2, filterLengths2, 1e-10);
+
+        assertEquals(correctBasis3.length, basis3.length, "Basis 3 shape incorrect");
+        assertEquals(correctBasis3[0].length, basis3[0].length, "Basis 3 shape incorrect");
+        for (int i = 0; i < correctBasis3.length; i++) {
+            for (int j = 0; j < correctBasis3[0].length; j++) {
+                assertEquals(correctBasis3[i][j].roundNicely(5), basis3[i][j].roundNicely(5), "Error at position (" + i + ", " + j + ")");
+            }
+        }
+        assertArrayEquals(correctFilterLengthsArr3, filterLengths3, 1e-10);
     }
 }
