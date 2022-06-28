@@ -2,7 +2,7 @@
  * FFT.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-23
+ * Updated on 2022-06-28
  *
  * Description: Class that implements Fast Fourier Transform (FFT) algorithms.
  *
@@ -25,7 +25,11 @@ import java.util.Arrays;
  * @see <a href="https://en.wikipedia.org/wiki/Fast_Fourier_transform">This Wikipedia Article</a>
  * about the FFT.
  */
-public class FFT {
+public final class FFT {
+    private FFT() {
+        // Private constructor to signal this is a utility class
+    }
+
     // Public methods
 
     /**

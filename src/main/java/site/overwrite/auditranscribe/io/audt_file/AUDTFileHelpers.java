@@ -2,7 +2,7 @@
  * AUDTFileHelpers.java
  *
  * Created on 2022-05-01
- * Updated on 2022-06-23
+ * Updated on 2022-06-28
  *
  * Description: Helper methods for writing to / reading from AUDT files.
  */
@@ -17,10 +17,14 @@ import java.util.List;
 /**
  * Helper methods for writing to / reading from AUDT files.
  */
-public class AUDTFileHelpers {
+public final class AUDTFileHelpers {
     // Constants
     static final int INT_CONVERSION_MINIMUM = Integer.MIN_VALUE;
     static final int INT_CONVERSION_MAXIMUM = Integer.MAX_VALUE;
+
+    private AUDTFileHelpers() {
+        // Private constructor to signal this is a utility class
+    }
 
     // Public methods
 

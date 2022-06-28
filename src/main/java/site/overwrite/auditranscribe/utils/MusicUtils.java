@@ -2,7 +2,7 @@
  * MusicUtils.java
  *
  * Created on 2022-06-11
- * Updated on 2022-06-23
+ * Updated on 2022-06-28
  *
  * Description: Musical utility methods.
  */
@@ -19,7 +19,7 @@ import static java.util.Map.entry;
 /**
  * Musical utility methods.
  */
-public class MusicUtils {
+public final class MusicUtils {
     // Constants
     public static final String[] MUSIC_KEYS = {
             // Major Scales
@@ -44,6 +44,10 @@ public class MusicUtils {
             entry("12/8", 12)
     );  // See https://en.wikipedia.org/wiki/Time_signature#Characteristics
     public static final String[] TIME_SIGNATURES = {"4/4", "2/2", "2/4", "3/4", "3/8", "6/8", "9/8", "12/8"};
+
+    private MusicUtils() {
+        // Private constructor to signal this is a utility class
+    }
 
     // Public methods
 

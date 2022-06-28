@@ -2,7 +2,7 @@
  * LZ4.java
  *
  * Created on 2022-05-04
- * Updated on 2022-06-23
+ * Updated on 2022-06-28
  *
  * Description: Class that handles LZ4 compression/decompression on byte arrays.
  */
@@ -20,11 +20,14 @@ import java.io.IOException;
 /**
  * Class that handles LZ4 compression/decompression on byte arrays.
  */
-public class LZ4 {
+public final class LZ4 {
     // Constants
     public static final int LZ4_BYTE_BUFFER_SIZE = 2048;
-
     public static final int LZ4_VERSION_NUMBER = 1;
+
+    private LZ4() {
+        // Private constructor to signal this is a utility class
+    }
 
     // Public methods
 

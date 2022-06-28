@@ -2,7 +2,7 @@
  * ApplicationDirectory.java
  *
  * Created on 2022-05-28
- * Updated on 2022-06-25
+ * Updated on 2022-06-28
  *
  * Description: Application directory factory class.
  */
@@ -12,7 +12,13 @@ package site.overwrite.auditranscribe.io;
 /**
  * Application directory factory class.
  */
-public class ApplicationDirectory {
+public final class ApplicationDirectory {
+    private ApplicationDirectory() {
+        // Private constructor to signal this is a utility class
+    }
+
+    // Public methods
+
     /**
      * Method that gets the application data directory of the user.
      *

@@ -2,7 +2,7 @@
  * MathUtils.java
  *
  * Created on 2022-02-15
- * Updated on 2022-06-23
+ * Updated on 2022-06-28
  *
  * Description: Mathematical utility methods.
  */
@@ -16,7 +16,11 @@ import java.math.BigDecimal;
 /**
  * Mathematical utility methods.
  */
-public class MathUtils {
+public final class MathUtils {
+    private MathUtils() {
+        // Private constructor to signal this is a utility class
+    }
+
     // General mathematical methods
 
     /**

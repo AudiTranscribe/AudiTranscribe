@@ -2,7 +2,7 @@
  * STFT.java
  *
  * Created on 2022-03-10
- * Updated on 2022-06-01
+ * Updated on 2022-06-28
  *
  * Description: Class that implements the Short-Time Fourier Transform (STFT) algorithm.
  */
@@ -19,7 +19,11 @@ import site.overwrite.auditranscribe.misc.Complex;
  * @see <a href="https://en.wikipedia.org/wiki/Short-time_Fourier_transform">This Wikipedia
  * Article</a> about the STFT.
  */
-public class STFT {
+public final class STFT {
+    private STFT() {
+        // Private constructor to signal this is a utility class
+    }
+
     // Public methods
 
     /**

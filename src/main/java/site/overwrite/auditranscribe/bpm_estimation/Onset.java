@@ -2,7 +2,7 @@
  * Onset.java
  *
  * Created on 2022-05-31
- * Updated on 2022-06-01
+ * Updated on 2022-06-28
  *
  * Description: Class that handles spectral flux onset detection.
  */
@@ -16,7 +16,11 @@ import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 /**
  * Class that handles spectral flux onset detection.
  */
-public class Onset {
+public final class Onset {
+    private Onset() {
+        // Private constructor to signal this is a utility class
+    }
+
     // Public methods
 
     /**

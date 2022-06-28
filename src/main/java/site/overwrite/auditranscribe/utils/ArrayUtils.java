@@ -2,7 +2,7 @@
  * ArrayUtils.java
  *
  * Created on 2022-02-16
- * Updated on 2022-06-23
+ * Updated on 2022-06-28
  *
  * Description: Array utility methods to modify, change, and search within arrays.
  */
@@ -20,7 +20,11 @@ import java.util.NoSuchElementException;
 /**
  * Array utility methods to modify, change, and search within arrays.
  */
-public class ArrayUtils {
+public final class ArrayUtils {
+    private ArrayUtils() {
+        // Private constructor to signal this is a utility class
+    }
+
     // Public methods
 
     /**

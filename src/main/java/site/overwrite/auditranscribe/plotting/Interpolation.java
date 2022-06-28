@@ -2,7 +2,7 @@
  * Interpolation.java
  *
  * Created on 2022-03-14
- * Updated on 2022-06-23
+ * Updated on 2022-06-28
  *
  * Description: Class that handles the interpolation of a 2D array.
  */
@@ -14,7 +14,13 @@ import site.overwrite.auditranscribe.exceptions.generic.LengthException;
 /**
  * Class that handles the interpolation of a 2D array.
  */
-public class Interpolation {
+public final class Interpolation {
+    private Interpolation() {
+        // Private constructor to signal this is a utility class
+    }
+
+    // Public methods
+
     /**
      * Interpolate <code>array</code> to have the new shape <code>(lengthXNew, lengthYNew)</code>.
      *

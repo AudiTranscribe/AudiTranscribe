@@ -2,7 +2,7 @@
  * FrequencyBins.java
  *
  * Created on 2022-05-31
- * Updated on 2022-05-31
+ * Updated on 2022-06-28
  *
  * Description: Methods that generate frequency bins for different spectral representations.
  */
@@ -14,7 +14,11 @@ import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 /**
  * Methods that generate frequency bins for different spectral representations.
  */
-public class FrequencyBins {
+public final class FrequencyBins {
+    private FrequencyBins() {
+        // Private constructor to signal this is a utility class
+    }
+
     // Public methods
 
     /**

@@ -2,7 +2,7 @@
  * AbstractInterpolation.java
  *
  * Created on 2022-04-12
- * Updated on 2022-06-23
+ * Updated on 2022-06-28
  *
  * Description: Abstract interpolation class.
  */
@@ -13,7 +13,7 @@ package site.overwrite.auditranscribe.plotting.interpolation_methods;
  * Abstract interpolation class.
  */
 public abstract class AbstractInterpolation {
-    // Helper functions
+    // Public methods
 
     /**
      * Method that performs the interpolation.

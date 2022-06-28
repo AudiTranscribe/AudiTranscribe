@@ -2,7 +2,7 @@
  * TypeConversionUtils.java
  *
  * Created on 2022-06-05
- * Updated on 2022-06-23
+ * Updated on 2022-06-28
  *
  * Description: Type conversion utility methods.
  */
@@ -12,7 +12,11 @@ package site.overwrite.auditranscribe.utils;
 /**
  * Type conversion utility methods.
  */
-public class TypeConversionUtils {
+public final class TypeConversionUtils {
+    private TypeConversionUtils() {
+        // Private constructor to signal this is a utility class
+    }
+
     // Public methods
 
     /**

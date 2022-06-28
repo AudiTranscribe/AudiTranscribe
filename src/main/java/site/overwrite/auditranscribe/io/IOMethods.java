@@ -2,7 +2,7 @@
  * IOMethods.java
  *
  * Created on 2022-03-15
- * Updated on 2022-06-27
+ * Updated on 2022-06-28
  *
  * Description: Input/Output methods that are used in the AudiTranscribe project.
  */
@@ -19,7 +19,11 @@ import java.nio.file.Paths;
 /**
  * Input/Output methods that are used in the AudiTranscribe project.
  */
-public class IOMethods {
+public final class IOMethods {
+    private IOMethods() {
+        // Private constructor to signal this is a utility class
+    }
+
     // File path handling
 
     /**
@@ -232,7 +236,7 @@ public class IOMethods {
         // (Most relevant to Windows)
         String separator = IOConstants.SEPARATOR;
         if (separator.contains("\\")) separator = separator.replace("\\", "\\\\");
-        
+
         // Then actually split by separator
         return paths.split(separator);
     }

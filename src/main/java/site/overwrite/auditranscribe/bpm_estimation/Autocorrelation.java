@@ -2,7 +2,7 @@
  * Autocorrelation.java
  *
  * Created on 2022-06-02
- * Updated on 2022-06-23
+ * Updated on 2022-06-28
  *
  * Description: Class that handles audio autocorrelation methods.
  */
@@ -16,8 +16,13 @@ import site.overwrite.auditranscribe.utils.ArrayUtils;
 /**
  * Class that handles audio autocorrelation methods.
  */
-public class Autocorrelation {
+public final class Autocorrelation {
+    private Autocorrelation() {
+        // Private constructor to signal this is a utility class
+    }
+
     // Public methods
+
     /**
      * Bounded-lag autocorrelation of a given matrix.<br>
      * This computes the autocorrelation <b>column-by-column</b> of a given matrix.

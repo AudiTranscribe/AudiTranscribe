@@ -2,7 +2,7 @@
  * VQT.java
  *
  * Created on 2022-03-11
- * Updated on 2022-06-25
+ * Updated on 2022-06-28
  *
  * Description: Class that implements the Variable Q-Transform (VQT) algorithm.
  */
@@ -38,9 +38,13 @@ import java.util.logging.Level;
  * Christian, and Anssi Klapuri. "Constant-Q transform toolbox for music processing." 7th Sound and
  * Music Computing Conference, Barcelona, Spain. 2010.
  */
-public class VQT {
+public final class VQT {
     // Constants
     static final double BW_FASTEST = 0.85;
+
+    private VQT() {
+        // Private constructor to signal this is a utility class
+    }
 
     // Public methods
 

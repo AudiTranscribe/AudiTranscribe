@@ -2,7 +2,7 @@
  * MelSpectrogram.java
  *
  * Created on 2022-05-31
- * Updated on 2022-06-01
+ * Updated on 2022-06-28
  *
  * Description: Class that handles the Mel-based Spectrogram.
  */
@@ -16,7 +16,11 @@ import site.overwrite.auditranscribe.utils.ArrayUtils;
 /**
  * Class that handles the Mel-based Spectrogram.
  */
-public class MelSpectrogram {
+public final class MelSpectrogram {
+    private MelSpectrogram() {
+        // Private constructor to signal this is a utility class
+    }
+
     // Public methods
 
     /**

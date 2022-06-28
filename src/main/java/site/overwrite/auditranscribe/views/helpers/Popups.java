@@ -2,7 +2,7 @@
  * Popups.java
  *
  * Created on 2022-05-26
- * Updated on 2022-06-23
+ * Updated on 2022-06-28
  *
  * Description: Class that handles the showing of popups and dialogs to the user.
  */
@@ -21,7 +21,11 @@ import java.util.Optional;
 /**
  * Class that handles the showing of popups and dialogs to the user.
  */
-public class Popups {
+public final class Popups {
+    private Popups() {
+        // Private constructor to signal this is a utility class
+    }
+
     // Public methods
 
     /**

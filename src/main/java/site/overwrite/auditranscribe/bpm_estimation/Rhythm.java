@@ -2,7 +2,7 @@
  * Rhythm.java
  *
  * Created on 2022-06-02
- * Updated on 2022-06-23
+ * Updated on 2022-06-28
  *
  * Description: Rhythmic feature extraction methods.
  */
@@ -17,7 +17,11 @@ import site.overwrite.auditranscribe.utils.MathUtils;
 /**
  * Rhythmic feature extraction methods.
  */
-public class Rhythm {
+public final class Rhythm {
+    private Rhythm() {
+        // Private constructor to signal this is a utility class
+    }
+
     // Public methods
 
     /**

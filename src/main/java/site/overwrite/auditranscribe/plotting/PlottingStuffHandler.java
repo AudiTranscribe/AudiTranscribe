@@ -2,7 +2,7 @@
  * PlottingStuffHandler.java
  *
  * Created on 2022-03-20
- * Updated on 2022-06-23
+ * Updated on 2022-06-28
  *
  * Description: Class that helps adds stuff to the spectrogram area.
  */
@@ -27,9 +27,13 @@ import java.util.HashSet;
 /**
  * Class that helps adds stuff to the spectrogram area.
  */
-public class PlottingStuffHandler {
-    // Attributes
-    static final double BAR_NUMBER_ELLIPSE_RADIUS_Y = 16;
+public final class PlottingStuffHandler {
+    // Constants
+    private static final double BAR_NUMBER_ELLIPSE_RADIUS_Y = 16;
+
+    private PlottingStuffHandler() {
+        // Private constructor to signal this is a utility class
+    }
 
     // Public methods
 

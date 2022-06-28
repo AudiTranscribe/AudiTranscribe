@@ -2,7 +2,7 @@
  * CQT.java
  *
  * Created on 2022-03-15
- * Updated on 2022-06-23
+ * Updated on 2022-06-28
  *
  * Description: Class that implements the Constant Q-Transform (CQT) algorithm.
  */
@@ -21,7 +21,13 @@ import site.overwrite.auditranscribe.misc.Complex;
  * <a href="http://librosa.org/doc/main/_modules/librosa/core/constantq.html#cqt">Librosa's
  * Implementation</a> of the CQT.
  */
-public class CQT {
+public final class CQT {
+    private CQT() {
+        // Private constructor to signal this is a utility class
+    }
+
+    // Public methods
+
     /**
      * Constant-Q Transform function.
      *

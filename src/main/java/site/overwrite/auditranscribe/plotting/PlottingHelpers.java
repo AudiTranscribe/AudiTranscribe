@@ -2,7 +2,7 @@
  * PlottingHelpers.java
  *
  * Created on 2022-03-19
- * Updated on 2022-05-28
+ * Updated on 2022-06-28
  *
  * Description: Helper functions for plotting.
  */
@@ -15,7 +15,11 @@ import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 /**
  * Helper functions for plotting.
  */
-public class PlottingHelpers {
+public final class PlottingHelpers {
+    private PlottingHelpers() {
+        // Private constructor to signal this is a utility class
+    }
+
     // Public methods
 
     /**

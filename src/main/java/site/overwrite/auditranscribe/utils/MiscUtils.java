@@ -2,7 +2,7 @@
  * MiscUtils.java
  *
  * Created on 2022-04-30
- * Updated on 2022-06-23
+ * Updated on 2022-06-28
  *
  * Description: Miscellaneous utility methods.
  */
@@ -22,7 +22,11 @@ import java.util.List;
 /**
  * Miscellaneous utility methods.
  */
-public class MiscUtils {
+public final class MiscUtils {
+    private MiscUtils() {
+        // Private constructor to signal this is a utility class
+    }
+
     // Time utils
 
     /**

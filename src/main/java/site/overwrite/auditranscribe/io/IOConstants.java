@@ -2,7 +2,7 @@
  * IOConstants.java
  *
  * Created on 2022-06-06
- * Updated on 2022-06-24
+ * Updated on 2022-06-28
  *
  * Description: Constants involved in the IO methods.
  */
@@ -14,7 +14,7 @@ import java.io.File;
 /**
  * Constants involved in the IO methods.
  */
-public class IOConstants {
+public final class IOConstants {
     // Constants
     public static final String SEPARATOR = File.separator;
 
@@ -28,4 +28,8 @@ public class IOConstants {
     public static final String RESOURCES_FOLDER_PATH = IOMethods.joinPaths(
             "src", "main", "resources", "site", "overwrite", "auditranscribe"
     );
+
+    private IOConstants() {
+        // Private constructor to signal this is a utility class
+    }
 }

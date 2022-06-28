@@ -2,7 +2,7 @@
  * BPMEstimator.java
  *
  * Created on 2022-06-02
- * Updated on 2022-06-03
+ * Updated on 2022-06-28
  *
  * Description: Class that handles all the methods to estimate the Beats Per Minute (BPM) of an
  *              audio signal.
@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Class that handles all the methods to estimate the Beats Per Minute (BPM) of an audio signal.
  */
-public class BPMEstimator {
+public final class BPMEstimator {
     // Constants
     public static final int MAX_SAMPLES_TO_CONSIDER = 1_323_000;  // 30 seconds of samples at 44100 Hz
 
@@ -28,6 +28,10 @@ public class BPMEstimator {
     public static final double STD_BPM = 1.;
     public static final double AC_SIZE = 8.;
     public static final double MAX_BPM = 320;
+
+    private BPMEstimator() {
+        // Private constructor to signal this is a utility class
+    }
 
     // Public methods
 

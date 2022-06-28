@@ -2,7 +2,7 @@
  * IOConverters.java
  *
  * Created on 2022-05-01
- * Updated on 2022-06-23
+ * Updated on 2022-06-28
  *
  * Description: Methods that converts Java objects/data into bytes for storage.
  */
@@ -18,7 +18,11 @@ import java.util.Arrays;
 /**
  * Methods that converts Java objects/data into bytes for storage.
  */
-public class IOConverters {
+public final class IOConverters {
+    private IOConverters() {
+        // Private constructor to signal this is a utility class
+    }
+
     // Public methods
 
     /**

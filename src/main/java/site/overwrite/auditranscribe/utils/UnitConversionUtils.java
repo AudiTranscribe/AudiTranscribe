@@ -2,7 +2,7 @@
  * UnitConversionUtils.java
  *
  * Created on 2022-03-12
- * Updated on 2022-06-26
+ * Updated on 2022-06-28
  *
  * Description: Unit conversion utility methods.
  */
@@ -22,9 +22,13 @@ import static java.util.Map.entry;
 /**
  * Unit conversion utility methods.
  */
-public class UnitConversionUtils {
+public final class UnitConversionUtils {
     // Constants
     static final double A_MIN = 1e-10;  // Minimum amplitude for `powerToDB`
+
+    private UnitConversionUtils() {
+        // Private constructor to signal this is a utility class
+    }
 
     // Notes conversion
 

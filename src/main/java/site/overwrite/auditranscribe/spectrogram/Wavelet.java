@@ -2,7 +2,7 @@
  * Wavelet.java
  *
  * Created on 2022-02-13
- * Updated on 2022-06-23
+ * Updated on 2022-06-28
  *
  * Description: Class that implements wavelet methods.
  */
@@ -22,7 +22,11 @@ import java.util.List;
 /**
  * Class that implements wavelet methods.
  */
-public class Wavelet {
+public final class Wavelet {
+    private Wavelet() {
+        // Private constructor to signal this is a utility class
+    }
+
     // Public methods
 
     /**

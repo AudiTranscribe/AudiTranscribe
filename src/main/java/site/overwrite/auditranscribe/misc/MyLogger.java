@@ -2,7 +2,7 @@
  * MyLogger.java
  *
  * Created on 2022-06-25
- * Updated on 2022-06-26
+ * Updated on 2022-06-28
  *
  * Description: Class that handles the loggers.
  */
@@ -19,12 +19,16 @@ import java.util.logging.*;
 /**
  * Class that handles the loggers.
  */
-public class MyLogger {
+public final class MyLogger {
     // Constants
     private static final long MAX_LOG_FILE_SIZE = 5_000_000;  // In bytes
 
-    // Attributes
+    // Static attributes
     private static Logger logger;
+
+    private MyLogger() {
+        // Private constructor to signal this is a utility class
+    }
 
     // Public methods
 

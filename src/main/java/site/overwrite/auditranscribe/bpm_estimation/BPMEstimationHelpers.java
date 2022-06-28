@@ -2,7 +2,7 @@
  * BPMEstimationHelpers.java
  *
  * Created on 2022-05-31
- * Updated on 2022-06-23
+ * Updated on 2022-06-28
  *
  * Description: Class containing helper methods for BPM estimation.
  */
@@ -12,7 +12,11 @@ package site.overwrite.auditranscribe.bpm_estimation;
 /**
  * Class containing helper methods for BPM estimation.
  */
-public class BPMEstimationHelpers {
+public final class BPMEstimationHelpers {
+    private BPMEstimationHelpers() {
+        // Private constructor to signal this is a utility class
+    }
+
     // Public methods
 
     /**

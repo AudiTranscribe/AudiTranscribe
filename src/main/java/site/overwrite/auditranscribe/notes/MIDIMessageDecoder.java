@@ -2,7 +2,7 @@
  * MIDIMessageDecoder.java
  *
  * Created on 2022-06-14
- * Updated on 2022-06-23
+ * Updated on 2022-06-28
  *
  * Description: Class that contains methods to decode MIDI messages.
  */
@@ -18,7 +18,7 @@ import java.util.HexFormat;
 /**
  * Class that contains methods to decode MIDI messages.
  */
-public class MIDIMessageDecoder {
+public final class MIDIMessageDecoder {
     // Constants
     // (Following https://www.fourmilab.ch/webtools/midicsv/)
     public static final String NOTE_ON = "NOTE_ON_C";
@@ -52,6 +52,10 @@ public class MIDIMessageDecoder {
     private static final String[] MIDI_KEY_SIGNATURES = {
             "Cb", "Gb", "Db", "Ab", "Eb", "Bb", "F", "C", "G", "D", "A", "E", "B", "F#", "C#"
     };  // As explained in https://www.recordingblogs.com/wiki/midi-key-signature-meta-message
+
+    private MIDIMessageDecoder() {
+        // Private constructor to signal this is a utility class
+    }
 
     // Public methods
 

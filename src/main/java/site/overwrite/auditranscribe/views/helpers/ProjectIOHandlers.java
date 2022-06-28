@@ -2,7 +2,7 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-06-22
+ * Updated on 2022-06-28
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
@@ -22,7 +22,11 @@ import java.io.IOException;
 /**
  * Methods that handle the IO operations for an AudiTranscribe project.
  */
-public class ProjectIOHandlers {
+public final class ProjectIOHandlers {
+    private ProjectIOHandlers() {
+        // Private constructor to signal this is a utility class
+    }
+
     // Public methods
 
     /**
