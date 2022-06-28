@@ -2,7 +2,7 @@
  * FFTTest.java
  *
  * Created on 2022-04-10
- * Updated on 2022-06-01
+ * Updated on 2022-06-28
  *
  * Description: Test `FFT.java`.
  */
@@ -10,14 +10,18 @@
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
 import org.junit.jupiter.api.Test;
+import site.overwrite.auditranscribe.exceptions.generic.LengthException;
 import site.overwrite.auditranscribe.misc.Complex;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class FFTTest {
 
     @Test
-    void fft_and_rfft() {
+    void fftAndRFFT() {
         // Define the complex number arrays
         double[] realNumberArray1 = {1, 2, -3, -4, 5, 6, -7};
         double[] realNumberArray2 = {
@@ -35,6 +39,7 @@ class FFTTest {
                 new Complex(1), new Complex(0, 2), new Complex(-3), new Complex(0, -4),
                 new Complex(5), new Complex(0, 6)
         };
+        Complex[] complexNumberArray3 = {};  // Empty complex number array
 
         // Generate the RFFT outputs
         Complex[] fftRealNumberArray1 = FFT.rfft(realNumberArray1);
@@ -62,10 +67,12 @@ class FFTTest {
         // Generate the FFT outputs
         Complex[] fftComplexNumberArray1 = FFT.fft(complexNumberArray1);
         Complex[] fftComplexNumberArray2 = FFT.fft(complexNumberArray2);
+        Complex[] fftComplexNumberArray3 = FFT.fft(complexNumberArray3);
 
         // Check the FFT output
         assertEquals(fftComplexNumberArray1.length, 8);
         assertEquals(fftComplexNumberArray2.length, 6);
+        assertEquals(fftComplexNumberArray3.length, 0);
 
         assertEquals(new Complex(-4, -4), fftComplexNumberArray1[0].roundNicely(3));
         assertEquals(new Complex(-4, -9.657), fftComplexNumberArray1[1].roundNicely(3));
@@ -85,7 +92,7 @@ class FFTTest {
     }
 
     @Test
-    void ifft_and_irfft() {
+    void ifftAndIRFFT() {
         // Define the FFT and RFFT outputs
         Complex[] fftRealNumberArray1 = {
                 Complex.ZERO, new Complex(-3.68598068, 5.64282152),
@@ -165,5 +172,52 @@ class FFTTest {
         assertEquals(new Complex(0, -4).roundNicely(5), complexNumberArray2[3].roundNicely(5));
         assertEquals(new Complex(5), complexNumberArray2[4].roundNicely(5));
         assertEquals(new Complex(0, 6).roundNicely(5), complexNumberArray2[5].roundNicely(5));
+    }
+
+    @Test
+    void circularConvolution() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        // Make the method accessible to this test
+        Method circularConvMtd = FFT.class.getDeclaredMethod("circularConvolution", Complex[].class, Complex[].class);
+        circularConvMtd.setAccessible(true);
+
+        // Define vectors to test the circular convolution method
+        Complex[] vectorA = {Complex.ZERO, Complex.ONE, Complex.IMAG_UNIT, Complex.ONE, Complex.ZERO};
+        Complex[] vectorB = {new Complex(10), new Complex(11), new Complex(0, 11), new Complex(11), new Complex(10)};
+        Complex[] vectorC = {new Complex(-1, -2), new Complex(-3, -4)};
+        Complex[] vectorD = {new Complex(10), new Complex(0, 13)};
+
+        // Define correct output vectors
+        Complex[] correctConvAB = {new Complex(10, 22), new Complex(21, 10), new Complex(21, 10), new Complex(10, 22), new Complex(11)};
+        Complex[] correctConvCD = {new Complex(42, -59), new Complex(-4, -53)};
+
+        // Generate the circular convolution outputs
+        Complex[] convAB = (Complex[]) circularConvMtd.invoke(null, vectorA, vectorB);
+        Complex[] convCD = (Complex[]) circularConvMtd.invoke(null, vectorC, vectorD);
+
+        // Check the circulat convolution outputs
+        assertEquals(correctConvAB.length, convAB.length);
+        assertEquals(correctConvCD.length, convCD.length);
+
+        for (int i = 0; i < correctConvAB.length; i++) {
+            assertEquals(correctConvAB[i].roundNicely(5), convAB[i].roundNicely(5));
+        }
+        for (int i = 0; i < correctConvCD.length; i++) {
+            assertEquals(correctConvCD[i].roundNicely(5), convCD[i].roundNicely(5));
+        }
+
+        assertThrowsExactly(LengthException.class, () -> {
+            try {
+                circularConvMtd.invoke(null, vectorA, vectorC);
+            } catch (InvocationTargetException e) {
+                throw e.getTargetException();
+            }
+        });
+        assertThrowsExactly(LengthException.class, () -> {
+            try {
+                circularConvMtd.invoke(null, vectorD, vectorB);
+            } catch (InvocationTargetException e) {
+                throw e.getTargetException();
+            }
+        });
     }
 }

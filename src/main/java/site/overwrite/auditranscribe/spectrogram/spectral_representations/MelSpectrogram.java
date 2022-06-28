@@ -82,23 +82,6 @@ public final class MelSpectrogram {
     }
 
     /**
-     * Compute a mel-scaled spectrogram.<br>
-     * A power spectrogram input P is mapped directly onto the mel basis by performing matrix
-     * multiplication.
-     *
-     * @param P          Power spectrogram.
-     * @param sampleRate Sample rate of the audio signal.
-     * @return Mel spectrogram.
-     */
-    public static double[][] melSpectrogram(double[][] P, double sampleRate) {
-        // Generate the mel filters
-        double[][] melFilters = melFilters(sampleRate, 2048);
-
-        // Finally, create the spectrogram and return
-        return ArrayUtils.matmul(melFilters, P);
-    }
-
-    /**
      * Create a Mel filter-bank.<br>
      * This produces a linear transformation matrix to project FFT bins onto Mel-frequency bins.
      *

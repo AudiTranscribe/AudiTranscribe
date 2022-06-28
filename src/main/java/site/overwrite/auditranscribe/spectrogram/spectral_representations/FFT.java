@@ -13,7 +13,7 @@
 
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
-import site.overwrite.auditranscribe.exceptions.generic.ValueException;
+import site.overwrite.auditranscribe.exceptions.generic.LengthException;
 import site.overwrite.auditranscribe.misc.Complex;
 import site.overwrite.auditranscribe.utils.MiscUtils;
 
@@ -105,7 +105,6 @@ public final class FFT {
      *
      * @param x The complex array <code>x</code> representing the data source.
      * @return An array of <code>Complex</code> objects representing the IFFT of the data source.
-     * @throws ValueException If the length of <code>x</code> is not a power of 2.
      */
     public static Complex[] ifft(Complex[] x) {
         // Get length of input array
@@ -142,8 +141,6 @@ public final class FFT {
      * @param x The complex array <code>x</code> representing the data source.
      * @param n Length of the transformed axis of the output.
      * @return An array of <code>Complex</code> objects representing the IRFFT of the data source.
-     * @throws ValueException If the length of <code>x</code> is not of the form
-     *                        <code>K / 2 + 1</code>.
      */
     public static Complex[] irfft(Complex[] x, int n) {
         // Extend the input array to `n`
@@ -276,12 +273,12 @@ public final class FFT {
      * @param aVector The first vector.
      * @param bVector The second vector.
      * @return The circular convolution of the two input vectors.
-     * @throws ValueException If the lengths of <code>aVector</code> and <code>bVector</code> are not equal.
+     * @throws LengthException If the lengths of <code>aVector</code> and <code>bVector</code> are not equal.
      */
     private static Complex[] circularConvolution(Complex[] aVector, Complex[] bVector) {
         // Check that the lengths of the vectors are equal
         if (aVector.length != bVector.length)
-            throw new ValueException("The lengths of the a and b vectors are not equal.");
+            throw new LengthException("The lengths of the a and b vectors are not equal.");
 
         // Get the number of elements in the vectors, `length`
         int length = aVector.length;
