@@ -1,4 +1,4 @@
-![AudiTranscribe Banner](IdeaProjects/AudiTranscribe/Designs/banner/banner.png "AudiTranscribe")
+![AudiTranscribe Banner](Designs/banner/banner.png "AudiTranscribe")
 
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4.svg)](.github/CODE_OF_CONDUCT.md)
 
