@@ -2,7 +2,7 @@
  * UnitConversionUtilsTest.java
  *
  * Created on 2022-03-12
- * Updated on 2022-06-26
+ * Updated on 2022-06-28
  *
  * Description: Test `UnitConversionUtils.java`.
  */
@@ -10,6 +10,8 @@
 package site.overwrite.auditranscribe.utils;
 
 import org.junit.jupiter.api.Test;
+import site.overwrite.auditranscribe.exceptions.generic.FormatException;
+import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -47,7 +49,6 @@ class UnitConversionUtilsTest {
 
         // Accidental tests
         assertEquals(60, UnitConversionUtils.noteToNoteNumber("C5"));
-        assertEquals(60, UnitConversionUtils.noteToNoteNumber("C♮5"));
         assertEquals(61, UnitConversionUtils.noteToNoteNumber("C#5"));
         assertEquals(61, UnitConversionUtils.noteToNoteNumber("C♯5"));
         assertEquals(62, UnitConversionUtils.noteToNoteNumber("C##5"));
@@ -58,6 +59,15 @@ class UnitConversionUtilsTest {
         assertEquals(58, UnitConversionUtils.noteToNoteNumber("Cbb5"));
         assertEquals(58, UnitConversionUtils.noteToNoteNumber("C!!5"));
         assertEquals(58, UnitConversionUtils.noteToNoteNumber("C♭♭5"));
+
+        // Weird 'no octave provided' tests
+        assertEquals(-2, UnitConversionUtils.noteToNoteNumber("C♭♭"));
+        assertEquals(2, UnitConversionUtils.noteToNoteNumber("C##"));
+
+        // Improper format tests
+        assertThrowsExactly(FormatException.class, () -> UnitConversionUtils.noteToNoteNumber("haha1"));
+        assertThrowsExactly(FormatException.class, () -> UnitConversionUtils.noteToNoteNumber("1C#"));
+        assertThrowsExactly(FormatException.class, () -> UnitConversionUtils.noteToNoteNumber("#C1"));
     }
 
     @Test
@@ -182,6 +192,7 @@ class UnitConversionUtilsTest {
                 new double[][]{{-60, 0}, {10, 20}, {20, 10}},
                 UnitConversionUtils.powerToDecibel(new double[][]{{0, 1}, {10, 100}, {100, 10}}, 1, 80)
         );
+        assertThrowsExactly(ValueException.class, () ->UnitConversionUtils.powerToDecibel(new double[][]{{0, 1}, {10, 100}, {100, 10}}, 1, -1));
     }
 
     @Test
@@ -300,5 +311,19 @@ class UnitConversionUtilsTest {
         assertEquals(68.333, UnitConversionUtils.ptToPx(51.25), 0.001);
         assertEquals(0, UnitConversionUtils.ptToPx(0), 0.001);
         assertEquals(219, UnitConversionUtils.ptToPx(164.25), 0.001);
+    }
+
+    // Other unit conversions
+    @Test
+    void secondsToTimeString() {
+        assertEquals("00:00", UnitConversionUtils.secondsToTimeString(0));
+        assertEquals("00:01", UnitConversionUtils.secondsToTimeString(1));
+        assertEquals("01:00", UnitConversionUtils.secondsToTimeString(60));
+        assertEquals("01:02", UnitConversionUtils.secondsToTimeString(62));
+        assertEquals("00:12", UnitConversionUtils.secondsToTimeString(12));
+        assertEquals("12:00", UnitConversionUtils.secondsToTimeString(720));
+        assertEquals("12:34", UnitConversionUtils.secondsToTimeString(754));
+
+        assertEquals("12345:40", UnitConversionUtils.secondsToTimeString(740740));  // Weird
     }
 }

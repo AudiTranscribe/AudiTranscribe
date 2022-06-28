@@ -74,12 +74,11 @@ public final class UnitConversionUtils {
                 entry("b", -1),
                 entry("!", -1),
                 entry("♯", 1),
-                entry("♭", -1),
-                entry("♮", 0)
+                entry("♭", -1)
         );
 
         final Pattern NOTE_PATTERN = Pattern.compile(
-                "^(?<note>[A-Ga-g])(?<accidental>[#♯b!♭♮]*)(?<octave>[+-]?\\d+)?$"
+                "^(?<note>[A-Ga-g])(?<accidental>[#♯b!♭]*)(?<octave>[+-]?\\d+)?$"
         );
 
         // Attempt to match the `note` string to the pattern
@@ -100,7 +99,7 @@ public final class UnitConversionUtils {
         }
 
         int octave;
-        if (Objects.equals(octaveChar, "")) {
+        if (octaveChar == null) {
             octave = 0;
         } else {
             octave = Integer.parseInt(octaveChar);
