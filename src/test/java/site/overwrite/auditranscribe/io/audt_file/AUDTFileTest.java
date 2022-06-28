@@ -2,7 +2,7 @@
  * AUDTFileTest.java
  *
  * Created on 2022-05-01
- * Updated on 2022-06-25
+ * Updated on 2022-06-28
  *
  * Description: Test AUDT file reading and writing.
  */
@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class AUDTFileTest {
     // Define the file path
     static final String FILE_PATH = IOMethods.joinPaths(
-            IOConstants.RESOURCES_FOLDER_PATH, "io-testing-directory", "files", "test-AUDTFileTest.audt"
+            IOConstants.RESOURCES_FOLDER_PATH, "testing-files", "misc", "test-AUDTFileTest.audt"
     );
 
     // Define helper attributes
@@ -86,7 +86,9 @@ class AUDTFileTest {
                 qTransformBytes, minMagnitude, maxMagnitude
         );
         audioDataObject = new AudioDataObject(
-                LZ4.lz4Compress(Files.readAllBytes(Paths.get(IOMethods.getAbsoluteFilePath("testing-audio-files/A440.mp3")))),
+                LZ4.lz4Compress(Files.readAllBytes(Paths.get(
+                        IOMethods.getAbsoluteFilePath("testing-files/audio/A440.mp3")
+                ))),
                 44100, 120000, "A440.wav");
 
         guiDataObject1 = new GUIDataObject(

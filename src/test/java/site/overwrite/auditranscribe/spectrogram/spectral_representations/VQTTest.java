@@ -2,7 +2,7 @@
  * VQTTest.java
  *
  * Created on 2022-04-10
- * Updated on 2022-06-09
+ * Updated on 2022-06-28
  *
  * Description: Test `VQT.java`.
  */
@@ -19,8 +19,6 @@ import site.overwrite.auditranscribe.utils.MathUtils;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,14 +26,10 @@ class VQTTest {
 
     @Test
     void vqt() {
-        // Constants
-        final boolean writeToFile = false;
-
-        // Run the test
         try {
             // Get the audio file
             Audio audio = new Audio(
-                    new File(IOMethods.getAbsoluteFilePath("testing-audio-files/Choice.wav")),
+                    new File(IOMethods.getAbsoluteFilePath("testing-files/audio/Choice.wav")),
                     "Choice.wav",
                     AudioProcessingMode.SAMPLES_ONLY
             );
@@ -70,18 +64,6 @@ class VQTTest {
             assertEquals(0.001, MathUtils.round(vqtMatrix[104][46].im(), 3), 0.005);
             assertEquals(0.001, MathUtils.round(vqtMatrix[147][398].re(), 3), 0.005);
             assertEquals(0.001, MathUtils.round(vqtMatrix[147][398].im(), 3), 0.005);
-
-            // Write the VQT matrix to a file
-            if (writeToFile) {
-                FileWriter myWriter = new FileWriter("test-VQT-data.txt");
-                myWriter.write("[");
-                for (Complex[] subarray : vqtMatrix) {
-                    myWriter.write(Arrays.toString(subarray) + ",");
-                }
-                myWriter.write("]");
-                myWriter.close();
-                System.out.println("Successfully wrote to the file.");
-            }
 
         } catch (Exception e) {
             e.printStackTrace();

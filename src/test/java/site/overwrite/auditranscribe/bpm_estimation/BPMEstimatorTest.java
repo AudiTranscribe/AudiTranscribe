@@ -2,7 +2,7 @@
  * BPMEstimatorTest.java
  *
  * Created on 2022-06-02
- * Updated on 2022-06-21
+ * Updated on 2022-06-28
  *
  * Description: Test `BPMEstimator.java`.
  */
@@ -29,12 +29,12 @@ class BPMEstimatorTest {
     void estimate() throws UnsupportedAudioFileException, IOException, AudioTooLongException {
         // Get the audio files
         Audio audio1 = new Audio(
-                new File(IOMethods.getAbsoluteFilePath("testing-audio-files/175bpm.wav")),
+                new File(IOMethods.getAbsoluteFilePath("testing-files/audio/175bpm.wav")),
                 "175bpm.wav",
                 AudioProcessingMode.SAMPLES_ONLY
         );
         Audio audio2 = new Audio(
-                new File(IOMethods.getAbsoluteFilePath("testing-audio-files/137bpmNoisy.wav")),
+                new File(IOMethods.getAbsoluteFilePath("testing-files/audio/137bpmNoisy.wav")),
                 "137bpmNoisy.wav",
                 AudioProcessingMode.SAMPLES_ONLY
         );
@@ -62,7 +62,7 @@ class BPMEstimatorTest {
         assertEquals(1, bpms2.size());
 
         // Check the values of the elements
-        assertEquals(87.59269068, bpms1.get(0), 1e-5);  // Yes, the BPM estimated is not 175 bpm, but that's what librosa says
+        assertEquals(87.59269068, bpms1.get(0), 1e-5);  // Surprisingly we did not estimate 175 bpm
         assertEquals(135.99917763, bpms2.get(0), 1e-5);
     }
 }

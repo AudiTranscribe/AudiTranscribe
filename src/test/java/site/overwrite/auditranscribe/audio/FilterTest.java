@@ -31,7 +31,7 @@ public class FilterTest {
 
         class MyInvalidTestFilter2 extends AbstractFilter {
             public MyInvalidTestFilter2() throws IOException {
-                defineAttributes(IOMethods.joinPaths("io-testing-directory", "files", "README.txt"));
+                defineAttributes(IOMethods.joinPaths("testing-files", "files", "README.txt"));
             }
         }
 

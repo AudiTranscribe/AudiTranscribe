@@ -122,16 +122,7 @@
                 <configuration>
                     <excludes>
                         <exclude>
-                            ${project.basedir}/designs/**
-                        </exclude>
-                        <exclude>
-                            ${project.basedir}/src/test/**
-                        </exclude>
-                        <exclude>
-                            ${project.basedir}/src/main/resources/site/overwrite/auditranscribe/test-resources/**
-                        </exclude>
-                        <exclude>
-                            ${project.basedir}/src/main/resources/site/overwrite/auditranscribe/testing-audio-files/**
+                            site/overwrite/auditranscribe/testing-files/**
                         </exclude>
                         <exclude>
                             *.svg

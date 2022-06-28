@@ -2,7 +2,7 @@
  * IOMethodsTest.java
  *
  * Created on 2022-05-10
- * Updated on 2022-06-27
+ * Updated on 2022-06-28
  *
  * Description: Test `IOMethods.java`.
  */
@@ -22,19 +22,19 @@ class IOMethodsTest {
     // Define the testing file path for testing the creation and deletion path
     static final String FILE_FOR_TESTING_CREATION_AND_DELETION_PATH = IOMethods.joinPaths(
             IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-            "io-testing-directory", "files", "FileForTestingCreationAndDeletion.txt"
+            "testing-files", "text", "FileForTestingCreationAndDeletion.txt"
     );
     static final String FILE_THAT_SHOULD_NOT_BE_CREATED_OR_DELETED = IOMethods.joinPaths(
             IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-            "io-testing-directory", "nonexistent-directory", "FakeFile.txt"
+            "testing-files", "nonexistent-directory", "FakeFile.txt"
     );
 
     // File path handling
     @Test
     void getFileURLString() {
-        String urlString = IOMethods.getFileURLAsString("io-testing-directory/files/README.txt");
+        String urlString = IOMethods.getFileURLAsString("testing-files/text/README.txt");
         assertTrue(urlString.contains("file:/"));
-        assertTrue(urlString.contains("io-testing-directory/files/README.txt"));
+        assertTrue(urlString.contains("testing-files/text/README.txt"));
     }
 
     // IO Handling
@@ -72,7 +72,7 @@ class IOMethodsTest {
         // Define the path to the test directory
         String testDirectory = IOMethods.joinPaths(
                 IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-                "io-testing-directory", "new-directory"
+                "testing-files", "new-directory"
         );
 
         // The test folder should create successfully
@@ -88,7 +88,7 @@ class IOMethodsTest {
     // File location handling
     @Test
     void isFileAt() {
-        assertTrue(IOMethods.isFileAt(IOMethods.getAbsoluteFilePath("io-testing-directory/files/README.txt")));
+        assertTrue(IOMethods.isFileAt(IOMethods.getAbsoluteFilePath("testing-files/text/README.txt")));
         assertTrue(IOMethods.isFileAt(IOMethods.getAbsoluteFilePath("conf/logging.properties")));
         assertFalse(IOMethods.isFileAt("this-is-a-totally-fake-file.fakefile.fake"));
     }
@@ -96,9 +96,9 @@ class IOMethodsTest {
     @Test
     void moveFile() throws IOException {
         // Define paths
-        String originalFilePath = IOMethods.getAbsoluteFilePath("io-testing-directory/files/MyFile.txt");
+        String originalFilePath = IOMethods.getAbsoluteFilePath("testing-files/text/MyFile.txt");
         String newFilePath = IOMethods.joinPaths(
-                IOConstants.RESOURCES_FOLDER_PATH, "io-testing-directory", "MyNewFile.txt"
+                IOConstants.RESOURCES_FOLDER_PATH, "testing-files", "MyNewFile.txt"
         );
 
         // Check if the file that we want to move exists

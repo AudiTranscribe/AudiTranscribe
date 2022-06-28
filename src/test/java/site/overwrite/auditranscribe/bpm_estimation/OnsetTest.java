@@ -2,7 +2,7 @@
  * OnsetTest.java
  *
  * Created on 2022-05-31
- * Updated on 2022-06-21
+ * Updated on 2022-06-28
  *
  * Description: Test `Onset.java`.
  */
@@ -26,12 +26,12 @@ class OnsetTest {
     void onsetStrength() throws UnsupportedAudioFileException, IOException, AudioTooLongException {
         // Get the audio files
         Audio audio1 = new Audio(
-                new File(IOMethods.getAbsoluteFilePath("testing-audio-files/Choice.wav")),
+                new File(IOMethods.getAbsoluteFilePath("testing-files/audio/Choice.wav")),
                 "Choice.wav",
                 AudioProcessingMode.SAMPLES_ONLY
         );
         Audio audio2 = new Audio(
-                new File(IOMethods.getAbsoluteFilePath("testing-audio-files/LevelsOfC.wav")),
+                new File(IOMethods.getAbsoluteFilePath("testing-files/audio/LevelsOfC.wav")),
                 "LevelsOfC.wav",
                 AudioProcessingMode.SAMPLES_ONLY
         );
