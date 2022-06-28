@@ -2,7 +2,7 @@
  * ComplexTest.java
  *
  * Created on 2022-03-09
- * Updated on 2022-05-28
+ * Updated on 2022-06-28
  *
  * Description: Test `Complex.java`.
  */
@@ -11,7 +11,6 @@ package site.overwrite.auditranscribe.misc;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import site.overwrite.auditranscribe.misc.Complex;
 import site.overwrite.auditranscribe.utils.MathUtils;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,6 +26,41 @@ class ComplexTest {
     void im() {
         assertEquals(4, (new Complex(3, 4)).im());
         assertEquals(6.78, (new Complex(3.45, 6.78)).im());
+    }
+
+    @Test
+    void testEquality() {
+        // Define three complex number objects to test equality
+        Complex complex1 = new Complex(1.2, 3.4);
+        Complex complex2 = new Complex(1.2, 3.4);
+        Complex complex3 = new Complex(5.67, 8.9);
+        Complex complex4 = new Complex(1.2, 8.9);
+        Complex complex5 = new Complex(5.67, 3.4);
+
+        // Define other objects to test comparison
+        String otherTypedVar = "hello";
+
+        // Test equality comparisons
+        assertEquals(complex1, complex1);
+
+        assertNotEquals(complex2, null);
+        //noinspection AssertBetweenInconvertibleTypes
+        assertNotEquals(complex3, otherTypedVar);  // Not redundant to test the equality method
+
+        assertEquals(complex1, complex2);
+        assertNotEquals(complex2, complex3);
+        assertNotEquals(complex1, complex4);
+        assertNotEquals(complex2, complex5);
+    }
+
+    @Test
+    void testHashCode() {
+        // Define three complex number objects to test equality
+        Complex complex1 = new Complex(1, 2.3);
+        Complex complex2 = new Complex(4.56, 7.89);
+
+        assertEquals(-462158911, complex1.hashCode());
+        assertEquals(-36961305, complex2.hashCode());
     }
 
     @Test

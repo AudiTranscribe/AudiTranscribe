@@ -2,7 +2,7 @@
  * Complex.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-23
+ * Updated on 2022-06-28
  *
  * Description: Complex number class.
  */
@@ -51,7 +51,8 @@ public class Complex {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null) return false;
+        if (getClass() != o.getClass()) return false;
         Complex that = (Complex) o;
         return (this.re == that.re) && (this.im == that.im);
     }
