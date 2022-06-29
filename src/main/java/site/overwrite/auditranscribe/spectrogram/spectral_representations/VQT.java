@@ -2,7 +2,7 @@
  * VQT.java
  *
  * Created on 2022-03-11
- * Updated on 2022-06-28
+ * Updated on 2022-06-29
  *
  * Description: Class that implements the Variable Q-Transform (VQT) algorithm.
  */
@@ -146,9 +146,6 @@ public final class VQT {
         double[] freqsTop = new double[binsPerOctave];
         System.arraycopy(freqs, numBins - binsPerOctave, freqsTop, 0, binsPerOctave);
 
-        // Get the highest frequency
-        double highestFrequency = freqsTop[binsPerOctave - 1];
-
         // Calculate the relative difference in frequency between any two consecutive bands, alpha
         double alpha = SpectralHelpers.computeAlpha(binsPerOctave);
 
@@ -163,7 +160,7 @@ public final class VQT {
 
         if (filterCutoff > nyquistFrequency) {
             throw new InvalidParameterException(
-                    "Wavelet basis with max frequency " + highestFrequency +
+                    "Wavelet basis with max frequency " + freqsTop[binsPerOctave - 1] +
                             " would exceed the Nyquist frequency " + nyquistFrequency +
                             ". Try reducing the number of frequency bins."
             );
@@ -323,25 +320,30 @@ public final class VQT {
         // Actually perform the downsampling
         double[] yNew;
 
-        if (downsampleCount > 0 && filter == Filter.KAISER_FAST) {
-            // Compute how much to downsample by
-            int downsampleFactor = (int) Math.pow(2, downsampleCount);
+        if (filter == Filter.KAISER_FAST) {
+            if (downsampleCount > 0) {
+                // Compute how much to downsample by
+                int downsampleFactor = (int) Math.pow(2, downsampleCount);
 
-            // Check if the signal can actually be downsampled
-            if (y.length < downsampleFactor) {
-                throw new ValueException(
-                        "Input signal length of " + y.length + " is too short for " + numOctaves + "-octave VQT"
-                );
+                // Check if the signal can actually be downsampled
+                if (y.length < downsampleFactor) {
+                    throw new ValueException(
+                            "Input signal length of " + y.length + " is too short for " + numOctaves + "-octave VQT"
+                    );
+                }
+
+                // Downsample hop length and the sample rate
+                hopLength /= downsampleFactor;
+                double newSr = sr / downsampleFactor;
+
+                // Downsample audio sample
+                yNew = Audio.resample(y, sr, newSr, filter, true);
+                sr = newSr;
+            } else {
+                yNew = y;
             }
-
-            // Downsample hop length and the sample rate
-            hopLength /= downsampleFactor;
-            double newSr = sr / downsampleFactor;
-
-            // Downsample audio sample
-            yNew = Audio.resample(y, sr, newSr, filter, true);
-            sr = newSr;
         } else {
+            // Not possible for `downsampleCount > 0` due to how `downsampleCount1` is calculated
             yNew = y;
         }
 
@@ -437,27 +439,16 @@ public final class VQT {
             // By default, take the whole octave
             int numOctaves = response.length;
 
-            // If the whole octave is more than we can fit, take the highest bins from `response`
-            if (end < numOctaves) {
-                for (int i = 0; i < end; i++) {
-                    System.arraycopy(
-                            response[numOctaves - end + i],
-                            0,
-                            vqtOut[i],
-                            0,
-                            maxPermittedNumCol
-                    );
-                }
-            } else {
-                for (int i = 0; i < numOctaves; i++) {
-                    System.arraycopy(
-                            response[i],
-                            0,
-                            vqtOut[end - numOctaves + i],
-                            0,
-                            maxPermittedNumCol
-                    );
-                }
+            // It is guaranteed that `end >= numOctaves` since `end = numBins` is a multiple of `numOctaves` and the
+            // number of VQT responses is `numOctaves / numBins`, so we just copy until `numOctaves`
+            for (int i = 0; i < numOctaves; i++) {
+                System.arraycopy(
+                        response[i],
+                        0,
+                        vqtOut[end - numOctaves + i],
+                        0,
+                        maxPermittedNumCol
+                );
             }
 
             end -= numOctaves;
