@@ -11,6 +11,8 @@ package site.overwrite.auditranscribe.io.audt_file;
 
 import org.javatuples.Triplet;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.LZ4;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
@@ -23,6 +25,7 @@ import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@EnabledOnOs({OS.LINUX})
 class ProjectDataTest {
     // Define helper attributes
     double[][] qTransformMagnitudes1;

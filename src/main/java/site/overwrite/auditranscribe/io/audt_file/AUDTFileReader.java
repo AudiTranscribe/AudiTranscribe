@@ -2,7 +2,7 @@
  * AUDTFileReader.java
  *
  * Created on 2022-05-02
- * Updated on 2022-06-26
+ * Updated on 2022-06-29
  *
  * Description: Class that handles the reading of the AudiTranscribe (AUDT) file.
  */
@@ -282,18 +282,18 @@ public class AUDTFileReader {
         fileFormatVersion = readInteger();
         lz4Version = readInteger();
 
-        // Check if the file format is the current version
-        if (fileFormatVersion != AUDTFileConstants.FILE_VERSION_NUMBER) {
+        // Check if the file format is outdated
+        if (fileFormatVersion < AUDTFileConstants.FILE_VERSION_NUMBER) {
             throw new OutdatedFileFormatException(
                     "Reading in outdated AUDT file (file version is " + fileFormatVersion +
                             " but current version is " + AUDTFileConstants.FILE_VERSION_NUMBER + ")"
             );
         }
 
-        // Check if the LZ4 version is *exactly* the current version
-        if (lz4Version != AUDTFileConstants.LZ4_VERSION_NUMBER) {
+        // Check if the LZ4 version is outdated
+        if (lz4Version < AUDTFileConstants.LZ4_VERSION_NUMBER) {
             throw new OutdatedFileFormatException(
-                    "LZ4 version mismatch (file: " + " but current version is " +
+                    "Outdated LZ4 version (file version is " + lz4Version + " but current version is " +
                             AUDTFileConstants.LZ4_VERSION_NUMBER + ")"
             );
         }

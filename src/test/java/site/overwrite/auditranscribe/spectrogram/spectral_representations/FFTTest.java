@@ -194,7 +194,7 @@ class FFTTest {
         Complex[] convAB = (Complex[]) circularConvMtd.invoke(null, vectorA, vectorB);
         Complex[] convCD = (Complex[]) circularConvMtd.invoke(null, vectorC, vectorD);
 
-        // Check the circulat convolution outputs
+        // Check the circular convolution outputs
         assertEquals(correctConvAB.length, convAB.length);
         assertEquals(correctConvCD.length, convCD.length);
 
