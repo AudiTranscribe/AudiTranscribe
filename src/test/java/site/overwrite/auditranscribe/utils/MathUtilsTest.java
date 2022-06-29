@@ -120,6 +120,38 @@ class MathUtilsTest {
         assertEquals(1f, MathUtils.round(1f, 3));
     }
 
+    // Combinatorial methods
+    @Test
+    void selfProduct() {
+        // Test base case
+        int[][] baseCaseTest1 = MathUtils.selfProduct(2, 0);
+        int[][] baseCaseTest2 = MathUtils.selfProduct(3, 0);
+        int[][] baseCaseTest3 = MathUtils.selfProduct(5, 0);
+
+        for (int[][] baseCaseTest :
+                new int[][][]{baseCaseTest1, baseCaseTest2, baseCaseTest3}) {
+            assertEquals(0, baseCaseTest.length);
+        }
+
+        // Test other values
+        int[][] selfProductTest1 = MathUtils.selfProduct(2, 5);
+        int[][] selfProductTest2 = MathUtils.selfProduct(5, 3);
+        int[][] selfProductTest3 = MathUtils.selfProduct(8, 1);
+
+        int[] expectedLengths = {32, 125, 8};
+
+        int i = 0;
+        for (int[][] selfProductTest:
+             new int[][][]{selfProductTest1, selfProductTest2, selfProductTest3}) {
+            assertEquals(expectedLengths[i], selfProductTest.length);
+            i++;
+        }
+
+        assertArrayEquals(new int[]{0, 1, 1, 0, 1}, selfProductTest1[13]);
+        assertArrayEquals(new int[]{2, 3, 2}, selfProductTest2[67]);
+        assertArrayEquals(new int[]{5}, selfProductTest3[5]);
+    }
+
     // Checking-related methods
     @Test
     void isInteger() {

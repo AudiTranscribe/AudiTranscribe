@@ -2,7 +2,7 @@
  * MathUtils.java
  *
  * Created on 2022-02-15
- * Updated on 2022-06-28
+ * Updated on 2022-06-29
  *
  * Description: Mathematical utility methods.
  */
@@ -197,6 +197,61 @@ public final class MathUtils {
         return Math.round(x * Math.pow(10, dp)) / Math.pow(10, dp);
     }
 
+    // Combinatorial methods
+
+    /**
+     * Method that computes the <code>k</code>th <em>self-product</em> of <code>n</code>
+     * elements and returns them in lexicographical order.<br>
+     * The <code>k</code>th <em>self-product</em> is the permutation of <code>k</code> copies of the
+     * <code>n</code> element array. Note for this method the elements of the <code>n</code> element
+     * array will be 0, 1, 2,...,<code>n-1</code>, like array indices.
+     *
+     * @param n Number of elements.
+     * @param k Number of repeats.
+     * @return 2D array of integers. Each subarray contains one possible <em>self-product</em>, and
+     * there will be <code>n</code><sup><code>k</code></sup> subarrays in total, unless
+     * <code>k = 0</code> in which case there will be 0 subarrays.
+     */
+    public static int[][] selfProduct(int n, int k) {
+        // Handle base case
+        if (k == 0) {
+            // If no repeats is specified, just return empty array
+            return new int[0][0];
+        }
+
+        // Otherwise, compute number of elements in the final array
+        int numElem = (int) Math.pow(n, k);
+
+        // Define final output array
+        int[][] output = new int[numElem][k];
+
+        // Get all possible elements for the 2nd to nth elements
+        int[][] tempSelfProduct = selfProduct(n, k-1);
+
+        // Check how many elements are to be appended
+        if (tempSelfProduct.length == 0) {
+            // No elements after this one; just linearly add to the output list
+            for (int i = 0; i < n; i++) {
+                output[i][0] = i;
+            }
+        } else {
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < tempSelfProduct.length; j++) {
+                    // Fill in temp array
+                    int[] temp = new int[k];
+                    temp[0] = i;
+                    System.arraycopy(tempSelfProduct[j], 0, temp, 1, k - 1);
+
+                    // Set array in the output
+                    output[i * tempSelfProduct.length + j] = temp;
+                }
+            }
+        }
+
+        // Return the output array
+        return output;
+    }
+
     // Checking-related methods
 
     /**
@@ -244,10 +299,10 @@ public final class MathUtils {
      * @return Wrapped value.
      * @throws ValueException If:<ul>
      *                        <li>
-     *                            The maximum value is not a positive integer.
+     *                        The maximum value is not a positive integer.
      *                        </li>
      *                        <li>
-     *                            The minimum value is larger than or equal to the maximum value.
+     *                        The minimum value is larger than or equal to the maximum value.
      *                        </li>
      *                        </ul>
      */
@@ -279,10 +334,10 @@ public final class MathUtils {
      * @return Wrapped value.
      * @throws ValueException If:<ul>
      *                        <li>
-     *                            The maximum value is not a positive number.
+     *                        The maximum value is not a positive number.
      *                        </li>
      *                        <li>
-     *                            The minimum value is larger than the maximum value.
+     *                        The minimum value is larger than the maximum value.
      *                        </li>
      *                        </ul>
      */
