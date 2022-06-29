@@ -2,7 +2,7 @@
  * AUDTFileTest.java
  *
  * Created on 2022-05-01
- * Updated on 2022-06-28
+ * Updated on 2022-06-29
  *
  * Description: Test AUDT file reading and writing.
  */
@@ -55,6 +55,9 @@ class AUDTFileTest {
     MusicNotesDataObject musicNotesDataObject2;
 
     UnchangingDataPropertiesObject unchangingDataPropertiesObject;
+
+    ProjectData projectData1;
+    ProjectData projectData2;
 
     // Initialization method
     AUDTFileTest() throws IOException {
@@ -111,12 +114,22 @@ class AUDTFileTest {
                         qTransformDataObject.numBytesNeeded() +
                         audioDataObject.numBytesNeeded()
         );
+
+        // Define the overall project data object
+        projectData1 = new ProjectData(
+                unchangingDataPropertiesObject, qTransformDataObject, audioDataObject, guiDataObject1,
+                musicNotesDataObject1
+        );
+        projectData2 = new ProjectData(
+                unchangingDataPropertiesObject, qTransformDataObject, audioDataObject, guiDataObject2,
+                musicNotesDataObject2
+        );
     }
 
     // Tests
     @Test
     @Order(1)
-    void fileWriterTestOne() throws IOException {
+    void fileWriterTestInitialWrite() throws IOException {
         // Create a filewriter object
         AUDTFileWriter fileWriter = new AUDTFileWriter(FILE_PATH);
 
@@ -133,7 +146,7 @@ class AUDTFileTest {
 
     @Test
     @Order(2)
-    void fileReaderTestOne() throws IOException, IncorrectFileFormatException, OutdatedFileFormatException,
+    void fileReaderTestInitialRead() throws IOException, IncorrectFileFormatException, OutdatedFileFormatException,
             FailedToReadDataException {
         // Create a filereader object
         AUDTFileReader fileReader = new AUDTFileReader(FILE_PATH);
@@ -163,10 +176,75 @@ class AUDTFileTest {
         for (int i = 0; i < array.length; i++) {
             assertArrayEquals(array[i], qTransformMagnitudes[i], 1e-5);
         }
+
+        // Check if the project data are equal
+        ProjectData readProjectData = new ProjectData(
+                readUnchangingDataProperties, readQTransformData, readAudioData, readGUIData, readMusicData
+        );
+
+        assertEquals(projectData1, readProjectData);
     }
 
     @Test
     @Order(3)
+    void fileWriterTestInitialWriteAlt() throws IOException {
+        // Create a filewriter object
+        AUDTFileWriter fileWriter = new AUDTFileWriter(FILE_PATH, 0);
+
+        // Test writing some data
+        fileWriter.writeUnchangingDataProperties(unchangingDataPropertiesObject);
+        fileWriter.writeQTransformData(qTransformDataObject);
+        fileWriter.writeAudioData(audioDataObject);
+        fileWriter.writeGUIData(guiDataObject1);
+        fileWriter.writeMusicNotesData(musicNotesDataObject1);
+
+        // Write the bytes to file
+        fileWriter.writeBytesToFile();
+    }
+
+    @Test
+    @Order(4)
+    void fileReaderTestInitialReadAlt() throws IOException, IncorrectFileFormatException, OutdatedFileFormatException,
+            FailedToReadDataException {
+        // Create a filereader object
+        AUDTFileReader fileReader = new AUDTFileReader(FILE_PATH);
+
+        // Test reading some data
+        UnchangingDataPropertiesObject readUnchangingDataProperties = fileReader.readUnchangingDataProperties();
+        QTransformDataObject readQTransformData = fileReader.readQTransformData();
+        AudioDataObject readAudioData = fileReader.readAudioData();
+        GUIDataObject readGUIData = fileReader.readGUIData();
+        MusicNotesDataObject readMusicData = fileReader.readMusicNotesData();
+
+        // Check if the read data are equal
+        assertEquals(unchangingDataPropertiesObject, readUnchangingDataProperties);
+        assertEquals(qTransformDataObject, readQTransformData);
+        assertEquals(audioDataObject, readAudioData);
+        assertEquals(guiDataObject1, readGUIData);
+        assertEquals(musicNotesDataObject1, readMusicData);
+
+        // Check if the decompressed version of the Q-Transform magnitudes is the same
+        double[][] array = QTransformDataObject.byteDataToQTransformMagnitudes(
+                qTransformDataObject.qTransformBytes,
+                qTransformDataObject.minMagnitude,
+                qTransformDataObject.maxMagnitude
+        );
+
+        assertEquals(array.length, qTransformMagnitudes.length);
+        for (int i = 0; i < array.length; i++) {
+            assertArrayEquals(array[i], qTransformMagnitudes[i], 1e-5);
+        }
+
+        // Check if the project data are equal
+        ProjectData readProjectData = new ProjectData(
+                readUnchangingDataProperties, readQTransformData, readAudioData, readGUIData, readMusicData
+        );
+
+        assertEquals(projectData1, readProjectData);
+    }
+
+    @Test
+    @Order(5)
     void fileWriterTestTwo() throws IOException {
         // Create a filewriter object
         AUDTFileWriter fileWriter = new AUDTFileWriter(FILE_PATH, unchangingDataPropertiesObject.numSkippableBytes);
@@ -180,7 +258,7 @@ class AUDTFileTest {
     }
 
     @Test
-    @Order(4)
+    @Order(6)
     void fileReaderTestTwo() throws IOException, IncorrectFileFormatException, OutdatedFileFormatException,
             FailedToReadDataException {
         // Create a filereader object
@@ -191,14 +269,14 @@ class AUDTFileTest {
         QTransformDataObject readQTransformData = fileReader.readQTransformData();
         AudioDataObject readAudioData = fileReader.readAudioData();
         GUIDataObject readGUIData = fileReader.readGUIData();
-        MusicNotesDataObject readMusicData2 = fileReader.readMusicNotesData();
+        MusicNotesDataObject readMusicData = fileReader.readMusicNotesData();
 
         // Check if the read data are equal
         assertEquals(unchangingDataPropertiesObject, readUnchangingDataProperties);
         assertEquals(qTransformDataObject, readQTransformData);
         assertEquals(audioDataObject, readAudioData);
         assertEquals(guiDataObject2, readGUIData);
-        assertEquals(musicNotesDataObject2, readMusicData2);
+        assertEquals(musicNotesDataObject2, readMusicData);
 
         // Check if the decompressed version of the Q-Transform magnitudes is the same
         double[][] array = QTransformDataObject.byteDataToQTransformMagnitudes(
@@ -211,6 +289,13 @@ class AUDTFileTest {
         for (int i = 0; i < array.length; i++) {
             assertArrayEquals(array[i], qTransformMagnitudes[i], 1e-5);
         }
+
+        // Check if the project data are equal
+        ProjectData readProjectData = new ProjectData(
+                readUnchangingDataProperties, readQTransformData, readAudioData, readGUIData, readMusicData
+        );
+
+        assertEquals(projectData2, readProjectData);
     }
 
     @AfterAll

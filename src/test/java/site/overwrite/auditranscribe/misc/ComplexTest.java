@@ -55,7 +55,7 @@ class ComplexTest {
 
     @Test
     void testHashCode() {
-        // Define three complex number objects to test equality
+        // Define complex number objects to test equality
         Complex complex1 = new Complex(1, 2.3);
         Complex complex2 = new Complex(4.56, 7.89);
 
