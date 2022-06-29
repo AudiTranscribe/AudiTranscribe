@@ -52,7 +52,8 @@ public class ProjectData {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null) return false;
+        if (getClass() != o.getClass()) return false;
         ProjectData that = (ProjectData) o;
         return (
                 unchangingDataProperties.equals(that.unchangingDataProperties) &&
