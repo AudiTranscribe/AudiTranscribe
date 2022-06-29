@@ -9,7 +9,6 @@
 
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
-import javafx.embed.swing.JFXPanel;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -21,7 +20,6 @@ import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
 import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.misc.Complex;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.utils.MathUtils;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
@@ -179,34 +177,6 @@ class QTransformTests {
         assertEquals(-0.006, MathUtils.round(vqtMatrix[15][425].im(), 3), 0.005);
         assertEquals(0.003, MathUtils.round(vqtMatrix[27][87].re(), 3), 0.005);
         assertEquals(0.005, MathUtils.round(vqtMatrix[27][87].im(), 3), 0.005);
-    }
-
-    @Test
-    @Order(3)
-    void vqtUseFakeTask() {
-        // Start JavaFX toolkit
-        new JFXPanel();
-
-        // Process VQT on those samples
-        VQT.vqt(
-                samples, audio.getSampleRate(), 512, UnitConversionUtils.noteToFreq("C1"), 168,
-                24, false, 0, WindowFunction.HANN_WINDOW, new CustomTask<Void>() {
-                    @Override
-                    protected Void call() {
-                        return null;
-                    }
-                }
-        );  // Kaiser Fast
-
-        VQT.vqt(
-                samples, audio.getSampleRate() / 1.75, 512, UnitConversionUtils.noteToFreq("C1"), 9,
-                1, false, 12, WindowFunction.HANN_WINDOW, new CustomTask<Void>() {
-                    @Override
-                    protected Void call() {
-                        return null;
-                    }
-                }
-        );  // Kaiser Best
     }
 
     @Test
