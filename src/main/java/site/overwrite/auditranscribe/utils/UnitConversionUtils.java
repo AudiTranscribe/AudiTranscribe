@@ -2,7 +2,7 @@
  * UnitConversionUtils.java
  *
  * Created on 2022-03-12
- * Updated on 2022-06-28
+ * Updated on 2022-06-29
  *
  * Description: Unit conversion utility methods.
  */
@@ -13,7 +13,6 @@ import site.overwrite.auditranscribe.exceptions.generic.FormatException;
 import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,7 +54,6 @@ public final class UnitConversionUtils {
      * @throws FormatException the note format is incorrect.
      * @implNote Double sharp and double flat are not currently supported.
      */
-    // Todo: find a way to incorporate double sharp and double flat
     public static int noteToNoteNumber(String note) {
         // Define constants
         final Map<String, Integer> PITCH_MAP = Map.ofEntries(
