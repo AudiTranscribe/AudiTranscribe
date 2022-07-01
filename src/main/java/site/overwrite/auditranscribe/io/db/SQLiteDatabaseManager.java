@@ -2,7 +2,7 @@
  * SQLiteDatabaseManager.java
  *
  * Created on 2022-05-11
- * Updated on 2022-06-05
+ * Updated on 2022-07-01
  *
  * Description: Class that helps manage the interactions with an SQLite3 database.
  */
@@ -41,31 +41,26 @@ public class SQLiteDatabaseManager {
 
     /**
      * Method that helps connect to the SQLite3 database.
+     *
+     * @throws SQLException If a database access error occurs, or the url is <code>null</code>.
      */
-    public void dbConnect() {
-        try {
-            // Attempt to connect to the database
-            connection = DriverManager.getConnection(ACCESS_METHOD_STRING + databaseAbsolutePath);
+    public void dbConnect() throws SQLException {
+        // Attempt to connect to the database
+        connection = DriverManager.getConnection(ACCESS_METHOD_STRING + databaseAbsolutePath);
 
-            // Create statement and set timeout
-            statement = connection.createStatement();
-            statement.setQueryTimeout(TIMEOUT);
-        } catch (SQLException e) {
-            // If the error message is "out of memory", it probably means no database file is found
-            throw new RuntimeException(e);
-        }
+        // Create statement and set timeout
+        statement = connection.createStatement();
+        statement.setQueryTimeout(TIMEOUT);
     }
 
     /**
      * Method that closes the connection to the SQLite3 database.
+     *
+     * @throws SQLException If a database access error occurs, or the url is <code>null</code>.
      */
-    public void dbDisconnect() {
+    public void dbDisconnect() throws SQLException {
         // Attempt to close the connection
-        try {
-            if (connection != null) connection.close();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        connection.close();
 
         // Set both `connection` and `statement` to `null` to signal that it is no longer connected
         connection = null;
