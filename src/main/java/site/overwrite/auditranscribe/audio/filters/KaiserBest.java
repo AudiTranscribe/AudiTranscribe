@@ -2,12 +2,15 @@
  * KaiserBest.java
  *
  * Created on 2022-03-07
- * Updated on 2022-06-24
+ * Updated on 2022-07-01
  *
  * Description: Kaiser Best resampling filter.
  */
 
 package site.overwrite.auditranscribe.audio.filters;
+
+import site.overwrite.auditranscribe.exceptions.audio.FilterNotFoundException;
+import site.overwrite.auditranscribe.io.IOMethods;
 
 import java.io.IOException;
 
@@ -20,8 +23,9 @@ import java.io.IOException;
 public class KaiserBest extends AbstractFilter {
     public KaiserBest() {
         try {
-            defineAttributes("filter-data/kaiser-best.json");
-        } catch (IOException ignored) {
+            defineAttributes(IOMethods.joinPaths("filter-data", "kaiser-best.json"));
+        } catch (IOException e) {
+            throw new FilterNotFoundException("The Kaiser Best JSON file could not be located.");
         }
     }
 }

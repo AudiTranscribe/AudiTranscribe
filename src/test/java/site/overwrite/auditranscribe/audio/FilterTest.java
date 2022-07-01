@@ -2,25 +2,30 @@
  * FilterTest.java
  *
  * Created on 2022-06-24
- * Updated on 2022-06-25
+ * Updated on 2022-07-01
  *
  * Description: Test the audio filters.
  */
 
 package site.overwrite.auditranscribe.audio;
 
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import site.overwrite.auditranscribe.audio.filters.AbstractFilter;
-import site.overwrite.auditranscribe.audio.filters.KaiserBest;
-import site.overwrite.auditranscribe.audio.filters.KaiserFast;
+import org.junit.jupiter.api.TestMethodOrder;
+import site.overwrite.auditranscribe.audio.filters.*;
+import site.overwrite.auditranscribe.exceptions.audio.FilterNotFoundException;
+import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class FilterTest {
     @Test
+    @Order(1)
     void abstractFilterTest() {
         // Create invalid classes for testing
         class MyInvalidTestFilter1 extends AbstractFilter {
@@ -41,7 +46,8 @@ public class FilterTest {
     }
 
     @Test
-    void kaiserBestTest() {
+    @Order(2)
+    void kaiserBestNormalTest() {
         // Create a new kaiser best filter
         KaiserBest kaiserBest = new KaiserBest();
 
@@ -60,6 +66,7 @@ public class FilterTest {
     }
 
     @Test
+    @Order(2)
     void kaiserFastTest() {
         // Create a new kaiser best filter
         KaiserFast kaiserFast = new KaiserFast();
@@ -74,5 +81,65 @@ public class FilterTest {
         assertEquals(0.2440165355807558, halfWindow[456], 1e-6);
         assertEquals(-0.1645266447169643, halfWindow[789], 1e-6);
         assertEquals(-2.628865215979547e-05, halfWindow[8192], 1e-6);
+    }
+
+    @Test
+    @Order(3)
+    void kaiserBestExceptionTest() throws IOException {
+        // Test exceptions
+        IOMethods.moveFile(
+                IOMethods.joinPaths(
+                        IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+                        "filter-data", "kaiser-best.json"
+                ),
+                IOMethods.joinPaths(
+                        IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+                        "kaiser-best.json"
+                )
+        );
+        try {
+            assertThrowsExactly(FilterNotFoundException.class, KaiserBest::new);
+        } finally {
+            IOMethods.moveFile(
+                    IOMethods.joinPaths(
+                            IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+                            "kaiser-best.json"
+                    ),
+                    IOMethods.joinPaths(
+                            IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+                            "filter-data", "kaiser-best.json"
+                    )
+            );
+        }
+    }
+
+    @Test
+    @Order(3)
+    void kaiserFastExceptionTest() throws IOException {
+        // Test exceptions
+        IOMethods.moveFile(
+                IOMethods.joinPaths(
+                        IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+                        "filter-data", "kaiser-fast.json"
+                ),
+                IOMethods.joinPaths(
+                        IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+                        "kaiser-fast.json"
+                )
+        );
+        try {
+            assertThrowsExactly(FilterNotFoundException.class, KaiserFast::new);
+        } finally {
+            IOMethods.moveFile(
+                    IOMethods.joinPaths(
+                            IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+                            "kaiser-fast.json"
+                    ),
+                    IOMethods.joinPaths(
+                            IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+                            "filter-data", "kaiser-fast.json"
+                    )
+            );
+        }
     }
 }

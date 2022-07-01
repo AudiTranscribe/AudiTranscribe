@@ -72,7 +72,17 @@ public final class IOMethods {
      * @return Input stream of the file.
      */
     public static InputStream getInputStream(String filePath) {
-        return MainApplication.class.getResourceAsStream(filePath);
+        // Define the absolute file path
+        String absoluteFilePath = IOMethods.joinPaths(
+                IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH, filePath
+        );
+
+        // Return the input stream
+        try {
+            return new FileInputStream(absoluteFilePath);
+        } catch (FileNotFoundException e) {
+            return null;
+        }
     }
 
     /**
