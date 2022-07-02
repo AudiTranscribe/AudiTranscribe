@@ -27,7 +27,7 @@ jobs:
             xvfb-run mvn --batch-mode clean test
           elif [ "$RUNNER_OS" == "Windows" ]; then
             mvn --batch-mode clean test
-          elif [ "$RUNNER_OS" == "MacOS ]; then
+          elif [ "$RUNNER_OS" == "MacOS" ]; then
             mvn --batch-mode clean test
           else
             echo "$RUNNER_OS not supported"
