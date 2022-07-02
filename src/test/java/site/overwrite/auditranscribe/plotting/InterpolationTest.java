@@ -2,7 +2,7 @@
  * InterpolationTest.java
  *
  * Created on 2022-03-14
- * Updated on 2022-06-03
+ * Updated on 2022-07-02
  *
  * Description: Test `Interpolation.java`.
  */
@@ -10,11 +10,33 @@
 package site.overwrite.auditranscribe.plotting;
 
 import org.junit.jupiter.api.Test;
+import site.overwrite.auditranscribe.exceptions.generic.LengthException;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class InterpolationTest {
+    @Test
+    void interpolationExceptionTest() {
+        // Define array
+        double[][] array = new double[][]{
+                {1, 1, 1},
+                {1, 1, 1}
+        };
+
+        // Test exceptions
+        assertThrowsExactly(LengthException.class, () ->
+                Interpolation.interpolate(
+                        array, 1, 4, InterpolationMethod.NEAREST_NEIGHBOUR  // New X length too short
+                )
+        );
+        assertThrowsExactly(LengthException.class, () ->
+                Interpolation.interpolate(
+                        array, 3, 2, InterpolationMethod.NEAREST_NEIGHBOUR  // New Y length too short
+                )
+        );
+    }
+
     @Test
     void nearestNeighbour() {
         // Define arrays

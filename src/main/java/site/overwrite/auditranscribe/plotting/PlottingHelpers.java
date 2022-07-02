@@ -2,7 +2,7 @@
  * PlottingHelpers.java
  *
  * Created on 2022-03-19
- * Updated on 2022-06-28
+ * Updated on 2022-07-02
  *
  * Description: Helper functions for plotting.
  */
@@ -81,7 +81,9 @@ public final class PlottingHelpers {
     }
 
     /**
-     * Converts a height on the spectrogram to a note number.
+     * Converts a height on the spectrogram to a note number.<br>
+     * Note that the height returned is measured <b>from the top of the screen</b>. So a height of
+     * 123 for a spectrogram pane with maximum height 200 is actually 77 <b>from the bottom</b>.
      *
      * @param height     Height on the spectrogram pane.
      * @param minNoteNum Smallest note number. This will be assigned height 0.
