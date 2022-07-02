@@ -18,7 +18,7 @@ class PlottingHelpersTest {
     @Test
     void freqToHeight() {
         assertEquals(334.914, PlottingHelpers.freqToHeight(123, 10, 20000, 500), 0.001);
-        assertEquals(153.6, PlottingHelpers.freqToHeight(4096,32,32768,512), 0.001);
+        assertEquals(153.6, PlottingHelpers.freqToHeight(4096, 32, 32768, 512), 0.001);
         assertEquals(59.39195, PlottingHelpers.freqToHeight(12345, 1, 22050, 1024), 0.001);
     }
 
@@ -38,15 +38,15 @@ class PlottingHelpersTest {
 
     @Test
     void heightToNoteNum() {
-        assertEquals(77, PlottingHelpers.heightToNoteNum(123, 0, 200, 200),1e-5);
-        assertEquals(200, PlottingHelpers.heightToNoteNum(0, 0, 200, 200),1e-5);
-        assertEquals(0, PlottingHelpers.heightToNoteNum(200, 0, 200, 200),1e-5);
+        assertEquals(77, PlottingHelpers.heightToNoteNum(123, 0, 200, 200), 1e-5);
+        assertEquals(200, PlottingHelpers.heightToNoteNum(0, 0, 200, 200), 1e-5);
+        assertEquals(0, PlottingHelpers.heightToNoteNum(200, 0, 200, 200), 1e-5);
     }
 
     @Test
     void getHeightDifference() {
         assertEquals(1, PlottingHelpers.getHeightDifference(120, 0, 120), 1e-5);
-        assertEquals(5d/3, PlottingHelpers.getHeightDifference(200, 0, 120), 1e-5);
+        assertEquals(5d / 3, PlottingHelpers.getHeightDifference(200, 0, 120), 1e-5);
 
         assertEquals(1, PlottingHelpers.getHeightDifference(120, 100, 220), 1e-5);
         assertEquals(0.60060, PlottingHelpers.getHeightDifference(200, 123, 456), 1e-5);

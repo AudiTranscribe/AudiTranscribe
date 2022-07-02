@@ -2,7 +2,7 @@
  * IOConvertersTest.java
  *
  * Created on 2022-05-01
- * Updated on 2022-06-08
+ * Updated on 2022-07-02
  *
  * Description: Test `IOConverters.java`.
  */
@@ -10,8 +10,8 @@
 package site.overwrite.auditranscribe.io;
 
 import org.junit.jupiter.api.Test;
+import site.overwrite.auditranscribe.exceptions.generic.LengthException;
 
-import java.util.Arrays;
 import java.util.HexFormat;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -137,21 +137,29 @@ class IOConvertersTest {
 
     @Test
     void bytesToInt() {
+        // Test conversion
         assertEquals(0, IOConverters.bytesToInt(HexFormat.of().parseHex("00000000")));
         assertEquals(1234, IOConverters.bytesToInt(HexFormat.of().parseHex("000004d2")));
         assertEquals(1234567890, IOConverters.bytesToInt(HexFormat.of().parseHex("499602d2")));
         assertEquals(2147483647, IOConverters.bytesToInt(HexFormat.of().parseHex("7fffffff")));
         assertEquals(-1234567890, IOConverters.bytesToInt(HexFormat.of().parseHex("b669fd2e")));
         assertEquals(-2147483647, IOConverters.bytesToInt(HexFormat.of().parseHex("80000001")));
+
+        // Test exception
+        assertThrowsExactly(LengthException.class, () -> IOConverters.bytesToInt(new byte[]{(byte) 0x12}));
     }
 
     @Test
     void bytesToDouble() {
+        // Test conversion
         assertEquals(65.43, IOConverters.bytesToDouble(HexFormat.of().parseHex("40505b851eb851ec")), 1e-10);
         assertEquals(-123.45, IOConverters.bytesToDouble(HexFormat.of().parseHex("c05edccccccccccd")), 1e-10);
         assertEquals(9876.54321, IOConverters.bytesToDouble(HexFormat.of().parseHex("40c34a4587e7c06e")), 1e-10);
         assertEquals(3.14159265, IOConverters.bytesToDouble(HexFormat.of().parseHex("400921fb53c8d4f1")), 1e-10);
         assertEquals(-0.000082147128481, IOConverters.bytesToDouble(HexFormat.of().parseHex("bf1588ccebd0259f")), 1e-16);
+
+        // Test exception
+        assertThrowsExactly(LengthException.class, () -> IOConverters.bytesToDouble(new byte[]{(byte) 0x12}));
     }
 
     @Test
