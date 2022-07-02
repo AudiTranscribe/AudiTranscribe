@@ -12,6 +12,7 @@ package site.overwrite.auditranscribe.io;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
+import org.opentest4j.AssertionFailedError;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -186,7 +187,10 @@ class IOMethodsTest {
         assertEquals("testing/file/1/hello.txt", IOMethods.treatPath("testing/file/1/hello.txt"));
         assertEquals("testing\\file\\2\\hello.txt", IOMethods.treatPath("testing\\file\\2\\hello.txt"));
         assertEquals("nothing/unusual/", IOMethods.treatPath("nothing/unusual/"));
-        assertEquals("there%20are%20now%20spaces/test.txt/", IOMethods.treatPath("there%20are%20now%20spaces/test.txt/"));
+        assertEquals(
+                "there%20are%20now%20spaces/test.txt/",
+                IOMethods.treatPath("there%20are%20now%20spaces/test.txt/")
+        );
     }
 
     @Test
@@ -195,7 +199,10 @@ class IOMethodsTest {
         assertEquals("C:/testing/file/1/hello.txt", IOMethods.treatPath("/C:/testing/file/1/hello.txt"));
         assertEquals("D:\\testing\\file\\2\\hello.txt", IOMethods.treatPath("\\D:\\testing\\file\\2\\hello.txt"));
         assertEquals("/nothing/unusual/", IOMethods.treatPath("/nothing/unusual/"));
-        assertEquals("E:/there are now spaces/test.txt/", IOMethods.treatPath("/E:/there%20are%20now%20spaces/test.txt/"));
+        assertEquals(
+                "E:/there are now spaces/test.txt/",
+                IOMethods.treatPath("/E:/there%20are%20now%20spaces/test.txt/")
+        );
     }
 
     @Test
@@ -221,10 +228,10 @@ class IOMethodsTest {
     // Environmental variable management
     @Test
     void getOrDefault() {
-        if (IOMethods.getOSName().startsWith("WINDOWS")) {
-            assertNotEquals("12345", IOMethods.getOrDefault("Path", "12345"));
-        } else {
+        try {
             assertNotEquals("12345", IOMethods.getOrDefault("PATH", "12345"));
+        } catch (AssertionFailedError e) {
+            assertNotEquals("12345", IOMethods.getOrDefault("Path", "12345"));
         }
         assertEquals("67890", IOMethods.getOrDefault("not-a-real-environment-variable", "67890"));
     }
