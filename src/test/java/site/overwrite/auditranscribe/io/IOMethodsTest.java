@@ -2,7 +2,7 @@
  * IOMethodsTest.java
  *
  * Created on 2022-05-10
- * Updated on 2022-06-28
+ * Updated on 2022-07-02
  *
  * Description: Test `IOMethods.java`.
  */
@@ -14,6 +14,8 @@ import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileLock;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -62,8 +64,26 @@ class IOMethodsTest {
 
         // Attempt to delete a file in a folder that does not exist should return `false`
         assertFalse(IOMethods.deleteFile(FILE_THAT_SHOULD_NOT_BE_CREATED_OR_DELETED));
+    }
 
-        // Todo: add test for `IOException` case
+    @Test
+    @Order(2)
+    @EnabledOnOs({OS.WINDOWS})
+    void deleteFileWhileInUseShouldCauseException() throws IOException {  // Todo: assert that this works
+        // Attempt to delete file while it is being used should return false, and then delete file
+        // on exit
+        String testFilePath = IOMethods.joinPaths(
+                IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+                "io-testing-directory", "files", "lock-file.txt"
+        );
+        IOMethods.createFile(testFilePath);
+
+        try (
+                RandomAccessFile reader = new RandomAccessFile(testFilePath, "rw");
+                FileLock ignored = reader.getChannel().lock()
+        ) {
+            assertFalse(IOMethods.deleteFile(testFilePath));
+        }
     }
 
     @Test
