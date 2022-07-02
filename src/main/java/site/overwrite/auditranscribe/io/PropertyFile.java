@@ -2,14 +2,13 @@
  * PropertyFile.java
  *
  * Created on 2022-05-02
- * Updated on 2022-06-23
+ * Updated on 2022-07-02
  *
  * Description: Class that handles the retrieval of data from a property file.
  */
 
 package site.overwrite.auditranscribe.io;
 
-import site.overwrite.auditranscribe.MainApplication;
 import site.overwrite.auditranscribe.exceptions.io.NoSuchPropertyException;
 
 import java.io.IOException;
@@ -33,7 +32,12 @@ public class PropertyFile {
      */
     public PropertyFile(String propertyFileName) throws IOException {
         // Load the properties from the property file into the `Properties` object
-        properties.load(MainApplication.class.getClassLoader().getResourceAsStream(propertyFileName));
+        try {
+            properties.load(IOMethods.getInputStream(propertyFileName));
+        } catch (NullPointerException e) {
+            throw new IOException("Property file with name '" + propertyFileName + "' not found.");
+        }
+
     }
 
     // Public methods

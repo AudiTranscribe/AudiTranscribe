@@ -2,7 +2,7 @@
  * FFmpegHandler.java
  *
  * Created on 2022-05-06
- * Updated on 2022-06-25
+ * Updated on 2022-07-01
  *
  * Description: Methods that help handle the FFmpeg commands and methods.
  */
@@ -11,10 +11,12 @@ package site.overwrite.auditranscribe.audio;
 
 import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.io.StreamGobbler;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 /**
  * Methods that help handle the FFmpeg commands and methods.
@@ -44,6 +46,52 @@ public class FFmpegHandler {
     }
 
     // Public methods
+
+    /**
+     * Method that attempts to find the FFmpeg installation path automatically by using the
+     * command-line interface of FFmpeg.
+     *
+     * @return A string, representing the FFmpeg installation path.
+     * @throws FFmpegNotFoundException If the program fails to find the FFmpeg installation.
+     */
+    public static String getPathToFFmpeg() throws FFmpegNotFoundException {
+        // Check the operating system
+        boolean isWindows = IOMethods.getOSName().startsWith("WINDOWS");
+
+        // Generate the command to execute
+        ProcessBuilder builder = new ProcessBuilder();
+        if (isWindows) {
+            builder.command("cmd.exe", "/c", "where ffmpeg");
+        } else {
+            builder.command("sh", "-c", "which ffmpeg");
+        }
+
+        // Specify the working directory
+        builder.directory(new File(System.getProperty("user.home")));
+
+        // Define variables
+        final String[] ffmpegPath = new String[1];
+        try {
+            // Build the process
+            Process process = builder.start();
+
+            // Define stream gobbler
+            StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), s -> ffmpegPath[0] = s);
+
+            // Start the process
+            Executors.newSingleThreadExecutor().submit(streamGobbler);
+
+            // Check exit code of the command
+            int exitCode = process.waitFor();
+            if (exitCode != 0) throw new FFmpegNotFoundException("FFmpeg binary cannot be located.\n" + ffmpegPath[0]);
+
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Return the ffmpeg path
+        return ffmpegPath[0];
+    }
 
     /**
      * Method that checks if the specified path contains the FFmpeg binary.

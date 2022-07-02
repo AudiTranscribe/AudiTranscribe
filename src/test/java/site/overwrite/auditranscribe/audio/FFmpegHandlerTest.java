@@ -2,7 +2,7 @@
  * FFmpegHandlerTest.java
  *
  * Created on 2022-05-06
- * Updated on 2022-06-28
+ * Updated on 2022-07-02
  *
  * Description: Test `FFmpegHandler.java`.
  */
@@ -19,6 +19,20 @@ import java.io.File;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FFmpegHandlerTest {
+    @Test
+    void getPathToFFmpeg() {
+        // Check if the FFmpeg binary can be accessed using CLI
+        if (FFmpegHandler.checkFFmpegPath("ffmpeg")) {
+            // Make sure that the method is ABLE TO GET that path and DOES NOT THROW an exception
+            assertDoesNotThrow(FFmpegHandler::getPathToFFmpeg);
+        } else {
+            // Make sure that the method CANNOT get the path and THROWS an exception
+            assertThrowsExactly(FFmpegNotFoundException.class, FFmpegHandler::getPathToFFmpeg);
+        }
+
+        // Todo: force test failure to obtain FFmpeg path automatically
+    }
+
     @Test
     void convertAudio() throws FFmpegNotFoundException {
         // Get a testing MP3 file
