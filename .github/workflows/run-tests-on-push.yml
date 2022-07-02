@@ -22,7 +22,12 @@ jobs:
       - name: Setup FFmpeg
         uses: FedericoCarboni/setup-ffmpeg@v1
       - name: Test with Maven
-        run: mvn --batch-mode clean test
+        run: |
+             if [ "$RUNNER_OS" == "Linux" ]; then
+                xvfb-run mvn --batch-mode clean test
+             else
+                mvn --batch-mode clean test
+             fi
       - name: Upload coverage report to CodeCov
         uses: codecov/codecov-action@v2
         with:

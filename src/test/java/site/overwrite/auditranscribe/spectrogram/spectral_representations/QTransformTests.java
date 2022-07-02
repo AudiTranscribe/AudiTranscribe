@@ -2,13 +2,14 @@
  * QTransformTests.java
  *
  * Created on 2022-04-10
- * Updated on 2022-06-29
+ * Updated on 2022-07-01
  *
  * Description: Test the Q-Transform algorithms.
  */
 
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
+import javafx.embed.swing.JFXPanel;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,7 @@ import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
 import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.misc.Complex;
 import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.utils.MathUtils;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
@@ -177,6 +179,32 @@ class QTransformTests {
         assertEquals(-0.006, MathUtils.round(vqtMatrix[15][425].im(), 3), 0.005);
         assertEquals(0.003, MathUtils.round(vqtMatrix[27][87].re(), 3), 0.005);
         assertEquals(0.005, MathUtils.round(vqtMatrix[27][87].im(), 3), 0.005);
+    }
+
+    @Test
+    @Order(2)
+    void vqtUseFakeTask() {
+        // Start JavaFX toolkit
+        new JFXPanel();
+
+        // Process VQT on those samples
+        Complex[][] vqtMatrix = VQT.vqt(
+                samples, audio.getSampleRate(), 512, UnitConversionUtils.noteToFreq("C1"), 28,
+                4, 0, WindowFunction.HANN_WINDOW, new CustomTask<Void>() {
+                    @Override
+                    protected Void call() {
+                        return null;
+                    }
+                }
+        );
+
+        // Check specific values in this resultant VQT matrix
+        assertEquals(0.000, MathUtils.round(vqtMatrix[10][32].re(), 3), 0.005);
+        assertEquals(-0.002, MathUtils.round(vqtMatrix[10][32].im(), 3), 0.005);
+        assertEquals(0.000, MathUtils.round(vqtMatrix[15][425].re(), 3), 0.005);
+        assertEquals(0.002, MathUtils.round(vqtMatrix[15][425].im(), 3), 0.005);
+        assertEquals(0.007, MathUtils.round(vqtMatrix[27][87].re(), 3), 0.005);
+        assertEquals(0.002, MathUtils.round(vqtMatrix[27][87].im(), 3), 0.005);
     }
 
     @Test
