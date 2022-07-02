@@ -74,7 +74,7 @@ class IOMethodsTest {
         // on exit
         String testFilePath = IOMethods.joinPaths(
                 IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-                "io-testing-directory", "files", "lock-file.txt"
+                "testing-files", "text", "lock-file.txt"
         );
         IOMethods.createFile(testFilePath);
 
