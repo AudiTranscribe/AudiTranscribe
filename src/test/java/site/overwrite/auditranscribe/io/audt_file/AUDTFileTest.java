@@ -2,7 +2,7 @@
  * AUDTFileTest.java
  *
  * Created on 2022-05-01
- * Updated on 2022-06-29
+ * Updated on 2022-07-02
  *
  * Description: Test AUDT file reading and writing.
  */
@@ -32,7 +32,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class AUDTFileTest {
     // Define the file path
     static final String FILE_PATH = IOMethods.joinPaths(
-            IOConstants.RESOURCES_FOLDER_PATH, "testing-files", "misc", "test-AUDTFileTest.audt"
+            IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+            "testing-files", "misc", "test-AUDTFileTest.audt"
     );
 
     // Define helper attributes
@@ -338,7 +339,8 @@ class AUDTFileTest {
     void fileReaderTestExceptions() {
         // Define files' folder
         String folder = IOMethods.joinPaths(
-                IOConstants.RESOURCES_FOLDER_PATH, "testing-files", "misc", "file-reader-test-files"
+                IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+                "testing-files", "misc", "file-reader-test-files"
         );
 
         // Perform tests
@@ -365,10 +367,10 @@ class AUDTFileTest {
         for (int sectionID = 1; sectionID <= 5; sectionID++) {  // 5 sections
             // Define paths
             String idIncorrectFile = IOMethods.joinPaths(
-                    folder, "incorrect-sections", "section" + sectionID  + "-id-incorrect.audt"
+                    folder, "incorrect-sections", "section" + sectionID + "-id-incorrect.audt"
             );
             String eosIncorrectFile = IOMethods.joinPaths(
-                    folder, "incorrect-sections", "section" + sectionID  + "-eos-incorrect.audt"
+                    folder, "incorrect-sections", "section" + sectionID + "-eos-incorrect.audt"
             );
 
             int finalSectionID = sectionID;

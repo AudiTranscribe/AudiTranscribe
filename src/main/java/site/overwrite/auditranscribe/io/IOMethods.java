@@ -2,7 +2,7 @@
  * IOMethods.java
  *
  * Created on 2022-03-15
- * Updated on 2022-06-28
+ * Updated on 2022-07-02
  *
  * Description: Input/Output methods that are used in the AudiTranscribe project.
  */
@@ -29,8 +29,8 @@ public final class IOMethods {
     /**
      * Gets a file's URL.
      *
-     * @param filePath Path to the file, with respect to the <b>root resource path</b>.
-     * @return A URL representing the absolute path to the file.
+     * @param filePath Path to the file, with respect to the <b>resource path</b>.
+     * @return A URL representing the absolute path to the file (which is in the target folder).
      */
     public static URL getFileURL(String filePath) {
         return MainApplication.class.getResource(filePath);
@@ -39,8 +39,8 @@ public final class IOMethods {
     /**
      * Gets a file's URL as a string.
      *
-     * @param filePath Path to the file, with respect to the <b>root resource path</b>.
-     * @return A string, representing a URL to the file.
+     * @param filePath Path to the file, with respect to the <b>resource path</b>.
+     * @return A string, representing a URL to the file (which is in the target folder).
      */
     public static String getFileURLAsString(String filePath) {
         return getFileURL(filePath).toString();
@@ -49,8 +49,8 @@ public final class IOMethods {
     /**
      * Gets the absolute path of a file.
      *
-     * @param filePath Path to the file, with respect to the <b>root resource path</b>.
-     * @return A string representing the absolute path to the file.
+     * @param filePath Path to the file, with respect to the <b>resource path</b>.
+     * @return A string representing the absolute path to the file (which is in the target folder).
      */
     public static String getAbsoluteFilePath(String filePath) {
         // Get the raw path to the file
@@ -66,29 +66,19 @@ public final class IOMethods {
     // IO Handling
 
     /**
-     * Gets the input stream of a file, with respect to the <b>root resource path</b>.
+     * Gets the input stream of a file, with respect to the <b>resource path</b>.
      *
-     * @param filePath Path to the file, with respect to the <b>root resource path</b>.
+     * @param filePath Path to the file, with respect to the <b>resource path</b>.
      * @return Input stream of the file.
      */
     public static InputStream getInputStream(String filePath) {
-        // Define the absolute file path
-        String absoluteFilePath = IOMethods.joinPaths(
-                IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH, filePath
-        );
-
-        // Return the input stream
-        try {
-            return new FileInputStream(absoluteFilePath);
-        } catch (FileNotFoundException e) {
-            return null;
-        }
+        return MainApplication.class.getResourceAsStream(filePath);
     }
 
     /**
      * Method that creates a file at the specified <code>absolutePath</code>.
      *
-     * @param absolutePath Absolute path to the file.
+     * @param absolutePath <b>Absolute path</b> to the file.
      * @return An integer.
      * <ul>
      *     <li>Returns <code>0</code> if the file was successfully created.</li>
@@ -113,7 +103,7 @@ public final class IOMethods {
     /**
      * Method that deletes a file at the specified <code>absolutePath</code>.
      *
-     * @param absolutePath Absolute path to the file.
+     * @param absolutePath <b>Absolute path</b> to the file.
      * @return Boolean. Is <code>true</code> is the file was deleted and <code>false</code>
      * otherwise.
      */
@@ -130,7 +120,7 @@ public final class IOMethods {
      * Method that creates a folder, if it does not already exist, at the specified
      * <code>absolutePath</code>.
      *
-     * @param absolutePath Absolute path to the folder.
+     * @param absolutePath <b>Absolute path</b> to the folder.
      * @return A boolean. Returns <code>true</code> if folder was created successfully, and
      * <code>false</code> otherwise.
      */
@@ -146,9 +136,9 @@ public final class IOMethods {
     // File location handling
 
     /**
-     * Method that checks if a file is present at the specified path.
+     * Method that checks if a file is present at the specified absolute path.
      *
-     * @param absolutePath Path to check if a file exists at.
+     * @param absolutePath <b>Absolute path</b> to check if a file exists at.
      * @return Boolean. Returns <code>true</code> if the file exists at the specified path, an
      * <code>false</code> otherwise.
      */
@@ -159,8 +149,8 @@ public final class IOMethods {
     /**
      * Method that moves the file to a new location.
      *
-     * @param originalAbsolutePath Original path.
-     * @param newAbsolutePath      New path.
+     * @param originalAbsolutePath Original <b>absolute</b> path.
+     * @param newAbsolutePath      New <b>absolute</b> path.
      * @throws IOException If movement of the file fails.
      */
     public static void moveFile(String originalAbsolutePath, String newAbsolutePath) throws IOException {

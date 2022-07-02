@@ -23,11 +23,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class IOMethodsTest {
     // Define the testing file path for testing the creation and deletion path
     static final String FILE_FOR_TESTING_CREATION_AND_DELETION_PATH = IOMethods.joinPaths(
-            IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+            IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
             "testing-files", "text", "FileForTestingCreationAndDeletion.txt"
     );
     static final String FILE_THAT_SHOULD_NOT_BE_CREATED_OR_DELETED = IOMethods.joinPaths(
-            IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+            IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
             "testing-files", "nonexistent-directory", "FakeFile.txt"
     );
 
@@ -69,11 +69,11 @@ class IOMethodsTest {
     @Test
     @Order(2)
     @EnabledOnOs({OS.WINDOWS})
-    void deleteFileWhileInUseShouldCauseException() throws IOException {  // Todo: assert that this works
+    void deleteFileWhileInUseShouldCauseException() throws IOException {
         // Attempt to delete file while it is being used should return false, and then delete file
         // on exit
         String testFilePath = IOMethods.joinPaths(
-                IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+                IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
                 "testing-files", "text", "lock-file.txt"
         );
         IOMethods.createFile(testFilePath);
@@ -91,7 +91,7 @@ class IOMethodsTest {
     void createDirectory() {
         // Define the path to the test directory
         String testDirectory = IOMethods.joinPaths(
-                IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+                IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
                 "testing-files", "new-directory"
         );
 
@@ -116,9 +116,13 @@ class IOMethodsTest {
     @Test
     void moveFile() throws IOException {
         // Define paths
-        String originalFilePath = IOMethods.getAbsoluteFilePath("testing-files/text/MyFile.txt");
+        String originalFilePath = IOMethods.joinPaths(
+                IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+                "testing-files", "text", "MyFile.txt"
+        );
         String newFilePath = IOMethods.joinPaths(
-                IOConstants.RESOURCES_FOLDER_PATH, "testing-files", "MyNewFile.txt"
+                IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+                "testing-files", "MyNewFile.txt"
         );
 
         // Check if the file that we want to move exists

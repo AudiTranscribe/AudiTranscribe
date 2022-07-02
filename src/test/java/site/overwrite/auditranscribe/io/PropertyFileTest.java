@@ -7,7 +7,6 @@
  * Description: Test `PropertyFile.java`.
  */
 
-
 package site.overwrite.auditranscribe.io;
 
 import org.junit.jupiter.api.Test;
@@ -20,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class PropertyFileTest {
     // Define the file path
     static final String FILE_PATH = IOMethods.joinPaths(
-            "testing-files", "misc", "testing-properties-file.properties"
+            IOConstants.RESOURCES_FOLDER_PATH, "testing-files", "misc", "testing-properties-file.properties"
     );
 
     // Define attributes

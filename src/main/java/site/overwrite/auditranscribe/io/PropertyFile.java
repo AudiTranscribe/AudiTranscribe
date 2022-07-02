@@ -9,6 +9,7 @@
 
 package site.overwrite.auditranscribe.io;
 
+import site.overwrite.auditranscribe.MainApplication;
 import site.overwrite.auditranscribe.exceptions.io.NoSuchPropertyException;
 
 import java.io.IOException;
@@ -33,7 +34,7 @@ public class PropertyFile {
     public PropertyFile(String propertyFileName) throws IOException {
         // Load the properties from the property file into the `Properties` object
         try {
-            properties.load(IOMethods.getInputStream(propertyFileName));
+            properties.load(MainApplication.class.getClassLoader().getResourceAsStream(propertyFileName));
         } catch (NullPointerException e) {
             throw new IOException("Property file with name '" + propertyFileName + "' not found.");
         }

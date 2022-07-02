@@ -2,7 +2,7 @@
  * FilterTest.java
  *
  * Created on 2022-06-24
- * Updated on 2022-07-01
+ * Updated on 2022-07-02
  *
  * Description: Test the audio filters.
  */
@@ -89,11 +89,11 @@ public class FilterTest {
         // Test exceptions
         IOMethods.moveFile(
                 IOMethods.joinPaths(
-                        IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+                        IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
                         "filter-data", "kaiser-best.json"
                 ),
                 IOMethods.joinPaths(
-                        IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+                        IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
                         "kaiser-best.json"
                 )
         );
@@ -102,11 +102,11 @@ public class FilterTest {
         } finally {
             IOMethods.moveFile(
                     IOMethods.joinPaths(
-                            IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+                            IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
                             "kaiser-best.json"
                     ),
                     IOMethods.joinPaths(
-                            IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+                            IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
                             "filter-data", "kaiser-best.json"
                     )
             );
@@ -119,11 +119,11 @@ public class FilterTest {
         // Test exceptions
         IOMethods.moveFile(
                 IOMethods.joinPaths(
-                        IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+                        IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
                         "filter-data", "kaiser-fast.json"
                 ),
                 IOMethods.joinPaths(
-                        IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+                        IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
                         "kaiser-fast.json"
                 )
         );
@@ -132,11 +132,11 @@ public class FilterTest {
         } finally {
             IOMethods.moveFile(
                     IOMethods.joinPaths(
-                            IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+                            IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
                             "kaiser-fast.json"
                     ),
                     IOMethods.joinPaths(
-                            IOConstants.ROOT_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+                            IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
                             "filter-data", "kaiser-fast.json"
                     )
             );
