@@ -2,7 +2,7 @@
  * QTransformTests.java
  *
  * Created on 2022-04-10
- * Updated on 2022-07-01
+ * Updated on 2022-07-02
  *
  * Description: Test the Q-Transform algorithms.
  */
@@ -183,11 +183,11 @@ class QTransformTests {
 
     @Test
     @Order(2)
-    void vqtUseFakeTask() {
+    void vqtUseFakeTasks() {
         // Start JavaFX toolkit
         new JFXPanel();
 
-        // Process VQT on those samples
+        // Process VQT using Kaiser Fast on those samples
         Complex[][] vqtMatrix = VQT.vqt(
                 samples, audio.getSampleRate(), 512, UnitConversionUtils.noteToFreq("C1"), 28,
                 4, 0, WindowFunction.HANN_WINDOW, new CustomTask<Void>() {
@@ -205,6 +205,25 @@ class QTransformTests {
         assertEquals(0.002, MathUtils.round(vqtMatrix[15][425].im(), 3), 0.005);
         assertEquals(0.007, MathUtils.round(vqtMatrix[27][87].re(), 3), 0.005);
         assertEquals(0.002, MathUtils.round(vqtMatrix[27][87].im(), 3), 0.005);
+
+        // Do it again, this time using Kaiser Best
+        vqtMatrix = VQT.vqt(
+                samples, audio.getSampleRate() / 1.75, 512, UnitConversionUtils.noteToFreq("C1"), 9,
+                1, false, 12, WindowFunction.HANN_WINDOW, new CustomTask<Void>() {
+                    @Override
+                    protected Void call() {
+                        return null;
+                    }
+                }
+        );
+
+        // Check specific values in this resultant VQT matrix
+        assertEquals(-0.002, MathUtils.round(vqtMatrix[3][45].re(), 3), 0.005);
+        assertEquals(0.000, MathUtils.round(vqtMatrix[3][45].im(), 3), 0.005);
+        assertEquals(0.003, MathUtils.round(vqtMatrix[5][11].re(), 3), 0.005);
+        assertEquals(0.033, MathUtils.round(vqtMatrix[5][11].im(), 3), 0.005);
+        assertEquals(0.000, MathUtils.round(vqtMatrix[8][345].re(), 3), 0.005);
+        assertEquals(0.001, MathUtils.round(vqtMatrix[8][345].im(), 3), 0.005);
     }
 
     @Test

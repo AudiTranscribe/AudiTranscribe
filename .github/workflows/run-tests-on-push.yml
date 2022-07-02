@@ -21,15 +21,19 @@ jobs:
           cache: maven
       - name: Setup FFmpeg
         uses: FedericoCarboni/setup-ffmpeg@v1
-      - name: Test with Maven on Ubuntu
-        if: ${{ matrix.os == 'ubuntu-latest' }}
-        run: xvfb-run mvn --batch-mode clean test
-      - name: Test with Maven on Windows
-        if: ${{ matrix.os == 'windows-latest' }}
-        run: mvn --batch-mode clean test
-      - name: Test with Maven on MacOS
-        if: ${{ matrix.os == 'macos-latest' }}
-        run: mvn --batch-mode clean test
+      - name: Test with Maven
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            xvfb-run mvn --batch-mode clean test
+          elif [ "$RUNNER_OS" == "Windows" ]; then
+            mvn --batch-mode clean test
+          elif [ "$RUNNER_OS" == "MacOS ]; then
+            mvn --batch-mode clean test
+          else
+            echo "$RUNNER_OS not supported"
+            exit 1
+          fi
+        shell: bash
       - name: Upload coverage report to CodeCov
         uses: codecov/codecov-action@v2
         with:
