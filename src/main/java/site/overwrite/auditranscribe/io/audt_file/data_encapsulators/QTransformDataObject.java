@@ -80,28 +80,6 @@ public class QTransformDataObject extends AbstractAUDTDataObject {
     // Public methods
 
     /**
-     * Method that converts given byte data to a Q-Transform magnitude data.
-     *
-     * @param bytes        The byte data to convert.
-     * @param minMagnitude The minimum magnitude of the Q-Transform data.
-     * @param maxMagnitude The maximum magnitude of the Q-Transform data.
-     * @return The Q-Transform magnitude data.
-     * @throws IOException If something went wrong when decompressing the bytes.
-     */
-    public static double[][] byteDataToQTransformMagnitudes(
-            byte[] bytes, double minMagnitude, double maxMagnitude
-    ) throws IOException {
-        // Decompress the bytes
-        byte[] plainBytes = LZ4.lz4Decompress(bytes);
-
-        // Convert bytes to 2D integer array
-        int[][] intData = IOConverters.bytesToTwoDimensionalIntegerArray(plainBytes);
-
-        // Finally convert the integer data to double
-        return AUDTFileHelpers.int2DtoDoubles2D(intData, minMagnitude, maxMagnitude);
-    }
-
-    /**
      * Method that converts given Q-Transform magnitude data to byte data.
      *
      * @param qTransformMagnitudes The Q-Transform magnitude data to convert.
@@ -136,5 +114,27 @@ public class QTransformDataObject extends AbstractAUDTDataObject {
 
         // Return the bytes and the min and max values
         return new Triplet<>(TypeConversionUtils.toByteArray(bytes), min, max);
+    }
+
+    /**
+     * Method that converts given byte data to a Q-Transform magnitude data.
+     *
+     * @param bytes        The byte data to convert.
+     * @param minMagnitude The minimum magnitude of the Q-Transform data.
+     * @param maxMagnitude The maximum magnitude of the Q-Transform data.
+     * @return The Q-Transform magnitude data.
+     * @throws IOException If something went wrong when decompressing the bytes.
+     */
+    public static double[][] byteDataToQTransformMagnitudes(
+            byte[] bytes, double minMagnitude, double maxMagnitude
+    ) throws IOException {
+        // Decompress the bytes
+        byte[] plainBytes = LZ4.lz4Decompress(bytes);
+
+        // Convert bytes to 2D integer array
+        int[][] intData = IOConverters.bytesToTwoDimensionalIntegerArray(plainBytes);
+
+        // Finally convert the integer data to double
+        return AUDTFileHelpers.int2DtoDoubles2D(intData, minMagnitude, maxMagnitude);
     }
 }

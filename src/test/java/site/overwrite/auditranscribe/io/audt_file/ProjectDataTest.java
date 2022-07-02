@@ -140,7 +140,7 @@ class ProjectDataTest {
     @Test
     void testEquals() {
         // Define temporary data objects for testing the initial checks
-        ProjectData tempProjectData = new ProjectData(
+        ProjectData temp = new ProjectData(
                 unchangingDataPropertiesObject1, qTransformDataObject1, audioDataObject1, guiDataObject1,
                 musicNotesDataObject1
         );
@@ -149,32 +149,32 @@ class ProjectDataTest {
         String otherTypedVar = "hello";
 
         // Test equality comparisons
-        assertEquals(tempProjectData, tempProjectData);
-        assertNotEquals(tempProjectData, null);
+        assertEquals(temp, temp);
+        assertNotEquals(temp, null);
         //noinspection AssertBetweenInconvertibleTypes
-        assertNotEquals(tempProjectData, otherTypedVar);  // Not redundant to test the equality method
+        assertNotEquals(temp, otherTypedVar);  // Not redundant to test the equality method
 
         // Define arrays to pick the data objects from
-        UnchangingDataPropertiesObject[] unchangingDataPropertiesObjects = new UnchangingDataPropertiesObject[]{
+        UnchangingDataPropertiesObject[] unchangingDataPropertiesObjects = {
                 unchangingDataPropertiesObject1, unchangingDataPropertiesObject2
         };
-        QTransformDataObject[] qTransformDataObjects = new QTransformDataObject[]{
+        QTransformDataObject[] qTransformDataObjects = {
                 qTransformDataObject1, qTransformDataObject2
         };
-        AudioDataObject[] audioDataObjects = new AudioDataObject[]{
+        AudioDataObject[] audioDataObjects = {
                 audioDataObject1, audioDataObject2
         };
-        GUIDataObject[] guiDataObjects = new GUIDataObject[]{
+        GUIDataObject[] guiDataObjects = {
                 guiDataObject1, guiDataObject2
         };
-        MusicNotesDataObject[] musicNotesDataObjects = new MusicNotesDataObject[]{
+        MusicNotesDataObject[] musicNotesDataObjects = {
                 musicNotesDataObject1, musicNotesDataObject2
         };
 
         // Generate product of indices
         int[][] indexProduct = MathUtils.selfProduct(2, 5);  // 5 data objects
         for (int[] indices1 : indexProduct) {
-            ProjectData projectData1 = new ProjectData(
+            ProjectData one = new ProjectData(
                     unchangingDataPropertiesObjects[indices1[0]],
                     qTransformDataObjects[indices1[1]],
                     audioDataObjects[indices1[2]],
@@ -183,7 +183,7 @@ class ProjectDataTest {
             );
 
             for (int[] indices2 : indexProduct) {
-                ProjectData projectData2 = new ProjectData(
+                ProjectData two = new ProjectData(
                         unchangingDataPropertiesObjects[indices2[0]],
                         qTransformDataObjects[indices2[1]],
                         audioDataObjects[indices2[2]],
@@ -193,11 +193,11 @@ class ProjectDataTest {
 
                 // Check equality
                 if (indices1 == indices2) {
-                    assertEquals(projectData1, projectData2);
-                    assertEquals(projectData2, projectData1);
+                    assertEquals(one, two);
+                    assertEquals(two, one);
                 } else {
-                    assertNotEquals(projectData1, projectData2);
-                    assertNotEquals(projectData2, projectData1);
+                    assertNotEquals(one, two);
+                    assertNotEquals(two, one);
                 }
             }
         }
@@ -206,16 +206,16 @@ class ProjectDataTest {
     @Test
     void testHashCode() {
         // Define project data objects for testing
-        ProjectData projectData1 = new ProjectData(
+        ProjectData one = new ProjectData(
                 unchangingDataPropertiesObject1, qTransformDataObject1, audioDataObject1, guiDataObject1,
                 musicNotesDataObject1
         );
-        ProjectData projectData2 = new ProjectData(
+        ProjectData two = new ProjectData(
                 unchangingDataPropertiesObject2, qTransformDataObject2, audioDataObject2, guiDataObject2,
                 musicNotesDataObject2
         );
 
-        assertEquals(814949758, projectData1.hashCode());
-        assertEquals(544922374, projectData2.hashCode());
+        assertEquals(814949758, one.hashCode());
+        assertEquals(544922374, two.hashCode());
     }
 }
