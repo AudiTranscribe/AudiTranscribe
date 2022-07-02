@@ -2,7 +2,7 @@
  * ComplexTest.java
  *
  * Created on 2022-03-09
- * Updated on 2022-06-28
+ * Updated on 2022-07-02
  *
  * Description: Test `Complex.java`.
  */
@@ -29,7 +29,7 @@ class ComplexTest {
     }
 
     @Test
-    void testEquality() {
+    void testEquals() {
         // Define three complex number objects to test equality
         Complex complex1 = new Complex(1.2, 3.4);
         Complex complex2 = new Complex(1.2, 3.4);
@@ -76,15 +76,6 @@ class ComplexTest {
 
         assertEquals("12.0 - 34.0j", (new Complex(12, -34)).toString());
         assertEquals("1.23 - 4.56j", (new Complex(1.23, -4.56)).toString());
-    }
-
-    @Test
-    void testEquals() {
-        assertEquals((new Complex(1, 2)), new Complex(1, 2));
-        assertEquals((new Complex(1.2, 2.3)), new Complex(1.2, 2.3));
-
-        assertNotEquals((new Complex(2, 3)), new Complex(1, 2));
-        assertNotEquals((new Complex(2.3, 3.4)), new Complex(1.2, 2.3));
     }
 
     @Test

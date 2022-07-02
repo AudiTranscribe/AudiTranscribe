@@ -2,7 +2,7 @@
  * ProjectDataTest.java
  *
  * Created on 2022-06-29
- * Updated on 2022-06-29
+ * Updated on 2022-07-02
  *
  * Description: Test `ProjectData.java`.
  */
@@ -138,7 +138,7 @@ class ProjectDataTest {
     }
 
     @Test
-    void testEquality() {
+    void testEquals() {
         // Define temporary data objects for testing the initial checks
         ProjectData tempProjectData = new ProjectData(
                 unchangingDataPropertiesObject1, qTransformDataObject1, audioDataObject1, guiDataObject1,
