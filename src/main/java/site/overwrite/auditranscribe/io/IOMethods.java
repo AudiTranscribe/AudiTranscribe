@@ -235,8 +235,7 @@ public final class IOMethods {
      */
     public static String[] splitPaths(String paths) {
         // Replace backslashes with forward slashes
-        String separator = IOConstants.SEPARATOR;
-        if (separator.contains("\\")) paths = paths.replace("\\", "/");
+        paths = paths.replace("\\", "/");
 
         // Then actually split by separator
         return paths.split("/");

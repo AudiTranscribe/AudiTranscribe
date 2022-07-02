@@ -149,9 +149,6 @@
                             site/overwrite/auditranscribe/exceptions/**
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/io/ApplicationDirectory.class
-                        </exclude>
-                        <exclude>
                             site/overwrite/auditranscribe/io/db/ProjectsDB.class
                         </exclude>
                         <exclude>
