@@ -248,15 +248,13 @@ public final class IOMethods {
      * @return Treated path.
      */
     public static String treatPath(String path) {
-        if (getOSName().startsWith("WINDOWS")) {
-            // If the path starts with something like "/C:" or "\C:", remove the first slash
-            if (path.matches("[/\\\\][A-Z]:.*")) {
-                path = path.substring(1);
-            }
-
-            // Now treat all the escaped characters
-            path = path.replace("%20", " ");
+        // If the path starts with something like "/C:" or "\C:", remove the first slash
+        if (path.matches("[/\\\\][A-Z]:.*")) {
+            path = path.substring(1);
         }
+
+        // Now treat all the escaped characters
+        path = path.replace("%20", " ");
 
         return path;
     }
