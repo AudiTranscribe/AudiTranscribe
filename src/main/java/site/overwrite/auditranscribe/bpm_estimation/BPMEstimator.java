@@ -2,7 +2,7 @@
  * BPMEstimator.java
  *
  * Created on 2022-06-02
- * Updated on 2022-06-28
+ * Updated on 2022-07-02
  *
  * Description: Class that handles all the methods to estimate the Beats Per Minute (BPM) of an
  *              audio signal.
@@ -92,11 +92,9 @@ public final class BPMEstimator {
         List<Double> maximumBPMs = new ArrayList<>();
 
         for (int i = 0; i < periods.length; i++) {
-            if (periods[i] > maxPeriod) {
+            if (periods[i] >= maxPeriod) {
                 maxPeriod = periods[i];
                 maximumBPMs.clear();
-                maximumBPMs.add(bpms[i]);
-            } else if (periods[i] == maxPeriod) {
                 maximumBPMs.add(bpms[i]);
             }
         }

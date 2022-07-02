@@ -2,18 +2,20 @@
  * BPMEstimatorTest.java
  *
  * Created on 2022-06-02
- * Updated on 2022-06-28
+ * Updated on 2022-07-02
  *
  * Description: Test `BPMEstimator.java`.
  */
 
 package site.overwrite.auditranscribe.bpm_estimation;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
+import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.io.IOMethods;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -24,28 +26,32 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BPMEstimatorTest {
-    @Disabled
+    // Get the audio files
+    Audio audio1 = new Audio(
+            new File(IOMethods.getAbsoluteFilePath("testing-files/audio/175bpm.wav")),
+            "175bpm.wav",
+            AudioProcessingMode.SAMPLES_ONLY
+    );
+    Audio audio2 = new Audio(
+            new File(IOMethods.getAbsoluteFilePath("testing-files/audio/137bpmNoisy.wav")),
+            "137bpmNoisy.wav",
+            AudioProcessingMode.SAMPLES_ONLY
+    );
+
+    // Extract samples and sample rate
+    double[] samples1 = audio1.getMonoSamples();
+    double sampleRate1 = audio1.getSampleRate();
+
+    double[] samples2 = audio2.getMonoSamples();
+    double sampleRate2 = audio2.getSampleRate();
+
+    // Initialization method
+    BPMEstimatorTest() throws UnsupportedAudioFileException, AudioTooLongException, IOException {
+    }
+
     @Test
-    void estimate() throws UnsupportedAudioFileException, IOException, AudioTooLongException {
-        // Get the audio files
-        Audio audio1 = new Audio(
-                new File(IOMethods.getAbsoluteFilePath("testing-files/audio/175bpm.wav")),
-                "175bpm.wav",
-                AudioProcessingMode.SAMPLES_ONLY
-        );
-        Audio audio2 = new Audio(
-                new File(IOMethods.getAbsoluteFilePath("testing-files/audio/137bpmNoisy.wav")),
-                "137bpmNoisy.wav",
-                AudioProcessingMode.SAMPLES_ONLY
-        );
-
-        // Extract samples and sample rate
-        double[] samples1 = audio1.getMonoSamples();
-        double sampleRate1 = audio1.getSampleRate();
-
-        double[] samples2 = audio2.getMonoSamples();
-        double sampleRate2 = audio2.getSampleRate();
-
+    @EnabledOnOs({OS.LINUX})
+    void estimateBPM() {
         // Check sample rate and the number of samples
         assertEquals(44100, sampleRate1, "Audio 1 sample rate is not 44100.");
         assertEquals(418950, samples1.length, "Audio 1 does not have correct sample length.");
@@ -64,5 +70,11 @@ class BPMEstimatorTest {
         // Check the values of the elements
         assertEquals(87.59269068, bpms1.get(0), 1e-5);  // Surprisingly we did not estimate 175 bpm
         assertEquals(135.99917763, bpms2.get(0), 1e-5);
+    }
+
+    @Test
+    void checkExceptionThrown() {
+        // Will throw the " The `winLength` must be a positive integer" exception
+        assertThrowsExactly(ValueException.class, () -> BPMEstimator.estimate(samples1, 1));
     }
 }
