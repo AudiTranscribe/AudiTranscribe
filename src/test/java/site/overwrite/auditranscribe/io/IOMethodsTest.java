@@ -175,23 +175,9 @@ class IOMethodsTest {
 
     @Test
     void joinPaths() {
-        assertEquals(
-                "a" + IOConstants.SEPARATOR + "bc" + IOConstants.SEPARATOR + "def",
-                IOMethods.joinPaths("a", "bc", "def")
-        );
-        assertEquals(
-                "a" + IOConstants.SEPARATOR + IOConstants.SEPARATOR + "bc" + IOConstants.SEPARATOR +
-                        IOConstants.SEPARATOR + IOConstants.SEPARATOR + "def",
-                IOMethods.joinPaths(
-                        "a" + IOConstants.SEPARATOR, "bc" + IOConstants.SEPARATOR, IOConstants.SEPARATOR + "def"
-                )
-        );
-        assertEquals(
-                "a" + IOConstants.SEPARATOR + "bc" + IOConstants.SEPARATOR + IOConstants.SEPARATOR + "def",
-                IOMethods.joinPaths(
-                        "a", null, "bc", null, null, null, IOConstants.SEPARATOR + "def"
-                )
-        );
+        assertEquals("a/bc/def", IOMethods.joinPaths("a", "bc", "def"));
+        assertEquals("a//bc///def", IOMethods.joinPaths("a/", "bc/", "/def"));
+        assertEquals("a/bc//def", IOMethods.joinPaths("a", null, "bc", null, null, null, "/def"));
     }
 
     @Test
@@ -235,7 +221,11 @@ class IOMethodsTest {
     // Environmental variable management
     @Test
     void getOrDefault() {
-        assertNotEquals("12345", IOMethods.getOrDefault("PATH", "12345"));
+        if (IOMethods.getOSName().startsWith("WINDOWS")) {
+            assertNotEquals("12345", IOMethods.getOrDefault("Path", "12345"));
+        } else {
+            assertNotEquals("12345", IOMethods.getOrDefault("PATH", "12345"));
+        }
         assertEquals("67890", IOMethods.getOrDefault("not-a-real-environment-variable", "67890"));
     }
 }

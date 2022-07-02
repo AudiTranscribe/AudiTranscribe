@@ -72,6 +72,8 @@ public final class IOMethods {
      * @return Input stream of the file.
      */
     public static InputStream getInputStream(String filePath) {
+        // If the file path contains backslashes, replace with forward slashes
+        filePath = filePath.replaceAll("\\\\", "/");
         return MainApplication.class.getResourceAsStream(filePath);
     }
 
@@ -216,10 +218,10 @@ public final class IOMethods {
                 continue;
             }
 
-            if (buffer.length() > 0) {                  // If there is something in the buffer
-                buffer.append(IOConstants.SEPARATOR);   // Append the separator first...
+            if (buffer.length() > 0) {  // If there is something in the buffer
+                buffer.append("/");     // Append the separator first...
             }
-            buffer.append(path);                        // ...before appending the path
+            buffer.append(path);        // ...before appending the path
         }
 
         return buffer.toString();
@@ -232,13 +234,12 @@ public final class IOMethods {
      * @return The split paths.
      */
     public static String[] splitPaths(String paths) {
-        // Check if the separator contains backslash
-        // (Most relevant to Windows)
+        // Replace backslashes with forward slashes
         String separator = IOConstants.SEPARATOR;
-        if (separator.contains("\\")) separator = separator.replace("\\", "\\\\");
+        if (separator.contains("\\")) paths = paths.replace("\\", "/");
 
         // Then actually split by separator
-        return paths.split(separator);
+        return paths.split("/");
     }
 
     /**
