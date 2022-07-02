@@ -188,8 +188,8 @@ class IOMethodsTest {
         assertEquals("testing\\file\\2\\hello.txt", IOMethods.treatPath("testing\\file\\2\\hello.txt"));
         assertEquals("nothing/unusual/", IOMethods.treatPath("nothing/unusual/"));
         assertEquals(
-                "there%20are%20now%20spaces/test.txt/",
-                IOMethods.treatPath("there%20are%20now%20spaces/test.txt/")
+                "there%20are%20n%6fw%20spaces/test.txt/",
+                IOMethods.treatPath("there%20are%20n%6fw%20spaces/test.txt/")
         );
     }
 
@@ -201,7 +201,7 @@ class IOMethodsTest {
         assertEquals("/nothing/unusual/", IOMethods.treatPath("/nothing/unusual/"));
         assertEquals(
                 "E:/there are now spaces/test.txt/",
-                IOMethods.treatPath("/E:/there%20are%20now%20spaces/test.txt/")
+                IOMethods.treatPath("/E:/there%20are%20n%6fw%20spaces/test.txt/")
         );
     }
 

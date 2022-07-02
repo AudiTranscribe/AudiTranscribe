@@ -15,6 +15,8 @@ import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Input/Output methods that are used in the AudiTranscribe project.
@@ -248,13 +250,26 @@ public final class IOMethods {
      * @return Treated path.
      */
     public static String treatPath(String path) {
-        // If the path starts with something like "/C:" or "\C:", remove the first slash
-        if (path.matches("[/\\\\][A-Z]:.*")) {
-            path = path.substring(1);
-        }
+        if (getOSName().startsWith("WINDOWS")) {
+            // If the path starts with something like "/C:" or "\C:", remove the first slash
+            if (path.matches("[/\\\\][A-Z]:.*")) {
+                path = path.substring(1);
+            }
 
-        // Now treat all the escaped characters
-        path = path.replace("%20", " ");
+            // Now treat all the escaped characters with percentage signs
+            Pattern pattern = Pattern.compile("%(?<seq>[\\da-fA-F]{2})");
+            Matcher matcher = pattern.matcher(path);
+            while (matcher.find()) {
+                // Get the sequence to convert
+                String sequence = matcher.group("seq");
+
+                // Replace the sequence with the character
+                path = matcher.replaceFirst(Character.toString((char) Integer.parseInt(sequence, 16)));
+
+                // Attempt to find next match
+                matcher = pattern.matcher(path);
+            }
+        }
 
         return path;
     }
