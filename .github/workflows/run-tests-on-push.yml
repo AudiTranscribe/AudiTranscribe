@@ -13,21 +13,29 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: "17"
           distribution: "adopt"
           cache: maven
+
       - name: Setup FFmpeg
         uses: FedericoCarboni/setup-ffmpeg@v1
-      - name: Test with Maven
-        run: |
-             if [ "$RUNNER_OS" == "Linux" ]; then
-                xvfb-run mvn --batch-mode clean test
-             else
-                mvn --batch-mode clean test
-             fi
+
+      - name: Test with Maven (Ubuntu)
+        if: matrix.os == "ubuntu-latest"
+        run: xvfb-run mvn --batch-mode clean test
+
+      - name: Test with Maven (Windows)
+        if: matrix.os == "windows-latest"
+        run: mvn --batch-mode clean test
+
+      - name: Test with Maven (MacOS)
+        if: matrix.os == "macos-latest"
+        run: mvn --batch-mode clean test
+
       - name: Upload coverage report to CodeCov
         uses: codecov/codecov-action@v2
         with:
