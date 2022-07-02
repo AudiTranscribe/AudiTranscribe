@@ -2,7 +2,7 @@
  * ApplicationDirectory.java
  *
  * Created on 2022-05-28
- * Updated on 2022-06-28
+ * Updated on 2022-07-02
  *
  * Description: Application directory factory class.
  */
@@ -36,7 +36,9 @@ public final class ApplicationDirectory {
                     IOConstants.USER_HOME_PATH, "/Library/Application Support", appName, appVersion
             );
         } else if (osName.startsWith("WINDOWS")) {
-            return System.getenv("AppData");
+            return IOMethods.buildPath(
+                    System.getenv("AppData"), appName, appVersion
+            );
         } else {
             // Assume other *nix
             String dir = IOMethods.getOrDefault(
