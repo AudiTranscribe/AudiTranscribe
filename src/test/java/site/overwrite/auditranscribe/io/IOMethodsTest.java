@@ -184,7 +184,6 @@ class IOMethodsTest {
     @Test
     @EnabledOnOs({OS.MAC, OS.LINUX})
     void treatPathUnix() {
-        System.out.println("Treat path Unix running on " + OSMethods.getOS());
         assertEquals("testing/file/1/hello.txt", IOMethods.treatPath("testing/file/1/hello.txt"));
         assertEquals("testing\\file\\2\\hello.txt", IOMethods.treatPath("testing\\file\\2\\hello.txt"));
         assertEquals("nothing/unusual/", IOMethods.treatPath("nothing/unusual/"));
@@ -197,7 +196,6 @@ class IOMethodsTest {
     @Test
     @EnabledOnOs({OS.WINDOWS})
     void treatPathWindows() {
-        System.out.println("Treat path Windows running on " + OSMethods.getOS());
         assertEquals("C:/testing/file/1/hello.txt", IOMethods.treatPath("/C:/testing/file/1/hello.txt"));
         assertEquals("D:\\testing\\file\\2\\hello.txt", IOMethods.treatPath("\\D:\\testing\\file\\2\\hello.txt"));
         assertEquals("/nothing/unusual/", IOMethods.treatPath("/nothing/unusual/"));

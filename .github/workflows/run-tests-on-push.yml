@@ -35,6 +35,7 @@ jobs:
           fi
         shell: bash
       - name: Upload coverage report to CodeCov
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
+          name: CodeCov-${{ matrix.os }}
           files: target/site/jacoco/jacoco.xml
