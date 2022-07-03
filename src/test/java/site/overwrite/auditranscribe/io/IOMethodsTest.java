@@ -68,7 +68,7 @@ class IOMethodsTest {
 
     @Test
     @Order(2)
-    @EnabledOnOs({OS.WINDOWS, OS.LINUX})  // No exception is thrown on macOS apparently
+    @EnabledOnOs({OS.WINDOWS})  // No exception is thrown on macOS and Linux apparently
     void deleteFileWhileInUseShouldCauseException() throws IOException {
         // Attempt to delete file while it is being used should return false, and then delete file
         // on exit
