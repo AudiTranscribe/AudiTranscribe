@@ -37,16 +37,15 @@ public final class OSMethods {
         // Get the OS name
         String osName = System.getProperty("os.name").toUpperCase();
 
-        // Get the appropriate OS
-        if (osName.startsWith("WINDOWS")) {
-            return OSType.WINDOWS;
-        }
+        // Split by spaces
+        String[] split = osName.split(" ");
 
-        if (osName.startsWith("MAC")) {
-            return OSType.MAC;
+        // Attempt to get the OS based on the first value
+        try {
+            return OSType.valueOf(split[0]);
+        } catch (IllegalArgumentException e) {
+            // Assume other *nix
+            return OSType.LINUX;
         }
-
-        // Assume other *nix
-        return OSType.LINUX;
     }
 }

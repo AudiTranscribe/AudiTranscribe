@@ -10,8 +10,6 @@
 package site.overwrite.auditranscribe.io;
 
 import site.overwrite.auditranscribe.MainApplication;
-import site.overwrite.auditranscribe.system.OSMethods;
-import site.overwrite.auditranscribe.system.OSType;
 
 import java.io.*;
 import java.net.URL;
@@ -252,27 +250,32 @@ public final class IOMethods {
      * @return Treated path.
      */
     public static String treatPath(String path) {
-        if (OSMethods.getOS() == OSType.WINDOWS) {
-            // If the path starts with something like "/C:" or "\C:", remove the first slash
-            if (path.matches("[/\\\\][A-Z]:.*")) {
-                path = path.substring(1);
-            }
+        // If the path starts with something like "/C:" or "\C:", we know we are on Windows
+        if (path.matches("[/\\\\][A-Z]:.*")) {
+            // Remove the first slash
+            path = path.substring(1);
 
             // Now treat all the escaped characters with percentage signs
+            String finalPath = path;
+
             Pattern pattern = Pattern.compile("%(?<seq>[\\da-fA-F]{2})");
-            Matcher matcher = pattern.matcher(path);
+            Matcher matcher = pattern.matcher(finalPath);
             while (matcher.find()) {
                 // Get the sequence to convert
                 String sequence = matcher.group("seq");
 
                 // Replace the sequence with the character
-                path = matcher.replaceFirst(Character.toString((char) Integer.parseInt(sequence, 16)));
+                finalPath = matcher.replaceFirst(Character.toString((char) Integer.parseInt(sequence, 16)));
 
                 // Attempt to find next match
-                matcher = pattern.matcher(path);
+                matcher = pattern.matcher(finalPath);
             }
-        }
 
-        return path;
+            // Return the final path
+            return finalPath;
+        } else {
+            // No treatment necessary
+            return path;
+        }
     }
 }

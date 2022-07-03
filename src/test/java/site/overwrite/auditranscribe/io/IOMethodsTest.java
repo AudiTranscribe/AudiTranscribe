@@ -12,7 +12,6 @@ package site.overwrite.auditranscribe.io;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
-import site.overwrite.auditranscribe.system.OSMethods;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -69,7 +68,7 @@ class IOMethodsTest {
 
     @Test
     @Order(2)
-    @EnabledOnOs({OS.WINDOWS})
+    @EnabledOnOs({OS.WINDOWS, OS.LINUX})  // No exception is thrown on macOS apparently
     void deleteFileWhileInUseShouldCauseException() throws IOException {
         // Attempt to delete file while it is being used should return false, and then delete file
         // on exit
@@ -182,8 +181,7 @@ class IOMethodsTest {
     }
 
     @Test
-    @EnabledOnOs({OS.MAC, OS.LINUX})
-    void treatPathUnix() {
+    void treatPath() {
         assertEquals("testing/file/1/hello.txt", IOMethods.treatPath("testing/file/1/hello.txt"));
         assertEquals("testing\\file\\2\\hello.txt", IOMethods.treatPath("testing\\file\\2\\hello.txt"));
         assertEquals("nothing/unusual/", IOMethods.treatPath("nothing/unusual/"));
@@ -191,14 +189,9 @@ class IOMethodsTest {
                 "there%20are%20n%6fw%20spaces/test.txt/",
                 IOMethods.treatPath("there%20are%20n%6fw%20spaces/test.txt/")
         );
-    }
 
-    @Test
-    @EnabledOnOs({OS.WINDOWS})
-    void treatPathWindows() {
         assertEquals("C:/testing/file/1/hello.txt", IOMethods.treatPath("/C:/testing/file/1/hello.txt"));
         assertEquals("D:\\testing\\file\\2\\hello.txt", IOMethods.treatPath("\\D:\\testing\\file\\2\\hello.txt"));
-        assertEquals("/nothing/unusual/", IOMethods.treatPath("/nothing/unusual/"));
         assertEquals(
                 "E:/there are now spaces/test.txt/",
                 IOMethods.treatPath("/E:/there%20are%20n%6fw%20spaces/test.txt/")
