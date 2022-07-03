@@ -1,9 +1,13 @@
 name: Run Tests On Push
 
-on: [ push ]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  build:
+  build_and_test:
     runs-on: ${{ matrix.os }}
 
     strategy:
