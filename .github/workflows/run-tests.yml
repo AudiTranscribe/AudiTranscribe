@@ -1,4 +1,4 @@
-name: Run Tests On Push
+name: Run Tests
 
 on:
   push:
@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        os: [ ubuntu-latest, windows-latest, macos-latest, ubuntu-18.04 ]  # 18.04 will be used to test Alpine Linux
 
     steps:
       - name: Checkout
@@ -28,6 +28,7 @@ jobs:
           distribution: "adopt"
           cache: maven
       - name: Test with Maven
+        if: ${{ matrix.os != 'ubuntu-18.04' }}
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
             xvfb-run mvn --batch-mode clean test
@@ -40,7 +41,15 @@ jobs:
             exit 1
           fi
         shell: bash
-      - name: Upload coverage report to CodeCov
+      - name: Test Specific Methods On Alpine Linux
+        uses: uraimo/run-on-arch-action@v2
+        if: ${{ matrix.os == 'ubuntu-18.04' }}
+        with:
+          arch: aarch64
+          distro: alpine_latest
+          githubToken: ${{ github.token }}
+          run: mvn --batch-mode clean test -Dtest=FFTTest,ApplicationDirectoryTest
+      - name: Upload Coverage Report to CodeCov
         uses: codecov/codecov-action@v3
         with:
           files: target/site/jacoco/jacoco.xml
@@ -48,5 +57,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: JaCoCo_Report_For_${{ matrix.os }}
-          path: |
-            target/site/jacoco
+          path: target/site/jacoco

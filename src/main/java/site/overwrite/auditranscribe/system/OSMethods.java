@@ -41,12 +41,11 @@ public final class OSMethods {
         String[] split = osName.split(" ");
 
         // Attempt to get the OS based on the first value
-        System.out.println("!!!!!!!!!! " + split[0] + " !!!!!!!!!!");
         try {
             return OSType.valueOf(split[0]);
         } catch (IllegalArgumentException e) {
-            // Assume other *nix
-            return OSType.LINUX;
+            // Assume other OS
+            return OSType.OTHER;
         }
     }
 }

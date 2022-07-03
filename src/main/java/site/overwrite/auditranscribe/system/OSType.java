@@ -15,5 +15,6 @@ package site.overwrite.auditranscribe.system;
 public enum OSType {
     WINDOWS,
     MAC,
-    LINUX
+    LINUX,
+    OTHER
 }

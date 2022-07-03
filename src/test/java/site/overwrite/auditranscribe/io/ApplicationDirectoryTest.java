@@ -31,8 +31,10 @@ class ApplicationDirectoryTest {
         } else if (osType == OSType.MAC) {
             assertTrue(appDir.contains("Application Support"));
             assertTrue(appDir.contains("test/123"));
-        } else {
+        } else if (osType == OSType.LINUX) {
             assertTrue(appDir.contains("test/123"));
+        } else {
+            assertNull(appDir);
         }
     }
 }
