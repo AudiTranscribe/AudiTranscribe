@@ -146,6 +146,9 @@
                             site/overwrite/auditranscribe/MainApplication.class
                         </exclude>
                         <exclude>
+                            site/overwrite/auditranscribe/audio/Audio.class
+                        </exclude>
+                        <exclude>
                             site/overwrite/auditranscribe/exceptions/**
                         </exclude>
                         <exclude>
