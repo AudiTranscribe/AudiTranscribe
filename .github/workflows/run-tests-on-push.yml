@@ -39,3 +39,8 @@ jobs:
         with:
           name: CodeCov-${{ matrix.os }}
           files: target/site/jacoco/jacoco.xml
+      - name: Upload JaCoCo HTML File
+        uses: actions/upload-artifact@v3
+        with:
+          name: JaCoCo_Report_$${ matrix.os }}
+          path: target/site/jacoco/index.html
