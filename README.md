@@ -1,4 +1,5 @@
 ![AudiTranscribe Banner](Designs/banner/banner.png "AudiTranscribe")
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FAudiTranscribe%2FAudiTranscribe.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FAudiTranscribe%2FAudiTranscribe?ref=badge_shield)
 
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4.svg)](.github/CODE_OF_CONDUCT.md)
 
@@ -37,6 +38,9 @@ to generate the AudiTranscribe executable.
 
 # Licence
 This project is licensed under the [GNU General Public Licence V3](LICENSE).
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FAudiTranscribe%2FAudiTranscribe.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FAudiTranscribe%2FAudiTranscribe?ref=badge_large)
 
 # Security Policy
 Read AudiTranscribe's security policy at [SECURITY.md](.github/SECURITY.md).
