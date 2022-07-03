@@ -9,6 +9,7 @@
 
 package site.overwrite.auditranscribe.audio;
 
+import site.overwrite.auditranscribe.exceptions.audio.FFmpegCommandFailedException;
 import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.StreamGobbler;
@@ -114,12 +115,14 @@ public class FFmpegHandler {
 
             // Check exit code of the command
             int exitCode = process.waitFor();
-            if (exitCode == 0) return true;  // Exited successfully
-
+            if (exitCode == 0) {
+                return true;  // Exited successfully
+            } else {
+                throw new IOException("FFmpeg path not at '" + ffmpegPath + "'.");
+            }
         } catch (IOException | InterruptedException e) {
             return false;
         }
-        return false;
     }
 
     /**
@@ -167,12 +170,14 @@ public class FFmpegHandler {
 
             // Check exit code of the command
             int exitCode = process.waitFor();
-            if (exitCode == 0) return outputFilePath;  // Exit code 0 => exited successfully => can return
-
+            if (exitCode == 0) {
+                // Exit code 0 => exited successfully => can return
+                return outputFilePath;
+            } else {
+                throw new IOException("Command execution failed");
+            }
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException("FFmpeg command " + builder.command() + " failed");
+            throw new FFmpegCommandFailedException("FFmpeg command " + builder.command() + " failed");
         }
-
-        return null;
     }
 }

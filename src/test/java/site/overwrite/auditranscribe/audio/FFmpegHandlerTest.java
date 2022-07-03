@@ -2,7 +2,7 @@
  * FFmpegHandlerTest.java
  *
  * Created on 2022-05-06
- * Updated on 2022-07-02
+ * Updated on 2022-07-03
  *
  * Description: Test `FFmpegHandler.java`.
  */
@@ -10,6 +10,7 @@
 package site.overwrite.auditranscribe.audio;
 
 import org.junit.jupiter.api.Test;
+import site.overwrite.auditranscribe.exceptions.audio.FFmpegCommandFailedException;
 import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
@@ -31,6 +32,12 @@ class FFmpegHandlerTest {
         }
 
         // Todo: force test failure to obtain FFmpeg path automatically
+    }
+
+    @Test
+    void checkFFmpegPath() {
+        assertTrue(FFmpegHandler.checkFFmpegPath("ffmpeg"));
+        assertFalse(FFmpegHandler.checkFFmpegPath("not-the-ffmpeg-path"));
     }
 
     @Test
@@ -61,5 +68,26 @@ class FFmpegHandlerTest {
 
         // Remove the file
         IOMethods.deleteFile(correctOutputPath);
+    }
+
+    @Test
+    void convertAudioFailureTest() throws FFmpegNotFoundException {
+        // Determine the FFmpeg path
+        FFmpegHandler handler;
+        try {
+            handler = new FFmpegHandler("ffmpeg");
+        } catch (FFmpegNotFoundException e) {
+            // Try to get the path from the settings file
+            handler = new FFmpegHandler(new SettingsFile().data.ffmpegInstallationPath);
+        }
+
+        // Try to test on a non-existent MP3 file
+        FFmpegHandler finalHandler = handler;
+        assertThrowsExactly(FFmpegCommandFailedException.class, () -> finalHandler.convertAudio(
+                new File("non-existent-file.mp3"), "no-output.mp3"
+        ));
+
+        // Try to define a handler with a non-existent FFmpeg binary
+        assertThrowsExactly(FFmpegNotFoundException.class, () -> new FFmpegHandler("not-ffmpeg"));
     }
 }
