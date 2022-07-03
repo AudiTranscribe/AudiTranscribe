@@ -44,7 +44,6 @@ jobs:
       - name: Upload JaCoCo HTML File
         uses: actions/upload-artifact@v3
         with:
-          name: JaCoCo_Report_${{ matrix.os }}
+          name: JaCoCo_Report_For_${{ matrix.os }}
           path: |
-            target/site/jacoco/index.html
-            target/site/jacoco/jacoco-resources
+            target/site/jacoco
