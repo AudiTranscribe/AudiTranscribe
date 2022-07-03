@@ -13,16 +13,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Setup FFmpeg
+        uses: FedericoCarboni/setup-ffmpeg@v1
+        with:
+          token: ${{ github.token }}
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: "17"
           distribution: "adopt"
           cache: maven
-      - name: Setup FFmpeg
-        uses: FedericoCarboni/setup-ffmpeg@v1
-        with:
-          token: ${{ github.token }}
       - name: Test with Maven
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
@@ -44,5 +44,7 @@ jobs:
       - name: Upload JaCoCo HTML File
         uses: actions/upload-artifact@v3
         with:
-          name: JaCoCo_Report_$${ matrix.os }}
-          path: target/site/jacoco/index.html
+          name: JaCoCo_Report_${{ matrix.os }}
+          path: |
+            target/site/jacoco/index.html
+            target/site/jacoco/jacoco-resources
