@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest, ubuntu-18.04 ]  # 18.04 will be used to test Alpine Linux
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
 
     steps:
       - name: Checkout
@@ -28,7 +28,6 @@ jobs:
           distribution: "adopt"
           cache: maven
       - name: Test with Maven
-        if: ${{ matrix.os != 'ubuntu-18.04' }}
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
             xvfb-run mvn --batch-mode clean test
@@ -41,22 +40,6 @@ jobs:
             exit 1
           fi
         shell: bash
-      - name: Test Specific Methods On Alpine Linux
-        uses: uraimo/run-on-arch-action@v2
-        if: ${{ matrix.os == 'ubuntu-18.04' }}
-        with:
-          arch: aarch64
-          distro: alpine_latest
-          githubToken: ${{ github.token }}
-          shell: /bin/sh
-          install: |
-            apk update
-            apk add openjdk17-jre-headless
-            apk add maven
-          run: |
-            ls
-            export PATH=${PATH}:${JAVA_HOME}/bin
-            mvn --batch-mode clean test -Dtest=FFTTest,ApplicationDirectoryTest
       - name: Upload Coverage Report to CodeCov
         uses: codecov/codecov-action@v3
         with:

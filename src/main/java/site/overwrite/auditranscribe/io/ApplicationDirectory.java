@@ -34,25 +34,18 @@ public final class ApplicationDirectory {
         OSType osType = OSMethods.getOS();
 
         // Get the user data directory based on the operating system name
-        String dataDirPath;
-        switch (osType) {
-            case WINDOWS -> dataDirPath = IOMethods.buildPath(
+        return switch (osType) {
+            case WINDOWS -> IOMethods.buildPath(
                     System.getenv("AppData"), appName, appVersion
             );
-            case MAC -> dataDirPath = IOMethods.buildPath(
+            case MAC -> IOMethods.buildPath(
                     IOConstants.USER_HOME_PATH, "/Library/Application Support", appName, appVersion
             );
-            case LINUX -> {
-                String dir = OSMethods.getOrDefault(
-                        "XDG_DATA_HOME", IOMethods.buildPath(
-                                IOConstants.USER_HOME_PATH, "/.local/share"
-                        )
-                );
-                dataDirPath = IOMethods.buildPath(dir, appName, appVersion);
-            }
-            default -> dataDirPath = null;
-        }
-
-        return dataDirPath;
+            default -> IOMethods.buildPath(OSMethods.getOrDefault(
+                    "XDG_DATA_HOME", IOMethods.buildPath(
+                            IOConstants.USER_HOME_PATH, "/.local/share"
+                    )
+            ), appName, appVersion);
+        };
     }
 }

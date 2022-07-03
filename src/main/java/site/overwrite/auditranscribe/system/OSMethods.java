@@ -40,12 +40,7 @@ public final class OSMethods {
         // Split by spaces
         String[] split = osName.split(" ");
 
-        // Attempt to get the OS based on the first value
-        try {
-            return OSType.valueOf(split[0]);
-        } catch (IllegalArgumentException e) {
-            // Assume other OS
-            return OSType.OTHER;
-        }
+        // Get the OS based on the first value
+        return OSType.valueOf(split[0]);
     }
 }
