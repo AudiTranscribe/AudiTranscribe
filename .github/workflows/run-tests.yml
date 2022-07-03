@@ -48,7 +48,15 @@ jobs:
           arch: aarch64
           distro: alpine_latest
           githubToken: ${{ github.token }}
-          run: mvn --batch-mode clean test -Dtest=FFTTest,ApplicationDirectoryTest
+          shell: /bin/sh
+          install: |
+            apk update
+            apk add openjdk17-jre-headless
+            apk add maven
+          run: |
+            ls
+            export PATH=${PATH}:${JAVA_HOME}/bin
+            mvn --batch-mode clean test -Dtest=FFTTest,ApplicationDirectoryTest
       - name: Upload Coverage Report to CodeCov
         uses: codecov/codecov-action@v3
         with:
