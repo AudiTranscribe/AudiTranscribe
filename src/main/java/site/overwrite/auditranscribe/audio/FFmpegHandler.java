@@ -2,7 +2,7 @@
  * FFmpegHandler.java
  *
  * Created on 2022-05-06
- * Updated on 2022-07-01
+ * Updated on 2022-07-03
  *
  * Description: Methods that help handle the FFmpeg commands and methods.
  */
@@ -12,6 +12,8 @@ package site.overwrite.auditranscribe.audio;
 import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.StreamGobbler;
+import site.overwrite.auditranscribe.system.OSMethods;
+import site.overwrite.auditranscribe.system.OSType;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,12 +57,9 @@ public class FFmpegHandler {
      * @throws FFmpegNotFoundException If the program fails to find the FFmpeg installation.
      */
     public static String getPathToFFmpeg() throws FFmpegNotFoundException {
-        // Check the operating system
-        boolean isWindows = IOMethods.getOSName().startsWith("WINDOWS");
-
         // Generate the command to execute
         ProcessBuilder builder = new ProcessBuilder();
-        if (isWindows) {
+        if (OSMethods.getOS() == OSType.WINDOWS) {
             builder.command("cmd.exe", "/c", "where ffmpeg");
         } else {
             builder.command("sh", "-c", "which ffmpeg");

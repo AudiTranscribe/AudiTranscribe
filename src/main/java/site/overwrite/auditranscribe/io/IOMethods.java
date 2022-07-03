@@ -2,7 +2,7 @@
  * IOMethods.java
  *
  * Created on 2022-03-15
- * Updated on 2022-07-02
+ * Updated on 2022-07-03
  *
  * Description: Input/Output methods that are used in the AudiTranscribe project.
  */
@@ -10,6 +10,8 @@
 package site.overwrite.auditranscribe.io;
 
 import site.overwrite.auditranscribe.MainApplication;
+import site.overwrite.auditranscribe.system.OSMethods;
+import site.overwrite.auditranscribe.system.OSType;
 
 import java.io.*;
 import java.net.URL;
@@ -250,7 +252,7 @@ public final class IOMethods {
      * @return Treated path.
      */
     public static String treatPath(String path) {
-        if (getOSName().startsWith("WINDOWS")) {
+        if (OSMethods.getOS() == OSType.WINDOWS) {
             // If the path starts with something like "/C:" or "\C:", remove the first slash
             if (path.matches("[/\\\\][A-Z]:.*")) {
                 path = path.substring(1);
@@ -272,28 +274,5 @@ public final class IOMethods {
         }
 
         return path;
-    }
-
-    // Environment variable management
-
-    /**
-     * Method that returns the value of the environment variable or the default value.
-     *
-     * @param key The environment variable key.
-     * @param def The default value.
-     * @return The value of the environment variable or the default value.
-     */
-    public static String getOrDefault(String key, String def) {
-        String val = System.getenv().get(key);
-        return val == null ? def : val;
-    }
-
-    /**
-     * Method that gets the operating system's name, <b>all in uppercase</b>.
-     *
-     * @return Operating system name in uppercase.
-     */
-    public static String getOSName() {
-        return System.getProperty("os.name").toUpperCase();
     }
 }

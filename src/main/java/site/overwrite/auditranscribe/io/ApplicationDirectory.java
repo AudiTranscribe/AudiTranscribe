@@ -2,12 +2,15 @@
  * ApplicationDirectory.java
  *
  * Created on 2022-05-28
- * Updated on 2022-07-02
+ * Updated on 2022-07-03
  *
  * Description: Application directory factory class.
  */
 
 package site.overwrite.auditranscribe.io;
+
+import site.overwrite.auditranscribe.system.OSMethods;
+import site.overwrite.auditranscribe.system.OSType;
 
 /**
  * Application directory factory class.
@@ -27,26 +30,31 @@ public final class ApplicationDirectory {
      * @return The application data directory of the user.
      */
     public static String getUserDataDirectory(String appName, String appVersion) {
-        // Get the operating system's name
-        String osName = IOMethods.getOSName();
+        // Get the operating system
+        OSType osType = OSMethods.getOS();
 
         // Get the user data directory based on the operating system name
-        if (osName.startsWith("MAC OS X")) {
-            return IOMethods.buildPath(
+        String dataDirPath;
+        switch (osType) {
+            case WINDOWS ->
+                    dataDirPath = IOMethods.buildPath(
+                            System.getenv("AppData"), appName, appVersion
+                    );
+            case MAC ->
+                    dataDirPath = IOMethods.buildPath(
                     IOConstants.USER_HOME_PATH, "/Library/Application Support", appName, appVersion
-            );
-        } else if (osName.startsWith("WINDOWS")) {
-            return IOMethods.buildPath(
-                    System.getenv("AppData"), appName, appVersion
-            );
-        } else {
-            // Assume other *nix
-            String dir = IOMethods.getOrDefault(
-                    "XDG_DATA_HOME", IOMethods.buildPath(
-                            IOConstants.USER_HOME_PATH, "/.local/share"
-                    )
-            );
-            return IOMethods.buildPath(dir, appName, appVersion);
+                    );
+            case LINUX -> {
+                String dir = OSMethods.getOrDefault(
+                        "XDG_DATA_HOME", IOMethods.buildPath(
+                                IOConstants.USER_HOME_PATH, "/.local/share"
+                        )
+                );
+                dataDirPath = IOMethods.buildPath(dir, appName, appVersion);
+            }
+            default -> dataDirPath = null;
         }
+
+        return dataDirPath;
     }
 }

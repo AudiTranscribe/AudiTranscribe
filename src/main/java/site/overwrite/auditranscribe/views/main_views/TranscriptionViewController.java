@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-26
+ * Updated on 2022-07-03
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -50,6 +50,8 @@ import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 import site.overwrite.auditranscribe.plotting.PlottingStuffHandler;
 import site.overwrite.auditranscribe.spectrogram.*;
+import site.overwrite.auditranscribe.system.OSMethods;
+import site.overwrite.auditranscribe.system.OSType;
 import site.overwrite.auditranscribe.utils.*;
 import site.overwrite.auditranscribe.misc.MouseHandler;
 import site.overwrite.auditranscribe.views.helpers.Popups;
@@ -242,8 +244,7 @@ public class TranscriptionViewController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // Make macOS systems use the system menu bar
-        String osName = IOMethods.getOSName();
-        if (osName.startsWith("MAC")) {
+        if (OSMethods.getOS() == OSType.MAC) {
             menuBar.useSystemMenuBarProperty().set(true);
         }
 

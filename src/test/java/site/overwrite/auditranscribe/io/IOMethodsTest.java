@@ -2,7 +2,7 @@
  * IOMethodsTest.java
  *
  * Created on 2022-05-10
- * Updated on 2022-07-02
+ * Updated on 2022-07-03
  *
  * Description: Test `IOMethods.java`.
  */
@@ -12,7 +12,6 @@ package site.overwrite.auditranscribe.io;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
-import org.opentest4j.AssertionFailedError;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -223,16 +222,5 @@ class IOMethodsTest {
         assertArrayEquals(new String[]{"a", "bc", "def", "ghij"}, IOMethods.splitPaths("a\\bc\\def\\ghij\\\\\\\\"));
         assertArrayEquals(new String[]{"abcdefg"}, IOMethods.splitPaths("abcdefg"));
         assertArrayEquals(new String[]{"abcdefg"}, IOMethods.splitPaths("abcdefg\\"));
-    }
-
-    // Environmental variable management
-    @Test
-    void getOrDefault() {
-        try {
-            assertNotEquals("12345", IOMethods.getOrDefault("PATH", "12345"));
-        } catch (AssertionFailedError e) {
-            assertNotEquals("12345", IOMethods.getOrDefault("Path", "12345"));
-        }
-        assertEquals("67890", IOMethods.getOrDefault("not-a-real-environment-variable", "67890"));
     }
 }

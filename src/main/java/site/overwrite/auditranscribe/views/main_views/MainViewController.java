@@ -2,7 +2,7 @@
  * MainViewController.java
  *
  * Created on 2022-02-09
- * Updated on 2022-06-26
+ * Updated on 2022-07-03
  *
  * Description: Contains the main view's controller class.
  */
@@ -36,6 +36,8 @@ import site.overwrite.auditranscribe.io.json_files.data_encapsulators.SettingsDa
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
+import site.overwrite.auditranscribe.system.OSMethods;
+import site.overwrite.auditranscribe.system.OSType;
 import site.overwrite.auditranscribe.utils.MiscUtils;
 import site.overwrite.auditranscribe.views.helpers.Popups;
 import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
@@ -96,8 +98,7 @@ public class MainViewController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Make macOS systems use the system menu bar
-        String osName = IOMethods.getOSName();
-        if (osName.startsWith("MAC")) {
+        if (OSMethods.getOS() == OSType.MAC) {
             menuBar.useSystemMenuBarProperty().set(true);
         }
 
