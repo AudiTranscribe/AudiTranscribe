@@ -5,3 +5,7 @@ Fixme:
     - Spectrogram duration/alignment seems off.
         - See "The Deep.wav".
     - Playhead line desync has not been resolved.
+    - Pause state not automatically toggled upon reaching end for some audio files.
+        - See "NonExactDuration.wav".
+    - Attempting to restart playback from end of audio causes it to freak out.
+        - See "NonExactDuration.wav".

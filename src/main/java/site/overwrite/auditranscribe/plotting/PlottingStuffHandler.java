@@ -503,6 +503,7 @@ public final class PlottingStuffHandler {
     public static void updatePlayheadLine(Line playheadLine, double newXPos) {
         playheadLine.setStartX(newXPos);
         playheadLine.setEndX(newXPos);
+        System.out.println(newXPos + " " + playheadLine.getStartX() + " " + playheadLine.getEndX());  // Todo: remove
     }
 
     // Private methods
