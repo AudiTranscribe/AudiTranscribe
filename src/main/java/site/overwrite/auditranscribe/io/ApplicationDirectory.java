@@ -44,7 +44,8 @@ public final class ApplicationDirectory {
                     dataDirPath = IOMethods.buildPath(
                     IOConstants.USER_HOME_PATH, "/Library/Application Support", appName, appVersion
                     );
-            case LINUX -> {
+            default -> {
+                // Assume other *nix
                 String dir = OSMethods.getOrDefault(
                         "XDG_DATA_HOME", IOMethods.buildPath(
                                 IOConstants.USER_HOME_PATH, "/.local/share"
@@ -52,7 +53,6 @@ public final class ApplicationDirectory {
                 );
                 dataDirPath = IOMethods.buildPath(dir, appName, appVersion);
             }
-            default -> dataDirPath = null;
         }
 
         return dataDirPath;
