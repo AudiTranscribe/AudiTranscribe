@@ -2,7 +2,7 @@
  * WindowFunctionTest.java
  *
  * Created on 2022-04-15
- * Updated on 2022-06-24
+ * Updated on 2022-07-03
  *
  * Description: Test the windowing functions.
  */
@@ -182,5 +182,13 @@ class WindowFunctionTest {
         assertThrows(NegativeArraySizeException.class, () -> window.generateWindow(-1, true));
         assertThrows(NegativeArraySizeException.class, () -> window.generateWindow(-12, false));
         assertThrows(NegativeArraySizeException.class, () -> window.generateWindow(-12, true));
+    }
+
+    @Test
+    void windowFunctionEnumToStringTest() {
+        // Test the `toString` methods of the enum values
+        assertEquals("Ones", WindowFunction.ONES_WINDOW.toString());
+        assertEquals("Hamming", WindowFunction.HAMMING_WINDOW.toString());
+        assertEquals("Hann", WindowFunction.HANN_WINDOW.toString());
     }
 }
