@@ -1,7 +1,8 @@
 ![AudiTranscribe Banner](Designs/banner/banner.png "AudiTranscribe")
 
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FAudiTranscribe%2FAudiTranscribe.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FAudiTranscribe%2FAudiTranscribe?ref=badge_shield)
-[![codecov](https://codecov.io/gh/AudiTranscribe/AudiTranscribe/branch/main/graph/badge.svg?token=1WQO7ZGKVJ)](https://codecov.io/gh/AudiTranscribe/AudiTranscribe)
+[![Run Tests](https://github.com/AudiTranscribe/AudiTranscribe/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/AudiTranscribe/AudiTranscribe/actions/workflows/run-tests.yml)
+[![CodeCov](https://codecov.io/gh/AudiTranscribe/AudiTranscribe/branch/main/graph/badge.svg?token=1WQO7ZGKVJ)](https://codecov.io/gh/AudiTranscribe/AudiTranscribe)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4.svg)](.github/CODE_OF_CONDUCT.md)
 
 An open source music transcription application.

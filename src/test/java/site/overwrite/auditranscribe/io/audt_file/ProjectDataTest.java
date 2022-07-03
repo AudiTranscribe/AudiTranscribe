@@ -2,7 +2,7 @@
  * ProjectDataTest.java
  *
  * Created on 2022-06-29
- * Updated on 2022-07-02
+ * Updated on 2022-07-03
  *
  * Description: Test `ProjectData.java`.
  */
@@ -25,7 +25,7 @@ import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@EnabledOnOs({OS.LINUX})
+@EnabledOnOs({OS.WINDOWS})
 class ProjectDataTest {
     // Define helper attributes
     double[][] qTransformMagnitudes1;

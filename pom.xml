@@ -155,7 +155,10 @@
                             site/overwrite/auditranscribe/io/db/ProjectsDB.class
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/io/json_files/**
+                            site/overwrite/auditranscribe/io/json_files/data_encapsulators/**
+                        </exclude>
+                        <exclude>
+                            site/overwrite/auditranscribe/io/json_files/file_classes/**
                         </exclude>
                         <exclude>
                             site/overwrite/auditranscribe/misc/CustomTask.class

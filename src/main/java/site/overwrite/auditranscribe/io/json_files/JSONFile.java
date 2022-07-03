@@ -2,23 +2,24 @@
  * JSONFile.java
  *
  * Created on 2022-05-30
- * Updated on 2022-06-24
+ * Updated on 2022-07-03
  *
- * Description: Handles interactions with JSON files.
+ * Description: Abstract class that helps handle interactions with JSON files.
  */
 
 package site.overwrite.auditranscribe.io.json_files;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import site.overwrite.auditranscribe.io.IOConstants;
-import site.overwrite.auditranscribe.io.IOMethods;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
+import site.overwrite.auditranscribe.exceptions.io.FailedToMakeJSONFileException;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * Handles interactions with JSON files.
+ * Abstract class that helps handle interactions with JSON files.
  */
 public abstract class JSONFile<T> {
     // Attributes
@@ -31,18 +32,18 @@ public abstract class JSONFile<T> {
     /**
      * Initialization method for a <code>JSONFile</code> object.
      *
-     * @param fileName File name of for the new JSON file. <b>Includes the extension</b>.
+     * @param filePath <b>Absolute</b> file path to the JSON file.
      * @param cls      Class to use.
      */
-    public JSONFile(String fileName, Class<T> cls) {
+    public JSONFile(String filePath, Class<T> cls) {
         // Update attributes
         this.cls = cls;
-        filePath = IOMethods.joinPaths(IOConstants.APP_DATA_FOLDER_PATH, fileName);
+        this.filePath = filePath;
 
         // Create the GSON object
         Gson gson = new Gson();
 
-        try (Reader reader = new FileReader(filePath)) {
+        try (Reader reader = new FileReader(this.filePath)) {
             // Try loading the settings data
             data = gson.fromJson(reader, cls);
 
@@ -51,10 +52,10 @@ public abstract class JSONFile<T> {
                 createNewFile();
             } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
                      IllegalAccessException e1) {
-                throw new RuntimeException(e1);
+                throw new FailedToMakeJSONFileException(e1);
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException | JsonSyntaxException e) {
+            throw new JsonIOException(e);
         }
     }
 
