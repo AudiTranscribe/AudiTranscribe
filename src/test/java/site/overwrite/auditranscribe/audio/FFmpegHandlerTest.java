@@ -36,8 +36,9 @@ class FFmpegHandlerTest {
 
     @Test
     void checkFFmpegPath() {
-        assertTrue(FFmpegHandler.checkFFmpegPath("ffmpeg"));
-        assertFalse(FFmpegHandler.checkFFmpegPath("not-the-ffmpeg-path"));
+        assertTrue(FFmpegHandler.checkFFmpegPath("ffmpeg"));  // Should exist => true
+        assertFalse(FFmpegHandler.checkFFmpegPath("not-the-ffmpeg-path"));  // IO Exception should be thrown => false
+        assertFalse(FFmpegHandler.checkFFmpegPath("git"));  // Should give error code 1 => false
     }
 
     @Test

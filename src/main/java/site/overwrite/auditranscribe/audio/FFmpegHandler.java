@@ -108,7 +108,7 @@ public class FFmpegHandler {
         // Specify the working directory
         builder.directory(new File(System.getProperty("user.home")));
 
-        // Define variables
+        // Check if the provided FFmpeg path works
         try {
             // Build the process
             Process process = builder.start();
