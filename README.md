@@ -1,5 +1,7 @@
 ![AudiTranscribe Banner](Designs/banner/banner.png "AudiTranscribe")
 
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FAudiTranscribe%2FAudiTranscribe.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FAudiTranscribe%2FAudiTranscribe?ref=badge_shield)
+[![codecov](https://codecov.io/gh/AudiTranscribe/AudiTranscribe/branch/main/graph/badge.svg?token=1WQO7ZGKVJ)](https://codecov.io/gh/AudiTranscribe/AudiTranscribe)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4.svg)](.github/CODE_OF_CONDUCT.md)
 
 An open source music transcription application.
@@ -35,11 +37,12 @@ The software is not perfect. There are a few limitations with the software in it
 **For Windows _developers_**: You will need to install the [WiX Toolset 3.0](https://wixtoolset.org/) or later in order
 to generate the AudiTranscribe executable.
 
-# Licence
-This project is licensed under the [GNU General Public Licence V3](LICENSE).
-
 # Security Policy
 Read AudiTranscribe's security policy at [SECURITY.md](.github/SECURITY.md).
 
 # Contributing to AudiTranscribe
 Please read the [CONTRIBUTING.md](.github/CONTRIBUTING.md) file.
+
+# Licence
+This project is licensed under the [GNU General Public Licence V3](LICENSE).
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FAudiTranscribe%2FAudiTranscribe.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FAudiTranscribe%2FAudiTranscribe?ref=badge_large)
