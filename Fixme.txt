@@ -2,10 +2,7 @@ Fixme:
     - Note playing is delayed.
         - Temporary fix is to implement a fixed constant to account for delay, but a more permanent fix is needed.
         - This also causes some notes to not play at the start of playback.
-    - Spectrogram duration/alignment seems off.
+    - Spectrogram alignment seems off.
         - See "The Deep.wav".
     - Playhead line desync has not been resolved.
-    - Pause state not automatically toggled upon reaching end for some audio files.
-        - See "NonExactDuration.wav".
-    - Attempting to restart playback from end of audio causes it to freak out.
-        - See "NonExactDuration.wav".
+    - Sometimes ovals at the end of the file are shown even though the spectrogram is too short to even reach there.

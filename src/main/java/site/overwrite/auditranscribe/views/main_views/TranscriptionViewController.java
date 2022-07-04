@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-07-03
+ * Updated on 2022-07-04
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -1106,6 +1106,9 @@ public class TranscriptionViewController implements Initializable {
             // double-clicking of the pause button on the next iteration
             if (isPaused) isPaused = togglePaused(true);
         }
+
+        // Round `seekTime` to 3 decimal places
+        seekTime = MathUtils.round(seekTime, 3);
 
         // Update the start time of the audio
         // (Do this so that when the player resumes out of a stop state it will start here)

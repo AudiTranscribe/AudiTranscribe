@@ -2,7 +2,7 @@
  * Audio.java
  *
  * Created on 2022-02-13
- * Updated on 2022-06-25
+ * Updated on 2022-07-04
  *
  * Description: Class that handles audio processing and audio playback.
  */
@@ -20,6 +20,7 @@ import site.overwrite.auditranscribe.utils.ArrayUtils;
 
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.Media;
+import site.overwrite.auditranscribe.utils.MathUtils;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -166,12 +167,15 @@ public class Audio {
         return sampleRate;
     }
 
+    /**
+     * @return Audio duration in <b>seconds</b>, correct to the nearest millisecond.
+     */
     public double getDuration() {
         if (duration == 0) {
             duration = mediaPlayer.getTotalDuration().toSeconds();
         }
 
-        return duration;
+        return MathUtils.round(duration, 3);
     }
 
     public void setDuration(double duration) {
@@ -257,14 +261,15 @@ public class Audio {
     }
 
     /**
-     * Method that gets the current audio time in <b>seconds</b>.
+     * Method that gets the current audio time in <b>seconds</b>, correct to the nearest
+     * millisecond.
      *
-     * @return Returns the current audio time in <b>seconds</b>.
+     * @return Returns the current audio time in <b>seconds</b>, correct to the nearest millisecond.
      * @throws InvalidObjectException If the media player was not initialized.
      */
     public double getCurrAudioTime() throws InvalidObjectException {
         if (mediaPlayer != null) {
-            return mediaPlayer.getCurrentTime().toSeconds();
+            return MathUtils.round(mediaPlayer.getCurrentTime().toSeconds(), 3);
         } else {
             throw new InvalidObjectException("Media player was not initialised.");
         }
