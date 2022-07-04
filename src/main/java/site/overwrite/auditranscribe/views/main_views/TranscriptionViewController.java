@@ -343,7 +343,7 @@ public class TranscriptionViewController implements Initializable {
                         barNumberEllipses = PlottingStuffHandler.updateBarNumberEllipses(
                                 barNumberPane, barNumberEllipses, audioDuration, bpm, bpm, offset, offset,
                                 barNumberPane.getPrefHeight(), oldBeatsPerBar, newBeatsPerBar, PX_PER_SECOND,
-                                SPECTROGRAM_ZOOM_SCALE_X
+                                SPECTROGRAM_ZOOM_SCALE_X, spectrogramPane.getWidth()
                         );
                     }
 
@@ -1380,7 +1380,8 @@ public class TranscriptionViewController implements Initializable {
             // Update the bar number ellipses
             barNumberEllipses = PlottingStuffHandler.updateBarNumberEllipses(
                     barNumberPane, barNumberEllipses, audioDuration, oldBPM, newBPM, offset, offset,
-                    barNumberPane.getPrefHeight(), beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+                    barNumberPane.getPrefHeight(), beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X,
+                    spectrogramPane.getWidth()
             );
         }
 
@@ -1426,7 +1427,8 @@ public class TranscriptionViewController implements Initializable {
             // Update the bar number ellipses
             barNumberEllipses = PlottingStuffHandler.updateBarNumberEllipses(
                     barNumberPane, barNumberEllipses, audioDuration, bpm, bpm, oldOffset, newOffset,
-                    barNumberPane.getPrefHeight(), beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+                    barNumberPane.getPrefHeight(), beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X,
+                    spectrogramPane.getWidth()
             );
         }
 

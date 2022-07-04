@@ -2,7 +2,7 @@
  * PlottingStuffHandler.java
  *
  * Created on 2022-03-20
- * Updated on 2022-06-28
+ * Updated on 2022-07-04
  *
  * Description: Class that helps adds stuff to the spectrogram area.
  */
@@ -300,6 +300,15 @@ public final class PlottingStuffHandler {
             // Calculate position to place the line
             double pos = (newOffset + beatNum * newSPB) * pxPerSecond * zoomScaleX;
 
+            // Check if the position is outside the spectrogram
+            if (pos > duration * pxPerSecond * zoomScaleX) {
+                // Remove that bar line
+                spectrogramPane.getChildren().remove(newLines[beatNum]);
+
+                // All other bar lines will also fall outside the spectrogram, so break
+                break;
+            }
+
             // Update line position
             newLines[beatNum].setStartX(pos);
             newLines[beatNum].setEndX(pos);
@@ -327,7 +336,11 @@ public final class PlottingStuffHandler {
 
                 // Add line to array
                 newLines[beatNum] = beatLine;
-                spectrogramPane.getChildren().add(beatLine);
+
+                // Check if we need to add to the spectrogram pane
+                if (beatNum != newNumBeats) {
+                    spectrogramPane.getChildren().add(beatLine);
+                }
             }
 
         } else {
@@ -393,24 +406,26 @@ public final class PlottingStuffHandler {
     /**
      * Method that updates the existing ellipses, and adds/removes as necessary.
      *
-     * @param barNumberPane  Bar number pane.
-     * @param ellipses       Original bar number ellipses.
-     * @param duration       Duration of the audio.
-     * @param oldBPM         Old value for the BPM.
-     * @param newBPM         New value for the BPM.
-     * @param oldOffset      Old offset value.
-     * @param newOffset      New offset value.
-     * @param height         Spectrogram pane height.
-     * @param oldBeatsPerBar Old number of beats per bar.
-     * @param newBeatsPerBar New number of beats per bar.
-     * @param pxPerSecond    Number of pixels dedicated per second.
-     * @param zoomScaleX     Zoom scaling for the X direction.
+     * @param barNumberPane        Bar number pane.
+     * @param ellipses             Original bar number ellipses.
+     * @param duration             Duration of the audio.
+     * @param oldBPM               Old value for the BPM.
+     * @param newBPM               New value for the BPM.
+     * @param oldOffset            Old offset value.
+     * @param newOffset            New offset value.
+     * @param height               Spectrogram pane height.
+     * @param oldBeatsPerBar       Old number of beats per bar.
+     * @param newBeatsPerBar       New number of beats per bar.
+     * @param pxPerSecond          Number of pixels dedicated per second.
+     * @param zoomScaleX           Zoom scaling for the X direction.
+     * @param spectrogramPaneWidth Width of the spectrogram pane.
      * @return Array of <code>Line</code> objects, representing the <b>new</b> beat lines that are
      * shown.
      */
     public static StackPane[] updateBarNumberEllipses(
             Pane barNumberPane, StackPane[] ellipses, double duration, double oldBPM, double newBPM, double oldOffset,
-            double newOffset, double height, int oldBeatsPerBar, int newBeatsPerBar, int pxPerSecond, double zoomScaleX
+            double newOffset, double height, int oldBeatsPerBar, int newBeatsPerBar, int pxPerSecond, double zoomScaleX,
+            double spectrogramPaneWidth
     ) {
         // Return prematurely if the olds equal the news (b/c nothing to update)
         if (oldBPM == newBPM && oldOffset == newOffset && oldBeatsPerBar == newBeatsPerBar) return ellipses;
@@ -444,6 +459,24 @@ public final class PlottingStuffHandler {
             // Calculate position to place the ellipse
             double pos = (newOffset + barNum * newSPB * newBeatsPerBar) * pxPerSecond * zoomScaleX;
 
+            // Handle halting differently depending on scroll pane width
+            boolean condition;
+            if (barNumberPane.getWidth() < spectrogramPaneWidth) {
+                // Check if the CENTER of the ellipse is outside the spectrogram
+                condition = pos > duration * pxPerSecond * zoomScaleX;
+            } else {
+                // Check if the LEFTMOST PART of the ellipse is outside the spectrogram
+                condition = pos - BAR_NUMBER_ELLIPSE_RADIUS_Y * zoomScaleX > duration * pxPerSecond * zoomScaleX;
+            }
+
+            if (condition) {
+                // Remove that ellipse
+                barNumberPane.getChildren().remove(newEllipses[barNum]);
+
+                // All other ellipses will also fail, so break
+                break;
+            }
+
             // Update ellipse position
             newEllipses[barNum].setTranslateX(pos - BAR_NUMBER_ELLIPSE_RADIUS_Y * zoomScaleX);
 
@@ -464,7 +497,11 @@ public final class PlottingStuffHandler {
 
                 // Add ellipse to array
                 newEllipses[barNum] = stackPane;
-                barNumberPane.getChildren().add(stackPane);
+
+                // Check if we need to add to the spectrogram pane
+                if (barNum != newNumBars) {
+                    barNumberPane.getChildren().add(stackPane);
+                }
             }
 
         } else {
@@ -503,7 +540,6 @@ public final class PlottingStuffHandler {
     public static void updatePlayheadLine(Line playheadLine, double newXPos) {
         playheadLine.setStartX(newXPos);
         playheadLine.setEndX(newXPos);
-        System.out.println(newXPos + " " + playheadLine.getStartX() + " " + playheadLine.getEndX());  // Todo: remove
     }
 
     // Private methods
