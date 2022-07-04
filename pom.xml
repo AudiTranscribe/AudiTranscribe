@@ -5,7 +5,7 @@
 
     <groupId>site.overwrite</groupId>
     <artifactId>AudiTranscribe</artifactId>
-    <version>0.4.1</version>
+    <version>0.4.2</version>
     <name>AudiTranscribe</name>
 
     <properties>
@@ -271,9 +271,11 @@
                 <version>1.4.0</version>
                 <configuration>
                     <name>AudiTranscribe</name>
-                    <appVersion>1.0.0</appVersion>
-                    <vendor>site.overwrite</vendor>
+                    <vendor>AudiTranscribe Team</vendor>
+                    <description>An open source music transcription application.</description>
+                    <copyright>© Copyright AudiTranscribe Team.</copyright>
                     <destination>target/dist</destination>
+                    <licenseFile>LICENSE</licenseFile>
                     <module>site.overwrite.auditranscribe/site.overwrite.auditranscribe.MainApplication</module>
                     <runtimeImage>target/AudiTranscribe</runtimeImage>
                     <javaOptions>
@@ -284,14 +286,21 @@
                     <execution>
                         <id>mac</id>
                         <configuration>
-                            <icon>${project.basedir}/designs/icons/icon.icns</icon>
+                            <appVersion>1.0.0</appVersion> <!-- For macOS, must make version at least 1.0.0 -->
+                            <icon>${project.basedir}/Designs/icons/icon.icns</icon>
+                            <type>DMG</type>
                         </configuration>
                     </execution>
                     <execution>
                         <id>win</id>
                         <configuration>
-                            <icon>${project.basedir}/designs/icons/icon.ico</icon>
+                            <appVersion>${version}</appVersion>
+                            <icon>${project.basedir}/Designs/icons/icon.ico</icon>
+                            <type>EXE</type>
                             <winMenu>true</winMenu>
+                            <winPerUserInstall>true</winPerUserInstall>
+                            <winShortcut>true</winShortcut>
+                            <winUpgradeUuid>AD75C1BE-77B3-4B8B-B55E-CB9C798819A2</winUpgradeUuid>
                         </configuration>
                     </execution>
                 </executions>
