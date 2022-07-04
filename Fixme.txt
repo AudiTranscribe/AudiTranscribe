@@ -2,4 +2,5 @@ Fixme:
     - Note playing is delayed.
         - Temporary fix is to implement a fixed constant to account for delay, but a more permanent fix is needed.
         - This also causes some notes to not play at the start of playback.
-    - Playhead line desync has not been resolved.
+    - Playhead line desync / spectrogram scroll failure has not been resolved.
+        - It triggers very inconsistently, how to cause it to trigger reliably?
