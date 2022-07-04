@@ -893,7 +893,10 @@ public class TranscriptionViewController implements Initializable {
 
         // Ensure that the temporary directory exists
         IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
-        MyLogger.log(Level.FINE, "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH, this.getClass().toString());
+        MyLogger.log(
+                Level.FINE,
+                "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH, this.getClass().toString()
+        );
 
         // Create an empty MP3 file in the temporary directory
         File auxiliaryMP3File = new File(IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-1.mp3"));
@@ -2278,11 +2281,11 @@ public class TranscriptionViewController implements Initializable {
                 qTransformBytes, minQTransformMagnitude, maxQTransformMagnitude
         );
         AudioDataObject audioData = new AudioDataObject(
-                compressedMP3Bytes, sampleRate, (int) audioDuration * 1000,
+                compressedMP3Bytes, sampleRate, (int) (audioDuration * 1000),
                 audioFileName);
         GUIDataObject guiData = new GUIDataObject(
                 musicKeyIndex, timeSignatureIndex, bpm, offset, audioVolume,
-                (int) currTime * 1000
+                (int) (currTime * 1000)
         );
         MusicNotesDataObject musicNotesData = new MusicNotesDataObject(
                 timesToPlaceRectangles, noteDurations, noteNums
