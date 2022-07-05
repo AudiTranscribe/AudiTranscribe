@@ -1,11 +1,8 @@
 name: Run Tests
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'src/main/java/site/overwrite/auditranscribe/**'
-  pull_request:
+  workflow_call
+  workflow_dispatch:
     branches: [ main ]
 
 jobs:
