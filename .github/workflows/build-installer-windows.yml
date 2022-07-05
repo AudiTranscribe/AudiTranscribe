@@ -32,8 +32,12 @@ jobs:
           java-version: "17"
           distribution: "adopt"
           cache: maven
-      - name: Build with Maven
-        run: mvn -B clean:clean compiler:compile javafx:jlink jpackage:jpackage@win
+      - name: Clean And Compile
+        run: mvn -B clean:clean compiler:compile
+      - name: Fix Automatic Modules
+        run:   # Todo: add command
+      - name: Generate Installer
+        run: mvn -B javafx:jlink jpackage:jpackage@win
       - name: Upload Windows Installer
         uses: actions/upload-artifact@v3
         with:

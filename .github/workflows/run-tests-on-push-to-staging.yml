@@ -1,4 +1,4 @@
-name: Run Staging Tests
+name: Run Tests On Push To Staging
 
 on:
   push:

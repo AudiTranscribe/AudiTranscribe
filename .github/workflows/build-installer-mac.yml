@@ -19,8 +19,13 @@ jobs:
           distribution: "adopt"
           cache: maven
       - name: Build with Maven
-        run: mvn -B clean:clean compiler:compile javafx:jlink jpackage:jpackage@mac
-      - name: Upload Windows Installer
+        run: mvn -B clean:clean compiler:compile
+      - name: Fix Automatic Modules
+        run: sh "./Update Legacy JARs With Module-Info.sh"
+        shell: bash
+      - name: Generate Installer
+        run: mvn -B javafx:jlink jpackage:jpackage@mac
+      - name: Upload macOS Installer
         uses: actions/upload-artifact@v3
         with:
           name: macOS-Installer
