@@ -294,7 +294,7 @@
                     <execution>
                         <id>win</id>
                         <configuration>
-                            <appVersion>${version}</appVersion>
+                            <appVersion>${project.version}</appVersion>
                             <icon>${project.basedir}/Designs/icons/icon.ico</icon>
                             <type>EXE</type>
                             <winMenu>true</winMenu>
