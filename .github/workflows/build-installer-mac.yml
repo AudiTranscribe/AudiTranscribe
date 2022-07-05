@@ -7,8 +7,8 @@ on:
 
 jobs:
   build_installer:
+    name: Build Installer
     runs-on: macos-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -18,6 +18,10 @@ jobs:
           java-version: "17"
           distribution: "adopt"
           cache: maven
+      - name: Setup FFmpeg
+        uses: FedericoCarboni/setup-ffmpeg@v1
+        with:
+          token: ${{ github.token }}
       - name: Install Maven Dependencies
         run: mvn install
       - name: Fix Automatic Modules

@@ -7,8 +7,8 @@ on:
 
 jobs:
   build_installer:
+    name: Build Installer
     runs-on: windows-latest
-
     steps:
       - name: Download WiX
         uses: i3h/download-release-asset@v1
@@ -32,6 +32,10 @@ jobs:
           java-version: "17"
           distribution: "adopt"
           cache: maven
+      - name: Setup FFmpeg
+        uses: FedericoCarboni/setup-ffmpeg@v1
+        with:
+          token: ${{ github.token }}
       - name: Install Maven Dependencies
         run: mvn install
       - name: Fix Automatic Modules

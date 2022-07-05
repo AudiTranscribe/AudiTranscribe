@@ -7,11 +7,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  run_tests:
-    uses: ./.github/workflows/run-tests.yml
   build_installer_windows:
-    needs: run_tests
+    name: Build Windows Installer
     uses: ./.github/workflows/build-installer-windows.yml
   build_installer_mac:
-    needs: run_tests
+    name: Build macOS Installer
     uses: ./.github/workflows/build-installer-windows.yml
