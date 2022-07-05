@@ -8,10 +8,10 @@ on:
 
 jobs:
   run_tests:
-    uses: ./.github/workflows/reusable/run-tests.yml
+    uses: ./.github/workflows/run-tests.yml
   build_installer_windows:
     needs: run_tests
-    uses: ./.github/workflows/reusable/build-installer-windows.yml
+    uses: ./.github/workflows/build-installer-windows.yml
   build_installer_mac:
     needs: run_tests
-    uses: ./.github/workflows/reusable/build-installer-windows.yml
+    uses: ./.github/workflows/build-installer-windows.yml

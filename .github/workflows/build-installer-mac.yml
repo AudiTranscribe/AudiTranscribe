@@ -1,7 +1,7 @@
-name: Build Windows macOS
+name: Build macOS Installer
 
 on:
-  workflow_call
+  workflow_call:
   workflow_dispatch:
     branches: [ main ]
 
