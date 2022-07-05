@@ -287,7 +287,8 @@
                         <id>mac</id>
                         <configuration>
                             <appVersion>1.0.0</appVersion> <!-- For macOS, must make version at least 1.0.0 -->
-                            <icon>${project.basedir}/Designs/icons/icon.icns</icon>
+                            <verbose>true</verbose>
+                            <resourceDir>${project.basedir}/Production Assets/mac</resourceDir>
                             <type>DMG</type>
                         </configuration>
                     </execution>
@@ -295,7 +296,7 @@
                         <id>win</id>
                         <configuration>
                             <appVersion>${project.version}</appVersion>
-                            <icon>${project.basedir}/Designs/icons/icon.ico</icon>
+                            <resourceDir>${project.basedir}/Production Assets/win</resourceDir>
                             <type>EXE</type>
                             <winMenu>true</winMenu>
                             <winPerUserInstall>true</winPerUserInstall>
