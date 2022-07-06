@@ -10,6 +10,8 @@ jobs:
   build_installer_windows:
     name: Build Windows Installer
     uses: ./.github/workflows/build-installer-windows.yml
-  build_installer_mac:
-    name: Build macOS Installer
-    uses: ./.github/workflows/build-installer-windows.yml
+
+#  # Todo: disabled due to lack of Apple signing key.
+#  build_installer_mac:
+#    name: Build macOS Installer
+#    uses: ./.github/workflows/build-installer-windows.yml

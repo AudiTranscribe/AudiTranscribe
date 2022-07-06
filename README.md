@@ -49,7 +49,26 @@ The software is not perfect. There are a few limitations with the software in it
 
 # Installation
 
+## Using An Installer
+
+Currently, the only installer available is one for Windows.
+
+1. Head to the latest releases section.
+    - If there are no current releases, you may want to choose a pre-release version instead.
+2. Under the downloads section, download an installer.
+3. Unzip the installer package.
+4. Run the application.
+    - It is highly likely that an alert like "Windows protected your PC" would pop up. This is normal, and is due to
+      AudiTranscribe not being a recognized app yet.
+5. Follow the installation instructions.
+6. Done!
+
+## From Source
+
 This guide will assume that [Apache Maven](https://maven.apache.org/) and [FFmpeg](https://ffmpeg.org/) are installed.
+
+Download the latest release/pre-release from the "releases" section of the GitHub page, or download the latest files
+under the `staging` branch.
 
 To set up AudiTranscribe with maven, run the following commands:
 
