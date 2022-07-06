@@ -61,7 +61,7 @@ mvn validate
 mvn -B clean:clean compiler:compile javafx:jlink
 
 # Test installation
-mvn test:test
+mvn test
 ```
 
 # Security Policy
