@@ -36,10 +36,8 @@ jobs:
         uses: FedericoCarboni/setup-ffmpeg@v1
         with:
           token: ${{ github.token }}
-      - name: Install Maven Dependencies
-        run: mvn install
-      - name: Fix Automatic Modules
-        run:   # Todo: add command
+      - name: Install Custom Maven Dependencies
+        run: mvn validate
       - name: Generate Installer
         run: mvn -B clean:clean compiler:compile javafx:jlink jpackage:jpackage@win
       - name: Upload Windows Installer
