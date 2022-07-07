@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="rootPane" prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="site.overwrite.auditranscribe.views.main_views.AboutViewController">
+<AnchorPane fx:id="rootPane" prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="site.overwrite.auditranscribe.main_views.AboutViewController">
    <children>
       <ImageView fx:id="bannerImage" fitHeight="167.0" fitWidth="400.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <image>

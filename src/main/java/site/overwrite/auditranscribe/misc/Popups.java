@@ -2,12 +2,12 @@
  * Popups.java
  *
  * Created on 2022-05-26
- * Updated on 2022-06-28
+ * Updated on 2022-07-07
  *
  * Description: Class that handles the showing of popups and dialogs to the user.
  */
 
-package site.overwrite.auditranscribe.views.helpers;
+package site.overwrite.auditranscribe.misc;
 
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;

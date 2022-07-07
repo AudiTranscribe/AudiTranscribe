@@ -2,12 +2,12 @@
  * SetupWizardHelper.java
  *
  * Created on 2022-06-19
- * Updated on 2022-07-02
+ * Updated on 2022-07-07
  *
  * Description: Class that handles the setup wizard.
  */
 
-package site.overwrite.auditranscribe.views.setup_wizard;
+package site.overwrite.auditranscribe.setup_wizard.view_controllers;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;

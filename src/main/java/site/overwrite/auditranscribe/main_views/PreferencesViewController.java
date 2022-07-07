@@ -2,12 +2,12 @@
  * PreferencesViewController.java
  *
  * Created on 2022-05-22
- * Updated on 2022-06-26
+ * Updated on 2022-07-07
  *
  * Description: Contains the preferences view's controller class.
  */
 
-package site.overwrite.auditranscribe.views.main_views;
+package site.overwrite.auditranscribe.main_views;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -27,8 +27,8 @@ import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
 import site.overwrite.auditranscribe.misc.spinners.CustomIntegerSpinnerValueFactory;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
-import site.overwrite.auditranscribe.views.helpers.Popups;
-import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
+import site.overwrite.auditranscribe.misc.Popups;
+import site.overwrite.auditranscribe.main_views.helpers.ProjectIOHandlers;
 
 import java.io.File;
 import java.io.IOException;
@@ -84,7 +84,7 @@ public class PreferencesViewController implements Initializable {
             // Define file extension filter
             FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
                     "FFmpeg binary",
-                    "*.exe", "*"  // Todo: check if works
+                    "*.exe", "*"
             );
 
             // Get the file
