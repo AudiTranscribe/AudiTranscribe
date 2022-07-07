@@ -2,7 +2,7 @@
  * SceneSwitcher.java
  *
  * Created on 2022-06-22
- * Updated on 2022-06-26
+ * Updated on 2022-07-07
  *
  * Description: Class that handles the switching between the main scene and transcription scenes.
  */
@@ -12,6 +12,7 @@ package site.overwrite.auditranscribe.views.scene_switching;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.apache.commons.compress.utils.FileNameUtils;
@@ -62,7 +63,13 @@ public class SceneSwitcher {
      */
     // Todo: somehow use the main scene
     public SceneSwitcher(SettingsFile settingsFile) {
+        // Update `settingsFile` attribute
         this.settingsFile = settingsFile;
+
+        // Set icon for the main stage and transcription stage
+        Image icon = new Image(IOMethods.getInputStream("images/logo-and-banner/icon.png"));
+        this.mainStage.getIcons().add(icon);
+        this.transcriptionStage.getIcons().add(icon);
     }
 
     // Public methods
