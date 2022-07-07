@@ -1,0 +1,12 @@
+name: Run Tests On Push To Staging
+
+on:
+  push:
+    branches: [ staging ]
+  pull_request:
+    branches: [ staging ]
+
+jobs:
+  run_tests:
+    name: Run Tests
+    uses: ./.github/workflows/run-tests.yml

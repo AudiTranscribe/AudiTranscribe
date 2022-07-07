@@ -1,21 +1,17 @@
 name: Run Tests
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'src/main/java/site/overwrite/auditranscribe/**'
-  pull_request:
+  workflow_call:
+  workflow_dispatch:
     branches: [ main ]
 
 jobs:
   build_and_test:
+    name: Build And Test
     runs-on: ${{ matrix.os }}
-
     strategy:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3

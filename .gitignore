@@ -30,6 +30,7 @@ out/
 
 # Others
 [Tt]est-*
+!lib/*.jar
 
 ~$*
 .DS_Store

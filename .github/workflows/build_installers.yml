@@ -1,0 +1,16 @@
+name: Generate Installers
+
+on:
+  release:
+    types: [ published ]
+  workflow_call:
+  workflow_dispatch:
+    branches: [ staging ]
+
+jobs:
+  build_installer_windows:
+    name: Build Windows Installer
+    uses: ./.github/workflows/build-installer-windows.yml
+  build_installer_mac:
+    name: Build macOS Installer
+    uses: ./.github/workflows/build-installer-mac.yml

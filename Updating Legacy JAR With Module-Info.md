@@ -7,18 +7,20 @@ We would hope that all dependencies already have a `module-info.java` file. Howe
 *will* need to update them. In the case where an error like "automatic module cannot be used with jlink" occurs, this
 file is meant to summarize what to do.
 
-Here's a list of all the dependencies that need updating, with any issues that you might encounter when updating them.
+Here's a list of all the dependencies are automatic, with any issues that you might encounter when updating them.
 
-| Dependency Name         | Module Name                   | Issues Associated With It <u>To Ignore</u>      |
-|:------------------------|:------------------------------|:------------------------------------------------|
-| Apache Commons Compress | `org.apache.commons.compress` | Missing dependencies error                      |
-| Apache Commons Exec     | `commons.exec`                |                                                 |
-| Javatuples              | `javatuples`                  |                                                 |
-| SQLite JDBC             | `org.xerial.sqlitejdbc`       |                                                 |
+| Dependency Name         | Module Name                   | Issues Associated With It <u>To Ignore</u> |
+|:------------------------|:------------------------------|:-------------------------------------------|
+| Apache Commons Compress | `org.apache.commons.compress` | Missing dependencies error                 |
+| Apache Commons Exec     | `commons.exec`                |                                            |
+| Javatuples              | `javatuples`                  |                                            |
+| SQLite JDBC             | `org.xerial.sqlitejdbc`       |                                            |
 
-Suppose we want to fix the Commons Compress (`org.apache.commons.compress`) package.
-In the error message where you see "automatic module cannot be used with jlink", the error message
-should also specify a file path. For example:
+JAR files that have these problems fixed are included in the `lib` directory. However, some JAR files may still need
+updating. This guide will help you update them.
+
+Suppose we want to fix the Commons Compress (`org.apache.commons.compress`) package. In the error message where you see
+"automatic module cannot be used with jlink", the error message should also specify a file path. For example:
 
 ```
 Error: automatic module cannot be used with jlink: org.apache.commons.compress from file:/path/to/the/jar/file
