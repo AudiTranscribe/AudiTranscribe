@@ -88,10 +88,23 @@
 }
 
 /* Others */
+.menu:hover, .menu:showing {
+    -fx-background-color: #515659ff;
+}
+
 .menu-bar {
     -fx-padding: 0 0 2 0;
     -fx-background-color: #555555ff, #282828ff, #3c3f41ff;
     -fx-background-insets: 0, 0 0 1 0, 0 0 2 0;
+}
+
+.menu-item {
+    -fx-background-color: #3c3f41ff;
+}
+
+.menu-item:hover {
+    -fx-background-color: #515659ff;
+    -fx-cursor: hand;
 }
 
 .separator *.line {
