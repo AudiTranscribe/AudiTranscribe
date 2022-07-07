@@ -94,6 +94,14 @@ class DownloadFileHandlerTest {
                     HashingUtils.getHash(new File(outputFilePath), "MD5")
             );
 
+            // This should throw an exception
+            assertThrowsExactly(IOException.class, () ->
+                    DownloadFileHandler.downloadFileWithRetry(
+                            new URL("https://example.com/12345"),
+                            outputFilePath,
+                            maxNumTries
+                    ));
+
             // Test the method that downloads the file and checks the signature at the same time
             assertDoesNotThrow(() -> DownloadFileHandler.downloadFileWithRetry(
                     new URL(

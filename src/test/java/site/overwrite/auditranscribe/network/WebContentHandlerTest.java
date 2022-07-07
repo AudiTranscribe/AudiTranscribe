@@ -20,10 +20,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class WebContentHandlerTest {
     @Test
     void readContentOnWebpage() throws IOException {
+        // This has no encoding attached to it
         assertEquals(
                 "This is a file with some text hosted online.",
                 WebContentHandler.readContentOnWebpage(new URL("https://pastebin.com/raw/PqNK5dvw"))
         );
+
+        // This URL will raise a 404 error
         assertThrows(
                 FileNotFoundException.class,
                 () -> WebContentHandler.readContentOnWebpage(new URL("https://example.com/12345"))

@@ -27,7 +27,8 @@ public final class WebContentHandler {
     // Public methods
 
     /**
-     * Method that reads the content on a webpage and returns it as a string.
+     * Method that reads the content on a webpage and returns it as a string.<br>
+     * This assumes that the content is <b>strictly text based</b>.
      * @param url   URL to access.
      * @return  String, representing the content of the webpage.
      * @throws IOException  If the reading of the webpage goes wrong.
@@ -39,11 +40,7 @@ public final class WebContentHandler {
         // Get the input stream for the webpage
         InputStream in = connection.getInputStream();
 
-        // Get the encoding for the webpage
-        String encoding = connection.getContentEncoding();
-        encoding = encoding == null ? "UTF-8" : encoding;
-
         // Return web content as string
-        return IOMethods.inputStreamToString(in, encoding);
+        return IOMethods.inputStreamToString(in, "UTF-8");
     }
 }
