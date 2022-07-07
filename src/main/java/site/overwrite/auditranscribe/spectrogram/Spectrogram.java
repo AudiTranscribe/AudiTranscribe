@@ -2,7 +2,7 @@
  * Spectrogram.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-26
+ * Updated on 2022-07-07
  *
  * Description: Class that handles the creation of the spectrogram image.
  */
@@ -107,7 +107,11 @@ public class Spectrogram {
         width = (int) (audioObj.getDuration() * numPxPerSecond);
         height = (int) (numOctaves * numPxPerOctave);
 
-        MyLogger.log(Level.FINE, "Spectrogram width is " + width + " and height is " + height, this.getClass().toString());
+        MyLogger.log(
+                Level.FINE,
+                "Spectrogram width is " + width + " and height is " + height,
+                this.getClass().toString()
+        );
 
         // Get the mono samples
         samples = audioObj.getMonoSamples();
@@ -169,11 +173,19 @@ public class Spectrogram {
         width = (int) (duration * numPxPerSecond);
         height = (int) (numOctaves * numPxPerOctave);
 
-        MyLogger.log(Level.FINE, "Spectrogram width is " + width + " and height is " + height, this.getClass().toString());
+        MyLogger.log(
+                Level.FINE,
+                "Spectrogram width is " + width + " and height is " + height,
+                this.getClass().toString()
+        );
 
         // We don't need samples in this case
         samples = null;
-        MyLogger.log(Level.FINE, "Spectrogram creation occurring WITHOUT audio file; samples not available", this.getClass().toString());
+        MyLogger.log(
+                Level.FINE,
+                "Spectrogram creation occurring WITHOUT audio file; samples not available",
+                this.getClass().toString()
+        );
 
         // Get the frequency bins
         frequencyBins = FrequencyBins.getQTFreqBins(numFreqBins, binsPerOctave, minFreq);
@@ -282,26 +294,26 @@ public class Spectrogram {
         }
 
         // Now convert all moduli into decibel numbers
-        double maxDB = -Double.MAX_VALUE;
+        double maxMagnitude = -Double.MAX_VALUE;
 
         double[][] magnitudes = new double[numRows][numCols];
         for (int i = 0; i < numRows; i++) {
             for (int j = 0; j < numCols; j++) {
                 // Get the decibel value for this amplitude
-                double dbVal = UnitConversionUtils.amplitudeToDecibel(moduli[i][j], maxModulus);
+                double magnitudeVal = UnitConversionUtils.amplitudeToDecibel(moduli[i][j], maxModulus);
 
                 // Add it into the magnitudes array
-                magnitudes[i][j] = dbVal;
+                magnitudes[i][j] = magnitudeVal;
 
-                // Update maximum decibel value as needed
-                if (maxDB < dbVal) maxDB = dbVal;
+                // Update maximum magnitude value as needed
+                if (maxMagnitude < magnitudeVal) maxMagnitude = magnitudeVal;
             }
         }
 
-        // Now fix the decibel values
+        // Now fix the magnitude values
         for (int i = 0; i < numRows; i++) {
             for (int j = 0; j < numCols; j++) {
-                magnitudes[i][j] = Math.max(magnitudes[i][j], maxDB - TOP_DB);
+                magnitudes[i][j] = Math.max(magnitudes[i][j], maxMagnitude - TOP_DB);
             }
         }
 
