@@ -2,7 +2,7 @@
  * IOMethods.java
  *
  * Created on 2022-03-15
- * Updated on 2022-07-03
+ * Updated on 2022-07-07
  *
  * Description: Input/Output methods that are used in the AudiTranscribe project.
  */
@@ -277,5 +277,32 @@ public final class IOMethods {
             // No treatment necessary
             return path;
         }
+    }
+
+    // Miscellaneous methods
+
+    /**
+     * Method that converts the bytes passed by an input stream <code>in</code> to a string with the
+     * specified encoding.
+     *
+     * @param in       Input stream.
+     * @param encoding Encoding to use (e.g. <code>UTF-8</code>).
+     * @return String representation of the input stream.
+     * @throws IOException If the encoding format is not recognized or something went wrong when
+     *                     reading the input stream.
+     */
+    public static String inputStreamToString(InputStream in, String encoding) throws IOException {
+        // Define a buffer for writing the output to
+        byte[] buf = new byte[8192];  // 8192 = 2^13
+
+        // Write input stream as bytes to the output stream
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        int len;
+        while ((len = in.read(buf)) != -1) {
+            out.write(buf, 0, len);
+        }
+
+        // Convert the output stream bytes into a string by using the provided encoding
+        return out.toString(encoding);
     }
 }

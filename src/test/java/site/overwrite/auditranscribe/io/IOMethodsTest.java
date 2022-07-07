@@ -2,7 +2,7 @@
  * IOMethodsTest.java
  *
  * Created on 2022-05-10
- * Updated on 2022-07-03
+ * Updated on 2022-07-07
  *
  * Description: Test `IOMethods.java`.
  */
@@ -211,5 +211,30 @@ class IOMethodsTest {
         assertArrayEquals(new String[]{"a", "bc", "def", "ghij"}, IOMethods.splitPaths("a\\bc\\def\\ghij\\\\\\\\"));
         assertArrayEquals(new String[]{"abcdefg"}, IOMethods.splitPaths("abcdefg"));
         assertArrayEquals(new String[]{"abcdefg"}, IOMethods.splitPaths("abcdefg\\"));
+    }
+
+    @Test
+    void inputStreamToString() throws IOException {
+        assertEquals(
+                "SOME TEXT Π",
+                IOMethods.inputStreamToString(
+                        IOMethods.getInputStream(
+                                IOMethods.joinPaths("testing-files", "text", "EncodingTestFile.txt")
+                        ),
+                        "UTF-8"
+                )
+        );
+        assertEquals(
+                "SOME TEXT ��",
+                IOMethods.inputStreamToString(
+                        IOMethods.getInputStream(
+                                IOMethods.joinPaths("testing-files", "text", "EncodingTestFile.txt")
+                        ),
+                        "ASCII")
+        );
+
+        assertThrowsExactly(NullPointerException.class, () -> IOMethods.inputStreamToString(
+                IOMethods.getInputStream("not-a-file"), "UTF-8"
+        ));
     }
 }
