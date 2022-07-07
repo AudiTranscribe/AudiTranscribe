@@ -2,12 +2,12 @@
  * MainViewController.java
  *
  * Created on 2022-02-09
- * Updated on 2022-07-03
+ * Updated on 2022-07-07
  *
  * Description: Contains the main view's controller class.
  */
 
-package site.overwrite.auditranscribe.views.main_views;
+package site.overwrite.auditranscribe.main_views;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -39,9 +39,9 @@ import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
 import site.overwrite.auditranscribe.utils.MiscUtils;
-import site.overwrite.auditranscribe.views.helpers.Popups;
-import site.overwrite.auditranscribe.views.helpers.ProjectIOHandlers;
-import site.overwrite.auditranscribe.views.scene_switching.SceneSwitchingState;
+import site.overwrite.auditranscribe.misc.Popups;
+import site.overwrite.auditranscribe.main_views.helpers.ProjectIOHandlers;
+import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingState;
 
 import java.io.File;
 import java.io.IOException;

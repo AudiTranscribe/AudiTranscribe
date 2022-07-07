@@ -1,40 +1,49 @@
 /*
- * FinishSetupViewController.java
+ * InstallingFFmpegViewController.java
  *
  * Created on 2022-06-19
- * Updated on 2022-06-22
+ * Updated on 2022-07-07
  *
- * Description: View controller for the view that signals the end of the setup process.
+ * Description: View controller that show instructions on how to install FFmpeg.
  */
 
-package site.overwrite.auditranscribe.views.setup_wizard;
+package site.overwrite.auditranscribe.setup_wizard.view_controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.Theme;
+import site.overwrite.auditranscribe.utils.GUIUtils;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
 /**
- * View controller for the view that signals the end of the setup process.
+ * View controller that show instructions on how to install FFmpeg.
  */
-public class FinishSetupViewController implements Initializable {
+public class InstallingFFmpegViewController implements Initializable {
     // FXML Elements
     @FXML
     private AnchorPane rootPane;
 
     @FXML
-    private Button closeButton;
+    private Hyperlink ffmpegHyperlink;
 
-    // Initialize method
+    @FXML
+    private Button confirmButton;
+
+    // Initialization method
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        closeButton.setOnAction(event -> ((Stage) rootPane.getScene().getWindow()).close());
+        // Set hyperlink methods
+        ffmpegHyperlink.setOnAction(event -> GUIUtils.openURLInBrowser("https://ffmpeg.org/"));
+
+        // Add button methods
+        confirmButton.setOnAction(event -> ((Stage) rootPane.getScene().getWindow()).close());
     }
 
     // Public methods

@@ -228,25 +228,27 @@
                             site/overwrite/auditranscribe/io/json_files/file_classes/**
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/misc/CustomTask.class
-                        </exclude>
-                        <exclude>
-                            site/overwrite/auditranscribe/misc/MyLogger.class
-                        </exclude>
-                        <exclude>
-                            site/overwrite/auditranscribe/misc/MouseHandler.class
-                        </exclude>
-                        <exclude>
-                            site/overwrite/auditranscribe/misc/Theme.class
+                            site/overwrite/auditranscribe/main_views/**
                         </exclude>
                         <exclude>
                             site/overwrite/auditranscribe/misc/spinners/**
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/misc/spinners/CustomTask.class
+                            site/overwrite/auditranscribe/misc/CustomTask.class
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/misc/spinners/MouseHandler.class
+                            site/overwrite/auditranscribe/misc/MouseHandler.class
+                        </exclude>
+                        <exclude>
+                            site/overwrite/auditranscribe/misc/MyLogger.class
+                        </exclude>
+                        <exclude>
+                            site/overwrite/auditranscribe/misc/Popups.class
+                        </exclude>
+                        <exclude>
+                            site/overwrite/auditranscribe/misc/Theme.class
+                        </exclude>
+                        <exclude>
                         </exclude>
                         <exclude>
                             site/overwrite/auditranscribe/notes/*.class
@@ -258,6 +260,9 @@
                             site/overwrite/auditranscribe/plotting/PlottingStuffHandler.class
                         </exclude>
                         <exclude>
+                            site/overwrite/auditranscribe/setup_wizard/**
+                        </exclude>
+                        <exclude>
                             site/overwrite/auditranscribe/spectrogram/ColourScale.class
                         </exclude>
                         <exclude>
@@ -265,9 +270,6 @@
                         </exclude>
                         <exclude>
                             site/overwrite/auditranscribe/utils/GUIUtils.class
-                        </exclude>
-                        <exclude>
-                            site/overwrite/auditranscribe/views/**
                         </exclude>
                     </excludes>
                 </configuration>

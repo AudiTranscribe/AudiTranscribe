@@ -2,12 +2,12 @@
  * CannotFindFFmpegViewController.java
  *
  * Created on 2022-06-19
- * Updated on 2022-06-22
+ * Updated on 2022-07-07
  *
  * Description: View controller of the view that reports the FFmpeg could not be found.
  */
 
-package site.overwrite.auditranscribe.views.setup_wizard;
+package site.overwrite.auditranscribe.setup_wizard.view_controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

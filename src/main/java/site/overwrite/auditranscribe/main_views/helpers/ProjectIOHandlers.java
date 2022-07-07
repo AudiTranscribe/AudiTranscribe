@@ -2,12 +2,12 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-06-28
+ * Updated on 2022-07-07
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
 
-package site.overwrite.auditranscribe.views.helpers;
+package site.overwrite.auditranscribe.main_views.helpers;
 
 import javafx.stage.*;
 import site.overwrite.auditranscribe.io.audt_file.ProjectData;

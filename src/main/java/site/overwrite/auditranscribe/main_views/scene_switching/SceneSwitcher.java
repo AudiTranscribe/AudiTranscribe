@@ -7,7 +7,7 @@
  * Description: Class that handles the switching between the main scene and transcription scenes.
  */
 
-package site.overwrite.auditranscribe.views.scene_switching;
+package site.overwrite.auditranscribe.main_views.scene_switching;
 
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
@@ -34,9 +34,9 @@ import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
-import site.overwrite.auditranscribe.views.helpers.Popups;
-import site.overwrite.auditranscribe.views.main_views.MainViewController;
-import site.overwrite.auditranscribe.views.main_views.TranscriptionViewController;
+import site.overwrite.auditranscribe.misc.Popups;
+import site.overwrite.auditranscribe.main_views.MainViewController;
+import site.overwrite.auditranscribe.main_views.TranscriptionViewController;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;

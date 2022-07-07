@@ -2,12 +2,12 @@
  * InitialViewController.java
  *
  * Created on 2022-06-19
- * Updated on 2022-06-22
+ * Updated on 2022-07-07
  *
  * Description: View controller that handles the initial view for the setup wizard.
  */
 
-package site.overwrite.auditranscribe.views.setup_wizard;
+package site.overwrite.auditranscribe.setup_wizard.view_controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -63,6 +63,7 @@ public class InitialViewController implements Initializable {
 
     /**
      * Method that sets the scene's theme.
+     *
      * @param theme Theme to set.
      */
     public void setThemeOnScene(Theme theme) {
