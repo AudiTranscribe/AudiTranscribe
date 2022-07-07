@@ -25,6 +25,7 @@ module site.overwrite.auditranscribe {
     exports site.overwrite.auditranscribe.exceptions.generic;
     exports site.overwrite.auditranscribe.exceptions.io;
     exports site.overwrite.auditranscribe.exceptions.io.audt_file;
+    exports site.overwrite.auditranscribe.exceptions.network;
     exports site.overwrite.auditranscribe.exceptions.notes;
     exports site.overwrite.auditranscribe.io.audt_file;
     exports site.overwrite.auditranscribe.io.audt_file.data_encapsulators;

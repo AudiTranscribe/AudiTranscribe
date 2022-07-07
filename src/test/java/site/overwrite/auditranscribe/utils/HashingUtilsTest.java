@@ -20,7 +20,6 @@ import java.security.NoSuchAlgorithmException;
 import static org.junit.jupiter.api.Assertions.*;
 
 class HashingUtilsTest {
-
     @Test
     void getHash() throws NoSuchAlgorithmException, IOException {
         assertEquals(
