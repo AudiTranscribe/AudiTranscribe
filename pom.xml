@@ -249,8 +249,6 @@
                             site/overwrite/auditranscribe/misc/Theme.class
                         </exclude>
                         <exclude>
-                        </exclude>
-                        <exclude>
                             site/overwrite/auditranscribe/notes/*.class
                         </exclude>
                         <exclude>
