@@ -32,6 +32,8 @@ import site.overwrite.auditranscribe.io.audt_file.ProjectData;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.MyLogger;
+import site.overwrite.auditranscribe.system.OSMethods;
+import site.overwrite.auditranscribe.system.OSType;
 import site.overwrite.auditranscribe.views.helpers.Popups;
 import site.overwrite.auditranscribe.views.main_views.MainViewController;
 import site.overwrite.auditranscribe.views.main_views.TranscriptionViewController;
@@ -66,10 +68,12 @@ public class SceneSwitcher {
         // Update `settingsFile` attribute
         this.settingsFile = settingsFile;
 
-        // Set icon for the main stage and transcription stage
-        Image icon = new Image(IOMethods.getInputStream("images/logo-and-banner/icon.png"));
-        this.mainStage.getIcons().add(icon);
-        this.transcriptionStage.getIcons().add(icon);
+        // Set icon for the main stage and transcription stage, if not on macOS
+        if (OSMethods.getOS() != OSType.MAC) {
+            Image icon = new Image(IOMethods.getInputStream("images/logo-and-banner/icon.png"));
+            this.mainStage.getIcons().add(icon);
+            this.transcriptionStage.getIcons().add(icon);
+        }
     }
 
     // Public methods
