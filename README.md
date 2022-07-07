@@ -51,17 +51,36 @@ The software is not perfect. There are a few limitations with the software in it
 
 ## Using An Installer
 
-Currently, the only installer available is one for Windows.
+Currently, the only installers available are for Windows and macOS.
+
+### Windows
 
 1. Head to the latest releases section.
     - If there are no current releases, you may want to choose a pre-release version instead.
-2. Under the downloads section, download an installer.
-3. Unzip the installer package.
+2. Under the downloads section, download the Windows installer.
+3. Unzip the installer package. The package should contain one `.exe` file.
 4. Run the application.
     - It is highly likely that an alert like "Windows protected your PC" would pop up. This is normal, and is due to
       AudiTranscribe not being a recognized app yet.
 5. Follow the installation instructions.
-6. Done!
+6. The application should be installed once completed.
+
+### macOS
+
+1. Head to the latest releases section.
+    - If there are no current releases, you may want to choose a pre-release version instead.
+2. Under the downloads section, download the macOS file.
+3. Unzip the installer package. The package should contain one `.dmg` file.
+4. The `.dmg` file would likely be quarantined by Apple due to it lacking a proper signing key. To fix this, run the
+   following command, which removes all attributes from the `.dmg` file and makes it no longer quarantined.
+
+```bash
+sudo xattr -cr path/to/the/dmg/file
+```
+
+5. Open the `.dmg` file.
+6. Drag the `AudiTranscribe.app` into the Applications folder.
+7. Run the application!
 
 ## From Source
 

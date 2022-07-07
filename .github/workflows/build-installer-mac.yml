@@ -24,6 +24,7 @@ jobs:
           token: ${{ github.token }}
       - name: Install Custom Maven Dependencies
         run: mvn validate
+        # Todo: get Apple signing key
       - name: Generate Installer
         run: mvn -B clean:clean compiler:compile javafx:jlink jpackage:jpackage@mac
       - name: Upload macOS Installer
