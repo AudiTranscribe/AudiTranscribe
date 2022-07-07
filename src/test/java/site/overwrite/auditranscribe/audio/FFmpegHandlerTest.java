@@ -2,7 +2,7 @@
  * FFmpegHandlerTest.java
  *
  * Created on 2022-05-06
- * Updated on 2022-07-04
+ * Updated on 2022-07-07
  *
  * Description: Test `FFmpegHandler.java`.
  */
@@ -41,7 +41,7 @@ class FFmpegHandlerTest {
         } catch (AssertionError e) {
             assertTrue(FFmpegHandler.checkFFmpegPath(new SettingsFile().data.ffmpegInstallationPath));
         }
-        assertFalse(FFmpegHandler.checkFFmpegPath("not-the-ffmpeg-path"));  // IO Exception should be thrown => false
+        assertFalse(FFmpegHandler.checkFFmpegPath("fake-ffmpeg-path"));  // IO Exception should be thrown => false
         assertFalse(FFmpegHandler.checkFFmpegPath("git"));  // Should give error code 1 => false
     }
 
