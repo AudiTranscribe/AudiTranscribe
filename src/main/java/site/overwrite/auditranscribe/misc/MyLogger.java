@@ -2,7 +2,7 @@
  * MyLogger.java
  *
  * Created on 2022-06-25
- * Updated on 2022-06-28
+ * Updated on 2022-07-08
  *
  * Description: Class that handles the loggers.
  */
@@ -12,6 +12,7 @@ package site.overwrite.auditranscribe.misc;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.utils.MiscUtils;
+import site.overwrite.auditranscribe.utils.TestingUtils;
 
 import java.io.*;
 import java.util.logging.*;
@@ -92,20 +93,22 @@ public final class MyLogger {
                 // Set up logger
                 logger = Logger.getLogger("AudiTranscribe");
 
-                // Create file handler
-                FileHandler fileHandler = new FileHandler(
-                        IOMethods.joinPaths(loggingFolder, "Log-" + initTime + ".log"),
-                        MAX_LOG_FILE_SIZE,
-                        1,
-                        true
-                );
+                // Create file handler if not running a test
+                if (!TestingUtils.isRunningTest()) {
+                    FileHandler fileHandler = new FileHandler(
+                            IOMethods.joinPaths(loggingFolder, "Log-" + initTime + ".log"),
+                            MAX_LOG_FILE_SIZE,
+                            1,
+                            true
+                    );
 
-                // Update attributes of the file handler
-                fileHandler.setLevel(Level.FINE);
-                fileHandler.setFormatter(new SimpleFormatter());
+                    // Update attributes of the file handler
+                    fileHandler.setLevel(Level.FINE);
+                    fileHandler.setFormatter(new SimpleFormatter());
 
-                // Add the file handler to the logger
-                logger.addHandler(fileHandler);
+                    // Add the file handler to the logger
+                    logger.addHandler(fileHandler);
+                }
 
                 // Make logger use parent handlers
                 logger.setUseParentHandlers(true);

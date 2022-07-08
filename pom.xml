@@ -269,6 +269,9 @@
                         <exclude>
                             site/overwrite/auditranscribe/utils/GUIUtils.class
                         </exclude>
+                        <exclude>
+                            site/overwrite/auditranscribe/utils/TestingUtils.class
+                        </exclude>
                     </excludes>
                 </configuration>
                 <executions>
