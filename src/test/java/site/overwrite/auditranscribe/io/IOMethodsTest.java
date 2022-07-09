@@ -212,7 +212,6 @@ class IOMethodsTest {
         assertEquals("a/bc/def", IOMethods.joinPaths("a", "bc", "def"));
         assertEquals("a//bc///def", IOMethods.joinPaths("a/", "bc/", "/def"));
         assertEquals("a/bc//def", IOMethods.joinPaths("a", null, "bc", null, null, null, "/def"));
-        assertEquals("a/bc/def", IOMethods.joinPaths("a", "", "bc", "", "def"));
     }
 
     @Test
