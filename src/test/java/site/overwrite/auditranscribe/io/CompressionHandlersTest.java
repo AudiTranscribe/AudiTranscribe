@@ -1,10 +1,10 @@
 /*
- * LZ4Test.java
+ * CompressionHandlersTest.java
  *
  * Created on 2022-05-04
- * Updated on 2022-07-02
+ * Updated on 2022-07-09
  *
- * Description: Test `LZ4.java`.
+ * Description: Test `CompressionHandlers.java`.
  */
 
 package site.overwrite.auditranscribe.io;
@@ -18,7 +18,7 @@ import java.util.HexFormat;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class LZ4Test {
+class CompressionHandlersTest {
     @Test
     void lz4Compress() throws IOException {
         // Define the hex string of the bytes to compress
@@ -31,7 +31,7 @@ class LZ4Test {
         String lz4HexStr = "8f0123456789abcdef0800058ff0123456789abcde0800051fef41000c1fde410000c056789abcdef0123456789abc";
 
         // Get the result of the compression
-        byte[] result = LZ4.lz4Compress(HexFormat.of().parseHex(hexStr));
+        byte[] result = CompressionHandlers.lz4Compress(HexFormat.of().parseHex(hexStr));
 
         // Check if they are the same
         assertEquals(HexFormat.of().formatHex(result), lz4HexStr);
@@ -52,7 +52,7 @@ class LZ4Test {
         String lz4HexStr = "8f0123456789abcdef0800058ff0123456789abcde0800051fef41000c1fde410000c056789abcdef0123456789abc";
 
         // Get the result of the compression
-        byte[] result = LZ4.lz4Compress(HexFormat.of().parseHex(hexStr), new CustomTask<Void>() {
+        byte[] result = CompressionHandlers.lz4Compress(HexFormat.of().parseHex(hexStr), new CustomTask<Void>() {
             @Override
             protected Void call() {
                 return null;
@@ -75,7 +75,7 @@ class LZ4Test {
                 "def0123456789abcdef0123456789abcdef0123456789abcdef0123456789abc";
 
         // Get the result of the decompression
-        byte[] result = LZ4.lz4Decompress(HexFormat.of().parseHex(lz4HexStr));
+        byte[] result = CompressionHandlers.lz4Decompress(HexFormat.of().parseHex(lz4HexStr));
 
         // Check if they are the same
         assertEquals(HexFormat.of().formatHex(result), hexStr);

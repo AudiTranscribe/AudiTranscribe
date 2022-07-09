@@ -2,7 +2,7 @@
  * QTransformDataObject.java
  *
  * Created on 2022-05-05
- * Updated on 2022-06-21
+ * Updated on 2022-07-09
  *
  * Description: Data object that stores the Q-Transform data.
  */
@@ -10,8 +10,8 @@
 package site.overwrite.auditranscribe.io.audt_file.data_encapsulators;
 
 import org.javatuples.Triplet;
+import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.IOConverters;
-import site.overwrite.auditranscribe.io.LZ4;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileHelpers;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.utils.TypeConversionUtils;
@@ -110,7 +110,7 @@ public class QTransformDataObject extends AbstractAUDTDataObject {
         byte[] plainBytes = IOConverters.twoDimensionalIntegerArrayToBytes(intDataPrimitive);
 
         // Compress the bytes
-        byte[] bytes = LZ4.lz4Compress(plainBytes, task);
+        byte[] bytes = CompressionHandlers.lz4Compress(plainBytes, task);
 
         // Return the bytes and the min and max values
         return new Triplet<>(TypeConversionUtils.toByteArray(bytes), min, max);
@@ -129,7 +129,7 @@ public class QTransformDataObject extends AbstractAUDTDataObject {
             byte[] bytes, double minMagnitude, double maxMagnitude
     ) throws IOException {
         // Decompress the bytes
-        byte[] plainBytes = LZ4.lz4Decompress(bytes);
+        byte[] plainBytes = CompressionHandlers.lz4Decompress(bytes);
 
         // Convert bytes to 2D integer array
         int[][] intData = IOConverters.bytesToTwoDimensionalIntegerArray(plainBytes);

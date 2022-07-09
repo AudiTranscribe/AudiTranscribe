@@ -1,10 +1,10 @@
 /*
- * LZ4.java
+ * CompressionHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-06-28
+ * Updated on 2022-07-09
  *
- * Description: Class that handles LZ4 compression/decompression on byte arrays.
+ * Description: Class that handles compression/decompression on byte arrays.
  */
 
 package site.overwrite.auditranscribe.io;
@@ -18,14 +18,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
- * Class that handles LZ4 compression/decompression on byte arrays.
+ * Class that handles compression/decompression on byte arrays.
  */
-public final class LZ4 {
+public final class CompressionHandlers {
     // Constants
-    public static final int LZ4_BYTE_BUFFER_SIZE = 2048;
-    public static final int LZ4_VERSION_NUMBER = 1;
+    public static final int BUFFER_SIZE = 2048;  // In bytes
+    public static final int VERSION_NUMBER = 1;
 
-    private LZ4() {
+    private CompressionHandlers() {
         // Private constructor to signal this is a utility class
     }
 
@@ -53,10 +53,10 @@ public final class LZ4 {
      */
     public static byte[] lz4Compress(byte[] bytes, CustomTask<?> task) throws IOException {
         // Create a byte buffer
-        byte[] buf = new byte[LZ4_BYTE_BUFFER_SIZE];
+        byte[] buf = new byte[BUFFER_SIZE];
 
         // Count the number of passes that are needed for the LZ4 compression to complete
-        int numPasses = (int) Math.ceil((double) bytes.length / LZ4_BYTE_BUFFER_SIZE);
+        int numPasses = (int) Math.ceil((double) bytes.length / BUFFER_SIZE);
 
         // Define needed byte streams
         ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);  // Takes bytes from the input bytes array
@@ -92,7 +92,7 @@ public final class LZ4 {
      */
     public static byte[] lz4Decompress(byte[] lz4Bytes) throws IOException {
         // Create a byte buffer
-        byte[] buf = new byte[LZ4_BYTE_BUFFER_SIZE];
+        byte[] buf = new byte[BUFFER_SIZE];
 
         // Define needed byte streams
         ByteArrayInputStream inputStream = new ByteArrayInputStream(lz4Bytes);  // Takes bytes from the input bytes array

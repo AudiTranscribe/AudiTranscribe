@@ -2,7 +2,7 @@
  * AUDTFileTest.java
  *
  * Created on 2022-05-01
- * Updated on 2022-07-02
+ * Updated on 2022-07-09
  *
  * Description: Test AUDT file reading and writing.
  */
@@ -14,9 +14,9 @@ import org.junit.jupiter.api.*;
 import site.overwrite.auditranscribe.exceptions.io.audt_file.FailedToReadDataException;
 import site.overwrite.auditranscribe.exceptions.io.audt_file.IncorrectFileFormatException;
 import site.overwrite.auditranscribe.exceptions.io.audt_file.OutdatedFileFormatException;
+import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.io.LZ4;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
 import site.overwrite.auditranscribe.utils.TypeConversionUtils;
 
@@ -92,7 +92,7 @@ class AUDTFileTest {
                 qTransformBytes, minMagnitude, maxMagnitude
         );
         audioDataObject = new AudioDataObject(
-                LZ4.lz4Compress(Files.readAllBytes(Paths.get(
+                CompressionHandlers.lz4Compress(Files.readAllBytes(Paths.get(
                         IOMethods.getAbsoluteFilePath("testing-files/audio/A440.mp3")
                 ))),
                 44100, 120000, "A440.wav");

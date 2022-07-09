@@ -2,7 +2,7 @@
  * ProjectDataTest.java
  *
  * Created on 2022-06-29
- * Updated on 2022-07-03
+ * Updated on 2022-07-09
  *
  * Description: Test `ProjectData.java`.
  */
@@ -13,8 +13,8 @@ import org.javatuples.Triplet;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
+import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.io.LZ4;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
 import site.overwrite.auditranscribe.utils.MathUtils;
 import site.overwrite.auditranscribe.utils.TypeConversionUtils;
@@ -99,12 +99,12 @@ class ProjectDataTest {
         );
 
         audioDataObject1 = new AudioDataObject(
-                LZ4.lz4Compress(Files.readAllBytes(Paths.get(
+                CompressionHandlers.lz4Compress(Files.readAllBytes(Paths.get(
                         IOMethods.getAbsoluteFilePath("testing-files/audio/A440.mp3")
                 ))),
                 44100, 8000, "A440.wav");
         audioDataObject2 = new AudioDataObject(
-                LZ4.lz4Compress(Files.readAllBytes(Paths.get(
+                CompressionHandlers.lz4Compress(Files.readAllBytes(Paths.get(
                         IOMethods.getAbsoluteFilePath("testing-files/audio/Choice.wav")
                 ))),
                 44100, 5000, "Choice.wav");

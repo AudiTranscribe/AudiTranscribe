@@ -2,7 +2,7 @@
  * AUDTFileWriter.java
  *
  * Created on 2022-05-01
- * Updated on 2022-06-21
+ * Updated on 2022-07-09
  *
  * Description: Class that handles the writing of the AudiTranscribe (AUDT) file.
  */
@@ -10,7 +10,7 @@
 package site.overwrite.auditranscribe.io.audt_file;
 
 import site.overwrite.auditranscribe.io.IOConverters;
-import site.overwrite.auditranscribe.io.LZ4;
+import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
 
 import java.io.File;
@@ -247,7 +247,7 @@ public class AUDTFileWriter {
         byte[] byteArray = IOConverters.oneDimensionalIntegerArrayToBytes(array);
 
         // Compress the byte array
-        byte[] compressedBytes = LZ4.lz4Compress(byteArray);
+        byte[] compressedBytes = CompressionHandlers.lz4Compress(byteArray);
 
         // Get the number of compressed bytes
         int numCompressedBytes = compressedBytes.length;
@@ -267,7 +267,7 @@ public class AUDTFileWriter {
         byte[] byteArray = IOConverters.oneDimensionalDoubleArrayToBytes(array);
 
         // Compress the byte array
-        byte[] compressedBytes = LZ4.lz4Compress(byteArray);
+        byte[] compressedBytes = CompressionHandlers.lz4Compress(byteArray);
 
         // Get the number of compressed bytes
         int numCompressedBytes = compressedBytes.length;

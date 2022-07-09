@@ -33,8 +33,8 @@ import site.overwrite.auditranscribe.bpm_estimation.BPMEstimator;
 import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
 import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.exceptions.notes.NoteRectangleCollisionException;
+import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.IOConstants;
-import site.overwrite.auditranscribe.io.LZ4;
 import site.overwrite.auditranscribe.io.audt_file.ProjectData;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
 import site.overwrite.auditranscribe.misc.CustomTask;
@@ -889,7 +889,7 @@ public class TranscriptionViewController implements Initializable {
         maxQTransformMagnitude = qTransformData.maxMagnitude;
 
         // Decompress the MP3 bytes
-        byte[] rawMP3Bytes = LZ4.lz4Decompress(compressedMP3Bytes);
+        byte[] rawMP3Bytes = CompressionHandlers.lz4Decompress(compressedMP3Bytes);
 
         // Ensure that the temporary directory exists
         IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
@@ -2254,7 +2254,7 @@ public class TranscriptionViewController implements Initializable {
         // Compress the raw MP3 bytes
         if (compressedMP3Bytes == null) {
             try {
-                compressedMP3Bytes = LZ4.lz4Compress(
+                compressedMP3Bytes = CompressionHandlers.lz4Compress(
                         audio.wavBytesToMP3Bytes(settingsFile.data.ffmpegInstallationPath),
                         task
                 );
