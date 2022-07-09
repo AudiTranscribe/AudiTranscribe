@@ -15,6 +15,7 @@ import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -105,9 +106,9 @@ public final class IOMethods {
     }
 
     /**
-     * Method that deletes a file or folder at the specified <code>absolutePath</code>.
+     * Method that deletes a file or <b>empty</b> folder at the specified <code>absolutePath</code>.
      *
-     * @param absolutePath <b>Absolute path</b> to the file or folder.
+     * @param absolutePath <b>Absolute path</b> to the file or <b>empty</b> folder.
      * @return Boolean. Is <code>true</code> is the file or folder was deleted and
      * <code>false</code> otherwise.
      */
@@ -306,5 +307,22 @@ public final class IOMethods {
 
         // Convert the output stream bytes into a string by using the provided encoding
         return out.toString(encoding);
+    }
+
+    /**
+     * Method that returns the number of files/folders in the specified directory.
+     *
+     * @param dirPath <b>Absolute</b> path to the directory.
+     * @return An integer, representing the number of files/folders in the directory. Returns
+     * <code>-1</code> if the directory does not exist. <b>This ignores any <code>.DS_Store</code>
+     * that may be present in the directory</b>.
+     */
+    public static int numThingsInDir(String dirPath) {
+        if (isSomethingAt(dirPath)) {
+            int numItems = Objects.requireNonNull(new File(dirPath).list()).length;
+            if (isSomethingAt(joinPaths(dirPath, ".DS_Store"))) return numItems - 1;
+            return numItems;
+        }
+        return -1;
     }
 }

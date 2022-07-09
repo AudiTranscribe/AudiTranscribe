@@ -271,4 +271,27 @@ class IOMethodsTest {
                 IOMethods.getInputStream("not-a-file"), "UTF-8"
         ));
     }
+
+    @Test
+    void numFilesInDir() {
+        // Define base testing directory path
+        String testingDirPath = IOMethods.joinPaths(
+                IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+                "testing-files"
+        );
+
+        // Make sure the directories has the required testing files
+        if (!IOMethods.isSomethingAt(IOMethods.joinPaths(testingDirPath, ".DS_Store"))) {
+            IOMethods.createFile(IOMethods.joinPaths(testingDirPath, ".DS_Store"));
+        }
+
+        if (IOMethods.isSomethingAt(IOMethods.joinPaths(testingDirPath, "database", ".DS_Store"))) {
+            IOMethods.delete(IOMethods.joinPaths(testingDirPath, "database", ".DS_Store"));
+        }
+
+        // Run tests
+        assertEquals(5, IOMethods.numThingsInDir(testingDirPath));
+        assertEquals(2, IOMethods.numThingsInDir(IOMethods.joinPaths(testingDirPath, "database")));
+        assertEquals(-1, IOMethods.numThingsInDir("not-a-dir"));
+    }
 }
