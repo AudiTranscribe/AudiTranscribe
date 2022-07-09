@@ -2,7 +2,7 @@
  * DownloadFileHandlerTest.java
  *
  * Created on 2022-07-07
- * Updated on 2022-07-08
+ * Updated on 2022-07-09
  *
  * Description: Test `DownloadFileHandler.java`.
  */
@@ -72,7 +72,7 @@ class DownloadFileHandlerTest {
             ));
         } finally {
             // Delete the test file
-            IOMethods.deleteFile(outputFilePath);
+            IOMethods.delete(outputFilePath);
         }
     }
 
@@ -132,7 +132,7 @@ class DownloadFileHandlerTest {
             ));
         } finally {
             // Delete the test file
-            IOMethods.deleteFile(outputFilePath);
+            IOMethods.delete(outputFilePath);
         }
     }
 
@@ -183,7 +183,7 @@ class DownloadFileHandlerTest {
             ));
         } finally {
             // Delete the test file
-            IOMethods.deleteFile(outputFilePath);
+            IOMethods.delete(outputFilePath);
         }
     }
 
@@ -239,7 +239,7 @@ class DownloadFileHandlerTest {
             ));
         } finally {
             // Delete the test file
-            IOMethods.deleteFile(outputFilePath);
+            IOMethods.delete(outputFilePath);
         }
     }
 }

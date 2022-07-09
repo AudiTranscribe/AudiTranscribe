@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-07-07
+ * Updated on 2022-07-09
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -928,8 +928,8 @@ public class TranscriptionViewController implements Initializable {
         audio.setRawMP3Bytes(rawMP3Bytes);  // This is to reduce the time needed to save the file later
 
         // Delete the auxiliary files
-        IOMethods.deleteFile(auxiliaryMP3File.getAbsolutePath());
-        IOMethods.deleteFile(auxiliaryWAVFile.getAbsolutePath());
+        IOMethods.delete(auxiliaryMP3File.getAbsolutePath());
+        IOMethods.delete(auxiliaryWAVFile.getAbsolutePath());
 
         // Update the audio object's duration
         // (The `MediaPlayer` duration cannot be trusted)

@@ -2,7 +2,7 @@
  * Audio.java
  *
  * Created on 2022-02-13
- * Updated on 2022-07-04
+ * Updated on 2022-07-09
  *
  * Description: Class that handles audio processing and audio playback.
  */
@@ -693,8 +693,8 @@ public class Audio {
         rawMP3Bytes = Files.readAllBytes(Paths.get(outputPath));
 
         // Delete the temporary files
-        IOMethods.deleteFile(inputPath);
-        IOMethods.deleteFile(outputPath);
+        IOMethods.delete(inputPath);
+        IOMethods.delete(outputPath);
 
         // Return the raw MP3 bytes
         MyLogger.log(Level.FINE, "Done converting", this.getClass().toString());

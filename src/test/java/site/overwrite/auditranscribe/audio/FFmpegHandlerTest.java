@@ -2,7 +2,7 @@
  * FFmpegHandlerTest.java
  *
  * Created on 2022-05-06
- * Updated on 2022-07-07
+ * Updated on 2022-07-09
  *
  * Description: Test `FFmpegHandler.java`.
  */
@@ -72,7 +72,7 @@ class FFmpegHandlerTest {
         assertEquals(correctOutputPath, outputFilePath);
 
         // Remove the file
-        IOMethods.deleteFile(correctOutputPath);
+        IOMethods.delete(correctOutputPath);
     }
 
     @Test

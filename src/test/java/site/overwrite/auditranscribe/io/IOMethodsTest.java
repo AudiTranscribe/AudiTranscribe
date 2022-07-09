@@ -2,7 +2,7 @@
  * IOMethodsTest.java
  *
  * Created on 2022-05-10
- * Updated on 2022-07-07
+ * Updated on 2022-07-09
  *
  * Description: Test `IOMethods.java`.
  */
@@ -13,6 +13,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileLock;
@@ -57,18 +58,19 @@ class IOMethodsTest {
     @Order(2)
     void deleteFile() {
         // First time round, the file should be deleted successfully
-        assertTrue(IOMethods.deleteFile(FILE_FOR_TESTING_CREATION_AND_DELETION_PATH));
+        assertTrue(IOMethods.delete(FILE_FOR_TESTING_CREATION_AND_DELETION_PATH));
 
         // Second time round, the file could not be deleted and thus returns `false`
-        assertFalse(IOMethods.deleteFile(FILE_FOR_TESTING_CREATION_AND_DELETION_PATH));
+        assertFalse(IOMethods.delete(FILE_FOR_TESTING_CREATION_AND_DELETION_PATH));
 
         // Attempt to delete a file in a folder that does not exist should return `false`
-        assertFalse(IOMethods.deleteFile(FILE_THAT_SHOULD_NOT_BE_CREATED_OR_DELETED));
+        assertFalse(IOMethods.delete(FILE_THAT_SHOULD_NOT_BE_CREATED_OR_DELETED));
     }
 
     @Test
     @Order(2)
-    @EnabledOnOs({OS.WINDOWS})  // No exception is thrown on macOS and Linux apparently
+    @EnabledOnOs({OS.WINDOWS})
+        // No exception is thrown on macOS and Linux apparently
     void deleteFileWhileInUseShouldCauseException() throws IOException {
         // Attempt to delete file while it is being used should return false, and then delete file
         // on exit
@@ -82,17 +84,17 @@ class IOMethodsTest {
                 RandomAccessFile reader = new RandomAccessFile(testFilePath, "rw");
                 FileLock ignored = reader.getChannel().lock()
         ) {
-            assertFalse(IOMethods.deleteFile(testFilePath));
+            assertFalse(IOMethods.delete(testFilePath));
         }
     }
 
     @Test
     @Order(3)
-    void createDirectory() {
+    void createDirectoryOne() {
         // Define the path to the test directory
         String testDirectory = IOMethods.joinPaths(
                 IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-                "testing-files", "new-directory"
+                "testing-files", "new-directory-1"
         );
 
         // The test folder should create successfully
@@ -102,15 +104,47 @@ class IOMethodsTest {
         assertFalse(IOMethods.createFolder(testDirectory));
 
         // Now delete the folder
-        assertTrue(IOMethods.deleteFile(testDirectory));
+        assertTrue(IOMethods.delete(testDirectory));
+
+        // Attempting to delete again should return false
+        assertFalse(IOMethods.delete(testDirectory));
+    }
+
+    @Test
+    @Order(3)
+    void createDirectoryTwo() {
+        // Define the path to the test directory
+        String testDirectory = IOMethods.joinPaths(
+                IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+                "testing-files", "new-directory-2", "new-sub-directory", "new-sub-sub-directory"
+        );
+
+        // The test folder should create successfully
+        assertTrue(IOMethods.createFolder(testDirectory));
+
+        // Second time round, the folder should not be created
+        assertFalse(IOMethods.createFolder(testDirectory));
+
+        // Now delete the folders
+        assertTrue(IOMethods.delete(testDirectory));
+        assertTrue(IOMethods.delete(new File(testDirectory).getParent()));
+        assertTrue(IOMethods.delete(new File(new File(testDirectory).getParent()).getParent()));
+
+        // Attempting to delete again should return false
+        assertFalse(IOMethods.delete(testDirectory));
+        assertFalse(IOMethods.delete(new File(testDirectory).getParent()));
+        assertFalse(IOMethods.delete(new File(new File(testDirectory).getParent()).getParent()));
     }
 
     // File location handling
     @Test
     void isFileAt() {
-        assertTrue(IOMethods.isFileAt(IOMethods.getAbsoluteFilePath("testing-files/text/README.txt")));
-        assertTrue(IOMethods.isFileAt(IOMethods.getAbsoluteFilePath("conf/logging.properties")));
-        assertFalse(IOMethods.isFileAt("this-is-a-totally-fake-file.fakefile.fake"));
+        assertTrue(IOMethods.isSomethingAt(IOMethods.getAbsoluteFilePath("testing-files/text/README.txt")));
+        assertTrue(IOMethods.isSomethingAt(IOMethods.getAbsoluteFilePath("conf/logging.properties")));
+        assertTrue(IOMethods.isSomethingAt(IOMethods.joinPaths(
+                IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH, "testing-files"
+        )));
+        assertFalse(IOMethods.isSomethingAt("this-is-a-totally-fake-file.fakefile.fake"));
     }
 
     @Test
@@ -126,22 +160,22 @@ class IOMethodsTest {
         );
 
         // Check if the file that we want to move exists
-        assertTrue(IOMethods.isFileAt(originalFilePath));
-        assertFalse(IOMethods.isFileAt(newFilePath));
+        assertTrue(IOMethods.isSomethingAt(originalFilePath));
+        assertFalse(IOMethods.isSomethingAt(newFilePath));
 
         // Now move the file
         IOMethods.moveFile(originalFilePath, newFilePath);
 
         // Check if the file was moved
-        assertFalse(IOMethods.isFileAt(originalFilePath));
-        assertTrue(IOMethods.isFileAt(newFilePath));
+        assertFalse(IOMethods.isSomethingAt(originalFilePath));
+        assertTrue(IOMethods.isSomethingAt(newFilePath));
 
         // Now move back
         IOMethods.moveFile(newFilePath, originalFilePath);
 
         // Check if the file was moved back
-        assertTrue(IOMethods.isFileAt(originalFilePath));
-        assertFalse(IOMethods.isFileAt(newFilePath));
+        assertTrue(IOMethods.isSomethingAt(originalFilePath));
+        assertFalse(IOMethods.isSomethingAt(newFilePath));
 
         // Test if the move file operation will fail if the file does not exist
         assertThrows(IOException.class, () -> IOMethods.moveFile(newFilePath, originalFilePath));

@@ -2,7 +2,7 @@
  * SceneSwitcher.java
  *
  * Created on 2022-06-22
- * Updated on 2022-07-07
+ * Updated on 2022-07-09
  *
  * Description: Class that handles the switching between the main scene and transcription scenes.
  */
@@ -213,7 +213,7 @@ public class SceneSwitcher {
             Audio audio = new Audio(auxiliaryWAVFile, audioFile.getName(), AudioProcessingMode.SAMPLES_AND_PLAYBACK);
 
             // Delete auxiliary WAV file
-            boolean successfullyDeleted = IOMethods.deleteFile(auxiliaryWAVFile.getAbsolutePath());
+            boolean successfullyDeleted = IOMethods.delete(auxiliaryWAVFile.getAbsolutePath());
             if (successfullyDeleted) {
                 MyLogger.log(Level.FINE, "Successfully deleted auxiliary WAV file.", this.getClass().toString());
             } else {

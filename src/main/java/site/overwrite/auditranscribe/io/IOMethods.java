@@ -2,7 +2,7 @@
  * IOMethods.java
  *
  * Created on 2022-03-15
- * Updated on 2022-07-07
+ * Updated on 2022-07-09
  *
  * Description: Input/Output methods that are used in the AudiTranscribe project.
  */
@@ -105,13 +105,13 @@ public final class IOMethods {
     }
 
     /**
-     * Method that deletes a file at the specified <code>absolutePath</code>.
+     * Method that deletes a file or folder at the specified <code>absolutePath</code>.
      *
-     * @param absolutePath <b>Absolute path</b> to the file.
-     * @return Boolean. Is <code>true</code> is the file was deleted and <code>false</code>
-     * otherwise.
+     * @param absolutePath <b>Absolute path</b> to the file or folder.
+     * @return Boolean. Is <code>true</code> is the file or folder was deleted and
+     * <code>false</code> otherwise.
      */
-    public static boolean deleteFile(String absolutePath) {
+    public static boolean delete(String absolutePath) {
         try {
             return Files.deleteIfExists(Paths.get(absolutePath));
         } catch (IOException e) {
@@ -122,7 +122,8 @@ public final class IOMethods {
 
     /**
      * Method that creates a folder, if it does not already exist, at the specified
-     * <code>absolutePath</code>.
+     * <code>absolutePath</code>.<br>
+     * This method will also create any parent directories that does not already exist.
      *
      * @param absolutePath <b>Absolute path</b> to the folder.
      * @return A boolean. Returns <code>true</code> if folder was created successfully, and
@@ -133,20 +134,21 @@ public final class IOMethods {
             Files.createDirectory(Paths.get(absolutePath));
             return true;
         } catch (IOException e) {
-            return false;
+            return new File(absolutePath).mkdirs();
         }
     }
 
     // File location handling
 
     /**
-     * Method that checks if a file is present at the specified absolute path.
+     * Method that checks if a file or folder is present at the specified absolute path.
      *
-     * @param absolutePath <b>Absolute path</b> to check if a file exists at.
-     * @return Boolean. Returns <code>true</code> if the file exists at the specified path, an
-     * <code>false</code> otherwise.
+     * @param absolutePath <b>Absolute path</b> to determine if a file or folder exists at that
+     *                     path.
+     * @return Boolean. Returns <code>true</code> if the file or folder exists at the specified
+     * path, and <code>false</code> otherwise.
      */
-    public static boolean isFileAt(String absolutePath) {
+    public static boolean isSomethingAt(String absolutePath) {
         return (new File(absolutePath)).exists();
     }
 

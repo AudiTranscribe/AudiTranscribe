@@ -2,11 +2,10 @@
  * JSONFileTest.java
  *
  * Created on 2022-07-03
- * Updated on 2022-07-03
+ * Updated on 2022-07-09
  *
  * Description: Test `JSONFile.java`.
  */
-
 
 package site.overwrite.auditranscribe.io.json_files;
 
@@ -28,7 +27,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @EnabledOnOs({OS.LINUX})
 class JSONFileTest {
     // Attributes
-    static String FILE_PATH = IOMethods.joinPaths(IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH, "testing-files", "my-json.json");
+    static String FILE_PATH = IOMethods.joinPaths(
+            IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+            "testing-files", "my-json.json"
+    );
     static JSONFile<TestingJSONData> jsonFile;
 
     // Tests
@@ -79,7 +81,7 @@ class JSONFileTest {
     @Order(5)
     void checkFileSaveFailure() {
         // Delete original file
-        IOMethods.deleteFile(FILE_PATH);
+        IOMethods.delete(FILE_PATH);
 
         // Make it a folder
         IOMethods.createFolder(FILE_PATH);
@@ -92,7 +94,7 @@ class JSONFileTest {
     @Order(6)
     void spoofJSONData() throws IOException {
         // Delete folder
-        IOMethods.deleteFile(FILE_PATH);
+        IOMethods.delete(FILE_PATH);
 
         // Write spoofed file
         PrintWriter writer = new PrintWriter(FILE_PATH, StandardCharsets.UTF_8);
@@ -109,7 +111,7 @@ class JSONFileTest {
     @Test
     @Order(8)
     void deleteJSONFile() {
-        IOMethods.deleteFile(FILE_PATH);
+        IOMethods.delete(FILE_PATH);
     }
 
     @Test

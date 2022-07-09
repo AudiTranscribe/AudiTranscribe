@@ -2,7 +2,7 @@
  * DownloadFileHandler.java
  *
  * Created on 2022-07-07
- * Updated on 2022-07-08
+ * Updated on 2022-07-09
  *
  * Description: Methods that handles the downloading of files.
  */
@@ -119,7 +119,7 @@ public final class DownloadFileHandler {
         // Check if the hashes are equal
         if (!Objects.equals(correctHash, calculatedHash)) {
             // Delete the downloaded file
-            IOMethods.deleteFile(outputFilePath);
+            IOMethods.delete(outputFilePath);
 
             // Throw an exception
             throw new FileSignatureMismatchException(
