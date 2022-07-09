@@ -1,6 +1,6 @@
 ![AudiTranscribe Banner](Designs/banner/banner.png "AudiTranscribe")
 
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FAudiTranscribe%2FAudiTranscribe.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FAudiTranscribe%2FAudiTranscribe?ref=badge_shield)
+[![FOSSA Status](https://app.fossa.com/api/projects/custom%2B32213%2Fgithub.com%2FAudiTranscribe%2FAudiTranscribe.svg?type=shield)](https://app.fossa.com/projects/custom%2B32213%2Fgithub.com%2FAudiTranscribe%2FAudiTranscribe?ref=badge_shield)
 [![Run Tests](https://github.com/AudiTranscribe/AudiTranscribe/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/AudiTranscribe/AudiTranscribe/actions/workflows/run-tests.yml)
 [![CodeCov](https://codecov.io/gh/AudiTranscribe/AudiTranscribe/branch/main/graph/badge.svg?token=1WQO7ZGKVJ)](https://codecov.io/gh/AudiTranscribe/AudiTranscribe)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4.svg)](.github/CODE_OF_CONDUCT.md)
@@ -114,4 +114,4 @@ Please read the [CONTRIBUTING.md](.github/CONTRIBUTING.md) file.
 
 This project is licensed under the [GNU General Public Licence V3](LICENSE).
 
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FAudiTranscribe%2FAudiTranscribe.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FAudiTranscribe%2FAudiTranscribe?ref=badge_large)
+[![FOSSA Status](https://app.fossa.com/api/projects/custom%2B32213%2Fgithub.com%2FAudiTranscribe%2FAudiTranscribe.svg?type=large)](https://app.fossa.com/projects/custom%2B32213%2Fgithub.com%2FAudiTranscribe%2FAudiTranscribe?ref=badge_large)
