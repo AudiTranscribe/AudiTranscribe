@@ -219,7 +219,7 @@ public final class IOMethods {
     public static String joinPaths(String... paths) {
         StringBuilder buffer = new StringBuilder();
         for (String path : paths) {
-            if (path == null) {  // Skip any empty/null paths
+            if (path == null || path.equals("")) {  // Skip any empty/null paths
                 continue;
             }
 
