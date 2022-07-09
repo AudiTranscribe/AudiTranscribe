@@ -37,6 +37,8 @@ module site.overwrite.auditranscribe {
     exports site.overwrite.auditranscribe.main_views.scene_switching;
     exports site.overwrite.auditranscribe.misc;
     exports site.overwrite.auditranscribe.notes;
+    exports site.overwrite.auditranscribe.setup_wizard.helpers;
+    exports site.overwrite.auditranscribe.setup_wizard.helpers.data_encapsulators;
     exports site.overwrite.auditranscribe.setup_wizard.view_controllers;
     exports site.overwrite.auditranscribe.spectrogram;
     exports site.overwrite.auditranscribe.utils;

@@ -1,0 +1,6 @@
+{
+  "url": "https://evermeet.cx/ffmpeg/ffmpeg-5.0.1.zip",
+  "signature": "6ba850f5d7a8ff1c33c7df99a1ec37687bf33b7b7c8135918ce994fc82f9c46c",
+  "outputFolder": "ffmpeg/bin",
+  "needSetExecutable": true
+}

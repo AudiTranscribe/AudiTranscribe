@@ -177,9 +177,7 @@ public final class CompressionHandlers {
      */
     public static void zipDecompress(String outputDirPath, String inputZipPath) throws IOException {
         // Create the output directory path
-        if (!IOMethods.createFolder(outputDirPath)) {
-            throw new IOException("Folder to extract to already exists");
-        }
+        IOMethods.createFolder(outputDirPath);
 
         // Wrap the output directory path as a file object
         File outputDir = new File(outputDirPath);
