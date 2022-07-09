@@ -15,6 +15,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Run FOSSA Licence Scan
-        uses: fossas/fossa-action@1.3.1
+        uses: fossas/fossa-action@v1.3.1
         with:
           api-key: ${{ secrets.FOSSA_API_KEY }}
