@@ -285,13 +285,13 @@ class IOMethodsTest {
             IOMethods.createFile(IOMethods.joinPaths(testingDirPath, ".DS_Store"));
         }
 
-        if (IOMethods.isSomethingAt(IOMethods.joinPaths(testingDirPath, "database", ".DS_Store"))) {
-            IOMethods.delete(IOMethods.joinPaths(testingDirPath, "database", ".DS_Store"));
+        if (IOMethods.isSomethingAt(IOMethods.joinPaths(testingDirPath, "text", ".DS_Store"))) {
+            IOMethods.delete(IOMethods.joinPaths(testingDirPath, "text", ".DS_Store"));
         }
 
         // Run tests
         assertEquals(5, IOMethods.numThingsInDir(testingDirPath));
-        assertEquals(2, IOMethods.numThingsInDir(IOMethods.joinPaths(testingDirPath, "database")));
+        assertEquals(3, IOMethods.numThingsInDir(IOMethods.joinPaths(testingDirPath, "text")));
         assertEquals(-1, IOMethods.numThingsInDir("not-a-dir"));
     }
 }
