@@ -2,7 +2,7 @@
  * IOMethodsTest.java
  *
  * Created on 2022-05-10
- * Updated on 2022-07-09
+ * Updated on 2022-07-10
  *
  * Description: Test `IOMethods.java`.
  */
@@ -273,6 +273,7 @@ class IOMethodsTest {
     }
 
     @Test
+    @EnabledOnOs({OS.MAC, OS.LINUX})
     void numFilesInDir() {
         // Define base testing directory path
         String testingDirPath = IOMethods.joinPaths(

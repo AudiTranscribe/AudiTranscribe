@@ -2,7 +2,7 @@
  * HashingUtilsTest.java
  *
  * Created on 2022-07-07
- * Updated on 2022-07-07
+ * Updated on 2022-07-10
  *
  * Description: Test `HashingUtils.java`.
  */
@@ -36,10 +36,10 @@ class HashingUtilsTest {
         );
 
         assertEquals(
-                "82216a8639d73c66768c1ee040d85fe9",
+                "ce10bee20f7982a1648d8807bd79263b",
                 HashingUtils.getHash(new File(IOMethods.joinPaths(
                         IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-                        "testing-files", "text", "MyFile.txt"
+                        "testing-files", "text", "README.txt"
                 )), "MD5")
         );
         assertThrows(IOException.class, () -> HashingUtils.getHash(new File("not a file"), "MD5"));
