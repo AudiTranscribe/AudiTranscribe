@@ -36,7 +36,7 @@ class HashingUtilsTest {
         );
 
         assertEquals(
-                "ce10bee20f7982a1648d8807bd79263b",
+                "0c7f9618ef4b39f56d2ba77cf7cfc079",
                 HashingUtils.getHash(new File(IOMethods.joinPaths(
                         IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
                         "testing-files", "text", "README.txt"
