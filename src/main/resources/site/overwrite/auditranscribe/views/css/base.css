@@ -156,3 +156,15 @@
 .setting-caption {
     -fx-font-size: 11px;
 }
+
+/* SETUP WIZARD */
+.download-ffmpeg-label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.download-progress-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Courier New", monospace;
+}

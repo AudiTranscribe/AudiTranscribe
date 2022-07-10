@@ -2,7 +2,7 @@
  * MainApplication.java
  *
  * Created on 2022-02-09
- * Updated on 2022-07-07
+ * Updated on 2022-07-10
  *
  * Description: Contains the main application class.
  */
@@ -15,7 +15,7 @@ import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitcher;
-import site.overwrite.auditranscribe.setup_wizard.view_controllers.SetupWizardHelper;
+import site.overwrite.auditranscribe.setup_wizard.SetupWizard;
 
 import java.io.IOException;
 
@@ -30,8 +30,8 @@ public class MainApplication extends Application {
         SettingsFile settingsFile = new SettingsFile();
 
         // Run setup wizard
-        SetupWizardHelper setupWizardHelper = new SetupWizardHelper(settingsFile);
-        setupWizardHelper.showSetupWizard();
+        SetupWizard setupWizard = new SetupWizard(settingsFile);
+        setupWizard.showSetupWizard();
 
         // Start scene handler
         SceneSwitcher sceneHandler = new SceneSwitcher(settingsFile);

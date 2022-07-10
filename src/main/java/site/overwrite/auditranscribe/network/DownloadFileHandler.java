@@ -2,7 +2,7 @@
  * DownloadFileHandler.java
  *
  * Created on 2022-07-07
- * Updated on 2022-07-09
+ * Updated on 2022-07-10
  *
  * Description: Methods that handles the downloading of files.
  */
@@ -30,7 +30,7 @@ import java.util.logging.Level;
  */
 public final class DownloadFileHandler {
     // Constants
-    public static int DOWNLOAD_FILE_BUFFER_SIZE = 1024;  // In bytes
+    public static int DOWNLOAD_FILE_BUFFER_SIZE = 8192;  // In bytes
 
     private DownloadFileHandler() {
         // Private constructor to signal this is a utility class
@@ -180,7 +180,7 @@ public final class DownloadFileHandler {
         // If reached here, that means maximum number of tries was exceeded. Throw an IO exception
         MyLogger.log(
                 Level.WARNING,
-                "Failed to download file '" + url.toString() + "'after " + maxAttempts + " attempts",
+                "Failed to download file '" + url.toString() + "' after " + maxAttempts + " attempts",
                 DownloadFileHandler.class.getName()
         );
         throw new IOException("File download from '" + url + "' failed after " + maxAttempts + " attempts");
@@ -235,7 +235,7 @@ public final class DownloadFileHandler {
         // If reached here, that means maximum number of tries was exceeded. Throw an IO exception
         MyLogger.log(
                 Level.WARNING,
-                "Failed to download file '" + url.toString() + "'after " + maxAttempts + " attempts",
+                "Failed to download file '" + url.toString() + "' after " + maxAttempts + " attempts",
                 DownloadFileHandler.class.getName()
         );
         throw new IOException("File download from '" + url + "' failed after " + maxAttempts + " attempts");

@@ -1,13 +1,13 @@
 /*
- * SetupWizardHelper.java
+ * SetupWizard.java
  *
  * Created on 2022-06-19
- * Updated on 2022-07-07
+ * Updated on 2022-07-10
  *
  * Description: Class that handles the setup wizard.
  */
 
-package site.overwrite.auditranscribe.setup_wizard.view_controllers;
+package site.overwrite.auditranscribe.setup_wizard;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -18,6 +18,7 @@ import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.Theme;
+import site.overwrite.auditranscribe.setup_wizard.view_controllers.*;
 
 import java.io.IOException;
 import java.net.URL;
@@ -25,7 +26,7 @@ import java.net.URL;
 /**
  * Class that handles the setup wizard.
  */
-public class SetupWizardHelper {
+public class SetupWizard {
     // Attributes
     private final Stage stage;
     private final SettingsFile settingsFile;
@@ -36,7 +37,7 @@ public class SetupWizardHelper {
      *
      * @param settingsFile The settings file.
      */
-    public SetupWizardHelper(SettingsFile settingsFile) {
+    public SetupWizard(SettingsFile settingsFile) {
         // Set attributes
         this.stage = new Stage(StageStyle.UTILITY);
         this.settingsFile = settingsFile;
@@ -61,6 +62,14 @@ public class SetupWizardHelper {
         boolean canFindFFmpeg = true;
         String ffmpegPath = null;
 
+        // If user says that they have not installed FFmpeg, show relevant scenes
+        if (!userSayFFmpegInstalled) {
+            if (!showAskToInstallManuallyView()) {  // Automatic installation
+                ffmpegPath = showDownloadingFFmpegView();
+                userSayFFmpegInstalled = true;
+            }
+        }
+
         // Repeat the following until FFmpeg has been successfully installed
         while (!isFFmpegInstalled) {
             // Show the installation instructions for FFmpeg
@@ -73,8 +82,8 @@ public class SetupWizardHelper {
                     throw new FFmpegNotFoundException("FFmpeg not found at manually specified path.");
                 }
 
-                // Attempt to get the path to the FFmpeg binary and save to persistent data file
-                ffmpegPath = FFmpegHandler.getPathToFFmpeg();
+                // Attempt to get the path to the FFmpeg binary
+                if (ffmpegPath == null) ffmpegPath = FFmpegHandler.getPathToFFmpeg();
 
                 // Update the `isFFmpegInstalled` flag
                 isFFmpegInstalled = true;
@@ -152,6 +161,72 @@ public class SetupWizardHelper {
         } catch (IOException ignored) {
         }
         return false;
+    }
+
+    /**
+     * Helper method that shows the view that asks the user whether to install FFmpeg manually or automatically.
+     *
+     * @return A boolean. Is <code>true</code> if <b>manual</b> installation is selected, and
+     * <code>false</code> if <b>automatic</b> installation is selected.
+     */
+    private boolean showAskToInstallManuallyView() {
+        try {
+            // Load the FXML file into the scene
+            FXMLLoader fxmlLoader = new FXMLLoader(getSetupWizardView("ask-to-install-manually-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+
+            // Get the view controller
+            AskToInstallManuallyViewController controller = fxmlLoader.getController();
+
+            // Set the theme on the scene
+            controller.setThemeOnScene(theme);
+
+            // Set the stage's scene
+            stage.setScene(scene);
+
+            // Show the stage
+            stage.showAndWait();
+
+            // Return the value of the `isManualInstallation` flag
+            return controller.getIsManualInstallation();
+
+        } catch (IOException ignored) {
+        }
+        return true;  // We want to make it manual installation by default
+    }
+
+    /**
+     * Helper method that shows the view that handles the downloading of FFmpeg.
+     *
+     * @return The absolute path to the FFmpeg binary. Returns <code>null</code> if something went
+     * wrong.
+     */
+    private String showDownloadingFFmpegView() {
+        try {
+            // Load the FXML file into the scene
+            FXMLLoader fxmlLoader = new FXMLLoader(getSetupWizardView("downloading-ffmpeg-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+
+            // Get the view controller
+            DownloadingFFmpegViewController controller = fxmlLoader.getController();
+
+            // Set the theme on the scene
+            controller.setThemeOnScene(theme);
+
+            // Set the stage's scene
+            stage.setScene(scene);
+
+            controller.startDownload();
+
+            // Show the stage
+            stage.showAndWait();
+
+            // Return the value of the FFmpeg path
+            return controller.getFFmpegPath();
+
+        } catch (IOException ignored) {
+        }
+        return null;
     }
 
     /**
