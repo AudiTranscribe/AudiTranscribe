@@ -139,6 +139,7 @@ class IOMethodsTest {
     // File location handling
     @Test
     void isFileAt() {
+        assertFalse(IOMethods.isSomethingAt(null));
         assertTrue(IOMethods.isSomethingAt(IOMethods.getAbsoluteFilePath("testing-files/text/README.txt")));
         assertTrue(IOMethods.isSomethingAt(IOMethods.getAbsoluteFilePath("conf/logging.properties")));
         assertTrue(IOMethods.isSomethingAt(IOMethods.joinPaths(

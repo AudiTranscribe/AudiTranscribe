@@ -2,7 +2,7 @@
  * CompressionHandlersTest.java
  *
  * Created on 2022-05-04
- * Updated on 2022-07-09
+ * Updated on 2022-07-10
  *
  * Description: Test `CompressionHandlers.java`.
  */
@@ -107,7 +107,7 @@ class CompressionHandlersTest {
         String outputPath = IOMethods.joinPaths(baseDir, "zip-file-1.zip");
 
         // Attempt compression
-        assertDoesNotThrow(() -> CompressionHandlers.zipCompressFiles(outputPath, filepath1, filepath2, filepath3, nonexistent));
+        assertDoesNotThrow(() -> CompressionHandlers.zipCompressFiles(outputPath, filepath1, filepath2, filepath3, nonexistent, null));
 
         // Attempt decompression
         assertDoesNotThrow(() -> CompressionHandlers.zipDecompress(IOMethods.joinPaths(baseDir, "zip-file-1-dir"), outputPath));
@@ -136,9 +136,16 @@ class CompressionHandlersTest {
                 IOMethods.joinPaths(baseDir, "zip-file-2.zip"),
                 IOMethods.joinPaths(baseDir, "testing-directory")
         ));
+        assertDoesNotThrow(() -> CompressionHandlers.zipCompressDir(
+                IOMethods.joinPaths(baseDir, "zip-file-3.zip"),
+                IOMethods.joinPaths(baseDir, "testing-directory/")
+        ));
 
-        // Delete generated zip file
+        // Todo: run tests for `children != null` (line 256)
+
+        // Delete generated zip files
         IOMethods.delete(IOMethods.joinPaths(baseDir, "zip-file-2.zip"));
+        IOMethods.delete(IOMethods.joinPaths(baseDir, "zip-file-3.zip"));
     }
 
     @Test
@@ -148,6 +155,15 @@ class CompressionHandlersTest {
         String baseDir = IOMethods.joinPaths(
                 IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH, "testing-files"
         );
+
+        // Run file traversal test
+        String finalBaseDir = baseDir;
+        assertThrowsExactly(IOException.class, () -> CompressionHandlers.zipDecompress(
+                IOMethods.joinPaths(finalBaseDir, "misc", "zip-dir"),
+                IOMethods.joinPaths(finalBaseDir, "misc", "DO-NOT-OPEN-zip-with-path-traversal.zip")
+        ));
+
+        // Todo: run tests for failure to create directory
 
         // Check if we have the correct ZIP file and that it is not damaged
         String correctHash = "d7714a0884d7bdc6a3bc55dddf29eb9f";

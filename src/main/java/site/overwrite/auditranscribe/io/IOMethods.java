@@ -2,7 +2,7 @@
  * IOMethods.java
  *
  * Created on 2022-03-15
- * Updated on 2022-07-09
+ * Updated on 2022-07-10
  *
  * Description: Input/Output methods that are used in the AudiTranscribe project.
  */
@@ -150,6 +150,7 @@ public final class IOMethods {
      * path, and <code>false</code> otherwise.
      */
     public static boolean isSomethingAt(String absolutePath) {
+        if (absolutePath == null) return false;
         return (new File(absolutePath)).exists();
     }
 

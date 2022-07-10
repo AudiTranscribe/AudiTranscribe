@@ -2,7 +2,7 @@
  * CompressionHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-07-09
+ * Updated on 2022-07-10
  *
  * Description: Class that handles compression/decompression operations.
  */
@@ -125,18 +125,13 @@ public final class CompressionHandlers {
      * @throws IOException If something went wrong during the zipping operation.
      */
     public static void zipCompressFiles(String outputPath, String... filePaths) throws IOException {
-        // Check if the output file already exists or not
-        if (IOMethods.createFile(outputPath) != 0) {
-            throw new IOException("File '" + outputPath + "' already exists or cannot be created");
-        }
-
         // Define output streams
         FileOutputStream fos = new FileOutputStream(outputPath);
         ZipOutputStream zos = new ZipOutputStream(fos);
 
         // Iterate through the input files
         for (String filePath : filePaths) {
-            zipCompressHelper(new File(filePath), filePath, zos);
+            zipCompressHelper(filePath != null ? new File(filePath) : null, filePath, zos);
         }
 
         // Close output streams
