@@ -268,7 +268,7 @@ class IOMethodsTest {
         );
 
         assertThrowsExactly(NullPointerException.class, () -> IOMethods.inputStreamToString(
-                IOMethods.getInputStream("not-a-file"), "UTF-8"
+                IOMethods.getInputStream("not-a-file-that-exists"), "UTF-8"
         ));
     }
 
