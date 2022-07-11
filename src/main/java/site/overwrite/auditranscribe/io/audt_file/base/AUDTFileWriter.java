@@ -15,8 +15,8 @@ import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileHelpers;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
+import site.overwrite.auditranscribe.io.audt_file.v0x00050002.AUDTFileWriter0x00050002;
 import site.overwrite.auditranscribe.io.audt_file.v401.AUDTFileWriter401;
-import site.overwrite.auditranscribe.io.audt_file.v501.AUDTFileWriter501;
 
 import java.io.File;
 import java.io.IOException;
@@ -78,8 +78,8 @@ public abstract class AUDTFileWriter {
     public static AUDTFileWriter getWriter(int fileVersion, String filepath) throws InvalidFileVersionException {
         // Get the appropriate file reader objects
         return switch (fileVersion) {
-            case 401 -> new AUDTFileWriter401(filepath);
-            case 501 -> new AUDTFileWriter501(filepath);
+            case 401 -> new AUDTFileWriter401(filepath);  // Todo: eventually depreciate this
+            case 0x00050002 -> new AUDTFileWriter0x00050002(filepath);
             default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
         };
     }
@@ -96,8 +96,8 @@ public abstract class AUDTFileWriter {
             throws InvalidFileVersionException {
         // Get the appropriate file reader objects
         return switch (fileVersion) {
-            case 401 -> new AUDTFileWriter401(filepath, numBytesToSkip);
-            case 501 -> new AUDTFileWriter501(filepath, numBytesToSkip);
+            case 401 -> new AUDTFileWriter401(filepath, numBytesToSkip);  // Todo: eventually depreciate this
+            case 0x00050002 -> new AUDTFileWriter0x00050002(filepath, numBytesToSkip);
             default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
         };
     }

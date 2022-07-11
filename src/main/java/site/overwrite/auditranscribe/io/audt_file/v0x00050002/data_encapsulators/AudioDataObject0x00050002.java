@@ -1,5 +1,5 @@
 /*
- * AudioDataObject501.java
+ * AudioDataObject0x00050002.java
  *
  * Created on 2022-07-11
  * Updated on 2022-07-11
@@ -7,14 +7,14 @@
  * Description: Data object that stores the audio data.
  */
 
-package site.overwrite.auditranscribe.io.audt_file.v501.data_encapsulators;
+package site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators;
 
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.AudioDataObject;
 
 /**
  * Data object that stores the audio data.
  */
-public class AudioDataObject501 extends AudioDataObject {
+public class AudioDataObject0x00050002 extends AudioDataObject {
     /**
      * Initialization method for the audio data object.
      *
@@ -23,7 +23,9 @@ public class AudioDataObject501 extends AudioDataObject {
      * @param totalDurationInMS  Total duration of the audio in <b>milliseconds</b>.
      * @param audioFileName      The name of the audio file.
      */
-    public AudioDataObject501(byte[] compressedMP3Bytes, double sampleRate, int totalDurationInMS, String audioFileName) {
+    public AudioDataObject0x00050002(
+            byte[] compressedMP3Bytes, double sampleRate, int totalDurationInMS, String audioFileName
+    ) {
         this.compressedMP3Bytes = compressedMP3Bytes;
         this.sampleRate = sampleRate;
         this.totalDurationInMS = totalDurationInMS;

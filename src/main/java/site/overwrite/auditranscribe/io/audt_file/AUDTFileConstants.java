@@ -31,7 +31,7 @@ public final class AUDTFileConstants {
             (byte) 0x42, (byte) 0x45, (byte) 0x0a, (byte) 0x0a,
             (byte) 0xad, (byte) 0x75, (byte) 0xc1, (byte) 0xbe
     };
-    public static final int FILE_VERSION_NUMBER = 501;  // Application version 0.5.0, revision 1 -> 0501 -> 401
+    public static final int FILE_VERSION_NUMBER = 0x00050002;  // File version 0.5.0, revision 2 -> 00 05 00 02
     public static final int LZ4_VERSION_NUMBER = CompressionHandlers.VERSION_NUMBER;  // Todo: rename this variable
 
     private AUDTFileConstants() {

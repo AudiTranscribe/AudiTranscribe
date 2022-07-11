@@ -1,25 +1,25 @@
 /*
- * AUDTFileReader501.java
+ * AUDTFileReader0x00050002.java
  *
  * Created on 2022-07-11
  * Updated on 2022-07-11
  *
  * Description: Class that handles the reading of the AudiTranscribe (AUDT) file for file version
- *              501.
+ *              0x00050002.
  */
 
-package site.overwrite.auditranscribe.io.audt_file.v501;
+package site.overwrite.auditranscribe.io.audt_file.v0x00050002;
 
 import site.overwrite.auditranscribe.exceptions.io.audt_file.FailedToReadDataException;
 import site.overwrite.auditranscribe.exceptions.io.audt_file.IncorrectFileFormatException;
 import site.overwrite.auditranscribe.exceptions.io.audt_file.InvalidFileVersionException;
 import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileReader;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import site.overwrite.auditranscribe.io.audt_file.v501.data_encapsulators.*;
+import site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.*;
 
 import java.io.IOException;
 
-public class AUDTFileReader501 extends AUDTFileReader {
+public class AUDTFileReader0x00050002 extends AUDTFileReader {
     /**
      * Initialization method to make an <code>AUDTFileReader</code> object.
      *
@@ -29,7 +29,7 @@ public class AUDTFileReader501 extends AUDTFileReader {
      * @throws IncorrectFileFormatException If the file was formatted incorrectly.
      * @throws InvalidFileVersionException  If the LZ4 version is outdated.
      */
-    public AUDTFileReader501(String filepath) throws IOException, IncorrectFileFormatException,
+    public AUDTFileReader0x00050002(String filepath) throws IOException, IncorrectFileFormatException,
             InvalidFileVersionException {
         super(filepath);
     }
@@ -57,7 +57,7 @@ public class AUDTFileReader501 extends AUDTFileReader {
         }
 
         // Create and return a `UnchangingDataPropertiesObject`
-        return new UnchangingDataPropertiesObject501(numSkippableBytes);
+        return new UnchangingDataPropertiesObject0x00050002(numSkippableBytes);
     }
 
     public QTransformDataObject readQTransformData() throws FailedToReadDataException {
@@ -81,7 +81,7 @@ public class AUDTFileReader501 extends AUDTFileReader {
         }
 
         // Create and return a `QTransformDataObject`
-        return new QTransformDataObject501(qTransformData, minMagnitude, maxMagnitude);
+        return new QTransformDataObject0x00050002(qTransformData, minMagnitude, maxMagnitude);
     }
 
     public AudioDataObject readAudioData() throws FailedToReadDataException {
@@ -106,7 +106,7 @@ public class AUDTFileReader501 extends AUDTFileReader {
         }
 
         // Create and return an `AudioDataObject`
-        return new AudioDataObject501(compressedMP3Bytes, sampleRate, totalDurationInMS, originalFileName);
+        return new AudioDataObject0x00050002(compressedMP3Bytes, sampleRate, totalDurationInMS, originalFileName);
     }
 
     public GUIDataObject readGUIData() throws FailedToReadDataException {
@@ -133,7 +133,7 @@ public class AUDTFileReader501 extends AUDTFileReader {
         }
 
         // Create and return a `GUIDataObject`
-        return new GUIDataObject501(
+        return new GUIDataObject0x00050002(
                 musicKeyIndex, timeSignatureIndex, bpm, offsetSeconds, playbackVolume, currTimeInMS
         );
     }
@@ -159,6 +159,6 @@ public class AUDTFileReader501 extends AUDTFileReader {
         }
 
         // Create and return a `MusicNotesDataObject`
-        return new MusicNotesDataObject501(timesToPlaceRectangles, noteDurations, noteNums);
+        return new MusicNotesDataObject0x00050002(timesToPlaceRectangles, noteDurations, noteNums);
     }
 }

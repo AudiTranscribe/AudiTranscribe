@@ -1,40 +1,40 @@
 /*
- * AUDTFileWriter501.java
+ * AUDTFileWriter0x00050002.java
  *
  * Created on 2022-07-11
  * Updated on 2022-07-11
  *
  * Description: Class that handles the writing of the AudiTranscribe (AUDT) file for file version
- *              501.
+ *              0x00050002.
  */
 
-package site.overwrite.auditranscribe.io.audt_file.v501;
+package site.overwrite.auditranscribe.io.audt_file.v0x00050002;
 
 import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileWriter;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
 
 import java.io.IOException;
 
-public class AUDTFileWriter501 extends AUDTFileWriter {
+public class AUDTFileWriter0x00050002 extends AUDTFileWriter {
     /**
-     * Initialization method to make an <code>AUDTFileWriter501</code> object.
+     * Initialization method to make an <code>AUDTFileWriter0x00050002</code> object.
      *
      * @param filepath       Path to the AUDT file. The file name at the end of the file path should
      *                       <b>include</b> the extension of the AUDT file.
      * @param numBytesToSkip Number of bytes to skip at the beginning of the file.
      */
-    public AUDTFileWriter501(String filepath, int numBytesToSkip) {
-        super(501, filepath, numBytesToSkip);
+    public AUDTFileWriter0x00050002(String filepath, int numBytesToSkip) {
+        super(0x00050002, filepath, numBytesToSkip);
     }
 
     /**
-     * Initialization method to make an <code>AUDTFileWriter501</code> object.
+     * Initialization method to make an <code>AUDTFileWriter0x00050002</code> object.
      *
      * @param filepath Path to the AUDT file. The file name at the end of the file path should
      *                 <b>include</b> the extension of the AUDT file.
      */
-    public AUDTFileWriter501(String filepath) {
-        super(501, filepath);
+    public AUDTFileWriter0x00050002(String filepath) {
+        super(0x00050002, filepath);
     }
 
     // Public methods

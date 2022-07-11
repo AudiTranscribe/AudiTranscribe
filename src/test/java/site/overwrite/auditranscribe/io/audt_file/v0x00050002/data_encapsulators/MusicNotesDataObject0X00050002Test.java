@@ -1,13 +1,13 @@
 /*
- * MusicNotesDataObject501Test.java
+ * MusicNotesDataObject0X00050002Test.java
  *
  * Created on 2022-07-11
  * Updated on 2022-07-11
  *
- * Description: Test `MusicNotesDataObject501.java`.
+ * Description: Test `MusicNotesDataObject0x00050002.java`.
  */
 
-package site.overwrite.auditranscribe.io.audt_file.v501.data_encapsulators;
+package site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators;
 
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.MusicNotesDataObject;
@@ -16,7 +16,7 @@ import site.overwrite.auditranscribe.utils.MathUtils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-class MusicNotesDataObject501Test {
+class MusicNotesDataObject0X00050002Test {
     // Attributes
     double[] timesToPlaceRectangles1 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     double[] timesToPlaceRectangles2 = {1.2, 3.4, 5.6, 7.8, 9};
@@ -31,10 +31,10 @@ class MusicNotesDataObject501Test {
     @Test
     void numBytesNeeded() {
         // Define the two music notes data objects to test number of bytes needed
-        MusicNotesDataObject one = new MusicNotesDataObject501(
+        MusicNotesDataObject one = new MusicNotesDataObject0x00050002(
                 timesToPlaceRectangles1, noteDurations1, noteNums1
         );
-        MusicNotesDataObject two = new MusicNotesDataObject501(
+        MusicNotesDataObject two = new MusicNotesDataObject0x00050002(
                 timesToPlaceRectangles2, noteDurations2, noteNums2
         );
 
@@ -46,7 +46,7 @@ class MusicNotesDataObject501Test {
     @Test
     void testEquals() {
         // Define temporary data object for testing the initial checks
-        MusicNotesDataObject temp = new MusicNotesDataObject501(
+        MusicNotesDataObject temp = new MusicNotesDataObject0x00050002(
                 timesToPlaceRectangles1, noteDurations1, noteNums1
         );
 
@@ -67,14 +67,14 @@ class MusicNotesDataObject501Test {
         // Generate product of indices
         int[][] indexProduct = MathUtils.selfProduct(2, 3);  // 3 data attributes
         for (int[] indices1 : indexProduct) {
-            MusicNotesDataObject one = new MusicNotesDataObject501(
+            MusicNotesDataObject one = new MusicNotesDataObject0x00050002(
                     timesToPlaceRectangles[indices1[0]],
                     noteDurations[indices1[1]],
                     noteNums[indices1[2]]
             );
 
             for (int[] indices2 : indexProduct) {
-                MusicNotesDataObject two = new MusicNotesDataObject501(
+                MusicNotesDataObject two = new MusicNotesDataObject0x00050002(
                         timesToPlaceRectangles[indices2[0]],
                         noteDurations[indices2[1]],
                         noteNums[indices2[2]]
@@ -95,10 +95,10 @@ class MusicNotesDataObject501Test {
     @Test
     void testHashCode() {
         // Define the two music notes data objects to test hash code generation
-        MusicNotesDataObject one = new MusicNotesDataObject501(
+        MusicNotesDataObject one = new MusicNotesDataObject0x00050002(
                 timesToPlaceRectangles1, noteDurations1, noteNums1
         );
-        MusicNotesDataObject two = new MusicNotesDataObject501(
+        MusicNotesDataObject two = new MusicNotesDataObject0x00050002(
                 timesToPlaceRectangles2, noteDurations2, noteNums2
         );
 

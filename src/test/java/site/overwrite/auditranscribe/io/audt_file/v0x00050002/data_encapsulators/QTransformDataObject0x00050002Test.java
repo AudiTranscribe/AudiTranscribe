@@ -1,13 +1,13 @@
 /*
- * QTransformDataObject501Test.java
+ * QTransformDataObject0x00050002Test.java
  *
  * Created on 2022-07-11
  * Updated on 2022-07-11
  *
- * Description: Test `QTransformDataObject501.java`.
+ * Description: Test `QTransformDataObject0x00050002.java`.
  */
 
-package site.overwrite.auditranscribe.io.audt_file.v501.data_encapsulators;
+package site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators;
 
 import org.javatuples.Triplet;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class QTransformDataObject501Test {
+class QTransformDataObject0x00050002Test {
     // Attributes
     byte[] qTransformBytes1 = new byte[]{(byte) 0xab, (byte) 0xcd, (byte) 0xef};  // Not real data; do NOT decompress
     byte[] qTransformBytes2 = new byte[]{(byte) 0x12, (byte) 0x34, (byte) 0x56, (byte) 0x78, (byte) 0x9a};
@@ -34,10 +34,10 @@ class QTransformDataObject501Test {
     @Test
     void numBytesNeeded() {
         // Define the two Q-Transform data objects to test number of bytes needed
-        QTransformDataObject one = new QTransformDataObject501(
+        QTransformDataObject one = new QTransformDataObject0x00050002(
                 qTransformBytes1, minMagnitude1, maxMagnitude1
         );
-        QTransformDataObject two = new QTransformDataObject501(
+        QTransformDataObject two = new QTransformDataObject0x00050002(
                 qTransformBytes2, minMagnitude2, maxMagnitude2
         );
 
@@ -49,7 +49,7 @@ class QTransformDataObject501Test {
     @Test
     void testEquals() {
         // Define temporary data object for testing the initial checks
-        QTransformDataObject temp = new QTransformDataObject501(
+        QTransformDataObject temp = new QTransformDataObject0x00050002(
                 qTransformBytes1, minMagnitude1, maxMagnitude1
         );
 
@@ -70,14 +70,14 @@ class QTransformDataObject501Test {
         // Generate product of indices
         int[][] indexProduct = MathUtils.selfProduct(2, 3);  // 3 data attributes
         for (int[] indices1 : indexProduct) {
-            QTransformDataObject one = new QTransformDataObject501(
+            QTransformDataObject one = new QTransformDataObject0x00050002(
                     qTransformBytes[indices1[0]],
                     minMagnitudes[indices1[1]],
                     maxMagnitudes[indices1[2]]
             );
 
             for (int[] indices2 : indexProduct) {
-                QTransformDataObject two = new QTransformDataObject501(
+                QTransformDataObject two = new QTransformDataObject0x00050002(
                         qTransformBytes[indices2[0]],
                         minMagnitudes[indices2[1]],
                         maxMagnitudes[indices2[2]]
@@ -98,10 +98,10 @@ class QTransformDataObject501Test {
     @Test
     void testHashCode() {
         // Define the two Q-Transform data objects to test hash code computation
-        QTransformDataObject one = new QTransformDataObject501(
+        QTransformDataObject one = new QTransformDataObject0x00050002(
                 qTransformBytes1, minMagnitude1, maxMagnitude1
         );
-        QTransformDataObject two = new QTransformDataObject501(
+        QTransformDataObject two = new QTransformDataObject0x00050002(
                 qTransformBytes2, minMagnitude2, maxMagnitude2
         );
 

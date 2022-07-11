@@ -36,7 +36,7 @@ import site.overwrite.auditranscribe.exceptions.notes.NoteRectangleCollisionExce
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import site.overwrite.auditranscribe.io.audt_file.v501.data_encapsulators.*;
+import site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.*;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
@@ -2278,19 +2278,19 @@ public class TranscriptionViewController implements Initializable {
         }
 
         // Package data for saving
-        // (Note: current file version is 501, so all data objects used will be for that version)
+        // (Note: current file version is 0x00050002, so all data objects used will be for that version)
         MyLogger.log(Level.INFO, "Packaging data for saving", this.getClass().toString());
-        QTransformDataObject qTransformData = new QTransformDataObject501(
+        QTransformDataObject qTransformData = new QTransformDataObject0x00050002(
                 qTransformBytes, minQTransformMagnitude, maxQTransformMagnitude
         );
-        AudioDataObject audioData = new AudioDataObject501(
+        AudioDataObject audioData = new AudioDataObject0x00050002(
                 compressedMP3Bytes, sampleRate, (int) (audioDuration * 1000),
                 audioFileName);
-        GUIDataObject guiData = new GUIDataObject501(
+        GUIDataObject guiData = new GUIDataObject0x00050002(
                 musicKeyIndex, timeSignatureIndex, bpm, offset, audioVolume,
                 (int) (currTime * 1000)
         );
-        MusicNotesDataObject musicNotesData = new MusicNotesDataObject501(
+        MusicNotesDataObject musicNotesData = new MusicNotesDataObject0x00050002(
                 timesToPlaceRectangles, noteDurations, noteNums
         );
 
@@ -2303,7 +2303,7 @@ public class TranscriptionViewController implements Initializable {
                     audioData.numBytesNeeded();
 
             // Update the unchanging data properties
-            UnchangingDataPropertiesObject unchangingDataProperties = new UnchangingDataPropertiesObject501(
+            UnchangingDataPropertiesObject unchangingDataProperties = new UnchangingDataPropertiesObject0x00050002(
                     numSkippableBytes
             );
 
