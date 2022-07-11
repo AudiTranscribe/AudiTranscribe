@@ -2,7 +2,7 @@
  * AudioDataObjectTest.java
  *
  * Created on 2022-07-02
- * Updated on 2022-07-02
+ * Updated on 2022-07-11
  *
  * Description: Test `AudioDataObject.java`.
  */
@@ -10,6 +10,7 @@
 package site.overwrite.auditranscribe.io.audt_file.data_encapsulators;
 
 import org.junit.jupiter.api.Test;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.v401.AudioDataObject401;
 import site.overwrite.auditranscribe.utils.MathUtils;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,10 +33,10 @@ class AudioDataObjectTest {
     @Test
     void numBytesNeeded() {
         // Define the two audio data objects to test the number of bytes needed
-        AudioDataObject one = new AudioDataObject(
+        AudioDataObject one = new AudioDataObject401(
                 compressedMP3Bytes1, sampleRate1, totalDurationInMS1, audioFileName1
         );
-        AudioDataObject two = new AudioDataObject(
+        AudioDataObject two = new AudioDataObject401(
                 compressedMP3Bytes2, sampleRate2, totalDurationInMS2, audioFileName2
         );
 
@@ -47,7 +48,7 @@ class AudioDataObjectTest {
     @Test
     void testEquals() {
         // Define temporary data object for testing the initial checks
-        AudioDataObject temp = new AudioDataObject(
+        AudioDataObject temp = new AudioDataObject401(
                 compressedMP3Bytes1, sampleRate1, totalDurationInMS1, audioFileName1
         );
 
@@ -69,7 +70,7 @@ class AudioDataObjectTest {
         // Generate product of indices
         int[][] indexProduct = MathUtils.selfProduct(2, 4);  // 4 data attributes
         for (int[] indices1 : indexProduct) {
-            AudioDataObject one = new AudioDataObject(
+            AudioDataObject one = new AudioDataObject401(
                     compressedMP3BytesArrays[indices1[0]],
                     sampleRates[indices1[1]],
                     totalDurationInMSs[indices1[2]],
@@ -77,7 +78,7 @@ class AudioDataObjectTest {
             );
 
             for (int[] indices2 : indexProduct) {
-                AudioDataObject two = new AudioDataObject(
+                AudioDataObject two = new AudioDataObject401(
                         compressedMP3BytesArrays[indices2[0]],
                         sampleRates[indices2[1]],
                         totalDurationInMSs[indices2[2]],
@@ -99,10 +100,10 @@ class AudioDataObjectTest {
     @Test
     void testHashCode() {
         // Define the two audio data objects to test the hash code method
-        AudioDataObject one = new AudioDataObject(
+        AudioDataObject one = new AudioDataObject401(
                 compressedMP3Bytes1, sampleRate1, totalDurationInMS1, audioFileName1
         );
-        AudioDataObject two = new AudioDataObject(
+        AudioDataObject two = new AudioDataObject401(
                 compressedMP3Bytes2, sampleRate2, totalDurationInMS2, audioFileName2
         );
 

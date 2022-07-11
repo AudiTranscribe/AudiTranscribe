@@ -1,8 +1,8 @@
 /*
- * GUIDataObject.java
+ * GUIDataObject401.java
  *
  * Created on 2022-05-02
- * Updated on 2022-06-21
+ * Updated on 2022-07-11
  *
  * Description: Data object that stores the GUI data.
  */
@@ -14,7 +14,7 @@ import java.util.Objects;
 /**
  * Data object that stores the GUI data.
  */
-public class GUIDataObject extends AbstractAUDTDataObject {
+public abstract class GUIDataObject extends AbstractAUDTDataObject {
     // Constants
     public static final int SECTION_ID = 4;
 
@@ -25,29 +25,6 @@ public class GUIDataObject extends AbstractAUDTDataObject {
     public double offsetSeconds;
     public double playbackVolume;
     public int currTimeInMS;
-
-    /**
-     * Initialization method for the GUI data object.
-     *
-     * @param musicKeyIndex      The index of the music key in the dropdown menu shown in the
-     *                           application.
-     * @param timeSignatureIndex The index of the time signature in the dropdown menu shown in the application.
-     * @param bpm                Number of beats per minute.
-     * @param offsetSeconds      Number of seconds offset from the start of the audio.
-     * @param playbackVolume     Volume to play back at.
-     * @param currTimeInMS       Current playback time of the audio in <b>milliseconds</b>.
-     */
-    public GUIDataObject(
-            int musicKeyIndex, int timeSignatureIndex, double bpm, double offsetSeconds, double playbackVolume,
-            int currTimeInMS
-    ) {
-        this.musicKeyIndex = musicKeyIndex;
-        this.timeSignatureIndex = timeSignatureIndex;
-        this.bpm = bpm;
-        this.offsetSeconds = offsetSeconds;
-        this.playbackVolume = playbackVolume;
-        this.currTimeInMS = currTimeInMS;
-    }
 
     // Overwritten methods
     @Override

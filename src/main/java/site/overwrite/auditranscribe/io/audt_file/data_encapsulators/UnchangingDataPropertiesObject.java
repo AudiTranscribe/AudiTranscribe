@@ -2,7 +2,7 @@
  * UnchangingDataPropertiesObject.java
  *
  * Created on 2022-06-21
- * Updated on 2022-06-21
+ * Updated on 2022-07-11
  *
  * Description: Data object that stores the unchanging data's properties.
  */
@@ -14,7 +14,7 @@ import java.util.Objects;
 /**
  * Data object that stores the unchanging data's properties.
  */
-public class UnchangingDataPropertiesObject extends AbstractAUDTDataObject {
+public abstract class UnchangingDataPropertiesObject extends AbstractAUDTDataObject {
     // Constants
     public static final int SECTION_ID = 1;
 
@@ -25,15 +25,6 @@ public class UnchangingDataPropertiesObject extends AbstractAUDTDataObject {
 
     // Attributes
     public int numSkippableBytes;
-
-    /**
-     * Initialization method for the unchanging data properties object.
-     *
-     * @param numSkippableBytes The number of skippable bytes.
-     */
-    public UnchangingDataPropertiesObject(int numSkippableBytes) {
-        this.numSkippableBytes = numSkippableBytes;
-    }
 
     // Overwritten methods
     @Override

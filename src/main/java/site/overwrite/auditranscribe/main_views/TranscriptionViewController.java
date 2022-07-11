@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-07-09
+ * Updated on 2022-07-11
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -37,6 +37,7 @@ import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.audt_file.ProjectData;
 import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.v401.*;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
@@ -2278,18 +2279,19 @@ public class TranscriptionViewController implements Initializable {
         }
 
         // Package data for saving
+        // (Note: current file version is 401, so all data objects used will be for that version)
         MyLogger.log(Level.INFO, "Packaging data for saving", this.getClass().toString());
-        QTransformDataObject qTransformData = new QTransformDataObject(
+        QTransformDataObject qTransformData = new QTransformDataObject401(
                 qTransformBytes, minQTransformMagnitude, maxQTransformMagnitude
         );
-        AudioDataObject audioData = new AudioDataObject(
+        AudioDataObject audioData = new AudioDataObject401(
                 compressedMP3Bytes, sampleRate, (int) (audioDuration * 1000),
                 audioFileName);
-        GUIDataObject guiData = new GUIDataObject(
+        GUIDataObject guiData = new GUIDataObject401(
                 musicKeyIndex, timeSignatureIndex, bpm, offset, audioVolume,
                 (int) (currTime * 1000)
         );
-        MusicNotesDataObject musicNotesData = new MusicNotesDataObject(
+        MusicNotesDataObject musicNotesData = new MusicNotesDataObject401(
                 timesToPlaceRectangles, noteDurations, noteNums
         );
 
@@ -2302,7 +2304,7 @@ public class TranscriptionViewController implements Initializable {
                     audioData.numBytesNeeded();
 
             // Update the unchanging data properties
-            UnchangingDataPropertiesObject unchangingDataProperties = new UnchangingDataPropertiesObject(
+            UnchangingDataPropertiesObject unchangingDataProperties = new UnchangingDataPropertiesObject401(
                     numSkippableBytes
             );
 

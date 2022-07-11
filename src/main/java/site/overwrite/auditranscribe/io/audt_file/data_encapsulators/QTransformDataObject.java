@@ -2,7 +2,7 @@
  * QTransformDataObject.java
  *
  * Created on 2022-05-05
- * Updated on 2022-07-09
+ * Updated on 2022-07-11
  *
  * Description: Data object that stores the Q-Transform data.
  */
@@ -23,7 +23,7 @@ import java.util.Objects;
 /**
  * Data object that stores the Q-Transform data.
  */
-public class QTransformDataObject extends AbstractAUDTDataObject {
+public abstract class QTransformDataObject extends AbstractAUDTDataObject {
     // Constants
     public static final int SECTION_ID = 2;
 
@@ -32,20 +32,6 @@ public class QTransformDataObject extends AbstractAUDTDataObject {
 
     public double minMagnitude;
     public double maxMagnitude;
-
-    /**
-     * Initialization method for the Q-Transform data object.
-     *
-     * @param qTransformBytes The Q-Transform data as LZ4 compressed bytes.
-     * @param maxMagnitude    The maximum magnitude of the Q-Transform data.
-     * @param minMagnitude    The minimum magnitude of the Q-Transform data.
-     */
-    public QTransformDataObject(byte[] qTransformBytes, double minMagnitude, double maxMagnitude) {
-        // Update attributes
-        this.qTransformBytes = qTransformBytes;
-        this.minMagnitude = minMagnitude;
-        this.maxMagnitude = maxMagnitude;
-    }
 
     // Overwritten methods
     @Override

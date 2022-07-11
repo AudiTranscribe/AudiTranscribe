@@ -2,7 +2,7 @@
  * GUIDataObjectTest.java
  *
  * Created on 2022-07-02
- * Updated on 2022-07-02
+ * Updated on 2022-07-11
  *
  * Description: Test `GUIDataObject.java`.
  */
@@ -10,6 +10,7 @@
 package site.overwrite.auditranscribe.io.audt_file.data_encapsulators;
 
 import org.junit.jupiter.api.Test;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.v401.GUIDataObject401;
 import site.overwrite.auditranscribe.utils.MathUtils;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -38,10 +39,10 @@ class GUIDataObjectTest {
     @Test
     void numBytesNeeded() {
         // Define the two GUI data objects to test number of bytes needed
-        GUIDataObject one = new GUIDataObject(
+        GUIDataObject one = new GUIDataObject401(
                 musicKeyIndex1, timeSignatureIndex1, bpm1, offsetSeconds1, playbackVolume1, currTimeInMS1
         );
-        GUIDataObject two = new GUIDataObject(
+        GUIDataObject two = new GUIDataObject401(
                 musicKeyIndex2, timeSignatureIndex2, bpm2, offsetSeconds2, playbackVolume2, currTimeInMS2
         );
 
@@ -53,7 +54,7 @@ class GUIDataObjectTest {
     @Test
     void testEquals() {
         // Define temporary data object for testing the initial checks
-        GUIDataObject temp = new GUIDataObject(
+        GUIDataObject temp = new GUIDataObject401(
                 musicKeyIndex1, timeSignatureIndex1, bpm1, offsetSeconds1, playbackVolume1, currTimeInMS1
         );
 
@@ -77,7 +78,7 @@ class GUIDataObjectTest {
         // Generate product of indices
         int[][] indexProduct = MathUtils.selfProduct(2, 6);  // 6 data attributes
         for (int[] indices1 : indexProduct) {
-            GUIDataObject one = new GUIDataObject(
+            GUIDataObject one = new GUIDataObject401(
                     musicKeyIndices[indices1[0]],
                     timeSignatureIndices[indices1[1]],
                     bpms[indices1[2]],
@@ -87,7 +88,7 @@ class GUIDataObjectTest {
             );
 
             for (int[] indices2 : indexProduct) {
-                GUIDataObject two = new GUIDataObject(
+                GUIDataObject two = new GUIDataObject401(
                         musicKeyIndices[indices2[0]],
                         timeSignatureIndices[indices2[1]],
                         bpms[indices2[2]],
@@ -111,10 +112,10 @@ class GUIDataObjectTest {
     @Test
     void testHashCode() {
         // Define the two GUI data objects to test hash code
-        GUIDataObject one = new GUIDataObject(
+        GUIDataObject one = new GUIDataObject401(
                 musicKeyIndex1, timeSignatureIndex1, bpm1, offsetSeconds1, playbackVolume1, currTimeInMS1
         );
-        GUIDataObject two = new GUIDataObject(
+        GUIDataObject two = new GUIDataObject401(
                 musicKeyIndex2, timeSignatureIndex2, bpm2, offsetSeconds2, playbackVolume2, currTimeInMS2
         );
 

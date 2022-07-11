@@ -2,7 +2,7 @@
  * MusicNotesDataObject.java
  *
  * Created on 2022-06-08
- * Updated on 2022-06-21
+ * Updated on 2022-07-11
  *
  * Description: Data object that stores the music notes' data.
  */
@@ -14,7 +14,7 @@ import java.util.Arrays;
 /**
  * Data object that stores the music notes' data.
  */
-public class MusicNotesDataObject extends AbstractAUDTDataObject {
+public abstract class MusicNotesDataObject extends AbstractAUDTDataObject {
     // Constants
     public static final int SECTION_ID = 5;
 
@@ -22,19 +22,6 @@ public class MusicNotesDataObject extends AbstractAUDTDataObject {
     public double[] timesToPlaceRectangles;
     public double[] noteDurations;
     public int[] noteNums;
-
-    /**
-     * Initialization method for the music notes data object.
-     *
-     * @param timesToPlaceRectangles The times to place the note rectangles.
-     * @param noteDurations          The duration of each note rectangle.
-     * @param noteNums               The note number of each note rectangle.
-     */
-    public MusicNotesDataObject(double[] timesToPlaceRectangles, double[] noteDurations, int[] noteNums) {
-        this.timesToPlaceRectangles = timesToPlaceRectangles;
-        this.noteDurations = noteDurations;
-        this.noteNums = noteNums;
-    }
 
     // Overwritten methods
     @Override

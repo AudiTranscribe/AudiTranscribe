@@ -2,7 +2,7 @@
  * QTransformDataObjectTest.java
  *
  * Created on 2022-07-02
- * Updated on 2022-07-02
+ * Updated on 2022-07-11
  *
  * Description: Test `QTransformDataObject.java`.
  */
@@ -11,6 +11,7 @@ package site.overwrite.auditranscribe.io.audt_file.data_encapsulators;
 
 import org.javatuples.Triplet;
 import org.junit.jupiter.api.Test;
+import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.v401.QTransformDataObject401;
 import site.overwrite.auditranscribe.utils.MathUtils;
 import site.overwrite.auditranscribe.utils.TypeConversionUtils;
 
@@ -33,10 +34,10 @@ class QTransformDataObjectTest {
     @Test
     void numBytesNeeded() {
         // Define the two Q-Transform data objects to test number of bytes needed
-        QTransformDataObject one = new QTransformDataObject(
+        QTransformDataObject one = new QTransformDataObject401(
                 qTransformBytes1, minMagnitude1, maxMagnitude1
         );
-        QTransformDataObject two = new QTransformDataObject(
+        QTransformDataObject two = new QTransformDataObject401(
                 qTransformBytes2, minMagnitude2, maxMagnitude2
         );
 
@@ -48,7 +49,7 @@ class QTransformDataObjectTest {
     @Test
     void testEquals() {
         // Define temporary data object for testing the initial checks
-        QTransformDataObject temp = new QTransformDataObject(
+        QTransformDataObject temp = new QTransformDataObject401(
                 qTransformBytes1, minMagnitude1, maxMagnitude1
         );
 
@@ -69,14 +70,14 @@ class QTransformDataObjectTest {
         // Generate product of indices
         int[][] indexProduct = MathUtils.selfProduct(2, 3);  // 3 data attributes
         for (int[] indices1 : indexProduct) {
-            QTransformDataObject one = new QTransformDataObject(
+            QTransformDataObject one = new QTransformDataObject401(
                     qTransformBytes[indices1[0]],
                     minMagnitudes[indices1[1]],
                     maxMagnitudes[indices1[2]]
             );
 
             for (int[] indices2 : indexProduct) {
-                QTransformDataObject two = new QTransformDataObject(
+                QTransformDataObject two = new QTransformDataObject401(
                         qTransformBytes[indices2[0]],
                         minMagnitudes[indices2[1]],
                         maxMagnitudes[indices2[2]]
@@ -97,10 +98,10 @@ class QTransformDataObjectTest {
     @Test
     void testHashCode() {
         // Define the two Q-Transform data objects to test hash code computation
-        QTransformDataObject one = new QTransformDataObject(
+        QTransformDataObject one = new QTransformDataObject401(
                 qTransformBytes1, minMagnitude1, maxMagnitude1
         );
-        QTransformDataObject two = new QTransformDataObject(
+        QTransformDataObject two = new QTransformDataObject401(
                 qTransformBytes2, minMagnitude2, maxMagnitude2
         );
 
