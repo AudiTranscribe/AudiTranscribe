@@ -1,5 +1,5 @@
 /*
- * GUIDataObject401.java
+ * GUIDataObject.java
  *
  * Created on 2022-05-02
  * Updated on 2022-07-11
