@@ -15,8 +15,8 @@ import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.v401.*;
+import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
+import site.overwrite.auditranscribe.io.audt_file.v401.data_encapsulators.*;
 import site.overwrite.auditranscribe.utils.MathUtils;
 import site.overwrite.auditranscribe.utils.TypeConversionUtils;
 
