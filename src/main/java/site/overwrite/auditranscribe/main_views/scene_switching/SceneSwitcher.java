@@ -2,7 +2,7 @@
  * SceneSwitcher.java
  *
  * Created on 2022-06-22
- * Updated on 2022-07-11
+ * Updated on 2022-07-12
  *
  * Description: Class that handles the switching between the main scene and transcription scenes.
  */

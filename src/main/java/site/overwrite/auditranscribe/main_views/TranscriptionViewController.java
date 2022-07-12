@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-07-11
+ * Updated on 2022-07-12
  *
  * Description: Contains the transcription view's controller class.
  */

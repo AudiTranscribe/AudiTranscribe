@@ -2,7 +2,7 @@
  * AUDTFileWriter.java
  *
  * Created on 2022-05-01
- * Updated on 2022-07-11
+ * Updated on 2022-07-12
  *
  * Description: Class that handles the writing of the AudiTranscribe (AUDT) file.
  */
@@ -131,6 +131,9 @@ public abstract class AUDTFileWriter {
             try (RandomAccessFile raf = new RandomAccessFile(myFile, "rw")) {  // Automatically closes file
                 // Seek to the correct position
                 raf.seek(numBytesToSkip);
+
+                // Set the new length of the file
+                raf.setLength(numBytesToSkip + byteArray.length);  // Make sure that the EOF delimiter is set correctly
 
                 // Write the byte array to the correct position
                 raf.write(byteArray);
