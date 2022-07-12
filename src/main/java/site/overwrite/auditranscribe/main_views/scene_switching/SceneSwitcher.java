@@ -309,6 +309,9 @@ public class SceneSwitcher {
             String audtFileName = audtFile.getName();
             AUDTFileReader reader = AUDTFileReader.getFileReader(audtFilePath);
 
+            // Get the file version
+            int fileVersion = reader.fileFormatVersion;
+
             // Read the data from the file
             UnchangingDataPropertiesObject unchangingDataProperties = reader.readUnchangingDataProperties();
             QTransformDataObject qTransformData = reader.readQTransformData();
@@ -331,6 +334,9 @@ public class SceneSwitcher {
 
             // Set the theme of the scene
             controller.setThemeOnScene();
+
+            // Set the file version that is used
+            controller.setFileVersion(fileVersion);
 
             // Set the project data for the existing project
             controller.useExistingData(audtFilePath, audtFileName, projectData);

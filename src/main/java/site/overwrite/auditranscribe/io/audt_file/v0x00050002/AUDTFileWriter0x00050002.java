@@ -2,7 +2,7 @@
  * AUDTFileWriter0x00050002.java
  *
  * Created on 2022-07-11
- * Updated on 2022-07-11
+ * Updated on 2022-07-12
  *
  * Description: Class that handles the writing of the AudiTranscribe (AUDT) file for file version
  *              0x00050002.
@@ -12,8 +12,10 @@ package site.overwrite.auditranscribe.io.audt_file.v0x00050002;
 
 import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileWriter;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
+import site.overwrite.auditranscribe.misc.MyLogger;
 
 import java.io.IOException;
+import java.util.logging.Level;
 
 public class AUDTFileWriter0x00050002 extends AUDTFileWriter {
     /**
@@ -25,6 +27,7 @@ public class AUDTFileWriter0x00050002 extends AUDTFileWriter {
      */
     public AUDTFileWriter0x00050002(String filepath, int numBytesToSkip) {
         super(0x00050002, filepath, numBytesToSkip);
+        MyLogger.log(Level.INFO, "Using Version 0x00050002 AUDT file writer", AUDTFileWriter.class.getName());
     }
 
     /**
@@ -35,6 +38,7 @@ public class AUDTFileWriter0x00050002 extends AUDTFileWriter {
      */
     public AUDTFileWriter0x00050002(String filepath) {
         super(0x00050002, filepath);
+        MyLogger.log(Level.INFO, "Using Version 0x00050002 AUDT file writer", AUDTFileWriter.class.getName());
     }
 
     // Public methods

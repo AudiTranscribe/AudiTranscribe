@@ -2,7 +2,7 @@
  * AUDTFileReader401.java
  *
  * Created on 2022-07-11
- * Updated on 2022-07-11
+ * Updated on 2022-07-12
  *
  * Description: Class that handles the reading of the AudiTranscribe (AUDT) file for file version
  *              401.
@@ -16,8 +16,10 @@ import site.overwrite.auditranscribe.exceptions.io.audt_file.InvalidFileVersionE
 import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileReader;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.audt_file.v401.data_encapsulators.*;
+import site.overwrite.auditranscribe.misc.MyLogger;
 
 import java.io.IOException;
+import java.util.logging.Level;
 
 public class AUDTFileReader401 extends AUDTFileReader {
     /**
@@ -32,6 +34,7 @@ public class AUDTFileReader401 extends AUDTFileReader {
     public AUDTFileReader401(String filepath) throws IOException, IncorrectFileFormatException,
             InvalidFileVersionException {
         super(filepath);
+        MyLogger.log(Level.INFO, "Using Version 401 AUDT file reader", AUDTFileReader.class.getName());
     }
 
     // Public methods

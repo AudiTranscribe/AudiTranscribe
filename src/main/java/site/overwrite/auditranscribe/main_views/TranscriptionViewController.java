@@ -35,6 +35,7 @@ import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.exceptions.notes.NoteRectangleCollisionException;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.IOConstants;
+import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.*;
 import site.overwrite.auditranscribe.misc.CustomTask;
@@ -121,6 +122,7 @@ public class TranscriptionViewController implements Initializable {
 
     // Other attributes
     private boolean hasUnsavedChanges = true;
+    private int fileVersion;
 
     private SettingsFile settingsFile;
     private Theme theme;
@@ -549,6 +551,10 @@ public class TranscriptionViewController implements Initializable {
 
     public File getSelectedFile() {
         return selectedFile;
+    }
+
+    public void setFileVersion(int fileVersion) {
+        this.fileVersion = fileVersion;
     }
 
     // Public methods
@@ -2294,8 +2300,8 @@ public class TranscriptionViewController implements Initializable {
                 timesToPlaceRectangles, noteDurations, noteNums
         );
 
-        // Determine the number of skippable bytes
-        if (numSkippableBytes == 0 || forceChooseFile) {
+        // Determine what mode of the writer should be used
+        if (numSkippableBytes == 0 || forceChooseFile || fileVersion != AUDTFileConstants.FILE_VERSION_NUMBER) {
             // Calculate the number of skippable bytes
             numSkippableBytes = 32 +  // Header section
                     UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
