@@ -2,7 +2,7 @@
  * AUDTFileReader.java
  *
  * Created on 2022-05-02
- * Updated on 2022-07-11
+ * Updated on 2022-07-15
  *
  * Description: Class that handles the reading of the AudiTranscribe (AUDT) file.
  */
@@ -36,40 +36,32 @@ public abstract class AUDTFileReader {
     /**
      * Initialization method to make an <code>AUDTFileReader</code> object.
      *
-     * @param filepath Path to the AUDT file. The file name at the end of the file path should
-     *                 <b>include</b> the extension of the AUDT file.
-     * @throws InvalidFileVersionException  If the LZ4 version is outdated.
+     * @param filepath    Path to the AUDT file. The file name at the end of the file path should
+     *                    <b>include</b> the extension of the AUDT file.
+     * @param inputStream Input stream of the file.
      * @throws IOException                  If something went wrong when reading the AUDT file.
      * @throws IncorrectFileFormatException If the file was formatted incorrectly.
+     * @throws InvalidFileVersionException  If the LZ4 version is outdated.
      */
-    public AUDTFileReader(String filepath) throws InvalidFileVersionException, IOException,
-            IncorrectFileFormatException {
+    public AUDTFileReader(
+            String filepath, InputStream inputStream
+    ) throws IOException, IncorrectFileFormatException, InvalidFileVersionException {
         // Update attributes
         this.filepath = filepath;
 
-        // Check extension
-        // (For simplicity assume the last 5 characters of the file path forms the extension)
-        int filepathLength = filepath.length();
-        if (filepathLength < 5 ||
-                !filepath.substring(filepathLength - 5, filepathLength).equalsIgnoreCase(".audt")) {
-            throw new IncorrectFileFormatException("The file is not an AUDT file. Is the extension correct?");
+        // Read bytes in from file
+        bytes = inputStream.readAllBytes();
+
+        // Verify that the header section is correct
+        if (!verifyHeaderSection()) {
+            throw new IncorrectFileFormatException("The file is not an AUDT file. Is the header correct?");
         }
 
-        // Read bytes in from file
-        try (InputStream inputStream = new FileInputStream(filepath)) {
-            bytes = inputStream.readAllBytes();
-
-            // Verify that the header section is correct
-            if (!verifyHeaderSection()) {
-                throw new IncorrectFileFormatException("The file is not an AUDT file. Is the header correct?");
-            }
-
-            // Verify that the last 4 bytes is the EOF delimiter
-            if (!checkEOFDelimiter()) {
-                throw new IncorrectFileFormatException(
-                        "The file is not an AUDT file. Is the end-of-file delimiter correct?"
-                );
-            }
+        // Verify that the last 4 bytes is the EOF delimiter
+        if (!checkEOFDelimiter()) {
+            throw new IncorrectFileFormatException(
+                    "The file is not an AUDT file. Is the end-of-file delimiter correct?"
+            );
         }
     }
 
@@ -89,21 +81,31 @@ public abstract class AUDTFileReader {
      */
     public static AUDTFileReader getFileReader(String filepath) throws InvalidFileVersionException, IOException,
             IncorrectFileFormatException {
-        // Attempt to get file version
-        byte[] fileVersionBytes;
-        try (InputStream inputStream = new FileInputStream(filepath)) {
-            inputStream.skipNBytes(20L);  // First 20 is the header
-            fileVersionBytes = inputStream.readNBytes(4);  // 4 bytes per integer
+        // Check extension
+        // (For simplicity assume the last 5 characters of the file path forms the extension)
+        int filepathLength = filepath.length();
+        if (filepathLength < 5 ||
+                !filepath.substring(filepathLength - 5, filepathLength).equalsIgnoreCase(".audt")) {
+            throw new IncorrectFileFormatException("The file is not an AUDT file. Is the extension correct?");
         }
 
-        int fileVersion = IOConverters.bytesToInt(fileVersionBytes);
+        // Attempt to read the file
+        int fileVersion;
+        try (InputStream inputStream = new FileInputStream(filepath)) {
+            // Try and get the file version
+            inputStream.skipNBytes(20L);  // First 20 is the header
+            byte[] fileVersionBytes = inputStream.readNBytes(4);  // 4 bytes per integer
+            fileVersion = IOConverters.bytesToInt(fileVersionBytes);
+        }
 
-        // Get the appropriate file reader objects
-        return switch (fileVersion) {
-            case 401 -> new AUDTFileReader401(filepath);  // Todo: eventually depreciate this
-            case 0x00050002 -> new AUDTFileReader0x00050002(filepath);
-            default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
-        };
+        try (InputStream inputStream = new FileInputStream(filepath)) {  // Do this so that the read point is the start
+            // Get the appropriate file reader objects
+            return switch (fileVersion) {
+                case 401 -> new AUDTFileReader401(filepath, inputStream);  // Todo: eventually depreciate this
+                case 0x00050002 -> new AUDTFileReader0x00050002(filepath, inputStream);
+                default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
+            };
+        }
     }
 
     // Abstract methods

@@ -2,7 +2,7 @@
  * AUDTFile401Test.java
  *
  * Created on 2022-07-11
- * Updated on 2022-07-11
+ * Updated on 2022-07-15
  *
  * Description: Test AUDT file reading and writing for file version 401.
  */
@@ -341,70 +341,49 @@ class AUDTFile401Test {
         assertEquals(projectData2, readProjectData);
     }
 
-    // Todo: fix tests with the new changes
     @Test
     void fileReaderTestExceptions() {
-//        // Define files' folder
-//        String folder = IOMethods.joinPaths(
-//                IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-//                "testing-files", "misc", "file-reader-test-files"
-//        );
-//
-//        // Perform tests
-//        assertThrowsExactly(IncorrectFileFormatException.class, () ->
-//                AUDTFileReader.getFileReader("abc")
-//        );
-//        assertThrowsExactly(IncorrectFileFormatException.class, () ->
-//                AUDTFileReader.getFileReader(IOMethods.joinPaths(folder, "not-audt-file.txt"))
-//        );
-//        assertThrowsExactly(IncorrectFileFormatException.class, () ->
-//                AUDTFileReader.getFileReader(IOMethods.joinPaths(folder, "header-incorrect.audt"))
-//        );
-//        assertThrowsExactly(IncorrectFileFormatException.class, () ->
-//                AUDTFileReader.getFileReader(IOMethods.joinPaths(folder, "eof-delimiter-incorrect.audt"))
-//        );
-//
-//        assertThrowsExactly(InvalidFileVersionException.class, () ->
-//                AUDTFileReader.getFileReader(IOMethods.joinPaths(folder, "outdated-file-version.audt"))
-//        );
-//        assertThrowsExactly(InvalidFileVersionException.class, () ->
-//                AUDTFileReader.getFileReader(IOMethods.joinPaths(folder, "outdated-lz4-version.audt"))
-//        );
-//
-//        for (int sectionID = 1; sectionID <= 5; sectionID++) {  // 5 sections
-//            // Define paths
-//            String idIncorrectFile = IOMethods.joinPaths(
-//                    folder, "incorrect-sections", "section" + sectionID + "-id-incorrect.audt"
-//            );
-//            String eosIncorrectFile = IOMethods.joinPaths(
-//                    folder, "incorrect-sections", "section" + sectionID + "-eos-incorrect.audt"
-//            );
-//
-//            int finalSectionID = sectionID;
-//            assertThrowsExactly(FailedToReadDataException.class, () -> {
-//                // Define reader
-//                AUDTFileReader idReader = AUDTFileReader.getFileReader(idIncorrectFile);
-//
-//                // Call methods
-//                idReader.readUnchangingDataProperties();
-//                if (finalSectionID >= 2) idReader.readQTransformData();
-//                if (finalSectionID >= 3) idReader.readAudioData();
-//                if (finalSectionID >= 4) idReader.readGUIData();
-//                if (finalSectionID >= 5) idReader.readMusicNotesData();
-//
-//            });
-//            assertThrowsExactly(FailedToReadDataException.class, () -> {
-//                // Define reader
-//                AUDTFileReader eosReader = AUDTFileReader.getFileReader(eosIncorrectFile);
-//
-//                // Call methods
-//                eosReader.readUnchangingDataProperties();
-//                if (finalSectionID >= 2) eosReader.readQTransformData();
-//                if (finalSectionID >= 3) eosReader.readAudioData();
-//                if (finalSectionID >= 4) eosReader.readGUIData();
-//                if (finalSectionID >= 5) eosReader.readMusicNotesData();
-//            });
-//        }
+        // Define files' folder
+        String folder = IOMethods.joinPaths(
+                IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
+                "testing-files", "audt-test-files", "v401"
+        );
+
+        // Perform tests
+        for (int sectionID = 1; sectionID <= 5; sectionID++) {  // 5 sections
+            // Define paths
+            String idIncorrectFile = IOMethods.joinPaths(
+                    folder, "section" + sectionID + "-id-incorrect.audt"
+            );
+            String eosIncorrectFile = IOMethods.joinPaths(
+                    folder, "section" + sectionID + "-eos-incorrect.audt"
+            );
+
+            int finalSectionID = sectionID;
+            assertThrowsExactly(FailedToReadDataException.class, () -> {
+                // Define reader
+                AUDTFileReader idReader = AUDTFileReader.getFileReader(idIncorrectFile);
+
+                // Call methods
+                idReader.readUnchangingDataProperties();
+                if (finalSectionID >= 2) idReader.readQTransformData();
+                if (finalSectionID >= 3) idReader.readAudioData();
+                if (finalSectionID >= 4) idReader.readGUIData();
+                if (finalSectionID >= 5) idReader.readMusicNotesData();
+
+            });
+            assertThrowsExactly(FailedToReadDataException.class, () -> {
+                // Define reader
+                AUDTFileReader eosReader = AUDTFileReader.getFileReader(eosIncorrectFile);
+
+                // Call methods
+                eosReader.readUnchangingDataProperties();
+                if (finalSectionID >= 2) eosReader.readQTransformData();
+                if (finalSectionID >= 3) eosReader.readAudioData();
+                if (finalSectionID >= 4) eosReader.readGUIData();
+                if (finalSectionID >= 5) eosReader.readMusicNotesData();
+            });
+        }
     }
 
     @AfterAll

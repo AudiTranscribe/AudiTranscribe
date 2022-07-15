@@ -2,7 +2,7 @@
  * AUDTFileReader0x00050002.java
  *
  * Created on 2022-07-11
- * Updated on 2022-07-12
+ * Updated on 2022-07-15
  *
  * Description: Class that handles the reading of the AudiTranscribe (AUDT) file for file version
  *              0x00050002.
@@ -19,21 +19,24 @@ import site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators
 import site.overwrite.auditranscribe.misc.MyLogger;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.logging.Level;
 
 public class AUDTFileReader0x00050002 extends AUDTFileReader {
     /**
      * Initialization method to make an <code>AUDTFileReader</code> object.
      *
-     * @param filepath Path to the AUDT file. The file name at the end of the file path should
-     *                 <b>include</b> the extension of the AUDT file.
+     * @param filepath    Path to the AUDT file. The file name at the end of the file path should
+     *                    <b>include</b> the extension of the AUDT file.
+     * @param inputStream Input stream of the file.
      * @throws IOException                  If something went wrong when reading the AUDT file.
      * @throws IncorrectFileFormatException If the file was formatted incorrectly.
      * @throws InvalidFileVersionException  If the LZ4 version is outdated.
      */
-    public AUDTFileReader0x00050002(String filepath) throws IOException, IncorrectFileFormatException,
-            InvalidFileVersionException {
-        super(filepath);
+    public AUDTFileReader0x00050002(
+            String filepath, InputStream inputStream
+    ) throws IOException, IncorrectFileFormatException, InvalidFileVersionException {
+        super(filepath, inputStream);
         MyLogger.log(Level.INFO, "Using Version 0x00050002 AUDT file reader", AUDTFileReader.class.getName());
     }
 
