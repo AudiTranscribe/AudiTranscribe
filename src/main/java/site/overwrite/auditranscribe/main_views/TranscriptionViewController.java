@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-07-12
+ * Updated on 2022-07-16
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -180,8 +180,8 @@ public class TranscriptionViewController implements Initializable {
     private MenuBar menuBar;
 
     @FXML
-    private MenuItem newProjectMenuItem, openProjectMenuItem, saveProjectMenuItem, saveAsMenuItem, preferencesMenuItem,
-            aboutMenuItem;
+    private MenuItem newProjectMenuItem, openProjectMenuItem, saveProjectMenuItem, saveAsMenuItem, importMIDIMenuItem,
+            exportMIDIMenuItem, preferencesMenuItem, aboutMenuItem;
 
     // Main elements
     @FXML
@@ -519,15 +519,13 @@ public class TranscriptionViewController implements Initializable {
 
         // Add methods to menu items
         newProjectMenuItem.setOnAction(this::handleNewProject);
-
         openProjectMenuItem.setOnAction(this::handleOpenProject);
-
         saveProjectMenuItem.setOnAction(event -> handleSavingProject(false, false));
-
         saveAsMenuItem.setOnAction(event -> handleSavingProject(false, true));
-
+        importMIDIMenuItem.setOnAction(event -> {
+        });  // Todo: add
+        exportMIDIMenuItem.setOnAction(event -> handleExportMIDI());
         preferencesMenuItem.setOnAction(actionEvent -> PreferencesViewController.showPreferencesWindow(settingsFile));
-
         aboutMenuItem.setOnAction(actionEvent -> AboutViewController.showAboutWindow(settingsFile));
 
         // Get the projects database
@@ -1311,6 +1309,54 @@ public class TranscriptionViewController implements Initializable {
     }
 
     /**
+     * Helper method that handles the exporting of the note rectangles' data to MIDI.
+     */
+    private void handleExportMIDI() {
+        // Get current window
+        Window window = rootPane.getScene().getWindow();
+
+        // Ask user to choose a file
+        FileChooser fileChooser = new FileChooser();
+        File file = fileChooser.showSaveDialog(window);
+
+        // If operation was cancelled, show error
+        if (file == null) {
+            Popups.showWarningAlert(
+                    "No destination specified",
+                    "No destination was specified. The MIDI file will not be created."
+            );
+            return;
+        }
+
+        // Check if the file path ends with ".midi"
+        String filePath = file.getAbsolutePath();
+        if (!file.getAbsolutePath().toLowerCase().endsWith(".midi")) {
+            filePath += ".midi";
+        }
+
+        // Set up the note player sequencer by setting the notes on it
+        setupNotePlayerSequencer();
+
+        // Now write the sequence to the MIDI file
+        try {
+            notePlayerSequencer.writeSequenceToMIDIFile(filePath);
+            MyLogger.log(
+                    Level.FINE,
+                    "Exported notes to '" + filePath + "'.",
+                    TranscriptionViewController.class.getName()
+            );
+            Popups.showInformationAlert("Successfully exported to MIDI", "Successfully exported to MIDI.");
+        } catch (IOException e) {
+            MyLogger.logException(e);
+            Popups.showExceptionAlert(
+                    "Failed to export to MIDI file",
+                    "An exception occurred when exporting the notes to MIDI file.",
+                    e
+            );
+        }
+    }
+
+    /**
      * Helper method that toggles the paused state.
      *
      * @param isPaused Old paused state.
@@ -1856,6 +1902,34 @@ public class TranscriptionViewController implements Initializable {
     }
 
     /**
+     * Helper method that sets up the note player sequencer by setting the notes on it.
+     */
+    private void setupNotePlayerSequencer() {
+        // Get number of note rectangles
+        int numNoteRects = NoteRectangle.allNoteRectangles.size();
+
+        // Get the note onset times, note durations, and note numbers from the note rectangles
+        double[] noteOnsetTimes = new double[numNoteRects];
+        double[] noteDurations = new double[numNoteRects];
+        int[] noteNums = new int[numNoteRects];
+
+        for (int i = 0; i < numNoteRects; i++) {
+            noteOnsetTimes[i] = NoteRectangle.allNoteRectangles.get(i).getNoteOnsetTime();
+            noteDurations[i] = NoteRectangle.allNoteRectangles.get(i).getNoteDuration();
+            noteNums[i] = NoteRectangle.allNoteRectangles.get(i).noteNum;
+        }
+
+        // Setup note player sequencer
+        notePlayerSequencer.setOnVelocity(notesVolume);
+        notePlayerSequencer.setOffVelocity(NOTE_PLAYING_OFF_VELOCITY);
+        notePlayerSequencer.setBPM(bpm);
+        notePlayerSequencer.setInstrument(NOTE_PLAYING_INSTRUMENT);
+
+        // Set notes
+        notePlayerSequencer.setNotesOnTrack(noteOnsetTimes, noteDurations, noteNums);  // Will clear existing notes
+    }
+
+    /**
      * Helper method that toggles the play button.
      */
     private void togglePlayButton() {
@@ -1879,28 +1953,8 @@ public class TranscriptionViewController implements Initializable {
 
         // Handle note rectangle operations when toggle paused
         if (!isPaused && !areNotesMuted) {
-            // Get number of note rectangles
-            int numNoteRects = NoteRectangle.allNoteRectangles.size();
-
-            // Get the note onset times, note durations, and note numbers from the note rectangles
-            double[] noteOnsetTimes = new double[numNoteRects];
-            double[] noteDurations = new double[numNoteRects];
-            int[] noteNums = new int[numNoteRects];
-
-            for (int i = 0; i < numNoteRects; i++) {
-                noteOnsetTimes[i] = NoteRectangle.allNoteRectangles.get(i).getNoteOnsetTime();
-                noteDurations[i] = NoteRectangle.allNoteRectangles.get(i).getNoteDuration();
-                noteNums[i] = NoteRectangle.allNoteRectangles.get(i).noteNum;
-            }
-
-            // Setup note player sequencer
-            notePlayerSequencer.setOnVelocity(notesVolume);
-            notePlayerSequencer.setOffVelocity(NOTE_PLAYING_OFF_VELOCITY);
-            notePlayerSequencer.setBPM(bpm);
-            notePlayerSequencer.setInstrument(NOTE_PLAYING_INSTRUMENT);
-
-            // Set notes
-            notePlayerSequencer.setNotesOnTrack(noteOnsetTimes, noteDurations, noteNums);  // Will clear existing notes
+            // Set up the note player sequencer by setting the notes on it
+            setupNotePlayerSequencer();
 
             // Start playback
             notePlayerSequencer.play(currTime + settingsFile.data.notePlayingDelayOffset);
