@@ -2,7 +2,7 @@
  * ProjectDataTest.java
  *
  * Created on 2022-06-29
- * Updated on 2022-07-09
+ * Updated on 2022-07-11
  *
  * Description: Test `ProjectData.java`.
  */
@@ -15,7 +15,8 @@ import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
+import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
+import site.overwrite.auditranscribe.io.audt_file.v401.data_encapsulators.*;
 import site.overwrite.auditranscribe.utils.MathUtils;
 import site.overwrite.auditranscribe.utils.TypeConversionUtils;
 
@@ -91,45 +92,45 @@ class ProjectDataTest {
         double maxMagnitude2 = conversionTuple2.getValue2();
 
         // Define data to be used within the tests
-        qTransformDataObject1 = new QTransformDataObject(
+        qTransformDataObject1 = new QTransformDataObject401(
                 qTransformBytes1, minMagnitude1, maxMagnitude1
         );
-        qTransformDataObject2 = new QTransformDataObject(
+        qTransformDataObject2 = new QTransformDataObject401(
                 qTransformBytes2, minMagnitude2, maxMagnitude2
         );
 
-        audioDataObject1 = new AudioDataObject(
+        audioDataObject1 = new AudioDataObject401(
                 CompressionHandlers.lz4Compress(Files.readAllBytes(Paths.get(
                         IOMethods.getAbsoluteFilePath("testing-files/audio/A440.mp3")
                 ))),
                 44100, 8000, "A440.wav");
-        audioDataObject2 = new AudioDataObject(
+        audioDataObject2 = new AudioDataObject401(
                 CompressionHandlers.lz4Compress(Files.readAllBytes(Paths.get(
                         IOMethods.getAbsoluteFilePath("testing-files/audio/Choice.wav")
                 ))),
                 44100, 5000, "Choice.wav");
 
-        guiDataObject1 = new GUIDataObject(
+        guiDataObject1 = new GUIDataObject401(
                 11, 9, 123.45, 0.01, 0.55, 9000
         );
-        guiDataObject2 = new GUIDataObject(
+        guiDataObject2 = new GUIDataObject401(
                 15, 14, 67.89, -1.23, 0.124, 2048
         );
 
-        musicNotesDataObject1 = new MusicNotesDataObject(
+        musicNotesDataObject1 = new MusicNotesDataObject401(
                 timesToPlaceRectangles1, noteDurations1, noteNums1
         );
-        musicNotesDataObject2 = new MusicNotesDataObject(
+        musicNotesDataObject2 = new MusicNotesDataObject401(
                 timesToPlaceRectangles2, noteDurations2, noteNums2
         );
 
-        unchangingDataPropertiesObject1 = new UnchangingDataPropertiesObject(
+        unchangingDataPropertiesObject1 = new UnchangingDataPropertiesObject401(
                 32 +  // Header section
                         UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
                         qTransformDataObject1.numBytesNeeded() +
                         audioDataObject1.numBytesNeeded()
         );
-        unchangingDataPropertiesObject2 = new UnchangingDataPropertiesObject(
+        unchangingDataPropertiesObject2 = new UnchangingDataPropertiesObject401(
                 32 +  // Header section
                         UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
                         qTransformDataObject2.numBytesNeeded() +

@@ -2,7 +2,7 @@
  * ProjectIOHandlers.java
  *
  * Created on 2022-05-04
- * Updated on 2022-07-07
+ * Updated on 2022-07-11
  *
  * Description: Methods that handle the IO operations for an AudiTranscribe project.
  */
@@ -10,9 +10,12 @@
 package site.overwrite.auditranscribe.main_views.helpers;
 
 import javafx.stage.*;
-import site.overwrite.auditranscribe.io.audt_file.ProjectData;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
-import site.overwrite.auditranscribe.io.audt_file.AUDTFileWriter;
+import site.overwrite.auditranscribe.exceptions.io.audt_file.InvalidFileVersionException;
+import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
+import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileWriter;
+import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.GUIDataObject;
+import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.MusicNotesDataObject;
+import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.ProjectData;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,14 +44,19 @@ public final class ProjectIOHandlers {
     public static void saveProject(
             String filepath, int numSkippableBytes, GUIDataObject guiData, MusicNotesDataObject musicNotesData
     ) throws IOException {
-        // Declare the file writer object
-        AUDTFileWriter fileWriter = new AUDTFileWriter(filepath, numSkippableBytes);
+        try {
+            // Declare the file writer object
+            AUDTFileWriter fileWriter = AUDTFileWriter.getWriter(
+                    AUDTFileConstants.FILE_VERSION_NUMBER, filepath, numSkippableBytes
+            );
 
-        // Write data to the file
-        fileWriter.writeGUIData(guiData);
-        fileWriter.writeMusicNotesData(musicNotesData);
+            // Write data to the file
+            fileWriter.writeGUIData(guiData);
+            fileWriter.writeMusicNotesData(musicNotesData);
 
-        fileWriter.writeBytesToFile();
+            fileWriter.writeBytesToFile();
+        } catch (InvalidFileVersionException ignored) {  // Impossible for the version to be wrong
+        }
     }
 
     /**
@@ -59,17 +67,20 @@ public final class ProjectIOHandlers {
      * @throws IOException If the writing to file encounters an error.
      */
     public static void saveProject(String filepath, ProjectData projectData) throws IOException {
-        // Declare the file writer object
-        AUDTFileWriter fileWriter = new AUDTFileWriter(filepath);
+        try {
+            // Declare the file writer object
+            AUDTFileWriter fileWriter = AUDTFileWriter.getWriter(AUDTFileConstants.FILE_VERSION_NUMBER, filepath);
 
-        // Write data to the file
-        fileWriter.writeUnchangingDataProperties(projectData.unchangingDataProperties);
-        fileWriter.writeQTransformData(projectData.qTransformData);
-        fileWriter.writeAudioData(projectData.audioData);
-        fileWriter.writeGUIData(projectData.guiData);
-        fileWriter.writeMusicNotesData(projectData.musicNotesData);
+            // Write data to the file
+            fileWriter.writeUnchangingDataProperties(projectData.unchangingDataProperties);
+            fileWriter.writeQTransformData(projectData.qTransformData);
+            fileWriter.writeAudioData(projectData.audioData);
+            fileWriter.writeGUIData(projectData.guiData);
+            fileWriter.writeMusicNotesData(projectData.musicNotesData);
 
-        fileWriter.writeBytesToFile();
+            fileWriter.writeBytesToFile();
+        } catch (InvalidFileVersionException ignored) {  // Impossible for the version to be wrong
+        }
     }
 
     /**

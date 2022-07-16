@@ -2,7 +2,7 @@
  * SceneSwitcher.java
  *
  * Created on 2022-06-22
- * Updated on 2022-07-09
+ * Updated on 2022-07-12
  *
  * Description: Class that handles the switching between the main scene and transcription scenes.
  */
@@ -24,12 +24,11 @@ import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
 import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.exceptions.io.audt_file.FailedToReadDataException;
 import site.overwrite.auditranscribe.exceptions.io.audt_file.IncorrectFileFormatException;
-import site.overwrite.auditranscribe.exceptions.io.audt_file.OutdatedFileFormatException;
+import site.overwrite.auditranscribe.exceptions.io.audt_file.InvalidFileVersionException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.io.audt_file.AUDTFileReader;
-import site.overwrite.auditranscribe.io.audt_file.ProjectData;
-import site.overwrite.auditranscribe.io.audt_file.data_encapsulators.*;
+import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileReader;
+import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.system.OSMethods;
@@ -308,7 +307,10 @@ public class SceneSwitcher {
             // Try and read the file as an AUDT file
             String audtFilePath = audtFile.getAbsolutePath();
             String audtFileName = audtFile.getName();
-            AUDTFileReader reader = new AUDTFileReader(audtFilePath);
+            AUDTFileReader reader = AUDTFileReader.getFileReader(audtFilePath);
+
+            // Get the file version
+            int fileVersion = reader.fileFormatVersion;
 
             // Read the data from the file
             UnchangingDataPropertiesObject unchangingDataProperties = reader.readUnchangingDataProperties();
@@ -332,6 +334,9 @@ public class SceneSwitcher {
 
             // Set the theme of the scene
             controller.setThemeOnScene();
+
+            // Set the file version that is used
+            controller.setFileVersion(fileVersion);
 
             // Set the project data for the existing project
             controller.useExistingData(audtFilePath, audtFileName, projectData);
@@ -382,10 +387,10 @@ public class SceneSwitcher {
             );
             MyLogger.logException(e);
             e.printStackTrace();
-        } catch (OutdatedFileFormatException e) {
+        } catch (InvalidFileVersionException e) {
             Popups.showExceptionAlert(
-                    "File version mismatch in '" + audtFile.getName() + "'.",
-                    "The AUDT file '" + audtFile.getName() + "' is outdated, or is not current. Please " +
+                    "Invalid file version in '" + audtFile.getName() + "'.",
+                    "The AUDT file '" + audtFile.getName() + "' has an invalid file version. Please " +
                             "check the version the file was saved in.",
                     e
             );

@@ -189,6 +189,9 @@
                         <exclude>
                             *.svg
                         </exclude>
+                        <exclude>
+                            *.pdf
+                        </exclude>
                     </excludes>
                     <source>17</source>
                     <target>17</target>

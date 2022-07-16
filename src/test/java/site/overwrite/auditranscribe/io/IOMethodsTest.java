@@ -2,7 +2,7 @@
  * IOMethodsTest.java
  *
  * Created on 2022-05-10
- * Updated on 2022-07-10
+ * Updated on 2022-07-15
  *
  * Description: Test `IOMethods.java`.
  */
@@ -292,7 +292,7 @@ class IOMethodsTest {
         }
 
         // Run tests
-        assertEquals(5, IOMethods.numThingsInDir(testingDirPath));
+        assertEquals(6, IOMethods.numThingsInDir(testingDirPath));
         assertEquals(3, IOMethods.numThingsInDir(IOMethods.joinPaths(testingDirPath, "text")));
         assertEquals(-1, IOMethods.numThingsInDir("not-a-dir"));
     }
