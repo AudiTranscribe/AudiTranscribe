@@ -27,7 +27,7 @@ import java.util.logging.Level;
  */
 public class NotePlayerSequencer {
     // Constants
-    public static int TICKS_PER_QUARTER = 100_000;  // Number of ticks per quarter note
+    public static int TICKS_PER_QUARTER = 10_000;  // Number of ticks per quarter note
     public static int MIDI_FILE_TYPE = 1;  // See https://tinyurl.com/2m9tcvzb for MIDI file types
 
     // Attributes
@@ -200,7 +200,13 @@ public class NotePlayerSequencer {
      * @throws IOException If an IO exception occurs.
      */
     public void exportToMIDI(String outputFilePath) throws IOException {
-        // Todo: fill in "Time_signature", "Tempo", "MIDI_port"
+        // Set tempo
+        setTempoOfNotePlayer((float) bpm);
+
+        // Set instrument
+        setInstrumentOfNotePlayer(instrumentNum);
+
+        // Write to file
         MidiSystem.write(sequence, MIDI_FILE_TYPE, new File(outputFilePath));
     }
 
@@ -217,7 +223,7 @@ public class NotePlayerSequencer {
         }
 
         // Set tempo
-        sequencer.setTempoInBPM((float) bpm);
+        setTempoOfNotePlayer((float) bpm);
 
         // Set instrument
         setInstrumentOfNotePlayer(instrumentNum);
@@ -372,6 +378,40 @@ public class NotePlayerSequencer {
         } catch (InvalidMidiDataException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Helper method that sets the BPM of the note player (and the track).
+     *
+     * @param bpm Beats per minute, as a <b>float</b> (and not a double).
+     */
+    private void setTempoOfNotePlayer(float bpm) {
+        // Get the number of microseconds per beat
+        long microsecondsPerBeat = (long) (6e7 / bpm);  // 6e7 microseconds per minute
+
+        // Create the tempo byte array
+        byte[] tempoByteArray = new byte[] { 0, 0, 0 };
+
+        for (int i = 0; i < 3; i++) {
+            // Calculate bit shift amount
+            int bitShift = (3 - (i + 1)) * 8;
+
+            // Compute byte to place in array
+            tempoByteArray[i] = (byte) (microsecondsPerBeat >> bitShift);
+        }
+
+        // Create the meta message
+        MetaMessage metaMessage = new MetaMessage();
+        try {
+            metaMessage.setMessage(0x51, tempoByteArray, 3);  // 0x51 is tempo message
+        } catch (InvalidMidiDataException ignored) {
+        }
+
+        // Add to track
+        track.add(new MidiEvent(metaMessage, 0));
+
+        // Set sequencer BPM
+        sequencer.setTempoInBPM(bpm);
     }
 
     /**

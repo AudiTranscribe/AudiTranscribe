@@ -1321,7 +1321,7 @@ public class TranscriptionViewController implements Initializable {
 
         // If operation was cancelled, show error
         if (file == null) {
-            Popups.showWarningAlert(
+            Popups.showInformationAlert(
                     "No destination specified",
                     "No destination was specified. The MIDI file will not be created."
             );
