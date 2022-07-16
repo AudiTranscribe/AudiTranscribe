@@ -1328,10 +1328,10 @@ public class TranscriptionViewController implements Initializable {
             return;
         }
 
-        // Check if the file path ends with ".midi"
+        // Check if the file path ends with ".mid"
         String filePath = file.getAbsolutePath();
-        if (!file.getAbsolutePath().toLowerCase().endsWith(".midi")) {
-            filePath += ".midi";
+        if (!file.getAbsolutePath().toLowerCase().endsWith(".mid")) {
+            filePath += ".mid";
         }
 
         // Set up the note player sequencer by setting the notes on it
