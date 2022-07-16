@@ -2,7 +2,7 @@
  * NotePlayerSequencer.java
  *
  * Created on 2022-06-09
- * Updated on 2022-06-26
+ * Updated on 2022-07-16
  *
  * Description: Class that handles the playing of notes as a MIDI sequence.
  */
@@ -17,6 +17,8 @@ import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 import javax.sound.midi.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -26,6 +28,7 @@ import java.util.logging.Level;
 public class NotePlayerSequencer {
     // Constants
     public static int TICKS_PER_QUARTER = 100_000;  // Number of ticks per quarter note
+    public static int MIDI_FILE_TYPE = 1;  // See https://tinyurl.com/2m9tcvzb for MIDI file types
 
     // Attributes
     private Track track;
@@ -188,6 +191,16 @@ public class NotePlayerSequencer {
             sb.append(s).append("\n");
         }
         return sb.toString();
+    }
+
+    /**
+     * Method that writes the MIDI sequence to a MIDI file.
+     *
+     * @param outputFilePath <b>Absolute</b> path to the output MIDI file.
+     * @throws IOException If an IO exception occurs.
+     */
+    public void writeSequenceToMIDIFile(String outputFilePath) throws IOException {
+        MidiSystem.write(sequence, MIDI_FILE_TYPE, new File(outputFilePath));
     }
 
     /**
