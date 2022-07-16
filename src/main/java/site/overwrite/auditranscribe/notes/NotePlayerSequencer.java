@@ -199,7 +199,8 @@ public class NotePlayerSequencer {
      * @param outputFilePath <b>Absolute</b> path to the output MIDI file.
      * @throws IOException If an IO exception occurs.
      */
-    public void writeSequenceToMIDIFile(String outputFilePath) throws IOException {
+    public void exportToMIDI(String outputFilePath) throws IOException {
+        // Todo: fill in "Time_signature", "Tempo", "MIDI_port"
         MidiSystem.write(sequence, MIDI_FILE_TYPE, new File(outputFilePath));
     }
 

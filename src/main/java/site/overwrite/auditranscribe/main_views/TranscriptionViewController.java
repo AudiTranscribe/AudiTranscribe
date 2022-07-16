@@ -1339,7 +1339,7 @@ public class TranscriptionViewController implements Initializable {
 
         // Now write the sequence to the MIDI file
         try {
-            notePlayerSequencer.writeSequenceToMIDIFile(filePath);
+            notePlayerSequencer.exportToMIDI(filePath);
             MyLogger.log(
                     Level.FINE,
                     "Exported notes to '" + filePath + "'.",
