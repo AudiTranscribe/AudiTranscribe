@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-07-12
+ * Updated on 2022-07-17
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -1032,15 +1032,15 @@ public class TranscriptionViewController implements Initializable {
         // Now check if there are unsaved changes
         if (hasUnsavedChanges) {
             // Prompt user to save work first
-            ButtonType saveAndExit = new ButtonType("Save And Leave");
-            ButtonType dontSaveButExit = new ButtonType("Don't Save, But Leave");
-            ButtonType dontSaveDontExit = new ButtonType("Don't Save, Don't Leave");
+            ButtonType dontSaveButExit = new ButtonType("Don't Save");
+            ButtonType dontSaveDontExit = new ButtonType("Cancel");
+            ButtonType saveAndExit = new ButtonType("Save");
 
             Optional<ButtonType> selectedButton = Popups.showMultiButtonAlert(
-                    "Unsaved Changes",
-                    "You Have Unsaved Changes",
-                    "Do you want to save your work?",
-                    saveAndExit, dontSaveButExit, dontSaveDontExit
+                    "",
+                    "",
+                    "Save changes to project before leaving?",
+                    dontSaveButExit, dontSaveDontExit, saveAndExit
             );
 
             // Handle different cases
