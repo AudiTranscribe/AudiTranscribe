@@ -1315,6 +1315,10 @@ public class TranscriptionViewController implements Initializable {
 
         // Ask user to choose a file
         FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
+                "MIDI Files (*.mid, *.midi)",
+                "*.mid", "*.midi"
+        ));
         File file = fileChooser.showSaveDialog(window);
 
         // If operation was cancelled, show error
@@ -1326,21 +1330,17 @@ public class TranscriptionViewController implements Initializable {
             return;
         }
 
-        // Check if the file path ends with ".mid"
-        String filePath = file.getAbsolutePath();
-        if (!file.getAbsolutePath().toLowerCase().endsWith(".mid")) {
-            filePath += ".mid";
-        }
-
         // Set up the note player sequencer by setting the notes on it
         setupNotePlayerSequencer();
 
         // Now write the sequence to the MIDI file
         try {
-            notePlayerSequencer.exportToMIDI(MusicUtils.TIME_SIGNATURES[timeSignatureIndex], musicKey, filePath);
+            notePlayerSequencer.exportToMIDI(
+                    MusicUtils.TIME_SIGNATURES[timeSignatureIndex], musicKey, file.getAbsolutePath()
+            );
             MyLogger.log(
                     Level.FINE,
-                    "Exported notes to '" + filePath + "'.",
+                    "Exported notes to '" + file.getAbsolutePath() + "'.",
                     TranscriptionViewController.class.getName()
             );
             Popups.showInformationAlert("Successfully exported to MIDI", "Successfully exported to MIDI.");
