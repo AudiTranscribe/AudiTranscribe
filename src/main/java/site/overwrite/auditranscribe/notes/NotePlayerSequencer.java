@@ -15,6 +15,7 @@ import site.overwrite.auditranscribe.exceptions.generic.LengthException;
 import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.utils.MathUtils;
+import site.overwrite.auditranscribe.utils.MusicUtils;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 import javax.sound.midi.*;
@@ -392,6 +393,36 @@ public class NotePlayerSequencer {
         MetaMessage metaMessage = new MetaMessage();
         try {
             metaMessage.setMessage(0x58, timeSignatureByteArray, 4);  // 0x58 is time signature message
+        } catch (InvalidMidiDataException ignored) {
+        }
+
+        // Add to track
+        track.add(new MidiEvent(metaMessage, 0));
+    }
+
+    /**
+     * Helper method that sets the key signature of the note player (and the track).
+     *
+     * @param key The key to set.
+     */
+    private void setKeySignatureOfNotePlayer(String key) {
+        // Get the key and mode of the provided key
+        Pair<String, String> keyAndMode = MusicUtils.parseKeySignature(key);
+        String modePart = keyAndMode.getValue1();
+
+        // Get the numeric value of the key
+        int numericValue = MusicUtils.getNumericValueOfKey(key);
+
+        // Create the key signature byte array
+        byte[] keySignatureByteArray = {
+                (byte) numericValue,
+                (byte) (Objects.equals(modePart, "Major") ? 0x00 : 0x01)
+        };
+
+        // Create the meta message
+        MetaMessage metaMessage = new MetaMessage();
+        try {
+            metaMessage.setMessage(0x59, keySignatureByteArray, 2);  // 0x59 is key signature message
         } catch (InvalidMidiDataException ignored) {
         }
 

@@ -12,6 +12,7 @@ package site.overwrite.auditranscribe.utils;
 import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.exceptions.generic.FormatException;
+import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 
 import java.util.HashSet;
 import java.util.List;
@@ -53,6 +54,45 @@ class MusicUtilsTest {
         assertEquals(new HashSet<>(List.of(new Integer[]{10, 0, 1, 3, 5, 6, 8})), MusicUtils.getNotesInKey("Bb Minor"));
         assertEquals(new HashSet<>(List.of(new Integer[]{3, 5, 6, 8, 10, 11, 1})), MusicUtils.getNotesInKey("Eb Minor"));
         assertEquals(new HashSet<>(List.of(new Integer[]{8, 10, 11, 1, 3, 4, 6})), MusicUtils.getNotesInKey("Ab Minor"));
+
+        assertThrowsExactly(ValueException.class, () -> MusicUtils.getNotesInKey("Zb Super"));
+    }
+
+    @Test
+    void getNumericValueOfKey() {
+        assertEquals(-7, MusicUtils.getNumericValueOfKey("C♭ Major"));
+        assertEquals(-6, MusicUtils.getNumericValueOfKey("G♭ Major"));
+        assertEquals(-5, MusicUtils.getNumericValueOfKey("D♭ Major"));
+        assertEquals(-4, MusicUtils.getNumericValueOfKey("A♭ Major"));
+        assertEquals(-3, MusicUtils.getNumericValueOfKey("E♭ Major"));
+        assertEquals(-2, MusicUtils.getNumericValueOfKey("B♭ Major"));
+        assertEquals(-1, MusicUtils.getNumericValueOfKey("F Major"));
+        assertEquals(0, MusicUtils.getNumericValueOfKey("C Major"));
+        assertEquals(1, MusicUtils.getNumericValueOfKey("G Major"));
+        assertEquals(2, MusicUtils.getNumericValueOfKey("D Major"));
+        assertEquals(3, MusicUtils.getNumericValueOfKey("A Major"));
+        assertEquals(4, MusicUtils.getNumericValueOfKey("E Major"));
+        assertEquals(5, MusicUtils.getNumericValueOfKey("B Major"));
+        assertEquals(6, MusicUtils.getNumericValueOfKey("F♯ Major"));
+        assertEquals(7, MusicUtils.getNumericValueOfKey("C♯ Major"));
+
+        assertEquals(-7, MusicUtils.getNumericValueOfKey("A♭ Minor"));
+        assertEquals(-6, MusicUtils.getNumericValueOfKey("E♭ Minor"));
+        assertEquals(-5, MusicUtils.getNumericValueOfKey("B♭ Minor"));
+        assertEquals(-4, MusicUtils.getNumericValueOfKey("F Minor"));
+        assertEquals(-3, MusicUtils.getNumericValueOfKey("C Minor"));
+        assertEquals(-2, MusicUtils.getNumericValueOfKey("G Minor"));
+        assertEquals(-1, MusicUtils.getNumericValueOfKey("D Minor"));
+        assertEquals(0, MusicUtils.getNumericValueOfKey("A Minor"));
+        assertEquals(1, MusicUtils.getNumericValueOfKey("E Minor"));
+        assertEquals(2, MusicUtils.getNumericValueOfKey("B Minor"));
+        assertEquals(3, MusicUtils.getNumericValueOfKey("F♯ Minor"));
+        assertEquals(4, MusicUtils.getNumericValueOfKey("C♯ Minor"));
+        assertEquals(5, MusicUtils.getNumericValueOfKey("G♯ Minor"));
+        assertEquals(6, MusicUtils.getNumericValueOfKey("D♯ Minor"));
+        assertEquals(7, MusicUtils.getNumericValueOfKey("A♯ Minor"));
+
+        assertThrowsExactly(ValueException.class, () -> MusicUtils.getNumericValueOfKey("Zb Super"));
     }
 
     @Test
@@ -116,5 +156,21 @@ class MusicUtilsTest {
         assertThrowsExactly(FormatException.class, () -> MusicUtils.parseTimeSignature("abc/def"));
         assertThrowsExactly(FormatException.class, () -> MusicUtils.parseTimeSignature("12/c"));
         assertThrowsExactly(FormatException.class, () -> MusicUtils.parseTimeSignature("ab/3"));
+    }
+
+    @Test
+    void parseKeySignature() {
+        assertEquals(new Pair<>("C", "Major"), MusicUtils.parseKeySignature("C Major"));
+        assertEquals(new Pair<>("A♯", "Minor"), MusicUtils.parseKeySignature("A♯ Minor"));
+        assertEquals(new Pair<>("D♭", "Minor"), MusicUtils.parseKeySignature("Db Minor"));
+
+        assertThrowsExactly(FormatException.class, () -> MusicUtils.parseKeySignature("A"));
+        assertThrowsExactly(FormatException.class, () -> MusicUtils.parseKeySignature("K Major"));
+        assertThrowsExactly(FormatException.class, () -> MusicUtils.parseKeySignature("Ck Minor"));
+        assertThrowsExactly(FormatException.class, () -> MusicUtils.parseKeySignature("Gb Something"));
+        assertThrowsExactly(FormatException.class, () -> MusicUtils.parseKeySignature("C minor"));  // Mode not capitalised
+        assertThrowsExactly(FormatException.class, () -> MusicUtils.parseKeySignature("F# major"));  // Mode not capitalised
+        assertThrowsExactly(FormatException.class, () -> MusicUtils.parseKeySignature("G#### Minor"));
+        assertThrowsExactly(FormatException.class, () -> MusicUtils.parseKeySignature("Abbb Major"));
     }
 }
