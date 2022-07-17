@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-07-16
+ * Updated on 2022-07-17
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -1339,7 +1339,7 @@ public class TranscriptionViewController implements Initializable {
 
         // Now write the sequence to the MIDI file
         try {
-            notePlayerSequencer.exportToMIDI(filePath);
+            notePlayerSequencer.exportToMIDI(MusicUtils.TIME_SIGNATURES[timeSignatureIndex], musicKey, filePath);
             MyLogger.log(
                     Level.FINE,
                     "Exported notes to '" + filePath + "'.",

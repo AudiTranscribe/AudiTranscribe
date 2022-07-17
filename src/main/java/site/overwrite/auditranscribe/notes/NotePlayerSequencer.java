@@ -198,16 +198,15 @@ public class NotePlayerSequencer {
     /**
      * Method that writes the MIDI sequence to a MIDI file.
      *
+     * @param timeSignature  Time signature string (e.g. <code>6/8</code>, <code>3/4</code>).
+     * @param key            Music key of the piece.
      * @param outputFilePath <b>Absolute</b> path to the output MIDI file.
      * @throws IOException If an IO exception occurs.
      */
-    public void exportToMIDI(String outputFilePath) throws IOException {
-        // Todo: set time and key signature
-
-        // Set tempo
+    public void exportToMIDI(String timeSignature, String key, String outputFilePath) throws IOException {
+        setTimeSignatureOfNotePlayer(timeSignature);
+        setKeySignatureOfNotePlayer(key);
         setTempoOfNotePlayer((float) bpm);
-
-        // Set instrument
         setInstrumentOfNotePlayer(instrumentNum);
 
         // Write to file
@@ -359,10 +358,7 @@ public class NotePlayerSequencer {
      * clocks, and that there are eight 32nd notes per beat.<br>
      * This method also assumes that the <code>denominator</code> is a perfect power of 2.
      *
-     * @param numerator   Numerator of the time signature. For example, in 6/8 time,
-     *                    <code>numerator</code> will be <code>6</code>.
-     * @param denominator Denominator of the time signature. For example, in 6/8 time,
-     *                    <code>denominator</code> will be <code>8</code>.
+     * @param timeSignature Time signature string (e.g. <code>6/8</code>, <code>3/4</code>).
      * @throws ValueException If: <ul>
      *                        <li>
      *                        Either the <code>numerator</code> or <code>denominator</code> does not
@@ -373,7 +369,12 @@ public class NotePlayerSequencer {
      *                        </li>
      *                        </ul>
      */
-    private void setTimeSignatureOfNotePlayer(int numerator, int denominator) {
+    private void setTimeSignatureOfNotePlayer(String timeSignature) {
+        // Parse the time signature
+        Pair<Integer, Integer> numeratorAndDenominator = MusicUtils.parseTimeSignature(timeSignature);
+        int numerator = numeratorAndDenominator.getValue0();
+        int denominator = numeratorAndDenominator.getValue1();
+
         // Check if the numerator and denominator values are valid
         if (!(numerator >= 0 && numerator <= 255 && denominator >= 0 && denominator <= 255))
             throw new ValueException("Numerator and denominator must be in the interval [0, 255]");
