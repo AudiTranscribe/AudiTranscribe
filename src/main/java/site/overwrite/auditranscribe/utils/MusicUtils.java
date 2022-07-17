@@ -2,17 +2,23 @@
  * MusicUtils.java
  *
  * Created on 2022-06-11
- * Updated on 2022-06-28
+ * Updated on 2022-07-17
  *
  * Description: Musical utility methods.
  */
 
 package site.overwrite.auditranscribe.utils;
 
+import org.javatuples.Pair;
+import site.overwrite.auditranscribe.exceptions.generic.FormatException;
+import site.overwrite.auditranscribe.exceptions.generic.ValueException;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.util.Map.entry;
 
@@ -56,8 +62,9 @@ public final class MusicUtils {
      *
      * @param key Music key, with both the key and the mode.
      * @return A <code>HashSet</code> object containing integer <b>offsets</b> from C (i.e. number
-     * of notes above the C key). Each integer in the returned  is the modulo 12 of a note number
+     * of notes above the C key). Each integer in the returned is the modulo 12 of a note number
      * that is in the key.
+     * @throws ValueException If the provided key is invalid.
      */
     public static HashSet<Integer> getNotesInKey(String key) {
         // Fancify the key
@@ -66,7 +73,7 @@ public final class MusicUtils {
         // Get the note offsets and place them into an array (for now)
         Integer[] noteOffsets = switch (keyFancified) {  // See the keys inside each musical scale
             // Major Scales
-            default -> new Integer[]{0, 2, 4, 5, 7, 9, 11};  // Default is C Major
+            case "C Major" -> new Integer[]{0, 2, 4, 5, 7, 9, 11};  // Default is C Major
             case "G Major" -> new Integer[]{7, 9, 11, 0, 2, 4, 6};
             case "D Major" -> new Integer[]{2, 4, 6, 7, 9, 11, 1};
             case "A Major" -> new Integer[]{9, 11, 1, 2, 4, 6, 8};
@@ -95,10 +102,46 @@ public final class MusicUtils {
             case "B♭ Minor" -> new Integer[]{10, 0, 1, 3, 5, 6, 8};
             case "E♭ Minor" -> new Integer[]{3, 5, 6, 8, 10, 11, 1};
             case "A♭ Minor" -> new Integer[]{8, 10, 11, 1, 3, 4, 6};
+
+            // Default case: throw value exception
+            default -> throw new ValueException("Invalid key '" + keyFancified + "'");
         };
 
         // Convert to a hash set and return
         return new HashSet<>(Arrays.asList(noteOffsets));
+    }
+
+    /**
+     * Method that determines the numeric value of the provided key.<br>
+     * The calculation of the numeric value follows
+     * <a href="https://www.musictheory.net/lessons/25">https://www.musictheory.net/lessons/25</a>.
+     *
+     * @param key Music key, with both the key and the mode.
+     * @return An integer, representing the key's numeric value.
+     */
+    public static int getNumericValueOfKey(String key) {
+        // Fancify the key
+        String keyFancified = fancifyMusicString(key);
+
+        // Get the note offsets and place them into an array (for now)
+        return switch (keyFancified) {
+            case "C♭ Major", "A♭ Minor" -> -7;
+            case "G♭ Major", "E♭ Minor" -> -6;
+            case "D♭ Major", "B♭ Minor" -> -5;
+            case "A♭ Major", "F Minor" -> -4;
+            case "E♭ Major", "C Minor" -> -3;
+            case "B♭ Major", "G Minor" -> -2;
+            case "F Major", "D Minor" -> -1;
+            case "C Major", "A Minor" -> 0;
+            case "G Major", "E Minor" -> 1;
+            case "D Major", "B Minor" -> 2;
+            case "A Major", "F♯ Minor" -> 3;
+            case "E Major", "C♯ Minor" -> 4;
+            case "B Major", "G♯ Minor" -> 5;
+            case "F♯ Major", "D♯ Minor" -> 6;
+            case "C♯ Major", "A♯ Minor" -> 7;
+            default -> throw new ValueException("Invalid key '" + keyFancified + "'");
+        };
     }
 
     /**
@@ -130,5 +173,66 @@ public final class MusicUtils {
      */
     public static String fancifyMusicString(String string) {
         return string.replace('#', '♯').replace('b', '♭');
+    }
+
+    /**
+     * Method that parses a time signature string.
+     *
+     * @param timeSignature The time signature string.<br>
+     *                      The time signature string is assumed to be of the form <code>N/D</code>,
+     *                      where <code>N</code> is the numerator of the time signature and
+     *                      <code>D</code> is the denominator.
+     * @return A pair. First value is the parsed numerator of the time signature, and the second
+     * value is the parsed denominator of the time signature.
+     * @throws FormatException If the time signature format is incorrect.
+     */
+    public static Pair<Integer, Integer> parseTimeSignature(String timeSignature) {
+        // Define time signature pattern
+        final Pattern TIME_SIGNATURE_PATTERN = Pattern.compile("^(?<numerator>\\d+)/(?<denominator>\\d+)$");
+
+        // Attempt to match pattern to the provided string
+        Matcher matcher = TIME_SIGNATURE_PATTERN.matcher(timeSignature);
+        if (!matcher.find()) {
+            throw new FormatException("Improper time signature format '" + timeSignature + "'");
+        }
+
+        // Get the matched groups
+        String numeratorStr = matcher.group("numerator");
+        String denominatorStr = matcher.group("denominator");
+
+        // Attempt to convert to integers
+        int numerator = Integer.parseInt(numeratorStr);
+        int denominator = Integer.parseInt(denominatorStr);
+
+        // Return as a pair
+        return new Pair<>(numerator, denominator);
+    }
+
+    /**
+     * Method that parses a key string.
+     *
+     * @param key Music key, with both the key and the mode.
+     * @return A pair. The first value is the key/scale of the key (e.g. C, A♯, G♭) and the second
+     * value is the mode (i.e. either <code>Major</code> or <code>Minor</code>).
+     */
+    public static Pair<String, String> parseKeySignature(String key) {
+        // Define key pattern
+        final Pattern KEY_PATTERN = Pattern.compile("^(?<key>[A-Ga-g][#♯b!♭]?) (?<mode>Major|Minor)$");
+
+        // Fancify key first
+        key = fancifyMusicString(key);
+
+        // Attempt to match pattern to the provided string
+        Matcher matcher = KEY_PATTERN.matcher(key);
+        if (!matcher.find()) {
+            throw new FormatException("Improper key format '" + key + "'");
+        }
+
+        // Get the matched groups
+        String keyPart = matcher.group("key");
+        String modePart = matcher.group("mode");
+
+        // Return as a pair
+        return new Pair<>(keyPart, modePart);
     }
 }

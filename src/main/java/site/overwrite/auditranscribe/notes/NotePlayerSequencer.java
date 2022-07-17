@@ -2,7 +2,7 @@
  * NotePlayerSequencer.java
  *
  * Created on 2022-06-09
- * Updated on 2022-06-26
+ * Updated on 2022-07-17
  *
  * Description: Class that handles the playing of notes as a MIDI sequence.
  */
@@ -14,9 +14,13 @@ import org.javatuples.Triplet;
 import site.overwrite.auditranscribe.exceptions.generic.LengthException;
 import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.misc.MyLogger;
+import site.overwrite.auditranscribe.utils.MathUtils;
+import site.overwrite.auditranscribe.utils.MusicUtils;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 import javax.sound.midi.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -25,7 +29,8 @@ import java.util.logging.Level;
  */
 public class NotePlayerSequencer {
     // Constants
-    public static int TICKS_PER_QUARTER = 100_000;  // Number of ticks per quarter note
+    public static int TICKS_PER_QUARTER = 10_000;  // Number of ticks per quarter note
+    public static int MIDI_FILE_TYPE = 1;  // See https://tinyurl.com/2m9tcvzb for MIDI file types
 
     // Attributes
     private Track track;
@@ -191,6 +196,24 @@ public class NotePlayerSequencer {
     }
 
     /**
+     * Method that writes the MIDI sequence to a MIDI file.
+     *
+     * @param timeSignature  Time signature string (e.g. <code>6/8</code>, <code>3/4</code>).
+     * @param key            Music key of the piece.
+     * @param outputFilePath <b>Absolute</b> path to the output MIDI file.
+     * @throws IOException If an IO exception occurs.
+     */
+    public void exportToMIDI(String timeSignature, String key, String outputFilePath) throws IOException {
+        setTimeSignatureOfNotePlayer(timeSignature);
+        setKeySignatureOfNotePlayer(key);
+        setTempoOfNotePlayer((float) bpm);
+        setInstrumentOfNotePlayer(instrumentNum);
+
+        // Write to file
+        MidiSystem.write(sequence, MIDI_FILE_TYPE, new File(outputFilePath));
+    }
+
+    /**
      * Start playback of the MIDI sequence.
      *
      * @param currTime The time to start playback at, <b>in seconds</b>.
@@ -203,7 +226,7 @@ public class NotePlayerSequencer {
         }
 
         // Set tempo
-        sequencer.setTempoInBPM((float) bpm);
+        setTempoOfNotePlayer((float) bpm);
 
         // Set instrument
         setInstrumentOfNotePlayer(instrumentNum);
@@ -327,6 +350,119 @@ public class NotePlayerSequencer {
         // Remove the events from the track
         track.remove(onEvent);
         track.remove(offEvent);
+    }
+
+    /**
+     * Helper method that sets the time signature of the note player (and the track).<br>
+     * The time signature set is <em>assumed</em> to make the metronome click once every 24 MIDI
+     * clocks, and that there are eight 32nd notes per beat.<br>
+     * This method also assumes that the <code>denominator</code> is a perfect power of 2.
+     *
+     * @param timeSignature Time signature string (e.g. <code>6/8</code>, <code>3/4</code>).
+     * @throws ValueException If: <ul>
+     *                        <li>
+     *                        Either the <code>numerator</code> or <code>denominator</code> does not
+     *                        lie in the interval [0, 255].
+     *                        </li>
+     *                        <li>
+     *                        The <code>denominator</code> is not a power of 2.
+     *                        </li>
+     *                        </ul>
+     */
+    private void setTimeSignatureOfNotePlayer(String timeSignature) {
+        // Parse the time signature
+        Pair<Integer, Integer> numeratorAndDenominator = MusicUtils.parseTimeSignature(timeSignature);
+        int numerator = numeratorAndDenominator.getValue0();
+        int denominator = numeratorAndDenominator.getValue1();
+
+        // Check if the numerator and denominator values are valid
+        if (!(numerator >= 0 && numerator <= 255 && denominator >= 0 && denominator <= 255))
+            throw new ValueException("Numerator and denominator must be in the interval [0, 255]");
+
+        // Check if the denominator is a power of 2
+        if (!MathUtils.isPowerOf2(denominator)) throw new ValueException("Denominator must be a power of 2");
+
+        // Create the time signature byte array
+        byte[] timeSignatureByteArray = {
+                (byte) numerator,
+                (byte) ((int) MathUtils.log2(denominator)),
+                0x18,  // Metronome click once every 24 = 0x18 MIDI clocks
+                0x08   // Eight 32nd notes per beat
+        };
+
+        // Create the meta message
+        MetaMessage metaMessage = new MetaMessage();
+        try {
+            metaMessage.setMessage(0x58, timeSignatureByteArray, 4);  // 0x58 is time signature message
+        } catch (InvalidMidiDataException ignored) {
+        }
+
+        // Add to track
+        track.add(new MidiEvent(metaMessage, 0));
+    }
+
+    /**
+     * Helper method that sets the key signature of the note player (and the track).
+     *
+     * @param key The key to set.
+     */
+    private void setKeySignatureOfNotePlayer(String key) {
+        // Get the key and mode of the provided key
+        Pair<String, String> keyAndMode = MusicUtils.parseKeySignature(key);
+        String modePart = keyAndMode.getValue1();
+
+        // Get the numeric value of the key
+        int numericValue = MusicUtils.getNumericValueOfKey(key);
+
+        // Create the key signature byte array
+        byte[] keySignatureByteArray = {
+                (byte) numericValue,
+                (byte) (Objects.equals(modePart, "Major") ? 0x00 : 0x01)
+        };
+
+        // Create the meta message
+        MetaMessage metaMessage = new MetaMessage();
+        try {
+            metaMessage.setMessage(0x59, keySignatureByteArray, 2);  // 0x59 is key signature message
+        } catch (InvalidMidiDataException ignored) {
+        }
+
+        // Add to track
+        track.add(new MidiEvent(metaMessage, 0));
+    }
+
+    /**
+     * Helper method that sets the BPM of the note player (and the track).
+     *
+     * @param bpm Beats per minute, as a <b>float</b> (and not a double).
+     */
+    private void setTempoOfNotePlayer(float bpm) {
+        // Get the number of microseconds per beat
+        long microsecondsPerBeat = (long) (6e7 / bpm);  // 6e7 microseconds per minute
+
+        // Create the tempo byte array
+        byte[] tempoByteArray = new byte[]{0, 0, 0};
+
+        for (int i = 0; i < 3; i++) {
+            // Calculate bit shift amount
+            int bitShift = (3 - (i + 1)) * 8;
+
+            // Compute byte to place in array
+            tempoByteArray[i] = (byte) (microsecondsPerBeat >> bitShift);
+        }
+
+        // Create the meta message
+        MetaMessage metaMessage = new MetaMessage();
+        try {
+            metaMessage.setMessage(0x51, tempoByteArray, 3);  // 0x51 is tempo message
+        } catch (InvalidMidiDataException ignored) {
+        }
+
+        // Add to track
+        track.add(new MidiEvent(metaMessage, 0));
+
+        // Set sequencer BPM
+        sequencer.setTempoInBPM(bpm);
     }
 
     /**

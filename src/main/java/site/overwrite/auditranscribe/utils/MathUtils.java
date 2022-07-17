@@ -2,7 +2,7 @@
  * MathUtils.java
  *
  * Created on 2022-02-15
- * Updated on 2022-06-29
+ * Updated on 2022-07-17
  *
  * Description: Mathematical utility methods.
  */
@@ -226,7 +226,7 @@ public final class MathUtils {
         int[][] output = new int[numElem][k];
 
         // Get all possible elements for the 2nd to nth elements
-        int[][] tempSelfProduct = selfProduct(n, k-1);
+        int[][] tempSelfProduct = selfProduct(n, k - 1);
 
         // Check how many elements are to be appended
         if (tempSelfProduct.length == 0) {
@@ -258,10 +258,24 @@ public final class MathUtils {
      * Method to check if the double <code>x</code> is an integer.
      *
      * @param x The number that should be tested.
-     * @return Boolean whether the double is an integer or not. True if yes and false if no.
+     * @return A boolean, <code>true</code> if the double is an integer and <code>false</code>
+     * otherwise.
      */
     public static boolean isInteger(double x) {
         return x % 1 == 0;
+    }
+
+    /**
+     * Method to check if the integer <code>x</code> is a power of 2.<br>
+     * This assumes that <code>x</code> is positive.
+     *
+     * @param x Integer to check.
+     * @return A boolean, <code>true</code> if the integer is a power of 2 and <code>false</code>
+     * otherwise.
+     */
+    public static boolean isPowerOf2(int x) {
+        if (x <= 0) throw new ValueException("The provided integer must be positive");
+        return (x & (x - 1)) == 0;
     }
 
     // Misc methods
