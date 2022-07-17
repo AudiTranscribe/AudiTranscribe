@@ -2,17 +2,22 @@
  * MusicUtils.java
  *
  * Created on 2022-06-11
- * Updated on 2022-06-28
+ * Updated on 2022-07-17
  *
  * Description: Musical utility methods.
  */
 
 package site.overwrite.auditranscribe.utils;
 
+import org.javatuples.Pair;
+import site.overwrite.auditranscribe.exceptions.generic.FormatException;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.util.Map.entry;
 
@@ -130,5 +135,38 @@ public final class MusicUtils {
      */
     public static String fancifyMusicString(String string) {
         return string.replace('#', '♯').replace('b', '♭');
+    }
+
+    /**
+     * Method that parses a time signature string.
+     *
+     * @param timeSignature The time signature string.<br>
+     *                      The time signature string is assumed to be of the form <code>N/D</code>,
+     *                      where <code>N</code> is the numerator of the time signature and
+     *                      <code>D</code> is the denominator.
+     * @return A pair. First value is the parsed numerator of the time signature, and the second
+     * value is the parsed denominator of the time signature.
+     * @throws FormatException If the time signature format is incorrect.
+     */
+    public static Pair<Integer, Integer> parseTimeSignature(String timeSignature) {
+        // Define time signature pattern
+        final Pattern TIME_SIGNATURE_PATTERN = Pattern.compile("^(?<numerator>\\d+)/(?<denominator>\\d+)$");
+
+        // Attempt to match pattern to the provided string
+        Matcher matcher = TIME_SIGNATURE_PATTERN.matcher(timeSignature);
+        if (!matcher.find()) {
+            throw new FormatException("Improper time signature format '" + timeSignature + "'");
+        }
+
+        // Get the matched groups
+        String numeratorStr = matcher.group("numerator");
+        String denominatorStr = matcher.group("denominator");
+
+        // Attempt to convert to integers
+        int numerator = Integer.parseInt(numeratorStr);
+        int denominator = Integer.parseInt(denominatorStr);
+
+        // Return as a pair
+        return new Pair<>(numerator, denominator);
     }
 }

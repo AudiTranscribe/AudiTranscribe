@@ -2,14 +2,16 @@
  * MusicUtilsTest.java
  *
  * Created on 2022-06-11
- * Updated on 2022-06-28
+ * Updated on 2022-07-17
  *
  * Description: Test `MusicUtils.java`.
  */
 
 package site.overwrite.auditranscribe.utils;
 
+import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;
+import site.overwrite.auditranscribe.exceptions.generic.FormatException;
 
 import java.util.HashSet;
 import java.util.List;
@@ -100,5 +102,19 @@ class MusicUtilsTest {
         assertEquals("C♭ Major", MusicUtils.fancifyMusicString("Cb Major"));
         assertEquals("C♯ Minor", MusicUtils.fancifyMusicString("C♯ Minor"));
         assertEquals("C♭ Major", MusicUtils.fancifyMusicString("C♭ Major"));
+    }
+
+    @Test
+    void parseTimeSignature() {
+        assertEquals(new Pair<>(4, 4), MusicUtils.parseTimeSignature("4/4"));
+        assertEquals(new Pair<>(6, 8), MusicUtils.parseTimeSignature("6/8"));
+        assertEquals(new Pair<>(12, 34), MusicUtils.parseTimeSignature("12/34"));  // Technically not valid, but format correct
+
+        assertThrowsExactly(FormatException.class, () -> MusicUtils.parseTimeSignature("123"));
+        assertThrowsExactly(FormatException.class, () -> MusicUtils.parseTimeSignature("123/"));
+        assertThrowsExactly(FormatException.class, () -> MusicUtils.parseTimeSignature("/123"));
+        assertThrowsExactly(FormatException.class, () -> MusicUtils.parseTimeSignature("abc/def"));
+        assertThrowsExactly(FormatException.class, () -> MusicUtils.parseTimeSignature("12/c"));
+        assertThrowsExactly(FormatException.class, () -> MusicUtils.parseTimeSignature("ab/3"));
     }
 }
