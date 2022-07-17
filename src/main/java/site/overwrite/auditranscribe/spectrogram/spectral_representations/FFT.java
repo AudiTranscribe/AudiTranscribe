@@ -2,7 +2,7 @@
  * FFT.java
  *
  * Created on 2022-02-12
- * Updated on 2022-06-28
+ * Updated on 2022-07-17
  *
  * Description: Class that implements Fast Fourier Transform (FFT) algorithms.
  *
@@ -15,6 +15,7 @@ package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
 import site.overwrite.auditranscribe.exceptions.generic.LengthException;
 import site.overwrite.auditranscribe.misc.Complex;
+import site.overwrite.auditranscribe.utils.MathUtils;
 import site.overwrite.auditranscribe.utils.MiscUtils;
 
 import java.util.Arrays;
@@ -45,7 +46,7 @@ public final class FFT {
         // Handle different cases of the length
         if (length == 0) {
             return new Complex[0];
-        } else if ((length & (length - 1)) == 0) {  // Is power of 2
+        } else if (MathUtils.isPowerOf2(length)) {
             return fftRadix2(x, length);
         } else {  // Is not power of 2
             return fftBluestein(x, length);

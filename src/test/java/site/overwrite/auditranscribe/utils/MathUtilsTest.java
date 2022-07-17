@@ -2,7 +2,7 @@
  * MathUtilsTest.java
  *
  * Created on 2022-03-12
- * Updated on 2022-06-29
+ * Updated on 2022-07-17
  *
  * Description: Test `MathUtils.java`.
  */
@@ -155,6 +155,22 @@ class MathUtilsTest {
     void isInteger() {
         assertTrue(MathUtils.isInteger(3.));
         assertFalse(MathUtils.isInteger(123.456));
+    }
+
+    @Test
+    void isPowerOf2() {
+        assertTrue(MathUtils.isPowerOf2(1));
+        assertTrue(MathUtils.isPowerOf2(4));
+        assertTrue(MathUtils.isPowerOf2(2048));
+        assertTrue(MathUtils.isPowerOf2(65536));
+
+        assertFalse(MathUtils.isPowerOf2(3));
+        assertFalse(MathUtils.isPowerOf2(5));
+        assertFalse(MathUtils.isPowerOf2(10012));
+        assertFalse(MathUtils.isPowerOf2(123456));
+
+        assertThrowsExactly(ValueException.class, () -> MathUtils.isPowerOf2(0));
+        assertThrowsExactly(ValueException.class, () -> MathUtils.isPowerOf2(-4));
     }
 
     // Misc methods
