@@ -31,7 +31,7 @@
          <children>
             <ImageView fitHeight="400.0" fitWidth="450.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../../../setup-wizard-files/images/Breakfast-Spectrogram.jpg" />
+                  <Image url="@../../../setup-wizard-files/images/breakfast-spectrogram.jpg" />
                </image>
             </ImageView>
          </children>
