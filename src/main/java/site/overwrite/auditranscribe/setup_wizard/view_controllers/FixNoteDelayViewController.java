@@ -21,15 +21,21 @@ import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
 import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.misc.MyLogger;
+import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
+import site.overwrite.auditranscribe.notes.MIDIInstrument;
+import site.overwrite.auditranscribe.notes.NotePlayerSequencer;
 import site.overwrite.auditranscribe.plotting.PlottingStuffHandler;
+import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 
 /**
  * View controller that helps the user fix any note playback delays.
@@ -38,10 +44,25 @@ public class FixNoteDelayViewController implements Initializable {
     // Constants
     private final String AUDIO_FILE = IOMethods.joinPaths("setup-wizard-files", "audio", "Breakfast.wav");
 
+    private final double[] NOTE_ONSET_TIMES = {
+            0.5, 0.75, 1, 1.25, 1.5, 3,
+            3.5, 3.75, 4, 4.25, 4.5
+    };
+    private final double[] NOTE_DURATIONS = {
+            0.25, 0.25, 0.25, 0.25, 1.5, 0.5,
+            0.25, 0.25, 0.25, 0.25, 2
+    };
+    private final String[] NOTE_STRINGS = {
+            "C#6", "B#5", "G#5", "E#5", "D#5", "B#4",
+            "C#5", "B#4", "G#5", "F#5", "E#5"
+    };
+
     // Attributes
     private boolean isPlaying = false;
 
     private Audio audio;
+    private NotePlayerSequencer sequencer;
+
     private Line playheadLine;
 
     // FXML elements
@@ -70,6 +91,9 @@ public class FixNoteDelayViewController implements Initializable {
         } catch (UnsupportedAudioFileException | IOException | AudioTooLongException e) {
             throw new RuntimeException(e);
         }
+
+        // Create a note player sequencer for note playback
+        setupNotePlayerSequencer();
 
         // Add playhead line to the spectrogram pane
         playheadLine = PlottingStuffHandler.createPlayheadLine(spectrogramPane.getPrefHeight());  // Pref height should be accurate
@@ -109,5 +133,57 @@ public class FixNoteDelayViewController implements Initializable {
      */
     public double getNotePlayingDelayOffset() {
         return notePlayingDelayOffsetSpinner.getValue();
+    }
+
+    // Private methods
+
+    /**
+     * Helper method that sets up the note player sequencer.
+     */
+    private void setupNotePlayerSequencer() {
+        // Convert notes to note numbers
+        int[] noteNumbers = new int[NOTE_STRINGS.length];
+        for (int i = 0; i < NOTE_STRINGS.length; i++) {
+            noteNumbers[i] = UnitConversionUtils.noteToNoteNumber(NOTE_STRINGS[i]);
+        }
+
+        // Create the sequencer
+        sequencer = new NotePlayerSequencer();
+
+        // Check if the sequencer is available
+        if (sequencer.isSequencerAvailable()) {
+            // Set velocities
+            sequencer.setOnVelocity(94);
+            sequencer.setOffVelocity(64);
+
+            // Set BPM
+            sequencer.setBPM(60);
+
+            // Set instrument
+            sequencer.setInstrument(MIDIInstrument.PIANO);
+
+            // Set the notes
+            sequencer.setNotesOnTrack(NOTE_ONSET_TIMES, NOTE_DURATIONS, noteNumbers);
+
+            // Todo: remove
+            // Play the notes
+            sequencer.play(0);
+
+            while (true) {
+                // Exit the program when sequencer has stopped playing
+                if (!sequencer.getSequencer().isRunning()) {
+                    sequencer.stop();
+                    break;
+                }
+            }
+
+        } else {
+            Popups.showWarningAlert(
+                    "Sequencer not available",
+                    "The note player sequencer is not available on your system. This part of the setup " +
+                            "wizard will not function. Simply skip to the next part."
+            );
+            MyLogger.log(Level.WARNING, "Sequencer not available", FixNoteDelayViewController.class.getName());
+        }
     }
 }
