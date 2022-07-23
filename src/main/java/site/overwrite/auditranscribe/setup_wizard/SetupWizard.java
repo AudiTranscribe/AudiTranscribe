@@ -2,7 +2,7 @@
  * SetupWizard.java
  *
  * Created on 2022-06-19
- * Updated on 2022-07-10
+ * Updated on 2022-07-23
  *
  * Description: Class that handles the setup wizard.
  */
@@ -120,12 +120,16 @@ public class SetupWizard {
             }
         }
 
+        // Fix note playback delay
+        double notePlaybackDelay = showFixNoteDelayView();
+
         // Report that the setup process has completed
         showFinishSetupView();
 
         // Update settings file data
         settingsFile.data.ffmpegInstallationPath = ffmpegPath;
         settingsFile.data.isSetupCompleted = true;
+        settingsFile.data.notePlayingDelayOffset = notePlaybackDelay;
         settingsFile.saveFile();
     }
 
@@ -315,6 +319,37 @@ public class SetupWizard {
         } catch (IOException ignored) {
         }
         return null;
+    }
+
+    /**
+     * Helper method that shows the view that helps the user fix any note playback delays.
+     *
+     * @return A double, representing the note playing delay value that the user has set.
+     */
+    private double showFixNoteDelayView() {
+        try {
+            // Load the FXML file into the scene
+            FXMLLoader fxmlLoader = new FXMLLoader(getSetupWizardView("fix-note-delay-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+
+            // Get the view controller
+            FixNoteDelayViewController controller = fxmlLoader.getController();
+
+            // Set the theme on the scene
+            controller.setThemeOnScene(theme);
+
+            // Set the stage's scene
+            stage.setScene(scene);
+
+            // Show the stage
+            stage.showAndWait();
+
+            // Return the value of the note playing delay offset
+            return controller.getNotePlayingDelayOffset();
+
+        } catch (IOException ignored) {
+        }
+        return 0;
     }
 
     /**

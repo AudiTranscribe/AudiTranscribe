@@ -2,7 +2,7 @@
  * FinishSetupViewController.java
  *
  * Created on 2022-06-19
- * Updated on 2022-07-07
+ * Updated on 2022-07-23
  *
  * Description: View controller for the view that signals the end of the setup process.
  */
@@ -31,7 +31,7 @@ public class FinishSetupViewController implements Initializable {
     @FXML
     private Button closeButton;
 
-    // Initialize method
+    // Initialization method
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         closeButton.setOnAction(event -> ((Stage) rootPane.getScene().getWindow()).close());
