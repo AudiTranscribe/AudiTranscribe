@@ -1963,10 +1963,6 @@ public class TranscriptionViewController implements Initializable {
         // Update the `hasUnsavedChanges` flag
         hasUnsavedChanges = true;
 
-        // Disable note volume slider and note muting button if playing
-        notesVolumeButton.setDisable(!isPaused);
-        notesVolumeSlider.setDisable(!isPaused);
-
         // Handle note rectangle operations when toggle paused
         if (isPaused && !areNotesMuted) {  // We use `isPaused` here because we will toggle it later
             // Set up the note player sequencer by setting the notes on it
@@ -1989,6 +1985,10 @@ public class TranscriptionViewController implements Initializable {
         if (!isPaused && !areNotesMuted) {  // We use `!isPaused` here because it was toggled already
             notePlayerSequencer.play(currTime + settingsFile.data.notePlayingDelayOffset);
         }
+
+        // Disable note volume slider and note muting button if playing
+        notesVolumeButton.setDisable(!isPaused);
+        notesVolumeSlider.setDisable(!isPaused);
 
         MyLogger.log(
                 Level.FINE,
