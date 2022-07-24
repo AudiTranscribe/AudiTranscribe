@@ -2,13 +2,14 @@
  * FixNoteDelayViewController.java
  *
  * Created on 2022-07-21
- * Updated on 2022-07-23
+ * Updated on 2022-07-24
  *
  * Description: View controller that helps the user fix any note playback delays.
  */
 
 package site.overwrite.auditranscribe.setup_wizard.view_controllers;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -33,8 +34,12 @@ import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
+import java.io.InvalidObjectException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 /**
@@ -42,7 +47,8 @@ import java.util.logging.Level;
  */
 public class FixNoteDelayViewController implements Initializable {
     // Constants
-    private final String AUDIO_FILE = IOMethods.joinPaths("setup-wizard-files", "audio", "Breakfast.wav");
+//    private final String AUDIO_FILE = IOMethods.joinPaths("setup-wizard-files", "audio", "Breakfast.wav");
+    private final String AUDIO_FILE = IOMethods.joinPaths("setup-wizard-files", "audio", "Breakfast-Alt.wav");
 
     private final double[] NOTE_ONSET_TIMES = {
             0.5, 0.75, 1, 1.25, 1.5, 3,
@@ -56,9 +62,11 @@ public class FixNoteDelayViewController implements Initializable {
             "C#6", "B#5", "G#5", "E#5", "D#5", "B#4",
             "C#5", "B#4", "G#5", "F#5", "E#5"
     };
+    private final MIDIInstrument INSTRUMENT = MIDIInstrument.PIANO;
 
     // Attributes
     private boolean isPlaying = false;
+    private double duration;
 
     private Audio audio;
     private NotePlayerSequencer sequencer;
@@ -81,6 +89,10 @@ public class FixNoteDelayViewController implements Initializable {
     // Initialization method
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        // Get the width and height of the spectrogram
+        double width = spectrogramPane.getPrefWidth();
+        double height = spectrogramPane.getPrefHeight();
+
         // Create the audio object for playback
         try {
             audio = new Audio(
@@ -96,7 +108,7 @@ public class FixNoteDelayViewController implements Initializable {
         setupNotePlayerSequencer();
 
         // Add playhead line to the spectrogram pane
-        playheadLine = PlottingStuffHandler.createPlayheadLine(spectrogramPane.getPrefHeight());  // Pref height should be accurate
+        playheadLine = PlottingStuffHandler.createPlayheadLine(height);
         spectrogramPane.getChildren().add(playheadLine);
 
         // Set spinner factory and methods
@@ -106,10 +118,61 @@ public class FixNoteDelayViewController implements Initializable {
 
         // Add methods on buttons
         togglePlaybackButton.setOnAction((event) -> {
-            // Todo: add
+            // Update duration attribute
+            // (We do it here so that audio is initialized first)
+            duration = audio.getDuration();
+
+            if (isPlaying) {
+                // By pressing the button we want to stop the audio
+                stopAudio();
+
+                // Update text on the button
+                togglePlaybackButton.setText("Play Test Audio");
+            } else {
+                // By pressing the button we want to play the audio
+                playAudio();
+
+                // Update text on the button
+                togglePlaybackButton.setText("Stop Test Audio");
+            }
+
+            // Toggle the `isPlaying` flag
+            isPlaying = !isPlaying;
         });
 
         setNotePlaybackDelayButton.setOnAction(event -> ((Stage) rootPane.getScene().getWindow()).close());
+
+        // Set up scheduler to update the playhead line and detect the end of the audio
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(0, runnable -> {
+            Thread thread = Executors.defaultThreadFactory().newThread(runnable);
+            thread.setDaemon(true);  // Make it so that it can shut down gracefully by placing it in background
+            return thread;
+        });
+        scheduler.scheduleAtFixedRate(() -> {
+            // Nothing really changes if the audio is not playing
+            if (isPlaying) {
+                // Get current audio time
+                double currTime;
+                try {
+                    currTime = audio.getCurrAudioTime();
+                } catch (InvalidObjectException e) {
+                    MyLogger.logException(e);
+                    throw new RuntimeException(e);
+                }
+
+                // Update playhead line position
+                double newPosX = currTime / duration * width;
+                PlottingStuffHandler.updatePlayheadLine(playheadLine, newPosX);
+
+                // Check if the current time has exceeded
+                if (currTime >= duration) {
+                    // Stop the audio
+                    stopAudio();
+                    Platform.runLater(() -> togglePlaybackButton.setText("Play Test Audio"));
+                    isPlaying = false;
+                }
+            }
+        }, 0, 50, TimeUnit.MILLISECONDS);
     }
 
     // Public methods
@@ -160,22 +223,14 @@ public class FixNoteDelayViewController implements Initializable {
             sequencer.setBPM(60);
 
             // Set instrument
-            sequencer.setInstrument(MIDIInstrument.PIANO);
+            sequencer.setInstrument(INSTRUMENT);
 
             // Set the notes
             sequencer.setNotesOnTrack(NOTE_ONSET_TIMES, NOTE_DURATIONS, noteNumbers);
 
-            // Todo: remove
-            // Play the notes
+            // Start & Stop the sequencer to correctly set timings
             sequencer.play(0);
-
-            while (true) {
-                // Exit the program when sequencer has stopped playing
-                if (!sequencer.getSequencer().isRunning()) {
-                    sequencer.stop();
-                    break;
-                }
-            }
+            sequencer.stop();
 
         } else {
             Popups.showWarningAlert(
@@ -185,5 +240,46 @@ public class FixNoteDelayViewController implements Initializable {
             );
             MyLogger.log(Level.WARNING, "Sequencer not available", FixNoteDelayViewController.class.getName());
         }
+    }
+
+    /**
+     * Helper method that starts the playback of the audio and the notes.
+     */
+    private void playAudio() {
+        // Get the offset time
+        double offsetTime = notePlayingDelayOffsetSpinner.getValue();
+
+        // Reset the current time for the audio object and the note player sequencer
+        try {
+            audio.setAudioPlaybackTime(0);
+        } catch (InvalidObjectException e) {
+            MyLogger.logException(e);
+            throw new RuntimeException(e);
+        }
+        sequencer.setCurrTime(offsetTime);
+
+        // Play the things
+        try {
+            audio.setPlaybackVolume(0.5);
+            audio.play();
+        } catch (InvalidObjectException e) {
+            MyLogger.logException(e);
+            throw new RuntimeException(e);
+        }
+        sequencer.play(offsetTime);
+    }
+
+    /**
+     * Helper method that stops the playback of the audio and the notes.
+     */
+    private void stopAudio() {
+        try {
+            audio.stop();
+            audio.pause();
+        } catch (InvalidObjectException e) {
+            MyLogger.logException(e);
+            throw new RuntimeException(e);
+        }
+        sequencer.stop();
     }
 }

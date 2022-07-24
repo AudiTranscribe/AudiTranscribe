@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-07-17
+ * Updated on 2022-07-24
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -1570,7 +1570,8 @@ public class TranscriptionViewController implements Initializable {
                         MyLogger.log(
                                 Level.FINE,
                                 "Playback reached end of audio, will start from beginning upon play",
-                                this.getClass().toString());
+                                this.getClass().toString()
+                        );
 
                         // Pause the audio
                         isPaused = togglePaused(false);

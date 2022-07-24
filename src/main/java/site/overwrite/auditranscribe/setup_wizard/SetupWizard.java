@@ -2,7 +2,7 @@
  * SetupWizard.java
  *
  * Created on 2022-06-19
- * Updated on 2022-07-23
+ * Updated on 2022-07-24
  *
  * Description: Class that handles the setup wizard.
  */
@@ -119,6 +119,8 @@ public class SetupWizard {
                 }
             }
         }
+
+        // Todo: add view that confirms that FFmpeg was installed successfully
 
         // Fix note playback delay
         double notePlaybackDelay = showFixNoteDelayView();
