@@ -63,7 +63,7 @@ public class FixNoteDelayViewController implements Initializable {
     };
     private final MIDIInstrument INSTRUMENT = MIDIInstrument.PIANO;
 
-    public static final double OFFSET_OF_OFFSET = 0.05;
+    public static final double OFFSET_OF_OFFSET = 0.1;
 
     // Attributes
     private boolean isPlaying = false;
