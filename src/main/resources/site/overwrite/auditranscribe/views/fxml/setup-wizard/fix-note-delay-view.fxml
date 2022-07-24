@@ -19,7 +19,7 @@
       <URL value="@../../css/light-mode.css" />
    </stylesheets>
    <children>
-      <Label layoutX="30.0" layoutY="30.0" prefHeight="40.0" text="Sometimes, the note playback may be delayed. This part of the setup wizard is to correct this delay." textAlignment="JUSTIFY" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
+      <Label layoutX="30.0" layoutY="30.0" prefHeight="40.0" text="Please adjust the spinner below until the notes of both piano pieces play at approximately the same time." textAlignment="JUSTIFY" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
          <font>
             <Font size="14.0" />
          </font>

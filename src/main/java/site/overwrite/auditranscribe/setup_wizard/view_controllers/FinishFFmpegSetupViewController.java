@@ -1,0 +1,57 @@
+/*
+ * FinisFFmpegSetupViewController.java
+ *
+ * Created on 2022-07-24
+ * Updated on 2022-07-24
+ *
+ * Description: View controller that informs the user that the FFmpeg portion of the setup is
+ *              complete.
+ */
+
+package site.overwrite.auditranscribe.setup_wizard.view_controllers;
+
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
+import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.misc.Theme;
+import site.overwrite.auditranscribe.utils.GUIUtils;
+
+import java.net.URL;
+import java.util.ResourceBundle;
+
+/**
+ * View controller that informs the user that the FFmpeg portion of the setup is complete.
+ */
+public class FinishFFmpegSetupViewController implements Initializable {
+    // FXML Elements
+    @FXML
+    private AnchorPane rootPane;
+
+    @FXML
+    private Button confirmButton;
+
+    // Initialization method
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        // Add button methods
+        confirmButton.setOnAction(event -> ((Stage) rootPane.getScene().getWindow()).close());
+    }
+
+    // Public methods
+
+    /**
+     * Method that sets the scene's theme.
+     *
+     * @param theme Theme to set.
+     */
+    public void setThemeOnScene(Theme theme) {
+        rootPane.getStylesheets().clear();  // Reset the stylesheets first before adding new ones
+
+        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
+        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/" + theme.cssFile));
+    }
+}

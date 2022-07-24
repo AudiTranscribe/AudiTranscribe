@@ -120,9 +120,10 @@ public class SetupWizard {
             }
         }
 
-        // Todo: add view that confirms that FFmpeg was installed successfully
+        // Show view that confirms that FFmpeg was installed successfully
+        showFinishFFmpegSetupView();
 
-        // Fix note playback delay
+        // Show view that helps fix the note playback delay
         double notePlaybackDelay = showFixNoteDelayView();
 
         // Report that the setup process has completed
@@ -321,6 +322,32 @@ public class SetupWizard {
         } catch (IOException ignored) {
         }
         return null;
+    }
+
+    /**
+     * Helper method that shows the view that informs the user that the FFmpeg portion of the setup
+     * is complete.
+     */
+    private void showFinishFFmpegSetupView() {
+        try {
+            // Load the FXML file into the scene
+            FXMLLoader fxmlLoader = new FXMLLoader(getSetupWizardView("finish-ffmpeg-setup-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+
+            // Get the view controller
+            FinishFFmpegSetupViewController controller = fxmlLoader.getController();
+
+            // Set the theme on the scene
+            controller.setThemeOnScene(theme);
+
+            // Set the stage's scene
+            stage.setScene(scene);
+
+            // Show the stage
+            stage.showAndWait();
+
+        } catch (IOException ignored) {
+        }
     }
 
     /**
