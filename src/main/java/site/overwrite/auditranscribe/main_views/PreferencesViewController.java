@@ -26,7 +26,6 @@ import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
 import site.overwrite.auditranscribe.misc.spinners.CustomIntegerSpinnerValueFactory;
-import site.overwrite.auditranscribe.setup_wizard.view_controllers.FixNoteDelayViewController;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
 import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.main_views.helpers.ProjectIOHandlers;
@@ -127,7 +126,11 @@ public class PreferencesViewController implements Initializable {
                     applyButton.setDisable(false);
 
                     // Report success
-                    MyLogger.log(Level.INFO, "FFmpeg binary path updated to: " + ffmpegBinaryPath, this.getClass().toString());
+                    MyLogger.log(
+                            Level.INFO,
+                            "FFmpeg binary path updated to: " + ffmpegBinaryPath,
+                            this.getClass().toString()
+                    );
                 } else {
                     // Reset the value of the text field to the last valid FFmpeg path
                     ffmpegBinaryPathTextField.setText(lastValidFFmpegPath);
@@ -139,7 +142,11 @@ public class PreferencesViewController implements Initializable {
                     );
 
                     // Report failure
-                    MyLogger.log(Level.INFO, "Selected FFmpeg binary path \"" + ffmpegBinaryPath + "\" invalid", this.getClass().toString());
+                    MyLogger.log(
+                            Level.WARNING,
+                            "Selected FFmpeg binary path \"" + ffmpegBinaryPath + "\" invalid",
+                            this.getClass().toString()
+                    );
                 }
             }
         });
@@ -204,11 +211,7 @@ public class PreferencesViewController implements Initializable {
 
         // Set spinner factories and methods
         notePlayingDelayOffsetSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
-                -1 - FixNoteDelayViewController.OFFSET_OF_OFFSET,
-                1 + FixNoteDelayViewController.OFFSET_OF_OFFSET,
-                settingsFile.data.notePlayingDelayOffset,
-                0.01,
-                2
+                -1,1, settingsFile.data.notePlayingDelayOffset, 0.01, 2
         ));
         autosaveIntervalSpinner.setValueFactory(new CustomIntegerSpinnerValueFactory(
                 1, Integer.MAX_VALUE, settingsFile.data.autosaveInterval, 1
