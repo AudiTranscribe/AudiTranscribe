@@ -47,8 +47,7 @@ import java.util.logging.Level;
  */
 public class FixNoteDelayViewController implements Initializable {
     // Constants
-//    private final String AUDIO_FILE = IOMethods.joinPaths("setup-wizard-files", "audio", "Breakfast.wav");
-    private final String AUDIO_FILE = IOMethods.joinPaths("setup-wizard-files", "audio", "Breakfast-Alt.wav");
+    private final String AUDIO_FILE = IOMethods.joinPaths("setup-wizard-files", "audio", "Breakfast.wav");
 
     private final double[] NOTE_ONSET_TIMES = {
             0.5, 0.75, 1, 1.25, 1.5, 3,
@@ -63,6 +62,8 @@ public class FixNoteDelayViewController implements Initializable {
             "C#5", "B#4", "G#5", "F#5", "E#5"
     };
     private final MIDIInstrument INSTRUMENT = MIDIInstrument.PIANO;
+
+    public static final double OFFSET_OF_OFFSET = 0.05;
 
     // Attributes
     private boolean isPlaying = false;
@@ -113,7 +114,7 @@ public class FixNoteDelayViewController implements Initializable {
 
         // Set spinner factory and methods
         notePlayingDelayOffsetSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
-                -1, 1, 0.2, 0.01, 2
+                -1, 1, 0, 0.01, 2
         ));
 
         // Add methods on buttons
@@ -190,12 +191,15 @@ public class FixNoteDelayViewController implements Initializable {
     }
 
     /**
-     * Method that gets the note playing delay offset set by the user and returns it.
+     * Method that gets the note playing delay offset set by the user and returns it.<br>
+     * Note that there is a further offset applied to the returned value. This is to account for any
+     * delays arising from the actual program having more 'stuff' to process than in the setup
+     * wizard.
      *
      * @return A double, representing the note playing delay value that the user has set.
      */
     public double getNotePlayingDelayOffset() {
-        return notePlayingDelayOffsetSpinner.getValue();
+        return notePlayingDelayOffsetSpinner.getValue() + OFFSET_OF_OFFSET;
     }
 
     // Private methods

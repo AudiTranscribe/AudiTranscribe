@@ -303,7 +303,11 @@ public class TranscriptionViewController implements Initializable {
 
         // Set methods on choice box fields
         musicKeyChoice.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            MyLogger.log(Level.FINE, "Changed music key from " + oldValue + " to " + newValue, this.getClass().toString());
+            MyLogger.log(
+                    Level.FINE,
+                    "Changed music key from " + oldValue + " to " + newValue,
+                    this.getClass().toString()
+            );
 
             // Update the `hasUnsavedChanges` flag
             hasUnsavedChanges = true;
@@ -323,7 +327,11 @@ public class TranscriptionViewController implements Initializable {
 
         timeSignatureChoice.getSelectionModel().selectedItemProperty()
                 .addListener((observable, oldValue, newValue) -> {
-                    MyLogger.log(Level.FINE, "Changed time signature from " + oldValue + " to " + newValue, this.getClass().toString());
+                    MyLogger.log(
+                            Level.FINE,
+                            "Changed time signature from " + oldValue + " to " + newValue,
+                            this.getClass().toString()
+                    );
 
                     // Update the `hasUnsavedChanges` flag
                     hasUnsavedChanges = true;
@@ -689,7 +697,11 @@ public class TranscriptionViewController implements Initializable {
             // Update CSS
             updateAudioVolumeSliderCSS();
 
-            MyLogger.log(Level.FINE, "Changed audio volume from " + oldValue + " to " + newValue, this.getClass().toString());
+            MyLogger.log(
+                    Level.FINE,
+                    "Changed audio volume from " + oldValue + " to " + newValue,
+                    this.getClass().toString()
+            );
         });
 
         notesVolumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -709,7 +721,11 @@ public class TranscriptionViewController implements Initializable {
             // Update CSS
             updateNotesVolumeSliderCSS();
 
-            MyLogger.log(Level.FINE, "Changed notes volume from " + oldValue + " to " + newValue, this.getClass().toString());
+            MyLogger.log(
+                    Level.FINE,
+                    "Changed notes volume from " + oldValue + " to " + newValue,
+                    this.getClass().toString()
+            );
         });
 
         // Update labels
@@ -1437,7 +1453,11 @@ public class TranscriptionViewController implements Initializable {
 
         // Update the BPM value
         if (!forceUpdate) {
-            MyLogger.log(Level.FINE, "Updated BPM value from " + bpm + " to " + newBPM, this.getClass().toString());
+            MyLogger.log(
+                    Level.FINE,
+                    "Updated BPM value from " + bpm + " to " + newBPM,
+                    this.getClass().toString()
+            );
         } else {
             MyLogger.log(Level.FINE, "Force update BPM value to " + newBPM, this.getClass().toString());
         }
@@ -1484,7 +1504,11 @@ public class TranscriptionViewController implements Initializable {
 
         // Update the offset value
         if (!forceUpdate) {
-            MyLogger.log(Level.FINE, "Updated offset value from " + offset + " to " + newOffset, this.getClass().toString());
+            MyLogger.log(
+                    Level.FINE,
+                    "Updated offset value from " + offset + " to " + newOffset,
+                    this.getClass().toString()
+            );
         } else {
             MyLogger.log(Level.FINE, "Force update offset value to " + newOffset, this.getClass().toString());
         }
@@ -1679,7 +1703,11 @@ public class TranscriptionViewController implements Initializable {
 
             // Mark the task as completed and report that the transcription view is ready to be shown
             markTaskAsCompleted(task);
-            MyLogger.log(Level.INFO, "Spectrogram for " + audioFileName + " ready to be shown", this.getClass().toString());
+            MyLogger.log(
+                    Level.INFO,
+                    "Spectrogram for " + audioFileName + " ready to be shown",
+                    this.getClass().toString()
+            );
         });
     }
 
@@ -1935,6 +1963,16 @@ public class TranscriptionViewController implements Initializable {
         // Update the `hasUnsavedChanges` flag
         hasUnsavedChanges = true;
 
+        // Disable note volume slider and note muting button if playing
+        notesVolumeButton.setDisable(!isPaused);
+        notesVolumeSlider.setDisable(!isPaused);
+
+        // Handle note rectangle operations when toggle paused
+        if (isPaused && !areNotesMuted) {  // We use `isPaused` here because we will toggle it later
+            // Set up the note player sequencer by setting the notes on it
+            setupNotePlayerSequencer();
+        }
+
         // Toggle audio paused state
         if (currTime == audioDuration) {
             try {
@@ -1946,20 +1984,17 @@ public class TranscriptionViewController implements Initializable {
         }
         isPaused = togglePaused(isPaused);
 
-        // Disable note volume slider and note muting button if playing
-        notesVolumeButton.setDisable(!isPaused);
-        notesVolumeSlider.setDisable(!isPaused);
-
-        // Handle note rectangle operations when toggle paused
-        if (!isPaused && !areNotesMuted) {
-            // Set up the note player sequencer by setting the notes on it
-            setupNotePlayerSequencer();
-
-            // Start playback
+        // Play notes on note player sequencer
+        // (We separate this method from above to ensure a more accurate note playing delay)
+        if (!isPaused && !areNotesMuted) {  // We use `!isPaused` here because it was toggled already
             notePlayerSequencer.play(currTime + settingsFile.data.notePlayingDelayOffset);
         }
 
-        MyLogger.log(Level.FINE, "Toggled play button; audio is now " + (!isPaused ? "paused" : "playing"), this.getClass().toString());
+        MyLogger.log(
+                Level.FINE,
+                "Toggled play button; audio is now " + (!isPaused ? "paused" : "playing"),
+                this.getClass().toString()
+        );
     }
 
     /**
@@ -1985,7 +2020,11 @@ public class TranscriptionViewController implements Initializable {
         // Toggle the `scrollToPlayhead` flag
         scrollToPlayhead = !scrollToPlayhead;
 
-        MyLogger.log(Level.FINE, "Toggled scroll (scroll is now " + scrollToPlayhead + ")", this.getClass().toString());
+        MyLogger.log(
+                Level.FINE,
+                "Toggled scroll (scroll is now " + scrollToPlayhead + ")",
+                this.getClass().toString()
+        );
     }
 
     /**
@@ -2013,7 +2052,11 @@ public class TranscriptionViewController implements Initializable {
         canEditNotes = !canEditNotes;
         NoteRectangle.setCanEdit(canEditNotes);
 
-        MyLogger.log(Level.FINE, "Toggled editing notes (editing notes is now " + canEditNotes + ")", this.getClass().toString());
+        MyLogger.log(
+                Level.FINE,
+                "Toggled editing notes (editing notes is now " + canEditNotes + ")",
+                this.getClass().toString()
+        );
     }
 
     /**
@@ -2055,7 +2098,11 @@ public class TranscriptionViewController implements Initializable {
         // Toggle the `isAudioMuted` flag
         isAudioMuted = !isAudioMuted;
 
-        MyLogger.log(Level.FINE, "Toggled audio mute button (audio muted is now " + isAudioMuted + ")", this.getClass().toString());
+        MyLogger.log(
+                Level.FINE,
+                "Toggled audio mute button (audio muted is now " + isAudioMuted + ")",
+                this.getClass().toString()
+        );
     }
 
     /**
@@ -2082,7 +2129,11 @@ public class TranscriptionViewController implements Initializable {
         // Toggle the `areNotesMuted` flag
         areNotesMuted = !areNotesMuted;
 
-        MyLogger.log(Level.FINE, "Toggled notes mute button (notes muted is now " + areNotesMuted + ")", this.getClass().toString());
+        MyLogger.log(
+                Level.FINE,
+                "Toggled notes mute button (notes muted is now " + areNotesMuted + ")",
+                this.getClass().toString()
+        );
     }
 
     /**
@@ -2292,8 +2343,8 @@ public class TranscriptionViewController implements Initializable {
             case O -> notePlayerSynth.noteOff(octaveNum * 12 + 13, NOTE_PLAYING_OFF_VELOCITY);  // C#'
             case L -> notePlayerSynth.noteOff(octaveNum * 12 + 14, NOTE_PLAYING_OFF_VELOCITY);  // D'
             case P -> notePlayerSynth.noteOff(octaveNum * 12 + 15, NOTE_PLAYING_OFF_VELOCITY);  // D#'
-            case SEMICOLON -> notePlayerSynth.noteOff(octaveNum * 12 + 16, NOTE_PLAYING_OFF_VELOCITY);    // E'
-            case QUOTE -> notePlayerSynth.noteOff(octaveNum * 12 + 17, NOTE_PLAYING_OFF_VELOCITY);    // F'
+            case SEMICOLON -> notePlayerSynth.noteOff(octaveNum * 12 + 16, NOTE_PLAYING_OFF_VELOCITY);  // E'
+            case QUOTE -> notePlayerSynth.noteOff(octaveNum * 12 + 17, NOTE_PLAYING_OFF_VELOCITY);  // F'
         }
     }
 

@@ -2,7 +2,7 @@
  * PreferencesViewController.java
  *
  * Created on 2022-05-22
- * Updated on 2022-07-07
+ * Updated on 2022-07-24
  *
  * Description: Contains the preferences view's controller class.
  */
@@ -26,6 +26,7 @@ import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
 import site.overwrite.auditranscribe.misc.spinners.CustomIntegerSpinnerValueFactory;
+import site.overwrite.auditranscribe.setup_wizard.view_controllers.FixNoteDelayViewController;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
 import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.main_views.helpers.ProjectIOHandlers;
@@ -203,7 +204,11 @@ public class PreferencesViewController implements Initializable {
 
         // Set spinner factories and methods
         notePlayingDelayOffsetSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
-                -1, 1, settingsFile.data.notePlayingDelayOffset, 0.01, 2
+                -1 - FixNoteDelayViewController.OFFSET_OF_OFFSET,
+                1 + FixNoteDelayViewController.OFFSET_OF_OFFSET,
+                settingsFile.data.notePlayingDelayOffset,
+                0.01,
+                2
         ));
         autosaveIntervalSpinner.setValueFactory(new CustomIntegerSpinnerValueFactory(
                 1, Integer.MAX_VALUE, settingsFile.data.autosaveInterval, 1
