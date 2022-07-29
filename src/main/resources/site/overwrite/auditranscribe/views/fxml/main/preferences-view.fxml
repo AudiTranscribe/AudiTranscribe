@@ -116,6 +116,12 @@
                                           <Label layoutX="190.0" layoutY="10.0" styleClass="setting-caption" text="In minutes" />
                                        </children>
                                     </VBox>
+                                    <VBox alignment="TOP_RIGHT" layoutX="20.0" layoutY="20.0" prefHeight="30.0">
+                                       <children>
+                                          <Label styleClass="setting-label" text="Log File Persistence" />
+                                          <Label layoutX="190.0" layoutY="10.0" styleClass="setting-caption" text="Number of days to keep old log files" />
+                                       </children>
+                                    </VBox>
                                  </children>
                               </VBox>
                               <VBox prefHeight="200.0" prefWidth="300.0" spacing="10.0" HBox.hgrow="ALWAYS">
@@ -124,6 +130,7 @@
                                  </padding>
                                  <children>
                                     <Spinner fx:id="autosaveIntervalSpinner" editable="true" prefHeight="30.0" />
+                                    <Spinner fx:id="logFilePersistenceSpinner" editable="true" layoutX="20.0" layoutY="20.0" prefHeight="30.0" />
                                  </children>
                               </VBox>
                            </children>

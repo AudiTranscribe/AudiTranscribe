@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
 public final class MyLogger {
     // Constants
     private static final long MAX_LOG_FILE_SIZE = 5_000_000;  // In bytes
-    private static final int LOG_FILE_PERSISTENCE = 5;  // In days
 
     // Static attributes
     private static Logger logger;
@@ -66,8 +65,10 @@ public final class MyLogger {
 
     /**
      * Method that helps clear old logs from the logs' folder.
+     *
+     * @param persistenceInDays Number of days to keep any log.
      */
-    public static void clearOldLogs() {
+    public static void clearOldLogs(int persistenceInDays) {
         // Determine logging folder path
         String loggingFolder;
         if (new File(IOConstants.APP_DATA_FOLDER_PATH).exists()) {
@@ -100,7 +101,7 @@ public final class MyLogger {
                     double daysDelta = timeDelta / 86400.;  // 86400 seconds in a day
 
                     // Check if the days delta exceeds the persistence value
-                    if (daysDelta > LOG_FILE_PERSISTENCE) {
+                    if (daysDelta > persistenceInDays) {
                         // Delete old log
                         IOMethods.delete(file.getAbsolutePath());
 
@@ -108,7 +109,7 @@ public final class MyLogger {
                         MyLogger.log(
                                 Level.FINE,
                                 "Deleted old log '" + file.getName() + "' (Older than " +
-                                        LOG_FILE_PERSISTENCE + " days).",
+                                        persistenceInDays + " days).",
                                 MyLogger.class.getName()
                         );
                     }

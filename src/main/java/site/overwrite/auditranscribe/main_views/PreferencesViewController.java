@@ -2,7 +2,7 @@
  * PreferencesViewController.java
  *
  * Created on 2022-05-22
- * Updated on 2022-07-24
+ * Updated on 2022-07-29
  *
  * Description: Contains the preferences view's controller class.
  */
@@ -55,7 +55,7 @@ public class PreferencesViewController implements Initializable {
     private ChoiceBox<Theme> themeChoiceBox;
 
     @FXML
-    private Spinner<Integer> autosaveIntervalSpinner;
+    private Spinner<Integer> autosaveIntervalSpinner, logFilePersistenceSpinner;
 
     @FXML
     private Spinner<Double> notePlayingDelayOffsetSpinner;
@@ -191,7 +191,9 @@ public class PreferencesViewController implements Initializable {
     public void setUpFields() {
         // Arrays that store the fields that just need to disable the apply button
         ChoiceBox<?>[] choiceBoxes = new ChoiceBox[]{colourScaleChoiceBox, windowFunctionChoiceBox};
-        Spinner<?>[] spinners = new Spinner[]{notePlayingDelayOffsetSpinner, autosaveIntervalSpinner};
+        Spinner<?>[] spinners = new Spinner[]{
+                notePlayingDelayOffsetSpinner, autosaveIntervalSpinner, logFilePersistenceSpinner
+        };
 
         // Set choice box values
         themeChoiceBox.setValue(Theme.values()[settingsFile.data.themeEnumOrdinal]);
@@ -215,6 +217,9 @@ public class PreferencesViewController implements Initializable {
         ));
         autosaveIntervalSpinner.setValueFactory(new CustomIntegerSpinnerValueFactory(
                 1, Integer.MAX_VALUE, settingsFile.data.autosaveInterval, 1
+        ));
+        logFilePersistenceSpinner.setValueFactory(new CustomIntegerSpinnerValueFactory(
+                1,Integer.MAX_VALUE, settingsFile.data.logFilePersistence, 1
         ));
 
         for (Spinner<?> spinner : spinners) {
@@ -287,6 +292,7 @@ public class PreferencesViewController implements Initializable {
         settingsFile.data.ffmpegInstallationPath = ffmpegBinaryPathTextField.getText();
 
         settingsFile.data.autosaveInterval = autosaveIntervalSpinner.getValue();
+        settingsFile.data.logFilePersistence = logFilePersistenceSpinner.getValue();
 
         settingsFile.data.colourScaleEnumOrdinal = colourScaleChoiceBox.getValue().ordinal();
         settingsFile.data.windowFunctionEnumOrdinal = windowFunctionChoiceBox.getValue().ordinal();

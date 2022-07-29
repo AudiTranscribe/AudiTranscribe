@@ -31,7 +31,7 @@ public class MainApplication extends Application {
         SettingsFile settingsFile = new SettingsFile();
 
         // Clear any old logs
-        MyLogger.clearOldLogs();
+        MyLogger.clearOldLogs(settingsFile.data.logFilePersistence);
 
         // Run setup wizard
         SetupWizard setupWizard = new SetupWizard(settingsFile);

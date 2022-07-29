@@ -2,7 +2,7 @@
  * SettingsData.java
  *
  * Created on 2022-05-22
- * Updated on 2022-06-19
+ * Updated on 2022-07-29
  *
  * Description: Class that contains the settings data.
  */
@@ -29,6 +29,7 @@ public class SettingsData {
 
     // I/O data
     public int autosaveInterval = 5;  // In minutes
+    public int logFilePersistence = 5;  // In days
 
     // Audio data
     public double notePlayingDelayOffset = 0.2;  // In seconds; to account for note playing delay
