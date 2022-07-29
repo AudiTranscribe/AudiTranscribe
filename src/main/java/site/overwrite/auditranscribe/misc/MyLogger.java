@@ -2,9 +2,9 @@
  * MyLogger.java
  *
  * Created on 2022-06-25
- * Updated on 2022-07-08
+ * Updated on 2022-07-29
  *
- * Description: Class that handles the loggers.
+ * Description: Class that handles the logging functionalities of AudiTranscribe.
  */
 
 package site.overwrite.auditranscribe.misc;
@@ -16,13 +16,16 @@ import site.overwrite.auditranscribe.utils.TestingUtils;
 
 import java.io.*;
 import java.util.logging.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * Class that handles the loggers.
+ * Class that handles the logging functionalities of AudiTranscribe.
  */
 public final class MyLogger {
     // Constants
     private static final long MAX_LOG_FILE_SIZE = 5_000_000;  // In bytes
+    private static final int LOG_FILE_PERSISTENCE = 5;  // In days
 
     // Static attributes
     private static Logger logger;
@@ -59,6 +62,59 @@ public final class MyLogger {
 
         // Log the error
         getLogger().log(Level.SEVERE, sw.toString());
+    }
+
+    /**
+     * Method that helps clear old logs from the logs' folder.
+     */
+    public static void clearOldLogs() {
+        // Determine logging folder path
+        String loggingFolder;
+        if (new File(IOConstants.APP_DATA_FOLDER_PATH).exists()) {
+            loggingFolder = IOMethods.joinPaths(IOConstants.APP_DATA_FOLDER_PATH, "logs");
+        } else {
+            loggingFolder = IOConstants.USER_HOME_PATH;
+        }
+
+        // Create logging folder (if it doesn't already exist)
+        IOMethods.createFolder(loggingFolder);
+
+        // Obtain all files in the logging folder
+        File[] files = new File(loggingFolder).listFiles();
+
+        // Get current time
+        int currTime = (int) (MiscUtils.getUnixTimestamp());
+
+        // Process all files
+        if (files != null) {
+            for (File file : files) {
+                // Check if the file is in the correct format
+                Pattern pattern = Pattern.compile("Log-(?<timestamp>\\d+)\\.log");
+                Matcher matcher = pattern.matcher(file.getName());
+                if (matcher.find()) {  // Is in correct format
+                    // Get the timestamp portion
+                    int timestamp = Integer.parseInt(matcher.group("timestamp"));  // Should not fail
+
+                    // Compare the current time with the timestamp of the log
+                    int timeDelta = currTime - timestamp;  // In seconds
+                    double daysDelta = timeDelta / 86400.;  // 86400 seconds in a day
+
+                    // Check if the days delta exceeds the persistence value
+                    if (daysDelta > LOG_FILE_PERSISTENCE) {
+                        // Delete old log
+                        IOMethods.delete(file.getAbsolutePath());
+
+                        // Log it
+                        MyLogger.log(
+                                Level.FINE,
+                                "Deleted old log '" + file.getName() + "' (Older than " +
+                                        LOG_FILE_PERSISTENCE + " days).",
+                                MyLogger.class.getName()
+                        );
+                    }
+                }
+            }
+        }
     }
 
     // Private methods
