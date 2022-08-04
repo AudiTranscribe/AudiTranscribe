@@ -2,7 +2,7 @@
  * MusicUtilsTest.java
  *
  * Created on 2022-06-11
- * Updated on 2022-07-17
+ * Updated on 2022-08-04
  *
  * Description: Test `MusicUtils.java`.
  */
@@ -133,6 +133,7 @@ class MusicUtilsTest {
         assertFalse(MusicUtils.doesKeyUseFlats("D♯ Minor"));  // 6 sharps
         assertFalse(MusicUtils.doesKeyUseFlats("A♯ Minor"));  // 7 sharps
 
+        assertThrowsExactly(ValueException.class, () -> MusicUtils.doesKeyUseFlats("Zb Super"));
     }
 
     @Test
@@ -148,7 +149,7 @@ class MusicUtilsTest {
     void parseTimeSignature() {
         assertEquals(new Pair<>(4, 4), MusicUtils.parseTimeSignature("4/4"));
         assertEquals(new Pair<>(6, 8), MusicUtils.parseTimeSignature("6/8"));
-        assertEquals(new Pair<>(12, 34), MusicUtils.parseTimeSignature("12/34"));  // Technically not valid, but format correct
+        assertEquals(new Pair<>(12, 34), MusicUtils.parseTimeSignature("12/34"));
 
         assertThrowsExactly(FormatException.class, () -> MusicUtils.parseTimeSignature("123"));
         assertThrowsExactly(FormatException.class, () -> MusicUtils.parseTimeSignature("123/"));

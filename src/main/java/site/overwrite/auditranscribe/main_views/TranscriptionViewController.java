@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-07-24
+ * Updated on 2022-08-04
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -49,7 +49,6 @@ import site.overwrite.auditranscribe.music.notes.MIDIInstrument;
 import site.overwrite.auditranscribe.music.notes.NotePlayerSequencer;
 import site.overwrite.auditranscribe.music.notes.NotePlayerSynth;
 import site.overwrite.auditranscribe.music.notes.NoteRectangle;
-import site.overwrite.auditranscribe.notes.*;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;

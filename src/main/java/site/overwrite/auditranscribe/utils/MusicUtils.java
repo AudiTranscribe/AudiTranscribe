@@ -2,7 +2,7 @@
  * MusicUtils.java
  *
  * Created on 2022-06-11
- * Updated on 2022-07-17
+ * Updated on 2022-08-04
  *
  * Description: Musical utility methods.
  */
@@ -12,11 +12,10 @@ package site.overwrite.auditranscribe.utils;
 import org.javatuples.Pair;
 import site.overwrite.auditranscribe.exceptions.generic.FormatException;
 import site.overwrite.auditranscribe.exceptions.generic.ValueException;
+import site.overwrite.auditranscribe.music.MusicKey;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,15 +26,7 @@ import static java.util.Map.entry;
  */
 public final class MusicUtils {
     // Constants
-    public static final String[] MUSIC_KEYS = {
-            // Major Scales
-            "C Major", "C♯ Major", "D♭ Major", "D Major", "E♭ Major", "E Major", "F Major", "F♯ Major", "G♭ Major",
-            "G Major", "A♭ Major", "A Major", "B♭ Major", "B Major", "C♭ Major",
-
-            // (Natural) Minor Scales
-            "C Minor", "C♯ Minor", "D Minor", "D♯ Minor", "E♭ Minor", "E Minor", "F Minor", "F♯ Minor", "G Minor",
-            "G♯ Minor", "A♭ Minor", "A Minor", "A♯ Minor", "B♭ Minor", "B Minor"
-    };
+    public static final String[] MUSIC_KEYS = MusicKey.getMusicKeyNames();
     public static final Map<String, Integer> TIME_SIGNATURE_TO_BEATS_PER_BAR = Map.ofEntries(
             // Simple time signatures
             entry("4/4", 4),
@@ -67,48 +58,15 @@ public final class MusicUtils {
      * @throws ValueException If the provided key is invalid.
      */
     public static HashSet<Integer> getNotesInKey(String key) {
-        // Fancify the key
-        String keyFancified = fancifyMusicString(key);
+        // Get the music key object that represents that key
+        MusicKey musicKey = MusicKey.getMusicKey(key);
 
-        // Get the note offsets and place them into an array (for now)
-        Integer[] noteOffsets = switch (keyFancified) {  // See the keys inside each musical scale
-            // Major Scales
-            case "C Major" -> new Integer[]{0, 2, 4, 5, 7, 9, 11};  // Default is C Major
-            case "G Major" -> new Integer[]{7, 9, 11, 0, 2, 4, 6};
-            case "D Major" -> new Integer[]{2, 4, 6, 7, 9, 11, 1};
-            case "A Major" -> new Integer[]{9, 11, 1, 2, 4, 6, 8};
-            case "E Major" -> new Integer[]{4, 6, 8, 9, 11, 1, 3};
-            case "B Major", "C♭ Major" -> new Integer[]{11, 1, 3, 4, 6, 8, 10};
-            case "F♯ Major", "G♭ Major" -> new Integer[]{6, 8, 10, 11, 1, 3, 5};
-            case "C♯ Major", "D♭ Major" -> new Integer[]{1, 3, 5, 6, 8, 10, 0};
-            case "F Major" -> new Integer[]{5, 7, 9, 10, 0, 2, 4};
-            case "B♭ Major" -> new Integer[]{10, 0, 2, 3, 5, 7, 9};
-            case "E♭ Major" -> new Integer[]{3, 5, 7, 8, 10, 0, 2};
-            case "A♭ Major" -> new Integer[]{8, 10, 0, 1, 3, 5, 7};
-
-            // (Natural) Minor Scales
-            case "A Minor" -> new Integer[]{9, 11, 0, 2, 4, 5, 7};
-            case "E Minor" -> new Integer[]{4, 6, 7, 9, 11, 0, 2};
-            case "B Minor" -> new Integer[]{11, 1, 2, 4, 6, 7, 9};
-            case "F♯ Minor" -> new Integer[]{6, 8, 9, 11, 1, 2, 4};
-            case "C♯ Minor" -> new Integer[]{1, 3, 4, 6, 8, 9, 11};
-            case "G♯ Minor" -> new Integer[]{8, 10, 11, 1, 3, 4, 6};
-            case "D♯ Minor" -> new Integer[]{3, 5, 6, 8, 10, 11, 1};
-            case "A♯ Minor" -> new Integer[]{10, 0, 1, 3, 5, 6, 8};
-            case "D Minor" -> new Integer[]{2, 4, 5, 7, 9, 10, 0};
-            case "G Minor" -> new Integer[]{7, 9, 10, 0, 2, 3, 5};
-            case "C Minor" -> new Integer[]{0, 2, 3, 5, 7, 8, 10};
-            case "F Minor" -> new Integer[]{5, 7, 8, 10, 0, 1, 3};
-            case "B♭ Minor" -> new Integer[]{10, 0, 1, 3, 5, 6, 8};
-            case "E♭ Minor" -> new Integer[]{3, 5, 6, 8, 10, 11, 1};
-            case "A♭ Minor" -> new Integer[]{8, 10, 11, 1, 3, 4, 6};
-
-            // Default case: throw value exception
-            default -> throw new ValueException("Invalid key '" + keyFancified + "'");
-        };
-
-        // Convert to a hash set and return
-        return new HashSet<>(Arrays.asList(noteOffsets));
+        // If not null, return the notes within the key
+        if (musicKey != null) {
+            return musicKey.notesInKey;
+        } else {
+            throw new ValueException("Invalid key '" + key + "'");
+        }
     }
 
     /**
@@ -118,50 +76,38 @@ public final class MusicUtils {
      *
      * @param key Music key, with both the key and the mode.
      * @return An integer, representing the key's numeric value.
+     * @throws ValueException If the provided key is invalid.
      */
     public static int getNumericValueOfKey(String key) {
-        // Fancify the key
-        String keyFancified = fancifyMusicString(key);
+        // Get the music key object that represents that key
+        MusicKey musicKey = MusicKey.getMusicKey(key);
 
-        // Get the note offsets and place them into an array (for now)
-        return switch (keyFancified) {
-            case "C♭ Major", "A♭ Minor" -> -7;
-            case "G♭ Major", "E♭ Minor" -> -6;
-            case "D♭ Major", "B♭ Minor" -> -5;
-            case "A♭ Major", "F Minor" -> -4;
-            case "E♭ Major", "C Minor" -> -3;
-            case "B♭ Major", "G Minor" -> -2;
-            case "F Major", "D Minor" -> -1;
-            case "C Major", "A Minor" -> 0;
-            case "G Major", "E Minor" -> 1;
-            case "D Major", "B Minor" -> 2;
-            case "A Major", "F♯ Minor" -> 3;
-            case "E Major", "C♯ Minor" -> 4;
-            case "B Major", "G♯ Minor" -> 5;
-            case "F♯ Major", "D♯ Minor" -> 6;
-            case "C♯ Major", "A♯ Minor" -> 7;
-            default -> throw new ValueException("Invalid key '" + keyFancified + "'");
-        };
+        // If not null, return the numeric value of the key
+        if (musicKey != null) {
+            return musicKey.numericValue;
+        } else {
+            throw new ValueException("Invalid key '" + key + "'");
+        }
     }
 
     /**
      * Method that determines whether the notes within the specified key uses flats instead of sharps.
      *
      * @param key The key to check.
-     * @return True if the notes within the key use flats, false if they use sharps.
+     * @return True if the notes within the key use flats, false if the notes within the key uses
+     * sharps.
+     * @throws ValueException If the provided key is invalid.
      */
     public static boolean doesKeyUseFlats(String key) {
-        // Fancify the key
-        String keyFancified = fancifyMusicString(key);
+        // Get the music key object that represents that key
+        MusicKey musicKey = MusicKey.getMusicKey(key);
 
-        // Constant of keys which has flats
-        final Set<String> KEYS_WITH_FLATS = Set.of(
-                "F Major", "B♭ Major", "E♭ Major", "A♭ Major", "D♭ Major", "G♭ Major", "C♭ Major",
-                "D Minor", "G Minor", "C Minor", "F Minor", "B♭ Minor", "E♭ Minor", "A♭ Minor"
-        );
-
-        // Check if the key uses flats
-        return KEYS_WITH_FLATS.contains(keyFancified);
+        // If not null, check if the key uses flats
+        if (musicKey != null) {
+            return musicKey.usesFlats;
+        } else {
+            throw new ValueException("Invalid key '" + key + "'");
+        }
     }
 
     /**
