@@ -7,7 +7,7 @@
  * Description: Class that handles the playing of notes using the synthesizer.
  */
 
-package site.overwrite.auditranscribe.notes;
+package site.overwrite.auditranscribe.music.notes;
 
 import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;

@@ -26,8 +26,8 @@ import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
-import site.overwrite.auditranscribe.notes.MIDIInstrument;
-import site.overwrite.auditranscribe.notes.NotePlayerSequencer;
+import site.overwrite.auditranscribe.music.notes.MIDIInstrument;
+import site.overwrite.auditranscribe.music.notes.NotePlayerSequencer;
 import site.overwrite.auditranscribe.plotting.PlottingStuffHandler;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 

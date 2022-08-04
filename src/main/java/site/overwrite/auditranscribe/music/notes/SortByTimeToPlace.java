@@ -7,7 +7,7 @@
  * Description: Comparator class that compares two notes by their time to place.
  */
 
-package site.overwrite.auditranscribe.notes;
+package site.overwrite.auditranscribe.music.notes;
 
 import java.util.Comparator;
 

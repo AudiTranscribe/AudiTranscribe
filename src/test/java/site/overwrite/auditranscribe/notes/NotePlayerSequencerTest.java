@@ -11,6 +11,8 @@ package site.overwrite.auditranscribe.notes;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import site.overwrite.auditranscribe.music.notes.MIDIInstrument;
+import site.overwrite.auditranscribe.music.notes.NotePlayerSequencer;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 class NotePlayerSequencerTest {

@@ -7,7 +7,7 @@
  * Description: Class that contains methods to decode MIDI messages.
  */
 
-package site.overwrite.auditranscribe.notes;
+package site.overwrite.auditranscribe.music.notes;
 
 import site.overwrite.auditranscribe.utils.MathUtils;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;

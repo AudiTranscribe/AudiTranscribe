@@ -7,7 +7,7 @@
  * Description: Enum that contains the MIDI values of the instruments.
  */
 
-package site.overwrite.auditranscribe.notes;
+package site.overwrite.auditranscribe.music.notes;
 
 /**
  * Enum that contains the MIDI values of the instruments.

@@ -7,7 +7,7 @@
  * Description: A `StackPane` object that is used to denote a note in the transcription view.
  */
 
-package site.overwrite.auditranscribe.notes;
+package site.overwrite.auditranscribe.music.notes;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;

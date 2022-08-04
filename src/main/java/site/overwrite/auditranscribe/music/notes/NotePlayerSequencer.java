@@ -7,7 +7,7 @@
  * Description: Class that handles the playing of notes as a MIDI sequence.
  */
 
-package site.overwrite.auditranscribe.notes;
+package site.overwrite.auditranscribe.music.notes;
 
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
