@@ -2,7 +2,7 @@
  * NotePlayerSequencer.java
  *
  * Created on 2022-06-09
- * Updated on 2022-07-17
+ * Updated on 2022-08-04
  *
  * Description: Class that handles the playing of notes as a MIDI sequence.
  */
@@ -407,9 +407,9 @@ public class NotePlayerSequencer {
      * @param key The key to set.
      */
     private void setKeySignatureOfNotePlayer(String key) {
-        // Get the key and mode of the provided key
-        Pair<String, String> keyAndMode = MusicUtils.parseKeySignature(key);
-        String modePart = keyAndMode.getValue1();
+        // Get the tonic and mode of the provided key
+        Pair<String, String> tonicAndMode = MusicUtils.parseKeySignature(key);
+        String modePart = tonicAndMode.getValue1();
 
         // Get the numeric value of the key
         int numericValue = MusicUtils.getNumericValueOfKey(key);

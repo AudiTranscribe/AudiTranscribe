@@ -2,7 +2,7 @@
  * UnitConversionUtils.java
  *
  * Created on 2022-03-12
- * Updated on 2022-06-29
+ * Updated on 2022-08-04
  *
  * Description: Unit conversion utility methods.
  */
@@ -76,7 +76,7 @@ public final class UnitConversionUtils {
         );
 
         final Pattern NOTE_PATTERN = Pattern.compile(
-                "^(?<note>[A-Ga-g])(?<accidental>[#♯b!♭]*)(?<octave>[+-]?\\d+)?$"
+                "^(?<tonic>[A-Ga-g])(?<accidental>[#♯b!♭]*)(?<octave>[+-]?\\d+)?$"
         );
 
         // Attempt to match the `note` string to the pattern
@@ -86,7 +86,7 @@ public final class UnitConversionUtils {
         }
 
         // Get the matched groups from the note
-        String pitchChar = matcher.group("note").toUpperCase();
+        String pitchChar = matcher.group("tonic").toUpperCase();
         String offsetChars = matcher.group("accidental");
         String octaveChar = matcher.group("octave");
 

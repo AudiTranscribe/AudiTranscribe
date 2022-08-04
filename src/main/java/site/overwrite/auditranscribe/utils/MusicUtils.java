@@ -157,13 +157,13 @@ public final class MusicUtils {
     /**
      * Method that parses a key string.
      *
-     * @param key Music key, with both the key and the mode.
-     * @return A pair. The first value is the key/scale of the key (e.g. C, A♯, G♭) and the second
-     * value is the mode (i.e. either <code>Major</code> or <code>Minor</code>).
+     * @param key Music key, with both the tonic and the mode.
+     * @return A pair. The first value is the tonic of the key (e.g. C, A♯, G♭) and the second value
+     * is the mode (i.e. either <code>Major</code> or <code>Minor</code>).
      */
     public static Pair<String, String> parseKeySignature(String key) {
         // Define key pattern
-        final Pattern KEY_PATTERN = Pattern.compile("^(?<key>[A-Ga-g][#♯b!♭]?) (?<mode>Major|Minor)$");
+        final Pattern KEY_PATTERN = Pattern.compile("^(?<tonic>[A-Ga-g][#♯b!♭]?) (?<mode>Major|Minor)$");
 
         // Fancify key first
         key = fancifyMusicString(key);
@@ -175,7 +175,7 @@ public final class MusicUtils {
         }
 
         // Get the matched groups
-        String keyPart = matcher.group("key");
+        String keyPart = matcher.group("tonic");
         String modePart = matcher.group("mode");
 
         // Return as a pair
