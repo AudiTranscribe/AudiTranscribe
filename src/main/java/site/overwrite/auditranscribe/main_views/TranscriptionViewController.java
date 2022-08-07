@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-07-24
+ * Updated on 2022-08-07
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -1766,12 +1766,17 @@ public class TranscriptionViewController implements Initializable {
                             this.getClass().toString());
                     task.getException().printStackTrace();
 
+                    // Determine the header and content text to show
+                    String headerText = "An Error Occurred";
+                    String contentText = "Task \"" + task.name + "\" failed.";
+
+                    if (task.getException() instanceof OutOfMemoryError) {
+                        headerText = "Out Of Memory";
+                        contentText = "Task \"" + task.name + "\" failed due to running out of memory.";
+                    }
+
                     // Show error dialog
-                    Popups.showExceptionAlert(
-                            "An Error Occurred",
-                            "Task \"" + task.name + "\" failed.",
-                            (Exception) task.getException()
-                    );
+                    Popups.showExceptionAlert(headerText, contentText, task.getException());
                 }));
 
                 // Add all tasks to the ongoing tasks queue
