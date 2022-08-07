@@ -2,7 +2,7 @@
  * Popups.java
  *
  * Created on 2022-05-26
- * Updated on 2022-07-07
+ * Updated on 2022-08-07
  *
  * Description: Class that handles the showing of popups and dialogs to the user.
  */
@@ -57,7 +57,9 @@ public final class Popups {
      * @param buttonTypes Button types for the confirmation alert.
      * @return A <code>ButtonType</code> value.
      */
-    public static Optional<ButtonType> showMultiButtonAlert(String title, String headerText, String contentText, ButtonType... buttonTypes) {
+    public static Optional<ButtonType> showMultiButtonAlert(
+            String title, String headerText, String contentText, ButtonType... buttonTypes
+    ) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.initStyle(StageStyle.UTILITY);
         alert.setTitle(title);
@@ -73,9 +75,9 @@ public final class Popups {
      *
      * @param headerText  Header text for the exception alert.
      * @param contentText Content text for the exception alert.
-     * @param e           Exception that occurred.
+     * @param throwable   <code>Throwable</code> object for the exception that occurred.
      */
-    public static void showExceptionAlert(String headerText, String contentText, Exception e) {
+    public static void showExceptionAlert(String headerText, String contentText, Throwable throwable) {
         // Create a new error alert
         Alert alert = new Alert(Alert.AlertType.ERROR);
 
@@ -92,7 +94,7 @@ public final class Popups {
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
+        throwable.printStackTrace(pw);
 
         TextArea textArea = new TextArea(sw.toString());
         textArea.setEditable(false);
