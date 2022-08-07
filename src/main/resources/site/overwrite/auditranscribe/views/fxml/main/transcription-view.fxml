@@ -121,21 +121,9 @@
                                           <Insets left="10.0" right="10.0" />
                                        </padding>
                                        <children>
-                                          <Label fx:id="freeMemoryLabel" text="??? MB">
-                                             <font>
-                                                <Font size="16.0" />
-                                             </font>
-                                          </Label>
-                                          <Label text="/">
-                                             <font>
-                                                <Font size="16.0" />
-                                             </font>
-                                          </Label>
-                                          <Label fx:id="maxMemoryLabel" text="??? MB">
-                                             <font>
-                                                <Font size="16.0" />
-                                             </font>
-                                          </Label>
+                                          <Label fx:id="freeMemoryLabel" text="??? MB" />
+                                          <Label text="/" />
+                                          <Label fx:id="maxMemoryLabel" text="??? MB" />
                                        </children>
                                     </HBox>
                                  </children>
