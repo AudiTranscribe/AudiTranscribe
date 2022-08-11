@@ -2,7 +2,7 @@
  * MainViewController.java
  *
  * Created on 2022-02-09
- * Updated on 2022-07-07
+ * Updated on 2022-08-11
  *
  * Description: Contains the main view's controller class.
  */
@@ -485,7 +485,12 @@ public class MainViewController implements Initializable {
                 Quartet<Long, String, String, String> o1,
                 Quartet<Long, String, String, String> o2
         ) {
-            return (int) -(o1.getValue0() - o2.getValue0());  // Sort in descending order
+            // Convert timestamps from millisecond value to second value
+            long timestamp1 = o1.getValue0() / 1000L;  // Divide by 1000 because 1000 ms = 1s
+            long timestamp2 = o2.getValue0() / 1000L;
+
+            // Now compare the timestamp values
+            return (int) -(timestamp1 - timestamp2);  // Sort in descending order
         }
     }
 }
