@@ -14,6 +14,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import site.overwrite.auditranscribe.exceptions.network.APIServerTimeoutException;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -24,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class APICallHandlerTest {
     @Test
     @Order(1)
-    void sendAPIRequest1() throws IOException {
+    void sendAPIRequest1() throws IOException, APIServerTimeoutException {
         JsonObject returned = APICallHandler.sendAPIRequest("test-api-server", RequestMethod.GET);
 
         assertEquals("OK", returned.get("status").getAsString());
@@ -35,7 +36,7 @@ class APICallHandlerTest {
 
     @Test
     @Order(2)
-    void sendAPIRequest2() throws IOException {
+    void sendAPIRequest2() throws IOException, APIServerTimeoutException {
         HashMap<String, String> params = new HashMap<>();
         params.put("is-testing", "True");
 
@@ -50,7 +51,7 @@ class APICallHandlerTest {
 
     @Test
     @Order(3)
-    void sendAPIRequest3() throws IOException {
+    void sendAPIRequest3() throws IOException, APIServerTimeoutException {
         JsonObject returned = APICallHandler.sendAPIRequest("test-api-server", RequestMethod.POST);
 
         assertEquals("OK", returned.get("status").getAsString());

@@ -11,6 +11,7 @@ package site.overwrite.auditranscribe.network;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import site.overwrite.auditranscribe.exceptions.network.APIServerTimeoutException;
 
 import java.io.*;
 import java.net.*;
@@ -42,7 +43,8 @@ public final class APICallHandler {
      * @throws IOException If something went wrong when processing the URL or when opening a
      *                     connection to the API server.
      */
-    public static JsonObject sendAPIRequest(String page, RequestMethod method) throws IOException {
+    public static JsonObject sendAPIRequest(String page, RequestMethod method) throws IOException,
+            APIServerTimeoutException {
         return sendAPIRequest(page, method, null);
     }
 
@@ -59,7 +61,7 @@ public final class APICallHandler {
      */
     public static JsonObject sendAPIRequest(
             String page, RequestMethod method, Map<String, String> params
-    ) throws IOException {
+    ) throws IOException, APIServerTimeoutException {
         // Form the destination URL
         String urlString = API_SERVER_URL + page;
         if (params != null) {
@@ -96,6 +98,8 @@ public final class APICallHandler {
 
             // Close the input stream
             in.close();
+        } catch (SocketTimeoutException e) {
+            throw new APIServerTimeoutException("Connection to '" + urlString + "' timed out");
         } finally {
             // Must remember to disconnect
             con.disconnect();
