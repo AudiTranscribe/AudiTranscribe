@@ -2,7 +2,7 @@
  * APICallHandler.java
  *
  * Created on 2022-07-07
- * Updated on 2022-08-12
+ * Updated on 2022-08-13
  *
  * Description: Methods that handle the reading and processing of API calls.
  */
@@ -11,7 +11,7 @@ package site.overwrite.auditranscribe.network;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import site.overwrite.auditranscribe.exceptions.network.APIServerTimeoutException;
+import site.overwrite.auditranscribe.exceptions.network.APIServerException;
 
 import java.io.*;
 import java.net.*;
@@ -44,7 +44,7 @@ public final class APICallHandler {
      *                     connection to the API server.
      */
     public static JsonObject sendAPIRequest(String page, RequestMethod method) throws IOException,
-            APIServerTimeoutException {
+            APIServerException {
         return sendAPIRequest(page, method, null);
     }
 
@@ -61,7 +61,7 @@ public final class APICallHandler {
      */
     public static JsonObject sendAPIRequest(
             String page, RequestMethod method, Map<String, String> params
-    ) throws IOException, APIServerTimeoutException {
+    ) throws IOException, APIServerException {
         // Form the destination URL
         String urlString = API_SERVER_URL + page;
         if (params != null) {
@@ -98,8 +98,10 @@ public final class APICallHandler {
 
             // Close the input stream
             in.close();
+        } catch (ConnectException e) {
+            throw new APIServerException("Connection to '" + urlString + "' refused");
         } catch (SocketTimeoutException e) {
-            throw new APIServerTimeoutException("Connection to '" + urlString + "' timed out");
+            throw new APIServerException("Connection to '" + urlString + "' timed out");
         } finally {
             // Must remember to disconnect
             con.disconnect();
