@@ -2,7 +2,7 @@
  * MainViewController.java
  *
  * Created on 2022-02-09
- * Updated on 2022-08-11
+ * Updated on 2022-08-13
  *
  * Description: Contains the main view's controller class.
  */
@@ -102,17 +102,6 @@ public class MainViewController implements Initializable {
             menuBar.useSystemMenuBarProperty().set(true);
         }
 
-        // Get the current version
-        try {
-            // Get the project properties file
-            PropertyFile projectPropertiesFile = new PropertyFile("project.properties");
-
-            // Update the version label with the version number
-            versionLabel.setText("Version " + projectPropertiesFile.getProperty("version"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
         // Add methods to buttons
         newProjectButton.setOnAction(this::handleNewProject);
 
@@ -202,6 +191,15 @@ public class MainViewController implements Initializable {
         searchImage.setImage(new Image(IOMethods.getFileURLAsString(
                 "images/icons/PNGs/" + theme.shortName + "/search.png"
         )));
+    }
+
+    /**
+     * Method that sets the version on the version label.
+     *
+     * @param version Current version of AudiTranscribe.
+     */
+    public void setVersionLabel(String version) {
+        versionLabel.setText("Version " + version);
     }
 
     /**

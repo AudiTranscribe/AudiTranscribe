@@ -2,7 +2,7 @@
  * SceneSwitcher.java
  *
  * Created on 2022-06-22
- * Updated on 2022-07-12
+ * Updated on 2022-08-13
  *
  * Description: Class that handles the switching between the main scene and transcription scenes.
  */
@@ -49,6 +49,7 @@ import java.util.logging.Level;
 public class SceneSwitcher {
     // Attributes
     private final SettingsFile settingsFile;
+    private final String currentVersion;
 
     private final Stage mainStage = new Stage();
     private final Stage transcriptionStage = new Stage();
@@ -60,12 +61,14 @@ public class SceneSwitcher {
     /**
      * Initialization method for a <code>SceneSwitcher</code> object.
      *
-     * @param settingsFile Settings file to use.
+     * @param settingsFile   Settings file to use.
+     * @param currentVersion Current version of AudiTranscribe.
      */
     // Todo: somehow use the main scene
-    public SceneSwitcher(SettingsFile settingsFile) {
-        // Update `settingsFile` attribute
+    public SceneSwitcher(SettingsFile settingsFile, String currentVersion) {
+        // Update attributes
         this.settingsFile = settingsFile;
+        this.currentVersion = currentVersion;
 
         // Set icon for the main stage and transcription stage, if not on macOS
         if (OSMethods.getOS() != OSType.MAC) {
@@ -151,8 +154,9 @@ public class SceneSwitcher {
             // Set the settings file on the main scene
             controller.setSettingsFile(settingsFile);
 
-            // Set the theme of the scene
+            // Setup main scene
             controller.setThemeOnScene();
+            controller.setVersionLabel(currentVersion);
 
             // Set main stage properties
             mainStage.setTitle("Welcome to AudiTranscribe");
