@@ -2,7 +2,7 @@
  * SetupWizard.java
  *
  * Created on 2022-06-19
- * Updated on 2022-07-24
+ * Updated on 2022-08-13
  *
  * Description: Class that handles the setup wizard.
  */
@@ -16,6 +16,7 @@ import javafx.stage.StageStyle;
 import site.overwrite.auditranscribe.audio.FFmpegHandler;
 import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.io.json_files.file_classes.PersistentDataFile;
 import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.setup_wizard.view_controllers.*;
@@ -28,19 +29,24 @@ import java.net.URL;
  */
 public class SetupWizard {
     // Attributes
-    private final Stage stage;
     private final SettingsFile settingsFile;
+    private final PersistentDataFile persistentDataFile;
+
+    private final Stage stage;
     private final Theme theme;
 
     /**
      * Initializes the setup wizard helper.
      *
-     * @param settingsFile The settings file.
+     * @param settingsFile       The settings file.
+     * @param persistentDataFile The persistent data file.
      */
-    public SetupWizard(SettingsFile settingsFile) {
+    public SetupWizard(SettingsFile settingsFile, PersistentDataFile persistentDataFile) {
         // Set attributes
-        this.stage = new Stage(StageStyle.UTILITY);
         this.settingsFile = settingsFile;
+        this.persistentDataFile = persistentDataFile;
+
+        this.stage = new Stage(StageStyle.UTILITY);
         this.theme = Theme.values()[settingsFile.data.themeEnumOrdinal];
 
         // Set stage properties
@@ -51,7 +57,7 @@ public class SetupWizard {
     // Public methods
     public void showSetupWizard() {
         // Check if the setup is complete
-        if (settingsFile.data.isSetupCompleted) return;  // Don't need to perform setup again
+        if (persistentDataFile.data.isSetupComplete) return;  // Don't need to perform setup again
 
         // Show the initial view for the setup wizard
         boolean userSayFFmpegInstalled = showInitialView();
@@ -129,11 +135,13 @@ public class SetupWizard {
         // Report that the setup process has completed
         showFinishSetupView();
 
-        // Update settings file data
+        // Update files' data
         settingsFile.data.ffmpegInstallationPath = ffmpegPath;
-        settingsFile.data.isSetupCompleted = true;
         settingsFile.data.notePlayingDelayOffset = notePlaybackDelay;
         settingsFile.saveFile();
+
+        persistentDataFile.data.isSetupComplete = true;
+        persistentDataFile.saveFile();
     }
 
     // Private methods
