@@ -7,7 +7,7 @@
  * Description: Class that contains persistent data.
  */
 
-package site.overwrite.auditranscribe.io.json_files.data_encapsulators;
+package site.overwrite.auditranscribe.io.data_files.data_encapsulators;
 
 /**
  * Class that contains persistent data.

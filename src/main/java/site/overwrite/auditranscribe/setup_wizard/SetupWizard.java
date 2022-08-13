@@ -16,8 +16,7 @@ import javafx.stage.StageStyle;
 import site.overwrite.auditranscribe.audio.FFmpegHandler;
 import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.io.json_files.file_classes.PersistentDataFile;
-import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
+import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.setup_wizard.view_controllers.*;
 
@@ -29,25 +28,16 @@ import java.net.URL;
  */
 public class SetupWizard {
     // Attributes
-    private final SettingsFile settingsFile;
-    private final PersistentDataFile persistentDataFile;
-
     private final Stage stage;
     private final Theme theme;
 
     /**
      * Initializes the setup wizard helper.
-     *
-     * @param settingsFile       The settings file.
-     * @param persistentDataFile The persistent data file.
      */
-    public SetupWizard(SettingsFile settingsFile, PersistentDataFile persistentDataFile) {
+    public SetupWizard() {
         // Set attributes
-        this.settingsFile = settingsFile;
-        this.persistentDataFile = persistentDataFile;
-
         this.stage = new Stage(StageStyle.UTILITY);
-        this.theme = Theme.values()[settingsFile.data.themeEnumOrdinal];
+        this.theme = Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal];
 
         // Set stage properties
         stage.setTitle("Setup Wizard");
@@ -57,7 +47,7 @@ public class SetupWizard {
     // Public methods
     public void showSetupWizard() {
         // Check if the setup is complete
-        if (persistentDataFile.data.isSetupComplete) return;  // Don't need to perform setup again
+        if (DataFiles.PERSISTENT_DATA_FILE.data.isSetupComplete) return;  // Don't need to perform setup again
 
         // Show the initial view for the setup wizard
         boolean userSayFFmpegInstalled = showInitialView();
@@ -136,12 +126,12 @@ public class SetupWizard {
         showFinishSetupView();
 
         // Update files' data
-        settingsFile.data.ffmpegInstallationPath = ffmpegPath;
-        settingsFile.data.notePlayingDelayOffset = notePlaybackDelay;
-        settingsFile.saveFile();
+        DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath = ffmpegPath;
+        DataFiles.SETTINGS_DATA_FILE.data.notePlayingDelayOffset = notePlaybackDelay;
+        DataFiles.SETTINGS_DATA_FILE.saveFile();
 
-        persistentDataFile.data.isSetupComplete = true;
-        persistentDataFile.saveFile();
+        DataFiles.PERSISTENT_DATA_FILE.data.isSetupComplete = true;
+        DataFiles.PERSISTENT_DATA_FILE.saveFile();
     }
 
     // Private methods

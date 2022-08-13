@@ -2,7 +2,7 @@
  * TranscriptionViewController.java
  *
  * Created on 2022-02-12
- * Updated on 2022-08-07
+ * Updated on 2022-08-13
  *
  * Description: Contains the transcription view's controller class.
  */
@@ -38,10 +38,10 @@ import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.*;
+import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
-import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
@@ -127,7 +127,6 @@ public class TranscriptionViewController implements Initializable {
     private boolean hasUnsavedChanges = true;
     private int fileVersion;
 
-    private SettingsFile settingsFile;
     private Theme theme;
 
     private NotePlayerSynth notePlayerSynth;
@@ -533,8 +532,8 @@ public class TranscriptionViewController implements Initializable {
         saveProjectMenuItem.setOnAction(event -> handleSavingProject(false, false));
         saveAsMenuItem.setOnAction(event -> handleSavingProject(false, true));
         exportMIDIMenuItem.setOnAction(event -> handleExportMIDI());
-        preferencesMenuItem.setOnAction(actionEvent -> PreferencesViewController.showPreferencesWindow(settingsFile));
-        aboutMenuItem.setOnAction(actionEvent -> AboutViewController.showAboutWindow(settingsFile));
+        preferencesMenuItem.setOnAction(actionEvent -> PreferencesViewController.showPreferencesWindow());
+        aboutMenuItem.setOnAction(actionEvent -> AboutViewController.showAboutWindow());
 
         // Get the projects database
         try {
@@ -552,10 +551,6 @@ public class TranscriptionViewController implements Initializable {
     }
 
     // Getter/Setter methods
-    public void setSettingsFile(SettingsFile settingsFile) {
-        this.settingsFile = settingsFile;
-    }
-
     public SceneSwitchingState getSceneSwitchingState() {
         if (sceneSwitchingState == null) return SceneSwitchingState.SHOW_MAIN_SCENE;
         return sceneSwitchingState;
@@ -576,7 +571,7 @@ public class TranscriptionViewController implements Initializable {
      */
     public void setThemeOnScene() {
         // Get the theme
-        theme = Theme.values()[settingsFile.data.themeEnumOrdinal];
+        theme = Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal];
 
         // Set stylesheets
         rootPane.getStylesheets().clear();  // Reset the stylesheets first before adding new ones
@@ -849,7 +844,7 @@ public class TranscriptionViewController implements Initializable {
 
                 // Obtain the raw spectrogram magnitudes
                 double[][] magnitudes = spectrogram.getSpectrogramMagnitudes(
-                        WindowFunction.values()[settingsFile.data.windowFunctionEnumOrdinal]
+                        WindowFunction.values()[DataFiles.SETTINGS_DATA_FILE.data.windowFunctionEnumOrdinal]
                 );
 
                 // Update attributes
@@ -864,7 +859,7 @@ public class TranscriptionViewController implements Initializable {
                 // Generate spectrogram
                 return spectrogram.generateSpectrogram(
                         magnitudes,
-                        ColourScale.values()[settingsFile.data.colourScaleEnumOrdinal]
+                        ColourScale.values()[DataFiles.SETTINGS_DATA_FILE.data.colourScaleEnumOrdinal]
                 );
             }
         };
@@ -934,7 +929,7 @@ public class TranscriptionViewController implements Initializable {
         fos.close();
 
         // Define a new FFmpeg handler
-        FFmpegHandler FFmpegHandler = new FFmpegHandler(settingsFile.data.ffmpegInstallationPath);
+        FFmpegHandler FFmpegHandler = new FFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
 
         // Generate the output path to the MP3 file
         String outputPath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-2.wav");
@@ -976,7 +971,7 @@ public class TranscriptionViewController implements Initializable {
                 );
                 return spectrogram.generateSpectrogram(
                         magnitudes,
-                        ColourScale.values()[settingsFile.data.colourScaleEnumOrdinal]
+                        ColourScale.values()[DataFiles.SETTINGS_DATA_FILE.data.colourScaleEnumOrdinal]
                 );
             }
         };
@@ -1151,9 +1146,9 @@ public class TranscriptionViewController implements Initializable {
         // Update note sequencer current time
         if (!areNotesMuted && notePlayerSequencer.isSequencerAvailable()) {
             if (!notePlayerSequencer.getSequencer().isRunning() && !isPaused) {  // Not running but unpaused
-                notePlayerSequencer.play(seekTime + settingsFile.data.notePlayingDelayOffset);
+                notePlayerSequencer.play(seekTime + DataFiles.SETTINGS_DATA_FILE.data.notePlayingDelayOffset);
             } else {
-                notePlayerSequencer.setCurrTime(seekTime + settingsFile.data.notePlayingDelayOffset);
+                notePlayerSequencer.setCurrTime(seekTime + DataFiles.SETTINGS_DATA_FILE.data.notePlayingDelayOffset);
             }
         }
 
@@ -1648,7 +1643,8 @@ public class TranscriptionViewController implements Initializable {
                 } else {
                     MyLogger.log(Level.INFO, "Autosave skipped, no project loaded", this.getClass().toString());
                 }
-            }), settingsFile.data.autosaveInterval, settingsFile.data.autosaveInterval, TimeUnit.MINUTES);
+            }), DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval, DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval,
+                    TimeUnit.MINUTES);
 
             // Create a third constantly-executing service for updating memory available
             memoryAvailableScheduler = Executors.newScheduledThreadPool(0, runnable -> {
@@ -2009,7 +2005,7 @@ public class TranscriptionViewController implements Initializable {
         // Play notes on note player sequencer
         // (We separate this method from above to ensure a more accurate note playing delay)
         if (!isPaused && !areNotesMuted) {  // We use `!isPaused` here because it was toggled already
-            notePlayerSequencer.play(currTime + settingsFile.data.notePlayingDelayOffset);
+            notePlayerSequencer.play(currTime + DataFiles.SETTINGS_DATA_FILE.data.notePlayingDelayOffset);
         }
 
         // Disable note volume slider and note muting button if playing
@@ -2391,7 +2387,7 @@ public class TranscriptionViewController implements Initializable {
         if (compressedMP3Bytes == null) {
             try {
                 compressedMP3Bytes = CompressionHandlers.lz4Compress(
-                        audio.wavBytesToMP3Bytes(settingsFile.data.ffmpegInstallationPath),
+                        audio.wavBytesToMP3Bytes(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath),
                         task
                 );
             } catch (IOException e) {

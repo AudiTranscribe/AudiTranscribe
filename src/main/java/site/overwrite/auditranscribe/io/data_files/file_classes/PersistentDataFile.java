@@ -7,17 +7,17 @@
  * Description: Handles the interactions with the persistent data file.
  */
 
-package site.overwrite.auditranscribe.io.json_files.file_classes;
+package site.overwrite.auditranscribe.io.data_files.file_classes;
 
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.io.json_files.JSONFile;
-import site.overwrite.auditranscribe.io.json_files.data_encapsulators.PersistentData;
+import site.overwrite.auditranscribe.io.data_files.JSONDataFile;
+import site.overwrite.auditranscribe.io.data_files.data_encapsulators.PersistentData;
 
 /**
  * Handles the interactions with the persistent data file.
  */
-public class PersistentDataFile extends JSONFile<PersistentData> {
+public class PersistentDataFile extends JSONDataFile<PersistentData> {
 
     /**
      * Initialization method for a <code>PersistentDataFile</code> object.

@@ -13,8 +13,7 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.io.json_files.file_classes.PersistentDataFile;
-import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
+import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitcher;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.setup_wizard.SetupWizard;
@@ -28,19 +27,15 @@ public class MainApplication extends Application {
         // Ensure that an application folder exists
         IOMethods.createFolder(IOConstants.APP_DATA_FOLDER_PATH);
 
-        // Get the data files
-        SettingsFile settingsFile = new SettingsFile();
-        PersistentDataFile persistentDataFile = new PersistentDataFile();
-
         // Clear any old logs
-        MyLogger.clearOldLogs(settingsFile.data.logFilePersistence);
+        MyLogger.clearOldLogs(DataFiles.SETTINGS_DATA_FILE.data.logFilePersistence);
 
         // Run setup wizard
-        SetupWizard setupWizard = new SetupWizard(settingsFile, persistentDataFile);
+        SetupWizard setupWizard = new SetupWizard();
         setupWizard.showSetupWizard();
 
         // Start scene handler
-        SceneSwitcher sceneHandler = new SceneSwitcher(settingsFile);
+        SceneSwitcher sceneHandler = new SceneSwitcher();
         sceneHandler.startHandler();
     }
 

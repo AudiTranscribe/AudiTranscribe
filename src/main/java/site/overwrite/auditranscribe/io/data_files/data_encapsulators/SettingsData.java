@@ -7,7 +7,7 @@
  * Description: Class that contains the settings data.
  */
 
-package site.overwrite.auditranscribe.io.json_files.data_encapsulators;
+package site.overwrite.auditranscribe.io.data_files.data_encapsulators;
 
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.misc.Theme;

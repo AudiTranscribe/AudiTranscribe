@@ -2,7 +2,7 @@
  * FFmpegHandlerTest.java
  *
  * Created on 2022-05-06
- * Updated on 2022-07-09
+ * Updated on 2022-08-13
  *
  * Description: Test `FFmpegHandler.java`.
  */
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.exceptions.audio.FFmpegCommandFailedException;
 import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
+import site.overwrite.auditranscribe.io.data_files.DataFiles;
 
 import java.io.File;
 
@@ -39,7 +39,7 @@ class FFmpegHandlerTest {
         try {
             assertTrue(FFmpegHandler.checkFFmpegPath("ffmpeg"));  // Should exist => true
         } catch (AssertionError e) {
-            assertTrue(FFmpegHandler.checkFFmpegPath(new SettingsFile().data.ffmpegInstallationPath));
+            assertTrue(FFmpegHandler.checkFFmpegPath(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath));
         }
         assertFalse(FFmpegHandler.checkFFmpegPath("fake-ffmpeg-path"));  // IO Exception should be thrown => false
         assertFalse(FFmpegHandler.checkFFmpegPath("git"));  // Should give error code 1 => false
@@ -59,7 +59,7 @@ class FFmpegHandlerTest {
             handler = new FFmpegHandler("ffmpeg");
         } catch (FFmpegNotFoundException e) {
             // Try to get the path from the settings file
-            handler = new FFmpegHandler(new SettingsFile().data.ffmpegInstallationPath);
+            handler = new FFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
         }
 
         // Determine the output path
@@ -83,7 +83,7 @@ class FFmpegHandlerTest {
             handler = new FFmpegHandler("ffmpeg");
         } catch (FFmpegNotFoundException e) {
             // Try to get the path from the settings file
-            handler = new FFmpegHandler(new SettingsFile().data.ffmpegInstallationPath);
+            handler = new FFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
         }
 
         // Try to test on a non-existent MP3 file

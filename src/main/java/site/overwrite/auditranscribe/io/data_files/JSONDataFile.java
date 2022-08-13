@@ -1,13 +1,13 @@
 /*
- * JSONFile.java
+ * JSONDataFile.java
  *
  * Created on 2022-05-30
- * Updated on 2022-07-03
+ * Updated on 2022-08-13
  *
  * Description: Abstract class that helps handle interactions with JSON files.
  */
 
-package site.overwrite.auditranscribe.io.json_files;
+package site.overwrite.auditranscribe.io.data_files;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -21,7 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * Abstract class that helps handle interactions with JSON files.
  */
-public abstract class JSONFile<T> {
+public abstract class JSONDataFile<T> {
     // Attributes
     public final String filePath;
 
@@ -30,12 +30,12 @@ public abstract class JSONFile<T> {
     public T data;
 
     /**
-     * Initialization method for a <code>JSONFile</code> object.
+     * Initialization method for a <code>JSONDataFile</code> object.
      *
      * @param filePath <b>Absolute</b> file path to the JSON file.
      * @param cls      Class to use.
      */
-    public JSONFile(String filePath, Class<T> cls) {
+    public JSONDataFile(String filePath, Class<T> cls) {
         // Update attributes
         this.cls = cls;
         this.filePath = filePath;
