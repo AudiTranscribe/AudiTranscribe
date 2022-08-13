@@ -54,7 +54,7 @@ public class PreferencesViewController implements Initializable {
     private ChoiceBox<Theme> themeChoiceBox;
 
     @FXML
-    private Spinner<Integer> autosaveIntervalSpinner, logFilePersistenceSpinner;
+    private Spinner<Integer> autosaveIntervalSpinner, logFilePersistenceSpinner, checkForUpdateIntervalSpinner;
 
     @FXML
     private Spinner<Double> notePlayingDelayOffsetSpinner;
@@ -185,7 +185,8 @@ public class PreferencesViewController implements Initializable {
         // Arrays that store the fields that just need to disable the apply button
         ChoiceBox<?>[] choiceBoxes = new ChoiceBox[]{colourScaleChoiceBox, windowFunctionChoiceBox};
         Spinner<?>[] spinners = new Spinner[]{
-                notePlayingDelayOffsetSpinner, autosaveIntervalSpinner, logFilePersistenceSpinner
+                notePlayingDelayOffsetSpinner, autosaveIntervalSpinner, logFilePersistenceSpinner,
+                checkForUpdateIntervalSpinner
         };
 
         // Set choice box values
@@ -215,6 +216,9 @@ public class PreferencesViewController implements Initializable {
         ));
         logFilePersistenceSpinner.setValueFactory(new CustomIntegerSpinnerValueFactory(
                 1, Integer.MAX_VALUE, DataFiles.SETTINGS_DATA_FILE.data.logFilePersistence, 1
+        ));
+        checkForUpdateIntervalSpinner.setValueFactory(new CustomIntegerSpinnerValueFactory(
+                1, 30, DataFiles.SETTINGS_DATA_FILE.data.checkForUpdateInterval, 1
         ));
 
         for (Spinner<?> spinner : spinners) {
@@ -285,6 +289,7 @@ public class PreferencesViewController implements Initializable {
         DataFiles.SETTINGS_DATA_FILE.data.windowFunctionEnumOrdinal = windowFunctionChoiceBox.getValue().ordinal();
 
         DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal = themeChoiceBox.getValue().ordinal();
+        DataFiles.SETTINGS_DATA_FILE.data.checkForUpdateInterval = checkForUpdateIntervalSpinner.getValue();
 
         // Apply settings to the settings file
         DataFiles.SETTINGS_DATA_FILE.saveFile();

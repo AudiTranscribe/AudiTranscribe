@@ -48,6 +48,8 @@ import java.util.logging.Level;
  */
 public class SceneSwitcher {
     // Attributes
+    private final String currentVersion;
+
     private final Stage mainStage = new Stage();
     private final Stage transcriptionStage = new Stage();
 
@@ -57,9 +59,14 @@ public class SceneSwitcher {
 
     /**
      * Initialization method for a <code>SceneSwitcher</code> object.
+     *
+     * @param currentVersion Current version of AudiTranscribe.
      */
     // Todo: somehow use the main scene
-    public SceneSwitcher() {
+    public SceneSwitcher(String currentVersion) {
+        // Update attributes
+        this.currentVersion = currentVersion;
+
         // Set icon for the main stage and transcription stage, if not on macOS
         if (OSMethods.getOS() != OSType.MAC) {
             Image icon = new Image(IOMethods.getInputStream("images/logo-and-banner/icon.png"));
@@ -141,8 +148,9 @@ public class SceneSwitcher {
             // Get the view controller
             MainViewController controller = fxmlLoader.getController();
 
-            // Set the theme of the scene
+            // Setup main scene
             controller.setThemeOnScene();
+            controller.setVersionLabel(currentVersion);
 
             // Set main stage properties
             mainStage.setTitle("Welcome to AudiTranscribe");

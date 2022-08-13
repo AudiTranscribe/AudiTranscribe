@@ -13,7 +13,9 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.io.PropertyFile;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
+import site.overwrite.auditranscribe.main_views.helpers.CheckForUpdatesViewHelper;
 import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitcher;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.setup_wizard.SetupWizard;
@@ -34,8 +36,23 @@ public class MainApplication extends Application {
         SetupWizard setupWizard = new SetupWizard();
         setupWizard.showSetupWizard();
 
+        // Get the current version
+        String currentVersion;
+        try {
+            // Get the project properties file
+            PropertyFile projectPropertiesFile = new PropertyFile("project.properties");
+
+            // Update the version label with the version number
+            currentVersion = projectPropertiesFile.getProperty("version");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Check if there are any updates
+        CheckForUpdatesViewHelper.checkForUpdates(currentVersion);
+
         // Start scene handler
-        SceneSwitcher sceneHandler = new SceneSwitcher();
+        SceneSwitcher sceneHandler = new SceneSwitcher(currentVersion);
         sceneHandler.startHandler();
     }
 
