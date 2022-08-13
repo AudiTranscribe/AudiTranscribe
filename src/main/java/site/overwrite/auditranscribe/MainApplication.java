@@ -14,7 +14,7 @@ import javafx.stage.Stage;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.PropertyFile;
-import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
+import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.main_views.helpers.CheckForUpdatesViewHelper;
 import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitcher;
 import site.overwrite.auditranscribe.misc.MyLogger;
@@ -29,14 +29,11 @@ public class MainApplication extends Application {
         // Ensure that an application folder exists
         IOMethods.createFolder(IOConstants.APP_DATA_FOLDER_PATH);
 
-        // Update the settings file attribute
-        SettingsFile settingsFile = new SettingsFile();
-
         // Clear any old logs
-        MyLogger.clearOldLogs(settingsFile.data.logFilePersistence);
+        MyLogger.clearOldLogs(DataFiles.SETTINGS_DATA_FILE.data.logFilePersistence);
 
         // Run setup wizard
-        SetupWizard setupWizard = new SetupWizard(settingsFile);
+        SetupWizard setupWizard = new SetupWizard();
         setupWizard.showSetupWizard();
 
         // Get the current version
@@ -55,7 +52,7 @@ public class MainApplication extends Application {
         CheckForUpdatesViewHelper.checkForUpdates(currentVersion);
 
         // Start scene handler
-        SceneSwitcher sceneHandler = new SceneSwitcher(settingsFile, currentVersion);
+        SceneSwitcher sceneHandler = new SceneSwitcher(currentVersion);
         sceneHandler.startHandler();
     }
 

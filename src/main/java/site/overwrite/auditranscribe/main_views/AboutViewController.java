@@ -2,7 +2,7 @@
  * AboutViewController.java
  *
  * Created on 2022-05-08
- * Updated on 2022-07-07
+ * Updated on 2022-08-13
  *
  * Description: View controller for the "about" window.
  */
@@ -22,7 +22,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.PropertyFile;
-import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
+import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.utils.GUIUtils;
@@ -33,9 +33,6 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 
 public class AboutViewController implements Initializable {
-    // Attributes
-    private SettingsFile settingsFile;
-
     // FXML Elements
     @FXML
     private Pane rootPane;
@@ -76,11 +73,6 @@ public class AboutViewController implements Initializable {
         }
     }
 
-    // Setter methods
-    public void setSettingsFile(SettingsFile settingsFile) {
-        this.settingsFile = settingsFile;
-    }
-
     // Public methods
 
     /**
@@ -88,7 +80,7 @@ public class AboutViewController implements Initializable {
      */
     public void setThemeOnScene() {
         // Get the theme
-        Theme theme = Theme.values()[settingsFile.data.themeEnumOrdinal];
+        Theme theme = Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal];
 
         // Set stylesheets
         rootPane.getStylesheets().clear();  // Reset the stylesheets first before adding new ones
@@ -104,11 +96,8 @@ public class AboutViewController implements Initializable {
 
     /**
      * Method that shows the "about" window.
-     *
-     * @param settingsFile The <code>SettingsFile</code> object that handles the reading and writing
-     *                     of settings.
      */
-    public static void showAboutWindow(SettingsFile settingsFile) {
+    public static void showAboutWindow() {
         try {
             // Load the FXML file into the scene
             FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/main/about-view.fxml"));
@@ -116,9 +105,6 @@ public class AboutViewController implements Initializable {
 
             // Get the view controller
             AboutViewController controller = fxmlLoader.getController();
-
-            // Update the `settingsFile` attribute
-            controller.setSettingsFile(settingsFile);
 
             // Set the theme of the scene
             controller.setThemeOnScene();

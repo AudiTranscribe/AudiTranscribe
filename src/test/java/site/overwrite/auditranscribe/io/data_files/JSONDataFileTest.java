@@ -1,13 +1,13 @@
 /*
- * JSONFileTest.java
+ * JSONDataFileTest.java
  *
  * Created on 2022-07-03
  * Updated on 2022-07-09
  *
- * Description: Test `JSONFile.java`.
+ * Description: Test `JSONDataFile.java`.
  */
 
-package site.overwrite.auditranscribe.io.json_files;
+package site.overwrite.auditranscribe.io.data_files;
 
 import com.google.gson.JsonIOException;
 import org.junit.jupiter.api.*;
@@ -25,56 +25,56 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @EnabledOnOs({OS.LINUX})
-class JSONFileTest {
+class JSONDataFileTest {
     // Attributes
     static String FILE_PATH = IOMethods.joinPaths(
             IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
             "testing-files", "my-json.json"
     );
-    static JSONFile<TestingJSONData> jsonFile;
+    static JSONDataFile<TestingJSONData> jsonDataFile;
 
     // Tests
     @Test
     @Order(1)
     void initJSONFileObject() {
-        jsonFile = new TestingJSONFile();
+        jsonDataFile = new TestingJSONDataFile();
     }
 
     @Test
     @Order(2)
     void checkFileContentsOne() {
-        assertEquals(1, jsonFile.data.attr1);
-        assertEquals(2.345, jsonFile.data.attr2);
-        assertFalse(jsonFile.data.attr3);
-        assertEquals("Yes", jsonFile.data.attr4);
-        assertEquals("This should not be changed", jsonFile.data.attr5);
+        assertEquals(1, jsonDataFile.data.attr1);
+        assertEquals(2.345, jsonDataFile.data.attr2);
+        assertFalse(jsonDataFile.data.attr3);
+        assertEquals("Yes", jsonDataFile.data.attr4);
+        assertEquals("This should not be changed", jsonDataFile.data.attr5);
     }
 
     @Test
     @Order(3)
     void saveFile() {
         // Modify some data
-        jsonFile.data.attr1 = -1;
-        jsonFile.data.attr2 = -2.345;
-        jsonFile.data.attr3 = true;
-        jsonFile.data.attr4 = "No";
+        jsonDataFile.data.attr1 = -1;
+        jsonDataFile.data.attr2 = -2.345;
+        jsonDataFile.data.attr3 = true;
+        jsonDataFile.data.attr4 = "No";
 
         // Save the file
-        jsonFile.saveFile();
+        jsonDataFile.saveFile();
     }
 
     @Test
     @Order(4)
     void checkFileContentsTwo() {
-        // Re-initialize the `jsonFile` object
-        jsonFile = new TestingJSONFile();
+        // Re-initialize the `jsonDataFile` object
+        jsonDataFile = new TestingJSONDataFile();
 
         // Check attribute values
-        assertEquals(-1, jsonFile.data.attr1);
-        assertEquals(-2.345, jsonFile.data.attr2);
-        assertTrue(jsonFile.data.attr3);
-        assertEquals("No", jsonFile.data.attr4);
-        assertEquals("This should not be changed", jsonFile.data.attr5);
+        assertEquals(-1, jsonDataFile.data.attr1);
+        assertEquals(-2.345, jsonDataFile.data.attr2);
+        assertTrue(jsonDataFile.data.attr3);
+        assertEquals("No", jsonDataFile.data.attr4);
+        assertEquals("This should not be changed", jsonDataFile.data.attr5);
     }
 
     @Test
@@ -87,7 +87,7 @@ class JSONFileTest {
         IOMethods.createFolder(FILE_PATH);
 
         // Now try and save
-        assertThrowsExactly(RuntimeException.class, () -> jsonFile.saveFile());
+        assertThrowsExactly(RuntimeException.class, () -> jsonDataFile.saveFile());
     }
 
     @Test
@@ -105,7 +105,7 @@ class JSONFileTest {
     @Test
     @Order(7)
     void checkInitializationFails() {
-        assertThrowsExactly(JsonIOException.class, TestingJSONFile::new);
+        assertThrowsExactly(JsonIOException.class, TestingJSONDataFile::new);
     }
 
     @Test
@@ -117,7 +117,7 @@ class JSONFileTest {
     @Test
     @Order(9)
     void incorrectInitializerTest() {
-        assertThrowsExactly(FailedToMakeJSONFileException.class, WrongTestingJSONFile::new);
+        assertThrowsExactly(FailedToMakeJSONFileException.class, WrongTestingJSONDataFile::new);
     }
 
     // Helper classes
@@ -139,15 +139,15 @@ class JSONFileTest {
         }
     }
 
-    static class TestingJSONFile extends JSONFile<TestingJSONData> {
-        public TestingJSONFile() {
-            super(JSONFileTest.FILE_PATH, TestingJSONData.class);
+    static class TestingJSONDataFile extends JSONDataFile<TestingJSONData> {
+        public TestingJSONDataFile() {
+            super(JSONDataFileTest.FILE_PATH, TestingJSONData.class);
         }
     }
 
-    static class WrongTestingJSONFile extends JSONFile<WrongTestingJSONData> {
-        public WrongTestingJSONFile() {
-            super(JSONFileTest.FILE_PATH, WrongTestingJSONData.class);
+    static class WrongTestingJSONDataFile extends JSONDataFile<WrongTestingJSONData> {
+        public WrongTestingJSONDataFile() {
+            super(JSONDataFileTest.FILE_PATH, WrongTestingJSONData.class);
         }
     }
 }

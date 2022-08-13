@@ -31,9 +31,9 @@ import org.javatuples.Pair;
 import org.javatuples.Quartet;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.PropertyFile;
+import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
-import site.overwrite.auditranscribe.io.json_files.data_encapsulators.SettingsData;
-import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
+import site.overwrite.auditranscribe.io.data_files.data_encapsulators.SettingsData;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.system.OSMethods;
@@ -61,8 +61,6 @@ public class MainViewController implements Initializable {
     private ProjectsDB projectsDB;
 
     private FilteredList<Quartet<Long, String, String, String>> filteredList;  // List of project records
-
-    private SettingsFile settingsFile;
 
     private SceneSwitchingState sceneSwitchingState = SceneSwitchingState.CLOSE_SCENE;
     private File selectedFile = null;
@@ -149,20 +147,15 @@ public class MainViewController implements Initializable {
 
         openProjectMenuItem.setOnAction(this::handleOpenProject);
 
-        preferencesMenuItem.setOnAction(actionEvent -> PreferencesViewController.showPreferencesWindow(settingsFile));
+        preferencesMenuItem.setOnAction(actionEvent -> PreferencesViewController.showPreferencesWindow());
 
-        aboutMenuItem.setOnAction(actionEvent -> AboutViewController.showAboutWindow(settingsFile));
+        aboutMenuItem.setOnAction(actionEvent -> AboutViewController.showAboutWindow());
 
         // Report that the main view is ready to be shown
         MyLogger.log(Level.INFO, "Main view ready to be shown", this.getClass().toString());
     }
 
     // Getter/Setter methods
-
-    public void setSettingsFile(SettingsFile settingsFile) {
-        this.settingsFile = settingsFile;
-    }
-
     public SceneSwitchingState getSceneSwitchingState() {
         if (sceneSwitchingState == null) return SceneSwitchingState.CLOSE_SCENE;
         return sceneSwitchingState;
@@ -179,7 +172,7 @@ public class MainViewController implements Initializable {
      */
     public void setThemeOnScene() {
         // Get the theme
-        Theme theme = Theme.values()[settingsFile.data.themeEnumOrdinal];
+        Theme theme = Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal];
 
         // Set stylesheets
         rootPane.getStylesheets().clear();  // Reset the stylesheets first before adding new ones
@@ -263,7 +256,7 @@ public class MainViewController implements Initializable {
             projectsListView.setItems(new SortedList<>(filteredList));  // Use a sorted list for searching
             projectsListView.setCellFactory(
                     customListCellListView -> new CustomListCell(
-                            projectsDB, projectsListView, settingsFile.data
+                            projectsDB, projectsListView, DataFiles.SETTINGS_DATA_FILE.data
                     )
             );
         } else {

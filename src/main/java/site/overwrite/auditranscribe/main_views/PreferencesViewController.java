@@ -2,7 +2,7 @@
  * PreferencesViewController.java
  *
  * Created on 2022-05-22
- * Updated on 2022-07-29
+ * Updated on 2022-08-13
  *
  * Description: Contains the preferences view's controller class.
  */
@@ -21,7 +21,7 @@ import javafx.stage.StageStyle;
 import site.overwrite.auditranscribe.audio.FFmpegHandler;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
+import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
@@ -39,7 +39,6 @@ import java.util.logging.Level;
 public class PreferencesViewController implements Initializable {
     // Attributes
     private String lastValidFFmpegPath;
-    private SettingsFile settingsFile;
 
     // FXML Elements
     @FXML
@@ -155,11 +154,6 @@ public class PreferencesViewController implements Initializable {
         MyLogger.log(Level.INFO, "Preferences view ready to be shown", this.getClass().toString());
     }
 
-    // Setter methods
-    public void setSettingsFile(SettingsFile settingsFile) {
-        this.settingsFile = settingsFile;
-    }
-
     // Public methods
 
     /**
@@ -181,12 +175,11 @@ public class PreferencesViewController implements Initializable {
      * Note that this method has to be called after the setting file has been set.
      */
     public void setThemeOnScene() {
-        setThemeOnScene(Theme.values()[settingsFile.data.themeEnumOrdinal]);
+        setThemeOnScene(Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal]);
     }
 
     /**
-     * Method that sets up the fields <b>after</b> the <code>settingsFile</code> attribute has been
-     * set.
+     * Method that sets up the fields.
      */
     public void setUpFields() {
         // Arrays that store the fields that just need to disable the apply button
@@ -196,10 +189,12 @@ public class PreferencesViewController implements Initializable {
         };
 
         // Set choice box values
-        themeChoiceBox.setValue(Theme.values()[settingsFile.data.themeEnumOrdinal]);
+        themeChoiceBox.setValue(Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal]);
 
-        colourScaleChoiceBox.setValue(ColourScale.values()[settingsFile.data.colourScaleEnumOrdinal]);
-        windowFunctionChoiceBox.setValue(WindowFunction.values()[settingsFile.data.windowFunctionEnumOrdinal]);
+        colourScaleChoiceBox.setValue(ColourScale.values()[DataFiles.SETTINGS_DATA_FILE.data.colourScaleEnumOrdinal]);
+        windowFunctionChoiceBox.setValue(
+                WindowFunction.values()[DataFiles.SETTINGS_DATA_FILE.data.windowFunctionEnumOrdinal]
+        );
 
         // Add methods to choice boxes
         for (ChoiceBox<?> choiceBox : choiceBoxes) {
@@ -213,13 +208,13 @@ public class PreferencesViewController implements Initializable {
 
         // Set spinner factories and methods
         notePlayingDelayOffsetSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
-                -1,1, settingsFile.data.notePlayingDelayOffset, 0.01, 2
+                -1, 1, DataFiles.SETTINGS_DATA_FILE.data.notePlayingDelayOffset, 0.01, 2
         ));
         autosaveIntervalSpinner.setValueFactory(new CustomIntegerSpinnerValueFactory(
-                1, Integer.MAX_VALUE, settingsFile.data.autosaveInterval, 1
+                1, Integer.MAX_VALUE, DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval, 1
         ));
         logFilePersistenceSpinner.setValueFactory(new CustomIntegerSpinnerValueFactory(
-                1,Integer.MAX_VALUE, settingsFile.data.logFilePersistence, 1
+                1, Integer.MAX_VALUE, DataFiles.SETTINGS_DATA_FILE.data.logFilePersistence, 1
         ));
 
         for (Spinner<?> spinner : spinners) {
@@ -227,17 +222,14 @@ public class PreferencesViewController implements Initializable {
         }
 
         // Update the last valid FFmpeg path, and set up the FFmpeg binary path text field
-        lastValidFFmpegPath = settingsFile.data.ffmpegInstallationPath;
+        lastValidFFmpegPath = DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath;
         ffmpegBinaryPathTextField.setText(lastValidFFmpegPath);
     }
 
     /**
      * Method that shows the preferences window.
-     *
-     * @param settingsFile The <code>SettingsFile</code> object that handles the reading and writing
-     *                     of settings.
      */
-    public static void showPreferencesWindow(SettingsFile settingsFile) {
+    public static void showPreferencesWindow() {
         try {
             // Load the FXML file into the scene
             FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL(
@@ -247,9 +239,6 @@ public class PreferencesViewController implements Initializable {
 
             // Get the view controller
             PreferencesViewController controller = fxmlLoader.getController();
-
-            // Update the `settingsFile` attribute
-            controller.setSettingsFile(settingsFile);
 
             // Set the theme of the scene
             controller.setThemeOnScene();
@@ -286,19 +275,19 @@ public class PreferencesViewController implements Initializable {
      */
     private void applySettings() {
         // Update settings' values
-        settingsFile.data.themeEnumOrdinal = themeChoiceBox.getValue().ordinal();
+        DataFiles.SETTINGS_DATA_FILE.data.notePlayingDelayOffset = notePlayingDelayOffsetSpinner.getValue();
+        DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath = ffmpegBinaryPathTextField.getText();
 
-        settingsFile.data.notePlayingDelayOffset = notePlayingDelayOffsetSpinner.getValue();
-        settingsFile.data.ffmpegInstallationPath = ffmpegBinaryPathTextField.getText();
+        DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval = autosaveIntervalSpinner.getValue();
+        DataFiles.SETTINGS_DATA_FILE.data.logFilePersistence = logFilePersistenceSpinner.getValue();
 
-        settingsFile.data.autosaveInterval = autosaveIntervalSpinner.getValue();
-        settingsFile.data.logFilePersistence = logFilePersistenceSpinner.getValue();
+        DataFiles.SETTINGS_DATA_FILE.data.colourScaleEnumOrdinal = colourScaleChoiceBox.getValue().ordinal();
+        DataFiles.SETTINGS_DATA_FILE.data.windowFunctionEnumOrdinal = windowFunctionChoiceBox.getValue().ordinal();
 
-        settingsFile.data.colourScaleEnumOrdinal = colourScaleChoiceBox.getValue().ordinal();
-        settingsFile.data.windowFunctionEnumOrdinal = windowFunctionChoiceBox.getValue().ordinal();
+        DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal = themeChoiceBox.getValue().ordinal();
 
         // Apply settings to the settings file
-        settingsFile.saveFile();
+        DataFiles.SETTINGS_DATA_FILE.saveFile();
 
         // Disable the apply button again
         applyButton.setDisable(true);

@@ -29,7 +29,7 @@ import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileReader;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import site.overwrite.auditranscribe.io.json_files.file_classes.SettingsFile;
+import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
@@ -48,7 +48,6 @@ import java.util.logging.Level;
  */
 public class SceneSwitcher {
     // Attributes
-    private final SettingsFile settingsFile;
     private final String currentVersion;
 
     private final Stage mainStage = new Stage();
@@ -61,13 +60,11 @@ public class SceneSwitcher {
     /**
      * Initialization method for a <code>SceneSwitcher</code> object.
      *
-     * @param settingsFile   Settings file to use.
      * @param currentVersion Current version of AudiTranscribe.
      */
     // Todo: somehow use the main scene
-    public SceneSwitcher(SettingsFile settingsFile, String currentVersion) {
+    public SceneSwitcher(String currentVersion) {
         // Update attributes
-        this.settingsFile = settingsFile;
         this.currentVersion = currentVersion;
 
         // Set icon for the main stage and transcription stage, if not on macOS
@@ -151,9 +148,6 @@ public class SceneSwitcher {
             // Get the view controller
             MainViewController controller = fxmlLoader.getController();
 
-            // Set the settings file on the main scene
-            controller.setSettingsFile(settingsFile);
-
             // Setup main scene
             controller.setThemeOnScene();
             controller.setVersionLabel(currentVersion);
@@ -206,7 +200,7 @@ public class SceneSwitcher {
             );
 
             // Generate a new WAV file
-            FFmpegHandler FFmpegHandler = new FFmpegHandler(settingsFile.data.ffmpegInstallationPath);
+            FFmpegHandler FFmpegHandler = new FFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
             File auxiliaryWAVFile = new File(
                     FFmpegHandler.convertAudio(audioFile, baseName + "-auxiliary-wav.wav")
             );
@@ -229,9 +223,6 @@ public class SceneSwitcher {
             Pair<Scene, TranscriptionViewController> stageSceneAndController = setupTranscriptionScene();
             Scene scene = stageSceneAndController.getValue0();
             TranscriptionViewController controller = stageSceneAndController.getValue1();
-
-            // Update the `settingsFile` attribute
-            controller.setSettingsFile(settingsFile);
 
             // Set the theme of the scene
             controller.setThemeOnScene();
@@ -332,9 +323,6 @@ public class SceneSwitcher {
             Pair<Scene, TranscriptionViewController> stageSceneAndController = setupTranscriptionScene();
             Scene scene = stageSceneAndController.getValue0();
             TranscriptionViewController controller = stageSceneAndController.getValue1();
-
-            // Update the `settingsFile` attribute
-            controller.setSettingsFile(settingsFile);
 
             // Set the theme of the scene
             controller.setThemeOnScene();

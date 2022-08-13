@@ -222,13 +222,13 @@
                             site/overwrite/auditranscribe/exceptions/**
                         </exclude>
                         <exclude>
+                            site/overwrite/auditranscribe/io/data_files/data_encapsulators/**
+                        </exclude>
+                        <exclude>
+                            site/overwrite/auditranscribe/io/data_files/file_classes/**
+                        </exclude>
+                        <exclude>
                             site/overwrite/auditranscribe/io/db/ProjectsDB.class
-                        </exclude>
-                        <exclude>
-                            site/overwrite/auditranscribe/io/json_files/data_encapsulators/**
-                        </exclude>
-                        <exclude>
-                            site/overwrite/auditranscribe/io/json_files/file_classes/**
                         </exclude>
                         <exclude>
                             site/overwrite/auditranscribe/main_views/**
