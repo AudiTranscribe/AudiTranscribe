@@ -14,4 +14,5 @@ package site.overwrite.auditranscribe.io.data_files.data_encapsulators;
  */
 public class PersistentData {
     public boolean isSetupComplete = false;
+    public int lastCheckedForUpdates = -1;
 }

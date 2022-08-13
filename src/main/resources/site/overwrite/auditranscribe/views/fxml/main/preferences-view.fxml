@@ -164,6 +164,16 @@
                                           </Label>
                                        </children>
                                     </VBox>
+                                    <VBox alignment="TOP_RIGHT" layoutX="20.0" layoutY="20.0" prefHeight="30.0">
+                                       <children>
+                                          <Label styleClass="setting-label" text="Update Checking Interval" />
+                                          <Label layoutX="10.0" layoutY="10.0" styleClass="setting-caption" text="Duration between checks for new updates">
+                                             <font>
+                                                <Font size="11.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </VBox>
                                  </children>
                               </VBox>
                               <VBox prefHeight="200.0" prefWidth="300.0" spacing="10.0" HBox.hgrow="ALWAYS">
@@ -172,6 +182,7 @@
                                  </padding>
                                  <children>
                                     <ChoiceBox fx:id="themeChoiceBox" prefHeight="30.0" prefWidth="150.0" />
+                                    <Spinner fx:id="checkForUpdateIntervalSpinner" editable="true" prefHeight="30.0" />
                                  </children>
                               </VBox>
                            </children>

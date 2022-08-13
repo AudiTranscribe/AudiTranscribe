@@ -24,6 +24,7 @@ import java.util.Map;
 public final class APICallHandler {
     // Constants
     static final String API_SERVER_URL = "https://api.auditranscribe.app/";
+//    static final String API_SERVER_URL = "http://127.0.0.1:5000/";  // For testing
 
     public static int CONNECTION_TIMEOUT = 5000;  // In milliseconds; duration to wait for connecting to server
     public static int READ_TIMEOUT = 5000;  // Duration to wait for reading the data

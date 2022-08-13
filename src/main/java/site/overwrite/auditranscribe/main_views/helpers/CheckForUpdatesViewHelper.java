@@ -14,11 +14,13 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import org.javatuples.Pair;
 import site.overwrite.auditranscribe.exceptions.network.APIServerException;
+import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.network.APICallHandler;
 import site.overwrite.auditranscribe.network.RequestMethod;
 import site.overwrite.auditranscribe.utils.GUIUtils;
+import site.overwrite.auditranscribe.utils.MiscUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -28,6 +30,11 @@ import java.util.logging.Level;
 public class CheckForUpdatesViewHelper {
     // Public methods
     public static void checkForUpdates(String currentVersion) {
+        // Determine if we need to check for updates
+        int currentTime = (int) MiscUtils.getUnixTimestamp();
+        int lastChecked = DataFiles.PERSISTENT_DATA_FILE.data.lastCheckedForUpdates;
+        if (currentTime - lastChecked <= DataFiles.SETTINGS_DATA_FILE.data.checkForUpdateInterval * 86400) return;
+
         // Check if there is any new updates available
         Pair<Boolean, String> response = checkIfHaveNewVersion(currentVersion);
         boolean isLatest = response.getValue0();
@@ -45,14 +52,14 @@ public class CheckForUpdatesViewHelper {
 
             // Show an alert telling the user that a new version is available
             ButtonType seeNewUpdate = new ButtonType("See New Update");
-            ButtonType dontRemind = new ButtonType("Don't Remind Me");
-            ButtonType ignore = new ButtonType("Ignore", ButtonBar.ButtonData.CANCEL_CLOSE);
+            ButtonType remindLater = new ButtonType("Remind Me Later");
+            ButtonType ignore = new ButtonType("Ignore For Now", ButtonBar.ButtonData.CANCEL_CLOSE);
 
             Optional<ButtonType> selectedButton = Popups.showMultiButtonAlert(
                     "New Version Available",
                     "New Version Available: " + semver,
                     "A new version for AudiTranscribe is available. Do you want to see it?",
-                    seeNewUpdate, dontRemind, ignore
+                    seeNewUpdate, remindLater, ignore
             );
 
             if (selectedButton.isPresent()) {
@@ -61,8 +68,11 @@ public class CheckForUpdatesViewHelper {
                     // Todo: use own website
                     String urlString = "https://github.com/AudiTranscribe/AudiTranscribe/releases/tag/" + newVersionTag;
                     GUIUtils.openURLInBrowser(urlString);
-                } else if (selectedButton.get() == dontRemind) {
-                    // Todo: supress warning for a set duration
+
+                } else if (selectedButton.get() == remindLater) {
+                    // Supress alert for a set duration
+                    DataFiles.PERSISTENT_DATA_FILE.data.lastCheckedForUpdates = currentTime;
+                    DataFiles.PERSISTENT_DATA_FILE.saveFile();
                 }
             }
         } else {

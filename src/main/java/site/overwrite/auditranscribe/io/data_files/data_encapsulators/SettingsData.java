@@ -31,4 +31,5 @@ public class SettingsData {
 
     // Miscellaneous data
     public int themeEnumOrdinal = Theme.LIGHT_MODE.ordinal();
+    public int checkForUpdateInterval = 3;  // In days
 }
