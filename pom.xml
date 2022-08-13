@@ -222,6 +222,9 @@
                             site/overwrite/auditranscribe/exceptions/**
                         </exclude>
                         <exclude>
+                            site/overwrite/auditranscribe/io/data_files/DataFiles.class
+                        </exclude>
+                        <exclude>
                             site/overwrite/auditranscribe/io/data_files/data_encapsulators/**
                         </exclude>
                         <exclude>
