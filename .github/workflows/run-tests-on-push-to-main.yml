@@ -8,6 +8,7 @@ on:
       - 'src/test/java/site/overwrite/auditranscribe/**'
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   run_tests:
