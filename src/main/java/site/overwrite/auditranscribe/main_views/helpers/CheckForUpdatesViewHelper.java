@@ -2,7 +2,7 @@
  * CheckForUpdatesViewHelper.java
  *
  * Created on 2022-08-13
- * Updated on 2022-08-13
+ * Updated on 2022-08-16
  *
  * Description: Helper class that handles the checking of updates.
  */
@@ -18,7 +18,6 @@ import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.network.APICallHandler;
-import site.overwrite.auditranscribe.network.RequestMethod;
 import site.overwrite.auditranscribe.utils.GUIUtils;
 import site.overwrite.auditranscribe.utils.MiscUtils;
 
@@ -100,7 +99,7 @@ public class CheckForUpdatesViewHelper {
 
         JsonObject response;
         try {
-            response = APICallHandler.sendAPIRequest("check-if-have-new-version", RequestMethod.GET, params);
+            response = APICallHandler.sendAPIGetRequest("check-if-have-new-version", params, 5000);
         } catch (APIServerException e) {
             // Return a value that says that the current version is latest
             MyLogger.log(

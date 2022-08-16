@@ -2,7 +2,7 @@
  * APICallHandler.java
  *
  * Created on 2022-07-07
- * Updated on 2022-08-13
+ * Updated on 2022-08-16
  *
  * Description: Methods that handle the reading and processing of API calls.
  */
@@ -23,11 +23,9 @@ import java.util.Map;
  */
 public final class APICallHandler {
     // Constants
+    public static int CONNECTION_TIMEOUT = 5000;  // In milliseconds; duration to wait for connecting to server
     static final String API_SERVER_URL = "https://api.auditranscribe.app/";
 //    static final String API_SERVER_URL = "http://127.0.0.1:5000/";  // For testing
-
-    public static int CONNECTION_TIMEOUT = 5000;  // In milliseconds; duration to wait for connecting to server
-    public static int READ_TIMEOUT = 5000;  // Duration to wait for reading the data
 
     private APICallHandler() {
         // Private constructor to signal this is a utility class
@@ -36,32 +34,31 @@ public final class APICallHandler {
     // Public methods
 
     /**
-     * Method that sends an API request to the API server using the desired method.
+     * Method that sends an API GET request to the API server using the desired method.
      *
-     * @param page   Page path to go to.
-     * @param method Method to use to send the request.
+     * @param page Page path to go to.
      * @return JSON object data as sent by the server.
      * @throws IOException If something went wrong when processing the URL or when opening a
      *                     connection to the API server.
      */
-    public static JsonObject sendAPIRequest(String page, RequestMethod method) throws IOException,
+    public static JsonObject sendAPIGetRequest(String page) throws IOException,
             APIServerException {
-        return sendAPIRequest(page, method, null);
+        return sendAPIGetRequest(page, null, 5000);
     }
 
     /**
-     * Method that sends an API request to the API server using the desired method and with the
+     * Method that sends an API GET request to the API server using the desired method and with the
      * specified parameters.
      *
-     * @param page   Page path to go to.
-     * @param method Method to use to send the request.
-     * @param params Parameters to include in the request.
+     * @param page    Page path to go to.
+     * @param params  Parameters to include in the request.
+     * @param timeout Duration to wait (in <b>milliseconds</b>) before timing out.
      * @return Raw request data from the server,
      * @throws IOException If something went wrong when processing the URL or when opening a
      *                     connection to the API server.
      */
-    public static JsonObject sendAPIRequest(
-            String page, RequestMethod method, Map<String, String> params
+    public static JsonObject sendAPIGetRequest(
+            String page, Map<String, String> params, int timeout
     ) throws IOException, APIServerException {
         // Form the destination URL
         String urlString = API_SERVER_URL + page;
@@ -72,33 +69,18 @@ public final class APICallHandler {
 
         // Set up a connection to the URL
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        StringBuilder content = new StringBuilder();
+        String output;
 
         try {
             // Set the request method for the connection
-            con.setRequestMethod(method.method);
+            con.setRequestMethod("GET");
 
             // Set timeouts
             con.setConnectTimeout(CONNECTION_TIMEOUT);
-            con.setReadTimeout(READ_TIMEOUT);
+            con.setReadTimeout(timeout);
 
-            // Get output from server
-            Reader streamReader;
-
-            if (con.getResponseCode() > 299) {
-                streamReader = new InputStreamReader(con.getErrorStream());
-            } else {
-                streamReader = new InputStreamReader(con.getInputStream());
-            }
-
-            BufferedReader in = new BufferedReader(streamReader);
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                content.append(inputLine);
-            }
-
-            // Close the input stream
-            in.close();
+            // Get the output from the connection
+            output = getConnectionOutput(con);
         } catch (ConnectException e) {
             throw new APIServerException("Connection to '" + urlString + "' refused");
         } catch (SocketTimeoutException e) {
@@ -109,7 +91,73 @@ public final class APICallHandler {
         }
 
         // Parse the content as JSON data
-        return JsonParser.parseString(content.toString()).getAsJsonObject();
+        return JsonParser.parseString(output).getAsJsonObject();
+    }
+
+    /**
+     * Method that sends an API POST request to the API server using the desired method.
+     *
+     * @param page   Page path to go to.
+     * @param params Parameters to send along the POST request.
+     * @return JSON object data as sent by the server.
+     * @throws IOException If something went wrong when processing the URL or when opening a
+     *                     connection to the API server.
+     */
+    public static JsonObject sendAPIPostRequest(String page, Map<String, String> params) throws IOException,
+            APIServerException {
+        return sendAPIPostRequest(page, params, 5000);
+    }
+
+    /**
+     * Method that sends an API POST request to the API server using the desired method and with the
+     * specified parameters.
+     *
+     * @param page    Page path to go to.
+     * @param params  Parameters to include in the request.
+     * @param timeout Duration to wait (in <b>milliseconds</b>) before timing out.
+     * @return Raw request data from the server,
+     * @throws IOException If something went wrong when processing the URL or when opening a
+     *                     connection to the API server.
+     */
+    public static JsonObject sendAPIPostRequest(
+            String page, Map<String, String> params, int timeout
+    ) throws IOException, APIServerException {
+        // Form the destination URL
+        String urlString = API_SERVER_URL + page;
+        URL url = new URL(urlString);
+
+        // Set up a connection to the URL
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        String output;
+
+        try {
+            // Set the request method for the connection
+            con.setRequestMethod("POST");
+
+            // Add POST data
+            con.setDoOutput(true);
+            DataOutputStream out = new DataOutputStream(con.getOutputStream());
+            out.writeBytes(paramsMapToString(params));
+            out.flush();
+            out.close();
+
+            // Set timeouts
+            con.setConnectTimeout(CONNECTION_TIMEOUT);
+            con.setReadTimeout(timeout);
+
+            // Get the output from the connection
+            output = getConnectionOutput(con);
+        } catch (ConnectException e) {
+            throw new APIServerException("Connection to '" + urlString + "' refused");
+        } catch (SocketTimeoutException e) {
+            throw new APIServerException("Connection to '" + urlString + "' timed out");
+        } finally {
+            // Must remember to disconnect
+            con.disconnect();
+        }
+
+        // Parse the content as JSON data
+        return JsonParser.parseString(output).getAsJsonObject();
     }
 
     // Private methods
@@ -125,14 +173,46 @@ public final class APICallHandler {
         // Build the main part of the string
         StringBuilder result = new StringBuilder();
 
-        for (Map.Entry<String, String> entry : params.entrySet()) {
-            result.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8));
-            result.append("=");
-            result.append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8));
-            result.append("&");
+        if (params != null) {
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                result.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8));
+                result.append("=");
+                result.append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8));
+                result.append("&");
+            }
+
+            // Remove trailing ampersand before returning
+            return result.substring(0, result.length() - 1);
         }
 
-        // Remove trailing ampersand before returning
-        return result.substring(0, result.length() - 1);
+        return "";
+    }
+
+    /**
+     * Helper method that gets the connection's output.
+     *
+     * @param con Connection.
+     * @return String representing the output from the connection.
+     * @throws IOException If something went wrong when reading the content.
+     */
+    private static String getConnectionOutput(HttpURLConnection con) throws IOException {
+        StringBuilder content = new StringBuilder();
+        Reader streamReader;
+
+        if (con.getResponseCode() > 299) {
+            streamReader = new InputStreamReader(con.getErrorStream());
+        } else {
+            streamReader = new InputStreamReader(con.getInputStream());
+        }
+
+        BufferedReader in = new BufferedReader(streamReader);
+        String inputLine;
+        while ((inputLine = in.readLine()) != null) {
+            content.append(inputLine);
+        }
+
+        in.close();
+
+        return content.toString();
     }
 }
