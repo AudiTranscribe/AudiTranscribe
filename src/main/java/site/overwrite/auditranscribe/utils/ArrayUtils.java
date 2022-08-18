@@ -2,7 +2,7 @@
  * ArrayUtils.java
  *
  * Created on 2022-02-16
- * Updated on 2022-06-28
+ * Updated on 2022-08-18
  *
  * Description: Array utility methods to modify, change, and search within arrays.
  */
@@ -13,9 +13,7 @@ import site.overwrite.auditranscribe.exceptions.generic.LengthException;
 import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.misc.Complex;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 /**
  * Array utility methods to modify, change, and search within arrays.
@@ -710,6 +708,32 @@ public final class ArrayUtils {
 
         // Return the output
         return output;
+    }
+
+    /**
+     * Flatten an array of arbitrarily nested arrays of elements into a flat list of elements.
+     *
+     * @param array An array of nested elements.
+     * @param cls   Class of the elements.
+     * @return Flattened list of elements, or <code>null</code> if the input is <code>null</code>.
+     */
+    public static <T> List<T> flatten(Object[] array, Class<T> cls) {
+        // If there is no array we don't have to do anything
+        if (array == null) return null;
+
+        // Create the list to store the elements
+        List<T> flatList = new ArrayList<>();
+
+        // Process each element in the un-flattened array
+        for (Object element : array) {
+            if (cls.isInstance(element)) {
+                // Is an instance of the target; add to flattened array
+                flatList.add(cls.cast(element));
+            } else {  // Has to be a nested array
+                flatList.addAll(flatten((Object[]) element, cls));
+            }
+        }
+        return flatList;
     }
 
     // Private methods

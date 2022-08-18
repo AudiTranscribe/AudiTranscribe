@@ -2,7 +2,7 @@
  * ArrayUtilsTest.java
  *
  * Created on 2022-03-12
- * Updated on 2022-06-28
+ * Updated on 2022-08-18
  *
  * Description: Test `ArrayUtils.java`.
  */
@@ -419,5 +419,34 @@ class ArrayUtilsTest {
         assertDoesNotThrow(() -> ArrayUtils.matmul(B, A));                          // ...but this should
         assertDoesNotThrow(() -> ArrayUtils.matmul(A, C));                          // Should execute fine...
         assertThrowsExactly(LengthException.class, () -> ArrayUtils.matmul(C, A));  // ...but not this
+    }
+
+    @Test
+    void flatten() {
+        // Define test arrays
+        Integer[][] array1 = {
+                {1, 2, 3, 4},
+                {5, 6, 7},
+                {8, 9},
+                {10}
+        };
+        Double[][][] array2 = {
+                {{1d}, {2d, 3d}},
+                {{4d, 5d, 6d}},
+                {{7d}, {8d, 9d}, {10d}},
+        };
+
+        // Define correct arrays
+        Integer[] correct1 = {
+                1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+        };
+        Double[] correct2 = {
+                1d, 2d, 3d, 4d, 5d, 6d, 7d, 8d, 9d, 10d
+        };
+
+        // Run tests
+        assertArrayEquals(correct1, ArrayUtils.flatten(array1, Integer.class).toArray());
+        assertArrayEquals(correct2, ArrayUtils.flatten(array2, Double.class).toArray());
+        assertNull(ArrayUtils.flatten(null, String.class));
     }
 }

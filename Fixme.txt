@@ -4,3 +4,5 @@ Fixme:
         - This also causes some notes to not play at the start of playback.
     - Playhead line desync / spectrogram scroll failure has not been resolved.
         - It triggers very inconsistently, how to cause it to trigger reliably?
+    - Exception in thread "JavaFX Application Thread" java.lang.IndexOutOfBoundsException: Index -1 out of bounds for
+      length 2
