@@ -2,7 +2,7 @@
  * TypeConversionUtils.java
  *
  * Created on 2022-06-05
- * Updated on 2022-06-28
+ * Updated on 2022-08-18
  *
  * Description: Type conversion utility methods.
  */
@@ -71,6 +71,34 @@ public final class TypeConversionUtils {
         int[] result = new int[ints.length];
         for (int i = 0; i < ints.length; i++) {
             result[i] = ints[i];
+        }
+        return result;
+    }
+
+    /**
+     * Method that converts a primitive double array to a non-primitive double array.
+     *
+     * @param doubles The primitive double array.
+     * @return The non-primitive double array.
+     */
+    public static Double[] toDoubleArray(double[] doubles) {
+        Double[] result = new Double[doubles.length];
+        for (int i = 0; i < doubles.length; i++) {
+            result[i] = doubles[i];
+        }
+        return result;
+    }
+
+    /**
+     * Method that converts a non-primitive double array to a primitive double array.
+     *
+     * @param doubles The non-primitive double array.
+     * @return The primitive double array.
+     */
+    public static double[] toDoubleArray(Double[] doubles) {
+        double[] result = new double[doubles.length];
+        for (int i = 0; i < doubles.length; i++) {
+            result[i] = doubles[i];
         }
         return result;
     }
