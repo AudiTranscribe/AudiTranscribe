@@ -2,7 +2,7 @@
  * CheckForUpdatesViewHelper.java
  *
  * Created on 2022-08-13
- * Updated on 2022-08-16
+ * Updated on 2022-08-23
  *
  * Description: Helper class that handles the checking of updates.
  */
@@ -64,8 +64,7 @@ public class CheckForUpdatesViewHelper {
             if (selectedButton.isPresent()) {
                 if (selectedButton.get() == seeNewUpdate) {
                     // Send user to the new release page
-                    // Todo: use own website
-                    String urlString = "https://github.com/AudiTranscribe/AudiTranscribe/releases/tag/" + newVersionTag;
+                    String urlString = "https://auditranscribe.app/release?" + newVersionTag;
                     GUIUtils.openURLInBrowser(urlString);
 
                 } else if (selectedButton.get() == remindLater) {
