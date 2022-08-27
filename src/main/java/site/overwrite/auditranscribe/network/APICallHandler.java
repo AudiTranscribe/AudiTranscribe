@@ -2,7 +2,7 @@
  * APICallHandler.java
  *
  * Created on 2022-07-07
- * Updated on 2022-08-16
+ * Updated on 2022-08-27
  *
  * Description: Methods that handle the reading and processing of API calls.
  */
@@ -195,24 +195,28 @@ public final class APICallHandler {
      * @return String representing the output from the connection.
      * @throws IOException If something went wrong when reading the content.
      */
-    private static String getConnectionOutput(HttpURLConnection con) throws IOException {
+    private static String getConnectionOutput(HttpURLConnection con) throws IOException, APIServerException {
         StringBuilder content = new StringBuilder();
         Reader streamReader;
 
-        if (con.getResponseCode() > 299) {
-            streamReader = new InputStreamReader(con.getErrorStream());
-        } else {
-            streamReader = new InputStreamReader(con.getInputStream());
+        try {
+            if (con.getResponseCode() > 299) {
+                streamReader = new InputStreamReader(con.getErrorStream());
+            } else {
+                streamReader = new InputStreamReader(con.getInputStream());
+            }
+
+            BufferedReader in = new BufferedReader(streamReader);
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                content.append(inputLine);
+            }
+
+            in.close();
+
+            return content.toString();
+        } catch (UnknownHostException e) {
+            throw new APIServerException(e);
         }
-
-        BufferedReader in = new BufferedReader(streamReader);
-        String inputLine;
-        while ((inputLine = in.readLine()) != null) {
-            content.append(inputLine);
-        }
-
-        in.close();
-
-        return content.toString();
     }
 }

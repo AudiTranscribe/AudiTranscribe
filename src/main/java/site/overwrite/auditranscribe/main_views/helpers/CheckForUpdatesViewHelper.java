@@ -2,7 +2,7 @@
  * CheckForUpdatesViewHelper.java
  *
  * Created on 2022-08-13
- * Updated on 2022-08-23
+ * Updated on 2022-08-27
  *
  * Description: Helper class that handles the checking of updates.
  */
@@ -66,11 +66,6 @@ public class CheckForUpdatesViewHelper {
                     // Send user to the new release page
                     String urlString = "https://auditranscribe.app/release?" + newVersionTag;
                     GUIUtils.openURLInBrowser(urlString);
-
-                } else if (selectedButton.get() == remindLater) {
-                    // Supress alert for a set duration
-                    DataFiles.PERSISTENT_DATA_FILE.data.lastCheckedForUpdates = currentTime;
-                    DataFiles.PERSISTENT_DATA_FILE.saveFile();
                 }
             }
         } else {
@@ -80,6 +75,10 @@ public class CheckForUpdatesViewHelper {
                     CheckForUpdatesViewHelper.class.getName()
             );
         }
+
+        // Supress alert for a set duration
+        DataFiles.PERSISTENT_DATA_FILE.data.lastCheckedForUpdates = currentTime;
+        DataFiles.PERSISTENT_DATA_FILE.saveFile();
     }
     // Private methods
 
