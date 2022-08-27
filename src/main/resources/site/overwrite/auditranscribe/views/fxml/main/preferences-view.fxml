@@ -32,7 +32,7 @@
                                     <VBox alignment="TOP_RIGHT" prefHeight="30.0">
                                        <children>
                                           <Label alignment="CENTER_RIGHT" styleClass="setting-label" text="Note playing delay offset" />
-                                          <Label alignment="CENTER_RIGHT" styleClass="setting-caption" text="To account for note playing delay" />
+                                          <Label alignment="CENTER_RIGHT" styleClass="setting-caption" text="To account for note playing delay; in seconds" />
                                        </children>
                                     </VBox>
                                     <VBox alignment="TOP_RIGHT" prefHeight="60.0">
@@ -167,7 +167,7 @@
                                     <VBox alignment="TOP_RIGHT" layoutX="20.0" layoutY="20.0" prefHeight="30.0">
                                        <children>
                                           <Label styleClass="setting-label" text="Update Checking Interval" />
-                                          <Label layoutX="10.0" layoutY="10.0" styleClass="setting-caption" text="Duration between checks for new updates">
+                                          <Label layoutX="10.0" layoutY="10.0" styleClass="setting-caption" text="Duration between checks for new updates in hours">
                                              <font>
                                                 <Font size="11.0" />
                                              </font>

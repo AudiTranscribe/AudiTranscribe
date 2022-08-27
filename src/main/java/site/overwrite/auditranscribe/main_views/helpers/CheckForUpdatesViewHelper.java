@@ -32,7 +32,10 @@ public class CheckForUpdatesViewHelper {
         // Determine if we need to check for updates
         int currentTime = (int) MiscUtils.getUnixTimestamp();
         int lastChecked = DataFiles.PERSISTENT_DATA_FILE.data.lastCheckedForUpdates;
-        if (currentTime - lastChecked <= DataFiles.SETTINGS_DATA_FILE.data.checkForUpdateInterval * 86400) return;
+        int interval = DataFiles.SETTINGS_DATA_FILE.data.checkForUpdateInterval;
+        if (currentTime - lastChecked <= interval * 3600) {  // 3600 s = 1 h
+            return;
+        }
 
         // Check if there is any new updates available
         Pair<Boolean, String> response = checkIfHaveNewVersion(currentVersion);

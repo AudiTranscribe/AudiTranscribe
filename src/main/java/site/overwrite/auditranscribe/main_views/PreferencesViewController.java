@@ -2,7 +2,7 @@
  * PreferencesViewController.java
  *
  * Created on 2022-05-22
- * Updated on 2022-08-13
+ * Updated on 2022-08-27
  *
  * Description: Contains the preferences view's controller class.
  */
@@ -218,7 +218,7 @@ public class PreferencesViewController implements Initializable {
                 1, Integer.MAX_VALUE, DataFiles.SETTINGS_DATA_FILE.data.logFilePersistence, 1
         ));
         checkForUpdateIntervalSpinner.setValueFactory(new CustomIntegerSpinnerValueFactory(
-                1, 30, DataFiles.SETTINGS_DATA_FILE.data.checkForUpdateInterval, 1
+                1, 720, DataFiles.SETTINGS_DATA_FILE.data.checkForUpdateInterval, 1
         ));
 
         for (Spinner<?> spinner : spinners) {

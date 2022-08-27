@@ -2,7 +2,7 @@
  * SettingsData.java
  *
  * Created on 2022-05-22
- * Updated on 2022-08-13
+ * Updated on 2022-08-27
  *
  * Description: Class that contains the settings data.
  */
@@ -31,5 +31,5 @@ public class SettingsData {
 
     // Miscellaneous data
     public int themeEnumOrdinal = Theme.LIGHT_MODE.ordinal();
-    public int checkForUpdateInterval = 3;  // In days
+    public int checkForUpdateInterval = 24;  // In hours
 }
