@@ -2,7 +2,7 @@
  * InitialViewController.java
  *
  * Created on 2022-06-19
- * Updated on 2022-07-07
+ * Updated on 2022-08-27
  *
  * Description: View controller that handles the initial view for the setup wizard.
  */
@@ -15,10 +15,13 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
+import site.overwrite.auditranscribe.setup_wizard.SetupWizard;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 
 /**
  * View controller that handles the initial view for the FFmpeg installation procedure.
@@ -46,6 +49,8 @@ public class InitialViewController implements Initializable {
             hasFFmpegInstalled = false;
             ((Stage) rootPane.getScene().getWindow()).close();
         });
+
+        MyLogger.log(Level.INFO, "Showing setup wizard initial view", this.getClass().getName());
     }
 
     // Getter methods

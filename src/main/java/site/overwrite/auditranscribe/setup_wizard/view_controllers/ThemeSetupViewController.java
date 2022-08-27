@@ -13,16 +13,16 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Spinner;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
+import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
-import site.overwrite.auditranscribe.misc.spinners.CustomIntegerSpinnerValueFactory;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 
 /**
  * View controller that helps the user set up the theme.
@@ -44,9 +44,14 @@ public class ThemeSetupViewController implements Initializable {
         for (Theme theme : Theme.values()) themeChoiceBox.getItems().add(theme);
 
         themeChoiceBox.setValue(Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal]);
-        themeChoiceBox.setOnAction(event -> setThemeOnScene(themeChoiceBox.getValue()));
+        themeChoiceBox.setOnAction(event -> {
+            setThemeOnScene(themeChoiceBox.getValue());
+            MyLogger.log(Level.INFO, "Changed theme to " + themeChoiceBox.getValue(), this.getClass().getName());
+        });
 
         confirmButton.setOnAction(event -> ((Stage) rootPane.getScene().getWindow()).close());
+
+        MyLogger.log(Level.INFO, "Showing theme setup view", this.getClass().getName());
     }
 
     // Public methods

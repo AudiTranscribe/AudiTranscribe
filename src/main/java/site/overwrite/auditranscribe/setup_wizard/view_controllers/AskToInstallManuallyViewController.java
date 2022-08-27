@@ -2,10 +2,10 @@
  * AskToInstallManuallyController.java
  *
  * Created on 2022-07-10
- * Updated on 2022-07-10
+ * Updated on 2022-08-27
  *
  * Description: View controller of the view that asks the user whether to install FFmpeg manually or
- * automatically.
+ *              automatically.
  */
 
 package site.overwrite.auditranscribe.setup_wizard.view_controllers;
@@ -16,10 +16,12 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 
 /**
  * View controller of the view that asks the user whether to install FFmpeg manually or
@@ -39,7 +41,6 @@ public class AskToInstallManuallyViewController implements Initializable {
     // Initialization method
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Add methods on buttons
         manualButton.setOnMouseClicked(event -> {
             isManualInstallation = true;
             ((Stage) rootPane.getScene().getWindow()).close();
@@ -48,6 +49,8 @@ public class AskToInstallManuallyViewController implements Initializable {
             isManualInstallation = false;
             ((Stage) rootPane.getScene().getWindow()).close();
         });
+
+        MyLogger.log(Level.INFO, "Asking whether to install FFmpeg automatically", this.getClass().getName());
     }
 
     // Getter methods

@@ -17,11 +17,13 @@ import site.overwrite.auditranscribe.audio.FFmpegHandler;
 import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
+import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.setup_wizard.view_controllers.*;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.logging.Level;
 
 /**
  * Class that handles the setup wizard.
@@ -381,7 +383,13 @@ public class SetupWizard {
             stage.showAndWait();
 
             // Return the value of the note playing delay offset
-            return controller.getNotePlayingDelayOffset();
+            double notePlayingDelayOffset = controller.getNotePlayingDelayOffset();
+            MyLogger.log(
+                    Level.INFO,
+                    "Note playing delay offset set to " + notePlayingDelayOffset,
+                    this.getClass().getName()
+            );
+            return notePlayingDelayOffset;
 
         } catch (IOException ignored) {
         }
@@ -412,7 +420,13 @@ public class SetupWizard {
             stage.showAndWait();
 
             // Return the value of the update checking interval
-            return controller.getUpdateCheckingInterval();
+            int updateCheckingInterval = controller.getUpdateCheckingInterval();
+            MyLogger.log(
+                    Level.INFO,
+                    "Update checking interval set to " + updateCheckingInterval,
+                    this.getClass().getName()
+            );
+            return updateCheckingInterval;
 
         } catch (IOException ignored) {
         }
@@ -443,7 +457,13 @@ public class SetupWizard {
             stage.showAndWait();
 
             // Return the value of the update checking interval
-            return controller.getSelectedThemeOrdinal();
+            int themeOrdinal = controller.getSelectedThemeOrdinal();
+            MyLogger.log(
+                    Level.INFO,
+                    "Theme set to " + Theme.values()[themeOrdinal],
+                    this.getClass().getName()
+            );
+            return themeOrdinal;
 
         } catch (IOException ignored) {
         }

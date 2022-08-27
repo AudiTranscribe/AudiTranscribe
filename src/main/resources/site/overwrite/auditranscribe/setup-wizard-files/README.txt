@@ -1,1 +1,1 @@
-This folder contains all the download URLs and SHA256 signatures of the FFmpeg files that are to be downloaded.
+This folder contains all the files that are needed for the setup wizard.

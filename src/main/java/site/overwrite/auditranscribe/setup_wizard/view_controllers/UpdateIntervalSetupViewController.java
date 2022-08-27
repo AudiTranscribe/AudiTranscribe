@@ -16,11 +16,13 @@ import javafx.scene.control.Spinner;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomIntegerSpinnerValueFactory;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 
 /**
  * View controller that helps the user set up the update checking interval.
@@ -43,6 +45,8 @@ public class UpdateIntervalSetupViewController implements Initializable {
                 1, 720, 24, 1
         ));
         confirmButton.setOnAction(event -> ((Stage) rootPane.getScene().getWindow()).close());
+
+        MyLogger.log(Level.INFO, "Showing update interval setup view", this.getClass().getName());
     }
 
     // Public methods

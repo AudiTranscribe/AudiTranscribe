@@ -2,7 +2,7 @@
  * CannotFindFFmpegViewController.java
  *
  * Created on 2022-06-19
- * Updated on 2022-07-07
+ * Updated on 2022-08-27
  *
  * Description: View controller of the view that reports the FFmpeg could not be found.
  */
@@ -15,10 +15,12 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 
 /**
  * View controller of the view that reports the FFmpeg could not be found.
@@ -37,7 +39,6 @@ public class CannotFindFFmpegViewController implements Initializable {
     // Initialization method
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Add methods on buttons
         specifyManuallyButton.setOnMouseClicked(event -> {
             isSpecifyManually = true;
             ((Stage) rootPane.getScene().getWindow()).close();
@@ -46,6 +47,8 @@ public class CannotFindFFmpegViewController implements Initializable {
             isSpecifyManually = false;
             ((Stage) rootPane.getScene().getWindow()).close();
         });
+
+        MyLogger.log(Level.INFO, "Can't find FFmpeg", this.getClass().getName());
     }
 
     // Getter methods

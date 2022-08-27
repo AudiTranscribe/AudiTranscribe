@@ -2,7 +2,7 @@
  * DownloadingFFmpegViewController.java
  *
  * Created on 2022-07-09
- * Updated on 2022-07-10
+ * Updated on 2022-08-27
  *
  * Description: View controller that handles the downloading of FFmpeg.
  */
@@ -17,11 +17,13 @@ import javafx.stage.Stage;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.CustomTask;
+import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.setup_wizard.helpers.FFmpegDownloadManager;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 
 /**
  * View controller that handles the downloading of FFmpeg.
@@ -88,6 +90,8 @@ public class DownloadingFFmpegViewController implements Initializable {
         Thread downloadThread = new Thread(downloadTask);
         downloadThread.setDaemon(true);
         downloadThread.start();
+
+        MyLogger.log(Level.INFO, "Showing FFmpeg download view", this.getClass().getName());
     }
 
     /**

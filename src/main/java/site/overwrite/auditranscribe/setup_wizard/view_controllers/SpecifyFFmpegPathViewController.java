@@ -18,6 +18,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.main_views.helpers.ProjectIOHandlers;
@@ -25,6 +26,7 @@ import site.overwrite.auditranscribe.main_views.helpers.ProjectIOHandlers;
 import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 
 /**
  * View controller of the view that allows the user to manually specify the path to FFmpeg.
@@ -43,12 +45,11 @@ public class SpecifyFFmpegPathViewController implements Initializable {
     // Initialization method
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Add methods on buttons
         selectFFmpegBinaryButton.setOnAction(event -> {
             // Define file extension filter
             FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
                     "FFmpeg binary",
-                    "*.exe", "*"  // Todo: check if works
+                    "*.exe", "*"
             );
 
             // Get the file
@@ -60,12 +61,18 @@ public class SpecifyFFmpegPathViewController implements Initializable {
             if (possibleFFmpegBinary != null) {
                 // Update the value of the FFmpeg path text field
                 ffmpegBinaryPathTextField.setText(possibleFFmpegBinary.getAbsolutePath());
+                MyLogger.log(
+                        Level.INFO,
+                        "FFmpeg path set to " + ffmpegBinaryPathTextField.getText(),
+                        this.getClass().getName()
+                );
             } else {
                 Popups.showInformationAlert("Info", "No file selected.");
             }
         });
-
         checkFFmpegPathButton.setOnAction(event -> ((Stage) rootPane.getScene().getWindow()).close());
+
+        MyLogger.log(Level.INFO, "Allowing user to select FFmpeg path", this.getClass().getName());
     }
 
     // Getter methods

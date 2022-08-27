@@ -2,7 +2,7 @@
  * FinishSetupViewController.java
  *
  * Created on 2022-06-19
- * Updated on 2022-07-23
+ * Updated on 2022-08-27
  *
  * Description: View controller for the view that signals the end of the setup process.
  */
@@ -15,10 +15,12 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 
 /**
  * View controller for the view that signals the end of the setup process.
@@ -35,6 +37,7 @@ public class FinishSetupViewController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         closeButton.setOnAction(event -> ((Stage) rootPane.getScene().getWindow()).close());
+        MyLogger.log(Level.INFO, "AudiTranscribe setup complete", this.getClass().getName());
     }
 
     // Public methods

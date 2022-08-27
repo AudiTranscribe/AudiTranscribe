@@ -2,7 +2,7 @@
  * FixNoteDelayViewController.java
  *
  * Created on 2022-07-21
- * Updated on 2022-07-24
+ * Updated on 2022-08-27
  *
  * Description: View controller that helps the user fix any note playback delays.
  */
@@ -174,6 +174,8 @@ public class FixNoteDelayViewController implements Initializable {
                 }
             }
         }, 0, 50, TimeUnit.MILLISECONDS);
+
+        MyLogger.log(Level.INFO, "Showing note delay fix view", this.getClass().getName());
     }
 
     // Public methods

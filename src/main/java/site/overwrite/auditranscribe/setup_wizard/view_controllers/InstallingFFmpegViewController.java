@@ -2,7 +2,7 @@
  * InstallingFFmpegViewController.java
  *
  * Created on 2022-06-19
- * Updated on 2022-07-07
+ * Updated on 2022-08-27
  *
  * Description: View controller that show instructions on how to install FFmpeg.
  */
@@ -16,11 +16,13 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.utils.GUIUtils;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 
 /**
  * View controller that show instructions on how to install FFmpeg.
@@ -39,11 +41,10 @@ public class InstallingFFmpegViewController implements Initializable {
     // Initialization method
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Set hyperlink methods
         ffmpegHyperlink.setOnAction(event -> GUIUtils.openURLInBrowser("https://ffmpeg.org/"));
-
-        // Add button methods
         confirmButton.setOnAction(event -> ((Stage) rootPane.getScene().getWindow()).close());
+
+        MyLogger.log(Level.INFO, "Showing instructions to install FFmpeg", this.getClass().getName());
     }
 
     // Public methods
