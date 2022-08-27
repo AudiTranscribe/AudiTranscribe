@@ -29,7 +29,7 @@ import java.net.URL;
 public class SetupWizard {
     // Attributes
     private final Stage stage;
-    private final Theme theme;
+    private Theme theme;
 
     /**
      * Initializes the setup wizard helper.
@@ -125,6 +125,10 @@ public class SetupWizard {
         // Show view that sets the update interval
         int updateInterval = showUpdateIntervalSetupView();
 
+        // Show view that allows the user to choose their theme
+        int themeOrdinal = showThemeSetupView();
+        this.theme = Theme.values()[themeOrdinal];
+
         // Report that the setup process has completed
         showFinishSetupView();
 
@@ -132,6 +136,7 @@ public class SetupWizard {
         DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath = ffmpegPath;
         DataFiles.SETTINGS_DATA_FILE.data.notePlayingDelayOffset = notePlaybackDelay;
         DataFiles.SETTINGS_DATA_FILE.data.checkForUpdateInterval = updateInterval;
+        DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal = themeOrdinal;
         DataFiles.SETTINGS_DATA_FILE.saveFile();
 
         DataFiles.PERSISTENT_DATA_FILE.data.isSetupComplete = true;
@@ -412,6 +417,37 @@ public class SetupWizard {
         } catch (IOException ignored) {
         }
         return 24;
+    }
+
+    /**
+     * Helper method that shows the view that allows the user to select their preferred theme.
+     *
+     * @return An integer, representing the ordinal of the theme selected.
+     */
+    private int showThemeSetupView() {
+        try {
+            // Load the FXML file into the scene
+            FXMLLoader fxmlLoader = new FXMLLoader(getSetupWizardView("theme-setup-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+
+            // Get the view controller
+            ThemeSetupViewController controller = fxmlLoader.getController();
+
+            // Set the theme on the scene
+            controller.setThemeOnScene(theme);
+
+            // Set the stage's scene
+            stage.setScene(scene);
+
+            // Show the stage
+            stage.showAndWait();
+
+            // Return the value of the update checking interval
+            return controller.getSelectedThemeOrdinal();
+
+        } catch (IOException ignored) {
+        }
+        return Theme.LIGHT_MODE.ordinal();
     }
 
     /**
