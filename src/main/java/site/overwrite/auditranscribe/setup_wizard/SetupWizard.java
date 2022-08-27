@@ -2,7 +2,7 @@
  * SetupWizard.java
  *
  * Created on 2022-06-19
- * Updated on 2022-08-13
+ * Updated on 2022-08-27
  *
  * Description: Class that handles the setup wizard.
  */
@@ -122,12 +122,16 @@ public class SetupWizard {
         // Show view that helps fix the note playback delay
         double notePlaybackDelay = showFixNoteDelayView();
 
+        // Show view that sets the update interval
+        int updateInterval = showUpdateIntervalSetupView();
+
         // Report that the setup process has completed
         showFinishSetupView();
 
         // Update files' data
         DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath = ffmpegPath;
         DataFiles.SETTINGS_DATA_FILE.data.notePlayingDelayOffset = notePlaybackDelay;
+        DataFiles.SETTINGS_DATA_FILE.data.checkForUpdateInterval = updateInterval;
         DataFiles.SETTINGS_DATA_FILE.saveFile();
 
         DataFiles.PERSISTENT_DATA_FILE.data.isSetupComplete = true;
@@ -377,6 +381,37 @@ public class SetupWizard {
         } catch (IOException ignored) {
         }
         return 0;
+    }
+
+    /**
+     * Helper method that shows the view that shows the update interval setup view.
+     *
+     * @return An integer, representing the update interval.
+     */
+    private int showUpdateIntervalSetupView() {
+        try {
+            // Load the FXML file into the scene
+            FXMLLoader fxmlLoader = new FXMLLoader(getSetupWizardView("update-interval-setup-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+
+            // Get the view controller
+            UpdateIntervalSetupViewController controller = fxmlLoader.getController();
+
+            // Set the theme on the scene
+            controller.setThemeOnScene(theme);
+
+            // Set the stage's scene
+            stage.setScene(scene);
+
+            // Show the stage
+            stage.showAndWait();
+
+            // Return the value of the update checking interval
+            return controller.getUpdateCheckingInterval();
+
+        } catch (IOException ignored) {
+        }
+        return 24;
     }
 
     /**
