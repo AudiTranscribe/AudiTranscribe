@@ -2,7 +2,7 @@
  * APICallHandlerTest.java
  *
  * Created on 2022-07-07
- * Updated on 2022-08-16
+ * Updated on 2022-08-27
  *
  * Description: Test `APICallHandler.java`.
  */
@@ -57,6 +57,15 @@ class APICallHandlerTest {
     }
 
     @Test
+    @Order(4)
+    void timeoutAPIGetRequest() {
+        assertThrows(
+                APIServerException.class,
+                () -> APICallHandler.sendAPIGetRequest("test-api-server-get", null, 1)
+        );
+    }
+
+    @Test
     @Order(1)
     void sendAPIPostRequest1() throws IOException, APIServerException {
         JsonObject returned = APICallHandler.sendAPIPostRequest("test-api-server-post", null);
@@ -87,5 +96,14 @@ class APICallHandlerTest {
     void sendInvalidAPIPostRequest() throws IOException, APIServerException {
         JsonObject returned = APICallHandler.sendAPIGetRequest("test-api-server-post");
         assertEquals("METHOD NOT ALLOWED", returned.get("status").getAsString());
+    }
+
+    @Test
+    @Order(4)
+    void timeoutAPIPostRequest() {
+        assertThrows(
+                APIServerException.class,
+                () -> APICallHandler.sendAPIGetRequest("test-api-server-post", null, 1)
+        );
     }
 }
