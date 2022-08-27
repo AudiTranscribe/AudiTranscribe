@@ -2,7 +2,7 @@
  * FFmpegDownloadManager.java
  *
  * Created on 2022-07-07
- * Updated on 2022-07-09
+ * Updated on 2022-08-27
  *
  * Description: Class that handles the downloading, unpackaging, and installation of FFmpeg.
  */
@@ -155,7 +155,9 @@ public class FFmpegDownloadManager {
         osName = osName.toLowerCase();
 
         // Define the data file path
-        String dataFilePath = IOMethods.joinPaths("setup-wizard-files", "ffmpeg-data-" + osName + ".json");
+        String dataFilePath = IOMethods.joinPaths(
+                "setup-wizard-files", "ffmpeg-data", "ffmpeg-data-" + osName + ".json"
+        );
 
         // Create the GSON loader object
         Gson gson = new Gson();
