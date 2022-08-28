@@ -1443,6 +1443,9 @@ public class TranscriptionViewController implements Initializable {
      * @param forceUpdate Whether to force an update to the BPM value.
      */
     private void updateBPMValue(double newBPM, boolean forceUpdate) {
+        // Check if the BPM value is valid first
+        if (!(newBPM >= BPM_RANGE.getValue0() && newBPM <= BPM_RANGE.getValue1())) return;
+
         // Update the `hasUnsavedChanges` flag
         hasUnsavedChanges = true;
 
@@ -1494,6 +1497,9 @@ public class TranscriptionViewController implements Initializable {
      * @param forceUpdate Whether to force an update to the offset value.
      */
     private void updateOffsetValue(double newOffset, boolean forceUpdate) {
+        // Check if the new offset value is valid first
+        if (!(newOffset >= OFFSET_RANGE.getValue0() && newOffset <= OFFSET_RANGE.getValue1())) return;
+
         // Update the `hasUnsavedChanges` flag
         hasUnsavedChanges = true;
 
