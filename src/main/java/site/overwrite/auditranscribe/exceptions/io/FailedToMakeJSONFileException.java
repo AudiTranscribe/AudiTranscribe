@@ -1,16 +1,25 @@
 /*
- * NoSuchPropertyException.java
+ * FailedToMakeJSONFileException.java
+ * Description: Exception to mark when a JSON file could not be created.
  *
- * Created on 2022-07-03
- * Updated on 2022-07-03
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
+ * Licence, or (at your option) any later version.
  *
- * Description: Exception to mark when a JSON file failed to be created.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public Licence for more details.
+ *
+ * You should have received a copy of the GNU General Public Licence along with this program. If
+ * not, see <https://www.gnu.org/licenses/>
+ *
+ * Copyright © AudiTranscribe Team
  */
 
 package site.overwrite.auditranscribe.exceptions.io;
 
 /**
- * Exception to mark when a JSON file failed to be created.
+ * Exception to mark when a JSON file could not be created.
  */
 public class FailedToMakeJSONFileException extends RuntimeException {
     public FailedToMakeJSONFileException() {
