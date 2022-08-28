@@ -1,11 +1,20 @@
 /*
- * FinisFFmpegSetupViewController.java
- *
- * Created on 2022-07-24
- * Updated on 2022-08-27
- *
+ * FinishFFmpegSetupViewController.java
  * Description: View controller that informs the user that the FFmpeg portion of the setup is
  *              complete.
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
+ * Licence, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public Licence for more details.
+ *
+ * You should have received a copy of the GNU General Public Licence along with this program. If
+ * not, see <https://www.gnu.org/licenses/>
+ *
+ * Copyright © AudiTranscribe Team
  */
 
 package site.overwrite.auditranscribe.setup_wizard.view_controllers;
@@ -13,13 +22,11 @@ package site.overwrite.auditranscribe.setup_wizard.view_controllers;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
-import site.overwrite.auditranscribe.utils.GUIUtils;
 
 import java.net.URL;
 import java.util.ResourceBundle;
