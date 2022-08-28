@@ -27,6 +27,7 @@ import site.overwrite.auditranscribe.exceptions.io.audt_file.IncorrectFileFormat
 import site.overwrite.auditranscribe.exceptions.io.audt_file.InvalidFileVersionException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.io.audt_file.ProjectData;
 import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileReader;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;

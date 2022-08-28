@@ -36,6 +36,7 @@ import site.overwrite.auditranscribe.exceptions.notes.NoteRectangleCollisionExce
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
+import site.overwrite.auditranscribe.io.audt_file.ProjectData;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;

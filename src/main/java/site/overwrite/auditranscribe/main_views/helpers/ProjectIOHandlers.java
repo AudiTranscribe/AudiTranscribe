@@ -15,7 +15,7 @@ import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
 import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileWriter;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.GUIDataObject;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.MusicNotesDataObject;
-import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.ProjectData;
+import site.overwrite.auditranscribe.io.audt_file.ProjectData;
 
 import java.io.File;
 import java.io.IOException;
