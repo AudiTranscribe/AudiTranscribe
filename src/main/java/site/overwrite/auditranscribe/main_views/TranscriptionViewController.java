@@ -1,10 +1,19 @@
 /*
  * TranscriptionViewController.java
- *
- * Created on 2022-02-12
- * Updated on 2022-08-13
- *
  * Description: Contains the transcription view's controller class.
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
+ * Licence, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public Licence for more details.
+ *
+ * You should have received a copy of the GNU General Public Licence along with this program. If
+ * not, see <https://www.gnu.org/licenses/>
+ *
+ * Copyright © AudiTranscribe Team
  */
 
 package site.overwrite.auditranscribe.main_views;
@@ -1638,13 +1647,17 @@ public class TranscriptionViewController implements Initializable {
                 return thread;
             });
             autosaveScheduler.scheduleAtFixedRate(() -> Platform.runLater(() -> {
-                if (audtFilePath != null) {
-                    handleSavingProject(true, false);
-                    MyLogger.log(Level.INFO, "Autosaved project", this.getClass().toString());
-                } else {
-                    MyLogger.log(Level.INFO, "Autosave skipped, no project loaded", this.getClass().toString());
-                }
-            }), DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval, DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval,
+                        if (audtFilePath != null) {
+                            handleSavingProject(true, false);
+                            MyLogger.log(Level.INFO, "Autosaved project", this.getClass().toString());
+                        } else {
+                            MyLogger.log(
+                                    Level.INFO,
+                                    "Autosave skipped, no project loaded",
+                                    this.getClass().toString()
+                            );
+                        }
+                    }), DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval, DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval,
                     TimeUnit.MINUTES);
 
             // Create a third constantly-executing service for updating memory available
