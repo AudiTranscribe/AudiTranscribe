@@ -6,3 +6,5 @@ Fixme:
         - It triggers very inconsistently, how to cause it to trigger reliably?
     - Exception in thread "JavaFX Application Thread" java.lang.IndexOutOfBoundsException: Index -1 out of bounds for
       length 2
+    - Exception in thread "JavaFX Application Thread" java.lang.NullPointerException: Cannot invoke
+      "javafx.scene.Node.getScene()" because "<local2>" is null
