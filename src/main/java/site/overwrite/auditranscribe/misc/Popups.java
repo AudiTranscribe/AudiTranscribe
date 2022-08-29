@@ -22,6 +22,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.stage.StageStyle;
+import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.io.data_files.DataFiles;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -69,7 +71,14 @@ public final class Popups {
     public static Optional<ButtonType> showMultiButtonAlert(
             String title, String headerText, String contentText, ButtonType... buttonTypes
     ) {
+        // Get active theme
+        Theme currentTheme = Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal];
+
+        // Create the alert
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.getDialogPane().getStylesheets().add(
+                IOMethods.getFileURL(IOMethods.joinPaths("views", "css", currentTheme.cssFile)).toExternalForm()
+        );
         alert.initStyle(StageStyle.UTILITY);
         alert.setTitle(title);
         alert.setHeaderText(headerText);
@@ -87,8 +96,16 @@ public final class Popups {
      * @param throwable   <code>Throwable</code> object for the exception that occurred.
      */
     public static void showExceptionAlert(String headerText, String contentText, Throwable throwable) {
+        // Get active theme
+        Theme currentTheme = Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal];
+
         // Create a new error alert
         Alert alert = new Alert(Alert.AlertType.ERROR);
+
+        // Set the theme on the alert
+        alert.getDialogPane().getStylesheets().add(
+                IOMethods.getFileURL(IOMethods.joinPaths("views", "css", currentTheme.cssFile)).toExternalForm()
+        );
 
         // Set the alert style to `UTILITY` so that it can be shown during fullscreen
         alert.initStyle(StageStyle.UTILITY);
@@ -135,7 +152,14 @@ public final class Popups {
      * @param type    Type of the alert box.
      */
     private static void showGenericAlert(String title, String content, Alert.AlertType type) {
+        // Get active theme
+        Theme currentTheme = Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal];
+
+        // Create the alert
         Alert alert = new Alert(type);
+        alert.getDialogPane().getStylesheets().add(
+                IOMethods.getFileURL(IOMethods.joinPaths("views", "css", currentTheme.cssFile)).toExternalForm()
+        );
         alert.initStyle(StageStyle.UTILITY);
         alert.setTitle(title);
         alert.setHeaderText(null);
