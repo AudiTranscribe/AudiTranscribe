@@ -288,24 +288,23 @@ public final class PlottingStuffHandler {
 
         // Calculate the difference between the number of beats needed
         int oldNumBeats = lines.length - 1;
-        int newNumBeats = (int) Math.ceil(newBPM / 60. * (duration + Math.abs(newOffset)));
+        int newNumBeats = (int) Math.ceil(newBPM / 60. * (duration - newOffset));
         int deltaNumBeats = newNumBeats - oldNumBeats;
 
         // Create a new array with the new beat lines
         Line[] newLines = new Line[newNumBeats + 1];
+        int numBeatLinesToCopy = Math.min(oldNumBeats, newNumBeats) + 1;
 
         if (deltaNumBeats > 0) {  // Need to add beats
             // Array copy old beat lines into the new lines
-            System.arraycopy(lines, 0, newLines, 0, oldNumBeats + 1);
+            System.arraycopy(lines, 0, newLines, 0, numBeatLinesToCopy);
         } else {  // Need to remove beats
             // Limit the number of lines that are copied
-            System.arraycopy(lines, 0, newLines, 0, newNumBeats + 1);
+            System.arraycopy(lines, 0, newLines, 0, numBeatLinesToCopy);
         }
 
         // Update existing lines
-        int numCopiedBeatLines = Math.min(oldNumBeats, newNumBeats) + 1;
-
-        for (int beatNum = 0; beatNum < numCopiedBeatLines; beatNum++) {
+        for (int beatNum = 0; beatNum < numBeatLinesToCopy; beatNum++) {
             // Calculate position to place the line
             double pos = (newOffset + beatNum * newSPB) * pxPerSecond * zoomScaleX;
 
@@ -337,7 +336,7 @@ public final class PlottingStuffHandler {
 
         // Add/remove lines if needed
         if (deltaNumBeats > 0) {
-            for (int beatNum = numCopiedBeatLines; beatNum <= newNumBeats; beatNum++) {
+            for (int beatNum = numBeatLinesToCopy; beatNum <= newNumBeats; beatNum++) {
                 // Generate the beat line
                 Line beatLine = generateBeatLine(
                         beatNum, newBeatsPerBar, pxPerSecond, height, zoomScaleX, newSPB, newOffset
