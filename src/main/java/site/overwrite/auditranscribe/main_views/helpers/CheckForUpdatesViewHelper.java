@@ -82,7 +82,7 @@ public class CheckForUpdatesViewHelper {
             }
         } else {
             MyLogger.log(
-                    Level.FINE,
+                    Level.INFO,
                     "AudiTranscribe is up to date",
                     CheckForUpdatesViewHelper.class.getName()
             );

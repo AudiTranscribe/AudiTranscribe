@@ -134,9 +134,10 @@ public class SceneSwitcher {
                         e
                 );
                 MyLogger.logException(e);
-                e.printStackTrace();
             }
         }
+
+        MyLogger.log(Level.INFO, "Shutdown ordered", SceneSwitcher.class.getName());
     }
 
     // Private methods
