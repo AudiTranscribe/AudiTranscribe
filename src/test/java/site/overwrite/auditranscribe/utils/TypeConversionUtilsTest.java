@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class TypeConversionUtilsTest {
-
     @Test
     void toByteArray() {
         // Define byte arrays to end up with
@@ -79,5 +78,22 @@ class TypeConversionUtilsTest {
         // Assertions
         assertArrayEquals(array1, TypeConversionUtils.toDoubleArray(TypeConversionUtils.toDoubleArray(array1)));
         assertArrayEquals(array2, TypeConversionUtils.toDoubleArray(TypeConversionUtils.toDoubleArray(array2)));
+    }
+
+    @Test
+    void toBooleanArray() {
+        // Define boolean arrays to end up with
+        boolean[] array1 = {
+                false, true, true, false, true, false, true, false, false, false,
+                true, false, true, false, false, false, true, false, true, false
+        };
+        Boolean[] array2 = {
+                true, false, false, true, false, false, false, false, true, false,
+                false, false, false, false, false, true, false, false, false, false
+        };
+
+        // Assertions
+        assertArrayEquals(array1, TypeConversionUtils.toBooleanArray(TypeConversionUtils.toBooleanArray(array1)));
+        assertArrayEquals(array2, TypeConversionUtils.toBooleanArray(TypeConversionUtils.toBooleanArray(array2)));
     }
 }

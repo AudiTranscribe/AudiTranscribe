@@ -317,7 +317,7 @@ class ArrayUtilsTest {
 
     @Test
     void transpose() {
-        // Define the two arrays and their transposes
+        // Define the arrays and their transposes
         double[][] A = new double[][]{
                 {1, 2, 3, 4},
                 {5, 6, 7, 8},
@@ -326,6 +326,11 @@ class ArrayUtilsTest {
         Complex[][] B = new Complex[][]{
                 {new Complex(1, 1), new Complex(2, 2), new Complex(3, 3)},
                 {new Complex(4, 4), new Complex(5, 5), new Complex(6, 6)}
+        };
+        boolean[][] C = new boolean[][]{
+                {false, false, false, true},
+                {false, true, true, false},
+                {true, false, true, false}
         };
 
         double[][] At = new double[][]{
@@ -339,10 +344,17 @@ class ArrayUtilsTest {
                 {new Complex(2, 2), new Complex(5, 5)},
                 {new Complex(3, 3), new Complex(6, 6)}
         };
+        boolean[][] Ct = new boolean[][]{
+                {false, false, true},
+                {false, true, false},
+                {false, true, true},
+                {true, false, false}
+        };
 
         // Run tests
         assertArrayEquals(At, ArrayUtils.transpose(A));
         assertArrayEquals(Bt, ArrayUtils.transpose(B));
+        assertArrayEquals(Ct, ArrayUtils.transpose(C));
     }
 
     @Test

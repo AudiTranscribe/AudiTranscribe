@@ -670,6 +670,43 @@ public final class ArrayUtils {
     }
 
     /**
+     * Transpose a 2D array of booleans
+     *
+     * @param array Array of booleans to transpose.
+     * @return Transposed array.
+     */
+    public static boolean[][] transpose(boolean[][] array) {
+        // Get the dimensions of the original array
+        int X = array.length;
+        int Y = array[0].length;
+
+        // Convert `boolean` to `Boolean`
+        Boolean[][] newArray = new Boolean[X][Y];
+        for (int x = 0; x < X; x++) {
+            for (int y = 0; y < Y; y++) {
+                newArray[x][y] = array[x][y];
+            }
+        }
+
+        // Create the new array
+        Boolean[][] transposed = new Boolean[Y][X];
+
+        // Run the transposition process
+        transpositionProcess(X, Y, newArray, transposed);
+
+        // Convert `Boolean` to `boolean`
+        boolean[][] transposedNew = new boolean[Y][X];
+        for (int y = 0; y < Y; y++) {
+            for (int x = 0; x < X; x++) {
+                transposedNew[y][x] = transposed[y][x];
+            }
+        }
+
+        // Return the transposed array
+        return transposedNew;
+    }
+
+    /**
      * Matrix multiply two complex numbered matrices.
      *
      * @param A The first matrix.

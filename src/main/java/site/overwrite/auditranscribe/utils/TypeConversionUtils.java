@@ -111,4 +111,32 @@ public final class TypeConversionUtils {
         }
         return result;
     }
+
+    /**
+     * Method that converts a primitive boolean array to a non-primitive boolean array.
+     *
+     * @param booleans The primitive boolean array.
+     * @return The non-primitive boolean array.
+     */
+    public static Boolean[] toBooleanArray(boolean[] booleans) {
+        Boolean[] result = new Boolean[booleans.length];
+        for (int i = 0; i < booleans.length; i++) {
+            result[i] = booleans[i];
+        }
+        return result;
+    }
+
+    /**
+     * Method that converts a non-primitive boolean array to a primitive boolean array.
+     *
+     * @param booleans The non-primitive boolean array.
+     * @return The primitive boolean array.
+     */
+    public static boolean[] toBooleanArray(Boolean[] booleans) {
+        boolean[] result = new boolean[booleans.length];
+        for (int i = 0; i < booleans.length; i++) {
+            result[i] = booleans[i];
+        }
+        return result;
+    }
 }
