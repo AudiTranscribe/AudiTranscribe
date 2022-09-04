@@ -63,6 +63,26 @@ class ArrayUtilsTest {
     }
 
     @Test
+    void localMaximum() {
+        double[] array = {
+                9, 2, 3, 4, 5,
+                6, 5, 6, 7, 8,
+                9, 8, 7, 4, 4,
+                2, 9, 1, 2, 2,
+                1, 2, 2, 3, 3
+        };
+        boolean[] correct = {
+                false, false, false, false, false,
+                true, false, false, false, false,
+                true, false, false, false, false,
+                false, true, false, true, false,
+                false, true, false, true, false
+        };
+
+        assertArrayEquals(correct, ArrayUtils.localMaximum(array));
+    }
+
+    @Test
     void lpNormalize() {
         // Define the arrays
         double[] array1 = {1, 2, 4, 8, 16};

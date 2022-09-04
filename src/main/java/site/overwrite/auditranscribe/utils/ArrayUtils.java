@@ -62,6 +62,36 @@ public final class ArrayUtils {
     }
 
     /**
+     * Find local maxima in an array.<br>
+     * An element <code>array[i]</code> is considered a local maximum if both conditions are met:
+     * <ul>
+     *     <li><code>array[i] > array[i-1]</code></li>
+     *     <li><code>array[i] >= array[i+1]</code></li>
+     * </ul>
+     * Note that the first condition is strict, and that the first element <code>array[0]</code>
+     * will never be considered as a local maximum.
+     *
+     * @param array Array of values.
+     * @return Boolean array. If the index has <code>true</code> at the spot, then the corresponding
+     * element is a local maximum.
+     */
+    public static boolean[] localMaximum(double[] array) {
+        boolean[] isLocalMaximum = new boolean[array.length];
+
+        for (int i = 0; i < array.length; i++) {
+            if (i == 0) {  // Edge case: first element never a local maximum
+                isLocalMaximum[0] = false;
+            } else if (i == array.length - 1) {  // Edge case: last element only needs to check the one before
+                isLocalMaximum[array.length - 1] = array[i] > array[i - 1];
+            } else {
+                isLocalMaximum[i] = ((array[i] > array[i - 1]) && (array[i] >= array[i + 1]));
+            }
+        }
+
+        return isLocalMaximum;
+    }
+
+    /**
      * Normalizes the elements in the given array such that the L<sup>p</sup> norm is 1.
      *
      * @param array The array to normalize.
