@@ -383,6 +383,24 @@ public final class ArrayUtils {
         return maxFilterArray;
     }
 
+    /**
+     * Construct an array by repeating <code>array</code> the number of times given by <code>reps</code>.<br>
+     * The repeating is done 'horizontally'.
+     *
+     * @param array The 2D array to repeat.
+     * @param reps Number of times to repeat the array.
+     * @return The tiled output array.
+     */
+    public static double[][] tile(double[][] array, int reps) {
+        double[][] output = new double[array.length][array[0].length * reps];
+        for (int i = 0; i < array.length; i++) {
+            for (int j = 0; j < array[0].length * reps; j++) {
+                output[i][j] = array[i][j % array[0].length];
+            }
+        }
+        return output;
+    }
+
     // Array modification methods
 
     /**
@@ -708,6 +726,37 @@ public final class ArrayUtils {
         // Return the output array
         return output;
     }
+
+    /**
+     * Roll array elements along a given axis. Elements that roll beyond the last position are
+     * re-introduced at the first.
+     *
+     * @param array The 2D array to roll.
+     * @param shift The number of places by which elements are shifted.
+     * @param axis  Axis along which elements are shifted.<br>
+     *              If <code>axis = 0</code>, elements are shifted <em>vertically</em> 'downwards'
+     *              by the specified shift.<br>
+     *              If <code>axis = 1</code>, elements are shifted <em>horizontally</em>
+     *              'rightwards' by the specified shift.
+     * @return The shifted array.
+     */
+    public static double[][] roll(double[][] array, int shift, int axis) {
+        double[][] output = new double[array.length][array[0].length];
+        if (axis == 0) {
+            for (int i = 0; i < array.length; i++) {
+                output[Math.floorMod(i + shift, array.length)] = array[i];
+            }
+        } else {
+            for (int i = 0; i < array.length; i++) {
+                for (int j = 0; j < array[0].length; j++) {
+                    output[i][Math.floorMod(j + shift, array[0].length)] = array[i][j];
+                }
+            }
+        }
+        return output;
+    }
+
+    // Fundamental matrix methods
 
     /**
      * Transpose a 2D <code>Complex</code> array.

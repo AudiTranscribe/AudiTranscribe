@@ -255,6 +255,24 @@ class ArrayUtilsTest {
         assertArrayEquals(new double[]{10, 10, 10, 10, 10, 10, 10}, ArrayUtils.maximumFilter1D(new double[]{9, 1, 2, -3, 10, 5, -6}, 10));
     }
 
+    @Test
+    void tile() {
+        // Define the array to tile
+        double[][] array = new double[][]{
+                {1, 2, 3, 4},
+                {5, 6, 7, 8}
+        };
+
+        // Define the correct tiled array
+        double[][] correct = new double[][]{
+                {1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4},
+                {5, 6, 7, 8, 5, 6, 7, 8, 5, 6, 7, 8}
+        };
+
+        // Assertions
+        assertArrayEquals(correct, ArrayUtils.tile(array, 3));
+    }
+
     // Array modification methods
     @Test
     void lpNormalize() {
@@ -394,6 +412,42 @@ class ArrayUtilsTest {
         assertThrowsExactly(ValueException.class, () -> ArrayUtils.padCenterReflect(array2, -1));  // Size is negative
     }
 
+    @Test
+    void roll() {
+        // Define the array to roll
+        double[][] array = {
+                {1, 2, 3},
+                {4, 5, 6},
+                {7, 8, 9},
+                {10, 11, 12}
+        };
+
+        // Define correct output arrays
+        double[][] correct1 = {
+                {7, 8, 9},
+                {10, 11, 12},
+                {1, 2, 3},
+                {4, 5, 6},
+        };
+        double[][] correct2 = {
+                {3, 1, 2},
+                {6, 4, 5},
+                {9, 7, 8},
+                {12, 10, 11}
+        };
+
+        // Assertions
+        assertArrayEquals(correct1, ArrayUtils.roll(array, 2, 0));
+        assertArrayEquals(correct1, ArrayUtils.roll(array, 6, 0));
+        assertArrayEquals(correct1, ArrayUtils.roll(array, -2, 0));
+        assertArrayEquals(correct1, ArrayUtils.roll(array, -6, 0));
+        assertArrayEquals(correct2, ArrayUtils.roll(array, 1, 1));
+        assertArrayEquals(correct2, ArrayUtils.roll(array, 4, 1));
+        assertArrayEquals(correct2, ArrayUtils.roll(array, -2, 1));
+        assertArrayEquals(correct2, ArrayUtils.roll(array, -5, 1));
+    }
+
+    // Fundamental matrix methods
     @Test
     void transpose() {
         // Define the arrays and their transposes
