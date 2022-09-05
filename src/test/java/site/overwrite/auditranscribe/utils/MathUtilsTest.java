@@ -31,6 +31,7 @@ class MathUtilsTest {
     void log2() {
         assertEquals(2, MathUtils.log2(4), 0.001);
         assertEquals(2.322, MathUtils.log2(5), 0.001);
+        assertEquals(7, MathUtils.log2(128), 0.001);
     }
 
     @Test

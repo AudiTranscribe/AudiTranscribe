@@ -93,7 +93,7 @@ public final class MiscUtils {
      * @implNote This method is based on the algorithm found at
      * <a href="https://stackoverflow.com/a/2891946">this StackOverflow answer</a>.
      */
-    public static int numOfSetBits(int value) {
+    public static int getNumSetBits(int value) {
         // Get the number which has all ones in the binary representation
         int allOnes = value;  // Initially set as the given value
         allOnes |= (allOnes >> 1);
@@ -103,7 +103,7 @@ public final class MiscUtils {
         allOnes |= (allOnes >> 16);
 
         // Get number of digits in the binary representation of the `allOnes` integer
-        return (int) MathUtils.log2(allOnes + 1);
+        return (int) MathUtils.round(MathUtils.log2(allOnes + 1), 10);  // To account for weird double rounding
     }
 
     // Name utils
