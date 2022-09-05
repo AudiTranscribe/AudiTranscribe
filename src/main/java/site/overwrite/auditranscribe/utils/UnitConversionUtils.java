@@ -413,6 +413,56 @@ public final class UnitConversionUtils {
         return freq;
     }
 
+    /**
+     * Method that converts a frequency in Hertz (Hz) into (fractional) octave numbers.
+     *
+     * @param hz            Frequency in Hertz.
+     * @param tuning        Tuning deviation from A440 in (fractional) bins per octave.
+     * @param binsPerOctave Number of bins per octave.
+     * @return Octave number for the specified frequency.
+     */
+    public static double hzToOctaves(double hz, double tuning, int binsPerOctave) {
+        double a440 = 440 * Math.pow(2, tuning / binsPerOctave);
+        return MathUtils.log2(16 * hz / a440);
+    }
+
+    /**
+     * Method that converts a frequency in Hertz (Hz) into (fractional) octave numbers.<br>
+     * This method assumes that there is no tuning deviation from A440 (i.e.
+     * <code>tuning = 0</code>).
+     *
+     * @param hz Frequency in Hertz.
+     * @return Octave number for the specified frequency.
+     */
+    public static double hzToOctaves(double hz) {
+        return MathUtils.log2(hz) - 4.781359713524659604069682476215;  // log2(16/440) to 30 dp
+    }
+
+    /**
+     * Method that converts a (fractional) octave number into a frequency in Hertz (Hz).
+     *
+     * @param octaves       Octave number.
+     * @param tuning        Tuning deviation from A440 in (fractional) bins per octave.
+     * @param binsPerOctave Number of bins per octave.
+     * @return Frequency in Hertz.
+     */
+    public static double octavesToHz(double octaves, double tuning, int binsPerOctave) {
+        double a440 = 440 * Math.pow(2, tuning / binsPerOctave);
+        return (a440 / 16) * Math.pow(2, octaves);
+    }
+
+    /**
+     * Method that converts a (fractional) octave number into a frequency in Hertz (Hz).<br>
+     * This method assumes that there is no tuning deviation from A440 (i.e.
+     * <code>tuning = 0</code>).
+     *
+     * @param octaves Octave number.
+     * @return Frequency in Hertz.
+     */
+    public static double octavesToHz(double octaves) {
+        return 27.5 * Math.pow(2, octaves);
+    }
+
     // Time unit conversion
 
     /**

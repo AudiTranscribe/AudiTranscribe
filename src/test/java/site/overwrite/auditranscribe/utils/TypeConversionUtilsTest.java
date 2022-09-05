@@ -20,6 +20,8 @@ package site.overwrite.auditranscribe.utils;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class TypeConversionUtilsTest {
@@ -74,10 +76,15 @@ class TypeConversionUtilsTest {
                 0d, 9d, 8d, 7d, 6d, 5d, 4d, 3d, 2d, 1d,
                 1d, 2d, 3d, 4d, 5d, 6d, 7d, 8d, 9d, 0d
         };
+        List<Double> list = List.of(
+                0d, 9d, 8d, 7d, 6d, 5d, 4d, 3d, 2d, 1d,
+                1d, 2d, 3d, 4d, 5d, 6d, 7d, 8d, 9d, 0d
+        );
 
         // Assertions
         assertArrayEquals(array1, TypeConversionUtils.toDoubleArray(TypeConversionUtils.toDoubleArray(array1)));
         assertArrayEquals(array2, TypeConversionUtils.toDoubleArray(TypeConversionUtils.toDoubleArray(array2)));
+        assertArrayEquals(array2, TypeConversionUtils.toDoubleArray(list));
     }
 
     @Test

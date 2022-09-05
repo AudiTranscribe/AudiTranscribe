@@ -35,6 +35,7 @@ class MathUtilsTest {
 
     @Test
     void logN() {
+        assertEquals(2.322, MathUtils.logN(5, 2), 0.001);
         assertEquals(1, MathUtils.logN(Math.PI, Math.PI), 0.001);
         assertEquals(2.090, MathUtils.logN(123, 10), 0.001);
         assertEquals(1.272, MathUtils.logN(456, 123), 0.001);

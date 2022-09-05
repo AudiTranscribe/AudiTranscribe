@@ -16,10 +16,19 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.spectrogram.spectral_representations;
+package site.overwrite.auditranscribe.spectrogram;
 
 import org.junit.jupiter.api.Test;
+import site.overwrite.auditranscribe.audio.Audio;
+import site.overwrite.auditranscribe.audio.AudioProcessingMode;
+import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
+import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.utils.MathUtils;
+
+import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,5 +37,19 @@ class SpectralHelpersTest {
     void computeAlpha() {
         assertEquals(0.6, SpectralHelpers.computeAlpha(1));
         assertEquals(MathUtils.round((double) 1 / 3, 6), MathUtils.round(SpectralHelpers.computeAlpha(2), 6));
+    }
+
+    @Test
+    void estimateTuning() throws UnsupportedAudioFileException, AudioTooLongException, IOException {
+        Audio audio = new Audio(
+                new File(IOMethods.getAbsoluteFilePath("testing-files/audio/Trumpet.wav")),
+                "Trumpet.wav",
+                AudioProcessingMode.SAMPLES_ONLY
+        );
+
+        double[] samples = audio.getMonoSamples();
+        double sampleRate = audio.getSampleRate();
+
+        assertEquals(-0.09, SpectralHelpers.estimateTuning(samples, sampleRate), 1e-5);
     }
 }

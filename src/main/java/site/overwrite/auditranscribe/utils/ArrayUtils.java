@@ -18,6 +18,7 @@
 
 package site.overwrite.auditranscribe.utils;
 
+import org.javatuples.Pair;
 import site.overwrite.auditranscribe.exceptions.generic.LengthException;
 import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.misc.Complex;
@@ -139,6 +140,77 @@ public final class ArrayUtils {
         }
 
         return isLocalMaximum;
+    }
+
+    /**
+     * Returns num evenly spaced samples, calculated over the interval [start, end], including the
+     * endpoint.
+     *
+     * @param start   Starting value.
+     * @param end     Ending value.
+     * @param numElem Number of samples.
+     * @return Array of samples.
+     */
+    public static double[] linspace(double start, double end, int numElem) {
+        // Handle edge cases
+        if (numElem == 0) return new double[0];
+        if (numElem == 1) return new double[]{start};
+
+        // Handle standard cases
+        double[] out = new double[numElem];
+        out[0] = start;
+        out[numElem - 1] = end;
+        for (int i = 1; i < numElem - 1; i++) {
+            out[i] = ((double) i / (numElem - 1)) * (end - start) + start;
+        }
+        return out;
+    }
+
+    /**
+     * Compute the histogram of a dataset.
+     *
+     * @param input   Input data.
+     * @param start   Starting value of the bins (inclusive).
+     * @param end     Ending value of the bins (inclusive).
+     * @param numBins Number of <b>uniformly distributed</b> bins.
+     * @return A pair of arrays.
+     * <ul>
+     *     <li>The first array is the count of items that appear in each of the bins.</li>
+     *     <li>
+     *         The second array is the bins. All but the right-hand-most bin is half-open. In other
+     *         words, if <code>bins = [1, 2, 3, 4]</code> then the first bin is [1, 2) (including
+     *         1, but excluding 2) and the second [2, 3). The last bin, however, is [3, 4], which
+     *         includes 4.
+     *     </li>
+     * </ul>
+     */
+    public static Pair<Integer[], Double[]> histogram(double[] input, double start, double end, int numBins) {
+        // Generate bins array
+        double[] bins = linspace(start, end, numBins + 1);
+
+        // Get leftmost edge of the bins
+        double[] binsLeftEdge = Arrays.copyOfRange(bins, 0, numBins);
+
+        // Generate counts
+        Integer[] counts = new Integer[numBins];
+        Arrays.fill(counts, 0);
+        for (double elem : input) {
+            // Check if element is within the range
+            if ((elem < start) || (elem > end)) {  // Note: end is *inclusive*
+                continue;
+            }
+
+            // Search for the position to insert the element into the `binsLeftEdge` array
+            int correctIndex = searchSorted(binsLeftEdge, elem);
+
+            // Determine the bin index
+            int binIndex = correctIndex == 0 ? 0 : correctIndex - 1;
+
+            // Add 1 to the bin index
+            counts[binIndex]++;
+        }
+
+        return new Pair<>(counts, TypeConversionUtils.toDoubleArray(bins));
     }
 
     /**

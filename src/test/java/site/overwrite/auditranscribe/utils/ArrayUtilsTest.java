@@ -18,11 +18,13 @@
 
 package site.overwrite.auditranscribe.utils;
 
+import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.exceptions.generic.LengthException;
 import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.misc.Complex;
 
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -106,6 +108,61 @@ class ArrayUtilsTest {
         };
 
         assertArrayEquals(correct, ArrayUtils.localMaximum(array));
+    }
+
+    @Test
+    void linspace() {
+        // Define correct arrays
+        double[] correct1 = {
+                -0.5, -0.4, -0.3, -0.2, -0.1,  0. ,  0.1,  0.2,  0.3,  0.4,  0.5
+        };
+        double[] correct2 = {
+                0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10
+        };
+        double[] correct3 = {
+                0.,  10d/3,  20d/3, 10
+        };
+        double[] correct4 = {
+                -1234
+        };
+        double[] correct5 = {};
+
+        // Assertions
+        assertArrayEquals(correct1, ArrayUtils.linspace(-0.5, 0.5, 11), 1e-5);
+        assertArrayEquals(correct2, ArrayUtils.linspace(0, 10, 11), 1e-5);
+        assertArrayEquals(correct3, ArrayUtils.linspace(0, 10, 4), 1e-5);
+        assertArrayEquals(correct4, ArrayUtils.linspace(-1234, 5678, 1), 1e-5);
+        assertArrayEquals(correct5, ArrayUtils.linspace(-1234, 5678, 0), 1e-5);
+    }
+
+    @Test
+    void histogram() {
+        // Test 1
+        double[] data1 = {1.5, 2.5, 4.5, 5, 1};
+        Pair<Integer[], Double[]> countsAndBins1 = ArrayUtils.histogram(data1, 1, 5, 4);
+        Integer[] counts1 = countsAndBins1.getValue0();
+        Double[] bins1 = countsAndBins1.getValue1();
+
+        assertArrayEquals(new double[]{1, 2, 3, 4, 5}, TypeConversionUtils.toDoubleArray(bins1), 1e-5);
+        assertArrayEquals(new int[]{2, 1, 0, 2}, TypeConversionUtils.toIntegerArray(counts1));
+
+        // Test 2
+        double[] data2 = {0, 0.1, -0.2, 0.3, -0.4, 0.5, -0.6, 0.7, -0.8, 0.9, -1, 1, 0, 0, 0, 0, 0};
+        Pair<Integer[], Double[]> countsAndBins2 = ArrayUtils.histogram(data2, -1, 1, 10);
+        Integer[] counts2 = countsAndBins2.getValue0();
+        Double[] bins2 = countsAndBins2.getValue1();
+
+        assertArrayEquals(new double[]{-1, -0.8, -0.6, -0.4, -0.2, 0, 0.2, 0.4, 0.6, 0.8, 1}, TypeConversionUtils.toDoubleArray(bins2), 1e-5);
+        assertArrayEquals(new int[]{2, 1, 1, 1, 6, 1, 1, 1, 1, 2}, TypeConversionUtils.toIntegerArray(counts2));
+
+        // Test 3
+        double[] data3 = {};
+        Pair<Integer[], Double[]> countsAndBins3 = ArrayUtils.histogram(data3, 1, 5, 4);
+        Integer[] counts3 = countsAndBins3.getValue0();
+        Double[] bins3 = countsAndBins3.getValue1();
+
+        assertArrayEquals(new double[]{1, 2, 3, 4, 5}, TypeConversionUtils.toDoubleArray(bins3), 1e-5);
+        assertArrayEquals(new int[]{0, 0, 0, 0}, TypeConversionUtils.toIntegerArray(counts3));
     }
 
     @Test
@@ -260,6 +317,7 @@ class ArrayUtilsTest {
 
         // Run tests
         assertEquals(0, ArrayUtils.searchSorted(array1, 0.12));
+        assertEquals(0, ArrayUtils.searchSorted(array1, 1.23));
         assertEquals(2, ArrayUtils.searchSorted(array1, 4.56));
         assertEquals(3, ArrayUtils.searchSorted(array1, 6));
         assertEquals(2, ArrayUtils.searchSorted(array1, 5.67));
