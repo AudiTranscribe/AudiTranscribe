@@ -33,7 +33,7 @@ public final class ArrayUtils {
         // Private constructor to signal this is a utility class
     }
 
-    // Public methods
+    // Element identification methods
 
     /**
      * Method that finds the index of an element in an array using linear search.<br>
@@ -85,34 +85,6 @@ public final class ArrayUtils {
     }
 
     /**
-     * Calculates the median of a 2D array.
-     *
-     * @param array The 2D array.
-     * @return The median value of the double array.
-     */
-    public static double median(double[][] array) {
-        // If there is no array we don't have to do anything
-        if (array.length == 0) return Double.NaN;
-
-        // Flatten the array
-        int totalLength = 0;
-        for (double[] value : array) {
-            totalLength += value.length;
-        }
-
-        double[] flattened = new double[totalLength];
-        int index = 0;
-        for (double[] doubles : array) {
-            for (double aDouble : doubles) {
-                flattened[index] = aDouble;
-                index++;
-            }
-        }
-
-        return median(flattened);
-    }
-
-    /**
      * Find local maxima in an array.<br>
      * An element <code>array[i]</code> is considered a local maximum if both conditions are met:
      * <ul>
@@ -141,6 +113,75 @@ public final class ArrayUtils {
 
         return isLocalMaximum;
     }
+
+    /**
+     * Take certain elements of an array and return them in a new array.
+     *
+     * @param array   The array to take elements from.
+     * @param indices The indices to take.
+     * @return The new array containing the selected elements.
+     */
+    public static double[] takeElem(double[] array, int[] indices) {
+        // Define output array
+        double[] output = new double[indices.length];
+
+        // Copy elements
+        for (int i = 0; i < indices.length; i++) {
+            output[i] = array[indices[i]];
+        }
+
+        // Return output array
+        return output;
+    }
+
+    /**
+     * Find the index where an element should be inserted to maintain order in a sorted array.<br>
+     * <p>
+     * Find the index into a <b>sorted</b> array <code>array</code> such that, if the
+     * <code>value</code> was inserted <b>before</b> the index, the order of elements in
+     * <code>array</code> would be preserved.
+     *
+     * @param array The array of <b>sorted</b> elements. <b>No checks are in place to assert that
+     *              this array is sorted</b>.
+     * @param value The value to insert into <code>array</code>.
+     * @return Index to insert <code>value</code> into <code>array</code> to maintain order.
+     * @implNote Taken from <a href="https://tinyurl.com/NumSharpSearchSorted">NumSharp's
+     * Implementation</a> of the <code>searchSorted</code> method in C#. See also
+     * <a href="https://tinyurl.com/2p9499dy">NumPy's Documentation</a> on how the function works.
+     */
+    public static int searchSorted(double[] array, double value) {
+        // Get the length of the array
+        int n = array.length;
+
+        // Perform 'trivial' checks
+        if (value <= array[0]) return 0;  // If the value is smaller than or equals minimum, return smallest index
+        if (value > array[n - 1]) return n;  // If the value is larger than maximum, return next index after largest
+
+        // Define left, right, and middle pointers
+        int left = 0;
+        int right = n - 1;
+        int middle;
+
+        // Perform iterative binary search
+        while (left < right) {
+            // Calculate middle
+            middle = (left + right) / 2;
+
+            // Compare 'middle' value with the target value
+            if (array[middle] < value) {
+                left = middle + 1;
+            } else if (array[middle] == value) {
+                return middle;
+            } else {
+                right = middle;
+            }
+        }
+
+        // Return left pointer
+        return left;
+    }
+
+    // Array generation methods
 
     /**
      * Returns num evenly spaced samples, calculated over the interval [start, end], including the
@@ -212,6 +253,137 @@ public final class ArrayUtils {
 
         return new Pair<>(counts, TypeConversionUtils.toDoubleArray(bins));
     }
+
+    /**
+     * Slice a data array into (overlapping) frames.<br>
+     * This means an array <code>[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]</code> with
+     * <code>frameLength = 3</code> and <code>hopLength = 2</code> will be framed into:
+     * <ul>
+     *     <li>
+     *         <code>[[1, 3, 5, 7, 9], [2, 4, 6, 8, 10], [3, 5, 7, 9, 11]]</code> if
+     *         <code>verticalFraming</code> is true
+     *     </li>
+     *     <li>
+     *         <code>[[1, 2, 3], [3, 4, 5], [5, 6, 7], [7, 8, 9], [9, 10, 11]]</code> if not (that
+     *         is, framed horizontally).
+     *     </li>
+     * </ul>
+     *
+     * @param array           Array to frame.
+     * @param frameLength     Length of each frame.
+     * @param hopLength       Number of steps to advance between frames.
+     * @param verticalFraming If true, will frame vertically. Otherwise, will frame horizontally.
+     * @return Framed view of <code>array</code>.
+     * @implNote See <a href="https://stackoverflow.com/a/38163917">this StackOverflow answer</a>
+     * for implementation details in Python.
+     */
+    public static double[][] frame(double[] array, int frameLength, int hopLength, boolean verticalFraming) {
+        // Calculate the length of the framed array
+        int finalArrayLength = (int) Math.floor((double) (array.length - frameLength) / hopLength) + 1;
+
+        // Create the blank array to store the framed data in
+        double[][] framed;
+        if (verticalFraming) {
+            framed = new double[frameLength][finalArrayLength];
+        } else {
+            framed = new double[finalArrayLength][frameLength];
+        }
+
+        // Fill in the array
+        int length = array.length;
+
+        for (int index = 0, endFrameIndex = 0; endFrameIndex < length;
+             index++, endFrameIndex += hopLength) {  // Iterate through the `framed` array
+            for (int i = 0; i < frameLength; i++) {  // Iterate through the frame
+                // Validate the value of `i`
+                if (i + endFrameIndex < length && index < finalArrayLength) {
+                    if (verticalFraming) {
+                        framed[i][index] = array[i + endFrameIndex];
+                    } else {
+                        framed[index][i] = array[i + endFrameIndex];
+                    }
+                }
+            }
+        }
+
+        // Return the `framed` array
+        return framed;
+    }
+
+    /**
+     * Calculate a 1-D maximum filter along the given axis.<br>
+     * The lines of the array along the given axis are filtered with a maximum filter of given size.
+     *
+     * @param array The input array.
+     * @param size  Length along which to calculate the 1-D maximum.
+     * @return Maximum-filtered array with same shape as input.
+     * @see <a href="https://bit.ly/37iRiK3">SciPy's implementation</a> of the MAXLIST algorithm.
+     * This code is based off how that works. See also
+     * <a href="https://stackoverflow.com/a/66808375">this StackOverflow answer</a> on how the
+     * algorithm should work. Implementation is based off of Method 4 of
+     * <a href="https://bit.ly/3LYIc3l">this GeeksForGeeks article</a>.
+     */
+    public static double[] maximumFilter1D(double[] array, int size) {
+        // Get the number of elements in the array
+        int numElem = array.length;
+
+        // Pad array using the center reflect mode
+        int padAmount;
+        if (size % 2 == 1) {  // Odd size
+            // Initial window is centered on FIRST element, and final window is centered on LAST element
+            padAmount = (size - 1) / 2;
+        } else {  // Even size
+            // Initial window's center two elements are the FIRST element of the array
+            padAmount = size / 2;
+        }
+
+        double[] paddedArray = padCenterReflect(array, numElem + 2 * padAmount);
+
+        // Define maximum filter array and the double-ended queue (Deque)
+        double[] maxFilterArray = new double[numElem];
+        Deque<Integer> indicesQueue = new ArrayDeque<>();
+
+        // Process first window
+        for (int i = 0; i < size; i++) {
+            // For every element, the previous smaller elements are useless so remove them from the indices queue
+            while (indicesQueue.size() != 0 && paddedArray[i] >= paddedArray[indicesQueue.peekLast()]) {
+                indicesQueue.removeLast();
+            }
+
+            // Add new element to the rear of the deque
+            indicesQueue.addLast(i);
+        }
+
+        // Process the rest of the elements
+        for (int i = size; i < numElem + 2 * padAmount; i++) {
+            // The element at the front of the queue is the largest element of previous window, so add that into the
+            // maximum filter array
+            maxFilterArray[i - size] = paddedArray[indicesQueue.getFirst()];
+
+            // Remove the elements which are out of this window
+            while (indicesQueue.size() != 0 && indicesQueue.peekFirst() <= i - size) {
+                indicesQueue.removeFirst();
+            }
+
+            // Remove all elements smaller than the currently being added element
+            while (indicesQueue.size() != 0 && paddedArray[i] >= paddedArray[indicesQueue.peekLast()]) {
+                indicesQueue.removeLast();
+            }
+
+            // Add new element to the rear of the deque
+            indicesQueue.addLast(i);
+        }
+
+        // Add last window's maximum element to the maximum filter array if the size is odd
+        if (size % 2 == 1) {
+            maxFilterArray[numElem - 1] = paddedArray[indicesQueue.getFirst()];
+        }
+
+        // Return the maximum filter array
+        return maxFilterArray;
+    }
+
+    // Array modification methods
 
     /**
      * Normalizes the elements in the given array such that the L<sup>p</sup> norm is 1.
@@ -535,202 +707,6 @@ public final class ArrayUtils {
 
         // Return the output array
         return output;
-    }
-
-    /**
-     * Take certain elements of an array and return them in a new array.
-     *
-     * @param array   The array to take elements from.
-     * @param indices The indices to take.
-     * @return The new array containing the selected elements.
-     */
-    public static double[] takeElem(double[] array, int[] indices) {
-        // Define output array
-        double[] output = new double[indices.length];
-
-        // Copy elements
-        for (int i = 0; i < indices.length; i++) {
-            output[i] = array[indices[i]];
-        }
-
-        // Return output array
-        return output;
-    }
-
-    /**
-     * Find the index where an element should be inserted to maintain order in a sorted array.<br>
-     * <p>
-     * Find the index into a <b>sorted</b> array <code>array</code> such that, if the
-     * <code>value</code> was inserted <b>before</b> the index, the order of elements in
-     * <code>array</code> would be preserved.
-     *
-     * @param array The array of <b>sorted</b> elements. <b>No checks are in place to assert that
-     *              this array is sorted</b>.
-     * @param value The value to insert into <code>array</code>.
-     * @return Index to insert <code>value</code> into <code>array</code> to maintain order.
-     * @implNote Taken from <a href="https://tinyurl.com/NumSharpSearchSorted">NumSharp's
-     * Implementation</a> of the <code>searchSorted</code> method in C#. See also
-     * <a href="https://tinyurl.com/2p9499dy">NumPy's Documentation</a> on how the function works.
-     */
-    public static int searchSorted(double[] array, double value) {
-        // Get the length of the array
-        int n = array.length;
-
-        // Perform 'trivial' checks
-        if (value <= array[0]) return 0;  // If the value is smaller than or equals minimum, return smallest index
-        if (value > array[n - 1]) return n;  // If the value is larger than maximum, return next index after largest
-
-        // Define left, right, and middle pointers
-        int left = 0;
-        int right = n - 1;
-        int middle;
-
-        // Perform iterative binary search
-        while (left < right) {
-            // Calculate middle
-            middle = (left + right) / 2;
-
-            // Compare 'middle' value with the target value
-            if (array[middle] < value) {
-                left = middle + 1;
-            } else if (array[middle] == value) {
-                return middle;
-            } else {
-                right = middle;
-            }
-        }
-
-        // Return left pointer
-        return left;
-    }
-
-    /**
-     * Slice a data array into (overlapping) frames.<br>
-     * This means an array <code>[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]</code> with
-     * <code>frameLength = 3</code> and <code>hopLength = 2</code> will be framed into:
-     * <ul>
-     *     <li>
-     *         <code>[[1, 3, 5, 7, 9], [2, 4, 6, 8, 10], [3, 5, 7, 9, 11]]</code> if
-     *         <code>verticalFraming</code> is true
-     *     </li>
-     *     <li>
-     *         <code>[[1, 2, 3], [3, 4, 5], [5, 6, 7], [7, 8, 9], [9, 10, 11]]</code> if not (that
-     *         is, framed horizontally).
-     *     </li>
-     * </ul>
-     *
-     * @param array           Array to frame.
-     * @param frameLength     Length of each frame.
-     * @param hopLength       Number of steps to advance between frames.
-     * @param verticalFraming If true, will frame vertically. Otherwise, will frame horizontally.
-     * @return Framed view of <code>array</code>.
-     * @implNote See <a href="https://stackoverflow.com/a/38163917">this StackOverflow answer</a>
-     * for implementation details in Python.
-     */
-    public static double[][] frame(double[] array, int frameLength, int hopLength, boolean verticalFraming) {
-        // Calculate the length of the framed array
-        int finalArrayLength = (int) Math.floor((double) (array.length - frameLength) / hopLength) + 1;
-
-        // Create the blank array to store the framed data in
-        double[][] framed;
-        if (verticalFraming) {
-            framed = new double[frameLength][finalArrayLength];
-        } else {
-            framed = new double[finalArrayLength][frameLength];
-        }
-
-        // Fill in the array
-        int length = array.length;
-
-        for (int index = 0, endFrameIndex = 0; endFrameIndex < length;
-             index++, endFrameIndex += hopLength) {  // Iterate through the `framed` array
-            for (int i = 0; i < frameLength; i++) {  // Iterate through the frame
-                // Validate the value of `i`
-                if (i + endFrameIndex < length && index < finalArrayLength) {
-                    if (verticalFraming) {
-                        framed[i][index] = array[i + endFrameIndex];
-                    } else {
-                        framed[index][i] = array[i + endFrameIndex];
-                    }
-                }
-            }
-        }
-
-        // Return the `framed` array
-        return framed;
-    }
-
-    /**
-     * Calculate a 1-D maximum filter along the given axis.<br>
-     * The lines of the array along the given axis are filtered with a maximum filter of given size.
-     *
-     * @param array The input array.
-     * @param size  Length along which to calculate the 1-D maximum.
-     * @return Maximum-filtered array with same shape as input.
-     * @see <a href="https://bit.ly/37iRiK3">SciPy's implementation</a> of the MAXLIST algorithm.
-     * This code is based off how that works. See also
-     * <a href="https://stackoverflow.com/a/66808375">this StackOverflow answer</a> on how the
-     * algorithm should work. Implementation is based off of Method 4 of
-     * <a href="https://bit.ly/3LYIc3l">this GeeksForGeeks article</a>.
-     */
-    public static double[] maximumFilter1D(double[] array, int size) {
-        // Get the number of elements in the array
-        int numElem = array.length;
-
-        // Pad array using the center reflect mode
-        int padAmount;
-        if (size % 2 == 1) {  // Odd size
-            // Initial window is centered on FIRST element, and final window is centered on LAST element
-            padAmount = (size - 1) / 2;
-        } else {  // Even size
-            // Initial window's center two elements are the FIRST element of the array
-            padAmount = size / 2;
-        }
-
-        double[] paddedArray = padCenterReflect(array, numElem + 2 * padAmount);
-
-        // Define maximum filter array and the double-ended queue (Deque)
-        double[] maxFilterArray = new double[numElem];
-        Deque<Integer> indicesQueue = new ArrayDeque<>();
-
-        // Process first window
-        for (int i = 0; i < size; i++) {
-            // For every element, the previous smaller elements are useless so remove them from the indices queue
-            while (indicesQueue.size() != 0 && paddedArray[i] >= paddedArray[indicesQueue.peekLast()]) {
-                indicesQueue.removeLast();
-            }
-
-            // Add new element to the rear of the deque
-            indicesQueue.addLast(i);
-        }
-
-        // Process the rest of the elements
-        for (int i = size; i < numElem + 2 * padAmount; i++) {
-            // The element at the front of the queue is the largest element of previous window, so add that into the
-            // maximum filter array
-            maxFilterArray[i - size] = paddedArray[indicesQueue.getFirst()];
-
-            // Remove the elements which are out of this window
-            while (indicesQueue.size() != 0 && indicesQueue.peekFirst() <= i - size) {
-                indicesQueue.removeFirst();
-            }
-
-            // Remove all elements smaller than the currently being added element
-            while (indicesQueue.size() != 0 && paddedArray[i] >= paddedArray[indicesQueue.peekLast()]) {
-                indicesQueue.removeLast();
-            }
-
-            // Add new element to the rear of the deque
-            indicesQueue.addLast(i);
-        }
-
-        // Add last window's maximum element to the maximum filter array if the size is odd
-        if (size % 2 == 1) {
-            maxFilterArray[numElem - 1] = paddedArray[indicesQueue.getFirst()];
-        }
-
-        // Return the maximum filter array
-        return maxFilterArray;
     }
 
     /**

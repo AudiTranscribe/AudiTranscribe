@@ -24,12 +24,12 @@ import site.overwrite.auditranscribe.exceptions.generic.LengthException;
 import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.misc.Complex;
 
-import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class ArrayUtilsTest {
+    // Element identification methods
     @Test
     void findIndex() {
         // Define the arrays
@@ -74,20 +74,13 @@ class ArrayUtilsTest {
                 2, 9, 1, 2, 2,
                 1, 2, 2, 3, 3
         };
-        double[][] array2 = {
-                {9, 2, 3, 4, 5},
-                {6, 5, 6, 7, 8},
-                {9, 8, 7, 4, 4},
-                {2, 9, 1, 2, 2},
-        };
-        double[] array3 = {1234};
-        double[] array4 = {};
+        double[] array2 = {1234};
+        double[] array3 = {};
 
         // Assertions
         assertEquals(4, ArrayUtils.median(array1));
-        assertEquals(5, ArrayUtils.median(array2));
-        assertEquals(1234, ArrayUtils.median(array3));
-        assertEquals(Double.NaN, ArrayUtils.median(array4));
+        assertEquals(1234, ArrayUtils.median(array2));
+        assertEquals(Double.NaN, ArrayUtils.median(array3));
     }
 
     @Test
@@ -111,16 +104,50 @@ class ArrayUtilsTest {
     }
 
     @Test
+    void takeElem() {
+        assertArrayEquals(new double[]{2, 4, 5, 8}, ArrayUtils.takeElem(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new int[]{1, 3, 4, 7}));
+    }
+
+    @Test
+    void searchSorted() {
+        // Define searching arrays
+        double[] array1 = new double[]{1.23, 3.45, 5.67, 7.89, 9.01};
+        double[] array2 = new double[]{1, 1, 2, 3, 5};
+        double[] array3 = new double[]{-10, 10};
+
+        // Run tests
+        assertEquals(0, ArrayUtils.searchSorted(array1, 0.12));
+        assertEquals(0, ArrayUtils.searchSorted(array1, 1.23));
+        assertEquals(2, ArrayUtils.searchSorted(array1, 4.56));
+        assertEquals(3, ArrayUtils.searchSorted(array1, 6));
+        assertEquals(2, ArrayUtils.searchSorted(array1, 5.67));
+
+        assertEquals(4, ArrayUtils.searchSorted(array2, 4));
+        assertEquals(5, ArrayUtils.searchSorted(array2, 6));
+        assertEquals(0, ArrayUtils.searchSorted(array2, 0));
+        assertEquals(0, ArrayUtils.searchSorted(array2, 1));
+
+        assertEquals(0, ArrayUtils.searchSorted(array3, -11));
+        assertEquals(0, ArrayUtils.searchSorted(array3, -10));
+        assertEquals(1, ArrayUtils.searchSorted(array3, -9));
+        assertEquals(1, ArrayUtils.searchSorted(array3, 0));
+        assertEquals(1, ArrayUtils.searchSorted(array3, 9));
+        assertEquals(1, ArrayUtils.searchSorted(array3, 10));
+        assertEquals(2, ArrayUtils.searchSorted(array3, 11));
+    }
+
+    // Array generation methods
+    @Test
     void linspace() {
         // Define correct arrays
         double[] correct1 = {
-                -0.5, -0.4, -0.3, -0.2, -0.1,  0. ,  0.1,  0.2,  0.3,  0.4,  0.5
+                -0.5, -0.4, -0.3, -0.2, -0.1, 0., 0.1, 0.2, 0.3, 0.4, 0.5
         };
         double[] correct2 = {
-                0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
         };
         double[] correct3 = {
-                0.,  10d/3,  20d/3, 10
+                0., 10d / 3, 20d / 3, 10
         };
         double[] correct4 = {
                 -1234
@@ -165,6 +192,70 @@ class ArrayUtilsTest {
         assertArrayEquals(new int[]{0, 0, 0, 0}, TypeConversionUtils.toIntegerArray(counts3));
     }
 
+    @Test
+    void frame() {
+        // Perfect length array framing
+        double[] array1 = new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+        double[][] framedHorizontal1 = ArrayUtils.frame(array1, 3, 2, false);
+        double[][] framedVertical1 = ArrayUtils.frame(array1, 3, 2, true);
+
+        assertArrayEquals(new double[][]{{1, 2, 3}, {3, 4, 5}, {5, 6, 7}, {7, 8, 9}, {9, 10, 11}}, framedHorizontal1);
+        assertArrayEquals(new double[][]{{1, 3, 5, 7, 9}, {2, 4, 6, 8, 10}, {3, 5, 7, 9, 11}}, framedVertical1);
+
+        // Imperfect length array framing
+        double[] array2 = new double[]{1, 2, 3, 4, 5, 6};
+        double[][] framedHorizontal2 = ArrayUtils.frame(array2, 3, 2, false);
+        double[][] framedVertical2 = ArrayUtils.frame(array2, 3, 2, true);
+
+        assertArrayEquals(new double[][]{{1, 2, 3}, {3, 4, 5}}, framedHorizontal2);
+        assertArrayEquals(new double[][]{{1, 3}, {2, 4}, {3, 5}}, framedVertical2);
+
+        // (Another) Imperfect length array framing
+        double[] array3 = new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
+        double[][] framedHorizontal3 = ArrayUtils.frame(array3, 9, 3, false);
+        double[][] framedVertical3 = ArrayUtils.frame(array3, 9, 3, true);
+
+        assertArrayEquals(new double[][]{{1, 2, 3, 4, 5, 6, 7, 8, 9}, {4, 5, 6, 7, 8, 9, 10, 11, 12}, {7, 8, 9, 10, 11, 12, 13, 14, 15}, {10, 11, 12, 13, 14, 15, 16, 17, 18}}, framedHorizontal3);
+        assertArrayEquals(new double[][]{{1, 4, 7, 10}, {2, 5, 8, 11}, {3, 6, 9, 12}, {4, 7, 10, 13}, {5, 8, 11, 14}, {6, 9, 12, 15}, {7, 10, 13, 16}, {8, 11, 14, 17}, {9, 12, 15, 18}}, framedVertical3);
+    }
+
+    @Test
+    void maximumFilter1D() {
+        assertArrayEquals(new double[]{1, 0, 2, 6, 9}, ArrayUtils.maximumFilter1D(new double[]{1, 0, 2, 6, 9}, 1));
+        assertArrayEquals(new double[]{1, 1, 2, 6, 9}, ArrayUtils.maximumFilter1D(new double[]{1, 0, 2, 6, 9}, 2));
+        assertArrayEquals(new double[]{1, 2, 6, 9, 9}, ArrayUtils.maximumFilter1D(new double[]{1, 0, 2, 6, 9}, 3));
+        assertArrayEquals(new double[]{1, 2, 6, 9, 9}, ArrayUtils.maximumFilter1D(new double[]{1, 0, 2, 6, 9}, 4));
+        assertArrayEquals(new double[]{2, 6, 9, 9, 9}, ArrayUtils.maximumFilter1D(new double[]{1, 0, 2, 6, 9}, 5));
+        assertArrayEquals(new double[]{2, 6, 9, 9, 9}, ArrayUtils.maximumFilter1D(new double[]{1, 0, 2, 6, 9}, 6));
+        assertArrayEquals(new double[]{6, 9, 9, 9, 9}, ArrayUtils.maximumFilter1D(new double[]{1, 0, 2, 6, 9}, 7));
+        assertArrayEquals(new double[]{6, 9, 9, 9, 9}, ArrayUtils.maximumFilter1D(new double[]{1, 0, 2, 6, 9}, 8));
+        assertArrayEquals(new double[]{9, 9, 9, 9, 9}, ArrayUtils.maximumFilter1D(new double[]{1, 0, 2, 6, 9}, 9));
+        assertArrayEquals(new double[]{9, 9, 9, 9, 9}, ArrayUtils.maximumFilter1D(new double[]{1, 0, 2, 6, 9}, 10));
+
+        assertArrayEquals(new double[]{-1, -2, 3, 4, -5, -6}, ArrayUtils.maximumFilter1D(new double[]{-1, -2, 3, 4, -5, -6}, 1));
+        assertArrayEquals(new double[]{-1, -1, 3, 4, 4, -5}, ArrayUtils.maximumFilter1D(new double[]{-1, -2, 3, 4, -5, -6}, 2));
+        assertArrayEquals(new double[]{-1, 3, 4, 4, 4, -5}, ArrayUtils.maximumFilter1D(new double[]{-1, -2, 3, 4, -5, -6}, 3));
+        assertArrayEquals(new double[]{-1, 3, 4, 4, 4, 4}, ArrayUtils.maximumFilter1D(new double[]{-1, -2, 3, 4, -5, -6}, 4));
+        assertArrayEquals(new double[]{3, 4, 4, 4, 4, 4}, ArrayUtils.maximumFilter1D(new double[]{-1, -2, 3, 4, -5, -6}, 5));
+        assertArrayEquals(new double[]{3, 4, 4, 4, 4, 4}, ArrayUtils.maximumFilter1D(new double[]{-1, -2, 3, 4, -5, -6}, 6));
+        assertArrayEquals(new double[]{4, 4, 4, 4, 4, 4}, ArrayUtils.maximumFilter1D(new double[]{-1, -2, 3, 4, -5, -6}, 7));
+        assertArrayEquals(new double[]{4, 4, 4, 4, 4, 4}, ArrayUtils.maximumFilter1D(new double[]{-1, -2, 3, 4, -5, -6}, 8));
+        assertArrayEquals(new double[]{4, 4, 4, 4, 4, 4}, ArrayUtils.maximumFilter1D(new double[]{-1, -2, 3, 4, -5, -6}, 9));
+        assertArrayEquals(new double[]{4, 4, 4, 4, 4, 4}, ArrayUtils.maximumFilter1D(new double[]{-1, -2, 3, 4, -5, -6}, 10));
+
+        assertArrayEquals(new double[]{9, 1, 2, -3, 10, 5, -6}, ArrayUtils.maximumFilter1D(new double[]{9, 1, 2, -3, 10, 5, -6}, 1));
+        assertArrayEquals(new double[]{9, 9, 2, 2, 10, 10, 5}, ArrayUtils.maximumFilter1D(new double[]{9, 1, 2, -3, 10, 5, -6}, 2));
+        assertArrayEquals(new double[]{9, 9, 2, 10, 10, 10, 5}, ArrayUtils.maximumFilter1D(new double[]{9, 1, 2, -3, 10, 5, -6}, 3));
+        assertArrayEquals(new double[]{9, 9, 9, 10, 10, 10, 10}, ArrayUtils.maximumFilter1D(new double[]{9, 1, 2, -3, 10, 5, -6}, 4));
+        assertArrayEquals(new double[]{9, 9, 10, 10, 10, 10, 10}, ArrayUtils.maximumFilter1D(new double[]{9, 1, 2, -3, 10, 5, -6}, 5));
+        assertArrayEquals(new double[]{9, 9, 10, 10, 10, 10, 10}, ArrayUtils.maximumFilter1D(new double[]{9, 1, 2, -3, 10, 5, -6}, 6));
+        assertArrayEquals(new double[]{9, 10, 10, 10, 10, 10, 10}, ArrayUtils.maximumFilter1D(new double[]{9, 1, 2, -3, 10, 5, -6}, 7));
+        assertArrayEquals(new double[]{9, 10, 10, 10, 10, 10, 10}, ArrayUtils.maximumFilter1D(new double[]{9, 1, 2, -3, 10, 5, -6}, 8));
+        assertArrayEquals(new double[]{10, 10, 10, 10, 10, 10, 10}, ArrayUtils.maximumFilter1D(new double[]{9, 1, 2, -3, 10, 5, -6}, 9));
+        assertArrayEquals(new double[]{10, 10, 10, 10, 10, 10, 10}, ArrayUtils.maximumFilter1D(new double[]{9, 1, 2, -3, 10, 5, -6}, 10));
+    }
+
+    // Array modification methods
     @Test
     void lpNormalize() {
         // Define the arrays
@@ -301,102 +392,6 @@ class ArrayUtilsTest {
 
         assertThrowsExactly(ValueException.class, () -> ArrayUtils.padCenterReflect(array1, 0));  // Size is zero
         assertThrowsExactly(ValueException.class, () -> ArrayUtils.padCenterReflect(array2, -1));  // Size is negative
-    }
-
-    @Test
-    void takeElem() {
-        assertArrayEquals(new double[]{2, 4, 5, 8}, ArrayUtils.takeElem(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new int[]{1, 3, 4, 7}));
-    }
-
-    @Test
-    void searchSorted() {
-        // Define searching arrays
-        double[] array1 = new double[]{1.23, 3.45, 5.67, 7.89, 9.01};
-        double[] array2 = new double[]{1, 1, 2, 3, 5};
-        double[] array3 = new double[]{-10, 10};
-
-        // Run tests
-        assertEquals(0, ArrayUtils.searchSorted(array1, 0.12));
-        assertEquals(0, ArrayUtils.searchSorted(array1, 1.23));
-        assertEquals(2, ArrayUtils.searchSorted(array1, 4.56));
-        assertEquals(3, ArrayUtils.searchSorted(array1, 6));
-        assertEquals(2, ArrayUtils.searchSorted(array1, 5.67));
-
-        assertEquals(4, ArrayUtils.searchSorted(array2, 4));
-        assertEquals(5, ArrayUtils.searchSorted(array2, 6));
-        assertEquals(0, ArrayUtils.searchSorted(array2, 0));
-        assertEquals(0, ArrayUtils.searchSorted(array2, 1));
-
-        assertEquals(0, ArrayUtils.searchSorted(array3, -11));
-        assertEquals(0, ArrayUtils.searchSorted(array3, -10));
-        assertEquals(1, ArrayUtils.searchSorted(array3, -9));
-        assertEquals(1, ArrayUtils.searchSorted(array3, 0));
-        assertEquals(1, ArrayUtils.searchSorted(array3, 9));
-        assertEquals(1, ArrayUtils.searchSorted(array3, 10));
-        assertEquals(2, ArrayUtils.searchSorted(array3, 11));
-    }
-
-    @Test
-    void frame() {
-        // Perfect length array framing
-        double[] array1 = new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
-        double[][] framedHorizontal1 = ArrayUtils.frame(array1, 3, 2, false);
-        double[][] framedVertical1 = ArrayUtils.frame(array1, 3, 2, true);
-
-        assertArrayEquals(new double[][]{{1, 2, 3}, {3, 4, 5}, {5, 6, 7}, {7, 8, 9}, {9, 10, 11}}, framedHorizontal1);
-        assertArrayEquals(new double[][]{{1, 3, 5, 7, 9}, {2, 4, 6, 8, 10}, {3, 5, 7, 9, 11}}, framedVertical1);
-
-        // Imperfect length array framing
-        double[] array2 = new double[]{1, 2, 3, 4, 5, 6};
-        double[][] framedHorizontal2 = ArrayUtils.frame(array2, 3, 2, false);
-        double[][] framedVertical2 = ArrayUtils.frame(array2, 3, 2, true);
-
-        assertArrayEquals(new double[][]{{1, 2, 3}, {3, 4, 5}}, framedHorizontal2);
-        assertArrayEquals(new double[][]{{1, 3}, {2, 4}, {3, 5}}, framedVertical2);
-
-        // (Another) Imperfect length array framing
-        double[] array3 = new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
-        double[][] framedHorizontal3 = ArrayUtils.frame(array3, 9, 3, false);
-        double[][] framedVertical3 = ArrayUtils.frame(array3, 9, 3, true);
-
-        assertArrayEquals(new double[][]{{1, 2, 3, 4, 5, 6, 7, 8, 9}, {4, 5, 6, 7, 8, 9, 10, 11, 12}, {7, 8, 9, 10, 11, 12, 13, 14, 15}, {10, 11, 12, 13, 14, 15, 16, 17, 18}}, framedHorizontal3);
-        assertArrayEquals(new double[][]{{1, 4, 7, 10}, {2, 5, 8, 11}, {3, 6, 9, 12}, {4, 7, 10, 13}, {5, 8, 11, 14}, {6, 9, 12, 15}, {7, 10, 13, 16}, {8, 11, 14, 17}, {9, 12, 15, 18}}, framedVertical3);
-    }
-
-    @Test
-    void maximumFilter1D() {
-        assertArrayEquals(new double[]{1, 0, 2, 6, 9}, ArrayUtils.maximumFilter1D(new double[]{1, 0, 2, 6, 9}, 1));
-        assertArrayEquals(new double[]{1, 1, 2, 6, 9}, ArrayUtils.maximumFilter1D(new double[]{1, 0, 2, 6, 9}, 2));
-        assertArrayEquals(new double[]{1, 2, 6, 9, 9}, ArrayUtils.maximumFilter1D(new double[]{1, 0, 2, 6, 9}, 3));
-        assertArrayEquals(new double[]{1, 2, 6, 9, 9}, ArrayUtils.maximumFilter1D(new double[]{1, 0, 2, 6, 9}, 4));
-        assertArrayEquals(new double[]{2, 6, 9, 9, 9}, ArrayUtils.maximumFilter1D(new double[]{1, 0, 2, 6, 9}, 5));
-        assertArrayEquals(new double[]{2, 6, 9, 9, 9}, ArrayUtils.maximumFilter1D(new double[]{1, 0, 2, 6, 9}, 6));
-        assertArrayEquals(new double[]{6, 9, 9, 9, 9}, ArrayUtils.maximumFilter1D(new double[]{1, 0, 2, 6, 9}, 7));
-        assertArrayEquals(new double[]{6, 9, 9, 9, 9}, ArrayUtils.maximumFilter1D(new double[]{1, 0, 2, 6, 9}, 8));
-        assertArrayEquals(new double[]{9, 9, 9, 9, 9}, ArrayUtils.maximumFilter1D(new double[]{1, 0, 2, 6, 9}, 9));
-        assertArrayEquals(new double[]{9, 9, 9, 9, 9}, ArrayUtils.maximumFilter1D(new double[]{1, 0, 2, 6, 9}, 10));
-
-        assertArrayEquals(new double[]{-1, -2, 3, 4, -5, -6}, ArrayUtils.maximumFilter1D(new double[]{-1, -2, 3, 4, -5, -6}, 1));
-        assertArrayEquals(new double[]{-1, -1, 3, 4, 4, -5}, ArrayUtils.maximumFilter1D(new double[]{-1, -2, 3, 4, -5, -6}, 2));
-        assertArrayEquals(new double[]{-1, 3, 4, 4, 4, -5}, ArrayUtils.maximumFilter1D(new double[]{-1, -2, 3, 4, -5, -6}, 3));
-        assertArrayEquals(new double[]{-1, 3, 4, 4, 4, 4}, ArrayUtils.maximumFilter1D(new double[]{-1, -2, 3, 4, -5, -6}, 4));
-        assertArrayEquals(new double[]{3, 4, 4, 4, 4, 4}, ArrayUtils.maximumFilter1D(new double[]{-1, -2, 3, 4, -5, -6}, 5));
-        assertArrayEquals(new double[]{3, 4, 4, 4, 4, 4}, ArrayUtils.maximumFilter1D(new double[]{-1, -2, 3, 4, -5, -6}, 6));
-        assertArrayEquals(new double[]{4, 4, 4, 4, 4, 4}, ArrayUtils.maximumFilter1D(new double[]{-1, -2, 3, 4, -5, -6}, 7));
-        assertArrayEquals(new double[]{4, 4, 4, 4, 4, 4}, ArrayUtils.maximumFilter1D(new double[]{-1, -2, 3, 4, -5, -6}, 8));
-        assertArrayEquals(new double[]{4, 4, 4, 4, 4, 4}, ArrayUtils.maximumFilter1D(new double[]{-1, -2, 3, 4, -5, -6}, 9));
-        assertArrayEquals(new double[]{4, 4, 4, 4, 4, 4}, ArrayUtils.maximumFilter1D(new double[]{-1, -2, 3, 4, -5, -6}, 10));
-
-        assertArrayEquals(new double[]{9, 1, 2, -3, 10, 5, -6}, ArrayUtils.maximumFilter1D(new double[]{9, 1, 2, -3, 10, 5, -6}, 1));
-        assertArrayEquals(new double[]{9, 9, 2, 2, 10, 10, 5}, ArrayUtils.maximumFilter1D(new double[]{9, 1, 2, -3, 10, 5, -6}, 2));
-        assertArrayEquals(new double[]{9, 9, 2, 10, 10, 10, 5}, ArrayUtils.maximumFilter1D(new double[]{9, 1, 2, -3, 10, 5, -6}, 3));
-        assertArrayEquals(new double[]{9, 9, 9, 10, 10, 10, 10}, ArrayUtils.maximumFilter1D(new double[]{9, 1, 2, -3, 10, 5, -6}, 4));
-        assertArrayEquals(new double[]{9, 9, 10, 10, 10, 10, 10}, ArrayUtils.maximumFilter1D(new double[]{9, 1, 2, -3, 10, 5, -6}, 5));
-        assertArrayEquals(new double[]{9, 9, 10, 10, 10, 10, 10}, ArrayUtils.maximumFilter1D(new double[]{9, 1, 2, -3, 10, 5, -6}, 6));
-        assertArrayEquals(new double[]{9, 10, 10, 10, 10, 10, 10}, ArrayUtils.maximumFilter1D(new double[]{9, 1, 2, -3, 10, 5, -6}, 7));
-        assertArrayEquals(new double[]{9, 10, 10, 10, 10, 10, 10}, ArrayUtils.maximumFilter1D(new double[]{9, 1, 2, -3, 10, 5, -6}, 8));
-        assertArrayEquals(new double[]{10, 10, 10, 10, 10, 10, 10}, ArrayUtils.maximumFilter1D(new double[]{9, 1, 2, -3, 10, 5, -6}, 9));
-        assertArrayEquals(new double[]{10, 10, 10, 10, 10, 10, 10}, ArrayUtils.maximumFilter1D(new double[]{9, 1, 2, -3, 10, 5, -6}, 10));
     }
 
     @Test
