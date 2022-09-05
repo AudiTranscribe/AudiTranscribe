@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.bpm_estimation;
+package site.overwrite.auditranscribe.music.bpm_estimation;
 
 /**
  * Class containing helper methods for BPM estimation.

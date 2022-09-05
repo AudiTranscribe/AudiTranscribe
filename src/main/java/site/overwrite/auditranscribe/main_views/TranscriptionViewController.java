@@ -38,7 +38,7 @@ import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.audio.FFmpegHandler;
-import site.overwrite.auditranscribe.bpm_estimation.BPMEstimator;
+import site.overwrite.auditranscribe.music.bpm_estimation.BPMEstimator;
 import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
 import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.exceptions.notes.NoteRectangleCollisionException;

@@ -16,10 +16,11 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.bpm_estimation;
+package site.overwrite.auditranscribe.music.bpm_estimation;
 
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.misc.Complex;
+import site.overwrite.auditranscribe.music.bpm_estimation.Autocorrelation;
 
 import static org.junit.jupiter.api.Assertions.*;
 

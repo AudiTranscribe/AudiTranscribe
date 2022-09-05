@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.bpm_estimation;
+package site.overwrite.auditranscribe.music.bpm_estimation;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
@@ -26,6 +26,7 @@ import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
 import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.music.bpm_estimation.BPMEstimator;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;

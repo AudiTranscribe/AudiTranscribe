@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.bpm_estimation;
+package site.overwrite.auditranscribe.music.bpm_estimation;
 
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.MelSpectrogram;
 import site.overwrite.auditranscribe.utils.MathUtils;
