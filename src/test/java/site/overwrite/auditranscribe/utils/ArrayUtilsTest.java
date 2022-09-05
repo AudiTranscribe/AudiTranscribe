@@ -65,25 +65,6 @@ class ArrayUtilsTest {
     }
 
     @Test
-    void median() {
-        // Define arrays
-        double[] array1 = {
-                9, 2, 3, 4, 5,
-                6, 5, 6, 7, 8,
-                9, 8, 7, 4, 4,
-                2, 9, 1, 2, 2,
-                1, 2, 2, 3, 3
-        };
-        double[] array2 = {1234};
-        double[] array3 = {};
-
-        // Assertions
-        assertEquals(4, ArrayUtils.median(array1));
-        assertEquals(1234, ArrayUtils.median(array2));
-        assertEquals(Double.NaN, ArrayUtils.median(array3));
-    }
-
-    @Test
     void localMaximum() {
         double[] array = {
                 9, 2, 3, 4, 5,

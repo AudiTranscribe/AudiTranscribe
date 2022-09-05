@@ -24,11 +24,11 @@ import site.overwrite.auditranscribe.misc.Complex;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.FrequencyBins;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.STFT;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
+import site.overwrite.auditranscribe.utils.StatisticalUtils;
 import site.overwrite.auditranscribe.utils.TypeConversionUtils;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -87,7 +87,7 @@ public final class SpectralHelpers {
         // Determine threshold value
         double threshold;
         if (tempRelevantPitches.size() != 0) {
-            threshold = ArrayUtils.median(
+            threshold = StatisticalUtils.median(
                     TypeConversionUtils.toDoubleArray(
                             TypeConversionUtils.toDoubleArray(tempRelevantMags)
                     )

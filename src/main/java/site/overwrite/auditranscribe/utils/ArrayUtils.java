@@ -63,28 +63,6 @@ public final class ArrayUtils {
     }
 
     /**
-     * Calculates the median of an array.
-     *
-     * @param array The array.
-     * @return The median value of the double array.
-     */
-    public static double median(double[] array) {
-        // If there is no array we don't have to do anything
-        if (array.length == 0) return Double.NaN;
-
-        // Sort the array first
-        Arrays.sort(array);
-
-        // Find the median
-        int n = array.length;
-        if (n % 2 == 1) {
-            return array[n / 2];
-        } else {
-            return 0.5 * (array[n / 2] + array[n / 2 - 1]);
-        }
-    }
-
-    /**
      * Find local maxima in an array.<br>
      * An element <code>array[i]</code> is considered a local maximum if both conditions are met:
      * <ul>

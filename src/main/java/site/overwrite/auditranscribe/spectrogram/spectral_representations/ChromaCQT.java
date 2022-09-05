@@ -53,6 +53,9 @@ public final class ChromaCQT {
      * @param task          The <code>CustomTask</code> object that is handling the generation. Pass
      *                      in <code>null</code> if no such task is being used.
      * @return The output chromagram
+     * @implNote See
+     * <a href="https://librosa.org/doc/main/generated/librosa.feature.chroma_cqt.html">Librosa's
+     * Implementation</a> of the Chroma CQT algorithm.
      */
 
     public static double[][] chromaCQT(
