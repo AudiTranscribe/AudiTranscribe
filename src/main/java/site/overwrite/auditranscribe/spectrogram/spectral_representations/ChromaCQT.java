@@ -81,7 +81,7 @@ public final class ChromaCQT {
         double[][] cqToChr = constantQToChroma(C.length, numChroma, binsPerOctave, fmin);
 
         // Map to chroma
-        double[][] chroma = ArrayUtils.matmul(cqToChr, C);  // Todo: verify that this is correct
+        double[][] chroma = ArrayUtils.matmul(cqToChr, C);
 
         // Threshold the chroma values
         for (int i = 0; i < chroma.length; i++) {
