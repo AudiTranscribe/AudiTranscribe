@@ -217,11 +217,11 @@ public class Spectrogram {
         Complex[][] QTMatrix;
         if (IS_CQT) {
             QTMatrix = CQT.cqt(
-                    samples, sampleRate, hopLength, minFreq, numFreqBins, binsPerOctave, windowFunction, task
+                    samples, sampleRate, hopLength, minFreq, numFreqBins, binsPerOctave, 0, windowFunction, task
             );
         } else {
             QTMatrix = VQT.vqt(
-                    samples, sampleRate, hopLength, minFreq, numFreqBins, binsPerOctave, GAMMA, windowFunction, task
+                    samples, sampleRate, hopLength, minFreq, numFreqBins, binsPerOctave, 0, GAMMA, windowFunction, task
             );
         }
 
