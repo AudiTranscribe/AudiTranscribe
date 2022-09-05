@@ -87,4 +87,31 @@ class StatisticalUtilsTest {
         assertArrayEquals(new double[]{2.5, 0}, cov3[0], 1e-5);
         assertArrayEquals(new double[]{0, 3.5}, cov3[1], 1e-5);
     }
+
+    @Test
+    void corrcoef() {
+        // Test 1
+        double[] x1 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        double[] y1 = {5, 6, 7, 8, 9, 10, 11, 12, 13, 14};
+        double[][] r1 = StatisticalUtils.corrcoef(x1, y1);
+
+        assertArrayEquals(new double[]{1, 1}, r1[0], 1e-5);
+        assertArrayEquals(new double[]{1, 1}, r1[1], 1e-5);
+
+        // Test 2
+        double[] x2 = {1, -1, 2, -2, 0};
+        double[] y2 = {-1, 1, -2, 2, 0};
+        double[][] r2 = StatisticalUtils.corrcoef(x2, y2);
+
+        assertArrayEquals(new double[]{1, -1}, r2[0], 1e-5);
+        assertArrayEquals(new double[]{-1, 1}, r2[1], 1e-5);
+
+        // Test 3
+        double[] x3 = {-2, -1, 0, 1, 2};
+        double[] y3 = {4, 1, 0, 1, 4};
+        double[][] r3 = StatisticalUtils.corrcoef(x3, y3);
+
+        assertArrayEquals(new double[]{1, 0}, r3[0], 1e-5);
+        assertArrayEquals(new double[]{0, 1}, r3[1], 1e-5);
+    }
 }

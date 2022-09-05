@@ -34,6 +34,7 @@ public final class StatisticalUtils {
 
     /**
      * Compute the sum of the array <code>x</code>.
+     *
      * @param x Array to compute the sum of.
      * @return The sum of the elements in the array.
      */
@@ -71,6 +72,15 @@ public final class StatisticalUtils {
         }
     }
 
+    /**
+     * Estimate a covariance matrix, given data and weights.
+     *
+     * @param x First array, containing observations of the random variable <em>X</em>.
+     * @param y Second array, containing observations of the random variable <em>Y</em>.
+     * @return A 2x2 matrix, representing the covariance matrix of <em>X</em> and <em>Y</em>.
+     * @implNote See <a href="https://numpy.org/doc/stable/reference/generated/numpy.cov.html">
+     * Numpy's Implementation</a> of the <code>cov</code> method.
+     */
     public static double[][] cov(double[] x, double[] y) {
         // The delta degrees of freedom is 0
         int ddof = 1;
@@ -117,5 +127,29 @@ public final class StatisticalUtils {
         }
 
         return C;
+    }
+
+    /**
+     * Return Pearson product-moment correlation coefficients.
+     *
+     * @param x First array, containing observations of the random variable <em>X</em>.
+     * @param y Second array, containing observations of the random variable <em>Y</em>.
+     * @return The correlation coefficient matrix of the variables.
+     * @implNote See <a href="https://numpy.org/doc/stable/reference/generated/numpy.corrcoef.html">
+     * Numpy's Implementation</a> of the <code>corrcoeff</code> method.
+     */
+    public static double[][] corrcoef(double[] x, double[] y) {
+        // Compute the covariance matrix first
+        double[][] C = cov(x, y);
+
+        // Compute the correlation coefficients
+        double[][] R = new double[C.length][C[0].length];
+        for (int i = 0; i < C.length; i++) {
+            for (int j = 0; j < C[0].length; j++) {
+                R[i][j] = (C[i][j]) / (Math.sqrt(C[i][i] * C[j][j]));
+            }
+        }
+
+        return R;
     }
 }
