@@ -506,7 +506,29 @@ public final class ArrayUtils {
      * Normalizes the elements in the given array such that the L<sup>p</sup> norm is 1.
      *
      * @param array The array to normalize.
-     * @param norm  The norm parameter for the L<sup>p</sup> normalization.
+     * @param norm  The norm parameter for the L<sup>p</sup> normalization. There are 5 cases to
+     *              consider for the value of <code>norm</code>.
+     *              <ul>
+     *                  <li>
+     *                      <code>norm = Double.NEGATIVE_INFINITY</code>: The L<sup>p</sup> norm is
+     *                      considered to be the <b>minimum</b> absolute value.
+     *                  </li>
+     *                  <li>
+     *                      <code>norm = Double.POSITIVE_INFINITY</code>: The L<sup>p</sup> norm is
+     *                      considered to be the <b>maximum</b> absolute value.
+     *                  </li>
+     *                  <li>
+     *                      <code>norm = 0</code>: The L<sup>p</sup> norm is considered to be the
+     *                      sum of all magnitudes.
+     *                  </li>
+     *                  <li>
+     *                      <code>norm > 0</code>: The <code>p</code> value is equal to
+     *                      <code>norm</code>, and L<sup>p</sup> norm will be calculated normally.
+     *                  </li>
+     *                  <li>
+     *                      <code>norm < 0</code>: No normalization will be performed.
+     *                  </li>
+     *              </ul>
      * @return The normalized complex array such that the L<sup>p</sup> norm of the array is 1.
      * @see <a href="https://bit.ly/3LVePPv">L<sup>p</sup>-Norm</a> on Wikipedia, and
      * <a href="https://bit.ly/3GwhYUJ">Librosa's Implementation</a> of this method.
