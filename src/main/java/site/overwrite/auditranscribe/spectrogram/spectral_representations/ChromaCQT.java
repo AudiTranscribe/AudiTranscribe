@@ -44,7 +44,7 @@ public final class ChromaCQT {
      *
      * @param y             Audio time series.
      * @param sr            Sample rate.
-     * @param hopLength     Number of samples between successive chroma frames
+     * @param hopLength     Number of samples between successive chroma frames.
      * @param fmin          Minimum frequency to analyze in the CQT.
      * @param numChroma     Number of chroma bins to produce.
      * @param numOctaves    Number of octaves to analyze above <code>fmin</code>.
@@ -52,7 +52,7 @@ public final class ChromaCQT {
      *                      <code>numChroma</code>.
      * @param task          The <code>CustomTask</code> object that is handling the generation. Pass
      *                      in <code>null</code> if no such task is being used.
-     * @return The output chromagram
+     * @return The output chromagram.
      * @implNote See
      * <a href="https://librosa.org/doc/main/generated/librosa.feature.chroma_cqt.html">Librosa's
      * Implementation</a> of the Chroma CQT algorithm.
