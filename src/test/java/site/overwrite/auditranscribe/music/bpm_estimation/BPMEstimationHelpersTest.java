@@ -24,7 +24,6 @@ import site.overwrite.auditranscribe.music.bpm_estimation.BPMEstimationHelpers;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BPMEstimationHelpersTest {
-
     @Test
     void tempoFrequencies() {
         // Define expected arrays

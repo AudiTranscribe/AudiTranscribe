@@ -76,7 +76,7 @@ public class CheckForUpdatesViewHelper {
             if (selectedButton.isPresent()) {
                 if (selectedButton.get() == seeNewUpdate) {
                     // Send user to the new release page
-                    String urlString = "https://auditranscribe.app/release?" + newVersionTag;
+                    String urlString = "https://auditranscribe.app/release?tag=" + newVersionTag;
                     GUIUtils.openURLInBrowser(urlString);
                 }
             }

@@ -5,7 +5,7 @@
 
     <groupId>site.overwrite</groupId>
     <artifactId>AudiTranscribe</artifactId>
-    <version>0.6.1</version>
+    <version>0.6.2</version>
     <name>AudiTranscribe</name>
 
     <properties>
@@ -78,7 +78,7 @@
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
-            <version>3.36.0.3</version> <!-- Do not change this version; we need to custom install it -->
+            <version>3.36.0.3</version> <!-- Do not change this version; we need to use the custom JAR file -->
         </dependency>
         <dependency>
             <groupId>org.javatuples</groupId>
@@ -162,7 +162,7 @@
                             <file>${project.basedir}/lib/sqlite-jdbc-3.36.0.3_custom.jar</file>
                             <groupId>org.xerial</groupId>
                             <artifactId>sqlite-jdbc</artifactId>
-                            <version>3.36.0.3</version>
+                            <version>3.36.0.3</version> <!-- Do not change this version -->
                             <packaging>jar</packaging>
                             <generatePom>true</generatePom>
                         </configuration>

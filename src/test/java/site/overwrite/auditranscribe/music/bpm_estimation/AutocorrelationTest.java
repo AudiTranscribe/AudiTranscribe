@@ -25,7 +25,6 @@ import site.overwrite.auditranscribe.music.bpm_estimation.Autocorrelation;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AutocorrelationTest {
-
     @Test
     void autocorrelation() {
         // Define matrices
