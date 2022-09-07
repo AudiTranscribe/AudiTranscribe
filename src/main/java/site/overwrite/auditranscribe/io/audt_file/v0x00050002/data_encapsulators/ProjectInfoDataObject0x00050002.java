@@ -1,6 +1,6 @@
 /*
- * GUIDataObject0x00050002.java
- * Description: Data object that stores the GUI data.
+ * ProjectInfoDataObject0x00050002.java
+ * Description: Data object that stores the project's info.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -18,14 +18,17 @@
 
 package site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators;
 
-import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.GUIDataObject;
+import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.ProjectInfoDataObject;
 
 /**
- * Data object that stores the GUI data.
+ * Data object that stores the project's info.<br>
+ * <b>Note</b>: This is different from the <code>ProjectData</code> class. This is a data object
+ * storing the project's info, whereas the <code>ProjectData</code> object stores all the different
+ * data encapsulators.
  */
-public class GUIDataObject0x00050002 extends GUIDataObject {
+public class ProjectInfoDataObject0x00050002 extends ProjectInfoDataObject {
     /**
-     * Initialization method for the GUI data object.
+     * Initialization method for the project info data object.
      *
      * @param musicKeyIndex      The index of the music key in the dropdown menu shown in the
      *                           application.
@@ -35,7 +38,7 @@ public class GUIDataObject0x00050002 extends GUIDataObject {
      * @param playbackVolume     Volume to play back at.
      * @param currTimeInMS       Current playback time of the audio in <b>milliseconds</b>.
      */
-    public GUIDataObject0x00050002(
+    public ProjectInfoDataObject0x00050002(
             int musicKeyIndex, int timeSignatureIndex, double bpm, double offsetSeconds, double playbackVolume,
             int currTimeInMS
     ) {

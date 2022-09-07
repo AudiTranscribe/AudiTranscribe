@@ -64,8 +64,8 @@ class AUDTFile0x00050002Test {
     QTransformDataObject qTransformDataObject;
     AudioDataObject audioDataObject;
 
-    GUIDataObject guiDataObject1;
-    GUIDataObject guiDataObject2;
+    ProjectInfoDataObject projectInfoDataObject1;
+    ProjectInfoDataObject projectInfoDataObject2;
 
     MusicNotesDataObject musicNotesDataObject1;
     MusicNotesDataObject musicNotesDataObject2;
@@ -110,10 +110,10 @@ class AUDTFile0x00050002Test {
                 ))),
                 44100, 120000, "A440.wav");
 
-        guiDataObject1 = new GUIDataObject0x00050002(
+        projectInfoDataObject1 = new ProjectInfoDataObject0x00050002(
                 11, 9, 123.45, 0.01, 0.55, 9000
         );
-        guiDataObject2 = new GUIDataObject0x00050002(
+        projectInfoDataObject2 = new ProjectInfoDataObject0x00050002(
                 15, 14, 67.89, -1.23, 0.124, 2048
         );
 
@@ -133,11 +133,11 @@ class AUDTFile0x00050002Test {
 
         // Define the overall project data object
         projectData1 = new ProjectData(
-                unchangingDataPropertiesObject, qTransformDataObject, audioDataObject, guiDataObject1,
+                unchangingDataPropertiesObject, qTransformDataObject, audioDataObject, projectInfoDataObject1,
                 musicNotesDataObject1
         );
         projectData2 = new ProjectData(
-                unchangingDataPropertiesObject, qTransformDataObject, audioDataObject, guiDataObject2,
+                unchangingDataPropertiesObject, qTransformDataObject, audioDataObject, projectInfoDataObject2,
                 musicNotesDataObject2
         );
     }
@@ -153,7 +153,7 @@ class AUDTFile0x00050002Test {
         fileWriter.writeUnchangingDataProperties(unchangingDataPropertiesObject);
         fileWriter.writeQTransformData(qTransformDataObject);
         fileWriter.writeAudioData(audioDataObject);
-        fileWriter.writeGUIData(guiDataObject1);
+        fileWriter.writeGUIData(projectInfoDataObject1);
         fileWriter.writeMusicNotesData(musicNotesDataObject1);
 
         // Write the bytes to file
@@ -171,14 +171,14 @@ class AUDTFile0x00050002Test {
         UnchangingDataPropertiesObject readUnchangingDataProperties = fileReader.readUnchangingDataProperties();
         QTransformDataObject readQTransformData = fileReader.readQTransformData();
         AudioDataObject readAudioData = fileReader.readAudioData();
-        GUIDataObject readGUIData = fileReader.readGUIData();
+        ProjectInfoDataObject readGUIData = fileReader.readProjectInfoData();
         MusicNotesDataObject readMusicData = fileReader.readMusicNotesData();
 
         // Check if the read data are equal
         assertEquals(unchangingDataPropertiesObject, readUnchangingDataProperties);
         assertEquals(qTransformDataObject, readQTransformData);
         assertEquals(audioDataObject, readAudioData);
-        assertEquals(guiDataObject1, readGUIData);
+        assertEquals(projectInfoDataObject1, readGUIData);
         assertEquals(musicNotesDataObject1, readMusicData);
 
         // Check if the decompressed version of the Q-Transform magnitudes is the same
@@ -245,7 +245,7 @@ class AUDTFile0x00050002Test {
         fileWriter.writeUnchangingDataProperties(unchangingDataPropertiesObject);
         fileWriter.writeQTransformData(qTransformDataObject);
         fileWriter.writeAudioData(audioDataObject);
-        fileWriter.writeGUIData(guiDataObject1);
+        fileWriter.writeGUIData(projectInfoDataObject1);
         fileWriter.writeMusicNotesData(musicNotesDataObject1);
 
         // Write the bytes to file
@@ -263,14 +263,14 @@ class AUDTFile0x00050002Test {
         UnchangingDataPropertiesObject readUnchangingDataProperties = fileReader.readUnchangingDataProperties();
         QTransformDataObject readQTransformData = fileReader.readQTransformData();
         AudioDataObject readAudioData = fileReader.readAudioData();
-        GUIDataObject readGUIData = fileReader.readGUIData();
+        ProjectInfoDataObject readGUIData = fileReader.readProjectInfoData();
         MusicNotesDataObject readMusicData = fileReader.readMusicNotesData();
 
         // Check if the read data are equal
         assertEquals(unchangingDataPropertiesObject, readUnchangingDataProperties);
         assertEquals(qTransformDataObject, readQTransformData);
         assertEquals(audioDataObject, readAudioData);
-        assertEquals(guiDataObject1, readGUIData);
+        assertEquals(projectInfoDataObject1, readGUIData);
         assertEquals(musicNotesDataObject1, readMusicData);
 
         // Check if the decompressed version of the Q-Transform magnitudes is the same
@@ -302,7 +302,7 @@ class AUDTFile0x00050002Test {
         );
 
         // Test writing only the GUI and music notes data
-        fileWriter.writeGUIData(guiDataObject2);
+        fileWriter.writeGUIData(projectInfoDataObject2);
         fileWriter.writeMusicNotesData(musicNotesDataObject2);
 
         // Write the bytes to file
@@ -320,14 +320,14 @@ class AUDTFile0x00050002Test {
         UnchangingDataPropertiesObject readUnchangingDataProperties = fileReader.readUnchangingDataProperties();
         QTransformDataObject readQTransformData = fileReader.readQTransformData();
         AudioDataObject readAudioData = fileReader.readAudioData();
-        GUIDataObject readGUIData = fileReader.readGUIData();
+        ProjectInfoDataObject readGUIData = fileReader.readProjectInfoData();
         MusicNotesDataObject readMusicData = fileReader.readMusicNotesData();
 
         // Check if the read data are equal
         assertEquals(unchangingDataPropertiesObject, readUnchangingDataProperties);
         assertEquals(qTransformDataObject, readQTransformData);
         assertEquals(audioDataObject, readAudioData);
-        assertEquals(guiDataObject2, readGUIData);
+        assertEquals(projectInfoDataObject2, readGUIData);
         assertEquals(musicNotesDataObject2, readMusicData);
 
         // Check if the decompressed version of the Q-Transform magnitudes is the same
@@ -377,8 +377,8 @@ class AUDTFile0x00050002Test {
                 idReader.readUnchangingDataProperties();
                 if (finalSectionID >= 2) idReader.readQTransformData();
                 if (finalSectionID >= 3) idReader.readAudioData();
-                if (finalSectionID >= 4) idReader.readGUIData();
-                if (finalSectionID >= 5) idReader.readMusicNotesData();
+                if (finalSectionID >= 4) idReader.readProjectInfoData();
+                if (finalSectionID == 5) idReader.readMusicNotesData();
 
             });
             assertThrowsExactly(FailedToReadDataException.class, () -> {
@@ -389,8 +389,8 @@ class AUDTFile0x00050002Test {
                 eosReader.readUnchangingDataProperties();
                 if (finalSectionID >= 2) eosReader.readQTransformData();
                 if (finalSectionID >= 3) eosReader.readAudioData();
-                if (finalSectionID >= 4) eosReader.readGUIData();
-                if (finalSectionID >= 5) eosReader.readMusicNotesData();
+                if (finalSectionID >= 4) eosReader.readProjectInfoData();
+                if (finalSectionID == 5) eosReader.readMusicNotesData();
             });
         }
     }

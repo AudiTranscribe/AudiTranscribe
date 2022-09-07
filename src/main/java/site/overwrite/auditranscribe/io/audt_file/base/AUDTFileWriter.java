@@ -172,11 +172,11 @@ public abstract class AUDTFileWriter {
     public abstract void writeAudioData(AudioDataObject audioDataObj);
 
     /**
-     * Method that writes the GUI data to file.
+     * Method that writes the project info data to file.
      *
-     * @param guiDataObj Data object that holds all the GUI data.
+     * @param projectInfoDataObj Data object that holds all the project info data.
      */
-    public abstract void writeGUIData(GUIDataObject guiDataObj);
+    public abstract void writeGUIData(ProjectInfoDataObject projectInfoDataObj);
 
     /**
      * Method that writes the music notes data to file.

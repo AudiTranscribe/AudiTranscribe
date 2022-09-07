@@ -322,7 +322,7 @@ public class SceneSwitcher {
             UnchangingDataPropertiesObject unchangingDataProperties = reader.readUnchangingDataProperties();
             QTransformDataObject qTransformData = reader.readQTransformData();
             AudioDataObject audioData = reader.readAudioData();
-            GUIDataObject guiData = reader.readGUIData();
+            ProjectInfoDataObject guiData = reader.readProjectInfoData();
             MusicNotesDataObject musicNotesData = reader.readMusicNotesData();
 
             // Pass these data into a `ProjectData`

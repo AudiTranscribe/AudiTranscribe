@@ -91,18 +91,18 @@ public class AUDTFileWriter401 extends AUDTFileWriter {
     }
 
     /**
-     * Method that writes the GUI data to file.
+     * Method that writes the project info data to file.
      *
-     * @param guiDataObj Data object that holds all the GUI data.
+     * @param projectInfoDataObj Data object that holds all the project info data.
      */
-    public void writeGUIData(GUIDataObject guiDataObj) {
-        writeSectionID(GUIDataObject.SECTION_ID);
-        writeInteger(guiDataObj.musicKeyIndex);
-        writeInteger(guiDataObj.timeSignatureIndex);
-        writeDouble(guiDataObj.bpm);
-        writeDouble(guiDataObj.offsetSeconds);
-        writeDouble(guiDataObj.playbackVolume);
-        writeInteger(guiDataObj.currTimeInMS);
+    public void writeGUIData(ProjectInfoDataObject projectInfoDataObj) {
+        writeSectionID(ProjectInfoDataObject.SECTION_ID);
+        writeInteger(projectInfoDataObj.musicKeyIndex);
+        writeInteger(projectInfoDataObj.timeSignatureIndex);
+        writeDouble(projectInfoDataObj.bpm);
+        writeDouble(projectInfoDataObj.offsetSeconds);
+        writeDouble(projectInfoDataObj.playbackVolume);
+        writeInteger(projectInfoDataObj.currTimeInMS);
         writeEOSDelimiter();
     }
 

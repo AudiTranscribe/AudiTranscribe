@@ -2276,7 +2276,7 @@ public class TranscriptionViewController implements Initializable {
         AudioDataObject audioData = new AudioDataObject0x00050002(
                 compressedMP3Bytes, sampleRate, (int) (audioDuration * 1000),
                 audioFileName);
-        GUIDataObject guiData = new GUIDataObject0x00050002(
+        ProjectInfoDataObject projectInfoData = new ProjectInfoDataObject0x00050002(
                 musicKeyIndex, timeSignatureIndex, bpm, offset, audioVolume,
                 (int) (currTime * 1000)
         );
@@ -2299,14 +2299,14 @@ public class TranscriptionViewController implements Initializable {
 
             // Package all the current data into a `ProjectData`
             ProjectData projectData = new ProjectData(
-                    unchangingDataProperties, qTransformData, audioData, guiData, musicNotesData
+                    unchangingDataProperties, qTransformData, audioData, projectInfoData, musicNotesData
             );
 
             // Save the project
             ProjectIOHandlers.saveProject(saveDest, projectData);
 
         } else {
-            ProjectIOHandlers.saveProject(saveDest, numSkippableBytes, guiData, musicNotesData);
+            ProjectIOHandlers.saveProject(saveDest, numSkippableBytes, projectInfoData, musicNotesData);
         }
 
         // Set the `hasUnsavedChanges` flag to false

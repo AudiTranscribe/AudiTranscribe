@@ -22,7 +22,7 @@ import javafx.stage.*;
 import site.overwrite.auditranscribe.exceptions.io.audt_file.InvalidFileVersionException;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
 import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileWriter;
-import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.GUIDataObject;
+import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.ProjectInfoDataObject;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.MusicNotesDataObject;
 import site.overwrite.auditranscribe.io.audt_file.ProjectData;
 
@@ -44,12 +44,12 @@ public final class ProjectIOHandlers {
      *
      * @param filepath          <b>Absolute</b> path to the AUDT file.
      * @param numSkippableBytes Number of bytes to skip before writing the data.
-     * @param guiData           <code>GUIDataObject</code> object that contains the GUI data.
+     * @param guiData           <code>ProjectInfoDataObject</code> object that contains the GUI data.
      * @param musicNotesData    <code>MusicNotesDataObject</code> object that contains the music data.
      * @throws IOException If the writing to file encounters an error.
      */
     public static void saveProject(
-            String filepath, int numSkippableBytes, GUIDataObject guiData, MusicNotesDataObject musicNotesData
+            String filepath, int numSkippableBytes, ProjectInfoDataObject guiData, MusicNotesDataObject musicNotesData
     ) throws IOException {
         try {
             // Declare the file writer object

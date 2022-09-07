@@ -1,6 +1,6 @@
 /*
- * GUIDataObject.java
- * Description: Data object that stores the GUI data.
+ * ProjectInfoDataObject.java
+ * Description: Data object that stores the project's info.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -21,9 +21,12 @@ package site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators;
 import java.util.Objects;
 
 /**
- * Data object that stores the GUI data.
+ * Data object that stores the project's info.<br>
+ * <b>Note</b>: This is different from the <code>ProjectData</code> class. This is a data object
+ * storing the project's info, whereas the <code>ProjectData</code> object stores all the different
+ * data encapsulators.
  */
-public abstract class GUIDataObject extends AbstractAUDTDataObject {
+public abstract class ProjectInfoDataObject extends AbstractAUDTDataObject {
     // Constants
     public static final int SECTION_ID = 4;
 
@@ -52,7 +55,7 @@ public abstract class GUIDataObject extends AbstractAUDTDataObject {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        GUIDataObject that = (GUIDataObject) o;
+        ProjectInfoDataObject that = (ProjectInfoDataObject) o;
         return (
                 musicKeyIndex == that.musicKeyIndex &&
                         timeSignatureIndex == that.timeSignatureIndex &&

@@ -146,13 +146,12 @@ public abstract class AUDTFileReader {
     public abstract AudioDataObject readAudioData() throws FailedToReadDataException;
 
     /**
-     * Method that reads the GUI data from the file.
+     * Method that reads the project info data from the file.
      *
-     * @return A <code>GUIDataObject</code> that encapsulates all the data that are needed by the
-     * GUI data.
+     * @return A <code>ProjectInfoDataObject</code> that encapsulates all the project's info.
      * @throws FailedToReadDataException If the program failed to read the data from the file.
      */
-    public abstract GUIDataObject readGUIData() throws FailedToReadDataException;
+    public abstract ProjectInfoDataObject readProjectInfoData() throws FailedToReadDataException;
 
     /**
      * Method that reads the music notes data from the file.

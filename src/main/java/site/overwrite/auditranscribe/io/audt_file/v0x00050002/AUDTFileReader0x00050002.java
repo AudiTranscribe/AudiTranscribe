@@ -124,13 +124,13 @@ public class AUDTFileReader0x00050002 extends AUDTFileReader {
         return new AudioDataObject0x00050002(compressedMP3Bytes, sampleRate, totalDurationInMS, originalFileName);
     }
 
-    public GUIDataObject readGUIData() throws FailedToReadDataException {
+    public ProjectInfoDataObject readProjectInfoData() throws FailedToReadDataException {
         // Ensure that the GUI data section ID is correct
         int sectionID = readSectionID();
-        if (sectionID != GUIDataObject.SECTION_ID) {
+        if (sectionID != ProjectInfoDataObject.SECTION_ID) {
             throw new FailedToReadDataException(
-                    "Failed to read GUI data; the GUI data section has the incorrect section ID of " + sectionID +
-                            " (expected: " + GUIDataObject.SECTION_ID + ")"
+                    "Failed to read project info data; the project info data section has the incorrect section ID of " +
+                            sectionID + "(expected: " + ProjectInfoDataObject.SECTION_ID + ")"
             );
         }
 
@@ -144,11 +144,11 @@ public class AUDTFileReader0x00050002 extends AUDTFileReader {
 
         // Check if there is an EOS
         if (!checkEOSDelimiter()) {
-            throw new FailedToReadDataException("Failed to read GUI data; end of section delimiter missing");
+            throw new FailedToReadDataException("Failed to read project info data; end of section delimiter missing");
         }
 
-        // Create and return a `GUIDataObject`
-        return new GUIDataObject0x00050002(
+        // Create and return a `ProjectInfoDataObject`
+        return new ProjectInfoDataObject0x00050002(
                 musicKeyIndex, timeSignatureIndex, bpm, offsetSeconds, playbackVolume, currTimeInMS
         );
     }
