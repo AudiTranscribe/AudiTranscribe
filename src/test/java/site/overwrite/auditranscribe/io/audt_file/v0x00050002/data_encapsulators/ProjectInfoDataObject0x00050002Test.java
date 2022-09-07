@@ -1,5 +1,5 @@
 /*
- * ProjectInfoDataObject0X00050002Test.java
+ * ProjectInfoDataObject0x00050002Test.java
  * Description: Test `ProjectInfoDataObject0x00050002.java`.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -25,7 +25,7 @@ import site.overwrite.auditranscribe.utils.MathUtils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-class ProjectInfoDataObject0X00050002Test {
+class ProjectInfoDataObject0x00050002Test {
     // Attributes
     int musicKeyIndex1 = 1;
     int musicKeyIndex2 = 23;

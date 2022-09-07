@@ -1,5 +1,5 @@
 /*
- * MusicNotesDataObject0X00050002Test.java
+ * MusicNotesDataObject0x00050002Test.java
  * Description: Test `MusicNotesDataObject0x00050002.java`.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -25,7 +25,7 @@ import site.overwrite.auditranscribe.utils.MathUtils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-class MusicNotesDataObject0X00050002Test {
+class MusicNotesDataObject0x00050002Test {
     // Attributes
     double[] timesToPlaceRectangles1 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     double[] timesToPlaceRectangles2 = {1.2, 3.4, 5.6, 7.8, 9};
