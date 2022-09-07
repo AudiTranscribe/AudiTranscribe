@@ -32,7 +32,6 @@ public abstract class AudioDataObject extends AbstractAUDTDataObject {
     public byte[] compressedMP3Bytes;
     public double sampleRate;
     public int totalDurationInMS;
-    public String audioFileName;
 
     // Overwritten methods
     @Override
@@ -43,14 +42,13 @@ public abstract class AudioDataObject extends AbstractAUDTDataObject {
         return (
                 Double.compare(that.sampleRate, sampleRate) == 0 &&
                         totalDurationInMS == that.totalDurationInMS &&
-                        Arrays.equals(compressedMP3Bytes, that.compressedMP3Bytes) &&
-                        audioFileName.equals(that.audioFileName)
+                        Arrays.equals(compressedMP3Bytes, that.compressedMP3Bytes)
         );
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(sampleRate, totalDurationInMS, audioFileName);
+        int result = Objects.hash(sampleRate, totalDurationInMS);
         result = 31 * result + Arrays.hashCode(compressedMP3Bytes);
         return result;
     }

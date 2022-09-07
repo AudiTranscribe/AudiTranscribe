@@ -884,7 +884,7 @@ public class TranscriptionViewController implements Initializable {
         compressedMP3Bytes = audioData.compressedMP3Bytes;
         sampleRate = audioData.sampleRate;
         audioDuration = audioData.totalDurationInMS / 1000.;
-        audioFileName = audioData.audioFileName;
+        audioFileName = "Temporary Name";  // Todo: depreciate in favour of project name
 
         qTransformBytes = qTransformData.qTransformBytes;
         minQTransformMagnitude = qTransformData.minMagnitude;

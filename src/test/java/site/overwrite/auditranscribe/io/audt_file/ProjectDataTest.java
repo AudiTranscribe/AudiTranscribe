@@ -62,8 +62,8 @@ class ProjectDataTest {
     MusicNotesDataObject musicNotesDataObject1;
     MusicNotesDataObject musicNotesDataObject2;
 
-    UnchangingDataPropertiesObject unchangingDataPropertiesObject1;
-    UnchangingDataPropertiesObject unchangingDataPropertiesObject2;
+    UnchangingDataPropertiesObject401 unchangingDataPropertiesObject1;
+    UnchangingDataPropertiesObject401 unchangingDataPropertiesObject2;
 
     // Initialization method
     public ProjectDataTest() throws IOException {
@@ -165,7 +165,7 @@ class ProjectDataTest {
         assertNotEquals(temp, otherTypedVar);  // Not redundant to test the equality method
 
         // Define arrays to pick the data objects from
-        UnchangingDataPropertiesObject[] unchangingDataPropertiesObjects = {
+        UnchangingDataPropertiesObject401[] unchangingDataPropertiesObjects = {
                 unchangingDataPropertiesObject1, unchangingDataPropertiesObject2
         };
         QTransformDataObject[] qTransformDataObjects = {

@@ -31,6 +31,7 @@ public abstract class ProjectInfoDataObject extends AbstractAUDTDataObject {
     public static final int SECTION_ID = 4;
 
     // Attributes
+    public String projectName;
     public int musicKeyIndex;
     public int timeSignatureIndex;
     public double bpm;

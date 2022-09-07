@@ -20,10 +20,16 @@ package site.overwrite.auditranscribe.io.audt_file.v401.data_encapsulators;
 
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.AudioDataObject;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * Data object that stores the audio data.
  */
 public class AudioDataObject401 extends AudioDataObject {
+    // Attributes
+    private final String audioFileName;
+
     /**
      * Initialization method for the audio data object.
      *
@@ -32,11 +38,47 @@ public class AudioDataObject401 extends AudioDataObject {
      * @param totalDurationInMS  Total duration of the audio in <b>milliseconds</b>.
      * @param audioFileName      The name of the audio file.
      */
-    public AudioDataObject401(byte[] compressedMP3Bytes, double sampleRate, int totalDurationInMS, String audioFileName) {
+    public AudioDataObject401(
+            byte[] compressedMP3Bytes, double sampleRate, int totalDurationInMS, String audioFileName
+    ) {
         this.compressedMP3Bytes = compressedMP3Bytes;
         this.sampleRate = sampleRate;
         this.totalDurationInMS = totalDurationInMS;
-        this.audioFileName = audioFileName;
+
+        this.audioFileName = audioFileName;  // No longer in the superclass
+    }
+
+    // Public methods
+
+    /**
+     * Method that gets the audio file name.<br>
+     * This method needs to be implemented to maintain backwards compatability with version 401.
+     *
+     * @return Audio file name.
+     */
+    public String getAudioFileName() {
+        return audioFileName;
+    }
+
+    // Overwritten methods
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AudioDataObject401 that = (AudioDataObject401) o;
+        return (
+                Double.compare(that.sampleRate, sampleRate) == 0 &&
+                        totalDurationInMS == that.totalDurationInMS &&
+                        Arrays.equals(compressedMP3Bytes, that.compressedMP3Bytes) &&
+                        audioFileName.equals(that.audioFileName)
+        );
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(sampleRate, totalDurationInMS, audioFileName);
+        result = 31 * result + Arrays.hashCode(compressedMP3Bytes);
+        return result;
     }
 
     @Override

@@ -42,7 +42,7 @@ public abstract class AUDTFileWriter {
     protected final int numBytesToSkip;
 
     /**
-     * Initialization method to make an <code>AUDTFileWriter401</code> object.
+     * Initialization method to make an <code>AUDTFileWriter</code> object.
      *
      * @param fileVersion    AUDT file version.
      * @param filepath       Path to the AUDT file. The file name at the end of the file path should
@@ -59,7 +59,7 @@ public abstract class AUDTFileWriter {
     }
 
     /**
-     * Initialization method to make an <code>AUDTFileWriter401</code> object.
+     * Initialization method to make an <code>AUDTFileWriter</code> object.
      *
      * @param fileVersion AUDT file version.
      * @param filepath    Path to the AUDT file. The file name at the end of the file path should

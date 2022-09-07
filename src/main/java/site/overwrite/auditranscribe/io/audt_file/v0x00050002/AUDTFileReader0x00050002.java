@@ -32,6 +32,9 @@ import java.io.InputStream;
 import java.util.logging.Level;
 
 public class AUDTFileReader0x00050002 extends AUDTFileReader {
+    // Attributes
+    private String originalFileName;  // To be used as input to the project info data object later
+
     /**
      * Initialization method to make an <code>AUDTFileReader</code> object.
      *
@@ -113,7 +116,7 @@ public class AUDTFileReader0x00050002 extends AUDTFileReader {
         byte[] compressedMP3Bytes = readByteArray();
         double sampleRate = readDouble();
         int totalDurationInMS = readInteger();
-        String originalFileName = readString();
+        originalFileName = readString();
 
         // Check if there is an EOS
         if (!checkEOSDelimiter()) {
@@ -148,9 +151,11 @@ public class AUDTFileReader0x00050002 extends AUDTFileReader {
         }
 
         // Create and return a `ProjectInfoDataObject`
-        return new ProjectInfoDataObject0x00050002(
+        ProjectInfoDataObject0x00050002 obj = new ProjectInfoDataObject0x00050002(
                 musicKeyIndex, timeSignatureIndex, bpm, offsetSeconds, playbackVolume, currTimeInMS
         );
+        obj.setProjectName(originalFileName);  // Set the superclass' attribute
+        return obj;
     }
 
     public MusicNotesDataObject readMusicNotesData() throws FailedToReadDataException, IOException {

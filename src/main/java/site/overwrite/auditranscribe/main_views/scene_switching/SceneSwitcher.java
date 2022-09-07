@@ -351,7 +351,7 @@ public class SceneSwitcher {
             // Set new scene properties
             transcriptionStage.setMaximized(true);
             transcriptionStage.setResizable(true);
-            transcriptionStage.setTitle(audioData.audioFileName);
+            transcriptionStage.setTitle("Temporary Window Title");  // Todo: use project name
 
             // Set width and height of the new scene
             Rectangle2D screenBounds = Screen.getPrimary().getBounds();

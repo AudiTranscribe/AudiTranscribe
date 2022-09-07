@@ -1,5 +1,5 @@
 /*
- * AudioDataObject0X00050002Test.java
+ * AudioDataObject0x00050002Test.java
  * Description: Test `AudioDataObject0x00050002.java`.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -25,7 +25,7 @@ import site.overwrite.auditranscribe.utils.MathUtils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-class AudioDataObject0X00050002Test {
+class AudioDataObject0x00050002Test {
     // Attributes
     byte[] compressedMP3Bytes1 = new byte[]{(byte) 0x12, (byte) 0x34, (byte) 0x56, (byte) 0x78, (byte) 0x9a};
     byte[] compressedMP3Bytes2 = new byte[]{(byte) 0xab, (byte) 0xcd, (byte) 0xef};

@@ -20,6 +20,8 @@ package site.overwrite.auditranscribe.io.audt_file.v401.data_encapsulators;
 
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.ProjectInfoDataObject;
 
+import java.util.Objects;
+
 /**
  * Data object that stores the project's info.<br>
  * <b>Note</b>: This is different from the <code>ProjectData</code> class. This is a data object
@@ -48,6 +50,44 @@ public class ProjectInfoDataObject401 extends ProjectInfoDataObject {
         this.offsetSeconds = offsetSeconds;
         this.playbackVolume = playbackVolume;
         this.currTimeInMS = currTimeInMS;
+
+        this.projectName = null;  // We will need to update this later
+    }
+
+    // Public methods
+
+    /**
+     * Sets the project name.<br>
+     * This helps bridge the gap between the old system (where we used <code>audioFileName</code> as
+     * the project name) and the new system.
+     *
+     * @param projectName The project name to set.
+     */
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;  // We are setting the superclass' attribute
+    }
+
+    // Overwritten methods
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProjectInfoDataObject401 that = (ProjectInfoDataObject401) o;
+        return (
+                musicKeyIndex == that.musicKeyIndex &&
+                        timeSignatureIndex == that.timeSignatureIndex &&
+                        Double.compare(that.bpm, bpm) == 0 &&
+                        Double.compare(that.offsetSeconds, offsetSeconds) == 0 &&
+                        Double.compare(that.playbackVolume, playbackVolume) == 0 &&
+                        currTimeInMS == that.currTimeInMS
+        );
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                musicKeyIndex, timeSignatureIndex, bpm, offsetSeconds, playbackVolume, currTimeInMS
+        );
     }
 
     @Override
