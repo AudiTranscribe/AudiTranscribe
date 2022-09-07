@@ -64,9 +64,6 @@ public final class MusicKeyEstimator {
     public static List<Triplet<Integer, Boolean, Double>> getKeyCorrelations(
             double[] y, double sr, CustomTask<?> task
     ) {
-        // Constants
-        int dpToRoundTo = 5;
-
         // Generate the chromagram
         double[][] chromagram = ChromaCQT.chromaCQT(
                 y, sr, 512, UnitConversionUtils.noteToFreq("C1"), 12, 7, 24,
@@ -92,8 +89,8 @@ public final class MusicKeyEstimator {
             }
 
             // Compute correlation coefficients with the major and minor key profiles
-            double majCor = MathUtils.round(StatisticalUtils.corrcoef(MAJOR_PROFILE, testProfile)[1][0], dpToRoundTo);
-            double minCor = MathUtils.round(StatisticalUtils.corrcoef(MINOR_PROFILE, testProfile)[1][0], dpToRoundTo);
+            double majCor = StatisticalUtils.corrcoef(MAJOR_PROFILE, testProfile)[1][0];
+            double minCor = StatisticalUtils.corrcoef(MINOR_PROFILE, testProfile)[1][0];
 
             // Add it to the list
             keyCorrelations.add(new Triplet<>(
