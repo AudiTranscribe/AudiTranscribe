@@ -20,6 +20,9 @@ package site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulator
 
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.QTransformDataObject;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * Data object that stores the Q-Transform data.
  */
@@ -36,6 +39,26 @@ public class QTransformDataObject0x00050002 extends QTransformDataObject {
         this.qTransformBytes = qTransformBytes;
         this.minMagnitude = minMagnitude;
         this.maxMagnitude = maxMagnitude;
+    }
+
+    // Overwritten methods
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        QTransformDataObject0x00050002 that = (QTransformDataObject0x00050002) o;
+        return (
+                Double.compare(that.minMagnitude, minMagnitude) == 0 &&
+                        Double.compare(that.maxMagnitude, maxMagnitude) == 0 &&
+                        Arrays.equals(qTransformBytes, that.qTransformBytes)
+        );
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(minMagnitude, maxMagnitude);
+        result = 31 * result + Arrays.hashCode(qTransformBytes);
+        return result;
     }
 
     @Override

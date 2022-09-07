@@ -20,6 +20,8 @@ package site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulator
 
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.MusicNotesDataObject;
 
+import java.util.Arrays;
+
 /**
  * Data object that stores the music notes' data.
  */
@@ -35,6 +37,27 @@ public class MusicNotesDataObject0x00050002 extends MusicNotesDataObject {
         this.timesToPlaceRectangles = timesToPlaceRectangles;
         this.noteDurations = noteDurations;
         this.noteNums = noteNums;
+    }
+
+    // Overwritten methods
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MusicNotesDataObject0x00050002 that = (MusicNotesDataObject0x00050002) o;
+        return (
+                Arrays.equals(timesToPlaceRectangles, that.timesToPlaceRectangles) &&
+                        Arrays.equals(noteDurations, that.noteDurations) &&
+                        Arrays.equals(noteNums, that.noteNums)
+        );
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Arrays.hashCode(timesToPlaceRectangles);
+        result = 31 * result + Arrays.hashCode(noteDurations);
+        result = 31 * result + Arrays.hashCode(noteNums);
+        return result;
     }
 
     @Override
