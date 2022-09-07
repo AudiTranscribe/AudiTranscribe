@@ -36,4 +36,13 @@ public class MusicNotesDataObject0x00050002 extends MusicNotesDataObject {
         this.noteDurations = noteDurations;
         this.noteNums = noteNums;
     }
+
+    @Override
+    public int numBytesNeeded() {
+        return 4 +  // Section ID
+                (4 + 8 * timesToPlaceRectangles.length) +  // +4 for the integer telling how many notes there are
+                (4 + 8 * noteDurations.length) +
+                (4 + 4 * noteNums.length) +
+                4;  // EOS delimiter
+    }
 }

@@ -44,15 +44,6 @@ public abstract class QTransformDataObject extends AbstractAUDTDataObject {
 
     // Overwritten methods
     @Override
-    public int numBytesNeeded() {
-        return 4 +  // Section ID
-                (4 + qTransformBytes.length) +  // +4 for the length of the Q-Transform data
-                8 +  // 8 bytes for the min magnitude
-                8 +  // 8 bytes for the max magnitude
-                4;   // EOS delimiter
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

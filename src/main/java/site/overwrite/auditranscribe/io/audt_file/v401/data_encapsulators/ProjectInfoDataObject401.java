@@ -49,4 +49,16 @@ public class ProjectInfoDataObject401 extends ProjectInfoDataObject {
         this.playbackVolume = playbackVolume;
         this.currTimeInMS = currTimeInMS;
     }
+
+    @Override
+    public int numBytesNeeded() {
+        return 4 +   // Section ID
+                4 +  // Music key index
+                4 +  // Time signature index
+                8 +  // BPM
+                8 +  // Offset seconds
+                8 +  // Playback volume
+                4 +  // Current time in milliseconds
+                4;   // EOS delimiter
+    }
 }

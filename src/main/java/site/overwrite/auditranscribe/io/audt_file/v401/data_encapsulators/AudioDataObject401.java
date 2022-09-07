@@ -38,4 +38,14 @@ public class AudioDataObject401 extends AudioDataObject {
         this.totalDurationInMS = totalDurationInMS;
         this.audioFileName = audioFileName;
     }
+
+    @Override
+    public int numBytesNeeded() {
+        return 4 +  // Section ID
+                (4 + compressedMP3Bytes.length) +  // +4 for the length of the MP3 audio data
+                8 +   // Sample rate
+                4 +   // Total duration in milliseconds
+                (4 + audioFileName.getBytes().length) +  // String length + string bytes of audio file name
+                4;    // EOS delimiter
+    }
 }
