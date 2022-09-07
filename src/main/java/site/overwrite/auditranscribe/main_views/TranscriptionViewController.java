@@ -700,12 +700,7 @@ public class TranscriptionViewController implements Initializable {
             }
 
             // Update audio volume
-            try {
-                audio.setPlaybackVolume(audioVolume);
-            } catch (InvalidObjectException e) {
-                MyLogger.logException(e);
-                throw new RuntimeException(e);
-            }
+            audio.setPlaybackVolume(audioVolume);
 
             // Update CSS
             updateAudioVolumeSliderCSS();
@@ -1025,12 +1020,7 @@ public class TranscriptionViewController implements Initializable {
      */
     public void handleSceneClosing() {
         // Stop the audio playing
-        try {
-            audio.stop();
-        } catch (InvalidObjectException e) {
-            MyLogger.logException(e);
-            throw new RuntimeException(e);
-        }
+        audio.stop();
 
         // Clear the note rectangles
         NoteRectangle.allNoteRectangles.clear();
@@ -1205,12 +1195,7 @@ public class TranscriptionViewController implements Initializable {
 
             // If a file was selected, stop the audio completely
             if (file != null) {
-                try {
-                    audio.stop();
-                } catch (InvalidObjectException e) {
-                    MyLogger.logException(e);
-                    throw new RuntimeException(e);
-                }
+                audio.stop();
             }
 
             // Verify that the user actually chose a file
@@ -1256,12 +1241,7 @@ public class TranscriptionViewController implements Initializable {
 
             // If a file was selected, stop the audio completely
             if (file != null) {
-                try {
-                    audio.stop();
-                } catch (InvalidObjectException e) {
-                    MyLogger.logException(e);
-                    throw new RuntimeException(e);
-                }
+                audio.stop();
             }
 
             // Verify that the user actually chose a file
@@ -1399,13 +1379,7 @@ public class TranscriptionViewController implements Initializable {
             )));
 
             // Unpause the audio (i.e. play the audio)
-            try {
-                audio.play();
-            } catch (InvalidObjectException e) {
-                MyLogger.logException(e);
-                throw new RuntimeException(e);
-            }
-
+            audio.play();
         } else {  // Is currently playing; want to make audio pause
             // Change the icon of the play button from the paused icon to the play icon
             // (So that the user knows that the next interaction with button will play audio)
@@ -1594,12 +1568,7 @@ public class TranscriptionViewController implements Initializable {
                 // Nothing really changes if the audio is paused
                 if (!isPaused) {
                     // Get the current audio time
-                    try {
-                        currTime = audio.getCurrAudioTime();
-                    } catch (InvalidObjectException e) {
-                        MyLogger.logException(e);
-                        throw new RuntimeException(e);
-                    }
+                    currTime = audio.getCurrAudioTime();
 
                     // Update the current time label
                     Platform.runLater(() -> currTimeLabel.setText(UnitConversionUtils.secondsToTimeString(currTime)));
@@ -1622,12 +1591,7 @@ public class TranscriptionViewController implements Initializable {
 
                         // Specially update the start time to 0
                         // (Because the `seekToTime` method would have set it to the end, which is not what we want)
-                        try {
-                            audio.setAudioStartTime(0);
-                        } catch (InvalidObjectException e) {
-                            MyLogger.logException(e);
-                            throw new RuntimeException(e);
-                        }
+                        audio.setAudioStartTime(0);
 
                         // We need to do this so that the status is set to paused
                         try {
@@ -2013,12 +1977,7 @@ public class TranscriptionViewController implements Initializable {
 
         // Toggle audio paused state
         if (currTime == audioDuration) {
-            try {
-                audio.setAudioPlaybackTime(0);
-            } catch (InvalidObjectException e) {
-                MyLogger.logException(e);
-                throw new RuntimeException(e);
-            }
+            audio.setAudioPlaybackTime(0);
         }
         isPaused = togglePaused(isPaused);
 
@@ -2114,12 +2073,7 @@ public class TranscriptionViewController implements Initializable {
             );
 
             // Unmute the audio by setting the volume back to the value before the mute
-            try {
-                audio.setPlaybackVolume(audioVolume);
-            } catch (InvalidObjectException e) {
-                MyLogger.logException(e);
-                throw new RuntimeException(e);
-            }
+            audio.setPlaybackVolume(audioVolume);
         } else {
             // Change the icon of the volume button from non-mute to mute
             audioVolumeButtonImage.setImage(
@@ -2129,12 +2083,7 @@ public class TranscriptionViewController implements Initializable {
             );
 
             // Mute the audio by setting the volume to zero
-            try {
-                audio.setPlaybackVolume(0);
-            } catch (InvalidObjectException e) {
-                MyLogger.logException(e);
-                throw new RuntimeException(e);
-            }
+            audio.setPlaybackVolume(0);
         }
 
         // Toggle the `isAudioMuted` flag

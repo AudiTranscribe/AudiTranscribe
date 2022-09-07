@@ -162,13 +162,7 @@ public class FixNoteDelayViewController implements Initializable {
             // Nothing really changes if the audio is not playing
             if (isPlaying) {
                 // Get current audio time
-                double currTime;
-                try {
-                    currTime = audio.getCurrAudioTime();
-                } catch (InvalidObjectException e) {
-                    MyLogger.logException(e);
-                    throw new RuntimeException(e);
-                }
+                double currTime = audio.getCurrAudioTime();
 
                 // Update playhead line position
                 double newPosX = currTime / duration * width;
@@ -265,22 +259,12 @@ public class FixNoteDelayViewController implements Initializable {
         double offsetTime = notePlayingDelayOffsetSpinner.getValue();
 
         // Reset the current time for the audio object and the note player sequencer
-        try {
-            audio.setAudioPlaybackTime(0);
-        } catch (InvalidObjectException e) {
-            MyLogger.logException(e);
-            throw new RuntimeException(e);
-        }
+        audio.setAudioPlaybackTime(0);
         sequencer.setCurrTime(offsetTime);
 
         // Play the things
-        try {
-            audio.setPlaybackVolume(0.5);
-            audio.play();
-        } catch (InvalidObjectException e) {
-            MyLogger.logException(e);
-            throw new RuntimeException(e);
-        }
+        audio.setPlaybackVolume(0.5);
+        audio.play();
         sequencer.play(offsetTime);
     }
 
