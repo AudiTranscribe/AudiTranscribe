@@ -604,39 +604,6 @@ public class TranscriptionViewController implements Initializable {
     }
 
     /**
-     * Method that sets the audio's volume slider's CSS.
-     */
-    public void updateAudioVolumeSliderCSS() {
-        // Generate the style of the volume slider for the current volume value
-        String style = String.format(
-                "-fx-background-color: linear-gradient(" +
-                        "to right, -slider-filled-colour %f%%, -slider-unfilled-colour %f%%" +
-                        ");",
-                audioVolume * 100, audioVolume * 100);
-
-        // Apply the style to the volume slider's track (if available)
-        StackPane track = (StackPane) audioVolumeSlider.lookup(".track");
-        if (track != null) track.setStyle(style);
-    }
-
-    /**
-     * Method that sets the notes' volume slider's CSS.
-     */
-    public void updateNotesVolumeSliderCSS() {
-        // Generate the style of the notes' volume slider for the current notes' volume value
-        double notesVolumePercentage = (double) (notesVolume - 33) / 94 * 100;
-        String style = String.format(
-                "-fx-background-color: linear-gradient(" +
-                        "to right, -slider-filled-colour %f%%, -slider-unfilled-colour %f%%" +
-                        ");",
-                notesVolumePercentage, notesVolumePercentage);
-
-        // Apply the style to the volume slider's track (if available)
-        StackPane track = (StackPane) notesVolumeSlider.lookup(".track");
-        if (track != null) track.setStyle(style);
-    }
-
-    /**
      * Method that finishes the setting up of the transcription view controller.<br>
      * Note that this method has to be called <b>last</b>, after all other spectrogram things have
      * been set up.
@@ -679,7 +646,7 @@ public class TranscriptionViewController implements Initializable {
             audio.setPlaybackVolume(audioVolume);
 
             // Update CSS
-            updateAudioVolumeSliderCSS();
+            updateVolumeSliderCSS(audioVolumeSlider, audioVolume);
 
             MyLogger.log(
                     Level.FINE,
@@ -703,7 +670,7 @@ public class TranscriptionViewController implements Initializable {
             }
 
             // Update CSS
-            updateNotesVolumeSliderCSS();
+            updateVolumeSliderCSS(notesVolumeSlider, (double) (notesVolume - 33) / 94);
 
             MyLogger.log(
                     Level.FINE,
@@ -1492,6 +1459,26 @@ public class TranscriptionViewController implements Initializable {
     }
 
     /**
+     * Method that sets the volume slider's CSS.
+     *
+     * @param volumeSlider Volume slider that needs updating.
+     * @param fillAmount   The amount of the volume slider that is filled. Must be a double between
+     *                     0 and 1 inclusive.
+     */
+    private void updateVolumeSliderCSS(Slider volumeSlider, double fillAmount) {
+        // Generate the style of the volume slider for the current volume value
+        String style = String.format(
+                "-fx-background-color: linear-gradient(" +
+                        "to right, -slider-filled-colour %f%%, -slider-unfilled-colour %f%%" +
+                        ");",
+                fillAmount * 100, fillAmount * 100);
+
+        // Apply the style to the volume slider's track (if available)
+        StackPane track = (StackPane) volumeSlider.lookup(".track");
+        if (track != null) track.setStyle(style);
+    }
+    
+    /**
      * Helper method that starts the spectrogram generation task.
      *
      * @param task    The task to start.
@@ -1590,18 +1577,18 @@ public class TranscriptionViewController implements Initializable {
                 return thread;
             });
             autosaveScheduler.scheduleAtFixedRate(() -> Platform.runLater(
-                    () -> {
-                        if (audtFilePath != null) {
-                            handleSavingProject(true, false);
-                            MyLogger.log(Level.INFO, "Autosaved project", this.getClass().toString());
-                        } else {
-                            MyLogger.log(
-                                    Level.INFO,
-                                    "Autosave skipped, no project loaded",
-                                    this.getClass().toString()
-                            );
-                        }
-                    }),
+                            () -> {
+                                if (audtFilePath != null) {
+                                    handleSavingProject(true, false);
+                                    MyLogger.log(Level.INFO, "Autosaved project", this.getClass().toString());
+                                } else {
+                                    MyLogger.log(
+                                            Level.INFO,
+                                            "Autosave skipped, no project loaded",
+                                            this.getClass().toString()
+                                    );
+                                }
+                            }),
                     DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval,
                     DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval,
                     TimeUnit.MINUTES
@@ -1677,8 +1664,9 @@ public class TranscriptionViewController implements Initializable {
             // Update volume sliders
             audioVolumeSlider.setValue(audioVolume);
             notesVolumeSlider.setValue(notesVolume);
-            updateAudioVolumeSliderCSS();
-            updateNotesVolumeSliderCSS();
+
+            updateVolumeSliderCSS(audioVolumeSlider, audioVolume);
+            updateVolumeSliderCSS(notesVolumeSlider, (double) (notesVolume - 33) / 94);
 
             // Ensure main pane is in focus
             rootPane.requestFocus();
