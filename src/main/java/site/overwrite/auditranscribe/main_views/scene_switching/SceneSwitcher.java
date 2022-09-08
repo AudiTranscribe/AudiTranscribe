@@ -387,7 +387,7 @@ public class SceneSwitcher {
             // Set new scene properties
             transcriptionStage.setMaximized(true);
             transcriptionStage.setResizable(true);
-            transcriptionStage.setTitle("Temporary Window Title");  // Todo: use project name
+            transcriptionStage.setTitle(projectData.projectInfoData.projectName);
 
             // Set width and height of the new scene
             Rectangle2D screenBounds = Screen.getPrimary().getBounds();
@@ -396,7 +396,7 @@ public class SceneSwitcher {
 
             // Update scroll position
             controller.updateScrollPosition(
-                    projectData.guiData.currTimeInMS / 1000. *
+                    projectData.projectInfoData.currTimeInMS / 1000. *
                             controller.PX_PER_SECOND *
                             controller.SPECTROGRAM_ZOOM_SCALE_X,
                     screenBounds.getWidth()

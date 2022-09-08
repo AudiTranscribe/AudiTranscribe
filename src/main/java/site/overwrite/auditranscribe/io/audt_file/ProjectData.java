@@ -30,7 +30,7 @@ public class ProjectData {
     public UnchangingDataPropertiesObject unchangingDataProperties;
     public QTransformDataObject qTransformData;
     public AudioDataObject audioData;
-    public ProjectInfoDataObject guiData;
+    public ProjectInfoDataObject projectInfoData;
     public MusicNotesDataObject musicNotesData;
 
     /**
@@ -53,7 +53,7 @@ public class ProjectData {
         this.unchangingDataProperties = unchangingData;
         this.qTransformData = qTransformData;
         this.audioData = audioData;
-        this.guiData = projectInfoData;
+        this.projectInfoData = projectInfoData;
         this.musicNotesData = musicNotesData;
     }
 
@@ -68,13 +68,13 @@ public class ProjectData {
                 unchangingDataProperties.equals(that.unchangingDataProperties) &&
                         qTransformData.equals(that.qTransformData) &&
                         audioData.equals(that.audioData) &&
-                        guiData.equals(that.guiData) &&
+                        projectInfoData.equals(that.projectInfoData) &&
                         musicNotesData.equals(that.musicNotesData)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(unchangingDataProperties, qTransformData, audioData, guiData, musicNotesData);
+        return Objects.hash(unchangingDataProperties, qTransformData, audioData, projectInfoData, musicNotesData);
     }
 }

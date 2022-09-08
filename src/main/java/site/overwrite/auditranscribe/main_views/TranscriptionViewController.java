@@ -47,7 +47,7 @@ import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
 import site.overwrite.auditranscribe.io.audt_file.ProjectData;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.*;
+import site.overwrite.auditranscribe.io.audt_file.v0x00070001.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
@@ -132,6 +132,7 @@ public class TranscriptionViewController implements Initializable {
     // Other attributes
     private boolean hasUnsavedChanges = true;
     private int fileVersion;
+    private String projectName;
 
     private Theme theme;
 
@@ -145,7 +146,6 @@ public class TranscriptionViewController implements Initializable {
 
     private String audtFilePath;
     private String audtFileName;
-    private String audioFileName;
     private Audio audio;
 
     private byte[] compressedMP3Bytes;
@@ -739,13 +739,14 @@ public class TranscriptionViewController implements Initializable {
         // Get number of skippable bytes
         numSkippableBytes = projectData.unchangingDataProperties.numSkippableBytes;
 
-        // Set up GUI data
-        musicKeyIndex = projectData.guiData.musicKeyIndex;
-        timeSignatureIndex = projectData.guiData.timeSignatureIndex;
-        bpm = projectData.guiData.bpm;
-        offset = projectData.guiData.offsetSeconds;
-        audioVolume = projectData.guiData.playbackVolume;
-        currTime = projectData.guiData.currTimeInMS / 1000.;
+        // Set up project data
+        projectName = projectData.projectInfoData.projectName;
+        musicKeyIndex = projectData.projectInfoData.musicKeyIndex;
+        timeSignatureIndex = projectData.projectInfoData.timeSignatureIndex;
+        bpm = projectData.projectInfoData.bpm;
+        offset = projectData.projectInfoData.offsetSeconds;
+        audioVolume = projectData.projectInfoData.playbackVolume;
+        currTime = projectData.projectInfoData.currTimeInMS / 1000.;
 
         // Set the music notes data attribute
         this.musicNotesData = projectData.musicNotesData;
@@ -809,7 +810,6 @@ public class TranscriptionViewController implements Initializable {
     public void setAudioAndSpectrogramData(Audio audioObj) {
         // Set attributes
         audio = audioObj;
-        audioFileName = audioObj.getAudioFileName();
         audioDuration = audio.getDuration();
         sampleRate = audio.getSampleRate();
 
@@ -884,7 +884,6 @@ public class TranscriptionViewController implements Initializable {
         compressedMP3Bytes = audioData.compressedMP3Bytes;
         sampleRate = audioData.sampleRate;
         audioDuration = audioData.totalDurationInMS / 1000.;
-        audioFileName = "Temporary Name";  // Todo: depreciate in favour of project name
 
         qTransformBytes = qTransformData.qTransformBytes;
         minQTransformMagnitude = qTransformData.minMagnitude;
@@ -923,7 +922,7 @@ public class TranscriptionViewController implements Initializable {
 
         // Create the `Audio` object
         audio = new Audio(
-                auxiliaryWAVFile, audioFileName, AudioProcessingMode.PLAYBACK_ONLY
+                auxiliaryWAVFile, auxiliaryWAVFile.getName(), AudioProcessingMode.PLAYBACK_ONLY
         );
 
         // Update the raw MP3 bytes of the audio object
@@ -1688,7 +1687,7 @@ public class TranscriptionViewController implements Initializable {
             markTaskAsCompleted(task);
             MyLogger.log(
                     Level.INFO,
-                    "Spectrogram for " + audioFileName + " ready to be shown",
+                    "Spectrogram for '" + projectName + "' ready to be shown",
                     this.getClass().toString()
             );
         });
@@ -2268,19 +2267,19 @@ public class TranscriptionViewController implements Initializable {
         }
 
         // Package data for saving
-        // (Note: current file version is 0x00050002, so all data objects used will be for that version)
+        // (Note: current file version is 0x00070001, so all data objects used will be for that version)
         MyLogger.log(Level.INFO, "Packaging data for saving", this.getClass().toString());
-        QTransformDataObject qTransformData = new QTransformDataObject0x00050002(
+        QTransformDataObject qTransformData = new QTransformDataObject0x00070001(
                 qTransformBytes, minQTransformMagnitude, maxQTransformMagnitude
         );
-        AudioDataObject audioData = new AudioDataObject0x00050002(
-                compressedMP3Bytes, sampleRate, (int) (audioDuration * 1000),
-                audioFileName);
-        ProjectInfoDataObject projectInfoData = new ProjectInfoDataObject0x00050002(
-                musicKeyIndex, timeSignatureIndex, bpm, offset, audioVolume,
+        AudioDataObject audioData = new AudioDataObject0x00070001(
+                compressedMP3Bytes, sampleRate, (int) (audioDuration * 1000)
+        );
+        ProjectInfoDataObject projectInfoData = new ProjectInfoDataObject0x00070001(
+                projectName, musicKeyIndex, timeSignatureIndex, bpm, offset, audioVolume,
                 (int) (currTime * 1000)
         );
-        MusicNotesDataObject musicNotesData = new MusicNotesDataObject0x00050002(
+        MusicNotesDataObject musicNotesData = new MusicNotesDataObject0x00070001(
                 timesToPlaceRectangles, noteDurations, noteNums
         );
 
@@ -2293,7 +2292,7 @@ public class TranscriptionViewController implements Initializable {
                     audioData.numBytesNeeded();
 
             // Update the unchanging data properties
-            UnchangingDataPropertiesObject unchangingDataProperties = new UnchangingDataPropertiesObject0x00050002(
+            UnchangingDataPropertiesObject unchangingDataProperties = new UnchangingDataPropertiesObject0x00070001(
                     numSkippableBytes
             );
 
