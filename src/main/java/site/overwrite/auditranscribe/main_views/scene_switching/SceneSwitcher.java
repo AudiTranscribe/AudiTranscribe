@@ -36,6 +36,7 @@ import site.overwrite.auditranscribe.exceptions.io.audt_file.IncorrectFileFormat
 import site.overwrite.auditranscribe.exceptions.io.audt_file.InvalidFileVersionException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
 import site.overwrite.auditranscribe.io.audt_file.ProjectData;
 import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileReader;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
@@ -318,11 +319,46 @@ public class SceneSwitcher {
             // Get the file version
             int fileVersion = reader.fileFormatVersion;
 
+            // If file is not the latest version, make a backup
+            if (fileVersion != AUDTFileConstants.FILE_VERSION_NUMBER) {
+                // Get the filename without extension
+                String noExtension = audtFileName;
+                int pos = noExtension.lastIndexOf(".");
+                if (pos > 0 && pos < (noExtension.length() - 1)) {
+                    noExtension = noExtension.substring(0, pos);
+                }
+
+                // Save to backups folder
+                String backupPath = IOMethods.joinPaths(
+                        IOConstants.PROJECT_BACKUPS_FOLDER_PATH,
+                        noExtension + "-" + Integer.toHexString(fileVersion) + ".audt"
+                );
+                boolean success = IOMethods.copyFile(audtFile.getAbsolutePath(), backupPath);
+
+                if (!success) {
+                    Popups.showInformationAlert(
+                            "Failed to make backup of '" + audtFileName + "'.",
+                            "The program failed to make a backup of '" + audtFile.getName() + "'."
+                    );
+                    MyLogger.log(
+                            Level.WARNING,
+                            "Failed to make backup of '" + audtFileName + "' to '" + backupPath + "'.",
+                            SceneSwitcher.class.getName()
+                    );
+                } else {
+                    MyLogger.log(
+                            Level.INFO,
+                            "Made backup of '" + audtFileName + "' to '" + backupPath + "'.",
+                            SceneSwitcher.class.getName()
+                    );
+                }
+            }
+
             // Read the data from the file
             UnchangingDataPropertiesObject unchangingDataProperties = reader.readUnchangingDataProperties();
             QTransformDataObject qTransformData = reader.readQTransformData();
             AudioDataObject audioData = reader.readAudioData();
-            GUIDataObject guiData = reader.readGUIData();
+            ProjectInfoDataObject guiData = reader.readProjectInfoData();
             MusicNotesDataObject musicNotesData = reader.readMusicNotesData();
 
             // Pass these data into a `ProjectData`
@@ -351,7 +387,7 @@ public class SceneSwitcher {
             // Set new scene properties
             transcriptionStage.setMaximized(true);
             transcriptionStage.setResizable(true);
-            transcriptionStage.setTitle(audioData.audioFileName);
+            transcriptionStage.setTitle(projectData.projectInfoData.projectName);
 
             // Set width and height of the new scene
             Rectangle2D screenBounds = Screen.getPrimary().getBounds();
@@ -360,7 +396,7 @@ public class SceneSwitcher {
 
             // Update scroll position
             controller.updateScrollPosition(
-                    projectData.guiData.currTimeInMS / 1000. *
+                    projectData.projectInfoData.currTimeInMS / 1000. *
                             controller.PX_PER_SECOND *
                             controller.SPECTROGRAM_ZOOM_SCALE_X,
                     screenBounds.getWidth()

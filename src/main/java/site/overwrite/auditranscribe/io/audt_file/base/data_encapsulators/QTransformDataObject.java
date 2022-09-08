@@ -42,36 +42,6 @@ public abstract class QTransformDataObject extends AbstractAUDTDataObject {
     public double minMagnitude;
     public double maxMagnitude;
 
-    // Overwritten methods
-    @Override
-    public int numBytesNeeded() {
-        return 4 +  // Section ID
-                (4 + qTransformBytes.length) +  // +4 for the length of the Q-Transform data
-                8 +  // 8 bytes for the min magnitude
-                8 +  // 8 bytes for the max magnitude
-                4;   // EOS delimiter
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        QTransformDataObject that = (QTransformDataObject) o;
-        return (
-                Double.compare(that.minMagnitude, minMagnitude) == 0 &&
-                        Double.compare(that.maxMagnitude, maxMagnitude) == 0 &&
-                        Arrays.equals(qTransformBytes, that.qTransformBytes)
-        );
-    }
-
-    @Override
-    public int hashCode() {
-        int result = Objects.hash(minMagnitude, maxMagnitude);
-        result = 31 * result + Arrays.hashCode(qTransformBytes);
-        return result;
-    }
-
-
     // Public methods
 
     /**
@@ -131,5 +101,25 @@ public abstract class QTransformDataObject extends AbstractAUDTDataObject {
 
         // Finally convert the integer data to double
         return AUDTFileHelpers.int2DtoDoubles2D(intData, minMagnitude, maxMagnitude);
+    }
+
+    // Overwritten methods
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        QTransformDataObject that = (QTransformDataObject) o;
+        return (
+                Double.compare(that.minMagnitude, minMagnitude) == 0 &&
+                        Double.compare(that.maxMagnitude, maxMagnitude) == 0 &&
+                        Arrays.equals(qTransformBytes, that.qTransformBytes)
+        );
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(minMagnitude, maxMagnitude);
+        result = 31 * result + Arrays.hashCode(qTransformBytes);
+        return result;
     }
 }

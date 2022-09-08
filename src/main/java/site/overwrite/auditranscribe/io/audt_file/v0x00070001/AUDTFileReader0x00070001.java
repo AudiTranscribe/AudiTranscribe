@@ -1,7 +1,7 @@
 /*
- * AUDTFileReader0x00050002.java
+ * AUDTFileReader0x00070001.java
  * Description: Class that handles the reading of the AudiTranscribe (AUDT) file for file version
- *              0x00050002.
+ *              0x00070001.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -17,24 +17,21 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.io.audt_file.v0x00050002;
+package site.overwrite.auditranscribe.io.audt_file.v0x00070001;
 
 import site.overwrite.auditranscribe.exceptions.io.audt_file.FailedToReadDataException;
 import site.overwrite.auditranscribe.exceptions.io.audt_file.IncorrectFileFormatException;
 import site.overwrite.auditranscribe.exceptions.io.audt_file.InvalidFileVersionException;
 import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileReader;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.*;
+import site.overwrite.auditranscribe.io.audt_file.v0x00070001.data_encapsulators.*;
 import site.overwrite.auditranscribe.misc.MyLogger;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
 
-public class AUDTFileReader0x00050002 extends AUDTFileReader {
-    // Attributes
-    private String originalFileName;  // To be used as input to the project info data object later
-
+public class AUDTFileReader0x00070001 extends AUDTFileReader {
     /**
      * Initialization method to make an <code>AUDTFileReader</code> object.
      *
@@ -45,11 +42,11 @@ public class AUDTFileReader0x00050002 extends AUDTFileReader {
      * @throws IncorrectFileFormatException If the file was formatted incorrectly.
      * @throws InvalidFileVersionException  If the LZ4 version is outdated.
      */
-    public AUDTFileReader0x00050002(
+    public AUDTFileReader0x00070001(
             String filepath, InputStream inputStream
     ) throws IOException, IncorrectFileFormatException, InvalidFileVersionException {
         super(filepath, inputStream);
-        MyLogger.log(Level.INFO, "Using Version 0x00050002 AUDT file reader", AUDTFileReader.class.getName());
+        MyLogger.log(Level.INFO, "Using Version 0x00070001 AUDT file reader", AUDTFileReader.class.getName());
     }
 
     // Public methods
@@ -75,7 +72,7 @@ public class AUDTFileReader0x00050002 extends AUDTFileReader {
         }
 
         // Create and return a `UnchangingDataPropertiesObject`
-        return new UnchangingDataPropertiesObject0x00050002(numSkippableBytes);
+        return new UnchangingDataPropertiesObject0x00070001(numSkippableBytes);
     }
 
     public QTransformDataObject readQTransformData() throws FailedToReadDataException {
@@ -99,7 +96,7 @@ public class AUDTFileReader0x00050002 extends AUDTFileReader {
         }
 
         // Create and return a `QTransformDataObject`
-        return new QTransformDataObject0x00050002(qTransformData, minMagnitude, maxMagnitude);
+        return new QTransformDataObject0x00070001(qTransformData, minMagnitude, maxMagnitude);
     }
 
     public AudioDataObject readAudioData() throws FailedToReadDataException {
@@ -116,7 +113,6 @@ public class AUDTFileReader0x00050002 extends AUDTFileReader {
         byte[] compressedMP3Bytes = readByteArray();
         double sampleRate = readDouble();
         int totalDurationInMS = readInteger();
-        originalFileName = readString();
 
         // Check if there is an EOS
         if (!checkEOSDelimiter()) {
@@ -124,7 +120,7 @@ public class AUDTFileReader0x00050002 extends AUDTFileReader {
         }
 
         // Create and return an `AudioDataObject`
-        return new AudioDataObject0x00050002(compressedMP3Bytes, sampleRate, totalDurationInMS, originalFileName);
+        return new AudioDataObject0x00070001(compressedMP3Bytes, sampleRate, totalDurationInMS);
     }
 
     public ProjectInfoDataObject readProjectInfoData() throws FailedToReadDataException {
@@ -138,6 +134,7 @@ public class AUDTFileReader0x00050002 extends AUDTFileReader {
         }
 
         // Read in the rest of the data first
+        String projectName = readString();
         int musicKeyIndex = readInteger();
         int timeSignatureIndex = readInteger();
         double bpm = readDouble();
@@ -151,11 +148,9 @@ public class AUDTFileReader0x00050002 extends AUDTFileReader {
         }
 
         // Create and return a `ProjectInfoDataObject`
-        ProjectInfoDataObject0x00050002 obj = new ProjectInfoDataObject0x00050002(
-                musicKeyIndex, timeSignatureIndex, bpm, offsetSeconds, playbackVolume, currTimeInMS
+        return new ProjectInfoDataObject0x00070001(
+                projectName, musicKeyIndex, timeSignatureIndex, bpm, offsetSeconds, playbackVolume, currTimeInMS
         );
-        obj.setProjectName(originalFileName);  // Set the superclass' attribute
-        return obj;
     }
 
     public MusicNotesDataObject readMusicNotesData() throws FailedToReadDataException, IOException {
@@ -179,6 +174,6 @@ public class AUDTFileReader0x00050002 extends AUDTFileReader {
         }
 
         // Create and return a `MusicNotesDataObject`
-        return new MusicNotesDataObject0x00050002(timesToPlaceRectangles, noteDurations, noteNums);
+        return new MusicNotesDataObject0x00070001(timesToPlaceRectangles, noteDurations, noteNums);
     }
 }

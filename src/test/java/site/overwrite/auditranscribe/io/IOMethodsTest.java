@@ -26,19 +26,23 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileLock;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class IOMethodsTest {
     // Define the testing file path for testing the creation and deletion path
-    static final String FILE_FOR_TESTING_CREATION_AND_DELETION_PATH = IOMethods.joinPaths(
+    static final String TESTING_FILES_PATH = IOMethods.joinPaths(
             IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-            "testing-files", "text", "FileForTestingCreationAndDeletion.txt"
+            "testing-files"
+    );
+    static final String FILE_FOR_TESTING_CREATION_AND_DELETION_PATH = IOMethods.joinPaths(
+            TESTING_FILES_PATH, "text", "FileForTestingCreationAndDeletion.txt"
     );
     static final String FILE_THAT_SHOULD_NOT_BE_CREATED_OR_DELETED = IOMethods.joinPaths(
-            IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-            "testing-files", "nonexistent-directory", "FakeFile.txt"
+            TESTING_FILES_PATH, "nonexistent-directory", "FakeFile.txt"
     );
 
     // File path handling
@@ -49,7 +53,7 @@ class IOMethodsTest {
         assertTrue(urlString.contains("testing-files/text/README.txt"));
     }
 
-    // IO Handling
+    // IO handling
     @Test
     @Order(1)
     void createFile() {
@@ -84,8 +88,7 @@ class IOMethodsTest {
         // Attempt to delete file while it is being used should return false, and then delete file
         // on exit
         String testFilePath = IOMethods.joinPaths(
-                IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-                "testing-files", "text", "lock-file.txt"
+                TESTING_FILES_PATH, "text", "lock-file.txt"
         );
         IOMethods.createFile(testFilePath);
 
@@ -101,10 +104,7 @@ class IOMethodsTest {
     @Order(3)
     void createDirectoryOne() {
         // Define the path to the test directory
-        String testDirectory = IOMethods.joinPaths(
-                IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-                "testing-files", "new-directory-1"
-        );
+        String testDirectory = IOMethods.joinPaths(TESTING_FILES_PATH, "new-directory-1");
 
         // The test folder should create successfully
         assertTrue(IOMethods.createFolder(testDirectory));
@@ -124,8 +124,7 @@ class IOMethodsTest {
     void createDirectoryTwo() {
         // Define the path to the test directory
         String testDirectory = IOMethods.joinPaths(
-                IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-                "testing-files", "new-directory-2", "new-sub-directory", "new-sub-sub-directory"
+                TESTING_FILES_PATH, "new-directory-2", "new-sub-directory", "new-sub-sub-directory"
         );
 
         // The test folder should create successfully
@@ -144,6 +143,31 @@ class IOMethodsTest {
         assertFalse(IOMethods.delete(new File(testDirectory).getParent()));
         assertFalse(IOMethods.delete(new File(new File(testDirectory).getParent()).getParent()));
     }
+    
+    @Test
+    void copyFile() throws IOException {
+        try {
+            // Test 1: Should be successful
+            boolean success1 = IOMethods.copyFile(
+                    IOMethods.joinPaths(TESTING_FILES_PATH, "text", "MyFile.txt"),
+                    IOMethods.joinPaths(TESTING_FILES_PATH, "text", "MyCopyFile.txt")
+            );
+            assertTrue(success1);
+            assertEquals(
+                    Files.readAllLines(Path.of(IOMethods.joinPaths(TESTING_FILES_PATH, "text", "MyFile.txt"))),
+                    Files.readAllLines(Path.of(IOMethods.joinPaths(TESTING_FILES_PATH, "text", "MyCopyFile.txt")))
+            );
+
+            // Test 2: Should not be successful
+            boolean success2 = IOMethods.copyFile(
+                    "this-file-does-not-exist", "this-path-should-not-work"
+            );
+            assertFalse(success2);
+        } finally {
+            IOMethods.delete(IOMethods.joinPaths(TESTING_FILES_PATH, "text", "MyCopyFile.txt"));
+        }
+
+    }
 
     // File location handling
     @Test
@@ -151,23 +175,15 @@ class IOMethodsTest {
         assertFalse(IOMethods.isSomethingAt(null));
         assertTrue(IOMethods.isSomethingAt(IOMethods.getAbsoluteFilePath("testing-files/text/README.txt")));
         assertTrue(IOMethods.isSomethingAt(IOMethods.getAbsoluteFilePath("conf/logging.properties")));
-        assertTrue(IOMethods.isSomethingAt(IOMethods.joinPaths(
-                IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH, "testing-files"
-        )));
+        assertTrue(IOMethods.isSomethingAt(TESTING_FILES_PATH));
         assertFalse(IOMethods.isSomethingAt("this-is-a-totally-fake-file.fakefile.fake"));
     }
 
     @Test
     void moveFile() throws IOException {
         // Define paths
-        String originalFilePath = IOMethods.joinPaths(
-                IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-                "testing-files", "text", "MyFile.txt"
-        );
-        String newFilePath = IOMethods.joinPaths(
-                IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-                "testing-files", "MyNewFile.txt"
-        );
+        String originalFilePath = IOMethods.joinPaths(TESTING_FILES_PATH, "text", "MyFile.txt");
+        String newFilePath = IOMethods.joinPaths(TESTING_FILES_PATH, "MyNewFile.txt");
 
         // Check if the file that we want to move exists
         assertTrue(IOMethods.isSomethingAt(originalFilePath));
@@ -285,24 +301,18 @@ class IOMethodsTest {
     @Test
     @EnabledOnOs({OS.MAC, OS.LINUX})
     void numFilesInDir() {
-        // Define base testing directory path
-        String testingDirPath = IOMethods.joinPaths(
-                IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-                "testing-files"
-        );
-
         // Make sure the directories has the required testing files
-        if (!IOMethods.isSomethingAt(IOMethods.joinPaths(testingDirPath, ".DS_Store"))) {
-            IOMethods.createFile(IOMethods.joinPaths(testingDirPath, ".DS_Store"));
+        if (!IOMethods.isSomethingAt(IOMethods.joinPaths(TESTING_FILES_PATH, ".DS_Store"))) {
+            IOMethods.createFile(IOMethods.joinPaths(TESTING_FILES_PATH, ".DS_Store"));
         }
 
-        if (IOMethods.isSomethingAt(IOMethods.joinPaths(testingDirPath, "text", ".DS_Store"))) {
-            IOMethods.delete(IOMethods.joinPaths(testingDirPath, "text", ".DS_Store"));
+        if (IOMethods.isSomethingAt(IOMethods.joinPaths(TESTING_FILES_PATH, "text", ".DS_Store"))) {
+            IOMethods.delete(IOMethods.joinPaths(TESTING_FILES_PATH, "text", ".DS_Store"));
         }
 
         // Run tests
-        assertEquals(6, IOMethods.numThingsInDir(testingDirPath));
-        assertEquals(3, IOMethods.numThingsInDir(IOMethods.joinPaths(testingDirPath, "text")));
+        assertEquals(6, IOMethods.numThingsInDir(TESTING_FILES_PATH));
+        assertEquals(3, IOMethods.numThingsInDir(IOMethods.joinPaths(TESTING_FILES_PATH, "text")));
         assertEquals(-1, IOMethods.numThingsInDir("not-a-dir"));
     }
 }

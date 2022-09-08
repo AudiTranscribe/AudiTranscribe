@@ -30,30 +30,30 @@ public class ProjectData {
     public UnchangingDataPropertiesObject unchangingDataProperties;
     public QTransformDataObject qTransformData;
     public AudioDataObject audioData;
-    public GUIDataObject guiData;
+    public ProjectInfoDataObject projectInfoData;
     public MusicNotesDataObject musicNotesData;
 
     /**
      * Initialization method for the project data object.
      *
-     * @param unchangingDataProperties A <code>UnchangingDataPropertiesObject</code> that stores all
-     *                                 the properties of the unchanging data.
-     * @param qTransformData           A <code>QTransformDataObject</code> that stores all the
-     *                                 Q-Transform data.
-     * @param audioData                A <code>AudioDataObject</code> that stores all the audio
-     *                                 data.
-     * @param guiData                  A <code>GUIDataObject</code> that stores all the GUI data.
-     * @param musicNotesData           A <code>MusicNotesDataObject</code> that stores all the music
-     *                                 notes' data.
+     * @param unchangingData  A <code>UnchangingDataPropertiesObject</code> that stores all the
+     *                        properties of the unchanging data.
+     * @param qTransformData  A <code>QTransformDataObject</code> that stores all the Q-Transform
+     *                        data.
+     * @param audioData       A <code>AudioDataObject</code> that stores all the audio data.
+     * @param projectInfoData A <code>ProjectInfoDataObject</code> that stores all the project info
+     *                        data.
+     * @param musicNotesData  A <code>MusicNotesDataObject</code> that stores all the music notes'
+     *                        data.
      */
     public ProjectData(
-            UnchangingDataPropertiesObject unchangingDataProperties, QTransformDataObject qTransformData,
-            AudioDataObject audioData, GUIDataObject guiData, MusicNotesDataObject musicNotesData
+            UnchangingDataPropertiesObject unchangingData, QTransformDataObject qTransformData,
+            AudioDataObject audioData, ProjectInfoDataObject projectInfoData, MusicNotesDataObject musicNotesData
     ) {
-        this.unchangingDataProperties = unchangingDataProperties;
+        this.unchangingDataProperties = unchangingData;
         this.qTransformData = qTransformData;
         this.audioData = audioData;
-        this.guiData = guiData;
+        this.projectInfoData = projectInfoData;
         this.musicNotesData = musicNotesData;
     }
 
@@ -68,13 +68,13 @@ public class ProjectData {
                 unchangingDataProperties.equals(that.unchangingDataProperties) &&
                         qTransformData.equals(that.qTransformData) &&
                         audioData.equals(that.audioData) &&
-                        guiData.equals(that.guiData) &&
+                        projectInfoData.equals(that.projectInfoData) &&
                         musicNotesData.equals(that.musicNotesData)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(unchangingDataProperties, qTransformData, audioData, guiData, musicNotesData);
+        return Objects.hash(unchangingDataProperties, qTransformData, audioData, projectInfoData, musicNotesData);
     }
 }

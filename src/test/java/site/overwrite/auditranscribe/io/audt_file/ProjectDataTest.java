@@ -56,14 +56,14 @@ class ProjectDataTest {
     AudioDataObject audioDataObject1;
     AudioDataObject audioDataObject2;
 
-    GUIDataObject guiDataObject1;
-    GUIDataObject guiDataObject2;
+    ProjectInfoDataObject projectInfoDataObject1;
+    ProjectInfoDataObject projectInfoDataObject2;
 
     MusicNotesDataObject musicNotesDataObject1;
     MusicNotesDataObject musicNotesDataObject2;
 
-    UnchangingDataPropertiesObject unchangingDataPropertiesObject1;
-    UnchangingDataPropertiesObject unchangingDataPropertiesObject2;
+    UnchangingDataPropertiesObject401 unchangingDataPropertiesObject1;
+    UnchangingDataPropertiesObject401 unchangingDataPropertiesObject2;
 
     // Initialization method
     public ProjectDataTest() throws IOException {
@@ -119,10 +119,10 @@ class ProjectDataTest {
                 ))),
                 44100, 5000, "Choice.wav");
 
-        guiDataObject1 = new GUIDataObject401(
+        projectInfoDataObject1 = new ProjectInfoDataObject401(
                 11, 9, 123.45, 0.01, 0.55, 9000
         );
-        guiDataObject2 = new GUIDataObject401(
+        projectInfoDataObject2 = new ProjectInfoDataObject401(
                 15, 14, 67.89, -1.23, 0.124, 2048
         );
 
@@ -151,7 +151,7 @@ class ProjectDataTest {
     void testEquals() {
         // Define temporary data objects for testing the initial checks
         ProjectData temp = new ProjectData(
-                unchangingDataPropertiesObject1, qTransformDataObject1, audioDataObject1, guiDataObject1,
+                unchangingDataPropertiesObject1, qTransformDataObject1, audioDataObject1, projectInfoDataObject1,
                 musicNotesDataObject1
         );
 
@@ -165,7 +165,7 @@ class ProjectDataTest {
         assertNotEquals(temp, otherTypedVar);  // Not redundant to test the equality method
 
         // Define arrays to pick the data objects from
-        UnchangingDataPropertiesObject[] unchangingDataPropertiesObjects = {
+        UnchangingDataPropertiesObject401[] unchangingDataPropertiesObjects = {
                 unchangingDataPropertiesObject1, unchangingDataPropertiesObject2
         };
         QTransformDataObject[] qTransformDataObjects = {
@@ -174,8 +174,8 @@ class ProjectDataTest {
         AudioDataObject[] audioDataObjects = {
                 audioDataObject1, audioDataObject2
         };
-        GUIDataObject[] guiDataObjects = {
-                guiDataObject1, guiDataObject2
+        ProjectInfoDataObject[] projectInfoDataObjects = {
+                projectInfoDataObject1, projectInfoDataObject2
         };
         MusicNotesDataObject[] musicNotesDataObjects = {
                 musicNotesDataObject1, musicNotesDataObject2
@@ -188,7 +188,7 @@ class ProjectDataTest {
                     unchangingDataPropertiesObjects[indices1[0]],
                     qTransformDataObjects[indices1[1]],
                     audioDataObjects[indices1[2]],
-                    guiDataObjects[indices1[3]],
+                    projectInfoDataObjects[indices1[3]],
                     musicNotesDataObjects[indices1[4]]
             );
 
@@ -197,7 +197,7 @@ class ProjectDataTest {
                         unchangingDataPropertiesObjects[indices2[0]],
                         qTransformDataObjects[indices2[1]],
                         audioDataObjects[indices2[2]],
-                        guiDataObjects[indices2[3]],
+                        projectInfoDataObjects[indices2[3]],
                         musicNotesDataObjects[indices2[4]]
                 );
 
@@ -215,13 +215,12 @@ class ProjectDataTest {
 
     @Test
     void testHashCode() {
-        // Define project data objects for testing
         ProjectData one = new ProjectData(
-                unchangingDataPropertiesObject1, qTransformDataObject1, audioDataObject1, guiDataObject1,
+                unchangingDataPropertiesObject1, qTransformDataObject1, audioDataObject1, projectInfoDataObject1,
                 musicNotesDataObject1
         );
         ProjectData two = new ProjectData(
-                unchangingDataPropertiesObject2, qTransformDataObject2, audioDataObject2, guiDataObject2,
+                unchangingDataPropertiesObject2, qTransformDataObject2, audioDataObject2, projectInfoDataObject2,
                 musicNotesDataObject2
         );
 

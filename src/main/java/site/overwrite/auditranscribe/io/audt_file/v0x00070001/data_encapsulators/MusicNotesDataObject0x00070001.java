@@ -1,5 +1,5 @@
 /*
- * MusicNotesDataObject401.java
+ * MusicNotesDataObject0x00070001.java
  * Description: Data object that stores the music notes' data.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.io.audt_file.v401.data_encapsulators;
+package site.overwrite.auditranscribe.io.audt_file.v0x00070001.data_encapsulators;
 
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.MusicNotesDataObject;
 
@@ -25,7 +25,7 @@ import java.util.Arrays;
 /**
  * Data object that stores the music notes' data.
  */
-public class MusicNotesDataObject401 extends MusicNotesDataObject {
+public class MusicNotesDataObject0x00070001 extends MusicNotesDataObject {
     /**
      * Initialization method for the music notes data object.
      *
@@ -33,19 +33,18 @@ public class MusicNotesDataObject401 extends MusicNotesDataObject {
      * @param noteDurations          The duration of each note rectangle.
      * @param noteNums               The note number of each note rectangle.
      */
-    public MusicNotesDataObject401(double[] timesToPlaceRectangles, double[] noteDurations, int[] noteNums) {
+    public MusicNotesDataObject0x00070001(double[] timesToPlaceRectangles, double[] noteDurations, int[] noteNums) {
         this.timesToPlaceRectangles = timesToPlaceRectangles;
         this.noteDurations = noteDurations;
         this.noteNums = noteNums;
     }
-
 
     // Overwritten methods
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MusicNotesDataObject401 that = (MusicNotesDataObject401) o;
+        MusicNotesDataObject0x00070001 that = (MusicNotesDataObject0x00070001) o;
         return (
                 Arrays.equals(timesToPlaceRectangles, that.timesToPlaceRectangles) &&
                         Arrays.equals(noteDurations, that.noteDurations) &&

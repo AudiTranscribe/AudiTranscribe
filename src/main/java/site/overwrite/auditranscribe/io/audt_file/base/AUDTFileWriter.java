@@ -25,6 +25,7 @@ import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileHelpers;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.audt_file.v0x00050002.AUDTFileWriter0x00050002;
+import site.overwrite.auditranscribe.io.audt_file.v0x00070001.AUDTFileWriter0x00070001;
 import site.overwrite.auditranscribe.io.audt_file.v401.AUDTFileWriter401;
 
 import java.io.File;
@@ -42,7 +43,7 @@ public abstract class AUDTFileWriter {
     protected final int numBytesToSkip;
 
     /**
-     * Initialization method to make an <code>AUDTFileWriter401</code> object.
+     * Initialization method to make an <code>AUDTFileWriter</code> object.
      *
      * @param fileVersion    AUDT file version.
      * @param filepath       Path to the AUDT file. The file name at the end of the file path should
@@ -59,7 +60,7 @@ public abstract class AUDTFileWriter {
     }
 
     /**
-     * Initialization method to make an <code>AUDTFileWriter401</code> object.
+     * Initialization method to make an <code>AUDTFileWriter</code> object.
      *
      * @param fileVersion AUDT file version.
      * @param filepath    Path to the AUDT file. The file name at the end of the file path should
@@ -89,6 +90,7 @@ public abstract class AUDTFileWriter {
         return switch (fileVersion) {
             case 401 -> new AUDTFileWriter401(filepath);  // Todo: eventually depreciate this
             case 0x00050002 -> new AUDTFileWriter0x00050002(filepath);
+            case 0x00070001 -> new AUDTFileWriter0x00070001(filepath);
             default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
         };
     }
@@ -107,6 +109,7 @@ public abstract class AUDTFileWriter {
         return switch (fileVersion) {
             case 401 -> new AUDTFileWriter401(filepath, numBytesToSkip);  // Todo: eventually depreciate this
             case 0x00050002 -> new AUDTFileWriter0x00050002(filepath, numBytesToSkip);
+            case 0x00070001 -> new AUDTFileWriter0x00070001(filepath, numBytesToSkip);
             default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
         };
     }
@@ -172,11 +175,11 @@ public abstract class AUDTFileWriter {
     public abstract void writeAudioData(AudioDataObject audioDataObj);
 
     /**
-     * Method that writes the GUI data to file.
+     * Method that writes the project info data to file.
      *
-     * @param guiDataObj Data object that holds all the GUI data.
+     * @param projectInfoDataObj Data object that holds all the project info data.
      */
-    public abstract void writeGUIData(GUIDataObject guiDataObj);
+    public abstract void writeProjectInfoData(ProjectInfoDataObject projectInfoDataObj);
 
     /**
      * Method that writes the music notes data to file.

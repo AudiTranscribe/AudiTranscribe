@@ -21,6 +21,7 @@ package site.overwrite.auditranscribe.io.audt_file.v401;
 
 import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileWriter;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
+import site.overwrite.auditranscribe.io.audt_file.v401.data_encapsulators.*;
 import site.overwrite.auditranscribe.misc.MyLogger;
 
 import java.io.IOException;
@@ -58,8 +59,12 @@ public class AUDTFileWriter401 extends AUDTFileWriter {
      * @param unchangingDataProperties Data object that contains the unchanging data's properties.
      */
     public void writeUnchangingDataProperties(UnchangingDataPropertiesObject unchangingDataProperties) {
-        writeSectionID(UnchangingDataPropertiesObject.SECTION_ID);
-        writeInteger(unchangingDataProperties.numSkippableBytes);
+        // Cast to the 401 version of the data object
+        UnchangingDataPropertiesObject401 obj = (UnchangingDataPropertiesObject401) unchangingDataProperties;
+
+        // Write to file
+        writeSectionID(UnchangingDataPropertiesObject401.SECTION_ID);
+        writeInteger(obj.numSkippableBytes);
         writeEOSDelimiter();
     }
 
@@ -69,10 +74,14 @@ public class AUDTFileWriter401 extends AUDTFileWriter {
      * @param qTransformDataObj Data object that holds all the Q-Transform data.
      */
     public void writeQTransformData(QTransformDataObject qTransformDataObj) {
-        writeSectionID(QTransformDataObject.SECTION_ID);
-        writeDouble(qTransformDataObj.minMagnitude);
-        writeDouble(qTransformDataObj.maxMagnitude);
-        writeByteArray(qTransformDataObj.qTransformBytes);
+        // Cast to the 401 version of the data object
+        QTransformDataObject401 obj = (QTransformDataObject401) qTransformDataObj;
+
+        // Write to file
+        writeSectionID(QTransformDataObject401.SECTION_ID);
+        writeDouble(obj.minMagnitude);
+        writeDouble(obj.maxMagnitude);
+        writeByteArray(obj.qTransformBytes);
         writeEOSDelimiter();
     }
 
@@ -82,27 +91,35 @@ public class AUDTFileWriter401 extends AUDTFileWriter {
      * @param audioDataObj Data object that holds all the audio data.
      */
     public void writeAudioData(AudioDataObject audioDataObj) {
-        writeSectionID(AudioDataObject.SECTION_ID);
-        writeByteArray(audioDataObj.compressedMP3Bytes);
-        writeDouble(audioDataObj.sampleRate);
-        writeInteger(audioDataObj.totalDurationInMS);
-        writeString(audioDataObj.audioFileName);
+        // Cast to the 401 version of the data object
+        AudioDataObject401 obj = (AudioDataObject401) audioDataObj;
+
+        // Write to file
+        writeSectionID(AudioDataObject401.SECTION_ID);
+        writeByteArray(obj.compressedMP3Bytes);
+        writeDouble(obj.sampleRate);
+        writeInteger(obj.totalDurationInMS);
+        writeString(obj.getAudioFileName());
         writeEOSDelimiter();
     }
 
     /**
-     * Method that writes the GUI data to file.
+     * Method that writes the project info data to file.
      *
-     * @param guiDataObj Data object that holds all the GUI data.
+     * @param projectInfoDataObj Data object that holds all the project info data.
      */
-    public void writeGUIData(GUIDataObject guiDataObj) {
-        writeSectionID(GUIDataObject.SECTION_ID);
-        writeInteger(guiDataObj.musicKeyIndex);
-        writeInteger(guiDataObj.timeSignatureIndex);
-        writeDouble(guiDataObj.bpm);
-        writeDouble(guiDataObj.offsetSeconds);
-        writeDouble(guiDataObj.playbackVolume);
-        writeInteger(guiDataObj.currTimeInMS);
+    public void writeProjectInfoData(ProjectInfoDataObject projectInfoDataObj) {
+        // Cast to the 401 version of the data object
+        ProjectInfoDataObject401 obj = (ProjectInfoDataObject401) projectInfoDataObj;
+
+        // Write to file
+        writeSectionID(ProjectInfoDataObject401.SECTION_ID);
+        writeInteger(obj.musicKeyIndex);
+        writeInteger(obj.timeSignatureIndex);
+        writeDouble(obj.bpm);
+        writeDouble(obj.offsetSeconds);
+        writeDouble(obj.playbackVolume);
+        writeInteger(obj.currTimeInMS);
         writeEOSDelimiter();
     }
 
@@ -113,10 +130,14 @@ public class AUDTFileWriter401 extends AUDTFileWriter {
      * @throws IOException If something went wrong when LZ4 compressing.
      */
     public void writeMusicNotesData(MusicNotesDataObject musicNotesDataObj) throws IOException {
-        writeSectionID(MusicNotesDataObject.SECTION_ID);
-        write1DDoubleArray(musicNotesDataObj.timesToPlaceRectangles);
-        write1DDoubleArray(musicNotesDataObj.noteDurations);
-        write1DIntegerArray(musicNotesDataObj.noteNums);
+        // Cast to the 401 version of the data object
+        MusicNotesDataObject401 obj = (MusicNotesDataObject401) musicNotesDataObj;
+
+        // Write to file
+        writeSectionID(MusicNotesDataObject401.SECTION_ID);
+        write1DDoubleArray(obj.timesToPlaceRectangles);
+        write1DDoubleArray(obj.noteDurations);
+        write1DIntegerArray(obj.noteNums);
         writeEOSDelimiter();
     }
 }

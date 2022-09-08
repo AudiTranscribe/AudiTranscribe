@@ -38,6 +38,9 @@ public class MainApplication extends Application {
         // Ensure that an application folder exists
         IOMethods.createFolder(IOConstants.APP_DATA_FOLDER_PATH);
 
+        // Create a backup folder for old project files
+        IOMethods.createFolder(IOConstants.PROJECT_BACKUPS_FOLDER_PATH);
+
         // Clear any old logs
         MyLogger.clearOldLogs(DataFiles.SETTINGS_DATA_FILE.data.logFilePersistence);
 

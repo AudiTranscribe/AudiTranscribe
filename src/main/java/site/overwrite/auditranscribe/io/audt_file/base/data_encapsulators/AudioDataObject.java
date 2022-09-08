@@ -32,20 +32,8 @@ public abstract class AudioDataObject extends AbstractAUDTDataObject {
     public byte[] compressedMP3Bytes;
     public double sampleRate;
     public int totalDurationInMS;
-    public String audioFileName;
 
     // Overwritten methods
-
-    @Override
-    public int numBytesNeeded() {
-        return 4 +  // Section ID
-                (4 + compressedMP3Bytes.length) +  // +4 for the length of the MP3 audio data
-                8 +   // Sample rate
-                4 +   // Total duration in milliseconds
-                (4 + audioFileName.getBytes().length) +  // String length + string bytes of audio file name
-                4;    // EOS delimiter
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -54,14 +42,13 @@ public abstract class AudioDataObject extends AbstractAUDTDataObject {
         return (
                 Double.compare(that.sampleRate, sampleRate) == 0 &&
                         totalDurationInMS == that.totalDurationInMS &&
-                        Arrays.equals(compressedMP3Bytes, that.compressedMP3Bytes) &&
-                        audioFileName.equals(that.audioFileName)
+                        Arrays.equals(compressedMP3Bytes, that.compressedMP3Bytes)
         );
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(sampleRate, totalDurationInMS, audioFileName);
+        int result = Objects.hash(sampleRate, totalDurationInMS);
         result = 31 * result + Arrays.hashCode(compressedMP3Bytes);
         return result;
     }

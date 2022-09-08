@@ -1,5 +1,5 @@
 /*
- * UnchangingDataPropertiesObject401.java
+ * UnchangingDataPropertiesObject0x00070001.java
  * Description: Data object that stores the unchanging data's properties.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.io.audt_file.v401.data_encapsulators;
+package site.overwrite.auditranscribe.io.audt_file.v0x00070001.data_encapsulators;
 
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.UnchangingDataPropertiesObject;
 
@@ -25,13 +25,13 @@ import java.util.Objects;
 /**
  * Data object that stores the unchanging data's properties.
  */
-public class UnchangingDataPropertiesObject401 extends UnchangingDataPropertiesObject {
+public class UnchangingDataPropertiesObject0x00070001 extends UnchangingDataPropertiesObject {
     /**
      * Initialization method for the unchanging data properties object.
      *
      * @param numSkippableBytes The number of skippable bytes.
      */
-    public UnchangingDataPropertiesObject401(int numSkippableBytes) {
+    public UnchangingDataPropertiesObject0x00070001(int numSkippableBytes) {
         this.numSkippableBytes = numSkippableBytes;
     }
 
@@ -45,7 +45,7 @@ public class UnchangingDataPropertiesObject401 extends UnchangingDataPropertiesO
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        UnchangingDataPropertiesObject401 that = (UnchangingDataPropertiesObject401) o;
+        UnchangingDataPropertiesObject0x00070001 that = (UnchangingDataPropertiesObject0x00070001) o;
         return numSkippableBytes == that.numSkippableBytes;
     }
 

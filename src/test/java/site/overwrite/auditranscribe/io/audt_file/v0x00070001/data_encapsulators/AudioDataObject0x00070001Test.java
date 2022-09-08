@@ -1,5 +1,5 @@
 /*
- * AudioDataObject0X00050002Test.java
+ * AudioDataObject0x00070001Test.java
  * Description: Test `AudioDataObject0x00050002.java`.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators;
+package site.overwrite.auditranscribe.io.audt_file.v0x00070001.data_encapsulators;
 
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.AudioDataObject;
@@ -25,7 +25,7 @@ import site.overwrite.auditranscribe.utils.MathUtils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-class AudioDataObject0X00050002Test {
+class AudioDataObject0x00070001Test {
     // Attributes
     byte[] compressedMP3Bytes1 = new byte[]{(byte) 0x12, (byte) 0x34, (byte) 0x56, (byte) 0x78, (byte) 0x9a};
     byte[] compressedMP3Bytes2 = new byte[]{(byte) 0xab, (byte) 0xcd, (byte) 0xef};
@@ -36,30 +36,27 @@ class AudioDataObject0X00050002Test {
     int totalDurationInMS1 = 1234;
     int totalDurationInMS2 = 5678;
 
-    String audioFileName1 = "Test File 1.mp3";
-    String audioFileName2 = "Test File 2.mp3";
-
     // Tests
     @Test
     void numBytesNeeded() {
         // Define the two audio data objects to test the number of bytes needed
-        AudioDataObject one = new AudioDataObject0x00050002(
-                compressedMP3Bytes1, sampleRate1, totalDurationInMS1, audioFileName1
+        AudioDataObject one = new AudioDataObject0x00070001(
+                compressedMP3Bytes1, sampleRate1, totalDurationInMS1
         );
-        AudioDataObject two = new AudioDataObject0x00050002(
-                compressedMP3Bytes2, sampleRate2, totalDurationInMS2, audioFileName2
+        AudioDataObject two = new AudioDataObject0x00070001(
+                compressedMP3Bytes2, sampleRate2, totalDurationInMS2
         );
 
         // Tests
-        assertEquals(48, one.numBytesNeeded());
-        assertEquals(46, two.numBytesNeeded());
+        assertEquals(29, one.numBytesNeeded());
+        assertEquals(27, two.numBytesNeeded());
     }
 
     @Test
     void testEquals() {
         // Define temporary data object for testing the initial checks
-        AudioDataObject temp = new AudioDataObject0x00050002(
-                compressedMP3Bytes1, sampleRate1, totalDurationInMS1, audioFileName1
+        AudioDataObject temp = new AudioDataObject0x00070001(
+                compressedMP3Bytes1, sampleRate1, totalDurationInMS1
         );
 
         // Define other objects to test comparison
@@ -75,24 +72,21 @@ class AudioDataObject0X00050002Test {
         byte[][] compressedMP3BytesArrays = {compressedMP3Bytes1, compressedMP3Bytes2};
         double[] sampleRates = {sampleRate1, sampleRate2};
         int[] totalDurationInMSs = {totalDurationInMS1, totalDurationInMS2};
-        String[] audioFileNames = {audioFileName1, audioFileName2};
 
         // Generate product of indices
-        int[][] indexProduct = MathUtils.selfProduct(2, 4);  // 4 data attributes
+        int[][] indexProduct = MathUtils.selfProduct(2, 3);  // 3 data attributes
         for (int[] indices1 : indexProduct) {
-            AudioDataObject one = new AudioDataObject0x00050002(
+            AudioDataObject one = new AudioDataObject0x00070001(
                     compressedMP3BytesArrays[indices1[0]],
                     sampleRates[indices1[1]],
-                    totalDurationInMSs[indices1[2]],
-                    audioFileNames[indices1[3]]
+                    totalDurationInMSs[indices1[2]]
             );
 
             for (int[] indices2 : indexProduct) {
-                AudioDataObject two = new AudioDataObject0x00050002(
+                AudioDataObject two = new AudioDataObject0x00070001(
                         compressedMP3BytesArrays[indices2[0]],
                         sampleRates[indices2[1]],
-                        totalDurationInMSs[indices2[2]],
-                        audioFileNames[indices2[3]]
+                        totalDurationInMSs[indices2[2]]
                 );
 
                 // Check equality
@@ -110,15 +104,15 @@ class AudioDataObject0X00050002Test {
     @Test
     void testHashCode() {
         // Define the two audio data objects to test the hash code method
-        AudioDataObject one = new AudioDataObject0x00050002(
-                compressedMP3Bytes1, sampleRate1, totalDurationInMS1, audioFileName1
+        AudioDataObject one = new AudioDataObject0x00070001(
+                compressedMP3Bytes1, sampleRate1, totalDurationInMS1
         );
-        AudioDataObject two = new AudioDataObject0x00050002(
-                compressedMP3Bytes2, sampleRate2, totalDurationInMS2, audioFileName2
+        AudioDataObject two = new AudioDataObject0x00070001(
+                compressedMP3Bytes2, sampleRate2, totalDurationInMS2
         );
 
         // Tests
-        assertEquals(1981043339, one.hashCode());
-        assertEquals(793645213, two.hashCode());
+        assertEquals(-1603148222, one.hashCode());
+        assertEquals(1637333885, two.hashCode());
     }
 }

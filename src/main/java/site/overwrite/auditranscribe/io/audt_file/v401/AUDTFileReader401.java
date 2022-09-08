@@ -32,6 +32,9 @@ import java.io.InputStream;
 import java.util.logging.Level;
 
 public class AUDTFileReader401 extends AUDTFileReader {
+    // Attributes
+    private String originalFileName;  // To be used as input to the project info data object later
+
     /**
      * Initialization method to make an <code>AUDTFileReader</code> object.
      *
@@ -50,7 +53,7 @@ public class AUDTFileReader401 extends AUDTFileReader {
     }
 
     // Public methods
-    public UnchangingDataPropertiesObject readUnchangingDataProperties() throws FailedToReadDataException {
+    public UnchangingDataPropertiesObject401 readUnchangingDataProperties() throws FailedToReadDataException {
         // Ensure that the unchanging data properties section ID is correct
         int sectionID = readSectionID();
         if (sectionID != UnchangingDataPropertiesObject.SECTION_ID) {
@@ -113,7 +116,7 @@ public class AUDTFileReader401 extends AUDTFileReader {
         byte[] compressedMP3Bytes = readByteArray();
         double sampleRate = readDouble();
         int totalDurationInMS = readInteger();
-        String originalFileName = readString();
+        originalFileName = readString();
 
         // Check if there is an EOS
         if (!checkEOSDelimiter()) {
@@ -124,13 +127,13 @@ public class AUDTFileReader401 extends AUDTFileReader {
         return new AudioDataObject401(compressedMP3Bytes, sampleRate, totalDurationInMS, originalFileName);
     }
 
-    public GUIDataObject readGUIData() throws FailedToReadDataException {
+    public ProjectInfoDataObject readProjectInfoData() throws FailedToReadDataException {
         // Ensure that the GUI data section ID is correct
         int sectionID = readSectionID();
-        if (sectionID != GUIDataObject.SECTION_ID) {
+        if (sectionID != ProjectInfoDataObject.SECTION_ID) {
             throw new FailedToReadDataException(
-                    "Failed to read GUI data; the GUI data section has the incorrect section ID of " + sectionID +
-                            " (expected: " + GUIDataObject.SECTION_ID + ")"
+                    "Failed to read project info data; the project info data section has the incorrect section ID of " +
+                            sectionID + "(expected: " + ProjectInfoDataObject.SECTION_ID + ")"
             );
         }
 
@@ -144,13 +147,15 @@ public class AUDTFileReader401 extends AUDTFileReader {
 
         // Check if there is an EOS
         if (!checkEOSDelimiter()) {
-            throw new FailedToReadDataException("Failed to read GUI data; end of section delimiter missing");
+            throw new FailedToReadDataException("Failed to read project info data; end of section delimiter missing");
         }
 
-        // Create and return a `GUIDataObject`
-        return new GUIDataObject401(
+        // Create and return a `ProjectInfoDataObject`
+        ProjectInfoDataObject401 obj = new ProjectInfoDataObject401(
                 musicKeyIndex, timeSignatureIndex, bpm, offsetSeconds, playbackVolume, currTimeInMS
         );
+        obj.setProjectName(originalFileName);  // Set the superclass' attribute
+        return obj;
     }
 
     public MusicNotesDataObject readMusicNotesData() throws FailedToReadDataException, IOException {

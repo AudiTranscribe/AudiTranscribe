@@ -1,5 +1,5 @@
 /*
- * QTransformDataObject0x00050002.java
+ * QTransformDataObject0x00070001.java
  * Description: Data object that stores the Q-Transform data.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators;
+package site.overwrite.auditranscribe.io.audt_file.v0x00070001.data_encapsulators;
 
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.QTransformDataObject;
 
@@ -26,7 +26,7 @@ import java.util.Objects;
 /**
  * Data object that stores the Q-Transform data.
  */
-public class QTransformDataObject0x00050002 extends QTransformDataObject {
+public class QTransformDataObject0x00070001 extends QTransformDataObject {
     /**
      * Initialization method for the Q-Transform data object.
      *
@@ -34,7 +34,7 @@ public class QTransformDataObject0x00050002 extends QTransformDataObject {
      * @param maxMagnitude    The maximum magnitude of the Q-Transform data.
      * @param minMagnitude    The minimum magnitude of the Q-Transform data.
      */
-    public QTransformDataObject0x00050002(byte[] qTransformBytes, double minMagnitude, double maxMagnitude) {
+    public QTransformDataObject0x00070001(byte[] qTransformBytes, double minMagnitude, double maxMagnitude) {
         // Update attributes
         this.qTransformBytes = qTransformBytes;
         this.minMagnitude = minMagnitude;
@@ -46,7 +46,7 @@ public class QTransformDataObject0x00050002 extends QTransformDataObject {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        QTransformDataObject0x00050002 that = (QTransformDataObject0x00050002) o;
+        QTransformDataObject0x00070001 that = (QTransformDataObject0x00070001) o;
         return (
                 Double.compare(that.minMagnitude, minMagnitude) == 0 &&
                         Double.compare(that.maxMagnitude, maxMagnitude) == 0 &&

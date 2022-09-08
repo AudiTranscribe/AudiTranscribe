@@ -1,6 +1,6 @@
 /*
- * GUIDataObject0X00050002Test.java
- * Description: Test `GUIDataObject0x00050002.java`.
+ * ProjectInfoDataObject0x00070001Test.java
+ * Description: Test `ProjectInfoDataObject0x00050002.java`.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,17 +16,20 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators;
+package site.overwrite.auditranscribe.io.audt_file.v0x00070001.data_encapsulators;
 
 import org.junit.jupiter.api.Test;
-import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.GUIDataObject;
+import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.ProjectInfoDataObject;
 import site.overwrite.auditranscribe.utils.MathUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-class GUIDataObject0X00050002Test {
+class ProjectInfoDataObject0x00070001Test {
     // Attributes
+    String projectName1 = "First Project Name";
+    String projectName2 = "Second Project Name";
+
     int musicKeyIndex1 = 1;
     int musicKeyIndex2 = 23;
 
@@ -48,24 +51,24 @@ class GUIDataObject0X00050002Test {
     // Tests
     @Test
     void numBytesNeeded() {
-        // Define the two GUI data objects to test number of bytes needed
-        GUIDataObject one = new GUIDataObject0x00050002(
-                musicKeyIndex1, timeSignatureIndex1, bpm1, offsetSeconds1, playbackVolume1, currTimeInMS1
+        // Define the two data objects to test number of bytes needed
+        ProjectInfoDataObject one = new ProjectInfoDataObject0x00070001(
+                projectName1, musicKeyIndex1, timeSignatureIndex1, bpm1, offsetSeconds1, playbackVolume1, currTimeInMS1
         );
-        GUIDataObject two = new GUIDataObject0x00050002(
-                musicKeyIndex2, timeSignatureIndex2, bpm2, offsetSeconds2, playbackVolume2, currTimeInMS2
+        ProjectInfoDataObject two = new ProjectInfoDataObject0x00070001(
+                projectName2, musicKeyIndex2, timeSignatureIndex2, bpm2, offsetSeconds2, playbackVolume2, currTimeInMS2
         );
 
         // Tests
-        assertEquals(44, one.numBytesNeeded());
-        assertEquals(44, two.numBytesNeeded());
+        assertEquals(66, one.numBytesNeeded());
+        assertEquals(67, two.numBytesNeeded());
     }
 
     @Test
     void testEquals() {
         // Define temporary data object for testing the initial checks
-        GUIDataObject temp = new GUIDataObject0x00050002(
-                musicKeyIndex1, timeSignatureIndex1, bpm1, offsetSeconds1, playbackVolume1, currTimeInMS1
+        ProjectInfoDataObject temp = new ProjectInfoDataObject0x00070001(
+                projectName1, musicKeyIndex1, timeSignatureIndex1, bpm1, offsetSeconds1, playbackVolume1, currTimeInMS1
         );
 
         // Define other objects to test comparison
@@ -78,6 +81,7 @@ class GUIDataObject0X00050002Test {
         assertNotEquals(temp, otherTypedVar);  // Not redundant to test the equality method
 
         // Define arrays to pick the data attributes from
+        String[] projectNames = {projectName1, projectName2};
         int[] musicKeyIndices = {musicKeyIndex1, musicKeyIndex2};
         int[] timeSignatureIndices = {timeSignatureIndex1, timeSignatureIndex2};
         double[] bpms = {bpm1, bpm2};
@@ -86,25 +90,27 @@ class GUIDataObject0X00050002Test {
         int[] currTimeInMSs = {currTimeInMS1, currTimeInMS2};
 
         // Generate product of indices
-        int[][] indexProduct = MathUtils.selfProduct(2, 6);  // 6 data attributes
+        int[][] indexProduct = MathUtils.selfProduct(2, 7);  // 7 data attributes
         for (int[] indices1 : indexProduct) {
-            GUIDataObject one = new GUIDataObject0x00050002(
-                    musicKeyIndices[indices1[0]],
-                    timeSignatureIndices[indices1[1]],
-                    bpms[indices1[2]],
-                    offsetSeconds[indices1[3]],
-                    playbackVolumes[indices1[4]],
-                    currTimeInMSs[indices1[5]]
+            ProjectInfoDataObject one = new ProjectInfoDataObject0x00070001(
+                    projectNames[indices1[0]],
+                    musicKeyIndices[indices1[1]],
+                    timeSignatureIndices[indices1[2]],
+                    bpms[indices1[3]],
+                    offsetSeconds[indices1[4]],
+                    playbackVolumes[indices1[5]],
+                    currTimeInMSs[indices1[6]]
             );
 
             for (int[] indices2 : indexProduct) {
-                GUIDataObject two = new GUIDataObject0x00050002(
-                        musicKeyIndices[indices2[0]],
-                        timeSignatureIndices[indices2[1]],
-                        bpms[indices2[2]],
-                        offsetSeconds[indices2[3]],
-                        playbackVolumes[indices2[4]],
-                        currTimeInMSs[indices2[5]]
+                ProjectInfoDataObject two = new ProjectInfoDataObject0x00070001(
+                        projectNames[indices2[0]],
+                        musicKeyIndices[indices2[1]],
+                        timeSignatureIndices[indices2[2]],
+                        bpms[indices2[3]],
+                        offsetSeconds[indices2[4]],
+                        playbackVolumes[indices2[5]],
+                        currTimeInMSs[indices2[6]]
                 );
 
                 // Check equality
@@ -121,16 +127,16 @@ class GUIDataObject0X00050002Test {
 
     @Test
     void testHashCode() {
-        // Define the two GUI data objects to test hash code
-        GUIDataObject one = new GUIDataObject0x00050002(
-                musicKeyIndex1, timeSignatureIndex1, bpm1, offsetSeconds1, playbackVolume1, currTimeInMS1
+        // Define the two data objects to test hash code
+        ProjectInfoDataObject one = new ProjectInfoDataObject0x00070001(
+                projectName1, musicKeyIndex1, timeSignatureIndex1, bpm1, offsetSeconds1, playbackVolume1, currTimeInMS1
         );
-        GUIDataObject two = new GUIDataObject0x00050002(
-                musicKeyIndex2, timeSignatureIndex2, bpm2, offsetSeconds2, playbackVolume2, currTimeInMS2
+        ProjectInfoDataObject two = new ProjectInfoDataObject0x00070001(
+                projectName2, musicKeyIndex2, timeSignatureIndex2, bpm2, offsetSeconds2, playbackVolume2, currTimeInMS2
         );
 
         // Tests
-        assertEquals(184433900, one.hashCode());
-        assertEquals(668235807, two.hashCode());
+        assertEquals(1413278732, one.hashCode());
+        assertEquals(-954764613, two.hashCode());
     }
 }

@@ -1,7 +1,7 @@
 /*
- * AUDTFileWriter0x00050002.java
+ * AUDTFileWriter0x00070001.java
  * Description: Class that handles the writing of the AudiTranscribe (AUDT) file for file version
- *              0x00050002.
+ *              0x00070001.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -17,38 +17,38 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.io.audt_file.v0x00050002;
+package site.overwrite.auditranscribe.io.audt_file.v0x00070001;
 
 import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileWriter;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.*;
+import site.overwrite.auditranscribe.io.audt_file.v0x00070001.data_encapsulators.*;
 import site.overwrite.auditranscribe.misc.MyLogger;
 
 import java.io.IOException;
 import java.util.logging.Level;
 
-public class AUDTFileWriter0x00050002 extends AUDTFileWriter {
+public class AUDTFileWriter0x00070001 extends AUDTFileWriter {
     /**
-     * Initialization method to make an <code>AUDTFileWriter0x00050002</code> object.
+     * Initialization method to make an <code>AUDTFileWriter0x00070001</code> object.
      *
      * @param filepath       Path to the AUDT file. The file name at the end of the file path should
      *                       <b>include</b> the extension of the AUDT file.
      * @param numBytesToSkip Number of bytes to skip at the beginning of the file.
      */
-    public AUDTFileWriter0x00050002(String filepath, int numBytesToSkip) {
-        super(0x00050002, filepath, numBytesToSkip);
-        MyLogger.log(Level.INFO, "Using Version 0x00050002 AUDT file writer", AUDTFileWriter.class.getName());
+    public AUDTFileWriter0x00070001(String filepath, int numBytesToSkip) {
+        super(0x00070001, filepath, numBytesToSkip);
+        MyLogger.log(Level.INFO, "Using Version 0x00070001 AUDT file writer", AUDTFileWriter.class.getName());
     }
 
     /**
-     * Initialization method to make an <code>AUDTFileWriter0x00050002</code> object.
+     * Initialization method to make an <code>AUDTFileWriter0x00070001</code> object.
      *
      * @param filepath Path to the AUDT file. The file name at the end of the file path should
      *                 <b>include</b> the extension of the AUDT file.
      */
-    public AUDTFileWriter0x00050002(String filepath) {
-        super(0x00050002, filepath);
-        MyLogger.log(Level.INFO, "Using Version 0x00050002 AUDT file writer", AUDTFileWriter.class.getName());
+    public AUDTFileWriter0x00070001(String filepath) {
+        super(0x00070001, filepath);
+        MyLogger.log(Level.INFO, "Using Version 0x00070001 AUDT file writer", AUDTFileWriter.class.getName());
     }
 
     // Public methods
@@ -60,10 +60,10 @@ public class AUDTFileWriter0x00050002 extends AUDTFileWriter {
      */
     public void writeUnchangingDataProperties(UnchangingDataPropertiesObject object) {
         // Cast to the correct version of the object
-        UnchangingDataPropertiesObject0x00050002 obj = (UnchangingDataPropertiesObject0x00050002) object;
+        UnchangingDataPropertiesObject0x00070001 obj = (UnchangingDataPropertiesObject0x00070001) object;
 
         // Write to file
-        writeSectionID(UnchangingDataPropertiesObject0x00050002.SECTION_ID);
+        writeSectionID(UnchangingDataPropertiesObject0x00070001.SECTION_ID);
         writeInteger(obj.numSkippableBytes);
         writeEOSDelimiter();
     }
@@ -75,10 +75,10 @@ public class AUDTFileWriter0x00050002 extends AUDTFileWriter {
      */
     public void writeQTransformData(QTransformDataObject object) {
         // Cast to the correct version of the object
-        QTransformDataObject0x00050002 obj = (QTransformDataObject0x00050002) object;
+        QTransformDataObject0x00070001 obj = (QTransformDataObject0x00070001) object;
 
         // Write to file
-        writeSectionID(QTransformDataObject0x00050002.SECTION_ID);
+        writeSectionID(QTransformDataObject0x00070001.SECTION_ID);
         writeDouble(obj.minMagnitude);
         writeDouble(obj.maxMagnitude);
         writeByteArray(obj.qTransformBytes);
@@ -92,14 +92,13 @@ public class AUDTFileWriter0x00050002 extends AUDTFileWriter {
      */
     public void writeAudioData(AudioDataObject object) {
         // Cast to the correct version of the object
-        AudioDataObject0x00050002 obj = (AudioDataObject0x00050002) object;
+        AudioDataObject0x00070001 obj = (AudioDataObject0x00070001) object;
 
         // Write to file
-        writeSectionID(AudioDataObject0x00050002.SECTION_ID);
+        writeSectionID(AudioDataObject0x00070001.SECTION_ID);
         writeByteArray(obj.compressedMP3Bytes);
         writeDouble(obj.sampleRate);
         writeInteger(obj.totalDurationInMS);
-        writeString(obj.getAudioFileName());
         writeEOSDelimiter();
     }
 
@@ -110,10 +109,11 @@ public class AUDTFileWriter0x00050002 extends AUDTFileWriter {
      */
     public void writeProjectInfoData(ProjectInfoDataObject object) {
         // Cast to the correct version of the object
-        ProjectInfoDataObject0x00050002 obj = (ProjectInfoDataObject0x00050002) object;
+        ProjectInfoDataObject0x00070001 obj = (ProjectInfoDataObject0x00070001) object;
 
         // Write to file
-        writeSectionID(ProjectInfoDataObject0x00050002.SECTION_ID);
+        writeSectionID(ProjectInfoDataObject0x00070001.SECTION_ID);
+        writeString(obj.projectName);
         writeInteger(obj.musicKeyIndex);
         writeInteger(obj.timeSignatureIndex);
         writeDouble(obj.bpm);
@@ -131,10 +131,10 @@ public class AUDTFileWriter0x00050002 extends AUDTFileWriter {
      */
     public void writeMusicNotesData(MusicNotesDataObject object) throws IOException {
         // Cast to the correct version of the object
-        MusicNotesDataObject0x00050002 obj = (MusicNotesDataObject0x00050002) object;
+        MusicNotesDataObject0x00070001 obj = (MusicNotesDataObject0x00070001) object;
 
         // Write to file
-        writeSectionID(MusicNotesDataObject0x00050002.SECTION_ID);
+        writeSectionID(MusicNotesDataObject0x00070001.SECTION_ID);
         write1DDoubleArray(obj.timesToPlaceRectangles);
         write1DDoubleArray(obj.noteDurations);
         write1DIntegerArray(obj.noteNums);
