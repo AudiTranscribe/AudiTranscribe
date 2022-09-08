@@ -293,18 +293,18 @@ public class TranscriptionViewController implements Initializable {
         for (String timeSignature : MusicUtils.TIME_SIGNATURES) timeSignatureChoice.getItems().add(timeSignature);
 
         // Set methods on spinners
-        bpmSpinner.valueProperty().addListener((observable, oldValue, newValue) -> updateBPMValue(newValue));
-        offsetSpinner.valueProperty().addListener(((observable, oldValue, newValue) -> updateOffsetValue(newValue)));
+        bpmSpinner.valueProperty().addListener((observable, oldValue, newValue) -> updateBPMValue(newValue, false));
+        offsetSpinner.valueProperty().addListener(((observable, oldValue, newValue) -> updateOffsetValue(newValue, false)));
 
         bpmSpinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue) {  // Lost focus
-                updateBPMValue(bpmSpinner.getValue());
+                updateBPMValue(bpmSpinner.getValue(), false);
             }
         });
 
         offsetSpinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue) {  // Lost focus
-                updateOffsetValue(offsetSpinner.getValue());
+                updateOffsetValue(offsetSpinner.getValue(), false);
             }
         });
 
@@ -1048,7 +1048,7 @@ public class TranscriptionViewController implements Initializable {
         }
     }
 
-    // Private methods
+    // Main methods
 
     /**
      * Helper method that seeks to the specified time.
@@ -1104,6 +1104,82 @@ public class TranscriptionViewController implements Initializable {
 
         MyLogger.log(Level.FINE, "Seeked to " + seekTime + " seconds", this.getClass().toString());
     }
+
+    /**
+     * Helper method that toggles the paused state.
+     *
+     * @param isPaused Old paused state.
+     * @return New paused state.
+     */
+    private boolean togglePaused(boolean isPaused) {
+        if (isPaused) {  // Is currently paused; want to make audio play
+            // Change the icon of the play button from the play icon to the paused icon
+            // (So that the user knows that the next interaction with button will pause audio)
+            playButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                    "images/icons/PNGs/" + theme.shortName + "/pause.png"
+            )));
+
+            // Unpause the audio (i.e. play the audio)
+            audio.play();
+        } else {  // Is currently playing; want to make audio pause
+            // Change the icon of the play button from the paused icon to the play icon
+            // (So that the user knows that the next interaction with button will play audio)
+            playButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
+                    "images/icons/PNGs/" + theme.shortName + "/play.png"
+            )));
+
+            // Pause the audio
+            try {
+                audio.pause();
+            } catch (InvalidObjectException e) {
+                MyLogger.logException(e);
+                throw new RuntimeException(e);
+            }
+
+            // Stop note sequencer playback
+            notePlayerSequencer.stop();
+        }
+
+        // Toggle paused state for note rectangles
+        NoteRectangle.setIsPaused(!isPaused);
+
+        // Return the toggled version of the `isPaused` flag
+        MyLogger.log(
+                Level.FINE,
+                "Toggled pause state; now is " + (!isPaused ? "paused" : "playing"),
+                this.getClass().toString());
+        return !isPaused;
+    }
+
+    /**
+     * Helper method that sets up the note player sequencer by setting the notes on it.
+     */
+    private void setupNotePlayerSequencer() {
+        // Get number of note rectangles
+        int numNoteRects = NoteRectangle.allNoteRectangles.size();
+
+        // Get the note onset times, note durations, and note numbers from the note rectangles
+        double[] noteOnsetTimes = new double[numNoteRects];
+        double[] noteDurations = new double[numNoteRects];
+        int[] noteNums = new int[numNoteRects];
+
+        for (int i = 0; i < numNoteRects; i++) {
+            noteOnsetTimes[i] = NoteRectangle.allNoteRectangles.get(i).getNoteOnsetTime();
+            noteDurations[i] = NoteRectangle.allNoteRectangles.get(i).getNoteDuration();
+            noteNums[i] = NoteRectangle.allNoteRectangles.get(i).noteNum;
+        }
+
+        // Setup note player sequencer
+        notePlayerSequencer.setOnVelocity(notesVolume);
+        notePlayerSequencer.setOffVelocity(NOTE_OFF_VELOCITY);
+        notePlayerSequencer.setBPM(bpm);
+        notePlayerSequencer.setInstrument(NOTE_INSTRUMENT);
+
+        // Set notes
+        notePlayerSequencer.setNotesOnTrack(noteOnsetTimes, noteDurations, noteNums);  // Will clear existing notes
+    }
+
+    // IO methods
 
     /**
      * Helper method that helps open a new project.
@@ -1305,50 +1381,93 @@ public class TranscriptionViewController implements Initializable {
     }
 
     /**
-     * Helper method that toggles the paused state.
+     * Helper method that helps save the data into an AUDT file.
      *
-     * @param isPaused Old paused state.
-     * @return New paused state.
+     * @param forceChooseFile Whether the file was forcibly chosen.
+     * @param saveDest        The destination to save the file to.
+     * @param task            The <code>CustomTask</code> object that will handle the saving of the
+     *                        file.
+     * @throws FFmpegNotFoundException If the FFmpeg binary could not be found.
+     * @throws IOException             If the saving to the AUDT file failed.
      */
-    private boolean togglePaused(boolean isPaused) {
-        if (isPaused) {  // Is currently paused; want to make audio play
-            // Change the icon of the play button from the play icon to the paused icon
-            // (So that the user knows that the next interaction with button will pause audio)
-            playButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                    "images/icons/PNGs/" + theme.shortName + "/pause.png"
-            )));
-
-            // Unpause the audio (i.e. play the audio)
-            audio.play();
-        } else {  // Is currently playing; want to make audio pause
-            // Change the icon of the play button from the paused icon to the play icon
-            // (So that the user knows that the next interaction with button will play audio)
-            playButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                    "images/icons/PNGs/" + theme.shortName + "/play.png"
-            )));
-
-            // Pause the audio
+    private void saveData(
+            boolean forceChooseFile, String saveDest, CustomTask<?> task
+    ) throws FFmpegNotFoundException, IOException {
+        // Compress the raw MP3 bytes
+        if (compressedMP3Bytes == null) {
             try {
-                audio.pause();
-            } catch (InvalidObjectException e) {
+                compressedMP3Bytes = CompressionHandlers.lz4Compress(
+                        audio.wavBytesToMP3Bytes(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath),
+                        task
+                );
+            } catch (IOException e) {
                 MyLogger.logException(e);
                 throw new RuntimeException(e);
             }
-
-            // Stop note sequencer playback
-            notePlayerSequencer.stop();
         }
 
-        // Toggle paused state for note rectangles
-        NoteRectangle.setIsPaused(!isPaused);
+        // Get data from the note rectangles
+        int numRectangles = NoteRectangle.allNoteRectangles.size();
+        double[] timesToPlaceRectangles = new double[numRectangles];
+        double[] noteDurations = new double[numRectangles];
+        int[] noteNums = new int[numRectangles];
 
-        // Return the toggled version of the `isPaused` flag
-        MyLogger.log(
-                Level.FINE,
-                "Toggled pause state; now is " + (!isPaused ? "paused" : "playing"),
-                this.getClass().toString());
-        return !isPaused;
+        for (int i = 0; i < numRectangles; i++) {
+            NoteRectangle noteRectangle = NoteRectangle.allNoteRectangles.get(i);
+            timesToPlaceRectangles[i] = noteRectangle.getNoteOnsetTime();
+            noteDurations[i] = noteRectangle.getNoteDuration();
+            noteNums[i] = noteRectangle.noteNum;
+        }
+
+        // Package data for saving
+        // (Note: current file version is 0x00070001, so all data objects used will be for that version)
+        MyLogger.log(Level.INFO, "Packaging data for saving", this.getClass().toString());
+        QTransformDataObject qTransformData = new QTransformDataObject0x00070001(
+                qTransformBytes, minQTransformMagnitude, maxQTransformMagnitude
+        );
+        AudioDataObject audioData = new AudioDataObject0x00070001(
+                compressedMP3Bytes, sampleRate, (int) (audioDuration * 1000)
+        );
+        ProjectInfoDataObject projectInfoData = new ProjectInfoDataObject0x00070001(
+                projectName, musicKeyIndex, timeSignatureIndex, bpm, offset, audioVolume,
+                (int) (currTime * 1000)
+        );
+        MusicNotesDataObject musicNotesData = new MusicNotesDataObject0x00070001(
+                timesToPlaceRectangles, noteDurations, noteNums
+        );
+
+        // Determine what mode of the writer should be used
+        if (numSkippableBytes == 0 || forceChooseFile || fileVersion != AUDTFileConstants.FILE_VERSION_NUMBER) {
+            // Calculate the number of skippable bytes
+            numSkippableBytes = 32 +  // Header section
+                    UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
+                    qTransformData.numBytesNeeded() +
+                    audioData.numBytesNeeded();
+
+            // Update the unchanging data properties
+            UnchangingDataPropertiesObject unchangingDataProperties = new UnchangingDataPropertiesObject0x00070001(
+                    numSkippableBytes
+            );
+
+            // Package all the current data into a `ProjectData`
+            ProjectData projectData = new ProjectData(
+                    unchangingDataProperties, qTransformData, audioData, projectInfoData, musicNotesData
+            );
+
+            // Save the project
+            ProjectIOHandlers.saveProject(saveDest, projectData);
+
+        } else {
+            ProjectIOHandlers.saveProject(saveDest, numSkippableBytes, projectInfoData, musicNotesData);
+        }
+
+        // Set the `hasUnsavedChanges` flag to false
+        hasUnsavedChanges = false;
+
+        MyLogger.log(Level.INFO, "File saved", this.getClass().toString());
     }
+
+    // Updaters
 
     /**
      * Helper method that helps update the needed things when the BPM value is to be updated.
@@ -1393,15 +1512,6 @@ public class TranscriptionViewController implements Initializable {
             MyLogger.log(Level.FINE, "Force update BPM value to " + newBPM, this.getClass().toString());
         }
         bpm = newBPM;
-    }
-
-    /**
-     * Helper method that helps update the needed things when the BPM value is to be updated.
-     *
-     * @param newBPM New BPM value.
-     */
-    private void updateBPMValue(double newBPM) {
-        updateBPMValue(newBPM, false);
     }
 
     /**
@@ -1450,15 +1560,6 @@ public class TranscriptionViewController implements Initializable {
     }
 
     /**
-     * Helper method that helps update the needed things when the offset value is to be updated.
-     *
-     * @param newOffset New offset value.
-     */
-    private void updateOffsetValue(double newOffset) {
-        updateOffsetValue(newOffset, false);
-    }
-
-    /**
      * Method that sets the volume slider's CSS.
      *
      * @param volumeSlider Volume slider that needs updating.
@@ -1477,7 +1578,9 @@ public class TranscriptionViewController implements Initializable {
         StackPane track = (StackPane) volumeSlider.lookup(".track");
         if (track != null) track.setStyle(style);
     }
-    
+
+    // Task handlers
+
     /**
      * Helper method that starts the spectrogram generation task.
      *
@@ -1693,7 +1796,7 @@ public class TranscriptionViewController implements Initializable {
         // Set task completion listener
         task.setOnSucceeded(event -> {
             // Update the BPM value
-            updateBPMValue(MathUtils.round(task.getValue(), 1));
+            updateBPMValue(MathUtils.round(task.getValue(), 1), false);
 
             // Update BPM spinner initial value
             bpmSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
@@ -1894,33 +1997,7 @@ public class TranscriptionViewController implements Initializable {
         }
     }
 
-    /**
-     * Helper method that sets up the note player sequencer by setting the notes on it.
-     */
-    private void setupNotePlayerSequencer() {
-        // Get number of note rectangles
-        int numNoteRects = NoteRectangle.allNoteRectangles.size();
-
-        // Get the note onset times, note durations, and note numbers from the note rectangles
-        double[] noteOnsetTimes = new double[numNoteRects];
-        double[] noteDurations = new double[numNoteRects];
-        int[] noteNums = new int[numNoteRects];
-
-        for (int i = 0; i < numNoteRects; i++) {
-            noteOnsetTimes[i] = NoteRectangle.allNoteRectangles.get(i).getNoteOnsetTime();
-            noteDurations[i] = NoteRectangle.allNoteRectangles.get(i).getNoteDuration();
-            noteNums[i] = NoteRectangle.allNoteRectangles.get(i).noteNum;
-        }
-
-        // Setup note player sequencer
-        notePlayerSequencer.setOnVelocity(notesVolume);
-        notePlayerSequencer.setOffVelocity(NOTE_OFF_VELOCITY);
-        notePlayerSequencer.setBPM(bpm);
-        notePlayerSequencer.setInstrument(NOTE_INSTRUMENT);
-
-        // Set notes
-        notePlayerSequencer.setNotesOnTrack(noteOnsetTimes, noteDurations, noteNums);  // Will clear existing notes
-    }
+    // Button handlers
 
     /**
      * Helper method that toggles the play button.
@@ -2087,6 +2164,8 @@ public class TranscriptionViewController implements Initializable {
         );
     }
 
+    // Keyboard event handlers
+
     /**
      * Helper method that handles a keyboard key press event.
      *
@@ -2215,92 +2294,7 @@ public class TranscriptionViewController implements Initializable {
         }
     }
 
-    /**
-     * Helper method that helps save the data into an AUDT file.
-     *
-     * @param forceChooseFile Whether the file was forcibly chosen.
-     * @param saveDest        The destination to save the file to.
-     * @param task            The <code>CustomTask</code> object that will handle the saving of the
-     *                        file.
-     * @throws FFmpegNotFoundException If the FFmpeg binary could not be found.
-     * @throws IOException             If the saving to the AUDT file failed.
-     */
-    private void saveData(
-            boolean forceChooseFile, String saveDest, CustomTask<?> task
-    ) throws FFmpegNotFoundException, IOException {
-        // Compress the raw MP3 bytes
-        if (compressedMP3Bytes == null) {
-            try {
-                compressedMP3Bytes = CompressionHandlers.lz4Compress(
-                        audio.wavBytesToMP3Bytes(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath),
-                        task
-                );
-            } catch (IOException e) {
-                MyLogger.logException(e);
-                throw new RuntimeException(e);
-            }
-        }
-
-        // Get data from the note rectangles
-        int numRectangles = NoteRectangle.allNoteRectangles.size();
-        double[] timesToPlaceRectangles = new double[numRectangles];
-        double[] noteDurations = new double[numRectangles];
-        int[] noteNums = new int[numRectangles];
-
-        for (int i = 0; i < numRectangles; i++) {
-            NoteRectangle noteRectangle = NoteRectangle.allNoteRectangles.get(i);
-            timesToPlaceRectangles[i] = noteRectangle.getNoteOnsetTime();
-            noteDurations[i] = noteRectangle.getNoteDuration();
-            noteNums[i] = noteRectangle.noteNum;
-        }
-
-        // Package data for saving
-        // (Note: current file version is 0x00070001, so all data objects used will be for that version)
-        MyLogger.log(Level.INFO, "Packaging data for saving", this.getClass().toString());
-        QTransformDataObject qTransformData = new QTransformDataObject0x00070001(
-                qTransformBytes, minQTransformMagnitude, maxQTransformMagnitude
-        );
-        AudioDataObject audioData = new AudioDataObject0x00070001(
-                compressedMP3Bytes, sampleRate, (int) (audioDuration * 1000)
-        );
-        ProjectInfoDataObject projectInfoData = new ProjectInfoDataObject0x00070001(
-                projectName, musicKeyIndex, timeSignatureIndex, bpm, offset, audioVolume,
-                (int) (currTime * 1000)
-        );
-        MusicNotesDataObject musicNotesData = new MusicNotesDataObject0x00070001(
-                timesToPlaceRectangles, noteDurations, noteNums
-        );
-
-        // Determine what mode of the writer should be used
-        if (numSkippableBytes == 0 || forceChooseFile || fileVersion != AUDTFileConstants.FILE_VERSION_NUMBER) {
-            // Calculate the number of skippable bytes
-            numSkippableBytes = 32 +  // Header section
-                    UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
-                    qTransformData.numBytesNeeded() +
-                    audioData.numBytesNeeded();
-
-            // Update the unchanging data properties
-            UnchangingDataPropertiesObject unchangingDataProperties = new UnchangingDataPropertiesObject0x00070001(
-                    numSkippableBytes
-            );
-
-            // Package all the current data into a `ProjectData`
-            ProjectData projectData = new ProjectData(
-                    unchangingDataProperties, qTransformData, audioData, projectInfoData, musicNotesData
-            );
-
-            // Save the project
-            ProjectIOHandlers.saveProject(saveDest, projectData);
-
-        } else {
-            ProjectIOHandlers.saveProject(saveDest, numSkippableBytes, projectInfoData, musicNotesData);
-        }
-
-        // Set the `hasUnsavedChanges` flag to false
-        hasUnsavedChanges = false;
-
-        MyLogger.log(Level.INFO, "File saved", this.getClass().toString());
-    }
+    // Miscellaneous methods
 
     /**
      * Helper method that gets the save destination.
@@ -2351,6 +2345,12 @@ public class TranscriptionViewController implements Initializable {
         return saveDest;
     }
 
+    /**
+     * Helper method that sets the visibility of the progress bar.<br>
+     * If the progress bar is invisible, then the memory use statistics will be shown.
+     *
+     * @param isVisible Whether the progress bar is visible or not.
+     */
     private void setProgressBarHBoxVisibility(boolean isVisible) {
         if (isVisible) {
             // Show the progress bar section
