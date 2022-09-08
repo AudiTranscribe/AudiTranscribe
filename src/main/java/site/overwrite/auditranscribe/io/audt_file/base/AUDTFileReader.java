@@ -25,8 +25,9 @@ import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import site.overwrite.auditranscribe.exceptions.io.audt_file.FailedToReadDataException;
 import site.overwrite.auditranscribe.exceptions.io.audt_file.IncorrectFileFormatException;
-import site.overwrite.auditranscribe.io.audt_file.v401.AUDTFileReader401;
 import site.overwrite.auditranscribe.io.audt_file.v0x00050002.AUDTFileReader0x00050002;
+import site.overwrite.auditranscribe.io.audt_file.v0x00070001.AUDTFileReader0x00070001;
+import site.overwrite.auditranscribe.io.audt_file.v401.AUDTFileReader401;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -112,6 +113,7 @@ public abstract class AUDTFileReader {
             return switch (fileVersion) {
                 case 401 -> new AUDTFileReader401(filepath, inputStream);  // Todo: eventually depreciate this
                 case 0x00050002 -> new AUDTFileReader0x00050002(filepath, inputStream);
+                case 0x00070001 -> new AUDTFileReader0x00070001(filepath, inputStream);
                 default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
             };
         }

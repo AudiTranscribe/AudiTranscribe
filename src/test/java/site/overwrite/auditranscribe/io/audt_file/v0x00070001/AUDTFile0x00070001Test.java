@@ -1,6 +1,6 @@
 /*
- * AUDTFile401Test.java
- * Description: Test AUDT file reading and writing for file version 401.
+ * AUDTFile0x00050002Test.java
+ * Description: Test AUDT file reading and writing for file version 0x00050002.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.io.audt_file.v401;
+package site.overwrite.auditranscribe.io.audt_file.v0x00070001;
 
 import org.javatuples.Triplet;
 import org.junit.jupiter.api.*;
@@ -26,11 +26,11 @@ import site.overwrite.auditranscribe.exceptions.io.audt_file.InvalidFileVersionE
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.io.audt_file.ProjectData;
 import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileReader;
 import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileWriter;
-import site.overwrite.auditranscribe.io.audt_file.ProjectData;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import site.overwrite.auditranscribe.io.audt_file.v401.data_encapsulators.*;
+import site.overwrite.auditranscribe.io.audt_file.v0x00070001.data_encapsulators.*;
 import site.overwrite.auditranscribe.utils.TypeConversionUtils;
 
 import java.io.IOException;
@@ -42,11 +42,11 @@ import java.nio.file.Paths;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class AUDTFile401Test {
+class AUDTFile0x00070001Test {
     // Define the file path
     static final String FILE_PATH = IOMethods.joinPaths(
             IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-            "testing-files", "misc", "test-AUDTFile401Test.audt"
+            "testing-files", "misc", "test-AUDTFile0x00070001Test.audt"
     );
 
     // Define helper attributes
@@ -76,7 +76,7 @@ class AUDTFile401Test {
     ProjectData projectData2;
 
     // Initialization method
-    AUDTFile401Test() throws IOException {
+    AUDTFile0x00070001Test() throws IOException {
         // Define sample array data
         // (These are example arrays, not actual data)
         qTransformMagnitudes = new double[][]{
@@ -101,30 +101,30 @@ class AUDTFile401Test {
         double maxMagnitude = conversionTuple.getValue2();
 
         // Define data to be used within the tests
-        qTransformDataObject = new QTransformDataObject401(
+        qTransformDataObject = new QTransformDataObject0x00070001(
                 qTransformBytes, minMagnitude, maxMagnitude
         );
-        audioDataObject = new AudioDataObject401(
+        audioDataObject = new AudioDataObject0x00070001(
                 CompressionHandlers.lz4Compress(Files.readAllBytes(Paths.get(
                         IOMethods.getAbsoluteFilePath("testing-files/audio/A440.mp3")
                 ))),
-                44100, 120000, "A440.wav");
+                44100, 120000);
 
-        projectInfoDataObject1 = new ProjectInfoDataObject401(
-                11, 9, 123.45, 0.01, 0.55, 9000
+        projectInfoDataObject1 = new ProjectInfoDataObject0x00070001(
+                "A440-1", 11, 9, 123.45, 0.01, 0.55, 9000
         );
-        projectInfoDataObject2 = new ProjectInfoDataObject401(
-                15, 14, 67.89, -1.23, 0.124, 2048
+        projectInfoDataObject2 = new ProjectInfoDataObject0x00070001(
+                "A440-2", 15, 14, 67.89, -1.23, 0.124, 2048
         );
 
-        musicNotesDataObject1 = new MusicNotesDataObject401(
+        musicNotesDataObject1 = new MusicNotesDataObject0x00070001(
                 timesToPlaceRectangles1, noteDurations1, noteNums1
         );
-        musicNotesDataObject2 = new MusicNotesDataObject401(
+        musicNotesDataObject2 = new MusicNotesDataObject0x00070001(
                 timesToPlaceRectangles2, noteDurations2, noteNums2
         );
 
-        unchangingDataPropertiesObject = new UnchangingDataPropertiesObject401(
+        unchangingDataPropertiesObject = new UnchangingDataPropertiesObject0x00070001(
                 32 +  // Header section
                         UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
                         qTransformDataObject.numBytesNeeded() +
@@ -147,7 +147,7 @@ class AUDTFile401Test {
     @Order(1)
     void fileWriterTestInitialWrite() throws IOException, InvalidFileVersionException {
         // Create a filewriter object
-        AUDTFileWriter fileWriter = AUDTFileWriter.getWriter(401, FILE_PATH);
+        AUDTFileWriter fileWriter = AUDTFileWriter.getWriter(0x00070001, FILE_PATH);
 
         // Test writing some data
         fileWriter.writeUnchangingDataProperties(unchangingDataPropertiesObject);
@@ -239,7 +239,7 @@ class AUDTFile401Test {
     @Order(3)
     void fileWriterTestInitialWriteAlt() throws IOException, InvalidFileVersionException {
         // Create a filewriter object
-        AUDTFileWriter fileWriter = AUDTFileWriter.getWriter(401, FILE_PATH, 0);
+        AUDTFileWriter fileWriter = AUDTFileWriter.getWriter(0x00070001, FILE_PATH, 0);
 
         // Test writing some data
         fileWriter.writeUnchangingDataProperties(unchangingDataPropertiesObject);
@@ -298,7 +298,7 @@ class AUDTFile401Test {
     void fileWriterTestTwo() throws IOException, InvalidFileVersionException {
         // Create a filewriter object
         AUDTFileWriter fileWriter = AUDTFileWriter.getWriter(
-                401, FILE_PATH, unchangingDataPropertiesObject.numSkippableBytes
+                0x00070001, FILE_PATH, unchangingDataPropertiesObject.numSkippableBytes
         );
 
         // Test writing only the GUI and music notes data
@@ -355,7 +355,7 @@ class AUDTFile401Test {
         // Define files' folder
         String folder = IOMethods.joinPaths(
                 IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-                "testing-files", "audt-test-files", "v401"
+                "testing-files", "audt-test-files", "v0x00070001"
         );
 
         // Perform tests

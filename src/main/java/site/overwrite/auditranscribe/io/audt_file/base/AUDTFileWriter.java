@@ -25,6 +25,7 @@ import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileHelpers;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.audt_file.v0x00050002.AUDTFileWriter0x00050002;
+import site.overwrite.auditranscribe.io.audt_file.v0x00070001.AUDTFileWriter0x00070001;
 import site.overwrite.auditranscribe.io.audt_file.v401.AUDTFileWriter401;
 
 import java.io.File;
@@ -89,6 +90,7 @@ public abstract class AUDTFileWriter {
         return switch (fileVersion) {
             case 401 -> new AUDTFileWriter401(filepath);  // Todo: eventually depreciate this
             case 0x00050002 -> new AUDTFileWriter0x00050002(filepath);
+            case 0x00070001 -> new AUDTFileWriter0x00070001(filepath);
             default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
         };
     }
@@ -107,6 +109,7 @@ public abstract class AUDTFileWriter {
         return switch (fileVersion) {
             case 401 -> new AUDTFileWriter401(filepath, numBytesToSkip);  // Todo: eventually depreciate this
             case 0x00050002 -> new AUDTFileWriter0x00050002(filepath, numBytesToSkip);
+            case 0x00070001 -> new AUDTFileWriter0x00070001(filepath, numBytesToSkip);
             default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
         };
     }
@@ -176,7 +179,7 @@ public abstract class AUDTFileWriter {
      *
      * @param projectInfoDataObj Data object that holds all the project info data.
      */
-    public abstract void writeGUIData(ProjectInfoDataObject projectInfoDataObj);
+    public abstract void writeProjectInfoData(ProjectInfoDataObject projectInfoDataObj);
 
     /**
      * Method that writes the music notes data to file.

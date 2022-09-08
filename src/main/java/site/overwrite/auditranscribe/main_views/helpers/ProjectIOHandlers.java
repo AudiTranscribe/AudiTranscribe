@@ -58,7 +58,7 @@ public final class ProjectIOHandlers {
             );
 
             // Write data to the file
-            fileWriter.writeGUIData(guiData);
+            fileWriter.writeProjectInfoData(guiData);
             fileWriter.writeMusicNotesData(musicNotesData);
 
             fileWriter.writeBytesToFile();
@@ -82,7 +82,7 @@ public final class ProjectIOHandlers {
             fileWriter.writeUnchangingDataProperties(projectData.unchangingDataProperties);
             fileWriter.writeQTransformData(projectData.qTransformData);
             fileWriter.writeAudioData(projectData.audioData);
-            fileWriter.writeGUIData(projectData.guiData);
+            fileWriter.writeProjectInfoData(projectData.guiData);
             fileWriter.writeMusicNotesData(projectData.musicNotesData);
 
             fileWriter.writeBytesToFile();

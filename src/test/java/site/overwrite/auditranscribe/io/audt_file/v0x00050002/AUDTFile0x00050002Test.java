@@ -153,7 +153,7 @@ class AUDTFile0x00050002Test {
         fileWriter.writeUnchangingDataProperties(unchangingDataPropertiesObject);
         fileWriter.writeQTransformData(qTransformDataObject);
         fileWriter.writeAudioData(audioDataObject);
-        fileWriter.writeGUIData(projectInfoDataObject1);
+        fileWriter.writeProjectInfoData(projectInfoDataObject1);
         fileWriter.writeMusicNotesData(musicNotesDataObject1);
 
         // Write the bytes to file
@@ -245,7 +245,7 @@ class AUDTFile0x00050002Test {
         fileWriter.writeUnchangingDataProperties(unchangingDataPropertiesObject);
         fileWriter.writeQTransformData(qTransformDataObject);
         fileWriter.writeAudioData(audioDataObject);
-        fileWriter.writeGUIData(projectInfoDataObject1);
+        fileWriter.writeProjectInfoData(projectInfoDataObject1);
         fileWriter.writeMusicNotesData(musicNotesDataObject1);
 
         // Write the bytes to file
@@ -302,7 +302,7 @@ class AUDTFile0x00050002Test {
         );
 
         // Test writing only the GUI and music notes data
-        fileWriter.writeGUIData(projectInfoDataObject2);
+        fileWriter.writeProjectInfoData(projectInfoDataObject2);
         fileWriter.writeMusicNotesData(musicNotesDataObject2);
 
         // Write the bytes to file

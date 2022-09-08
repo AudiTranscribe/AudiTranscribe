@@ -108,7 +108,7 @@ public class AUDTFileWriter401 extends AUDTFileWriter {
      *
      * @param projectInfoDataObj Data object that holds all the project info data.
      */
-    public void writeGUIData(ProjectInfoDataObject projectInfoDataObj) {
+    public void writeProjectInfoData(ProjectInfoDataObject projectInfoDataObj) {
         // Cast to the 401 version of the data object
         ProjectInfoDataObject401 obj = (ProjectInfoDataObject401) projectInfoDataObj;
 
