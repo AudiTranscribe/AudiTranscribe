@@ -37,6 +37,9 @@ public final class IOConstants {
 
     public static final String APP_DATA_FOLDER_PATH =
             ApplicationDirectory.getUserDataDirectory("AudiTranscribe", null);
+    public static final String PROJECT_BACKUPS_FOLDER_PATH = IOMethods.joinPaths(
+            IOConstants.APP_DATA_FOLDER_PATH, "project_backups"
+    );
 
     public static final String RESOURCES_FOLDER_PATH = IOMethods.joinPaths("site", "overwrite", "auditranscribe");
 

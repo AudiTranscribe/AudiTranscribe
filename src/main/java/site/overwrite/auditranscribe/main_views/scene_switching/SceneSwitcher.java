@@ -36,6 +36,7 @@ import site.overwrite.auditranscribe.exceptions.io.audt_file.IncorrectFileFormat
 import site.overwrite.auditranscribe.exceptions.io.audt_file.InvalidFileVersionException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
 import site.overwrite.auditranscribe.io.audt_file.ProjectData;
 import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileReader;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
@@ -317,6 +318,41 @@ public class SceneSwitcher {
 
             // Get the file version
             int fileVersion = reader.fileFormatVersion;
+
+            // If file is not the latest version, make a backup
+            if (fileVersion != AUDTFileConstants.FILE_VERSION_NUMBER) {
+                // Get the filename without extension
+                String noExtension = audtFileName;
+                int pos = noExtension.lastIndexOf(".");
+                if (pos > 0 && pos < (noExtension.length() - 1)) {
+                    noExtension = noExtension.substring(0, pos);
+                }
+
+                // Save to backups folder
+                String backupPath = IOMethods.joinPaths(
+                        IOConstants.PROJECT_BACKUPS_FOLDER_PATH,
+                        noExtension + "-" + Integer.toHexString(fileVersion) + ".audt"
+                );
+                boolean success = IOMethods.copyFile(audtFile.getAbsolutePath(), backupPath);
+
+                if (!success) {
+                    Popups.showInformationAlert(
+                            "Failed to make backup of '" + audtFileName + "'.",
+                            "The program failed to make a backup of '" + audtFile.getName() + "'."
+                    );
+                    MyLogger.log(
+                            Level.WARNING,
+                            "Failed to make backup of '" + audtFileName + "' to '" + backupPath + "'.",
+                            SceneSwitcher.class.getName()
+                    );
+                } else {
+                    MyLogger.log(
+                            Level.INFO,
+                            "Made backup of '" + audtFileName + "' to '" + backupPath + "'.",
+                            SceneSwitcher.class.getName()
+                    );
+                }
+            }
 
             // Read the data from the file
             UnchangingDataPropertiesObject unchangingDataProperties = reader.readUnchangingDataProperties();
