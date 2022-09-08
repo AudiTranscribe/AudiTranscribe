@@ -23,7 +23,9 @@ import site.overwrite.auditranscribe.MainApplication;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -75,7 +77,7 @@ public final class IOMethods {
         return path;
     }
 
-    // IO Handling
+    // IO handling
 
     /**
      * Gets the input stream of a file, with respect to the <b>resource path</b>.
@@ -145,6 +147,28 @@ public final class IOMethods {
             return true;
         } catch (IOException e) {
             return new File(absolutePath).mkdirs();
+        }
+    }
+
+    /**
+     * Method that copies the contents of the original file into a new file.
+     *
+     * @param originalFilePath Original file's <b>absolute</b >path.
+     * @param newFilePath      New file's <b>absolute</b> path.
+     * @return A boolean. Returns <code>true</code> if the copy is successful and <code>false</code>
+     * otherwise.
+     */
+    public static boolean copyFile(String originalFilePath, String newFilePath) {
+        // Convert the given strings into `Path` objects
+        Path origPath = Paths.get(originalFilePath);
+        Path copyPath = Paths.get(newFilePath);
+
+        // Properly copy the file
+        try {
+            Files.copy(origPath, copyPath, StandardCopyOption.REPLACE_EXISTING);
+            return true;
+        } catch (IOException e) {
+            return false;
         }
     }
 
