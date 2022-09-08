@@ -91,20 +91,19 @@ public class TranscriptionViewController implements Initializable {
 
     public final double SPECTROGRAM_ZOOM_SCALE_X = 1.75;
     public final double SPECTROGRAM_ZOOM_SCALE_Y = 5;
-
     public final int PX_PER_SECOND = 120;
     private final int BINS_PER_OCTAVE = 60;
     private final int SPECTROGRAM_HOP_LENGTH = 1024;  // Needs to be a power of 2
     private final double NUM_PX_PER_OCTAVE = 72;
-
     private final int MIN_NOTE_NUMBER = 0;  // C0
     private final int MAX_NOTE_NUMBER = 107;  // B8
 
     private final long UPDATE_PLAYBACK_SCHEDULER_PERIOD = 50;  // In milliseconds
+    private final long MEMORY_AVAILABLE_SCHEDULER_PERIOD = 1;  // In seconds
 
-    private final boolean USE_FANCY_SHARPS_FOR_NOTE_LABELS = true;
+    private final boolean FANCY_NOTE_LABELS = true;  // Use fancy accidentals for note labels
 
-    public final double VOLUME_VALUE_DELTA_ON_KEY_PRESS = 0.05;
+    public final double VOLUME_VALUE_DELTA_ON_KEY_PRESS = 0.05;  // Amount to change the volume by
 
     public final int MIDI_CHANNEL_NUM = 0;
     private final MIDIInstrument NOTE_INSTRUMENT = MIDIInstrument.PIANO;
@@ -121,6 +120,7 @@ public class TranscriptionViewController implements Initializable {
 
     private double sampleRate;  // Sample rate of the audio
 
+    private String projectName;
     private int musicKeyIndex = 0;  // Index of the music key chosen, according to the `MUSIC_KEYS` array
     private int timeSignatureIndex = 0;
     private double bpm = 120;
@@ -132,7 +132,6 @@ public class TranscriptionViewController implements Initializable {
     // Other attributes
     private boolean hasUnsavedChanges = true;
     private int fileVersion;
-    private String projectName;
 
     private Theme theme;
 
@@ -323,7 +322,7 @@ public class TranscriptionViewController implements Initializable {
             if (isEverythingReady) {
                 noteLabels = PlottingStuffHandler.addNoteLabels(
                         notePane, noteLabels, newValue, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER,
-                        USE_FANCY_SHARPS_FOR_NOTE_LABELS
+                        FANCY_NOTE_LABELS
                 );
             }
 
@@ -1711,7 +1710,7 @@ public class TranscriptionViewController implements Initializable {
 
                 // Update the free memory label
                 freeMemoryLabel.setText(MathUtils.round(presumableFreeMemory / 1e6, 2) + " MB");
-            }), 1, 1, TimeUnit.SECONDS);
+            }), 1, MEMORY_AVAILABLE_SCHEDULER_PERIOD, TimeUnit.SECONDS);
 
             // Set image on the spectrogram area
             spectrogramImage.setFitHeight(finalWidth);
@@ -1721,7 +1720,7 @@ public class TranscriptionViewController implements Initializable {
             // Add note labels and note lines
             noteLabels = PlottingStuffHandler.addNoteLabels(
                     notePane, noteLabels, musicKey, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER,
-                    USE_FANCY_SHARPS_FOR_NOTE_LABELS
+                    FANCY_NOTE_LABELS
             );
             PlottingStuffHandler.addNoteLines(spectrogramPaneAnchor, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER);
 
