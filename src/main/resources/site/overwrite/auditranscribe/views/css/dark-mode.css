@@ -34,6 +34,24 @@
     -fx-border-color: #767c81ff !important;
 }
 
+/* Radio Buttons */
+.radio-button .radio {
+    -fx-background-color: #44494aff;
+    -fx-padding: 5px;
+    -fx-border-radius: 50%;
+    -fx-border-width: 1px;
+    -fx-border-color: #6b6b6bff;
+}
+
+.radio-button .dot {
+    -fx-background-radius: 50%;
+    -fx-padding: 3px;
+}
+
+.radio-button:selected .radio .dot {
+    -fx-background-color: #a7a7a7ff;
+}
+
 /* Spinners/Choice Boxes */
 .choice-box, .spinner {
     -fx-background-color: #646464ff, #3c3f41ff;
