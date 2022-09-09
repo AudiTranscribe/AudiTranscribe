@@ -97,6 +97,12 @@
     -fx-max-width: 765px;
 }
 
+/* PROJECT SETUP PAGE */
+.requirement-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
 /* TRANSCRIPTION PAGE */
 /* Labels */
 .display-label {
