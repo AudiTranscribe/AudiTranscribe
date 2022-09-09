@@ -1,4 +1,14 @@
 /* MAIN PAGE */
+/* Buttons */
+.button.error {
+    -fx-border-color: #b83434ff;
+}
+
+/* Text */
+.text-field.error {
+    -fx-border-color: #b83434ff;
+}
+
 /* Others */
 .no-projects-vbox {
     -fx-background-color: #ffffffff;

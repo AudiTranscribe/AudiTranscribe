@@ -24,6 +24,10 @@
     -fx-border-color: #767c81ff;
 }
 
+.button.error {
+    -fx-border-color: #ed6e69ff;
+}
+
 .image-button {
     -fx-background-color: transparent !important;
     -fx-border-color: transparent !important;
@@ -103,6 +107,10 @@
     -fx-background-color: #45494aff;
     -fx-prompt-text-fill: #777777ff;
     -fx-text-fill: #bbbbbbff;;
+}
+
+.text-field.error {
+    -fx-border-color: #ed6e69ff;
 }
 
 /* Others */

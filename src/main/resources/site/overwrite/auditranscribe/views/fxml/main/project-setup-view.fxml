@@ -33,7 +33,7 @@
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <Label alignment="TOP_RIGHT" layoutX="67.0" layoutY="20.0" prefHeight="60.0" styleClass="requirement-label" text="Audio File">
+                  <Label alignment="TOP_RIGHT" layoutX="67.0" layoutY="20.0" prefHeight="30.0" styleClass="requirement-label" text="Audio File">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
@@ -62,12 +62,12 @@
                </padding>
                <children>
                   <TextField fx:id="projectNameField" prefHeight="30.0" prefWidth="300.0" />
-                  <VBox prefWidth="300.0">
+                  <HBox prefHeight="30.0" prefWidth="300.0" spacing="5.0">
                      <children>
-                        <Button fx:id="selectAudioFileButton" mnemonicParsing="false" prefHeight="30.0" text="Choose Audio File" />
-                        <TextField fx:id="audioFilePathField" prefHeight="30.0" promptText="Path to audio file" />
+                        <Button fx:id="selectAudioFileButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" text="Select File" />
+                        <Label fx:id="audioFileLabel" prefHeight="30.0" prefWidth="220.0" text="No file selected." />
                      </children>
-                  </VBox>
+                  </HBox>
                   <VBox fillWidth="false" prefHeight="55.0" prefWidth="350.0" spacing="5.0">
                      <children>
                         <RadioButton fx:id="bpmEstimateAutomatically" mnemonicParsing="false" selected="true" text="Estimate BPM Automatically" />
