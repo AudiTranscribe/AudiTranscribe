@@ -22,12 +22,12 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.21</version>
+            <version>1.21</version> <!-- Do not change this version; we need to use the custom JAR file -->
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-exec</artifactId>
-            <version>1.3</version>
+            <version>1.3</version> <!-- Do not change this version; we need to use the custom JAR file -->
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
@@ -83,7 +83,7 @@
         <dependency>
             <groupId>org.javatuples</groupId>
             <artifactId>javatuples</artifactId>
-            <version>1.2</version>
+            <version>1.2</version> <!-- Do not change this version; we need to use the custom JAR file -->
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -117,7 +117,7 @@
                             <file>${project.basedir}/lib/commons-compress-1.21_custom.jar</file>
                             <groupId>org.apache.commons</groupId>
                             <artifactId>commons-compress</artifactId>
-                            <version>1.21</version>
+                            <version>1.21</version> <!-- Do not change this version -->
                             <packaging>jar</packaging>
                             <generatePom>true</generatePom>
                         </configuration>
@@ -132,7 +132,7 @@
                             <file>${project.basedir}/lib/commons-exec-1.3_custom.jar</file>
                             <groupId>org.apache.commons</groupId>
                             <artifactId>commons-exec</artifactId>
-                            <version>1.3</version>
+                            <version>1.3</version> <!-- Do not change this version -->
                             <packaging>jar</packaging>
                             <generatePom>true</generatePom>
                         </configuration>
@@ -147,7 +147,7 @@
                             <file>${project.basedir}/lib/javatuples-1.2_custom.jar</file>
                             <groupId>org.javatuples</groupId>
                             <artifactId>javatuples</artifactId>
-                            <version>1.2</version>
+                            <version>1.2</version> <!-- Do not change this version -->
                             <packaging>jar</packaging>
                             <generatePom>true</generatePom>
                         </configuration>
