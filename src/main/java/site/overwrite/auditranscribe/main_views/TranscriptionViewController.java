@@ -19,6 +19,8 @@
 package site.overwrite.auditranscribe.main_views;
 
 import javafx.application.Platform;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -130,6 +132,8 @@ public class TranscriptionViewController implements Initializable {
     private double currTime = 0;
 
     // Other attributes
+    private final DoubleProperty playheadX = new SimpleDoubleProperty(0);
+
     private boolean hasUnsavedChanges = true;
     private int fileVersion;
 
@@ -147,9 +151,9 @@ public class TranscriptionViewController implements Initializable {
     private String audtFileName;
     private Audio audio;
 
-    private byte[] compressedMP3Bytes;
+    private byte[] compressedMP3Bytes;  // Todo: somehow remove the need to store this
 
-    private byte[] qTransformBytes;  // LZ4 compressed version
+    private byte[] qTransformBytes;  // LZ4 compressed version; todo: somehow remove the need to store this
     private double minQTransformMagnitude;
     private double maxQTransformMagnitude;
 
@@ -945,7 +949,7 @@ public class TranscriptionViewController implements Initializable {
             spectrogramPane.setHvalue(0);
 
         } else if (newPosX >= finalWidth - spectrogramAreaHalfWidth) {
-            // If the `newPoxX` is within the last 'half width' of the entire spectrogram area, keep the scrolling to
+            // If the `newPosX` is within the last 'half width' of the entire spectrogram area, keep the scrolling to
             // the end
             spectrogramPane.setHvalue(1);
         } else {
@@ -1095,11 +1099,8 @@ public class TranscriptionViewController implements Initializable {
         currTime = seekTime;
         currTimeLabel.setText(UnitConversionUtils.secondsToTimeString(seekTime));
 
-        // Update coloured progress pane and playhead line
-        double newXPos = seekTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X;
-
-        colouredProgressPane.setPrefWidth(newXPos);
-        if (isEverythingReady) PlottingStuffHandler.updatePlayheadLine(playheadLine, newXPos);
+        // Update the playhead X position
+        playheadX.set(seekTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X);
 
         MyLogger.log(Level.FINE, "Seeked to " + seekTime + " seconds", this.getClass().toString());
     }
@@ -1610,7 +1611,6 @@ public class TranscriptionViewController implements Initializable {
             bottomPaneAnchor.setPrefWidth(finalWidth);
 
             clickableProgressPane.setPrefWidth(finalWidth);
-            colouredProgressPane.setPrefWidth(0);
 
             // Set scrolling for panes
             leftPane.vvalueProperty().bindBidirectional(spectrogramPane.vvalueProperty());
@@ -1619,6 +1619,11 @@ public class TranscriptionViewController implements Initializable {
             // Add the playhead line
             playheadLine = PlottingStuffHandler.createPlayheadLine(finalHeight);
             spectrogramPaneAnchor.getChildren().add(playheadLine);
+
+            // Bind properties
+            colouredProgressPane.prefWidthProperty().bind(playheadX);
+            playheadLine.startXProperty().bind(playheadX);
+            playheadLine.endXProperty().bind(playheadX);
 
             // Create a constantly-executing service for playback functionality
             scheduler = Executors.newScheduledThreadPool(0, runnable -> {
@@ -1635,10 +1640,8 @@ public class TranscriptionViewController implements Initializable {
                     // Update the current time label
                     Platform.runLater(() -> currTimeLabel.setText(UnitConversionUtils.secondsToTimeString(currTime)));
 
-                    // Update coloured progress pane and playhead line
-                    double newPosX = currTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X;
-                    colouredProgressPane.setPrefWidth(newPosX);
-                    PlottingStuffHandler.updatePlayheadLine(playheadLine, newPosX);
+                    // Update the playhead X position
+                    playheadX.set(currTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X);
 
                     // Check if the current time has exceeded and is not paused
                     if (currTime >= audioDuration) {
@@ -1666,8 +1669,9 @@ public class TranscriptionViewController implements Initializable {
                     }
 
                     // Update scrolling
+                    // Todo: fix scrolling
                     if (scrollToPlayhead) {
-                        updateScrollPosition(newPosX, spectrogramPane.getWidth());
+                        updateScrollPosition(playheadX.doubleValue(), spectrogramPane.getWidth());
                     }
                 }
             }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);
