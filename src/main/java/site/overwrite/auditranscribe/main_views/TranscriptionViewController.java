@@ -89,7 +89,7 @@ public class TranscriptionViewController implements Initializable {
     private final Pair<Integer, Integer> BPM_RANGE = new Pair<>(1, 512);  // In the format [min, max]
     private final Pair<Double, Double> OFFSET_RANGE = new Pair<>(-5., 5.);  // In the format [min, max]
 
-    public final double SPECTROGRAM_ZOOM_SCALE_X = 1.75;
+    public final double SPECTROGRAM_ZOOM_SCALE_X = 2;
     public final double SPECTROGRAM_ZOOM_SCALE_Y = 5;
     public final int PX_PER_SECOND = 120;
     private final int BINS_PER_OCTAVE = 60;
