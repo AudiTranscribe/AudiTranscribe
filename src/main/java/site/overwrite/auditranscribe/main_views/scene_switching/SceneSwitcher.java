@@ -64,16 +64,16 @@ public class SceneSwitcher {
     private final Stage mainStage = new Stage();
     private final Stage transcriptionStage = new Stage();
 
-    private Pair<SceneSwitchingState, File> returnedPair = null;
+    private Pair<SceneSwitchingState, SceneSwitchingData> returnedPair = null;
+
     private SceneSwitchingState state = SceneSwitchingState.SHOW_MAIN_SCENE;
-    private File selectedFile = null;
+    private SceneSwitchingData data = new SceneSwitchingData();
 
     /**
      * Initialization method for a <code>SceneSwitcher</code> object.
      *
      * @param currentVersion Current version of AudiTranscribe.
      */
-    // Todo: somehow use the main scene
     public SceneSwitcher(String currentVersion) {
         // Update attributes
         this.currentVersion = currentVersion;
@@ -100,8 +100,8 @@ public class SceneSwitcher {
             try {
                 // Handle the different cases of the returned state
                 switch (state) {
-                    case NEW_PROJECT -> returnedPair = newProjectInTranscriptionScene(selectedFile);
-                    case OPEN_PROJECT -> returnedPair = openProjectInTranscriptionScene(selectedFile);
+                    case NEW_PROJECT -> returnedPair = newProjectInTranscriptionScene();
+                    case OPEN_PROJECT -> returnedPair = openProjectInTranscriptionScene();
                     case SHOW_MAIN_SCENE -> returnedPair = showMainScene();
                     case CLOSE_SCENE -> {
                         // Since close scene was called, shutdown scene handler
@@ -110,7 +110,7 @@ public class SceneSwitcher {
                     }
                 }
 
-                // Check if the returned pair is null
+                // Check if the returned pair is `null`
                 if (returnedPair == null) {
                     // If the returned pair is `null`, that means something went wrong
                     // If we are currently in the transcription scene, then the next state is `SHOW_MAIN_SCENE`
@@ -121,12 +121,12 @@ public class SceneSwitcher {
                         state = SceneSwitchingState.CLOSE_SCENE;
                     }
 
-                    // Regardless of the state, the newly selected file will be `null`
-                    selectedFile = null;
+                    // Regardless of the state, the data will be `null`
+                    data = null;
                 } else {
-                    // Otherwise get the state and the selected file
+                    // Otherwise get the state and the data
                     state = returnedPair.getValue0();
-                    selectedFile = returnedPair.getValue1();
+                    data = returnedPair.getValue1();
                 }
             } catch (Exception e) {  // Catch any alert that was not handled correctly
                 Popups.showExceptionAlert(
@@ -149,7 +149,7 @@ public class SceneSwitcher {
      * @return Pair of values. First value is the scene switching state, and the second is the
      * selected file.
      */
-    private Pair<SceneSwitchingState, File> showMainScene() {
+    private Pair<SceneSwitchingState, SceneSwitchingData> showMainScene() {
         try {
             // Load the FXML file into the scene
             FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL(
@@ -175,7 +175,7 @@ public class SceneSwitcher {
             // Obtain the scene switching state and the selected file and return
             return new Pair<>(
                     controller.getSceneSwitchingState(),
-                    controller.getSelectedFile()
+                    controller.getSceneSwitchingData()
             );
         } catch (IOException e) {
             MyLogger.logException(e);
@@ -186,12 +186,11 @@ public class SceneSwitcher {
 
     /**
      * Helper method that handles the creation of a new project in the transcription scene.
-     *
-     * @param audioFile Audio file to create a new project of.<br>
-     *                  By this point, we should have verified that <code>audioFile</code> is not
-     *                  <code>null</code>.
      */
-    private Pair<SceneSwitchingState, File> newProjectInTranscriptionScene(File audioFile) {
+    private Pair<SceneSwitchingState, SceneSwitchingData> newProjectInTranscriptionScene() {
+        // Obtain the audio file from the scene switching data
+        File audioFile = data.file;
+
         try {
             // Get the extension of the provided audio file
             String fileExt = "." + FileNameUtils.getExtension(audioFile.getName()).toLowerCase();
@@ -203,7 +202,11 @@ public class SceneSwitcher {
 
             // Attempt creation of temporary folder if it doesn't exist
             IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
-            MyLogger.log(Level.FINE, "Temporary folder: " + IOConstants.TEMP_FOLDER_PATH, this.getClass().toString());
+            MyLogger.log(
+                    Level.FINE,
+                    "Temporary folder: " + IOConstants.TEMP_FOLDER_PATH,
+                    this.getClass().toString()
+            );
 
             // Get the base path for the auxiliary files
             String baseName = IOMethods.joinPaths(
@@ -227,7 +230,8 @@ public class SceneSwitcher {
                 MyLogger.log(Level.FINE, "Successfully deleted auxiliary WAV file.", this.getClass().toString());
             } else {
                 MyLogger.log(
-                        Level.WARNING, "Failed to delete auxiliary WAV file now; will attempt delete after exit.",
+                        Level.WARNING,
+                        "Failed to delete auxiliary WAV file now; will attempt delete after exit.",
                         this.getClass().toString());
             }
 
@@ -240,7 +244,7 @@ public class SceneSwitcher {
             controller.setThemeOnScene();
 
             // Set the project data for the existing project
-            controller.setAudioAndSpectrogramData(audio);
+            controller.setAudioAndSpectrogramData(audio, data);
             controller.finishSetup();
 
             // Set the scene for the transcription page
@@ -249,7 +253,7 @@ public class SceneSwitcher {
             // Set new scene properties
             transcriptionStage.setMaximized(true);
             transcriptionStage.setResizable(true);
-            transcriptionStage.setTitle(audioFile.getName());
+            transcriptionStage.setTitle(data.projectName);
 
             // Set width and height of the new scene
             Rectangle2D screenBounds = Screen.getPrimary().getBounds();
@@ -268,7 +272,7 @@ public class SceneSwitcher {
             // Obtain the scene switching state and the selected file and return
             return new Pair<>(
                     controller.getSceneSwitchingState(),
-                    controller.getSelectedFile()
+                    controller.getSceneSwitchingData()
             );
 
         } catch (IOException | UnsupportedAudioFileException e) {
@@ -304,12 +308,11 @@ public class SceneSwitcher {
 
     /**
      * Helper method that handles the opening of an existing project in the transcription scene.
-     *
-     * @param audtFile AudiTranscribe file to open.<br>
-     *                 By this point, we should have verified that <code>audtFile</code> is not
-     *                 <code>null</code>.
      */
-    private Pair<SceneSwitchingState, File> openProjectInTranscriptionScene(File audtFile) {
+    private Pair<SceneSwitchingState, SceneSwitchingData> openProjectInTranscriptionScene() {
+        // Obtain the AUDT file from the scene switching data
+        File audtFile = data.file;
+
         try {
             // Try and read the file as an AUDT file
             String audtFilePath = audtFile.getAbsolutePath();
@@ -414,7 +417,7 @@ public class SceneSwitcher {
             // Obtain the scene switching state and the selected file and return
             return new Pair<>(
                     controller.getSceneSwitchingState(),
-                    controller.getSelectedFile()
+                    controller.getSceneSwitchingData()
             );
 
         } catch (FileNotFoundException e) {

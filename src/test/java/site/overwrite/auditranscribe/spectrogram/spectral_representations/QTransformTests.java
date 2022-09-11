@@ -60,7 +60,7 @@ class QTransformTests {
         // Process CQT on those samples
         Complex[][] cqtMatrix = CQT.cqt(
                 samples, audio.getSampleRate(), 512, UnitConversionUtils.noteToFreq("C1"), 168,
-                24, WindowFunction.HANN_WINDOW, null
+                24, 0, WindowFunction.HANN_WINDOW, null
         );
 
         // Check specific values in this resultant VQT matrix
@@ -92,7 +92,7 @@ class QTransformTests {
         // Process VQT on those samples
         Complex[][] vqtMatrix = VQT.vqt(
                 samples, audio.getSampleRate(), 512, UnitConversionUtils.noteToFreq("C1"), 168,
-                24, false, 0, WindowFunction.HANN_WINDOW, null
+                24, 0, 0, WindowFunction.HANN_WINDOW, null, false
         );
 
         // Check specific values in this resultant VQT matrix
@@ -124,7 +124,7 @@ class QTransformTests {
         // Process VQT on those samples
         Complex[][] vqtMatrix = VQT.vqt(
                 samples, audio.getSampleRate(), 512, UnitConversionUtils.noteToFreq("C1"), 168,
-                24, 0, WindowFunction.HANN_WINDOW, null
+                24, 0, 0, WindowFunction.HANN_WINDOW, null
         );
 
         // Check specific values in this resultant VQT matrix
@@ -142,7 +142,7 @@ class QTransformTests {
         // Process VQT on those samples
         Complex[][] vqtMatrix = VQT.vqt(
                 samples, audio.getSampleRate(), 512, UnitConversionUtils.noteToFreq("C1"), 168,
-                24, false, 12, WindowFunction.HANN_WINDOW, null
+                24, 0, 12, WindowFunction.HANN_WINDOW, null, false
         );
 
         // Check specific values in this resultant VQT matrix
@@ -160,7 +160,7 @@ class QTransformTests {
         // Process VQT on those samples
         Complex[][] vqtMatrix = VQT.vqt(
                 samples, audio.getSampleRate() / 1.75, 512, UnitConversionUtils.noteToFreq("C1"), 9,
-                1, false, 12, WindowFunction.HANN_WINDOW, null
+                1, 0, 12, WindowFunction.HANN_WINDOW, null, false
         );
 
         // Check specific values in this resultant VQT matrix
@@ -178,7 +178,7 @@ class QTransformTests {
         // Process VQT on those samples
         Complex[][] vqtMatrix = VQT.vqt(
                 samples, audio.getSampleRate(), 511, UnitConversionUtils.noteToFreq("C1"), 28,
-                4, 0, WindowFunction.HANN_WINDOW, null
+                4, 0, 0, WindowFunction.HANN_WINDOW, null
         );
 
         // Check specific values in this resultant VQT matrix
@@ -199,7 +199,7 @@ class QTransformTests {
         // Process VQT using Kaiser Fast on those samples
         Complex[][] vqtMatrix = VQT.vqt(
                 samples, audio.getSampleRate(), 512, UnitConversionUtils.noteToFreq("C1"), 28,
-                4, 0, WindowFunction.HANN_WINDOW, new CustomTask<Void>() {
+                4, 0, 0, WindowFunction.HANN_WINDOW, new CustomTask<Void>() {
                     @Override
                     protected Void call() {
                         return null;
@@ -218,12 +218,12 @@ class QTransformTests {
         // Do it again, this time using Kaiser Best
         vqtMatrix = VQT.vqt(
                 samples, audio.getSampleRate() / 1.75, 512, UnitConversionUtils.noteToFreq("C1"), 9,
-                1, false, 12, WindowFunction.HANN_WINDOW, new CustomTask<Void>() {
+                1, 0, 12, WindowFunction.HANN_WINDOW, new CustomTask<Void>() {
                     @Override
                     protected Void call() {
                         return null;
                     }
-                }
+                }, false
         );
 
         // Check specific values in this resultant VQT matrix
@@ -241,30 +241,30 @@ class QTransformTests {
         // Provide invalid values in an attempt to throw errors
         assertThrowsExactly(ValueException.class, () -> VQT.vqt(
                 samples, audio.getSampleRate(), 512, UnitConversionUtils.noteToFreq("C1"), 0,
-                24, false, 12, WindowFunction.HANN_WINDOW, null
+                24, 0, 12, WindowFunction.HANN_WINDOW, null, false
         ));  // Number of bins is invalid
         assertThrowsExactly(ValueException.class, () -> VQT.vqt(
                 samples, audio.getSampleRate(), 512, UnitConversionUtils.noteToFreq("C1"), -12,
-                24, false, 12, WindowFunction.HANN_WINDOW, null
+                24, 0, 12, WindowFunction.HANN_WINDOW, null, false
         ));  // Number of bins is invalid
 
         assertThrowsExactly(ValueException.class, () -> VQT.vqt(
                 samples, audio.getSampleRate(), 512, UnitConversionUtils.noteToFreq("C1"), 168,
-                0, false, 12, WindowFunction.HANN_WINDOW, null
+                0, 0, 12, WindowFunction.HANN_WINDOW, null, false
         ));  // Bins per octave is invalid
         assertThrowsExactly(ValueException.class, () -> VQT.vqt(
                 samples, audio.getSampleRate(), 512, UnitConversionUtils.noteToFreq("C1"), 168,
-                -12, false, 12, WindowFunction.HANN_WINDOW, null
+                -12, 0, 12, WindowFunction.HANN_WINDOW, null, false
         ));  // Bins per octave is invalid
 
         assertThrowsExactly(ValueException.class, () -> VQT.vqt(
                 samples, audio.getSampleRate(), 512, UnitConversionUtils.noteToFreq("C1"), 168,
-                13, false, 12, WindowFunction.HANN_WINDOW, null
+                13, 0, 12, WindowFunction.HANN_WINDOW, null, false
         ));  // Bins per octave not multiple of number of bins
 
         assertThrowsExactly(InvalidParameterException.class, () -> VQT.vqt(
                 samples, audio.getSampleRate(), 512, UnitConversionUtils.noteToFreq("C1"), 336,
-                24, false, 12, WindowFunction.HANN_WINDOW, null
+                24, 0, 12, WindowFunction.HANN_WINDOW, null, false
         ));  // Too many bins, resulting in cutoff frequency being above Nyquist frequency
     }
 
@@ -273,11 +273,11 @@ class QTransformTests {
     void vqtCauseErrorInEarlyDownsample() {
         assertThrowsExactly(ValueException.class, () -> VQT.vqt(
                 new double[1], audio.getSampleRate(), 512, UnitConversionUtils.noteToFreq("C1"), 56,
-                8, 0, WindowFunction.HANN_WINDOW, null
+                8, 0, 0, WindowFunction.HANN_WINDOW, null
         ));  // Input signal length of 1 is too short for 7-octave VQT
         assertThrowsExactly(ValueException.class, () -> VQT.vqt(
                 new double[0], audio.getSampleRate(), 512, UnitConversionUtils.noteToFreq("C1"), 56,
-                8, 0, WindowFunction.HANN_WINDOW, null
+                8, 0, 0, WindowFunction.HANN_WINDOW, null
         ));  // Input signal length of 0 is too short for 7-octave VQT
     }
 }

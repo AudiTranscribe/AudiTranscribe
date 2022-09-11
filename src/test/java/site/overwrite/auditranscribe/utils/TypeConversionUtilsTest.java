@@ -20,10 +20,11 @@ package site.overwrite.auditranscribe.utils;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class TypeConversionUtilsTest {
-
     @Test
     void toByteArray() {
         // Define byte arrays to end up with
@@ -75,9 +76,31 @@ class TypeConversionUtilsTest {
                 0d, 9d, 8d, 7d, 6d, 5d, 4d, 3d, 2d, 1d,
                 1d, 2d, 3d, 4d, 5d, 6d, 7d, 8d, 9d, 0d
         };
+        List<Double> list = List.of(
+                0d, 9d, 8d, 7d, 6d, 5d, 4d, 3d, 2d, 1d,
+                1d, 2d, 3d, 4d, 5d, 6d, 7d, 8d, 9d, 0d
+        );
 
         // Assertions
         assertArrayEquals(array1, TypeConversionUtils.toDoubleArray(TypeConversionUtils.toDoubleArray(array1)));
         assertArrayEquals(array2, TypeConversionUtils.toDoubleArray(TypeConversionUtils.toDoubleArray(array2)));
+        assertArrayEquals(array2, TypeConversionUtils.toDoubleArray(list));
+    }
+
+    @Test
+    void toBooleanArray() {
+        // Define boolean arrays to end up with
+        boolean[] array1 = {
+                false, true, true, false, true, false, true, false, false, false,
+                true, false, true, false, false, false, true, false, true, false
+        };
+        Boolean[] array2 = {
+                true, false, false, true, false, false, false, false, true, false,
+                false, false, false, false, false, true, false, false, false, false
+        };
+
+        // Assertions
+        assertArrayEquals(array1, TypeConversionUtils.toBooleanArray(TypeConversionUtils.toBooleanArray(array1)));
+        assertArrayEquals(array2, TypeConversionUtils.toBooleanArray(TypeConversionUtils.toBooleanArray(array2)));
     }
 }

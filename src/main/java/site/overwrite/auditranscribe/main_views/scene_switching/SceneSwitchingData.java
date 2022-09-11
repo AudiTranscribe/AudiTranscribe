@@ -1,6 +1,6 @@
 /*
- * SpectralHelpersTest.java
- * Description: Test `SpectralHelpers.java`.
+ * SceneSwitchingData.java
+ * Description: Data that is used for the scene switcher handler.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,17 +16,19 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.spectrogram.spectral_representations;
+package site.overwrite.auditranscribe.main_views.scene_switching;
 
-import org.junit.jupiter.api.Test;
-import site.overwrite.auditranscribe.utils.MathUtils;
+import java.io.File;
 
-import static org.junit.jupiter.api.Assertions.*;
+public class SceneSwitchingData {
+    public String projectName;
+    public File file;  // Can either be an audio file or an AUDT file
 
-class SpectralHelpersTest {
-    @Test
-    void computeAlpha() {
-        assertEquals(0.6, SpectralHelpers.computeAlpha(1));
-        assertEquals(MathUtils.round((double) 1 / 3, 6), MathUtils.round(SpectralHelpers.computeAlpha(2), 6));
-    }
+    public boolean isProjectSetup = false;  // False by default
+
+    public boolean estimateBPM;
+    public double manualBPM;
+
+    public boolean estimateMusicKey;
+    public String musicKeyString;
 }

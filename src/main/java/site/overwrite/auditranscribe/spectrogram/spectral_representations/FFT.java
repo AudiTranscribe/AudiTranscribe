@@ -221,7 +221,7 @@ public final class FFT {
      */
     private static Complex[] fftBluestein(Complex[] x, int length) {
         // Find a power of 2 convolution length such that it is at least `length * 2 + 1`
-        int convolutionLength = (int) Math.pow(2, MiscUtils.numOfSetBits(length * 2));
+        int convolutionLength = (int) Math.pow(2, MiscUtils.getNumSetBits(length * 2));
 
         // Generate trigonometric table
         double exponentCoefficient = -Math.PI / length;

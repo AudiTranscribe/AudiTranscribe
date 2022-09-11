@@ -18,6 +18,8 @@
 
 package site.overwrite.auditranscribe.utils;
 
+import java.util.List;
+
 /**
  * Type conversion utility methods.
  */
@@ -108,6 +110,48 @@ public final class TypeConversionUtils {
         double[] result = new double[doubles.length];
         for (int i = 0; i < doubles.length; i++) {
             result[i] = doubles[i];
+        }
+        return result;
+    }
+
+    /**
+     * Method that converts a double list to a double array.
+     * @param doubles   List of doubles.
+     * @return Array of doubles.
+     */
+    public static Double[] toDoubleArray(List<Double>doubles) {
+        int n = doubles.size();
+        Double[] result = new Double[n];
+        for (int i = 0; i < n; i++) {
+            result[i] = doubles.get(i);
+        }
+        return result;
+    }
+
+    /**
+     * Method that converts a primitive boolean array to a non-primitive boolean array.
+     *
+     * @param booleans The primitive boolean array.
+     * @return The non-primitive boolean array.
+     */
+    public static Boolean[] toBooleanArray(boolean[] booleans) {
+        Boolean[] result = new Boolean[booleans.length];
+        for (int i = 0; i < booleans.length; i++) {
+            result[i] = booleans[i];
+        }
+        return result;
+    }
+
+    /**
+     * Method that converts a non-primitive boolean array to a primitive boolean array.
+     *
+     * @param booleans The non-primitive boolean array.
+     * @return The primitive boolean array.
+     */
+    public static boolean[] toBooleanArray(Boolean[] booleans) {
+        boolean[] result = new boolean[booleans.length];
+        for (int i = 0; i < booleans.length; i++) {
+            result[i] = booleans[i];
         }
         return result;
     }

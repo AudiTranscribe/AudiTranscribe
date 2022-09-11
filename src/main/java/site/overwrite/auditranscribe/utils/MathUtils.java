@@ -39,7 +39,7 @@ public final class MathUtils {
      * @return Log base 2 of <code>x</code>.
      */
     public static double log2(double x) {
-        return Math.log(x) / Math.log(2);
+        return Math.log(x) * 1.442695040888963407359924681002;  // ln x * (1/ln 2), to 30 dp
     }
 
     /**
@@ -55,6 +55,9 @@ public final class MathUtils {
         if (n <= 0 || n == 1) {
             throw new ValueException("Invalid value for the base of logarithm: " + n);
         }
+
+        // Special case of `n = 2` as we already handle it
+        if (n == 2) return log2(x);
 
         // Return the logarithm
         return Math.log(x) / Math.log(n);

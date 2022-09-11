@@ -40,7 +40,8 @@ import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.audio.FFmpegHandler;
-import site.overwrite.auditranscribe.bpm_estimation.BPMEstimator;
+import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingData;
+import site.overwrite.auditranscribe.music.bpm_estimation.BPMEstimator;
 import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
 import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.exceptions.notes.NoteRectangleCollisionException;
@@ -88,7 +89,7 @@ import java.util.logging.Level;
 
 public class TranscriptionViewController implements Initializable {
     // Constants
-    private final Pair<Integer, Integer> BPM_RANGE = new Pair<>(1, 512);  // In the format [min, max]
+    public static final Pair<Integer, Integer> BPM_RANGE = new Pair<>(1, 512);  // In the format [min, max]
     private final Pair<Double, Double> OFFSET_RANGE = new Pair<>(-5., 5.);  // In the format [min, max]
 
     public final double SPECTROGRAM_ZOOM_SCALE_X = 2;
@@ -180,7 +181,7 @@ public class TranscriptionViewController implements Initializable {
     public Queue<CustomTask<?>> ongoingTasks = new LinkedList<>();
 
     private SceneSwitchingState sceneSwitchingState = SceneSwitchingState.SHOW_MAIN_SCENE;
-    private File selectedFile = null;
+    private SceneSwitchingData sceneSwitchingData = new SceneSwitchingData();
 
     private ScheduledExecutorService scheduler, autosaveScheduler, memoryAvailableScheduler;
 
@@ -296,8 +297,12 @@ public class TranscriptionViewController implements Initializable {
         for (String timeSignature : MusicUtils.TIME_SIGNATURES) timeSignatureChoice.getItems().add(timeSignature);
 
         // Set methods on spinners
-        bpmSpinner.valueProperty().addListener((observable, oldValue, newValue) -> updateBPMValue(newValue, false));
-        offsetSpinner.valueProperty().addListener(((observable, oldValue, newValue) -> updateOffsetValue(newValue, false)));
+        bpmSpinner.valueProperty().addListener(
+                (observable, oldValue, newValue) -> updateBPMValue(newValue, false)
+        );
+        offsetSpinner.valueProperty().addListener(
+                ((observable, oldValue, newValue) -> updateOffsetValue(newValue, false))
+        );
 
         bpmSpinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue) {  // Lost focus
@@ -545,8 +550,8 @@ public class TranscriptionViewController implements Initializable {
         return sceneSwitchingState;
     }
 
-    public File getSelectedFile() {
-        return selectedFile;
+    public SceneSwitchingData getSceneSwitchingData() {
+        return sceneSwitchingData;
     }
 
     public void setFileVersion(int fileVersion) {
@@ -775,13 +780,17 @@ public class TranscriptionViewController implements Initializable {
      * Method that sets the audio and spectrogram data for the transcription view controller.<br>
      * This method uses the actual audio file to do the setting of the data.
      *
-     * @param audioObj An <code>Audio</code> object that contains audio data.
+     * @param audioObj           An <code>Audio</code> object that contains audio data.
+     * @param sceneSwitchingData Scene switching data that controls whether certain tasks will be
+     *                           executed (e.g. BPM estimation task).
      */
-    public void setAudioAndSpectrogramData(Audio audioObj) {
+    public void setAudioAndSpectrogramData(Audio audioObj, SceneSwitchingData sceneSwitchingData) {
         // Set attributes
         audio = audioObj;
         audioDuration = audio.getDuration();
         sampleRate = audio.getSampleRate();
+
+        projectName = sceneSwitchingData.projectName;
 
         // Generate spectrogram image based on newly generated magnitude data
         CustomTask<WritableImage> spectrogramTask = new CustomTask<>("Generate Spectrogram") {
@@ -819,7 +828,11 @@ public class TranscriptionViewController implements Initializable {
         CustomTask<Double> bpmTask = new CustomTask<>("Estimate BPM") {
             @Override
             protected Double call() {
-                return BPMEstimator.estimate(audio.getMonoSamples(), sampleRate).get(0);  // Assume we take fist element
+                if (sceneSwitchingData.estimateBPM) {
+                    return BPMEstimator.estimate(audio.getMonoSamples(), sampleRate).get(0);  // Take first element
+                } else {
+                    return sceneSwitchingData.manualBPM;  // Use provided BPM
+                }
             }
         };
 
@@ -1199,28 +1212,15 @@ public class TranscriptionViewController implements Initializable {
         // Deal with possible unsaved changes
         boolean canCloseWindow = handleUnsavedChanges();
         if (canCloseWindow) {
-            // Get the current window
-            Window window = rootPane.getScene().getWindow();
+            // Get the scene switching data
+            Pair<Boolean, SceneSwitchingData> pair = ProjectSetupViewController.showProjectSetupView();
+            boolean shouldProceed = pair.getValue0();
+            sceneSwitchingData = pair.getValue1();
 
-            // Get user to select an audio file
-            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
-                    "Audio files (*.wav, *.mp3, *.flac, *.aif, *.aiff)",
-                    "*.wav", "*.mp3", "*.flac", "*.aif", "*.aiff"
-            );
-            File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
-
-            // If a file was selected, stop the audio completely
-            if (file != null) {
-                audio.stop();
-            }
-
-            // Verify that the user actually chose a file
-            if (file == null) {
-                Popups.showInformationAlert("Info", "No file selected.");
-            } else {
-                // Set the scene switching status and the selected file
+            // Specify the scene switching state
+            if (shouldProceed) {
+                // Signal the creation of a new project
                 sceneSwitchingState = SceneSwitchingState.NEW_PROJECT;
-                selectedFile = file;
 
                 // Close this stage
                 ((Stage) rootPane.getScene().getWindow()).close();
@@ -1266,7 +1266,7 @@ public class TranscriptionViewController implements Initializable {
             } else {
                 // Set the scene switching status and the selected file
                 sceneSwitchingState = SceneSwitchingState.OPEN_PROJECT;
-                selectedFile = file;
+                sceneSwitchingData.file = file;
 
                 // Close this stage
                 ((Stage) rootPane.getScene().getWindow()).close();
