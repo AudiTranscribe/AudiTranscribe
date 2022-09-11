@@ -19,9 +19,9 @@
 package site.overwrite.auditranscribe.music;
 
 import org.javatuples.Triplet;
+import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.ChromaCQT;
-import site.overwrite.auditranscribe.utils.MathUtils;
 import site.overwrite.auditranscribe.utils.StatisticalUtils;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
@@ -32,22 +32,76 @@ import java.util.List;
 /**
  * Class that handles the estimation of the music key.
  */
-public final class MusicKeyEstimator {
+public class MusicKeyEstimator {
     // Constants
     final static double[] MAJOR_PROFILE = {6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88};
     final static double[] MINOR_PROFILE = {6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17};
 
-    private MusicKeyEstimator() {
-        // Private constructor to signal this is a utility class
+    // Attributes
+    private final double[] samples;
+    private final double sampleRate;
+
+    /**
+     * Initialization method for a new <code>MusicKeyEstimator</code> object.
+     *
+     * @param y  Audio time series.
+     * @param sr Sample rate of the audio.
+     */
+    public MusicKeyEstimator(double[] y, double sr) {
+        this.samples = y;
+        this.sampleRate = sr;
     }
 
     // Public methods
 
     /**
+     * Method that returns the most likely keys for the audio sequence.
+     *
+     * @param numKeys Number of music keys to return.<br>
+     *                This number cannot be less than 1 or more than 30.
+     * @param task    The <code>CustomTask</code> object that is handling the generation. Pass in
+     *                <code>null</code> if no such task is being used.
+     * @return A list of <code>MusicKey</code> objects in <b>decreasing</b> likelihood of being the
+     * actual music key.
+     */
+    public List<MusicKey> getMostLikelyKeys(int numKeys, CustomTask<?> task) {
+        // Check that `numKeys` is valid
+        if ((numKeys < 1) || (numKeys > 30)) throw new ValueException("Invalid value for `numKeys`: " + numKeys);
+
+        // First get the key correlations
+        List<Triplet<Integer, Boolean, Double>> correlations = getKeyCorrelations(task);
+
+        // Now get the needed keys
+        List<MusicKey> keys = new ArrayList<>();
+        int corrIndex = 0;
+        while (keys.size() < numKeys) {
+            // Get the next triplet of correlation values
+            Triplet<Integer, Boolean, Double> triplet = correlations.get(corrIndex);
+            corrIndex++;
+
+            // Get the required properties from the triplet
+            int keyOffset = triplet.getValue0();
+            boolean isMinor = triplet.getValue1();
+
+            // Attempt to match to music key(s) and add to master list
+            List<MusicKey> possibleMatches = MusicKey.getPossibleMatches(keyOffset, isMinor);
+            keys.addAll(possibleMatches);
+        }
+
+        // Truncate until the size is exactly `numKeys`
+        while (keys.size() > numKeys) {
+            keys.remove(keys.size() - 1);  // Remove the least likely key at the end
+        }
+
+        // Return the final list of `numKeys` keys
+        return keys;
+    }
+
+    // Private methods
+
+    /**
      * Gets a list of key correlations based on the input audio series.
      *
-     * @param y    Audio time series.
-     * @param sr   Sample rate of the audio.
      * @param task The <code>CustomTask</code> object that is handling the generation. Pass in
      *             <code>null</code> if no such task is being used.
      * @return A list of triplets, sorted in <b>descending order</b> by how likely the key is to be
@@ -61,13 +115,11 @@ public final class MusicKeyEstimator {
      * </ul>
      * @implNote Uses the Krumhansl-Schmuckler key-finding algorithm to estimate the key.
      */
-    public static List<Triplet<Integer, Boolean, Double>> getKeyCorrelations(
-            double[] y, double sr, CustomTask<?> task
-    ) {
+    private List<Triplet<Integer, Boolean, Double>> getKeyCorrelations(CustomTask<?> task) {
         // Generate the chromagram
         double[][] chromagram = ChromaCQT.chromaCQT(
-                y, sr, 512, UnitConversionUtils.noteToFreq("C1"), 12, 7, 24,
-                task
+                samples, sampleRate, 512, UnitConversionUtils.noteToFreq("C1"), 12,
+                7, 24, task
         );
 
         // Compute the amount of each pitch class present in the time interval
@@ -111,7 +163,8 @@ public final class MusicKeyEstimator {
         return keyCorrelations;
     }
 
-    static class SortKeyProfiles implements Comparator<Triplet<Integer, Boolean, Double>> {
+    // Helper classes
+    private static class SortKeyProfiles implements Comparator<Triplet<Integer, Boolean, Double>> {
         @Override
         public int compare(
                 Triplet<Integer, Boolean, Double> o1, Triplet<Integer, Boolean, Double> o2

@@ -16,14 +16,13 @@
  * Copyright © AudiTranscribe Team
  */
 
-
 package site.overwrite.auditranscribe.music;
 
-import org.javatuples.Triplet;
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
+import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.io.IOMethods;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -35,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MusicKeyEstimatorTest {
     @Test
-    void getKeyCorrelations() throws UnsupportedAudioFileException, AudioTooLongException, IOException {
+    void getMostLikelyWays() throws UnsupportedAudioFileException, AudioTooLongException, IOException {
         // Test 1
         Audio audio1 = new Audio(
                 new File(IOMethods.getAbsoluteFilePath("testing-files/audio/Choice.wav")),
@@ -45,18 +44,11 @@ class MusicKeyEstimatorTest {
 
         double[] samples1 = audio1.getMonoSamples();
         double sampleRate1 = audio1.getSampleRate();
-        List<Triplet<Integer, Boolean, Double>> corr1 = MusicKeyEstimator.getKeyCorrelations(samples1, sampleRate1, null);
 
-        Triplet<Integer, Boolean, Double> best11 = corr1.get(0);
-        Triplet<Integer, Boolean, Double> best12 = corr1.get(1);
-        Triplet<Integer, Boolean, Double> best13 = corr1.get(2);
+        MusicKeyEstimator estimator1 = new MusicKeyEstimator(samples1, sampleRate1);
+        List<MusicKey> mostLikelyKeys1 = estimator1.getMostLikelyKeys(3, null);
 
-        assertEquals(7, best11.getValue0());
-        assertEquals(false, best11.getValue1());
-        assertEquals(2, best12.getValue0());
-        assertEquals(true, best12.getValue1());
-        assertEquals(7, best13.getValue0());
-        assertEquals(true, best13.getValue1());
+        assertEquals(List.of(MusicKey.G_MAJOR, MusicKey.D_MINOR, MusicKey.G_MINOR), mostLikelyKeys1);
 
         // Test 2
         Audio audio2 = new Audio(
@@ -67,17 +59,19 @@ class MusicKeyEstimatorTest {
 
         double[] samples2 = audio2.getMonoSamples();
         double sampleRate2 = audio2.getSampleRate();
-        List<Triplet<Integer, Boolean, Double>> corr2 = MusicKeyEstimator.getKeyCorrelations(samples2, sampleRate2, null);
 
-        Triplet<Integer, Boolean, Double> best21 = corr2.get(0);
-        Triplet<Integer, Boolean, Double> best22 = corr2.get(1);
-        Triplet<Integer, Boolean, Double> best23 = corr2.get(2);
+        MusicKeyEstimator estimator2 = new MusicKeyEstimator(samples2, sampleRate2);
+        List<MusicKey> mostLikelyKeys2 = estimator2.getMostLikelyKeys(4, null);
 
-        assertEquals(5, best21.getValue0());
-        assertEquals(false, best21.getValue1());
-        assertEquals(5, best22.getValue0());
-        assertEquals(true, best22.getValue1());
-        assertEquals(10, best23.getValue0());
-        assertEquals(false, best23.getValue1());
+        assertEquals(
+                List.of(MusicKey.F_MAJOR, MusicKey.F_MINOR, MusicKey.B_FLAT_MAJOR, MusicKey.A_SHARP_MINOR),
+                mostLikelyKeys2
+        );
+
+        // Test 3: Invalid key values
+        assertThrowsExactly(ValueException.class, () -> estimator1.getMostLikelyKeys(0, null));
+        assertThrowsExactly(ValueException.class, () -> estimator2.getMostLikelyKeys(-1, null));
+        assertThrowsExactly(ValueException.class, () -> estimator1.getMostLikelyKeys(31, null));
+        assertThrowsExactly(ValueException.class, () -> estimator2.getMostLikelyKeys(1337, null));
     }
 }
