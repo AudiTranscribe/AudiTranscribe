@@ -42,6 +42,7 @@ import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.io.data_files.data_encapsulators.SettingsData;
+import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingData;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.system.OSMethods;
@@ -69,8 +70,8 @@ public class MainViewController implements Initializable {
 
     private FilteredList<Quartet<Long, String, String, String>> filteredList;  // List of project records
 
-    private SceneSwitchingState sceneSwitchingState = SceneSwitchingState.CLOSE_SCENE;
-    private File selectedFile = null;
+    private SceneSwitchingState sceneSwitchingState;
+    private SceneSwitchingData sceneSwitchingData = new SceneSwitchingData();
 
     // FXML Elements
     // Menu bar items
@@ -138,9 +139,9 @@ public class MainViewController implements Initializable {
                 String filepath = selectedItem.getValue2();
                 File file = new File(filepath);
 
-                // Set the scene switching status and the selected file
+                // Set the scene switching state and data
                 sceneSwitchingState = SceneSwitchingState.OPEN_PROJECT;
-                selectedFile = file;
+                sceneSwitchingData.file = file;
 
                 // Close this stage
                 ((Stage) rootPane.getScene().getWindow()).close();
@@ -168,8 +169,8 @@ public class MainViewController implements Initializable {
         return sceneSwitchingState;
     }
 
-    public File getSelectedFile() {
-        return selectedFile;
+    public SceneSwitchingData getSceneSwitchingData() {
+        return sceneSwitchingData;
     }
 
     // Public methods
@@ -280,23 +281,15 @@ public class MainViewController implements Initializable {
      * @param actionEvent Event that triggered this function.
      */
     private void handleNewProject(ActionEvent actionEvent) {
-        // Get the current window
-        Window window = rootPane.getScene().getWindow();
+        // Get the scene switching data
+        Pair<Boolean, SceneSwitchingData> pair = ProjectSetupViewController.showProjectSetupView();
+        boolean shouldProceed = pair.getValue0();
+        sceneSwitchingData = pair.getValue1();
 
-        // Get user to select an audio file
-        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
-                "Audio files (*.wav, *.mp3, *.flac, *.aif, *.aiff)",
-                "*.wav", "*.mp3", "*.flac", "*.aif", "*.aiff"
-        );
-        File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
-
-        // Verify that the user actually chose a file
-        if (file == null) {
-            Popups.showInformationAlert("Info", "No file selected.");
-        } else {
-            // Set the scene switching status and the selected file
+        // Specify the scene switching state
+        if (shouldProceed) {
+            // Signal the creation of a new project
             sceneSwitchingState = SceneSwitchingState.NEW_PROJECT;
-            selectedFile = file;
 
             // Close this stage
             ((Stage) rootPane.getScene().getWindow()).close();
@@ -322,9 +315,9 @@ public class MainViewController implements Initializable {
         if (file == null) {
             Popups.showInformationAlert("Info", "No file selected.");
         } else {
-            // Set the scene switching status and the selected file
+            // Set the scene switching state and data
             sceneSwitchingState = SceneSwitchingState.OPEN_PROJECT;
-            selectedFile = file;
+            sceneSwitchingData.file = file;
 
             // Close this stage
             ((Stage) window).close();

@@ -19,17 +19,20 @@
 package site.overwrite.auditranscribe.main_views;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import org.javatuples.Pair;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.main_views.helpers.ProjectIOHandlers;
-import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingState;
+import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingData;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.misc.Theme;
@@ -37,6 +40,7 @@ import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFacto
 import site.overwrite.auditranscribe.utils.MusicUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -44,10 +48,11 @@ import java.util.logging.Level;
 public class ProjectSetupViewController implements Initializable {
     // Attributes
     private File audioFile;
-    private SceneSwitchingState sceneSwitchingState = SceneSwitchingState.SHOW_MAIN_SCENE;
 
     final ToggleGroup bpmGroup = new ToggleGroup();
     final ToggleGroup musicKeyGroup = new ToggleGroup();
+
+    public boolean shouldProceed = false;
 
     // FXML Elements
     @FXML
@@ -102,12 +107,12 @@ public class ProjectSetupViewController implements Initializable {
             }
         });
         cancelButton.setOnAction((event) -> {
-            sceneSwitchingState = SceneSwitchingState.SHOW_MAIN_SCENE;  // Go back to main scene
+            shouldProceed = false;
             closeProjectSetupView();
         });
         createButton.setOnAction((event) -> {
             if (validateValues()) {
-                sceneSwitchingState = SceneSwitchingState.NEW_PROJECT;  // Move on to creating the new project
+                shouldProceed = true;
                 closeProjectSetupView();
             }
         });
@@ -158,20 +163,6 @@ public class ProjectSetupViewController implements Initializable {
     // Getter/Setter methods
 
     /**
-     * Gets the scene switching state.
-     */
-    public SceneSwitchingState getSceneSwitchingState() {
-        return sceneSwitchingState;
-    }
-
-    /**
-     * Gets the audio file that was selected by the user.
-     */
-    public File getAudioFile() {
-        return audioFile;
-    }
-
-    /**
      * Gets the project name.
      */
     public String getProjectName() {
@@ -187,7 +178,7 @@ public class ProjectSetupViewController implements Initializable {
      */
     public Pair<Boolean, Double> getBPMPreference() {
         if (bpmGroup.getSelectedToggle() == bpmEstimateAutomatically) {
-            return new Pair<>(true, null);
+            return new Pair<>(true, -1.);  // -1 is used to signal `null`
         } else {
             return new Pair<>(false, bpmManualSpinner.getValue());
         }
@@ -211,9 +202,77 @@ public class ProjectSetupViewController implements Initializable {
     // Public methods
 
     /**
+     * Method that shows the project setup view.
+     *
+     * @return A pair. The first value indicates whether the setup should proceed. The second is the
+     * scene switching data.
+     */
+    public static Pair<Boolean, SceneSwitchingData> showProjectSetupView() {
+        try {
+            // Load the FXML file into the scene
+            FXMLLoader fxmlLoader = new FXMLLoader(
+                    IOMethods.getFileURL("views/fxml/main/project-setup-view.fxml")
+            );
+            Scene scene = new Scene(fxmlLoader.load());
+
+            // Get the view controller
+            ProjectSetupViewController controller = fxmlLoader.getController();
+
+            // Set the theme of the scene
+            controller.setThemeOnScene();
+
+            // Set stage properties
+            Stage projectSetupStage = new Stage();
+            projectSetupStage.initStyle(StageStyle.UTILITY);
+            projectSetupStage.setTitle("Project Setup");
+            projectSetupStage.setScene(scene);
+            projectSetupStage.setResizable(false);
+
+            // Show the stage
+            projectSetupStage.showAndWait();
+
+            // Set the scene switching data
+            SceneSwitchingData data = new SceneSwitchingData();
+
+            // Set data
+            if (controller.shouldProceed) {
+                // Obtain data from controller first
+                Pair<Boolean, Double> bpmPair = controller.getBPMPreference();
+                boolean shouldEstimateBPM = bpmPair.getValue0();
+                double manualBPM = bpmPair.getValue1();
+
+                Pair<Boolean, String> musicKeyPair = controller.getMusicKeyPreference();
+                boolean shouldEstimateMusicKey = musicKeyPair.getValue0();
+                String manualMusicKey = musicKeyPair.getValue1();
+
+                // Then set on the scene switching data
+                data.projectName = controller.getProjectName();
+                data.file = controller.audioFile;
+
+                data.isProjectSetup = true;
+
+                data.estimateBPM = shouldEstimateBPM;
+                data.manualBPM = manualBPM;
+
+                data.estimateMusicKey = shouldEstimateMusicKey;
+                data.musicKeyString = manualMusicKey;
+            }
+
+            // Return the formed data
+            return new Pair<>(controller.shouldProceed, data);
+
+        } catch (IOException e) {
+            MyLogger.logException(e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    // Private methods
+
+    /**
      * Method that sets the theme for the scene.
      */
-    public void setThemeOnScene() {
+    private void setThemeOnScene() {
         // Get the theme
         Theme theme = Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal];
 
@@ -223,8 +282,6 @@ public class ProjectSetupViewController implements Initializable {
         rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
         rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/" + theme.cssFile));
     }
-
-    // Private methods
 
     /**
      * Helper method that validates the values entered.

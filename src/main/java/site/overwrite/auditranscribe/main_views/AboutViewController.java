@@ -85,25 +85,6 @@ public class AboutViewController implements Initializable {
     // Public methods
 
     /**
-     * Method that sets the theme for the scene.
-     */
-    public void setThemeOnScene() {
-        // Get the theme
-        Theme theme = Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal];
-
-        // Set stylesheets
-        rootPane.getStylesheets().clear();  // Reset the stylesheets first before adding new ones
-
-        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
-        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/" + theme.cssFile));
-
-        // Set graphics
-        bannerImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/logo-and-banner/banner-" + theme.shortName + ".png"
-        )));
-    }
-
-    /**
      * Method that shows the "about" window.
      */
     public static void showAboutWindow() {
@@ -131,5 +112,26 @@ public class AboutViewController implements Initializable {
             MyLogger.logException(e);
             throw new RuntimeException(e);
         }
+    }
+
+    // Private methods
+
+    /**
+     * Method that sets the theme for the scene.
+     */
+    public void setThemeOnScene() {
+        // Get the theme
+        Theme theme = Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal];
+
+        // Set stylesheets
+        rootPane.getStylesheets().clear();  // Reset the stylesheets first before adding new ones
+
+        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
+        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/" + theme.cssFile));
+
+        // Set graphics
+        bannerImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/logo-and-banner/banner-" + theme.shortName + ".png"
+        )));
     }
 }
