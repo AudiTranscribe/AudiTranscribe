@@ -178,7 +178,6 @@ public class TranscriptionViewController implements Initializable {
 
     private SceneSwitchingState sceneSwitchingState = SceneSwitchingState.SHOW_MAIN_SCENE;
     private SceneSwitchingData sceneSwitchingData = new SceneSwitchingData();
-//    private File selectedFile = null;  // Todo: remove
 
     private ScheduledExecutorService scheduler, autosaveScheduler, memoryAvailableScheduler;
 
@@ -294,8 +293,12 @@ public class TranscriptionViewController implements Initializable {
         for (String timeSignature : MusicUtils.TIME_SIGNATURES) timeSignatureChoice.getItems().add(timeSignature);
 
         // Set methods on spinners
-        bpmSpinner.valueProperty().addListener((observable, oldValue, newValue) -> updateBPMValue(newValue, false));
-        offsetSpinner.valueProperty().addListener(((observable, oldValue, newValue) -> updateOffsetValue(newValue, false)));
+        bpmSpinner.valueProperty().addListener(
+                (observable, oldValue, newValue) -> updateBPMValue(newValue, false)
+        );
+        offsetSpinner.valueProperty().addListener(
+                ((observable, oldValue, newValue) -> updateOffsetValue(newValue, false))
+        );
 
         bpmSpinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue) {  // Lost focus
@@ -543,10 +546,6 @@ public class TranscriptionViewController implements Initializable {
         return sceneSwitchingState;
     }
 
-//    public File getSelectedFile() {  // Todo: remove
-//        return selectedFile;
-//    }
-
     public SceneSwitchingData getSceneSwitchingData() {
         return sceneSwitchingData;
     }
@@ -787,6 +786,8 @@ public class TranscriptionViewController implements Initializable {
         audioDuration = audio.getDuration();
         sampleRate = audio.getSampleRate();
 
+        projectName = sceneSwitchingData.projectName;
+
         // Generate spectrogram image based on newly generated magnitude data
         CustomTask<WritableImage> spectrogramTask = new CustomTask<>("Generate Spectrogram") {
             @Override
@@ -820,12 +821,11 @@ public class TranscriptionViewController implements Initializable {
         };
 
         // Estimate BPM based on the audio samples
-        // Todo: this is not good code; please fix
         CustomTask<Double> bpmTask = new CustomTask<>("Estimate BPM") {
             @Override
             protected Double call() {
                 if (sceneSwitchingData.estimateBPM) {
-                    return BPMEstimator.estimate(audio.getMonoSamples(), sampleRate).get(0);  // Assume we take fist element
+                    return BPMEstimator.estimate(audio.getMonoSamples(), sampleRate).get(0);  // Take first element
                 } else {
                     return sceneSwitchingData.manualBPM;  // Use provided BPM
                 }
@@ -1224,34 +1224,6 @@ public class TranscriptionViewController implements Initializable {
                 // Close this stage
                 ((Stage) rootPane.getScene().getWindow()).close();
             }
-
-            // Todo: remove
-//            // Get the current window
-//            Window window = rootPane.getScene().getWindow();
-//
-//            // Get user to select an audio file
-//            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
-//                    "Audio files (*.wav, *.mp3, *.flac, *.aif, *.aiff)",
-//                    "*.wav", "*.mp3", "*.flac", "*.aif", "*.aiff"
-//            );
-//            File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
-//
-//            // If a file was selected, stop the audio completely
-//            if (file != null) {
-//                audio.stop();
-//            }
-//
-//            // Verify that the user actually chose a file
-//            if (file == null) {
-//                Popups.showInformationAlert("Info", "No file selected.");
-//            } else {
-//                // Set the scene switching status and the selected file
-//                sceneSwitchingState = SceneSwitchingState.NEW_PROJECT;
-//                selectedFile = file;
-//
-//                // Close this stage
-//                ((Stage) rootPane.getScene().getWindow()).close();
-//            }
         }
     }
 

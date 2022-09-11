@@ -202,7 +202,11 @@ public class SceneSwitcher {
 
             // Attempt creation of temporary folder if it doesn't exist
             IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
-            MyLogger.log(Level.FINE, "Temporary folder: " + IOConstants.TEMP_FOLDER_PATH, this.getClass().toString());
+            MyLogger.log(
+                    Level.FINE,
+                    "Temporary folder: " + IOConstants.TEMP_FOLDER_PATH,
+                    this.getClass().toString()
+            );
 
             // Get the base path for the auxiliary files
             String baseName = IOMethods.joinPaths(
@@ -226,7 +230,8 @@ public class SceneSwitcher {
                 MyLogger.log(Level.FINE, "Successfully deleted auxiliary WAV file.", this.getClass().toString());
             } else {
                 MyLogger.log(
-                        Level.WARNING, "Failed to delete auxiliary WAV file now; will attempt delete after exit.",
+                        Level.WARNING,
+                        "Failed to delete auxiliary WAV file now; will attempt delete after exit.",
                         this.getClass().toString());
             }
 
