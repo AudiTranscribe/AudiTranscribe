@@ -19,6 +19,7 @@
 package site.overwrite.auditranscribe.utils;
 
 import org.junit.jupiter.api.Test;
+import site.overwrite.auditranscribe.exceptions.generic.LengthException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -52,13 +53,15 @@ class StatisticalUtilsTest {
                 2, 9, 1, 2, 2,
                 1, 2, 2, 3, 3
         };
-        double[] array2 = {1234};
-        double[] array3 = {};
+        double[] array2 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        double[] array3 = {1234};
+        double[] array4 = {};
 
         // Assertions
         assertEquals(4, StatisticalUtils.median(array1));
-        assertEquals(1234, StatisticalUtils.median(array2));
-        assertEquals(Double.NaN, StatisticalUtils.median(array3));
+        assertEquals(5.5, StatisticalUtils.median(array2));
+        assertEquals(1234, StatisticalUtils.median(array3));
+        assertEquals(Double.NaN, StatisticalUtils.median(array4));
     }
 
     @Test
@@ -86,6 +89,14 @@ class StatisticalUtilsTest {
 
         assertArrayEquals(new double[]{2.5, 0}, cov3[0], 1e-5);
         assertArrayEquals(new double[]{0, 3.5}, cov3[1], 1e-5);
+
+        // Test exceptions
+        assertThrowsExactly(LengthException.class, () -> StatisticalUtils.cov(new double[0], y1));
+        assertThrowsExactly(LengthException.class, () -> StatisticalUtils.cov(x1, new double[0]));
+        assertThrowsExactly(LengthException.class, () -> StatisticalUtils.cov(new double[0], new double[0]));
+
+        assertThrowsExactly(LengthException.class, () -> StatisticalUtils.cov(x1, y2));
+        assertThrowsExactly(LengthException.class, () -> StatisticalUtils.cov(x2, y1));
     }
 
     @Test
