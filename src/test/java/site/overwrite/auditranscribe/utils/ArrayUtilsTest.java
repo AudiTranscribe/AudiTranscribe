@@ -155,7 +155,7 @@ class ArrayUtilsTest {
         assertArrayEquals(new int[]{2, 1, 0, 2}, TypeConversionUtils.toIntegerArray(counts1));
 
         // Test 2
-        double[] data2 = {0, 0.1, -0.2, 0.3, -0.4, 0.5, -0.6, 0.7, -0.8, 0.9, -1, 1, 0, 0, 0, 0, 0};
+        double[] data2 = {-10, 0, 0.1, -0.2, 0.3, -0.4, 0.5, -0.6, 0.7, -0.8, 0.9, -1, 1, 0, 0, 0, 0, 0, 10};
         Pair<Integer[], Double[]> countsAndBins2 = ArrayUtils.histogram(data2, -1, 1, 10);
         Integer[] counts2 = countsAndBins2.getValue0();
         Double[] bins2 = countsAndBins2.getValue1();
