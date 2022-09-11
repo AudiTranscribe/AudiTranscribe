@@ -222,10 +222,10 @@ public class MainViewController implements Initializable {
 
             // For each file, get their last accessed time and generate the shortened name
             for (int key : keys) {
-                // Get both the filepath and the filename
+                // Get both the filepath and the project name
                 Pair<String, String> values = projectRecords.get(key);
                 String filepath = values.getValue0();
-                String filename = values.getValue1();
+                String projectName = values.getValue1();
 
                 // Add the project to the records
                 BasicFileAttributes attributes;
@@ -237,11 +237,10 @@ public class MainViewController implements Initializable {
                     long lastModifiedTimestamp = lastModifiedTime.toMillis();
 
                     // Get the shortened name of the file name
-                    filename = filename.substring(0, filename.length() - 5);  // Exclude the ".audt" at the end
-                    String shortenedName = MiscUtils.getShortenedName(filename);
+                    String shortenedName = MiscUtils.getShortenedName(projectName);
 
                     // Add to the list of projects
-                    projects.add(new Quartet<>(lastModifiedTimestamp, filename, filepath, shortenedName));
+                    projects.add(new Quartet<>(lastModifiedTimestamp, projectName, filepath, shortenedName));
                 } catch (NoSuchFileException e) {
                     projectsDB.deleteProjectRecord(key);
                 }
@@ -399,7 +398,7 @@ public class MainViewController implements Initializable {
                 // Get the primary key from the database
                 int pk;
                 try {
-                    pk = db.getIDOfProjectWithFilepath(filepath);
+                    pk = db.getPKOfProjectWithFilepath(filepath);
                 } catch (SQLException e) {
                     MyLogger.logException(e);
                     throw new RuntimeException(e);

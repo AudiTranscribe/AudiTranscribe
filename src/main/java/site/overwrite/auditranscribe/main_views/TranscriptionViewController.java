@@ -768,7 +768,7 @@ public class TranscriptionViewController implements Initializable {
         try {
             if (projectsDB.checkIfProjectDoesNotExist(audtFilePath)) {
                 // Insert the record into the database
-                projectsDB.insertProjectRecord(audtFilePath, audtFileName);
+                projectsDB.insertProjectRecord(audtFilePath, projectName);
             }
         } catch (SQLException e) {
             MyLogger.logException(e);
@@ -1307,7 +1307,7 @@ public class TranscriptionViewController implements Initializable {
             try {
                 if (projectsDB.checkIfProjectDoesNotExist(audtFilePath)) {
                     // Insert the record into the database
-                    projectsDB.insertProjectRecord(audtFilePath, audtFileName);
+                    projectsDB.insertProjectRecord(audtFilePath, projectName);
                 }
             } catch (SQLException e) {
                 MyLogger.logException(e);

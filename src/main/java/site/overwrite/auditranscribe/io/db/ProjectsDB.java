@@ -125,6 +125,29 @@ public class ProjectsDB {
                         """);
             }
         }
+        try (ResultSet resultSet = dbManager.executeGetQuery(
+                "SELECT \"id\", \"project_name\" FROM \"Projects\";"
+        )) {
+            while (resultSet.next()) {
+                // Get the ID
+                int id = resultSet.getInt("id");
+                String projectName = resultSet.getString("project_name");
+
+                // Update the project name
+                if (projectName.substring(projectName.length() - 5).equalsIgnoreCase(".audt")) {
+                    projectName = projectName.substring(0, projectName.length() - 5);  // Exclude the ".audt" at the end
+                }
+
+                try (PreparedStatement statement = dbManager.prepareStatement(
+                        "UPDATE \"Projects\" SET \"project_name\" = ? WHERE \"id\" = ?;"
+                )) {
+                    statement.setString(1, projectName);
+                    statement.setInt(2, id);
+
+                    dbManager.executeUpdate(statement);
+                }
+            }
+        }
 
         // Close connection with database
         dbManager.dbDisconnect();
@@ -173,7 +196,7 @@ public class ProjectsDB {
      * Returns <code>-1</code> if the project is not present in the database.
      * @throws SQLException If something went wrong when executing the SQL query.
      */
-    public int getIDOfProjectWithFilepath(String filepath) throws SQLException {
+    public int getPKOfProjectWithFilepath(String filepath) throws SQLException {
         // Start connection with the database
         dbManager.dbConnect();
 
