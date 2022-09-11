@@ -32,13 +32,21 @@ import java.util.Map;
  * Class that interfaces with the projects' database.
  */
 public class ProjectsDB {
+    // Constants
+    public static int SQL_DATABASE_VERSION = 0x00070001;  // Database version 0.7.0, revision 1 -> 00 07 00 01
+
     // SQL Queries
-    public static String SQL_CREATE_TABLE = """
+    public static String SQL_CREATE_PROJECTS_TABLE = """
             CREATE TABLE IF NOT EXISTS "Projects" (
-                "id"		INTEGER,
-            	"filepath"	TEXT UNIQUE,
-            	"filename"	TEXT NOT NULL,
+                "id"			INTEGER,
+            	"filepath"		TEXT UNIQUE,
+            	"project_name"	TEXT NOT NULL,
             	PRIMARY KEY("id")
+            );
+            """;
+    public static String SQL_CREATE_VERSION_TABLE = """
+            CREATE TABLE IF NOT EXISTS "Version" (
+            	"version_number"	INTEGER NOT NULL
             );
             """;
     public static String SQL_GET_ALL_PROJECTS = """
@@ -53,7 +61,7 @@ public class ProjectsDB {
             WHERE "filepath" = ?;
             """;
     public static String SQL_INSERT_PROJECT_RECORD = """
-            INSERT INTO "Projects" ("filepath", "filename")
+            INSERT INTO "Projects" ("filepath", "project_name")
             VALUES (?, ?);
             """;
     public static String SQL_DELETE_PROJECT_RECORD = """
@@ -79,9 +87,46 @@ public class ProjectsDB {
         // Create a database manager object
         dbManager = new SQLiteDatabaseManager(PROJECT_FILE_LIST_DB_PATH);
 
-        // Create the projects table
+        // Start connection with the database
         dbManager.dbConnect();
-        dbManager.executeUpdate(SQL_CREATE_TABLE);
+
+        // Prepare to create the database tables
+        dbManager.executeUpdate(SQL_CREATE_PROJECTS_TABLE);
+        dbManager.executeUpdate(SQL_CREATE_VERSION_TABLE);
+
+        // Add version entry
+        // (Note: in general, modifying the SQL query like this is insecure and not safe. However, since we control
+        // the `SQL_DATABASE_VERSION`, this will be safe.)
+        try (ResultSet resultSet = dbManager.executeGetQuery(
+                "SELECT COUNT(*) AS X FROM \"Version\";"
+        )) {
+            if (resultSet.next()) {
+                if (resultSet.getInt("X") == 0) {
+                    dbManager.executeUpdate(
+                            "INSERT INTO \"Version\" VALUES (" + SQL_DATABASE_VERSION + ");"
+                    );
+                } else {
+                    dbManager.executeUpdate(
+                            "UPDATE \"Version\" SET version_number = " + SQL_DATABASE_VERSION + ";"
+                    );
+                }
+            }
+        }
+
+        // FOR VERSION 0.7.x ONLY: Update existing "Projects" table
+        // TODO: IMPORTANT: Remove once 0.7.x passes
+        try (ResultSet resultSet = dbManager.executeGetQuery(
+                "SELECT COUNT(*) AS X FROM pragma_table_info('Projects') WHERE name='filename';"
+        )) {
+            if (resultSet.next() && resultSet.getInt("X") == 1) {
+                dbManager.executeUpdate("""
+                        ALTER TABLE "Projects"
+                        RENAME COLUMN "filename" TO "project_name";
+                        """);
+            }
+        }
+
+        // Close connection with database
         dbManager.dbDisconnect();
     }
 
@@ -91,7 +136,7 @@ public class ProjectsDB {
      * Method that gets all the projects' details.
      *
      * @return Map of all the projects. Key is the database primary key and values are the filepath
-     * and filename in that order.
+     * and project name in that order.
      * @throws SQLException If something went wrong when executing the SQL query.
      */
     public Map<Integer, Pair<String, String>> getAllProjects() throws SQLException {
@@ -106,10 +151,10 @@ public class ProjectsDB {
                 // Get the data
                 int pk = resultSet.getInt("id");
                 String filepath = resultSet.getString("filepath");
-                String filename = resultSet.getString("filename");
+                String projectName = resultSet.getString("project_name");
 
                 // Place the data into the map
-                allProjects.put(pk, new Pair<>(filepath, filename));
+                allProjects.put(pk, new Pair<>(filepath, projectName));
             }
         }
 
@@ -186,21 +231,21 @@ public class ProjectsDB {
     /**
      * Method that inserts a new project record into the database.
      *
-     * @param filepath <b>Absolute</b> path to the project file.
-     * @param filename Project file's name.
+     * @param filepath    <b>Absolute</b> path to the project file.
+     * @param projectName Name of the project that is being added.
      * @throws SQLException If something went wrong when executing the SQL query.<br>
      *                      Specifically, for this method, a <code>SQLException</code> would likely
      *                      be due to a <code>UNIQUE</code> constraint failure; i.e. there already
      *                      exists a project file with the same file path as the current record.
      */
-    public void insertProjectRecord(String filepath, String filename) throws SQLException {
+    public void insertProjectRecord(String filepath, String projectName) throws SQLException {
         // Start connection with the database
         dbManager.dbConnect();
 
         try (PreparedStatement insertProjectStatement = dbManager.prepareStatement(SQL_INSERT_PROJECT_RECORD)) {
             // Prepare the statement for execution
             insertProjectStatement.setString(1, filepath);
-            insertProjectStatement.setString(2, filename);
+            insertProjectStatement.setString(2, projectName);
 
             // Execute the statement
             dbManager.executeUpdate(insertProjectStatement);
@@ -213,7 +258,7 @@ public class ProjectsDB {
     /**
      * Method that deletes a specific project's record from the database.
      *
-     * @param key Public key of the record in the database.
+     * @param key Primary key of the record in the database.
      * @throws SQLException If something went wrong when executing the SQL query.
      */
     public void deleteProjectRecord(int key) throws SQLException {
