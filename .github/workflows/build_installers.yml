@@ -4,13 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: 'Specify Release Tag'
-        default: 'Example: v1.2.3-alpha'
+        description: "Specify Release Tag"
+        default: "Example: v1.2.3"
         required: true
       branch:
-        description: 'Specify Branch'
+        description: "Specify Branch"
         required: true
-        default: 'staging'
+        default: "staging"
 
 permissions:
   contents: write
