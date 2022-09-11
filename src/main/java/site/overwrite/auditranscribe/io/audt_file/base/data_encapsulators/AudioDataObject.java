@@ -18,9 +18,6 @@
 
 package site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators;
 
-import java.util.Arrays;
-import java.util.Objects;
-
 /**
  * Data object that stores the audio data.
  */
@@ -32,24 +29,4 @@ public abstract class AudioDataObject extends AbstractAUDTDataObject {
     public byte[] compressedMP3Bytes;
     public double sampleRate;
     public int totalDurationInMS;
-
-    // Overwritten methods
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        AudioDataObject that = (AudioDataObject) o;
-        return (
-                Double.compare(that.sampleRate, sampleRate) == 0 &&
-                        totalDurationInMS == that.totalDurationInMS &&
-                        Arrays.equals(compressedMP3Bytes, that.compressedMP3Bytes)
-        );
-    }
-
-    @Override
-    public int hashCode() {
-        int result = Objects.hash(sampleRate, totalDurationInMS);
-        result = 31 * result + Arrays.hashCode(compressedMP3Bytes);
-        return result;
-    }
 }

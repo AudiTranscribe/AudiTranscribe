@@ -18,8 +18,6 @@
 
 package site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators;
 
-import java.util.Objects;
-
 /**
  * Data object that stores the unchanging data's properties.
  */
@@ -34,23 +32,4 @@ public abstract class UnchangingDataPropertiesObject extends AbstractAUDTDataObj
 
     // Attributes
     public int numSkippableBytes;
-
-    // Overwritten methods
-    @Override
-    public int numBytesNeeded() {
-        return NUM_BYTES_NEEDED;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        UnchangingDataPropertiesObject that = (UnchangingDataPropertiesObject) o;
-        return numSkippableBytes == that.numSkippableBytes;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(numSkippableBytes);
-    }
 }
