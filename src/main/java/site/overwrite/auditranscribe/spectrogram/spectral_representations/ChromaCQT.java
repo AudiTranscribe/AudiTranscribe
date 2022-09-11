@@ -62,8 +62,33 @@ public final class ChromaCQT {
             double[] y, double sr, int hopLength, double fmin, int numChroma, int numOctaves, int binsPerOctave,
             CustomTask<?> task
     ) {
-        // Constants
-        double threshold = 0;
+        return ChromaCQT.chromaCQT(y, sr, hopLength, fmin, numChroma, numOctaves, binsPerOctave, 0, task);
+    }
+
+    /**
+     * Constant-Q chromagram.
+     *
+     * @param y             Audio time series.
+     * @param sr            Sample rate.
+     * @param hopLength     Number of samples between successive chroma frames.
+     * @param fmin          Minimum frequency to analyze in the CQT.
+     * @param numChroma     Number of chroma bins to produce.
+     * @param numOctaves    Number of octaves to analyze above <code>fmin</code>.
+     * @param binsPerOctave Number of bins per octave in the CQT. Must be an integer multiple of
+     *                      <code>numChroma</code>.
+     * @param threshold     Minimum chroma value for it to count.
+     * @param task          The <code>CustomTask</code> object that is handling the generation. Pass
+     *                      in <code>null</code> if no such task is being used.
+     * @return The output chromagram.
+     * @implNote See
+     * <a href="https://librosa.org/doc/main/generated/librosa.feature.chroma_cqt.html">Librosa's
+     * Implementation</a> of the Chroma CQT algorithm.
+     */
+
+    public static double[][] chromaCQT(
+            double[] y, double sr, int hopLength, double fmin, int numChroma, int numOctaves, int binsPerOctave,
+            double threshold, CustomTask<?> task
+    ) {
 
         // Build the CQT
         Complex[][] cqt = CQT.cqt(
@@ -86,10 +111,12 @@ public final class ChromaCQT {
         // Map to chroma
         double[][] chroma = ArrayUtils.matmul(cqToChr, C);
 
+        System.out.println(chroma[0][0] + " " + chroma[1][1] + " " + chroma[11][23] +  " " + chroma[5][214] + " " + chroma[9][128]);
+
         // Threshold the chroma values
         for (int i = 0; i < chroma.length; i++) {
             for (int j = 0; j < chroma[i].length; j++) {
-                chroma[i][j] = chroma[i][j] < threshold ? 0 : chroma[i][j];
+                chroma[i][j] = Math.max(chroma[i][j], threshold);
             }
         }
 
