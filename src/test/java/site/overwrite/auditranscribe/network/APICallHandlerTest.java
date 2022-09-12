@@ -112,7 +112,7 @@ class APICallHandlerTest {
     void timeoutAPIPostRequest() {
         assertThrows(
                 APIServerException.class,
-                () -> APICallHandler.sendAPIGetRequest("test-api-server-post", null, 1)
+                () -> APICallHandler.sendAPIPostRequest("test-api-server-post", null, 1)
         );
     }
 }

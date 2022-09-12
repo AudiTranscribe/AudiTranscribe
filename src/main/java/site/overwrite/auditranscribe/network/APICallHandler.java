@@ -143,16 +143,16 @@ public final class APICallHandler {
             // Set the request method for the connection
             con.setRequestMethod("POST");
 
+            // Set timeouts
+            con.setConnectTimeout(CONNECTION_TIMEOUT);
+            con.setReadTimeout(timeout);
+
             // Add POST data
             con.setDoOutput(true);
             DataOutputStream out = new DataOutputStream(con.getOutputStream());
             out.writeBytes(paramsMapToString(params));
             out.flush();
             out.close();
-
-            // Set timeouts
-            con.setConnectTimeout(CONNECTION_TIMEOUT);
-            con.setReadTimeout(timeout);
 
             // Get the output from the connection
             output = getConnectionOutput(con);
