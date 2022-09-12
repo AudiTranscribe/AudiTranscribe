@@ -56,7 +56,7 @@ you could submit an issue instead of a pull request.
 
 ## Reporting Bugs
 
-If you find a bug within AudiTranscribe, please 
+If you find a bug within AudiTranscribe, please
 [submit an issue](https://github.com/AudiTranscribe/AudiTranscribe/issues) on the issue tracker. We recommend using the
 issue template to aid us in fixing the bug.
 
