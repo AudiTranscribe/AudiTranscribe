@@ -111,8 +111,6 @@ public final class ChromaCQT {
         // Map to chroma
         double[][] chroma = ArrayUtils.matmul(cqToChr, C);
 
-        System.out.println(chroma[0][0] + " " + chroma[1][1] + " " + chroma[11][23] +  " " + chroma[5][214] + " " + chroma[9][128]);
-
         // Threshold the chroma values
         for (int i = 0; i < chroma.length; i++) {
             for (int j = 0; j < chroma[i].length; j++) {

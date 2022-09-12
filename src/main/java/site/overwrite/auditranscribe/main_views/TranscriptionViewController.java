@@ -41,6 +41,8 @@ import org.javatuples.Triplet;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.audio.FFmpegHandler;
 import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingData;
+import site.overwrite.auditranscribe.music.MusicKey;
+import site.overwrite.auditranscribe.music.MusicKeyEstimator;
 import site.overwrite.auditranscribe.music.bpm_estimation.BPMEstimator;
 import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
 import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
@@ -318,26 +320,9 @@ public class TranscriptionViewController implements Initializable {
 
         // Set methods on choice box fields
         musicKeyChoice.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            MyLogger.log(
-                    Level.FINE,
-                    "Changed music key from " + oldValue + " to " + newValue,
-                    this.getClass().toString()
-            );
-
-            // Update the `hasUnsavedChanges` flag
-            hasUnsavedChanges = true;
-
-            // Update note pane and note labels
-            if (isEverythingReady) {
-                noteLabels = PlottingStuffHandler.addNoteLabels(
-                        notePane, noteLabels, newValue, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER,
-                        FANCY_NOTE_LABELS
-                );
+            if (!Objects.equals(newValue, oldValue)) {
+                updateMusicKeyValue(newValue, false);
             }
-
-            // Update the music key value and music key index
-            musicKey = newValue;
-            musicKeyIndex = ArrayUtils.findIndex(MusicUtils.MUSIC_KEYS, newValue);
         });
 
         timeSignatureChoice.getSelectionModel().selectedItemProperty()
@@ -836,12 +821,33 @@ public class TranscriptionViewController implements Initializable {
             }
         };
 
+        // Estimate music key
+        CustomTask<String> musicKeyTask = new CustomTask<>("Estimate Music Key") {
+            @Override
+            protected String call() {
+                if (sceneSwitchingData.estimateMusicKey) {
+                    // Create a music key estimator
+                    MusicKeyEstimator musicKeyEstimator = new MusicKeyEstimator(audio.getMonoSamples(), sampleRate);
+
+                    // Get the top 3 most likely keys
+                    List<MusicKey> mostLikelyKeys = musicKeyEstimator.getMostLikelyKeys(3, this);
+
+                    // Return the most likely key
+                    // Todo: show the other keys as well
+                    return mostLikelyKeys.get(0).name;
+                } else {
+                    return sceneSwitchingData.musicKeyString;
+                }
+            }
+        };
+
         // Set up tasks
         setupSpectrogramTask(spectrogramTask, "Generating spectrogram...");
         setupBPMEstimationTask(bpmTask);
+        setupMusicKeyEstimationTask(musicKeyTask);
 
         // Start the tasks
-        startTasks(spectrogramTask, bpmTask);
+        startTasks(spectrogramTask, bpmTask, musicKeyTask);
     }
 
     /**
@@ -1511,6 +1517,7 @@ public class TranscriptionViewController implements Initializable {
         } else {
             MyLogger.log(Level.FINE, "Force update BPM value to " + newBPM, this.getClass().toString());
         }
+
         bpm = newBPM;
     }
 
@@ -1556,7 +1563,45 @@ public class TranscriptionViewController implements Initializable {
         } else {
             MyLogger.log(Level.FINE, "Force update offset value to " + newOffset, this.getClass().toString());
         }
+
         offset = newOffset;
+    }
+
+    /**
+     * Helper method that updates the needed things when the music key value changes.
+     *
+     * @param newMusicKey New music key value.
+     * @param forceUpdate Whether to force an update to the note labels.
+     */
+    private void updateMusicKeyValue(String newMusicKey, boolean forceUpdate) {
+        // Update the `hasUnsavedChanges` flag
+        hasUnsavedChanges = true;
+
+        // Update note pane and note labels
+        if (isEverythingReady || forceUpdate) {
+            noteLabels = PlottingStuffHandler.addNoteLabels(
+                    notePane, noteLabels, newMusicKey, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER,
+                    FANCY_NOTE_LABELS
+            );
+        }
+
+        // Update the music key value and music key index
+        if (!forceUpdate) {
+            MyLogger.log(
+                    Level.FINE,
+                    "Changed music key from " + musicKey + " to " + newMusicKey,
+                    this.getClass().toString()
+            );
+        } else {
+            MyLogger.log(
+                    Level.FINE,
+                    "Forced changed music key from " + musicKey + " to " + newMusicKey,
+                    this.getClass().toString()
+            );
+        }
+
+        musicKey = newMusicKey;
+        musicKeyIndex = ArrayUtils.findIndex(MusicUtils.MUSIC_KEYS, newMusicKey);
     }
 
     /**
@@ -1582,9 +1627,9 @@ public class TranscriptionViewController implements Initializable {
     // Task handlers
 
     /**
-     * Helper method that starts the spectrogram generation task.
+     * Helper method that sets up the spectrogram generation task.
      *
-     * @param task    The task to start.
+     * @param task    The spectrogram task.
      * @param message Message to display at the side of the progress bar.
      */
     private void setupSpectrogramTask(CustomTask<WritableImage> task, String message) {
@@ -1788,9 +1833,9 @@ public class TranscriptionViewController implements Initializable {
     }
 
     /**
-     * Helper method that starts the BPM estimation task.
+     * Helper method that sets up the BPM estimation task.
      *
-     * @param task The task to start.
+     * @param task The BPM estimation task.
      */
     private void setupBPMEstimationTask(CustomTask<Double> task) {
         // Set the task's message
@@ -1809,6 +1854,30 @@ public class TranscriptionViewController implements Initializable {
             // Mark the task as completed
             markTaskAsCompleted(task);
             MyLogger.log(Level.INFO, "BPM estimation task complete", this.getClass().toString());
+        });
+    }
+
+    /**
+     * Helper method that sets up the music key estimation task.
+     *
+     * @param task The music key estimation task.
+     */
+    private void setupMusicKeyEstimationTask(CustomTask<String> task) {
+        // Set the task's message
+        task.setMessage("Estimating music key...");
+
+        // Set task completion listener
+        task.setOnSucceeded(event -> {
+            // Get the music key
+            String key = task.getValue();
+
+            // Update the music key choice
+            updateMusicKeyValue(key, true);
+            musicKeyChoice.setValue(key);
+
+            // Mark the task as completed
+            markTaskAsCompleted(task);
+            MyLogger.log(Level.INFO, "Music key estimation task complete", this.getClass().toString());
         });
     }
 
