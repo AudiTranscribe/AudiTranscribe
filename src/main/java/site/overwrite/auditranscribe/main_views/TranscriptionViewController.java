@@ -1872,7 +1872,7 @@ public class TranscriptionViewController implements Initializable {
             String key = task.getValue();
 
             // Update the music key choice
-            updateMusicKeyValue(key, true);
+            updateMusicKeyValue(key, sceneSwitchingData.estimateMusicKey);  // Will force update if estimating key
             musicKeyChoice.setValue(key);
 
             // Mark the task as completed
@@ -1945,7 +1945,7 @@ public class TranscriptionViewController implements Initializable {
                     throw new RuntimeException(e);
                 }
 
-                MyLogger.log(Level.INFO, "All tasks have finished", this.getClass().toString());
+                MyLogger.log(Level.INFO, "All tasks complete", this.getClass().toString());
                 return hasTerminated;
             }
         };
