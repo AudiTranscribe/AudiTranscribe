@@ -19,7 +19,6 @@
 package site.overwrite.auditranscribe.music.bpm_estimation;
 
 import org.junit.jupiter.api.Test;
-import site.overwrite.auditranscribe.music.bpm_estimation.BPMEstimationHelpers;
 
 import static org.junit.jupiter.api.Assertions.*;
 

@@ -26,7 +26,6 @@ import site.overwrite.auditranscribe.misc.Complex;
 import static org.junit.jupiter.api.Assertions.*;
 
 class WaveletTest {
-
     @Test
     void computeWaveletLengths() {
         // Define frequency arrays

@@ -35,7 +35,7 @@ import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@EnabledOnOs({OS.WINDOWS})
+@EnabledOnOs({OS.LINUX})
 class ProjectDataTest {
     // Define helper attributes
     double[][] qTransformMagnitudes1;

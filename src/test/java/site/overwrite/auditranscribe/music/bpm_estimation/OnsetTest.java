@@ -23,7 +23,6 @@ import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.music.bpm_estimation.Onset;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;

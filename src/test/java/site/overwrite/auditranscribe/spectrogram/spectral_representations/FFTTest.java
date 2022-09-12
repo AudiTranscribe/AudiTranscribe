@@ -28,7 +28,6 @@ import java.lang.reflect.Method;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FFTTest {
-
     @Test
     void fftAndRFFT() {
         // Define the complex number arrays

@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ChromaCQTTest {
+    // Get audio file, audio samples, and sample rate for the tests
     Audio audio = new Audio(
             new File(IOMethods.getAbsoluteFilePath("testing-files/audio/Trumpet.wav")),
             "Trumpet.wav",
