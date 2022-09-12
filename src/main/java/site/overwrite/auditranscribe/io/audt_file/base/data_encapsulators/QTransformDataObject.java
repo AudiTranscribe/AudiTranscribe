@@ -19,8 +19,8 @@
 package site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators;
 
 import org.javatuples.Triplet;
+import site.overwrite.auditranscribe.utils.ByteConversionUtils;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
-import site.overwrite.auditranscribe.io.IOConverters;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileHelpers;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.utils.TypeConversionUtils;
@@ -70,7 +70,7 @@ public abstract class QTransformDataObject extends AbstractAUDTDataObject {
         }
 
         // Convert the integer data to bytes
-        byte[] plainBytes = IOConverters.twoDimensionalIntegerArrayToBytes(intDataPrimitive);
+        byte[] plainBytes = ByteConversionUtils.twoDimensionalIntegerArrayToBytes(intDataPrimitive);
 
         // Compress the bytes
         byte[] bytes = CompressionHandlers.lz4Compress(plainBytes, task);
@@ -95,7 +95,7 @@ public abstract class QTransformDataObject extends AbstractAUDTDataObject {
         byte[] plainBytes = CompressionHandlers.lz4Decompress(bytes);
 
         // Convert bytes to 2D integer array
-        int[][] intData = IOConverters.bytesToTwoDimensionalIntegerArray(plainBytes);
+        int[][] intData = ByteConversionUtils.bytesToTwoDimensionalIntegerArray(plainBytes);
 
         // Finally convert the integer data to double
         return AUDTFileHelpers.int2DtoDoubles2D(intData, minMagnitude, maxMagnitude);

@@ -1,5 +1,5 @@
 /*
- * IOConverters.java
+ * ByteConversionUtils.java
  * Description: Methods that converts Java objects/data into bytes for storage.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.io;
+package site.overwrite.auditranscribe.utils;
 
 import site.overwrite.auditranscribe.exceptions.generic.LengthException;
 
@@ -27,8 +27,8 @@ import java.util.Arrays;
 /**
  * Methods that converts Java objects/data into bytes for storage.
  */
-public final class IOConverters {
-    private IOConverters() {
+public final class ByteConversionUtils {
+    private ByteConversionUtils() {
         // Private constructor to signal this is a utility class
     }
 

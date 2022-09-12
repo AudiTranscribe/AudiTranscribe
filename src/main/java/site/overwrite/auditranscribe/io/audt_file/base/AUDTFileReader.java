@@ -19,8 +19,8 @@
 package site.overwrite.auditranscribe.io.audt_file.base;
 
 import site.overwrite.auditranscribe.exceptions.io.audt_file.InvalidFileVersionException;
+import site.overwrite.auditranscribe.utils.ByteConversionUtils;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
-import site.overwrite.auditranscribe.io.IOConverters;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import site.overwrite.auditranscribe.exceptions.io.audt_file.FailedToReadDataException;
@@ -105,7 +105,7 @@ public abstract class AUDTFileReader {
             // Try and get the file version
             inputStream.skipNBytes(20L);  // First 20 is the header
             byte[] fileVersionBytes = inputStream.readNBytes(4);  // 4 bytes per integer
-            fileVersion = IOConverters.bytesToInt(fileVersionBytes);
+            fileVersion = ByteConversionUtils.bytesToInt(fileVersionBytes);
         }
 
         try (InputStream inputStream = new FileInputStream(filepath)) {  // Do this so that the read point is the start
@@ -234,7 +234,7 @@ public abstract class AUDTFileReader {
         bytePos += 4;
 
         // Convert these integer bytes back into an integer and return
-        return IOConverters.bytesToInt(integerBytes);
+        return ByteConversionUtils.bytesToInt(integerBytes);
     }
 
     /**
@@ -248,7 +248,7 @@ public abstract class AUDTFileReader {
         bytePos += 8;
 
         // Convert these double bytes back into a double and return
-        return IOConverters.bytesToDouble(doubleBytes);
+        return ByteConversionUtils.bytesToDouble(doubleBytes);
     }
 
     /**
@@ -265,7 +265,7 @@ public abstract class AUDTFileReader {
         bytePos += numBytes;
 
         // Convert these string bytes back into a string and return
-        return IOConverters.bytesToString(stringBytes);
+        return ByteConversionUtils.bytesToString(stringBytes);
     }
 
     /**
@@ -302,7 +302,7 @@ public abstract class AUDTFileReader {
         byte[] decompressedBytes = CompressionHandlers.lz4Decompress(compressedBytes);
 
         // Convert these bytes back into the 1D array and return
-        return IOConverters.bytesToOneDimensionalIntegerArray(decompressedBytes);
+        return ByteConversionUtils.bytesToOneDimensionalIntegerArray(decompressedBytes);
     }
 
     /**
@@ -322,7 +322,7 @@ public abstract class AUDTFileReader {
         byte[] decompressedBytes = CompressionHandlers.lz4Decompress(compressedBytes);
 
         // Convert these bytes back into the 1D array and return
-        return IOConverters.bytesToOneDimensionalDoubleArray(decompressedBytes);
+        return ByteConversionUtils.bytesToOneDimensionalDoubleArray(decompressedBytes);
     }
 
     /**

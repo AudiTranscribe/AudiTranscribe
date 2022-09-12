@@ -19,7 +19,7 @@
 package site.overwrite.auditranscribe.io.audt_file.base;
 
 import site.overwrite.auditranscribe.exceptions.io.audt_file.InvalidFileVersionException;
-import site.overwrite.auditranscribe.io.IOConverters;
+import site.overwrite.auditranscribe.utils.ByteConversionUtils;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileHelpers;
@@ -198,7 +198,7 @@ public abstract class AUDTFileWriter {
      */
     protected void writeInteger(int integer) {
         // Convert the integer into its bytes
-        byte[] byteArray = IOConverters.intToBytes(integer);
+        byte[] byteArray = ByteConversionUtils.intToBytes(integer);
 
         // Write to the byte list
         AUDTFileHelpers.addBytesIntoBytesList(bytes, byteArray);
@@ -211,7 +211,7 @@ public abstract class AUDTFileWriter {
      */
     protected void writeDouble(double dbl) {
         // Convert the double into its bytes
-        byte[] byteArray = IOConverters.doubleToBytes(dbl);
+        byte[] byteArray = ByteConversionUtils.doubleToBytes(dbl);
 
         // Write to the byte list
         AUDTFileHelpers.addBytesIntoBytesList(bytes, byteArray);
@@ -224,7 +224,7 @@ public abstract class AUDTFileWriter {
      */
     protected void writeString(String str) {
         // Convert the string into its bytes
-        byte[] byteArray = IOConverters.stringToBytes(str);
+        byte[] byteArray = ByteConversionUtils.stringToBytes(str);
 
         // Get the number of bytes needed to store the string
         int numBytes = byteArray.length;
@@ -251,7 +251,7 @@ public abstract class AUDTFileWriter {
      */
     protected void write1DIntegerArray(int[] array) throws IOException {
         // Convert the 1D array into its bytes
-        byte[] byteArray = IOConverters.oneDimensionalIntegerArrayToBytes(array);
+        byte[] byteArray = ByteConversionUtils.oneDimensionalIntegerArrayToBytes(array);
 
         // Compress the byte array
         byte[] compressedBytes = CompressionHandlers.lz4Compress(byteArray);
@@ -271,7 +271,7 @@ public abstract class AUDTFileWriter {
      */
     protected void write1DDoubleArray(double[] array) throws IOException {
         // Convert the 1D array into its bytes
-        byte[] byteArray = IOConverters.oneDimensionalDoubleArrayToBytes(array);
+        byte[] byteArray = ByteConversionUtils.oneDimensionalDoubleArrayToBytes(array);
 
         // Compress the byte array
         byte[] compressedBytes = CompressionHandlers.lz4Compress(byteArray);
@@ -313,8 +313,8 @@ public abstract class AUDTFileWriter {
         AUDTFileHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_FILE_HEADER);
 
         // Write version numbers
-        byte[] fileVersionBytes = IOConverters.intToBytes(fileVersion);
-        byte[] lz4VersionBytes = IOConverters.intToBytes(AUDTFileConstants.LZ4_VERSION_NUMBER);
+        byte[] fileVersionBytes = ByteConversionUtils.intToBytes(fileVersion);
+        byte[] lz4VersionBytes = ByteConversionUtils.intToBytes(AUDTFileConstants.LZ4_VERSION_NUMBER);
 
         AUDTFileHelpers.addBytesIntoBytesList(bytes, fileVersionBytes);
         AUDTFileHelpers.addBytesIntoBytesList(bytes, lz4VersionBytes);
