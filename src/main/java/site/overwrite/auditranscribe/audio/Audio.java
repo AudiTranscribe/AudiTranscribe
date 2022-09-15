@@ -49,7 +49,7 @@ import java.util.logging.Level;
 public class Audio {
     // Constants
     public static final int SAMPLES_BUFFER_SIZE = 1024;  // In bits; 1024 = 2^10
-    public static final double MAX_AUDIO_LENGTH = 4;  // Maximum length of audio
+    public static final double MAX_AUDIO_LENGTH = 5;  // Maximum length of audio in minutes
 
     // Attributes
     private final String audioFileName;
