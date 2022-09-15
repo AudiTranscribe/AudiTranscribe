@@ -52,8 +52,6 @@ public class Audio {
     public static final double MAX_AUDIO_LENGTH = 5;  // Maximum length of audio in minutes
 
     // Attributes
-    private final String audioFileName;
-
     private final AudioInputStream audioStream;
     private final AudioFormat audioFormat;
     private final double sampleRate;
@@ -73,7 +71,6 @@ public class Audio {
      *
      * @param wavFile        File object representing the WAV file to be used for both samples
      *                       generation and audio playback.
-     * @param audioFileName  The file name of the original audio file.
      * @param processingMode The processing mode when handling the audio file.
      *                       <ul>
      *                       <li>
@@ -93,11 +90,8 @@ public class Audio {
      *                                       permitted.
      */
     public Audio(
-            File wavFile, String audioFileName, AudioProcessingMode processingMode
+            File wavFile, AudioProcessingMode processingMode
     ) throws UnsupportedAudioFileException, IOException, AudioTooLongException {
-        // Update attributes
-        this.audioFileName = audioFileName;
-
         // Set flags
         boolean needPlayback = false;
         boolean needSamples = false;
@@ -172,10 +166,6 @@ public class Audio {
     }
 
     // Getter/Setter methods
-
-    public String getAudioFileName() {
-        return audioFileName;
-    }
 
     public double getSampleRate() {
         return sampleRate;

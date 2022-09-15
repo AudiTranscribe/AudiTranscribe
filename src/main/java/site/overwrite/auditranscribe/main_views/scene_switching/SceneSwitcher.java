@@ -222,7 +222,7 @@ public class SceneSwitcher {
 
             // Try and read the auxiliary WAV file as an `Audio` object
             // (Failure to read will throw exceptions)
-            Audio audio = new Audio(auxiliaryWAVFile, audioFile.getName(), AudioProcessingMode.SAMPLES_AND_PLAYBACK);
+            Audio audio = new Audio(auxiliaryWAVFile, AudioProcessingMode.SAMPLES_AND_PLAYBACK);
 
             // Delete auxiliary WAV file
             boolean successfullyDeleted = IOMethods.delete(auxiliaryWAVFile.getAbsolutePath());

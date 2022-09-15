@@ -916,7 +916,7 @@ public class TranscriptionViewController implements Initializable {
 
         // Create the `Audio` object
         audio = new Audio(
-                auxiliaryWAVFile, auxiliaryWAVFile.getName(), AudioProcessingMode.PLAYBACK_ONLY
+                auxiliaryWAVFile, AudioProcessingMode.PLAYBACK_ONLY
         );
 
         // Update the raw MP3 bytes of the audio object

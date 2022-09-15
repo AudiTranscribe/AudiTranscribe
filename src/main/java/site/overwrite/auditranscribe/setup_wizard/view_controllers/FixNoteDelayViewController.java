@@ -109,7 +109,6 @@ public class FixNoteDelayViewController implements Initializable {
         try {
             audio = new Audio(
                     new File(IOMethods.getAbsoluteFilePath(AUDIO_FILE)),
-                    "Breakfast.wav",
                     AudioProcessingMode.PLAYBACK_ONLY
             );
         } catch (UnsupportedAudioFileException | IOException | AudioTooLongException e) {

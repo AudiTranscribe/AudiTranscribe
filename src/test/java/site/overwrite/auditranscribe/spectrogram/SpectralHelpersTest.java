@@ -28,7 +28,6 @@ import site.overwrite.auditranscribe.utils.MathUtils;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -43,7 +42,6 @@ class SpectralHelpersTest {
     void estimateTuning() throws UnsupportedAudioFileException, AudioTooLongException, IOException {
         Audio audio = new Audio(
                 new File(IOMethods.getAbsoluteFilePath("testing-files/audio/Trumpet.wav")),
-                "Trumpet.wav",
                 AudioProcessingMode.SAMPLES_ONLY
         );
 
