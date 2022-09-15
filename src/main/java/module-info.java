@@ -28,7 +28,6 @@ module site.overwrite.auditranscribe {
     requires org.kordamp.bootstrapfx.core;
     requires org.xerial.sqlitejdbc;
     requires java.logging;
-    requires javatuples;
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.media;
@@ -59,6 +58,7 @@ module site.overwrite.auditranscribe {
     exports site.overwrite.auditranscribe.main_views.helpers;
     exports site.overwrite.auditranscribe.main_views.scene_switching;
     exports site.overwrite.auditranscribe.misc;
+    exports site.overwrite.auditranscribe.misc.tuples;
     exports site.overwrite.auditranscribe.music.notes;
     exports site.overwrite.auditranscribe.setup_wizard;
     exports site.overwrite.auditranscribe.setup_wizard.helpers;

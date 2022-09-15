@@ -18,7 +18,7 @@
 
 package site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators;
 
-import org.javatuples.Triplet;
+import site.overwrite.auditranscribe.misc.tuples.Triple;
 import site.overwrite.auditranscribe.utils.ByteConversionUtils;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileHelpers;
@@ -54,14 +54,14 @@ public abstract class QTransformDataObject extends AbstractAUDTDataObject {
      * data.
      * @throws IOException If something went wrong when compressing the bytes.
      */
-    public static Triplet<Byte[], Double, Double> qTransformMagnitudesToByteData(
+    public static Triple<Byte[], Double, Double> qTransformMagnitudesToByteData(
             double[][] qTransformMagnitudes, CustomTask<?> task
     ) throws IOException {
         // Convert the double data to integer data
-        Triplet<Integer[][], Double, Double> convertedTuple = AUDTFileHelpers.doubles2DtoInt2D(qTransformMagnitudes);
-        Integer[][] intData = convertedTuple.getValue0();
-        double min = convertedTuple.getValue1();
-        double max = convertedTuple.getValue2();
+        Triple<Integer[][], Double, Double> convertedTuple = AUDTFileHelpers.doubles2DtoInt2D(qTransformMagnitudes);
+        Integer[][] intData = convertedTuple.value0();
+        double min = convertedTuple.value1();
+        double max = convertedTuple.value2();
 
         // Convert non-primitive integers to primitive integers
         int[][] intDataPrimitive = new int[intData.length][intData[0].length];
@@ -76,7 +76,7 @@ public abstract class QTransformDataObject extends AbstractAUDTDataObject {
         byte[] bytes = CompressionHandlers.lz4Compress(plainBytes, task);
 
         // Return the bytes and the min and max values
-        return new Triplet<>(TypeConversionUtils.toByteArray(bytes), min, max);
+        return new Triple<>(TypeConversionUtils.toByteArray(bytes), min, max);
     }
 
     /**

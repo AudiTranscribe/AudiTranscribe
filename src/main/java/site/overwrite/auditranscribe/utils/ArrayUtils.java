@@ -18,10 +18,10 @@
 
 package site.overwrite.auditranscribe.utils;
 
-import org.javatuples.Pair;
 import site.overwrite.auditranscribe.exceptions.generic.LengthException;
 import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.misc.Complex;
+import site.overwrite.auditranscribe.misc.tuples.Pair;
 
 import java.util.*;
 
@@ -366,7 +366,7 @@ public final class ArrayUtils {
      * The repeating is done 'horizontally'.
      *
      * @param array The 2D array to repeat.
-     * @param reps Number of times to repeat the array.
+     * @param reps  Number of times to repeat the array.
      * @return The tiled output array.
      */
     public static double[][] tile(double[][] array, int reps) {

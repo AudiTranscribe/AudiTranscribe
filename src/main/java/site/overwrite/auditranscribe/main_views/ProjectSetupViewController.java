@@ -28,7 +28,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
-import org.javatuples.Pair;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.main_views.helpers.ProjectIOHandlers;
@@ -37,6 +36,7 @@ import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
+import site.overwrite.auditranscribe.misc.tuples.Pair;
 import site.overwrite.auditranscribe.utils.MusicUtils;
 
 import java.io.File;
@@ -128,8 +128,8 @@ public class ProjectSetupViewController implements Initializable {
 
         // Set spinner factories
         bpmManualSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
-                TranscriptionViewController.BPM_RANGE.getValue0(),
-                TranscriptionViewController.BPM_RANGE.getValue1(),
+                TranscriptionViewController.BPM_RANGE.value0(),
+                TranscriptionViewController.BPM_RANGE.value1(),
                 120,
                 0.1,
                 2
@@ -238,12 +238,12 @@ public class ProjectSetupViewController implements Initializable {
             if (controller.shouldProceed) {
                 // Obtain data from controller first
                 Pair<Boolean, Double> bpmPair = controller.getBPMPreference();
-                boolean shouldEstimateBPM = bpmPair.getValue0();
-                double manualBPM = bpmPair.getValue1();
+                boolean shouldEstimateBPM = bpmPair.value0();
+                double manualBPM = bpmPair.value1();
 
                 Pair<Boolean, String> musicKeyPair = controller.getMusicKeyPreference();
-                boolean shouldEstimateMusicKey = musicKeyPair.getValue0();
-                String manualMusicKey = musicKeyPair.getValue1();
+                boolean shouldEstimateMusicKey = musicKeyPair.value0();
+                String manualMusicKey = musicKeyPair.value1();
 
                 // Then set on the scene switching data
                 data.projectName = controller.getProjectName();

@@ -36,13 +36,13 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import org.javatuples.Pair;
-import org.javatuples.Triplet;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.audio.FFmpegHandler;
 import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingData;
 import site.overwrite.auditranscribe.music.MusicKey;
 import site.overwrite.auditranscribe.music.MusicKeyEstimator;
+import site.overwrite.auditranscribe.misc.tuples.Pair;
+import site.overwrite.auditranscribe.misc.tuples.Triple;
 import site.overwrite.auditranscribe.music.bpm_estimation.BPMEstimator;
 import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
 import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
@@ -288,10 +288,10 @@ public class TranscriptionViewController implements Initializable {
 
         // Update spinners' ranges
         bpmSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
-                BPM_RANGE.getValue0(), BPM_RANGE.getValue1(), 120, 0.1, 2
+                BPM_RANGE.value0(), BPM_RANGE.value1(), 120, 0.1, 2
         ));
         offsetSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
-                OFFSET_RANGE.getValue0(), OFFSET_RANGE.getValue1(), 0, 0.01, 2
+                OFFSET_RANGE.value0(), OFFSET_RANGE.value1(), 0, 0.01, 2
         ));
 
         // Set the choice boxes' choices
@@ -611,10 +611,10 @@ public class TranscriptionViewController implements Initializable {
         updateOffsetValue(offset, true);
 
         bpmSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
-                BPM_RANGE.getValue0(), BPM_RANGE.getValue1(), bpm, 0.1, 2
+                BPM_RANGE.value0(), BPM_RANGE.value1(), bpm, 0.1, 2
         ));
         offsetSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
-                OFFSET_RANGE.getValue0(), OFFSET_RANGE.getValue1(), offset, 0.01, 2
+                OFFSET_RANGE.value0(), OFFSET_RANGE.value1(), offset, 0.01, 2
         ));
 
         // Set methods on the volume sliders
@@ -794,12 +794,12 @@ public class TranscriptionViewController implements Initializable {
 
                 // Update attributes
                 this.setMessage("Compressing spectrogram data...");
-                Triplet<Byte[], Double, Double> conversionTuple =
+                Triple<Byte[], Double, Double> conversionTuple =
                         QTransformDataObject.qTransformMagnitudesToByteData(magnitudes, this);
 
-                qTransformBytes = TypeConversionUtils.toByteArray(conversionTuple.getValue0());
-                minQTransformMagnitude = conversionTuple.getValue1();
-                maxQTransformMagnitude = conversionTuple.getValue2();
+                qTransformBytes = TypeConversionUtils.toByteArray(conversionTuple.value0());
+                minQTransformMagnitude = conversionTuple.value1();
+                maxQTransformMagnitude = conversionTuple.value2();
 
                 // Generate spectrogram
                 return spectrogram.generateSpectrogram(
@@ -1220,8 +1220,8 @@ public class TranscriptionViewController implements Initializable {
         if (canCloseWindow) {
             // Get the scene switching data
             Pair<Boolean, SceneSwitchingData> pair = ProjectSetupViewController.showProjectSetupView();
-            boolean shouldProceed = pair.getValue0();
-            sceneSwitchingData = pair.getValue1();
+            boolean shouldProceed = pair.value0();
+            sceneSwitchingData = pair.value1();
 
             // Specify the scene switching state
             if (shouldProceed) {
@@ -1483,7 +1483,7 @@ public class TranscriptionViewController implements Initializable {
      */
     private void updateBPMValue(double newBPM, boolean forceUpdate) {
         // Check if the BPM value is valid first
-        if (!(newBPM >= BPM_RANGE.getValue0() && newBPM <= BPM_RANGE.getValue1())) return;
+        if (!(newBPM >= BPM_RANGE.value0() && newBPM <= BPM_RANGE.value1())) return;
 
         // Update the `hasUnsavedChanges` flag
         hasUnsavedChanges = true;
@@ -1529,13 +1529,13 @@ public class TranscriptionViewController implements Initializable {
      */
     private void updateOffsetValue(double newOffset, boolean forceUpdate) {
         // Check if the new offset value is valid first
-        if (!(newOffset >= OFFSET_RANGE.getValue0() && newOffset <= OFFSET_RANGE.getValue1())) return;
+        if (!(newOffset >= OFFSET_RANGE.value0() && newOffset <= OFFSET_RANGE.value1())) return;
 
         // Update the `hasUnsavedChanges` flag
         hasUnsavedChanges = true;
 
         // Get the previous offset value
-        double oldOffset = forceUpdate ? OFFSET_RANGE.getValue0() - 1 : offset;  // Make it 1 less than permitted
+        double oldOffset = forceUpdate ? OFFSET_RANGE.value0() - 1 : offset;  // Make it 1 less than permitted
 
         // These can only be called when the spectrogram is ready to be shown
         if (isEverythingReady) {
@@ -1848,7 +1848,7 @@ public class TranscriptionViewController implements Initializable {
 
             // Update BPM spinner initial value
             bpmSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
-                    BPM_RANGE.getValue0(), BPM_RANGE.getValue1(), bpm, 0.1, 2
+                    BPM_RANGE.value0(), BPM_RANGE.value1(), bpm, 0.1, 2
             ));
 
             // Mark the task as completed

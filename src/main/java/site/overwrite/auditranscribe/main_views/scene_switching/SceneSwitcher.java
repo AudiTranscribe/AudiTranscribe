@@ -25,7 +25,6 @@ import javafx.scene.image.Image;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.apache.commons.compress.utils.FileNameUtils;
-import org.javatuples.Pair;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.audio.FFmpegHandler;
@@ -42,6 +41,7 @@ import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileReader;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.misc.MyLogger;
+import site.overwrite.auditranscribe.misc.tuples.Pair;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
 import site.overwrite.auditranscribe.misc.Popups;
@@ -125,8 +125,8 @@ public class SceneSwitcher {
                     data = null;
                 } else {
                     // Otherwise get the state and the data
-                    state = returnedPair.getValue0();
-                    data = returnedPair.getValue1();
+                    state = returnedPair.value0();
+                    data = returnedPair.value1();
                 }
             } catch (Exception e) {  // Catch any alert that was not handled correctly
                 Popups.showExceptionAlert(
@@ -237,8 +237,8 @@ public class SceneSwitcher {
 
             // Get the current scene and the spectrogram view controller
             Pair<Scene, TranscriptionViewController> stageSceneAndController = setupTranscriptionScene();
-            Scene scene = stageSceneAndController.getValue0();
-            TranscriptionViewController controller = stageSceneAndController.getValue1();
+            Scene scene = stageSceneAndController.value0();
+            TranscriptionViewController controller = stageSceneAndController.value1();
 
             // Set the theme of the scene
             controller.setThemeOnScene();
@@ -371,8 +371,8 @@ public class SceneSwitcher {
 
             // Get the current scene and the spectrogram view controller
             Pair<Scene, TranscriptionViewController> stageSceneAndController = setupTranscriptionScene();
-            Scene scene = stageSceneAndController.getValue0();
-            TranscriptionViewController controller = stageSceneAndController.getValue1();
+            Scene scene = stageSceneAndController.value0();
+            TranscriptionViewController controller = stageSceneAndController.value1();
 
             // Set the theme of the scene
             controller.setThemeOnScene();

@@ -18,9 +18,9 @@
 
 package site.overwrite.auditranscribe.music;
 
-import org.javatuples.Triplet;
 import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.misc.CustomTask;
+import site.overwrite.auditranscribe.misc.tuples.Triple;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.ChromaCQT;
 import site.overwrite.auditranscribe.utils.StatisticalUtils;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
@@ -69,19 +69,19 @@ public class MusicKeyEstimator {
         if ((numKeys < 1) || (numKeys > 30)) throw new ValueException("Invalid value for `numKeys`: " + numKeys);
 
         // First get the key correlations
-        List<Triplet<Integer, Boolean, Double>> correlations = getKeyCorrelations(task);
+        List<Triple<Integer, Boolean, Double>> correlations = getKeyCorrelations(task);
 
         // Now get the needed keys
         List<MusicKey> keys = new ArrayList<>();
         int corrIndex = 0;
         while (keys.size() < numKeys) {
             // Get the next triplet of correlation values
-            Triplet<Integer, Boolean, Double> triplet = correlations.get(corrIndex);
+            Triple<Integer, Boolean, Double> triplet = correlations.get(corrIndex);
             corrIndex++;
 
             // Get the required properties from the triplet
-            int keyOffset = triplet.getValue0();
-            boolean isMinor = triplet.getValue1();
+            int keyOffset = triplet.value0();
+            boolean isMinor = triplet.value1();
 
             // Attempt to match to music key(s) and add to master list
             List<MusicKey> possibleMatches = MusicKey.getPossibleMatches(keyOffset, isMinor);
@@ -115,7 +115,7 @@ public class MusicKeyEstimator {
      * </ul>
      * @implNote Uses the Krumhansl-Schmuckler key-finding algorithm to estimate the key.
      */
-    private List<Triplet<Integer, Boolean, Double>> getKeyCorrelations(CustomTask<?> task) {
+    private List<Triple<Integer, Boolean, Double>> getKeyCorrelations(CustomTask<?> task) {
         // Generate the chromagram
         double[][] chromagram = ChromaCQT.chromaCQT(
                 samples, sampleRate, 512, UnitConversionUtils.noteToFreq("C1"), 12,
@@ -131,7 +131,7 @@ public class MusicKeyEstimator {
         }
 
         // Determine offset from root tonic
-        List<Triplet<Integer, Boolean, Double>> keyCorrelations = new ArrayList<>();
+        List<Triple<Integer, Boolean, Double>> keyCorrelations = new ArrayList<>();
 
         for (int offset = 0; offset < 12; offset++) {
             // Get the profile of the key with the specified offset
@@ -145,12 +145,12 @@ public class MusicKeyEstimator {
             double minCor = StatisticalUtils.corrcoef(MINOR_PROFILE, testProfile)[1][0];
 
             // Add it to the list
-            keyCorrelations.add(new Triplet<>(
+            keyCorrelations.add(new Triple<>(
                     offset,
                     true,  // Is major
                     majCor
             ));
-            keyCorrelations.add(new Triplet<>(
+            keyCorrelations.add(new Triple<>(
                     offset,
                     false,  // Is minor
                     minCor
@@ -164,12 +164,12 @@ public class MusicKeyEstimator {
     }
 
     // Helper classes
-    private static class SortKeyProfiles implements Comparator<Triplet<Integer, Boolean, Double>> {
+    private static class SortKeyProfiles implements Comparator<Triple<Integer, Boolean, Double>> {
         @Override
         public int compare(
-                Triplet<Integer, Boolean, Double> o1, Triplet<Integer, Boolean, Double> o2
+                Triple<Integer, Boolean, Double> o1, Triple<Integer, Boolean, Double> o2
         ) {
-            return o1.getValue2() > o2.getValue2() ? -1 : 0;  // Sort in descending order
+            return o1.value2() > o2.value2() ? -1 : 0;  // Sort in descending order
         }
     }
 }

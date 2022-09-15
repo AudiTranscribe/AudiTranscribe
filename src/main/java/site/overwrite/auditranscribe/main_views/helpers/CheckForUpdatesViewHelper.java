@@ -21,11 +21,11 @@ package site.overwrite.auditranscribe.main_views.helpers;
 import com.google.gson.JsonObject;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import org.javatuples.Pair;
 import site.overwrite.auditranscribe.exceptions.network.APIServerException;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Popups;
+import site.overwrite.auditranscribe.misc.tuples.Pair;
 import site.overwrite.auditranscribe.network.APICallHandler;
 import site.overwrite.auditranscribe.utils.GUIUtils;
 import site.overwrite.auditranscribe.utils.MiscUtils;
@@ -48,8 +48,8 @@ public class CheckForUpdatesViewHelper {
 
         // Check if there is any new updates available
         Pair<Boolean, String> response = checkIfHaveNewVersion(currentVersion);
-        boolean isLatest = response.getValue0();
-        String newVersionTag = response.getValue1();
+        boolean isLatest = response.value0();
+        String newVersionTag = response.value1();
 
         if (!isLatest) {
             MyLogger.log(
