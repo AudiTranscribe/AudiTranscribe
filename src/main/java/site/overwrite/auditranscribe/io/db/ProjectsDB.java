@@ -134,7 +134,8 @@ public class ProjectsDB {
                 String projectName = resultSet.getString("project_name");
 
                 // Update the project name
-                if (projectName.substring(projectName.length() - 5).equalsIgnoreCase(".audt")) {
+                int length = projectName.length();
+                if (length >= 5 && projectName.substring(length - 5).equalsIgnoreCase(".audt")) {
                     projectName = projectName.substring(0, projectName.length() - 5);  // Exclude the ".audt" at the end
                 }
 
