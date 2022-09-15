@@ -55,7 +55,6 @@ module site.overwrite.auditranscribe {
     exports site.overwrite.auditranscribe.io.data_files.data_encapsulators;
     exports site.overwrite.auditranscribe.io.data_files.file_classes;
     exports site.overwrite.auditranscribe.main_views;
-    exports site.overwrite.auditranscribe.main_views.helpers;
     exports site.overwrite.auditranscribe.main_views.scene_switching;
     exports site.overwrite.auditranscribe.misc;
     exports site.overwrite.auditranscribe.misc.tuples;
@@ -69,7 +68,6 @@ module site.overwrite.auditranscribe {
 
     opens site.overwrite.auditranscribe to javafx.fxml;
     opens site.overwrite.auditranscribe.main_views to javafx.fxml;
-    opens site.overwrite.auditranscribe.main_views.helpers to javafx.fxml;
     opens site.overwrite.auditranscribe.main_views.scene_switching to javafx.fxml;
     opens site.overwrite.auditranscribe.misc to javafx.fxml;
     opens site.overwrite.auditranscribe.setup_wizard to javafx.fxml;

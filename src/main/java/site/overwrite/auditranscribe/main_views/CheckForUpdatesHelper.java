@@ -1,6 +1,6 @@
 /*
- * CheckForUpdatesViewHelper.java
- * Description: Helper class that handles the checking of updates.
+ * CheckForUpdatesHelper.java
+ * Description: Class that assists with the checking of updates from the API server.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.main_views.helpers;
+package site.overwrite.auditranscribe.main_views;
 
 import com.google.gson.JsonObject;
 import javafx.scene.control.ButtonBar;
@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.logging.Level;
 
-public class CheckForUpdatesViewHelper {
+public class CheckForUpdatesHelper {
     // Public methods
     public static void checkForUpdates(String currentVersion) {
         // Determine if we need to check for updates
@@ -55,7 +55,7 @@ public class CheckForUpdatesViewHelper {
             MyLogger.log(
                     Level.INFO,
                     "New version available: " + newVersionTag,
-                    CheckForUpdatesViewHelper.class.getName()
+                    CheckForUpdatesHelper.class.getName()
             );
 
             // Convert the new version tag into a semver
@@ -84,7 +84,7 @@ public class CheckForUpdatesViewHelper {
             MyLogger.log(
                     Level.INFO,
                     "AudiTranscribe is up to date",
-                    CheckForUpdatesViewHelper.class.getName()
+                    CheckForUpdatesHelper.class.getName()
             );
         }
 
@@ -115,7 +115,7 @@ public class CheckForUpdatesViewHelper {
             MyLogger.log(
                     Level.WARNING,
                     "Error for API request on checking new version: timed out or connection refused",
-                    CheckForUpdatesViewHelper.class.getName()
+                    CheckForUpdatesHelper.class.getName()
             );
             return new Pair<>(true, null);
         } catch (IOException e) {

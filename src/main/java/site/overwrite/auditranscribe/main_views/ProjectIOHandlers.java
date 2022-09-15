@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.main_views.helpers;
+package site.overwrite.auditranscribe.main_views;
 
 import javafx.stage.*;
 import site.overwrite.auditranscribe.exceptions.io.audt_file.InvalidFileVersionException;

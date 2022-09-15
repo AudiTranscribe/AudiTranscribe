@@ -49,7 +49,6 @@ import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
 import site.overwrite.auditranscribe.utils.MiscUtils;
 import site.overwrite.auditranscribe.misc.Popups;
-import site.overwrite.auditranscribe.main_views.helpers.ProjectIOHandlers;
 import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingState;
 
 import java.io.File;
