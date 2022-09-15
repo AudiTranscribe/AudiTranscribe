@@ -389,6 +389,9 @@ public class TranscriptionViewController implements Initializable {
             // Seek to the start of the audio
             seekToTime(0);
 
+            // Scroll to beginning
+            updateScrollPosition(0, finalWidth);
+
             // Pause the audio
             isPaused = togglePaused(false);
         });
@@ -398,6 +401,9 @@ public class TranscriptionViewController implements Initializable {
 
             // Seek to the end of the audio
             seekToTime(audioDuration);
+
+            // Scroll to end
+            updateScrollPosition(finalWidth, finalWidth);
 
             // Force the audio to play at the end
             // (This is to avoid a nasty seek to end issue where user needs to click on play button twice)
