@@ -18,11 +18,11 @@
 
 package site.overwrite.auditranscribe.utils;
 
-import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.exceptions.generic.LengthException;
 import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.misc.Complex;
+import site.overwrite.auditranscribe.misc.tuples.Pair;
 
 import java.util.NoSuchElementException;
 
@@ -148,8 +148,8 @@ class ArrayUtilsTest {
         // Test 1
         double[] data1 = {1.5, 2.5, 4.5, 5, 1};
         Pair<Integer[], Double[]> countsAndBins1 = ArrayUtils.histogram(data1, 1, 5, 4);
-        Integer[] counts1 = countsAndBins1.getValue0();
-        Double[] bins1 = countsAndBins1.getValue1();
+        Integer[] counts1 = countsAndBins1.value0();
+        Double[] bins1 = countsAndBins1.value1();
 
         assertArrayEquals(new double[]{1, 2, 3, 4, 5}, TypeConversionUtils.toDoubleArray(bins1), 1e-5);
         assertArrayEquals(new int[]{2, 1, 0, 2}, TypeConversionUtils.toIntegerArray(counts1));
@@ -157,8 +157,8 @@ class ArrayUtilsTest {
         // Test 2
         double[] data2 = {-10, 0, 0.1, -0.2, 0.3, -0.4, 0.5, -0.6, 0.7, -0.8, 0.9, -1, 1, 0, 0, 0, 0, 0, 10};
         Pair<Integer[], Double[]> countsAndBins2 = ArrayUtils.histogram(data2, -1, 1, 10);
-        Integer[] counts2 = countsAndBins2.getValue0();
-        Double[] bins2 = countsAndBins2.getValue1();
+        Integer[] counts2 = countsAndBins2.value0();
+        Double[] bins2 = countsAndBins2.value1();
 
         assertArrayEquals(new double[]{-1, -0.8, -0.6, -0.4, -0.2, 0, 0.2, 0.4, 0.6, 0.8, 1}, TypeConversionUtils.toDoubleArray(bins2), 1e-5);
         assertArrayEquals(new int[]{2, 1, 1, 1, 6, 1, 1, 1, 1, 2}, TypeConversionUtils.toIntegerArray(counts2));
@@ -166,8 +166,8 @@ class ArrayUtilsTest {
         // Test 3
         double[] data3 = {};
         Pair<Integer[], Double[]> countsAndBins3 = ArrayUtils.histogram(data3, 1, 5, 4);
-        Integer[] counts3 = countsAndBins3.getValue0();
-        Double[] bins3 = countsAndBins3.getValue1();
+        Integer[] counts3 = countsAndBins3.value0();
+        Double[] bins3 = countsAndBins3.value1();
 
         assertArrayEquals(new double[]{1, 2, 3, 4, 5}, TypeConversionUtils.toDoubleArray(bins3), 1e-5);
         assertArrayEquals(new int[]{0, 0, 0, 0}, TypeConversionUtils.toIntegerArray(counts3));

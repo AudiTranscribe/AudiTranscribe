@@ -18,10 +18,10 @@
 
 package site.overwrite.auditranscribe.utils;
 
-import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.exceptions.generic.FormatException;
 import site.overwrite.auditranscribe.exceptions.generic.ValueException;
+import site.overwrite.auditranscribe.misc.tuples.Pair;
 
 import java.util.HashSet;
 import java.util.List;

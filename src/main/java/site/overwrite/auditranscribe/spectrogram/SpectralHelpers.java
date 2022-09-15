@@ -18,9 +18,9 @@
 
 package site.overwrite.auditranscribe.spectrogram;
 
-import org.javatuples.Pair;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.misc.Complex;
+import site.overwrite.auditranscribe.misc.tuples.Pair;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.FrequencyBins;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.STFT;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
@@ -69,8 +69,8 @@ public final class SpectralHelpers {
 
         // Get pitch-magnitude values
         Pair<Double[][], Double[][]> pitchAndMag = piptack(x, sr, 150, 4000);
-        Double[][] pitch = pitchAndMag.getValue0();
-        Double[][] mag = pitchAndMag.getValue1();
+        Double[][] pitch = pitchAndMag.value0();
+        Double[][] mag = pitchAndMag.value1();
 
         // Only count magnitude where frequency is > 0
         List<Double> tempRelevantPitches = new ArrayList<>();
@@ -120,8 +120,8 @@ public final class SpectralHelpers {
         Pair<Integer[], Double[]> countsAndTuning = ArrayUtils.histogram(
                 residuals, -0.5, 0.5, (int) Math.ceil(1 / resolution)
         );
-        Integer[] counts = countsAndTuning.getValue0();
-        Double[] tuning = countsAndTuning.getValue1();
+        Integer[] counts = countsAndTuning.value0();
+        Double[] tuning = countsAndTuning.value1();
 
         // Return the histogram peak
         int peakCount = counts[0];

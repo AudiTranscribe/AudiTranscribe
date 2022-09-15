@@ -18,11 +18,11 @@
 
 package site.overwrite.auditranscribe.music.notes;
 
-import org.javatuples.Pair;
-import org.javatuples.Triplet;
 import site.overwrite.auditranscribe.exceptions.generic.LengthException;
 import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.misc.MyLogger;
+import site.overwrite.auditranscribe.misc.tuples.Pair;
+import site.overwrite.auditranscribe.misc.tuples.Triple;
 import site.overwrite.auditranscribe.utils.MathUtils;
 import site.overwrite.auditranscribe.utils.MusicUtils;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
@@ -53,7 +53,7 @@ public class NotePlayerSequencer {
 
     public double bpm;
 
-    private final Map<Triplet<Double, Double, Integer>, Pair<MidiEvent, MidiEvent>> allMIDIEventPairs = new HashMap<>();
+    private final Map<Triple<Double, Double, Integer>, Pair<MidiEvent, MidiEvent>> allMIDIEventPairs = new HashMap<>();
     public boolean areNotesSet = false;
 
     /**
@@ -165,10 +165,10 @@ public class NotePlayerSequencer {
      * Method that clears all the notes that are currently present on the track.
      */
     public void clearNotesOnTrack() {
-        Set<Triplet<Double, Double, Integer>> keys = new HashSet<>(allMIDIEventPairs.keySet());  // Make copy
+        Set<Triple<Double, Double, Integer>> keys = new HashSet<>(allMIDIEventPairs.keySet());  // Make copy
 
-        for (Triplet<Double, Double, Integer> key : keys) {
-            removeNote(key.getValue0(), key.getValue1(), key.getValue2());
+        for (Triple<Double, Double, Integer> key : keys) {
+            removeNote(key.value0(), key.value1(), key.value2());
         }
         sequence.deleteTrack(track);
         track = sequence.createTrack();
@@ -338,7 +338,7 @@ public class NotePlayerSequencer {
         // Add the events to the track and to the set of all MIDI events
         track.add(onEvent);
         track.add(offEvent);
-        allMIDIEventPairs.put(new Triplet<>(noteOnsetTime, duration, noteNum), new Pair<>(onEvent, offEvent));
+        allMIDIEventPairs.put(new Triple<>(noteOnsetTime, duration, noteNum), new Pair<>(onEvent, offEvent));
     }
 
     /**
@@ -350,11 +350,11 @@ public class NotePlayerSequencer {
      */
     private void removeNote(double noteOnsetTime, double duration, int noteNum) {
         // Get the MIDI event pair that corresponds to this
-        Pair<MidiEvent, MidiEvent> eventPair = allMIDIEventPairs.remove(new Triplet<>(noteOnsetTime, duration, noteNum));
+        Pair<MidiEvent, MidiEvent> eventPair = allMIDIEventPairs.remove(new Triple<>(noteOnsetTime, duration, noteNum));
         if (eventPair == null) return;
 
-        MidiEvent onEvent = eventPair.getValue0();
-        MidiEvent offEvent = eventPair.getValue1();
+        MidiEvent onEvent = eventPair.value0();
+        MidiEvent offEvent = eventPair.value1();
 
         // Remove the events from the track
         track.remove(onEvent);
@@ -381,8 +381,8 @@ public class NotePlayerSequencer {
     private void setTimeSignatureOfNotePlayer(String timeSignature) {
         // Parse the time signature
         Pair<Integer, Integer> numeratorAndDenominator = MusicUtils.parseTimeSignature(timeSignature);
-        int numerator = numeratorAndDenominator.getValue0();
-        int denominator = numeratorAndDenominator.getValue1();
+        int numerator = numeratorAndDenominator.value0();
+        int denominator = numeratorAndDenominator.value1();
 
         // Check if the numerator and denominator values are valid
         if (!(numerator >= 0 && numerator <= 255 && denominator >= 0 && denominator <= 255))
@@ -418,7 +418,7 @@ public class NotePlayerSequencer {
     private void setKeySignatureOfNotePlayer(String key) {
         // Get the tonic and mode of the provided key
         Pair<String, String> tonicAndMode = MusicUtils.parseKeySignature(key);
-        String modePart = tonicAndMode.getValue1();
+        String modePart = tonicAndMode.value1();
 
         // Get the numeric value of the key
         int numericValue = MusicUtils.getNumericValueOfKey(key);

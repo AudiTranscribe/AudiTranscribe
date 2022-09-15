@@ -31,9 +31,9 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
-import org.javatuples.Pair;
 import site.overwrite.auditranscribe.exceptions.notes.NoteRectangleCollisionException;
 import site.overwrite.auditranscribe.misc.MyLogger;
+import site.overwrite.auditranscribe.misc.tuples.Pair;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 
 import java.util.ArrayList;
@@ -538,8 +538,8 @@ public class NoteRectangle extends StackPane {
                 isVerticalMovement) {
             // Update bounding rectangles
             Pair<NoteRectangle, NoteRectangle> rectangles = getLeftAndRightRectangles(xPos, noteNumber);
-            leftBoundingRectangle = rectangles.getValue0();
-            rightBoundingRectangle = rectangles.getValue1();
+            leftBoundingRectangle = rectangles.value0();
+            rightBoundingRectangle = rectangles.value1();
         }
 
         // Handle edge cases

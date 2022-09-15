@@ -18,8 +18,8 @@
 
 package site.overwrite.auditranscribe.spectrogram;
 
-import org.javatuples.Pair;
 import site.overwrite.auditranscribe.audio.WindowFunction;
+import site.overwrite.auditranscribe.misc.tuples.Pair;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
 import site.overwrite.auditranscribe.misc.Complex;
 import site.overwrite.auditranscribe.utils.MathUtils;
@@ -161,7 +161,7 @@ public final class Wavelet {
         Pair<double[], Double> waveletLengthsResult = computeWaveletLengths(
                 freqs, sr, windowFunction, filterScale, isCQT, gamma, alpha
         );
-        double[] lengths = waveletLengthsResult.getValue0();
+        double[] lengths = waveletLengthsResult.value0();
         int numLengths = lengths.length;
 
         // Build the filters

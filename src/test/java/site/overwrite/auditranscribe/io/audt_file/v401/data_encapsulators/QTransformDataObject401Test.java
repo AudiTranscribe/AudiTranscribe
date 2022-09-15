@@ -18,9 +18,9 @@
 
 package site.overwrite.auditranscribe.io.audt_file.v401.data_encapsulators;
 
-import org.javatuples.Triplet;
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.QTransformDataObject;
+import site.overwrite.auditranscribe.misc.tuples.Triple;
 import site.overwrite.auditranscribe.utils.MathUtils;
 import site.overwrite.auditranscribe.utils.TypeConversionUtils;
 
@@ -138,14 +138,14 @@ class QTransformDataObject401Test {
         double correctMaxMagnitude = 9;
 
         // Run the method
-        Triplet<Byte[], Double, Double> returned = QTransformDataObject.qTransformMagnitudesToByteData(
+        Triple<Byte[], Double, Double> returned = QTransformDataObject.qTransformMagnitudesToByteData(
                 magnitudes, null
         );
 
         // Tests
-        assertArrayEquals(correctBytes, TypeConversionUtils.toByteArray(returned.getValue0()));
-        assertEquals(correctMinMagnitude, returned.getValue1(), 1e-5);
-        assertEquals(correctMaxMagnitude, returned.getValue2(), 1e-5);
+        assertArrayEquals(correctBytes, TypeConversionUtils.toByteArray(returned.value0()));
+        assertEquals(correctMinMagnitude, returned.value1(), 1e-5);
+        assertEquals(correctMaxMagnitude, returned.value2(), 1e-5);
     }
 
     @Test

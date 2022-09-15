@@ -18,7 +18,6 @@
 
 package site.overwrite.auditranscribe.io.audt_file.v0x00070001;
 
-import org.javatuples.Triplet;
 import org.junit.jupiter.api.*;
 import site.overwrite.auditranscribe.exceptions.io.audt_file.FailedToReadDataException;
 import site.overwrite.auditranscribe.exceptions.io.audt_file.IncorrectFileFormatException;
@@ -31,6 +30,7 @@ import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileReader;
 import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileWriter;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.audt_file.v0x00070001.data_encapsulators.*;
+import site.overwrite.auditranscribe.misc.tuples.Triple;
 import site.overwrite.auditranscribe.utils.TypeConversionUtils;
 
 import java.io.IOException;
@@ -94,11 +94,11 @@ class AUDTFile0x00070001Test {
         noteNums2 = new int[]{64, 62, 53, 55, 60, 59, 52, 53};
 
         // Convert the magnitude data to required form
-        Triplet<Byte[], Double, Double> conversionTuple =
+        Triple<Byte[], Double, Double> conversionTuple =
                 QTransformDataObject.qTransformMagnitudesToByteData(qTransformMagnitudes, null);
-        byte[] qTransformBytes = TypeConversionUtils.toByteArray(conversionTuple.getValue0());
-        double minMagnitude = conversionTuple.getValue1();
-        double maxMagnitude = conversionTuple.getValue2();
+        byte[] qTransformBytes = TypeConversionUtils.toByteArray(conversionTuple.value0());
+        double minMagnitude = conversionTuple.value1();
+        double maxMagnitude = conversionTuple.value2();
 
         // Define data to be used within the tests
         qTransformDataObject = new QTransformDataObject0x00070001(

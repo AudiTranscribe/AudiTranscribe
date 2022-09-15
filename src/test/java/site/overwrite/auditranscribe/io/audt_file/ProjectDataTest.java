@@ -18,7 +18,6 @@
 
 package site.overwrite.auditranscribe.io.audt_file;
 
-import org.javatuples.Triplet;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
@@ -26,6 +25,7 @@ import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.audt_file.v401.data_encapsulators.*;
+import site.overwrite.auditranscribe.misc.tuples.Triple;
 import site.overwrite.auditranscribe.utils.MathUtils;
 import site.overwrite.auditranscribe.utils.TypeConversionUtils;
 
@@ -89,16 +89,16 @@ class ProjectDataTest {
         noteNums2 = new int[]{64, 62, 53, 55, 60, 59, 52, 53};
 
         // Convert the magnitude data to required form
-        Triplet<Byte[], Double, Double> conversionTuple1 =
+        Triple<Byte[], Double, Double> conversionTuple1 =
                 QTransformDataObject.qTransformMagnitudesToByteData(qTransformMagnitudes1, null);
-        byte[] qTransformBytes1 = TypeConversionUtils.toByteArray(conversionTuple1.getValue0());
-        double minMagnitude1 = conversionTuple1.getValue1();
-        double maxMagnitude1 = conversionTuple1.getValue2();
-        Triplet<Byte[], Double, Double> conversionTuple2 =
+        byte[] qTransformBytes1 = TypeConversionUtils.toByteArray(conversionTuple1.value0());
+        double minMagnitude1 = conversionTuple1.value1();
+        double maxMagnitude1 = conversionTuple1.value2();
+        Triple<Byte[], Double, Double> conversionTuple2 =
                 QTransformDataObject.qTransformMagnitudesToByteData(qTransformMagnitudes2, null);
-        byte[] qTransformBytes2 = TypeConversionUtils.toByteArray(conversionTuple2.getValue0());
-        double minMagnitude2 = conversionTuple2.getValue1();
-        double maxMagnitude2 = conversionTuple2.getValue2();
+        byte[] qTransformBytes2 = TypeConversionUtils.toByteArray(conversionTuple2.value0());
+        double minMagnitude2 = conversionTuple2.value1();
+        double maxMagnitude2 = conversionTuple2.value2();
 
         // Define data to be used within the tests
         qTransformDataObject1 = new QTransformDataObject401(
