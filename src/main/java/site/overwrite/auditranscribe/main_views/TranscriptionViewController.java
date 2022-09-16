@@ -104,7 +104,6 @@ public class TranscriptionViewController implements Initializable {
     private final int MAX_NOTE_NUMBER = 107;  // B8
 
     private final long UPDATE_PLAYBACK_SCHEDULER_PERIOD = 50;  // In milliseconds
-    private final long MEMORY_AVAILABLE_SCHEDULER_PERIOD = 1;  // In seconds
 
     private final boolean FANCY_NOTE_LABELS = true;  // Use fancy accidentals for note labels
 
@@ -215,7 +214,7 @@ public class TranscriptionViewController implements Initializable {
     private Spinner<Double> bpmSpinner, offsetSpinner;
 
     @FXML
-    private HBox progressBarHBox, memoryHBox;
+    private HBox progressBarHBox;
 
     @FXML
     private ProgressBar progressBar;
@@ -527,6 +526,22 @@ public class TranscriptionViewController implements Initializable {
         exportMIDIMenuItem.setOnAction(event -> handleExportMIDI());
         preferencesMenuItem.setOnAction(actionEvent -> PreferencesViewController.showPreferencesWindow());
         aboutMenuItem.setOnAction(actionEvent -> AboutViewController.showAboutWindow());
+
+        // Create scheduler to update memory available
+        memoryAvailableScheduler = Executors.newScheduledThreadPool(0, runnable -> {
+            Thread thread = Executors.defaultThreadFactory().newThread(runnable);
+            thread.setDaemon(true);
+            return thread;
+        });
+        memoryAvailableScheduler.scheduleAtFixedRate(() -> Platform.runLater(() -> {
+            // Get the presumed free memory available
+            // (See https://stackoverflow.com/a/12807848)
+            long allocatedMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+            long presumableFreeMemory = Runtime.getRuntime().maxMemory() - allocatedMemory;
+
+            // Update the free memory label
+            freeMemoryLabel.setText(MathUtils.round(presumableFreeMemory / 1e6, 2) + " MB");
+        }), 1, 1, TimeUnit.SECONDS);
 
         // Get the projects database
         try {
@@ -1318,7 +1333,7 @@ public class TranscriptionViewController implements Initializable {
         };
 
         // Link the progress of the task with the progress bar
-        setProgressBarHBoxVisibility(true);
+        progressBarHBox.setVisible(true);
         progressBar.progressProperty().bind(task.progressProperty());
         progressLabel.setText("Saving file...");
 
@@ -1336,7 +1351,7 @@ public class TranscriptionViewController implements Initializable {
             }
 
             // Hide the progress box
-            setProgressBarHBoxVisibility(false);
+            progressBarHBox.setVisible(false);
 
             // Show popup upon saving completion, if it is not an autosave
             if (!isAutosave) {
@@ -1763,22 +1778,6 @@ public class TranscriptionViewController implements Initializable {
                     TimeUnit.MINUTES
             );
 
-            // Create a third constantly-executing service for updating memory available
-            memoryAvailableScheduler = Executors.newScheduledThreadPool(0, runnable -> {
-                Thread thread = Executors.defaultThreadFactory().newThread(runnable);
-                thread.setDaemon(true);
-                return thread;
-            });
-            memoryAvailableScheduler.scheduleAtFixedRate(() -> Platform.runLater(() -> {
-                // Get the presumed free memory available
-                // (See https://stackoverflow.com/a/12807848)
-                long allocatedMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-                long presumableFreeMemory = Runtime.getRuntime().maxMemory() - allocatedMemory;
-
-                // Update the free memory label
-                freeMemoryLabel.setText(MathUtils.round(presumableFreeMemory / 1e6, 2) + " MB");
-            }), 1, MEMORY_AVAILABLE_SCHEDULER_PERIOD, TimeUnit.SECONDS);
-
             // Set image on the spectrogram area
             spectrogramImage.setFitHeight(finalWidth);
             spectrogramImage.setFitWidth(finalHeight);
@@ -2064,7 +2063,7 @@ public class TranscriptionViewController implements Initializable {
                 progressLabel.textProperty().bind(currentTask.messageProperty());
 
             } else {
-                setProgressBarHBoxVisibility(false);
+                progressBarHBox.setVisible(false);
             }
         }
     }
@@ -2419,40 +2418,5 @@ public class TranscriptionViewController implements Initializable {
 
         // Return the needed data
         return saveDest;
-    }
-
-    /**
-     * Helper method that sets the visibility of the progress bar.<br>
-     * If the progress bar is invisible, then the memory use statistics will be shown.
-     *
-     * @param isVisible Whether the progress bar is visible or not.
-     */
-    private void setProgressBarHBoxVisibility(boolean isVisible) {
-        if (isVisible) {
-            // Show the progress bar section
-            progressBarHBox.setVisible(true);
-
-            // Manage the progress label and progress bar
-            progressBarHBox.setManaged(true);
-            progressLabel.setManaged(true);
-            progressBar.setManaged(true);
-
-            // Hide the memory HBox
-            memoryHBox.setVisible(true);
-        } else {
-            // Hide the progress bar section
-            progressBarHBox.setVisible(false);
-
-            // Unbind the progress label text property
-            progressLabel.textProperty().unbind();
-
-            // Un-manage the progress label and progress bar
-            progressBarHBox.setManaged(false);
-            progressLabel.setManaged(false);
-            progressBar.setManaged(false);
-
-            // Show the memory HBox
-            memoryHBox.setVisible(true);
-        }
     }
 }
