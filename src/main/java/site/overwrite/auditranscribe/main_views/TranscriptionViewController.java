@@ -814,22 +814,22 @@ public class TranscriptionViewController implements Initializable {
             }
         };
 
-        // Estimate BPM based on the audio samples
-        CustomTask<Double> bpmTask = new CustomTask<>("Estimate BPM") {
+        // Create an estimation task to estimate both the BPM and the music key
+        CustomTask<Pair<Double, String>> estimationTask = new CustomTask<>("Estimation Task") {
             @Override
-            protected Double call() {
+            protected Pair<Double, String> call() {
+                // First estimate BPM
+                this.setMessage("Estimating BPM...");
+                double bpm;
                 if (sceneSwitchingData.estimateBPM) {
-                    return BPMEstimator.estimate(audio.getMonoSamples(), sampleRate).get(0);  // Take first element
+                    bpm = BPMEstimator.estimate(audio.getMonoSamples(), sampleRate).get(0);  // Take first element
                 } else {
-                    return sceneSwitchingData.manualBPM;  // Use provided BPM
+                    bpm = sceneSwitchingData.manualBPM;  // Use provided BPM
                 }
-            }
-        };
 
-        // Estimate music key
-        CustomTask<String> musicKeyTask = new CustomTask<>("Estimate Music Key") {
-            @Override
-            protected String call() {
+                // Next estimate key
+                this.setMessage("Estimating key...");
+                String key;
                 if (sceneSwitchingData.estimateMusicKey) {
                     // Create a music key estimator
                     MusicKeyEstimator musicKeyEstimator = new MusicKeyEstimator(audio.getMonoSamples(), sampleRate);
@@ -839,20 +839,22 @@ public class TranscriptionViewController implements Initializable {
 
                     // Return the most likely key
                     // Todo: show the other keys as well
-                    return mostLikelyKeys.get(0).name;
+                    key = mostLikelyKeys.get(0).name;
                 } else {
-                    return sceneSwitchingData.musicKeyString;
+                    key = sceneSwitchingData.musicKeyString;
                 }
+
+                // Now return them both as a pair
+                return new Pair<>(bpm, key);
             }
         };
 
         // Set up tasks
         setupSpectrogramTask(spectrogramTask, "Generating spectrogram...");
-        setupBPMEstimationTask(bpmTask);
-        setupMusicKeyEstimationTask(musicKeyTask);
+        setupEstimationTask(estimationTask);
 
         // Start the tasks
-        startTasks(spectrogramTask, bpmTask, musicKeyTask);
+        startTasks(spectrogramTask, estimationTask);
     }
 
     /**
@@ -1838,43 +1840,25 @@ public class TranscriptionViewController implements Initializable {
     }
 
     /**
-     * Helper method that sets up the BPM estimation task.
+     * Helper method that sets up the estimation task.
      *
-     * @param task The BPM estimation task.
+     * @param task The estimation task.
      */
-    private void setupBPMEstimationTask(CustomTask<Double> task) {
-        // Set the task's message
-        task.setMessage("Estimating tempo...");
-
+    private void setupEstimationTask(CustomTask<Pair<Double, String>> task) {
         // Set task completion listener
         task.setOnSucceeded(event -> {
+            // Get the BPM and key values
+            Pair<Double, String> returnedPair = task.getValue();
+            double newBPM = returnedPair.value0();
+            String key = returnedPair.value1();
+
             // Update the BPM value
-            updateBPMValue(MathUtils.round(task.getValue(), 1), false);
+            updateBPMValue(MathUtils.round(newBPM, 1), false);
 
             // Update BPM spinner initial value
             bpmSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
                     BPM_RANGE.value0(), BPM_RANGE.value1(), bpm, 0.1, 2
             ));
-
-            // Mark the task as completed
-            markTaskAsCompleted(task);
-            MyLogger.log(Level.INFO, "BPM estimation task complete", this.getClass().toString());
-        });
-    }
-
-    /**
-     * Helper method that sets up the music key estimation task.
-     *
-     * @param task The music key estimation task.
-     */
-    private void setupMusicKeyEstimationTask(CustomTask<String> task) {
-        // Set the task's message
-        task.setMessage("Estimating music key...");
-
-        // Set task completion listener
-        task.setOnSucceeded(event -> {
-            // Get the music key
-            String key = task.getValue();
 
             // Update the music key choice
             updateMusicKeyValue(key, sceneSwitchingData.estimateMusicKey);  // Will force update if estimating key
@@ -1882,7 +1866,7 @@ public class TranscriptionViewController implements Initializable {
 
             // Mark the task as completed
             markTaskAsCompleted(task);
-            MyLogger.log(Level.INFO, "Music key estimation task complete", this.getClass().toString());
+            MyLogger.log(Level.INFO, "Estimation task complete", this.getClass().toString());
         });
     }
 
