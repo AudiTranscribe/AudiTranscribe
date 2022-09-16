@@ -36,45 +36,42 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.audio.FFmpegHandler;
-import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingData;
-import site.overwrite.auditranscribe.music.MusicKey;
-import site.overwrite.auditranscribe.music.MusicKeyEstimator;
-import site.overwrite.auditranscribe.misc.tuples.Pair;
-import site.overwrite.auditranscribe.misc.tuples.Triple;
-import site.overwrite.auditranscribe.music.bpm_estimation.BPMEstimator;
+import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
 import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.exceptions.notes.NoteRectangleCollisionException;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.IOConstants;
+import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
 import site.overwrite.auditranscribe.io.audt_file.ProjectData;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.audt_file.v0x00070001.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
-import site.overwrite.auditranscribe.misc.CustomTask;
-import site.overwrite.auditranscribe.audio.Audio;
-import site.overwrite.auditranscribe.audio.WindowFunction;
-import site.overwrite.auditranscribe.misc.MyLogger;
-import site.overwrite.auditranscribe.misc.Theme;
+import site.overwrite.auditranscribe.io.db.ProjectsDB;
+import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingData;
+import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingState;
+import site.overwrite.auditranscribe.misc.*;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
+import site.overwrite.auditranscribe.misc.tuples.Pair;
+import site.overwrite.auditranscribe.misc.tuples.Triple;
+import site.overwrite.auditranscribe.music.MusicKey;
+import site.overwrite.auditranscribe.music.MusicKeyEstimator;
+import site.overwrite.auditranscribe.music.bpm_estimation.BPMEstimator;
 import site.overwrite.auditranscribe.music.notes.MIDIInstrument;
 import site.overwrite.auditranscribe.music.notes.NotePlayerSequencer;
 import site.overwrite.auditranscribe.music.notes.NotePlayerSynth;
 import site.overwrite.auditranscribe.music.notes.NoteRectangle;
-import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 import site.overwrite.auditranscribe.plotting.PlottingStuffHandler;
-import site.overwrite.auditranscribe.spectrogram.*;
+import site.overwrite.auditranscribe.spectrogram.ColourScale;
+import site.overwrite.auditranscribe.spectrogram.Spectrogram;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
 import site.overwrite.auditranscribe.utils.*;
-import site.overwrite.auditranscribe.misc.MouseHandler;
-import site.overwrite.auditranscribe.misc.Popups;
-import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingState;
 
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -85,7 +82,10 @@ import java.io.InvalidObjectException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 public class TranscriptionViewController implements Initializable {
@@ -153,7 +153,7 @@ public class TranscriptionViewController implements Initializable {
     private String audtFileName;
     private Audio audio;
 
-    private byte[] qTransformBytes;  // LZ4 compressed version; todo: somehow remove the need to store this
+    private byte[] qTransformBytes;  // These bytes are LZ4 compressed
     private double minQTransformMagnitude;
     private double maxQTransformMagnitude;
 
@@ -1719,7 +1719,6 @@ public class TranscriptionViewController implements Initializable {
                     }
 
                     // Update scrolling
-                    // Todo: fix scrolling
                     if (scrollToPlayhead) {
                         updateScrollPosition(playheadX.doubleValue(), spectrogramPane.getWidth());
                     }
