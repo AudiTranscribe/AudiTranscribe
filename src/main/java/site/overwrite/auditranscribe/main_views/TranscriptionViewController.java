@@ -153,8 +153,6 @@ public class TranscriptionViewController implements Initializable {
     private String audtFileName;
     private Audio audio;
 
-    private byte[] compressedMP3Bytes;  // Todo: somehow remove the need to store this
-
     private byte[] qTransformBytes;  // LZ4 compressed version; todo: somehow remove the need to store this
     private double minQTransformMagnitude;
     private double maxQTransformMagnitude;
@@ -877,7 +875,6 @@ public class TranscriptionViewController implements Initializable {
             QTransformDataObject qTransformData, AudioDataObject audioData
     ) throws IOException, FFmpegNotFoundException, UnsupportedAudioFileException, AudioTooLongException {
         // Set attributes
-        compressedMP3Bytes = audioData.compressedMP3Bytes;
         sampleRate = audioData.sampleRate;
         audioDuration = audioData.totalDurationInMS / 1000.;
 
@@ -886,7 +883,7 @@ public class TranscriptionViewController implements Initializable {
         maxQTransformMagnitude = qTransformData.maxMagnitude;
 
         // Decompress the MP3 bytes
-        byte[] rawMP3Bytes = CompressionHandlers.lz4Decompress(compressedMP3Bytes);
+        byte[] rawMP3Bytes = CompressionHandlers.lz4Decompress(audioData.compressedMP3Bytes);
 
         // Ensure that the temporary directory exists
         IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
@@ -1406,19 +1403,6 @@ public class TranscriptionViewController implements Initializable {
     private void saveData(
             boolean forceChooseFile, String saveDest, CustomTask<?> task
     ) throws FFmpegNotFoundException, IOException {
-        // Compress the raw MP3 bytes
-        if (compressedMP3Bytes == null) {
-            try {
-                compressedMP3Bytes = CompressionHandlers.lz4Compress(
-                        audio.wavBytesToMP3Bytes(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath),
-                        task
-                );
-            } catch (IOException e) {
-                MyLogger.logException(e);
-                throw new RuntimeException(e);
-            }
-        }
-
         // Get data from the note rectangles
         int numRectangles = NoteRectangle.allNoteRectangles.size();
         double[] timesToPlaceRectangles = new double[numRectangles];
@@ -1432,15 +1416,9 @@ public class TranscriptionViewController implements Initializable {
             noteNums[i] = noteRectangle.noteNum;
         }
 
-        // Package data for saving
+        // Package project info data and music notes data for saving
         // (Note: current file version is 0x00070001, so all data objects used will be for that version)
         MyLogger.log(Level.INFO, "Packaging data for saving", this.getClass().toString());
-        QTransformDataObject qTransformData = new QTransformDataObject0x00070001(
-                qTransformBytes, minQTransformMagnitude, maxQTransformMagnitude
-        );
-        AudioDataObject audioData = new AudioDataObject0x00070001(
-                compressedMP3Bytes, sampleRate, (int) (audioDuration * 1000)
-        );
         ProjectInfoDataObject projectInfoData = new ProjectInfoDataObject0x00070001(
                 projectName, musicKeyIndex, timeSignatureIndex, bpm, offset, audioVolume,
                 (int) (currTime * 1000)
@@ -1451,6 +1429,26 @@ public class TranscriptionViewController implements Initializable {
 
         // Determine what mode of the writer should be used
         if (numSkippableBytes == 0 || forceChooseFile || fileVersion != AUDTFileConstants.FILE_VERSION_NUMBER) {
+            // Compress the audio data
+            byte[] compressedMP3Bytes;
+            try {
+                compressedMP3Bytes = CompressionHandlers.lz4Compress(
+                        audio.wavBytesToMP3Bytes(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath),
+                        task
+                );
+            } catch (IOException e) {
+                MyLogger.logException(e);
+                throw new RuntimeException(e);
+            }
+
+            // Package Q-transform data and audio data for saving
+            QTransformDataObject qTransformData = new QTransformDataObject0x00070001(
+                    qTransformBytes, minQTransformMagnitude, maxQTransformMagnitude
+            );
+            AudioDataObject audioData = new AudioDataObject0x00070001(
+                    compressedMP3Bytes, sampleRate, (int) (audioDuration * 1000)
+            );
+
             // Calculate the number of skippable bytes
             numSkippableBytes = 32 +  // Header section
                     UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
