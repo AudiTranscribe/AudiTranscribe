@@ -191,8 +191,8 @@ public class TranscriptionViewController implements Initializable {
     private MenuBar menuBar;
 
     @FXML
-    private MenuItem newProjectMenuItem, openProjectMenuItem, saveProjectMenuItem, saveAsMenuItem, exportMIDIMenuItem,
-            preferencesMenuItem, aboutMenuItem;
+    private MenuItem newProjectMenuItem, openProjectMenuItem, saveProjectMenuItem, saveAsMenuItem,
+            exportMIDIMenuItem, preferencesMenuItem, aboutMenuItem;
 
     // Main elements
     @FXML
@@ -344,8 +344,8 @@ public class TranscriptionViewController implements Initializable {
                     // Update the beat lines and bar number ellipses, if the spectrogram is ready
                     if (isEverythingReady) {
                         beatLines = PlottingStuffHandler.updateBeatLines(
-                                spectrogramPaneAnchor, beatLines, audioDuration, bpm, bpm, offset, offset, finalHeight,
-                                oldBeatsPerBar, newBeatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+                                spectrogramPaneAnchor, beatLines, audioDuration, bpm, bpm, offset, offset,
+                                finalHeight, oldBeatsPerBar, newBeatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
                         );
 
                         barNumberEllipses = PlottingStuffHandler.updateBarNumberEllipses(
@@ -797,8 +797,8 @@ public class TranscriptionViewController implements Initializable {
             protected WritableImage call() throws IOException {
                 // Define a spectrogram object
                 Spectrogram spectrogram = new Spectrogram(
-                        audio, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER, BINS_PER_OCTAVE, SPECTROGRAM_HOP_LENGTH, PX_PER_SECOND,
-                        NUM_PX_PER_OCTAVE, this
+                        audio, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER, BINS_PER_OCTAVE, SPECTROGRAM_HOP_LENGTH,
+                        PX_PER_SECOND, NUM_PX_PER_OCTAVE, this
                 );
 
                 // Obtain the raw spectrogram magnitudes
@@ -1390,7 +1390,10 @@ public class TranscriptionViewController implements Initializable {
                     "Exported notes to '" + file.getAbsolutePath() + "'.",
                     TranscriptionViewController.class.getName()
             );
-            Popups.showInformationAlert("Successfully exported to MIDI", "Successfully exported to MIDI.");
+            Popups.showInformationAlert(
+                    "Successfully exported to MIDI",
+                    "Successfully exported to MIDI."
+            );
         } catch (IOException e) {
             MyLogger.logException(e);
             Popups.showExceptionAlert(
@@ -1746,7 +1749,7 @@ public class TranscriptionViewController implements Initializable {
                             () -> {
                                 if (audtFilePath != null) {
                                     handleSavingProject(true, false);
-                                    MyLogger.log(Level.INFO, "Autosaved project", this.getClass().toString());
+                                    MyLogger.log(Level.INFO, "Project autosaved", this.getClass().toString());
                                 } else {
                                     MyLogger.log(
                                             Level.INFO,
@@ -1981,8 +1984,8 @@ public class TranscriptionViewController implements Initializable {
 
                             MyLogger.log(
                                     Level.FINE,
-                                    "Loaded note " + noteNum + " with " + noteDuration + " seconds duration at " +
-                                            timeToPlaceRectangle + " seconds",
+                                    "Loaded note " + noteNum + " with " + noteDuration +
+                                            " seconds duration at " + timeToPlaceRectangle + " seconds",
                                     this.getClass().toString());
                         } catch (NoteRectangleCollisionException ignored) {
                         }
@@ -1994,8 +1997,8 @@ public class TranscriptionViewController implements Initializable {
                     // Show a warning message to the user
                     Popups.showWarningAlert(
                             "MIDI Playback Unavailable",
-                            "The MIDI playback is not available on your system. Playback of created notes " +
-                                    "will not work."
+                            "The MIDI playback is not available on your system. Playback of created " +
+                                    "notes will not work."
                     );
                 }
 
@@ -2376,7 +2379,11 @@ public class TranscriptionViewController implements Initializable {
 
         // Check if there already exist a place to save
         if (audtFilePath == null || forceChooseFile) {
-            MyLogger.log(Level.FINE, "AUDT file destination not yet set; asking now", this.getClass().toString());
+            MyLogger.log(
+                    Level.FINE,
+                    "AUDT file destination not yet set; asking now",
+                    this.getClass().toString()
+            );
 
             // Get current window
             Window window = rootPane.getScene().getWindow();
