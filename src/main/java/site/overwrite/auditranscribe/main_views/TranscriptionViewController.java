@@ -1784,6 +1784,11 @@ public class TranscriptionViewController implements Initializable {
             spectrogramImage.setFitWidth(finalHeight);
             spectrogramImage.setImage(image);
 
+            // Set the current octave rectangle
+            currentOctaveRectangle = PlottingStuffHandler.addCurrentOctaveRectangle(
+                    notePane, finalHeight, octaveNum, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER
+            );
+            
             // Add note labels and note lines
             noteLabels = PlottingStuffHandler.addNoteLabels(
                     notePane, noteLabels, musicKey, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER,
@@ -1802,11 +1807,6 @@ public class TranscriptionViewController implements Initializable {
                     SPECTROGRAM_ZOOM_SCALE_X
             );
             PlottingStuffHandler.addBarNumberEllipses(barNumberPane, barNumberEllipses);
-
-            // Set the current octave rectangle
-            currentOctaveRectangle = PlottingStuffHandler.addCurrentOctaveRectangle(
-                    notePane, finalHeight, octaveNum, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER
-            );
 
             // Resize spectrogram image pane
             // (We do this at the end to ensure that the image is properly placed)
