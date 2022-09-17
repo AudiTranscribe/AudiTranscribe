@@ -17,7 +17,7 @@ on:
   pull_request:
     branches: [ "main" ]
   schedule:
-    - cron: '18 11 * * 2'
+    - cron: "00 00 * * 1"  # Run at 00:00 UTC every monday
 
 jobs:
   analyze:
@@ -62,7 +62,7 @@ jobs:
       - name: Build AudiTranscribe
         run: xvfb-run mvn clean compile package -B -V -e -Dfindbugs.skip -Dcheckstyle.skip -Dpmd.skip=true -Dspotbugs.skip -Denforcer.skip -Dmaven.javadoc.skip -DskipTests -Dmaven.test.skip.exec -Dlicense.skip=true -Drat.skip=true -Dspotless.check.skip=true
 
-        # ℹ️ Command-line programs to run using the OS shell.
+      # ℹ️ Command-line programs to run using the OS shell.
       # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
 
       #   If the Autobuild fails above, remove it and uncomment the following three lines.
