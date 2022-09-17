@@ -63,12 +63,24 @@ public final class SpectralHelpers {
      * @return Estimated tuning deviation in fractions of a bin.
      */
     public static double estimateTuning(double[] x, double sr) {
+        return estimateTuning(x, sr, 0);
+    }
+
+    /**
+     * Estimate the tuning of an audio time series or spectrogram input.
+     *
+     * @param x       Audio signal.
+     * @param sr      Audio sampling rate of <code>x</code>.
+     * @param minFreq Minimum frequency value for it to be counted.
+     * @return Estimated tuning deviation in fractions of a bin.
+     */
+    public static double estimateTuning(double[] x, double sr, double minFreq) {
         // Constants
         double resolution = 0.01;
         int binsPerOctave = 12;
 
         // Get pitch-magnitude values
-        Pair<Double[][], Double[][]> pitchAndMag = piptack(x, sr, 150, 4000);
+        Pair<Double[][], Double[][]> pitchAndMag = piptack(x, sr);
         Double[][] pitch = pitchAndMag.value0();
         Double[][] mag = pitchAndMag.value1();
 
@@ -77,7 +89,7 @@ public final class SpectralHelpers {
         List<Double> tempRelevantMags = new ArrayList<>();
         for (int i = 0; i < pitch.length; i++) {
             for (int j = 0; j < pitch[i].length; j++) {
-                if (pitch[i][j] > 0) {
+                if (pitch[i][j] > minFreq) {
                     tempRelevantPitches.add(pitch[i][j]);
                     tempRelevantMags.add(mag[i][j]);
                 }
@@ -142,10 +154,8 @@ public final class SpectralHelpers {
     /**
      * Pitch tracking on thresholded parabolically-interpolated STFT.
      *
-     * @param x    Audio signal.
-     * @param sr   Audio sampling rate of the audio signal.
-     * @param fmin Lower frequency cutoff.
-     * @param fmax Upper frequency cutoff.
+     * @param x  Audio signal.
+     * @param sr Audio sampling rate of the audio signal.
      * @return A pair of matrices.<br>
      * The first matrix is the pitch matrix, which contains instantaneous frequencies.<br>
      * The second matrix contains the corresponding magnitudes.
@@ -154,10 +164,13 @@ public final class SpectralHelpers {
      * article</a> by Center for Computer Research in Music and Acoustics (CCRMA),
      * Stanford University.
      */
-    private static Pair<Double[][], Double[][]> piptack(double[] x, double sr, double fmin, double fmax) {
+    private static Pair<Double[][], Double[][]> piptack(double[] x, double sr) {
         // Constants
         int numFFT = 2048;
         int hopLength = numFFT / 4;
+
+        double fmin = 150;
+        double fmax = 4000;
 
         // Generate the STFT spectrogram
         Complex[][] stft = STFT.stft(x, numFFT, hopLength, WindowFunction.HANN_WINDOW);
@@ -173,7 +186,6 @@ public final class SpectralHelpers {
         }
 
         // Truncate to feasible region
-        fmin = Math.max(fmin, 0);
         fmax = Math.min(fmax, sr / 2);
 
         // Get the frequency bins of the FFT

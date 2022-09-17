@@ -32,6 +32,20 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SpectralHelpersTest {
+    // Load samples and sample rate for some tests
+    Audio audio = new Audio(
+            new File(IOMethods.getAbsoluteFilePath("testing-files/audio/Trumpet.wav")),
+            AudioProcessingMode.SAMPLES_ONLY
+    );
+
+    double[] samples = audio.getMonoSamples();
+    double sampleRate = audio.getSampleRate();
+
+    // Initialization method
+    SpectralHelpersTest() throws UnsupportedAudioFileException, AudioTooLongException, IOException {
+    }
+
+    // Tests
     @Test
     void computeAlpha() {
         assertEquals(0.6, SpectralHelpers.computeAlpha(1));
@@ -39,15 +53,12 @@ class SpectralHelpersTest {
     }
 
     @Test
-    void estimateTuning() throws UnsupportedAudioFileException, AudioTooLongException, IOException {
-        Audio audio = new Audio(
-                new File(IOMethods.getAbsoluteFilePath("testing-files/audio/Trumpet.wav")),
-                AudioProcessingMode.SAMPLES_ONLY
-        );
-
-        double[] samples = audio.getMonoSamples();
-        double sampleRate = audio.getSampleRate();
-
+    void estimateTuning() {
         assertEquals(-0.09, SpectralHelpers.estimateTuning(samples, sampleRate), 1e-5);
+    }
+
+    @Test
+    void estimateTuningWithWeirdThreshold() {
+        assertEquals(-0.5, SpectralHelpers.estimateTuning(samples, sampleRate, 1e6), 1e-5);
     }
 }
