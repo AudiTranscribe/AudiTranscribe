@@ -25,6 +25,7 @@ import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.network.DownloadFileHandler;
+import site.overwrite.auditranscribe.network.WebContentHandler;
 import site.overwrite.auditranscribe.setup_wizard.helpers.data_encapsulators.FFmpegDownloadData;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
@@ -156,7 +157,8 @@ public class FFmpegDownloadManager {
      * Define all the attributes of this filter.
      *
      * @param osName Name of the OS.
-     * @throws IOException         If the data file path is incorrect.
+     * @throws IOException         If the data file path is incorrect, or if the file signature URL
+     *                             is incorrect.
      * @throws JsonSyntaxException If the syntax of the filter file is incorrect.
      */
     private void defineAttributes(String osName) throws IOException {
@@ -185,9 +187,16 @@ public class FFmpegDownloadManager {
 
             // Set attributes
             downloadURL = new URL(data.url);
-            signature = data.signature;
             ffmpegFolder = data.outputFolder;
             needSetExecutable = data.needSetExecutable;
+
+            // Handle signature setting
+            if (data.signature != null) {
+                signature = data.signature;
+            } else {
+                // Get signature from signature URL
+                signature = WebContentHandler.readContentOnWebpage(new URL(data.signatureURL));
+            }
 
         } catch (JsonSyntaxException e) {
             throw new IOException(e);
