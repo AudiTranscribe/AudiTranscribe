@@ -1352,6 +1352,7 @@ public class TranscriptionViewController implements Initializable {
 
             // Hide the progress box
             progressBarHBox.setVisible(false);
+            progressBar.progressProperty().unbind();
 
             // Show popup upon saving completion, if it is not an autosave
             if (!isAutosave) {
@@ -1783,6 +1784,11 @@ public class TranscriptionViewController implements Initializable {
             spectrogramImage.setFitWidth(finalHeight);
             spectrogramImage.setImage(image);
 
+            // Set the current octave rectangle
+            currentOctaveRectangle = PlottingStuffHandler.addCurrentOctaveRectangle(
+                    notePane, finalHeight, octaveNum, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER
+            );
+
             // Add note labels and note lines
             noteLabels = PlottingStuffHandler.addNoteLabels(
                     notePane, noteLabels, musicKey, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER,
@@ -1801,11 +1807,6 @@ public class TranscriptionViewController implements Initializable {
                     SPECTROGRAM_ZOOM_SCALE_X
             );
             PlottingStuffHandler.addBarNumberEllipses(barNumberPane, barNumberEllipses);
-
-            // Set the current octave rectangle
-            currentOctaveRectangle = PlottingStuffHandler.addCurrentOctaveRectangle(
-                    notePane, finalHeight, octaveNum, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER
-            );
 
             // Resize spectrogram image pane
             // (We do this at the end to ensure that the image is properly placed)
@@ -2064,6 +2065,8 @@ public class TranscriptionViewController implements Initializable {
 
             } else {
                 progressBarHBox.setVisible(false);
+                progressBar.progressProperty().unbind();
+                progressLabel.textProperty().unbind();
             }
         }
     }
@@ -2261,6 +2264,7 @@ public class TranscriptionViewController implements Initializable {
         // Check if user wants to save the project
         if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {  // Save current project
             handleSavingProject(false, false);
+            return;
         }
 
         // Otherwise, get the key event's key code
@@ -2336,6 +2340,12 @@ public class TranscriptionViewController implements Initializable {
     private void keyReleasedEventHandler(KeyEvent keyEvent) {
         // If the spectrogram is not ready or if in the middle of editing do not do anything
         if (!isEverythingReady || NoteRectangle.isEditing) {
+            keyEvent.consume();
+            return;
+        }
+
+        // If the key event is part of the save project combination, ignore
+        if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {
             keyEvent.consume();
             return;
         }

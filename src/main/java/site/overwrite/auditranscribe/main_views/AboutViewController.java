@@ -108,6 +108,10 @@ public class AboutViewController implements Initializable {
 
             // Show the stage
             aboutStage.show();
+
+            // Stop highlighting the hyperlink
+            controller.rootPane.requestFocus();
+
         } catch (IOException e) {
             MyLogger.logException(e);
             throw new RuntimeException(e);

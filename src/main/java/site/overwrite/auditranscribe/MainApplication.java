@@ -57,6 +57,7 @@ public class MainApplication extends Application {
             // Update the version label with the version number
             currentVersion = projectPropertiesFile.getProperty("version");
         } catch (IOException e) {
+            MyLogger.logException(e);
             throw new RuntimeException(e);
         }
 

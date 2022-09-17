@@ -228,13 +228,20 @@ public final class DownloadFileHandler {
             // Try downloading the file
             try {
                 downloadFile(url, outputFilePath, task, algorithm, correctHash);
-            } catch (IOException | FileSignatureMismatchException e) {
+            } catch (IOException e) {
                 MyLogger.log(
                         Level.WARNING,
                         "Failed to download file, trying again (attempt " + (i + 1) + " of " + maxAttempts + ")",
                         DownloadFileHandler.class.getName()
                 );
                 continue;  // Try again
+            } catch (FileSignatureMismatchException e) {
+                MyLogger.log(
+                        Level.WARNING,
+                        e.getMessage() + " Trying again (attempt " + (i + 1) + " of " + maxAttempts + ")",
+                        DownloadFileHandler.class.getName()
+                );
+                continue;
             }
 
             // Download successful, return

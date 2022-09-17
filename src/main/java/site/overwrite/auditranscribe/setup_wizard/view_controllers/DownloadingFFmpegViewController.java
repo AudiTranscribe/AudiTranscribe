@@ -89,6 +89,11 @@ public class DownloadingFFmpegViewController implements Initializable {
         });
         downloadTask.setOnSucceeded((event) -> {
             ffmpegPath = downloadTask.getValue();
+            MyLogger.log(
+                    Level.INFO,
+                    "FFmpeg downloaded; path set to '" + ffmpegPath + "'.",
+                    this.getClass().getName()
+            );
             ((Stage) rootPane.getScene().getWindow()).close();
         });
 

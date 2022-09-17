@@ -10,6 +10,8 @@
     -fx-body-color: -fx-base;
     -fx-body-color-bottomup: -fx-base;
     -fx-body-color-to-right: -fx-base;
+
+    -default-text-fill: #bbbbbbff;
 }
 
 /* Buttons */
@@ -17,6 +19,7 @@
     -fx-border-color: #646464ff;
     -fx-border-radius: 3px;
     -fx-background-color: #4c5052ff;
+    -fx-text-fill: -default-text-fill;
 }
 
 .button:hover {
@@ -38,7 +41,16 @@
     -fx-border-color: #767c81ff !important;
 }
 
+/* Hyperlinks */
+.hyperlink {
+    -fx-text-fill: #94b3f2ff;
+}
+
 /* Radio Buttons */
+.radio-button {
+    -fx-text-fill: -default-text-fill;
+}
+
 .radio-button .radio {
     -fx-background-color: #44494aff;
     -fx-padding: 5px;
@@ -67,7 +79,7 @@
 }
 
 .choice-box .menu-item > .label {
-    -fx-text-fill: #bbbbbbff;
+    -fx-text-fill: -default-text-fill;
 }
 
 .choice-box .menu-item:focused {
@@ -75,12 +87,12 @@
 }
 
 .spinner > .text-field {
-    -fx-text-fill: #bbbbbbff;
+    -fx-text-fill: -default-text-fill;
     -fx-background-color: transparent;
 }
 
 .arrow, .left-arrow, .right-arrow, .increment-arrow, .decrement-arrow {
-    -fx-background-color: #bbbbbbff;
+    -fx-background-color: -default-text-fill;
     -fx-cursor: hand;
 }
 
@@ -98,7 +110,11 @@
 
 /* Text */
 .text {
-    -fx-fill: #bbbbbbff;
+    -fx-text-fill: -default-text-fill;
+}
+
+.label {
+    -fx-text-fill: -default-text-fill;
 }
 
 .text-field {
@@ -106,7 +122,7 @@
     -fx-border-radius: 3px;
     -fx-background-color: #45494aff;
     -fx-prompt-text-fill: #777777ff;
-    -fx-text-fill: #bbbbbbff;;
+    -fx-text-fill: -default-text-fill;
 }
 
 .text-field.error {
@@ -139,10 +155,15 @@
     -fx-border-width: 1px;
 }
 
+.tab-label {
+    -fx-fill: -default-text-fill;
+    -fx-text-fill: -default-text-fill;
+}
+
 /* MAIN PAGE */
 /* Text */
 .short-name-text {
-    -fx-fill: #bbbbbbff;
+    -fx-fill: -default-text-fill;
 }
 
 /* Others */
@@ -164,14 +185,14 @@
 }
 
 .list-cell:selected .text {
-    -fx-fill: #bbbbbbff;
-    -fx-text-fill: #bbbbbbff;
+    -fx-fill: -default-text-fill;
+    -fx-text-fill: -default-text-fill;
 }
 
 /* TRANSCRIPTION PAGE */
 /* Labels */
 .display-label {
-    -fx-fill: #bbbbbbff;
+    -fx-fill: -default-text-fill;
 }
 
 /* Spectrogram */
@@ -184,15 +205,11 @@
 }
 
 .bar-number-ellipse {
-    -fx-stroke: #ffffffff;
+    -fx-stroke: -default-text-fill;
 }
 
 .current-octave-rectangle {
     -fx-fill: #ffbf0050;
-}
-
-.spectrogram-square {
-    -fx-border-color: #d3d3d3ff; /* Lightgray */
 }
 
 /* Playback */
