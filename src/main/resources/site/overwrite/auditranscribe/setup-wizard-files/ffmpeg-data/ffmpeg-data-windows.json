@@ -2,6 +2,5 @@
   "url": "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip",
   "signature": null,
   "signatureURL": "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip.sha256",
-  "outputFolder": null,
-  "needSetExecutable": false
+  "outputFolder": null
 }

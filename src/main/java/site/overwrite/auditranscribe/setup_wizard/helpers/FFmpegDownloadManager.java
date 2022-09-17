@@ -46,7 +46,6 @@ public class FFmpegDownloadManager {
     private URL downloadURL;
     private String signature;
     private String ffmpegFolder;
-    private boolean needSetExecutable;
 
     /**
      * Initialization method for a <code>FFmpegDownloadManager</code>.
@@ -113,29 +112,46 @@ public class FFmpegDownloadManager {
         String ffmpegBinPath = null;
 
         // Set executable status if needed
-        if (needSetExecutable) {
-            if (os == OSType.MAC) {
-                if (!new File(IOMethods.joinPaths(outputFolder, "ffmpeg")).setExecutable(true)) {
-                    MyLogger.log(
-                            Level.SEVERE,
-                            "Failed to set executable status for FFmpeg",
-                            FFmpegDownloadManager.class.getName()
-                    );
-                    throw new IOException(
-                            "Failed to set executable status for '" +
-                                    IOMethods.joinPaths(outputFolder, "ffmpeg") + "'."
-                    );
-                } else {
-                    MyLogger.log(
-                            Level.INFO,
-                            "Set executable status for FFmpeg",
-                            FFmpegDownloadManager.class.getName()
-                    );
-                    ffmpegBinPath = IOMethods.joinPaths(outputFolder, "ffmpeg");
-                }
+        if (os == OSType.MAC) {
+            if (!new File(IOMethods.joinPaths(outputFolder, "ffmpeg")).setExecutable(true)) {
+                MyLogger.log(
+                        Level.SEVERE,
+                        "Failed to set executable status for FFmpeg",
+                        FFmpegDownloadManager.class.getName()
+                );
+                throw new IOException(
+                        "Failed to set executable status for '" +
+                                IOMethods.joinPaths(outputFolder, "ffmpeg") + "'."
+                );
             } else {
-                throw new IOException("Unrecognised OS");
+                MyLogger.log(
+                        Level.INFO,
+                        "Set executable status for FFmpeg",
+                        FFmpegDownloadManager.class.getName()
+                );
+                ffmpegBinPath = IOMethods.joinPaths(outputFolder, "ffmpeg");
             }
+        } else if (os == OSType.WINDOWS) {
+            // Get all files and folders from the destination folder
+            String[] filesAndFolders = new File(destFolder).list();
+
+            // Get the folder that contains FFmpeg
+            if (filesAndFolders != null) {
+                String folder = null;
+
+                for (String fileOrFolder : filesAndFolders) {
+                    if (fileOrFolder.matches("ffmpeg-[0-9.]+-.+")) {
+                        folder = fileOrFolder;
+                        break;
+                    }
+                }
+
+                if (folder != null) {
+                    ffmpegBinPath = IOMethods.joinPaths(destFolder, folder, "bin", "ffmpeg.exe");
+                }
+            }
+        } else {
+            throw new IOException("Unrecognised OS");
         }
 
         // Delete the downloaded zip file
@@ -188,7 +204,6 @@ public class FFmpegDownloadManager {
             // Set attributes
             downloadURL = new URL(data.url);
             ffmpegFolder = data.outputFolder;
-            needSetExecutable = data.needSetExecutable;
 
             // Handle signature setting
             if (data.signature != null) {

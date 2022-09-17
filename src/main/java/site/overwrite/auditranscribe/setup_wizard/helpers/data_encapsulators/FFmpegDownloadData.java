@@ -26,5 +26,4 @@ public class FFmpegDownloadData {
     public String signature;
     public String signatureURL;
     public String outputFolder;
-    public boolean needSetExecutable;
 }
