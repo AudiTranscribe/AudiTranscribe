@@ -19,6 +19,15 @@
     -fx-background-radius: 3px, 3px, 2px, 1px;
 }
 
+/* Hyperlinks */
+.hyperlink:hover {
+    -fx-cursor: hand;
+}
+
+.hyperlink:focused {
+    -fx-border-color: #00000000;
+}
+
 /* MAIN PAGE */
 /* Labels and Texts */
 .title-label {
