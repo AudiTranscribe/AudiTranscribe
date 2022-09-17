@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
@@ -112,4 +113,8 @@
       </Label>
       <Label alignment="CENTER" layoutX="10.0" layoutY="10.0" prefWidth="400.0" text="Published under the GNU General Public Licence 3.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
    </children>
+   <stylesheets>
+      <URL value="@../../css/base.css" />
+      <URL value="@../../css/light-mode.css" />
+   </stylesheets>
 </AnchorPane>
