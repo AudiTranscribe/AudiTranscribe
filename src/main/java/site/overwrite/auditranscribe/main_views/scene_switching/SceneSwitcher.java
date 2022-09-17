@@ -140,7 +140,7 @@ public class SceneSwitcher {
         }
 
         MyLogger.log(Level.INFO, "Shutdown ordered", SceneSwitcher.class.getName());
-        Platform.exit();
+        System.exit(0);  // Forces JVM to shut down
     }
 
     // Private methods
