@@ -1352,6 +1352,7 @@ public class TranscriptionViewController implements Initializable {
 
             // Hide the progress box
             progressBarHBox.setVisible(false);
+            progressBar.progressProperty().unbind();
 
             // Show popup upon saving completion, if it is not an autosave
             if (!isAutosave) {
@@ -2064,6 +2065,8 @@ public class TranscriptionViewController implements Initializable {
 
             } else {
                 progressBarHBox.setVisible(false);
+                progressBar.progressProperty().unbind();
+                progressLabel.textProperty().unbind();
             }
         }
     }
