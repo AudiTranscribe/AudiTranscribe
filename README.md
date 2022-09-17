@@ -50,9 +50,9 @@ The software is not perfect. There are a few limitations with the software in it
 
 # Installation
 
-## Using An Installer
+Currently, the only supported platforms for AudiTranscribe are Windows and macOS. We are working on a Linux port.
 
-Currently, the only installers available are for Windows and macOS.
+## Using An Installer
 
 ### Windows
 
