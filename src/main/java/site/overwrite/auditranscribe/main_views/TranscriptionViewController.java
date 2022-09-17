@@ -2264,6 +2264,7 @@ public class TranscriptionViewController implements Initializable {
         // Check if user wants to save the project
         if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {  // Save current project
             handleSavingProject(false, false);
+            return;
         }
 
         // Otherwise, get the key event's key code
@@ -2339,6 +2340,12 @@ public class TranscriptionViewController implements Initializable {
     private void keyReleasedEventHandler(KeyEvent keyEvent) {
         // If the spectrogram is not ready or if in the middle of editing do not do anything
         if (!isEverythingReady || NoteRectangle.isEditing) {
+            keyEvent.consume();
+            return;
+        }
+
+        // If the key event is part of the save project combination, ignore
+        if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {
             keyEvent.consume();
             return;
         }
