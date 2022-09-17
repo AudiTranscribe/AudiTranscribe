@@ -43,12 +43,12 @@
             <Insets left="75.0" right="75.0" />
          </padding>
       </Label>
-      <Button fx:id="hasFFmpegButton" layoutX="70.0" layoutY="329.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="210.0" text="I Have FFmpeg Installed" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="75.0">
+      <Button fx:id="hasFFmpegButton" layoutX="70.0" layoutY="329.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="210.0" text="I Have FFmpeg Installed" wrapText="true" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="75.0">
          <font>
             <Font size="14.0" />
          </font>
       </Button>
-      <Button fx:id="doNotHaveFFmpegButton" layoutX="398.0" layoutY="330.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="210.0" text="I Do Not Have FFmpeg Installed" AnchorPane.bottomAnchor="45.0" AnchorPane.rightAnchor="75.0">
+      <Button fx:id="doNotHaveFFmpegButton" layoutX="398.0" layoutY="330.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="210.0" text="I Do Not Have FFmpeg Installed" wrapText="true" AnchorPane.bottomAnchor="45.0" AnchorPane.rightAnchor="75.0">
          <font>
             <Font size="14.0" />
          </font>
