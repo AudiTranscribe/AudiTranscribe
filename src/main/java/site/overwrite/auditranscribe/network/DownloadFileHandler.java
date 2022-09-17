@@ -238,7 +238,7 @@ public final class DownloadFileHandler {
             } catch (FileSignatureMismatchException e) {
                 MyLogger.log(
                         Level.WARNING,
-                        "File signature mismatch, trying again (attempt " + (i + 1) + " of " + maxAttempts + ")",
+                        e.getMessage() + " Trying again (attempt " + (i + 1) + " of " + maxAttempts + ")",
                         DownloadFileHandler.class.getName()
                 );
                 continue;
