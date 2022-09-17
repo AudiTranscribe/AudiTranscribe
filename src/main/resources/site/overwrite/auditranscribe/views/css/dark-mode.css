@@ -47,6 +47,10 @@
 }
 
 /* Radio Buttons */
+.radio-button {
+    -fx-text-fill: -default-text-fill;
+}
+
 .radio-button .radio {
     -fx-background-color: #44494aff;
     -fx-padding: 5px;
