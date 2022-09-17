@@ -1788,7 +1788,7 @@ public class TranscriptionViewController implements Initializable {
             currentOctaveRectangle = PlottingStuffHandler.addCurrentOctaveRectangle(
                     notePane, finalHeight, octaveNum, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER
             );
-            
+
             // Add note labels and note lines
             noteLabels = PlottingStuffHandler.addNoteLabels(
                     notePane, noteLabels, musicKey, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER,

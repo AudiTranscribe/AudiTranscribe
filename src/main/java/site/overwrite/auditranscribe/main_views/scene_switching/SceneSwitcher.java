@@ -18,6 +18,7 @@
 
 package site.overwrite.auditranscribe.main_views.scene_switching;
 
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -139,6 +140,7 @@ public class SceneSwitcher {
         }
 
         MyLogger.log(Level.INFO, "Shutdown ordered", SceneSwitcher.class.getName());
+        Platform.exit();
     }
 
     // Private methods
