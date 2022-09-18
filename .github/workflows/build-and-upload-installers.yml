@@ -1,4 +1,4 @@
-name: Generate Installers
+name: Build And Upload Installers
 
 on:
   workflow_dispatch:
@@ -38,10 +38,16 @@ jobs:
         run: |
           zip -r Windows-Installer.zip Windows-Installer
           zip -r macOS-Installer.zip macOS-Installer
-      - name: Upload Windows Installer
+      - name: Upload Installers
         uses: softprops/action-gh-release@v0.1.14
         with:
           tag_name: ${{ inputs.release_tag }}
           files: |
             Windows-Installer.zip
             macOS-Installer.zip
+      - name: Delete Artifacts
+        uses: GeekyEggo/delete-artifact@v1.0.0
+        with:
+          name: |
+            Windows-Installer
+            macOS-Installer

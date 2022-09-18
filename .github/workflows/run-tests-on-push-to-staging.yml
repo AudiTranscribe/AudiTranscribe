@@ -2,9 +2,9 @@ name: Run Tests On Push To Staging
 
 on:
   push:
-    branches: [ staging ]
+    branches: [ "staging" ]
   pull_request:
-    branches: [ staging ]
+    branches: [ "staging" ]
   workflow_dispatch:
 
 jobs:

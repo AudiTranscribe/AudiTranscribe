@@ -2,12 +2,12 @@ name: Run Tests On Push To Main
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
     paths:
       - 'src/main/java/site/overwrite/auditranscribe/**'
       - 'src/test/java/site/overwrite/auditranscribe/**'
   pull_request:
-    branches: [ main ]
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:

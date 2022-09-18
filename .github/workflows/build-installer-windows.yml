@@ -4,16 +4,10 @@ on:
   workflow_call:
     inputs:
       branch:
-        description: 'Specify Branch'
+        description: "Specify Branch"
         required: true
-        default: 'staging'
+        default: "staging"
         type: string
-  workflow_dispatch:
-    inputs:
-      branch:
-        description: 'Specify Branch'
-        required: true
-        default: 'staging'
 
 jobs:
   build_installer:

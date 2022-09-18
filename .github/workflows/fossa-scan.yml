@@ -2,9 +2,9 @@ name: FOSSA Scan
 
 on:
   push:
-    branches: [ main, staging ]
+    branches: [ "main", "staging" ]
   pull_request:
-    branches: [ main, staging ]
+    branches: [ "main", "staging" ]
   workflow_dispatch:
 
 jobs:
