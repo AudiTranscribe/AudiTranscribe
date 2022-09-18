@@ -37,7 +37,6 @@ import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFacto
 import site.overwrite.auditranscribe.misc.spinners.CustomIntegerSpinnerValueFactory;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
 import site.overwrite.auditranscribe.misc.Popups;
-import site.overwrite.auditranscribe.main_views.helpers.ProjectIOHandlers;
 
 import java.io.File;
 import java.io.IOException;

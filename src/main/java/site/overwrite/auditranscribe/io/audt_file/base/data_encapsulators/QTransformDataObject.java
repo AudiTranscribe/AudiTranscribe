@@ -18,16 +18,14 @@
 
 package site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators;
 
-import org.javatuples.Triplet;
+import site.overwrite.auditranscribe.misc.tuples.Triple;
+import site.overwrite.auditranscribe.utils.ByteConversionUtils;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
-import site.overwrite.auditranscribe.io.IOConverters;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileHelpers;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.utils.TypeConversionUtils;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * Data object that stores the Q-Transform data.
@@ -41,36 +39,6 @@ public abstract class QTransformDataObject extends AbstractAUDTDataObject {
 
     public double minMagnitude;
     public double maxMagnitude;
-
-    // Overwritten methods
-    @Override
-    public int numBytesNeeded() {
-        return 4 +  // Section ID
-                (4 + qTransformBytes.length) +  // +4 for the length of the Q-Transform data
-                8 +  // 8 bytes for the min magnitude
-                8 +  // 8 bytes for the max magnitude
-                4;   // EOS delimiter
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        QTransformDataObject that = (QTransformDataObject) o;
-        return (
-                Double.compare(that.minMagnitude, minMagnitude) == 0 &&
-                        Double.compare(that.maxMagnitude, maxMagnitude) == 0 &&
-                        Arrays.equals(qTransformBytes, that.qTransformBytes)
-        );
-    }
-
-    @Override
-    public int hashCode() {
-        int result = Objects.hash(minMagnitude, maxMagnitude);
-        result = 31 * result + Arrays.hashCode(qTransformBytes);
-        return result;
-    }
-
 
     // Public methods
 
@@ -86,14 +54,14 @@ public abstract class QTransformDataObject extends AbstractAUDTDataObject {
      * data.
      * @throws IOException If something went wrong when compressing the bytes.
      */
-    public static Triplet<Byte[], Double, Double> qTransformMagnitudesToByteData(
+    public static Triple<Byte[], Double, Double> qTransformMagnitudesToByteData(
             double[][] qTransformMagnitudes, CustomTask<?> task
     ) throws IOException {
         // Convert the double data to integer data
-        Triplet<Integer[][], Double, Double> convertedTuple = AUDTFileHelpers.doubles2DtoInt2D(qTransformMagnitudes);
-        Integer[][] intData = convertedTuple.getValue0();
-        double min = convertedTuple.getValue1();
-        double max = convertedTuple.getValue2();
+        Triple<Integer[][], Double, Double> convertedTuple = AUDTFileHelpers.doubles2DtoInt2D(qTransformMagnitudes);
+        Integer[][] intData = convertedTuple.value0();
+        double min = convertedTuple.value1();
+        double max = convertedTuple.value2();
 
         // Convert non-primitive integers to primitive integers
         int[][] intDataPrimitive = new int[intData.length][intData[0].length];
@@ -102,13 +70,13 @@ public abstract class QTransformDataObject extends AbstractAUDTDataObject {
         }
 
         // Convert the integer data to bytes
-        byte[] plainBytes = IOConverters.twoDimensionalIntegerArrayToBytes(intDataPrimitive);
+        byte[] plainBytes = ByteConversionUtils.twoDimensionalIntegerArrayToBytes(intDataPrimitive);
 
         // Compress the bytes
         byte[] bytes = CompressionHandlers.lz4Compress(plainBytes, task);
 
         // Return the bytes and the min and max values
-        return new Triplet<>(TypeConversionUtils.toByteArray(bytes), min, max);
+        return new Triple<>(TypeConversionUtils.toByteArray(bytes), min, max);
     }
 
     /**
@@ -127,7 +95,7 @@ public abstract class QTransformDataObject extends AbstractAUDTDataObject {
         byte[] plainBytes = CompressionHandlers.lz4Decompress(bytes);
 
         // Convert bytes to 2D integer array
-        int[][] intData = IOConverters.bytesToTwoDimensionalIntegerArray(plainBytes);
+        int[][] intData = ByteConversionUtils.bytesToTwoDimensionalIntegerArray(plainBytes);
 
         // Finally convert the integer data to double
         return AUDTFileHelpers.int2DtoDoubles2D(intData, minMagnitude, maxMagnitude);

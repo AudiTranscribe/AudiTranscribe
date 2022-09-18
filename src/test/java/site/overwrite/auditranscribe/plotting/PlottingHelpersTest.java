@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PlottingHelpersTest {
-
     @Test
     void freqToHeight() {
         assertEquals(334.914, PlottingHelpers.freqToHeight(123, 10, 20000, 500), 0.001);

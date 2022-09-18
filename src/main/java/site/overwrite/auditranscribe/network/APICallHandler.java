@@ -90,10 +90,8 @@ public final class APICallHandler {
 
             // Get the output from the connection
             output = getConnectionOutput(con);
-        } catch (ConnectException e) {
-            throw new APIServerException("Connection to '" + urlString + "' refused");
-        } catch (SocketTimeoutException e) {
-            throw new APIServerException("Connection to '" + urlString + "' timed out");
+        } catch (IOException e) {
+            throw new APIServerException("Connection to '" + urlString + "' failed");
         } finally {
             // Must remember to disconnect
             con.disconnect();
@@ -143,6 +141,10 @@ public final class APICallHandler {
             // Set the request method for the connection
             con.setRequestMethod("POST");
 
+            // Set timeouts
+            con.setConnectTimeout(CONNECTION_TIMEOUT);
+            con.setReadTimeout(timeout);
+
             // Add POST data
             con.setDoOutput(true);
             DataOutputStream out = new DataOutputStream(con.getOutputStream());
@@ -150,16 +152,10 @@ public final class APICallHandler {
             out.flush();
             out.close();
 
-            // Set timeouts
-            con.setConnectTimeout(CONNECTION_TIMEOUT);
-            con.setReadTimeout(timeout);
-
             // Get the output from the connection
             output = getConnectionOutput(con);
-        } catch (ConnectException e) {
-            throw new APIServerException("Connection to '" + urlString + "' refused");
-        } catch (SocketTimeoutException e) {
-            throw new APIServerException("Connection to '" + urlString + "' timed out");
+        } catch (IOException e) {
+            throw new APIServerException("Connection to '" + urlString + "' failed");
         } finally {
             // Must remember to disconnect
             con.disconnect();

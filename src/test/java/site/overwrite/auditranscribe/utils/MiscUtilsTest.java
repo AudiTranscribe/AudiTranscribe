@@ -74,13 +74,13 @@ class MiscUtilsTest {
 
     @Test
     void setBits() {
-        assertEquals(0, MiscUtils.numOfSetBits(0));
-        assertEquals(1, MiscUtils.numOfSetBits(1));
-        assertEquals(2, MiscUtils.numOfSetBits(2));
-        assertEquals(2, MiscUtils.numOfSetBits(3));
-        assertEquals(4, MiscUtils.numOfSetBits(13));
-        assertEquals(7, MiscUtils.numOfSetBits(127));
-        assertEquals(21, MiscUtils.numOfSetBits(1924282));
+        assertEquals(0, MiscUtils.getNumSetBits(0));
+        assertEquals(1, MiscUtils.getNumSetBits(1));
+        assertEquals(2, MiscUtils.getNumSetBits(2));
+        assertEquals(2, MiscUtils.getNumSetBits(3));
+        assertEquals(4, MiscUtils.getNumSetBits(13));
+        assertEquals(7, MiscUtils.getNumSetBits(127));
+        assertEquals(21, MiscUtils.getNumSetBits(1924282));
     }
 
     @Test

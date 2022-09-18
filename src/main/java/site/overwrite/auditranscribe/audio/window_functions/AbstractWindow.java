@@ -18,7 +18,7 @@
 
 package site.overwrite.auditranscribe.audio.window_functions;
 
-import org.javatuples.Pair;
+import site.overwrite.auditranscribe.misc.tuples.Pair;
 
 /**
  * Abstract window class that implements most methods needed by window classes.
@@ -58,8 +58,8 @@ public abstract class AbstractWindow {
 
         // Check if we need to extend the window
         Pair<Integer, Boolean> extendResponse = extend(length, symmetric);
-        int newLength = extendResponse.getValue0();
-        boolean truncateNeeded = extendResponse.getValue1();
+        int newLength = extendResponse.value0();
+        boolean truncateNeeded = extendResponse.value1();
 
         // Generate the window
         double[] window = new double[newLength];

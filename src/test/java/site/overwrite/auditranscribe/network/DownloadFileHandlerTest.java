@@ -131,12 +131,20 @@ class DownloadFileHandlerTest {
                     maxNumTries
             ));
             assertThrowsExactly(IOException.class, () -> DownloadFileHandler.downloadFileWithRetry(
-                    new URL(
-                            "https://no-file-here.com/not-a-file.txt"
-                    ),
+                    new URL("https://no-file-here.com/not-a-file.txt"),
                     outputFilePath,
                     "SHA1",
                     "Not a hash",
+                    maxNumTries
+            ));
+            assertThrowsExactly(IOException.class, () -> DownloadFileHandler.downloadFileWithRetry(
+                    new URL(
+                            "https://raw.githubusercontent.com/AudiTranscribe/AudiTranscribe/" +
+                                    "90ba622e09c867250c24b3a2e437e888b2740027/Feature%20Plan.txt"
+                    ),
+                    outputFilePath,
+                    "SHA1",
+                    "this-is-a-fake-hash",
                     maxNumTries
             ));
         } finally {

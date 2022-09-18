@@ -19,6 +19,8 @@
 package site.overwrite.auditranscribe.setup_wizard.view_controllers;
 
 import javafx.application.Platform;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -75,13 +77,13 @@ public class FixNoteDelayViewController implements Initializable {
     public static final double OFFSET_OF_OFFSET = 0.1;
 
     // Attributes
+    private final DoubleProperty playheadX = new SimpleDoubleProperty(0);
+
     private boolean isPlaying = false;
     private double duration;
 
     private Audio audio;
     private NotePlayerSequencer sequencer;
-
-    private Line playheadLine;
 
     // FXML elements
     @FXML
@@ -107,7 +109,6 @@ public class FixNoteDelayViewController implements Initializable {
         try {
             audio = new Audio(
                     new File(IOMethods.getAbsoluteFilePath(AUDIO_FILE)),
-                    "Breakfast.wav",
                     AudioProcessingMode.PLAYBACK_ONLY
             );
         } catch (UnsupportedAudioFileException | IOException | AudioTooLongException e) {
@@ -118,8 +119,12 @@ public class FixNoteDelayViewController implements Initializable {
         setupNotePlayerSequencer();
 
         // Add playhead line to the spectrogram pane
-        playheadLine = PlottingStuffHandler.createPlayheadLine(height);
+        Line playheadLine = PlottingStuffHandler.createPlayheadLine(height);
         spectrogramPane.getChildren().add(playheadLine);
+
+        // Bind properties
+        playheadLine.startXProperty().bind(playheadX);
+        playheadLine.endXProperty().bind(playheadX);
 
         // Set spinner factory and methods
         notePlayingDelayOffsetSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
@@ -162,17 +167,10 @@ public class FixNoteDelayViewController implements Initializable {
             // Nothing really changes if the audio is not playing
             if (isPlaying) {
                 // Get current audio time
-                double currTime;
-                try {
-                    currTime = audio.getCurrAudioTime();
-                } catch (InvalidObjectException e) {
-                    MyLogger.logException(e);
-                    throw new RuntimeException(e);
-                }
+                double currTime = audio.getCurrAudioTime();
 
                 // Update playhead line position
-                double newPosX = currTime / duration * width;
-                PlottingStuffHandler.updatePlayheadLine(playheadLine, newPosX);
+                playheadX.set(currTime / duration * width);
 
                 // Check if the current time has exceeded
                 if (currTime >= duration) {
@@ -265,22 +263,12 @@ public class FixNoteDelayViewController implements Initializable {
         double offsetTime = notePlayingDelayOffsetSpinner.getValue();
 
         // Reset the current time for the audio object and the note player sequencer
-        try {
-            audio.setAudioPlaybackTime(0);
-        } catch (InvalidObjectException e) {
-            MyLogger.logException(e);
-            throw new RuntimeException(e);
-        }
+        audio.setAudioPlaybackTime(0);
         sequencer.setCurrTime(offsetTime);
 
         // Play the things
-        try {
-            audio.setPlaybackVolume(0.5);
-            audio.play();
-        } catch (InvalidObjectException e) {
-            MyLogger.logException(e);
-            throw new RuntimeException(e);
-        }
+        audio.setPlaybackVolume(0.5);
+        audio.play();
         sequencer.play(offsetTime);
     }
 

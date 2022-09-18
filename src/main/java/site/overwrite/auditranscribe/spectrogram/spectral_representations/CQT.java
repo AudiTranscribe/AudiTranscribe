@@ -46,6 +46,11 @@ public final class CQT {
      * @param fmin           Minimum frequency.
      * @param numBins        Number of frequency bins, starting at <code>fmin</code>.
      * @param binsPerOctave  Number of bins per octave.
+     * @param tuning         Tuning offset in fractions of a bin.<br>
+     *                       If <code>tuning = Double.NaN</code>, the <code>tuning</code> value will
+     *                       be automatically estimated from the signal.<br>
+     *                       The minimum frequency of the resulting CQT will be modified to
+     *                       <code>fmin * Math.pow(2., tuning / binsPerOctave)</code>.
      * @param windowFunction Window specification for the basis filters.
      * @param task           The <code>CustomTask</code> object that is handling the generation.
      *                       Pass in <code>null</code> if no such task is being used.
@@ -68,9 +73,11 @@ public final class CQT {
      */
     public static Complex[][] cqt(
             double[] y, double sr, int hopLength, double fmin, int numBins, int binsPerOctave,
-            WindowFunction windowFunction, CustomTask<?> task
+            double tuning, WindowFunction windowFunction, CustomTask<?> task
     ) {
         // CQT is the special case of VQT where `gamma` is zero
-        return VQT.vqt(y, sr, hopLength, fmin, numBins, binsPerOctave, true, 0, windowFunction, task);
+        return VQT.vqt(
+                y, sr, hopLength, fmin, numBins, binsPerOctave, tuning, 0, windowFunction, task, true
+        );
     }
 }

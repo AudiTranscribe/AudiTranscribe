@@ -18,7 +18,7 @@
 
 package site.overwrite.auditranscribe.io.audt_file;
 
-import org.javatuples.Triplet;
+import site.overwrite.auditranscribe.misc.tuples.Triple;
 import site.overwrite.auditranscribe.utils.MathUtils;
 
 import java.util.List;
@@ -57,7 +57,7 @@ public final class AUDTFileHelpers {
      * @return Triplet of values. First value is the 2D integer array. Second value is the minimum
      * value of the doubles array. Final value is the maximum value of the doubles array.
      */
-    public static Triplet<Integer[][], Double, Double> doubles2DtoInt2D(double[][] array) {
+    public static Triple<Integer[][], Double, Double> doubles2DtoInt2D(double[][] array) {
         // Get array size
         int m = array.length;
         int n = array[0].length;
@@ -84,7 +84,7 @@ public final class AUDTFileHelpers {
         }
 
         // Return the integer array, minimum value, and maximum value
-        return new Triplet<>(intArray, min, max);
+        return new Triple<>(intArray, min, max);
     }
 
     /**

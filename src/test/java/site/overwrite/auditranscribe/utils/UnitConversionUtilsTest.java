@@ -201,7 +201,7 @@ class UnitConversionUtilsTest {
                 new double[][]{{-60, 0}, {10, 20}, {20, 10}},
                 UnitConversionUtils.powerToDecibel(new double[][]{{0, 1}, {10, 100}, {100, 10}}, 1, 80)
         );
-        assertThrowsExactly(ValueException.class, () ->UnitConversionUtils.powerToDecibel(new double[][]{{0, 1}, {10, 100}, {100, 10}}, 1, -1));
+        assertThrowsExactly(ValueException.class, () -> UnitConversionUtils.powerToDecibel(new double[][]{{0, 1}, {10, 100}, {100, 10}}, 1, -1));
     }
 
     @Test
@@ -231,6 +231,26 @@ class UnitConversionUtilsTest {
         assertEquals(110, UnitConversionUtils.melToHz(1.65), 1e-5);
         assertEquals(220, UnitConversionUtils.melToHz(3.3), 1e-5);
         assertEquals(440, UnitConversionUtils.melToHz(6.6), 1e-5);
+    }
+
+    @Test
+    void hzToOctaves() {
+        assertEquals(2.11768, UnitConversionUtils.hzToOctaves(123, 1, 23), 1e-5);
+        assertEquals(8.36675, UnitConversionUtils.hzToOctaves(9123, 0.56, 78), 1e-5);
+        assertEquals(4, UnitConversionUtils.hzToOctaves(440, 0, 1234), 1e-5);
+        assertEquals(4, UnitConversionUtils.hzToOctaves(440), 1e-5);
+        assertEquals(6.21864, UnitConversionUtils.hzToOctaves(2048), 1e-5);
+        assertEquals(8.81028, UnitConversionUtils.hzToOctaves(12345), 1e-5);
+    }
+
+    @Test
+    void octavesToHz() {
+        assertEquals(123, UnitConversionUtils.octavesToHz(2.117676530945015, 1, 23), 1e-5);
+        assertEquals(9123, UnitConversionUtils.octavesToHz(8.366753401047808, 0.56, 78), 1e-5);
+        assertEquals(440, UnitConversionUtils.octavesToHz(4, 0, 12));
+        assertEquals(440, UnitConversionUtils.octavesToHz(4), 1e-5);
+        assertEquals(2048, UnitConversionUtils.octavesToHz(6.21864028647534), 1e-5);
+        assertEquals(12345, UnitConversionUtils.octavesToHz(8.810279502505484), 1e-5);
     }
 
     // Time unit conversion

@@ -20,6 +20,8 @@ package site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulator
 
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.UnchangingDataPropertiesObject;
 
+import java.util.Objects;
+
 /**
  * Data object that stores the unchanging data's properties.
  */
@@ -31,5 +33,24 @@ public class UnchangingDataPropertiesObject0x00050002 extends UnchangingDataProp
      */
     public UnchangingDataPropertiesObject0x00050002(int numSkippableBytes) {
         this.numSkippableBytes = numSkippableBytes;
+    }
+
+    // Overwritten methods
+    @Override
+    public int numBytesNeeded() {
+        return NUM_BYTES_NEEDED;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UnchangingDataPropertiesObject0x00050002 that = (UnchangingDataPropertiesObject0x00050002) o;
+        return numSkippableBytes == that.numSkippableBytes;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(numSkippableBytes);
     }
 }

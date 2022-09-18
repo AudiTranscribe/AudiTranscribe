@@ -24,6 +24,6 @@ package site.overwrite.auditranscribe.setup_wizard.helpers.data_encapsulators;
 public class FFmpegDownloadData {
     public String url;
     public String signature;
+    public String signatureURL;
     public String outputFolder;
-    public boolean needSetExecutable;
 }

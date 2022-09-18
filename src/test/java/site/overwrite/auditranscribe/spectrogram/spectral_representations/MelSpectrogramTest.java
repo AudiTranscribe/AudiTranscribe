@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MelSpectrogramTest {
-
     @Test
     void melSpectrogram() {
         // Define input arrays

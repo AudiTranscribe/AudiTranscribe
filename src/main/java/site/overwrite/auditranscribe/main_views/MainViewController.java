@@ -36,19 +36,19 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import org.javatuples.Pair;
-import org.javatuples.Quartet;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.io.data_files.data_encapsulators.SettingsData;
+import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingData;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
+import site.overwrite.auditranscribe.misc.tuples.Pair;
+import site.overwrite.auditranscribe.misc.tuples.Quadruple;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
 import site.overwrite.auditranscribe.utils.MiscUtils;
 import site.overwrite.auditranscribe.misc.Popups;
-import site.overwrite.auditranscribe.main_views.helpers.ProjectIOHandlers;
 import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingState;
 
 import java.io.File;
@@ -67,10 +67,10 @@ public class MainViewController implements Initializable {
     // Attributes
     private ProjectsDB projectsDB;
 
-    private FilteredList<Quartet<Long, String, String, String>> filteredList;  // List of project records
+    private FilteredList<Quadruple<Long, String, String, String>> filteredList;  // List of project records
 
-    private SceneSwitchingState sceneSwitchingState = SceneSwitchingState.CLOSE_SCENE;
-    private File selectedFile = null;
+    private SceneSwitchingState sceneSwitchingState;
+    private SceneSwitchingData sceneSwitchingData = new SceneSwitchingData();
 
     // FXML Elements
     // Menu bar items
@@ -97,7 +97,7 @@ public class MainViewController implements Initializable {
     private ImageView searchImage;
 
     @FXML
-    private ListView<Quartet<Long, String, String, String>> projectsListView;
+    private ListView<Quadruple<Long, String, String, String>> projectsListView;
 
     // Initialization method
     @Override
@@ -120,7 +120,7 @@ public class MainViewController implements Initializable {
 
                     // Attempt to find a match within the *file path*
                     String searchFilter = newValue.toLowerCase();
-                    String lowercaseFilepath = projectRecord.getValue2().toLowerCase();
+                    String lowercaseFilepath = projectRecord.value2().toLowerCase();
 
                     return lowercaseFilepath.contains(searchFilter);
                 })
@@ -129,18 +129,18 @@ public class MainViewController implements Initializable {
         // Update the projects list view
         projectsListView.setOnMouseClicked(mouseEvent -> {
             // Get the selected item
-            Quartet<Long, String, String, String> selectedItem =
+            Quadruple<Long, String, String, String> selectedItem =
                     projectsListView.getSelectionModel().getSelectedItem();
 
             // Check if an item was selected
             if (selectedItem != null) {
                 // Get the file of the selected item
-                String filepath = selectedItem.getValue2();
+                String filepath = selectedItem.value2();
                 File file = new File(filepath);
 
-                // Set the scene switching status and the selected file
+                // Set the scene switching state and data
                 sceneSwitchingState = SceneSwitchingState.OPEN_PROJECT;
-                selectedFile = file;
+                sceneSwitchingData.file = file;
 
                 // Close this stage
                 ((Stage) rootPane.getScene().getWindow()).close();
@@ -168,8 +168,8 @@ public class MainViewController implements Initializable {
         return sceneSwitchingState;
     }
 
-    public File getSelectedFile() {
-        return selectedFile;
+    public SceneSwitchingData getSceneSwitchingData() {
+        return sceneSwitchingData;
     }
 
     // Public methods
@@ -207,7 +207,7 @@ public class MainViewController implements Initializable {
      */
     public void refreshProjectsListView() {
         // Get all projects' records
-        List<Quartet<Long, String, String, String>> projects = new ArrayList<>();
+        List<Quadruple<Long, String, String, String>> projects = new ArrayList<>();
 
         try {
             // Get the projects database
@@ -221,10 +221,10 @@ public class MainViewController implements Initializable {
 
             // For each file, get their last accessed time and generate the shortened name
             for (int key : keys) {
-                // Get both the filepath and the filename
+                // Get both the filepath and the project name
                 Pair<String, String> values = projectRecords.get(key);
-                String filepath = values.getValue0();
-                String filename = values.getValue1();
+                String filepath = values.value0();
+                String projectName = values.value1();
 
                 // Add the project to the records
                 BasicFileAttributes attributes;
@@ -236,11 +236,10 @@ public class MainViewController implements Initializable {
                     long lastModifiedTimestamp = lastModifiedTime.toMillis();
 
                     // Get the shortened name of the file name
-                    filename = filename.substring(0, filename.length() - 5);  // Exclude the ".audt" at the end
-                    String shortenedName = MiscUtils.getShortenedName(filename);
+                    String shortenedName = MiscUtils.getShortenedName(projectName);
 
                     // Add to the list of projects
-                    projects.add(new Quartet<>(lastModifiedTimestamp, filename, filepath, shortenedName));
+                    projects.add(new Quadruple<>(lastModifiedTimestamp, projectName, filepath, shortenedName));
                 } catch (NoSuchFileException e) {
                     projectsDB.deleteProjectRecord(key);
                 }
@@ -255,7 +254,7 @@ public class MainViewController implements Initializable {
         }
 
         // Convert the `projects` list to an FXML `ObservableList` and a `FilteredList` to allow for searching
-        ObservableList<Quartet<Long, String, String, String>> projectsList = FXCollections.observableList(projects);
+        ObservableList<Quadruple<Long, String, String, String>> projectsList = FXCollections.observableList(projects);
         filteredList = new FilteredList<>(projectsList);
 
         if (projectsList.size() != 0) {
@@ -280,23 +279,15 @@ public class MainViewController implements Initializable {
      * @param actionEvent Event that triggered this function.
      */
     private void handleNewProject(ActionEvent actionEvent) {
-        // Get the current window
-        Window window = rootPane.getScene().getWindow();
+        // Get the scene switching data
+        Pair<Boolean, SceneSwitchingData> pair = ProjectSetupViewController.showProjectSetupView();
+        boolean shouldProceed = pair.value0();
+        sceneSwitchingData = pair.value1();
 
-        // Get user to select an audio file
-        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
-                "Audio files (*.wav, *.mp3, *.flac, *.aif, *.aiff)",
-                "*.wav", "*.mp3", "*.flac", "*.aif", "*.aiff"
-        );
-        File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
-
-        // Verify that the user actually chose a file
-        if (file == null) {
-            Popups.showInformationAlert("Info", "No file selected.");
-        } else {
-            // Set the scene switching status and the selected file
+        // Specify the scene switching state
+        if (shouldProceed) {
+            // Signal the creation of a new project
             sceneSwitchingState = SceneSwitchingState.NEW_PROJECT;
-            selectedFile = file;
 
             // Close this stage
             ((Stage) rootPane.getScene().getWindow()).close();
@@ -322,9 +313,9 @@ public class MainViewController implements Initializable {
         if (file == null) {
             Popups.showInformationAlert("Info", "No file selected.");
         } else {
-            // Set the scene switching status and the selected file
+            // Set the scene switching state and data
             sceneSwitchingState = SceneSwitchingState.OPEN_PROJECT;
-            selectedFile = file;
+            sceneSwitchingData.file = file;
 
             // Close this stage
             ((Stage) window).close();
@@ -332,7 +323,7 @@ public class MainViewController implements Initializable {
     }
 
     // Helper classes
-    static class CustomListCell extends ListCell<Quartet<Long, String, String, String>> {
+    static class CustomListCell extends ListCell<Quadruple<Long, String, String, String>> {
         // Attributes
         ProjectsDB db;
         ListView<?> projectsListView;
@@ -406,7 +397,7 @@ public class MainViewController implements Initializable {
                 // Get the primary key from the database
                 int pk;
                 try {
-                    pk = db.getIDOfProjectWithFilepath(filepath);
+                    pk = db.getPKOfProjectWithFilepath(filepath);
                 } catch (SQLException e) {
                     MyLogger.logException(e);
                     throw new RuntimeException(e);
@@ -453,7 +444,7 @@ public class MainViewController implements Initializable {
         }
 
         @Override
-        protected void updateItem(Quartet<Long, String, String, String> object, boolean empty) {
+        protected void updateItem(Quadruple<Long, String, String, String> object, boolean empty) {
             // Call superclass method
             super.updateItem(object, empty);
 
@@ -462,12 +453,12 @@ public class MainViewController implements Initializable {
                 // Convert the timestamp to a date string
                 lastModifiedTimeLabel.setText(
                         "[Last modified on " +
-                                MiscUtils.formatDate(new Date(object.getValue0()), "yyyy-MM-dd HH:mm") +
+                                MiscUtils.formatDate(new Date(object.value0()), "yyyy-MM-dd HH:mm") +
                                 "]"
                 );
-                nameLabel.setText(object.getValue1());
-                filepathLabel.setText(object.getValue2());
-                shortNameText.setText(object.getValue3());
+                nameLabel.setText(object.value1());
+                filepathLabel.setText(object.value2());
+                shortNameText.setText(object.value3());
 
                 // Set the graphic of the list item
                 setGraphic(content);
@@ -477,15 +468,15 @@ public class MainViewController implements Initializable {
         }
     }
 
-    static class SortByTimestamp implements Comparator<Quartet<Long, String, String, String>> {
+    static class SortByTimestamp implements Comparator<Quadruple<Long, String, String, String>> {
         @Override
         public int compare(
-                Quartet<Long, String, String, String> o1,
-                Quartet<Long, String, String, String> o2
+                Quadruple<Long, String, String, String> o1,
+                Quadruple<Long, String, String, String> o2
         ) {
             // Convert timestamps from millisecond value to second value
-            long timestamp1 = o1.getValue0() / 1000L;  // Divide by 1000 because 1000 ms = 1s
-            long timestamp2 = o2.getValue0() / 1000L;
+            long timestamp1 = o1.value0() / 1000L;  // Divide by 1000 because 1000 ms = 1s
+            long timestamp2 = o2.value0() / 1000L;
 
             // Now compare the timestamp values
             return (int) -(timestamp1 - timestamp2);  // Sort in descending order

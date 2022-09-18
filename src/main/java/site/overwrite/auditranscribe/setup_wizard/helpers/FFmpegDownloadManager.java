@@ -25,6 +25,7 @@ import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.network.DownloadFileHandler;
+import site.overwrite.auditranscribe.network.WebContentHandler;
 import site.overwrite.auditranscribe.setup_wizard.helpers.data_encapsulators.FFmpegDownloadData;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
@@ -45,7 +46,6 @@ public class FFmpegDownloadManager {
     private URL downloadURL;
     private String signature;
     private String ffmpegFolder;
-    private boolean needSetExecutable;
 
     /**
      * Initialization method for a <code>FFmpegDownloadManager</code>.
@@ -112,29 +112,46 @@ public class FFmpegDownloadManager {
         String ffmpegBinPath = null;
 
         // Set executable status if needed
-        if (needSetExecutable) {
-            if (os == OSType.MAC) {
-                if (!new File(IOMethods.joinPaths(outputFolder, "ffmpeg")).setExecutable(true)) {
-                    MyLogger.log(
-                            Level.SEVERE,
-                            "Failed to set executable status for FFmpeg",
-                            FFmpegDownloadManager.class.getName()
-                    );
-                    throw new IOException(
-                            "Failed to set executable status for '" +
-                                    IOMethods.joinPaths(outputFolder, "ffmpeg") + "'."
-                    );
-                } else {
-                    MyLogger.log(
-                            Level.INFO,
-                            "Set executable status for FFmpeg",
-                            FFmpegDownloadManager.class.getName()
-                    );
-                    ffmpegBinPath = IOMethods.joinPaths(outputFolder, "ffmpeg");
-                }
+        if (os == OSType.MAC) {
+            if (!new File(IOMethods.joinPaths(outputFolder, "ffmpeg")).setExecutable(true)) {
+                MyLogger.log(
+                        Level.SEVERE,
+                        "Failed to set executable status for FFmpeg",
+                        FFmpegDownloadManager.class.getName()
+                );
+                throw new IOException(
+                        "Failed to set executable status for '" +
+                                IOMethods.joinPaths(outputFolder, "ffmpeg") + "'."
+                );
             } else {
-                throw new IOException("Unrecognised OS");
+                MyLogger.log(
+                        Level.INFO,
+                        "Set executable status for FFmpeg",
+                        FFmpegDownloadManager.class.getName()
+                );
+                ffmpegBinPath = IOMethods.joinPaths(outputFolder, "ffmpeg");
             }
+        } else if (os == OSType.WINDOWS) {
+            // Get all files and folders from the destination folder
+            String[] filesAndFolders = new File(destFolder).list();
+
+            // Get the folder that contains FFmpeg
+            if (filesAndFolders != null) {
+                String folder = null;
+
+                for (String fileOrFolder : filesAndFolders) {
+                    if (fileOrFolder.matches("ffmpeg-[0-9.]+-.+")) {
+                        folder = fileOrFolder;
+                        break;
+                    }
+                }
+
+                if (folder != null) {
+                    ffmpegBinPath = IOMethods.joinPaths(destFolder, folder, "bin", "ffmpeg.exe");
+                }
+            }
+        } else {
+            throw new IOException("Unrecognised OS");
         }
 
         // Delete the downloaded zip file
@@ -156,7 +173,8 @@ public class FFmpegDownloadManager {
      * Define all the attributes of this filter.
      *
      * @param osName Name of the OS.
-     * @throws IOException         If the data file path is incorrect.
+     * @throws IOException         If the data file path is incorrect, or if the file signature URL
+     *                             is incorrect.
      * @throws JsonSyntaxException If the syntax of the filter file is incorrect.
      */
     private void defineAttributes(String osName) throws IOException {
@@ -185,9 +203,15 @@ public class FFmpegDownloadManager {
 
             // Set attributes
             downloadURL = new URL(data.url);
-            signature = data.signature;
             ffmpegFolder = data.outputFolder;
-            needSetExecutable = data.needSetExecutable;
+
+            // Handle signature setting
+            if (data.signature != null) {
+                signature = data.signature;
+            } else {
+                // Get signature from signature URL
+                signature = WebContentHandler.readContentOnWebpage(new URL(data.signatureURL));
+            }
 
         } catch (JsonSyntaxException e) {
             throw new IOException(e);

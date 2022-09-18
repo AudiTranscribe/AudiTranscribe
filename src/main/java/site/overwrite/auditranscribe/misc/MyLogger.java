@@ -54,7 +54,12 @@ public final class MyLogger {
      * @param callingClassName Name of the class that called this method.
      */
     public static void log(Level level, String msg, String callingClassName) {
-        getLogger().log(level, String.format("%1$-80s (%2$s)", msg, callingClassName));
+        // Convert calling class name to just the class
+        String[] split = callingClassName.split("\\.");
+        String classStr = split[split.length - 1];
+
+        // Log the message
+        getLogger().log(level, String.format("(%1$-30s) %2$s", classStr, msg));
     }
 
     /**

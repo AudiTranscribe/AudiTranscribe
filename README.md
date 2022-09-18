@@ -1,4 +1,4 @@
-![AudiTranscribe Banner](Designs/banner/banner.png "AudiTranscribe")
+![AudiTranscribe Banner](Designs/banner/banner.png "AudiTranscribe Banner")
 
 [![FOSSA Status](https://app.fossa.com/api/projects/custom%2B32213%2Fgithub.com%2FAudiTranscribe%2FAudiTranscribe.svg?type=shield)](https://app.fossa.com/projects/custom%2B32213%2Fgithub.com%2FAudiTranscribe%2FAudiTranscribe?ref=badge_shield)
 [![Run Tests On Push To Main](https://github.com/AudiTranscribe/AudiTranscribe/actions/workflows/run-tests-on-push-to-main.yml/badge.svg)](https://github.com/AudiTranscribe/AudiTranscribe/actions/workflows/run-tests-on-push-to-main.yml)
@@ -32,27 +32,28 @@ AudiTranscribe is meant to be an Open-Source and free alternative.
 The software is not perfect. There are a few limitations with the software in its current state:
 
 - The spectrogram may make it hard to distinguish between different notes.
-- The application is janky and incomplete.
-- The application's functionality and features are (largely) undocumented and missing tutorials.
+- The application's functionality and features are missing tutorials.
 
 # Dependencies
 
-- FFmpeg: A complete, cross-platform solution to record, convert and stream audio and video. AudiTranscribe uses it to
-  help process different audio files.
-- Java 17.0.2: The language used to write the application. In the future, standalone builds would be provided, so this
-  dependency is only temporarily required.
+The only dependency needed is [FFmpeg](https://ffmpeg.org/): a complete, cross-platform solution to
+record, convert and stream audio and video. AudiTranscribe uses it to help process different audio
+files.
 
-**For Developers**: Extra dependencies are required for packaging.
+- Note: AudiTranscribe will attempt to automatically install FFmpeg. You do **not** need to manually
+  install this unless specified.
 
-- **Windows**: You will need to install the [WiX Toolset 3.0](https://wixtoolset.org/) or later in order
-  to generate the AudiTranscribe executable.
-- **macOS**: You will need the Xcode Command Line Tools to be installed.
+## For Developers
+
+- Java 17: The language used to write the application.
+- (**Windows Only**) [WiX Toolset 3](https://wixtoolset.org/): To generate the AudiTranscribe executable for Windows.
+- (**macOS Only**) Xcode Command Line Tools: Contains needed utilities to make AudiTranscribe run in development.
 
 # Installation
 
-## Using An Installer
+Currently, the only supported platforms for AudiTranscribe are Windows and macOS. We are working on a Linux port.
 
-Currently, the only installers available are for Windows and macOS.
+## Using An Installer
 
 ### Windows
 
@@ -111,7 +112,9 @@ Read AudiTranscribe's security policy at [SECURITY.md](.github/SECURITY.md).
 
 Please read the [CONTRIBUTING.md](.github/CONTRIBUTING.md) file.
 
-# Licence
+# Licences
+
+Full licence information, including dependencies' licences, can be found [here](https://auditranscribe.app/licences).
 
 This project is licensed under the [GNU General Public Licence V3](LICENSE).
 

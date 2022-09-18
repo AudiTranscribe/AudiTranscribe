@@ -26,7 +26,6 @@ import org.opentest4j.AssertionFailedError;
 import static org.junit.jupiter.api.Assertions.*;
 
 class OSMethodsTest {
-
     @Test
     void getOrDefault() {
         try {

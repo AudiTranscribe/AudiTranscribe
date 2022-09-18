@@ -18,9 +18,9 @@
 
 package site.overwrite.auditranscribe.utils;
 
-import org.javatuples.Pair;
 import site.overwrite.auditranscribe.exceptions.generic.FormatException;
 import site.overwrite.auditranscribe.exceptions.generic.ValueException;
+import site.overwrite.auditranscribe.misc.tuples.Pair;
 import site.overwrite.auditranscribe.music.MusicKey;
 
 import java.util.HashSet;

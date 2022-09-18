@@ -539,17 +539,6 @@ public final class PlottingStuffHandler {
         return playheadLine;
     }
 
-    /**
-     * Method that moves the playhead line to the new horizontal position.
-     *
-     * @param playheadLine Playhead line to update.
-     * @param newXPos      New horizontal position to move the line to.
-     */
-    public static void updatePlayheadLine(Line playheadLine, double newXPos) {
-        playheadLine.setStartX(newXPos);
-        playheadLine.setEndX(newXPos);
-    }
-
     // Private methods
 
     /**

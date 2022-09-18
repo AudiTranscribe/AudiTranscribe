@@ -18,15 +18,14 @@
 
 package site.overwrite.auditranscribe.spectrogram;
 
-import org.javatuples.Pair;
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.misc.Complex;
+import site.overwrite.auditranscribe.misc.tuples.Pair;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class WaveletTest {
-
     @Test
     void computeWaveletLengths() {
         // Define frequency arrays
@@ -67,26 +66,26 @@ class WaveletTest {
         Pair<double[], Double> waveletLengthsPair1 = Wavelet.computeWaveletLengths(
                 freqs1, 44100, WindowFunction.HANN_WINDOW, 1, false, 0, 0
         );
-        double[] waveletLengths1 = waveletLengthsPair1.getValue0();
-        double freqCutoff1 = waveletLengthsPair1.getValue1();
+        double[] waveletLengths1 = waveletLengthsPair1.value0();
+        double freqCutoff1 = waveletLengthsPair1.value1();
 
         Pair<double[], Double> waveletLengthsPair2 = Wavelet.computeWaveletLengths(
                 freqs2, 44100, WindowFunction.HANN_WINDOW, 1, false, 0, 1.23
         );
-        double[] waveletLengths2 = waveletLengthsPair2.getValue0();
-        double freqCutoff2 = waveletLengthsPair2.getValue1();
+        double[] waveletLengths2 = waveletLengthsPair2.value0();
+        double freqCutoff2 = waveletLengthsPair2.value1();
 
         Pair<double[], Double> waveletLengthsPair3 = Wavelet.computeWaveletLengths(
                 freqs3, 441, WindowFunction.HANN_WINDOW, 1, false, 0, 0
         );
-        double[] waveletLengths3 = waveletLengthsPair3.getValue0();
-        double freqCutoff3 = waveletLengthsPair3.getValue1();
+        double[] waveletLengths3 = waveletLengthsPair3.value0();
+        double freqCutoff3 = waveletLengthsPair3.value1();
 
         Pair<double[], Double> waveletLengthsPair4 = Wavelet.computeWaveletLengths(
                 freqs4, 44100, WindowFunction.HANN_WINDOW, 1, false, 0, 12.3
         );
-        double[] waveletLengths4 = waveletLengthsPair4.getValue0();
-        double freqCutoff4 = waveletLengthsPair4.getValue1();
+        double[] waveletLengths4 = waveletLengthsPair4.value0();
+        double freqCutoff4 = waveletLengthsPair4.value1();
 
         // Assertions
         assertArrayEquals(waveletLengthCorrect1, waveletLengths1, 1e-10);
@@ -173,20 +172,20 @@ class WaveletTest {
         Pair<Complex[][], double[]> waveletBasisPair1 = Wavelet.computeWaveletBasis(
                 freqs1, 441, WindowFunction.HANN_WINDOW, 1, true, 1, false, 0, 0
         );
-        Complex[][] basis1 = waveletBasisPair1.getValue0();
-        double[] filterLengths1 = waveletBasisPair1.getValue1();
+        Complex[][] basis1 = waveletBasisPair1.value0();
+        double[] filterLengths1 = waveletBasisPair1.value1();
 
         Pair<Complex[][], double[]> waveletBasisPair2 = Wavelet.computeWaveletBasis(
                 freqs2, 900, WindowFunction.HANN_WINDOW, 1, true, 1, false, 0, 0
         );
-        Complex[][] basis2 = waveletBasisPair2.getValue0();
-        double[] filterLengths2 = waveletBasisPair2.getValue1();
+        Complex[][] basis2 = waveletBasisPair2.value0();
+        double[] filterLengths2 = waveletBasisPair2.value1();
 
         Pair<Complex[][], double[]> waveletBasisPair3 = Wavelet.computeWaveletBasis(
                 freqs3, 441, WindowFunction.HANN_WINDOW, 1, false, 1, false, 0, 0
         );
-        Complex[][] basis3 = waveletBasisPair3.getValue0();
-        double[] filterLengths3 = waveletBasisPair3.getValue1();
+        Complex[][] basis3 = waveletBasisPair3.value0();
+        double[] filterLengths3 = waveletBasisPair3.value1();
 
         // Assertions
         assertEquals(correctBasis1.length, basis1.length, "Basis 1 shape incorrect");

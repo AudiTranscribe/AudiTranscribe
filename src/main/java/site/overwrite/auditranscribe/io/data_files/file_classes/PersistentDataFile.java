@@ -27,7 +27,6 @@ import site.overwrite.auditranscribe.io.data_files.data_encapsulators.Persistent
  * Handles the interactions with the persistent data file.
  */
 public class PersistentDataFile extends JSONDataFile<PersistentData> {
-
     /**
      * Initialization method for a <code>PersistentDataFile</code> object.
      */
