@@ -30,7 +30,8 @@ import java.util.*;
  */
 public final class ArrayUtils {
     // Constants
-    static final int LEAF_SIZE = 2048;  // Todo: edit name
+    static final int DOUBLES_LEAF_SIZE = 2048;
+    static final int COMPLEX_LEAF_SIZE = 1024;
 
     private ArrayUtils() {
         // Private constructor to signal this is a utility class
@@ -977,7 +978,7 @@ public final class ArrayUtils {
      * @throws LengthException If the matrix sizes are not suitable for multiplication.
      */
     public static Complex[][] matmul(Complex[][] A, Complex[][] B) {
-        return matmul(A, B, LEAF_SIZE);
+        return matmul(A, B, COMPLEX_LEAF_SIZE);
     }
 
     /**
@@ -1019,7 +1020,7 @@ public final class ArrayUtils {
      * @throws LengthException If the matrix sizes are not suitable for multiplication.
      */
     public static double[][] matmul(double[][] A, double[][] B) {
-        return matmul(A, B, LEAF_SIZE);
+        return matmul(A, B, DOUBLES_LEAF_SIZE);
     }
 
     /**
