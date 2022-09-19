@@ -472,6 +472,74 @@ class ArrayUtilsTest {
     }
 
     @Test
+    void matadd() {
+        // Define matrices
+        double[][] A = {{1, 2, 3}, {4, 5, 6}};
+        double[][] B = {{7, 8, 9}, {10, 11, 12}};
+
+        Complex[][] C = {{Complex.ZERO, Complex.ONE}, {Complex.IMAG_UNIT, Complex.IMAG_UNIT.conjugate()}};
+        Complex[][] D = {{Complex.IMAG_UNIT, Complex.IMAG_UNIT.conjugate()}, {Complex.ZERO, Complex.ONE}};
+
+        // Define expected outputs
+        double[][] expectedAB = {{8, 10, 12}, {14, 16, 18}};
+        Complex[][] expectedCD = {
+                {Complex.IMAG_UNIT, new Complex(1, -1)},
+                {Complex.IMAG_UNIT, new Complex(1, -1)}
+        };
+
+        // Compute matrix sums
+        double[][] resultAB = ArrayUtils.matadd(A, B);
+        Complex[][] resultCD = ArrayUtils.matadd(C, D);
+
+        // Assertions
+        assertArrayEquals(expectedAB, resultAB);
+        assertArrayEquals(expectedCD, resultCD);
+
+        // Assert exceptions
+        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matadd(new double[3][4], new double[4][4]));
+        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matadd(new double[3][4], new double[3][5]));
+        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matadd(new double[3][4], new double[4][5]));
+
+        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matadd(new Complex[3][4], new Complex[4][4]));
+        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matadd(new Complex[3][4], new Complex[3][5]));
+        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matadd(new Complex[3][4], new Complex[4][5]));
+    }
+
+    @Test
+    void matsub() {
+        // Define matrices
+        double[][] A = {{1, 2, 3}, {4, 5, 6}};
+        double[][] B = {{7, 8, 9}, {10, 11, 12}};
+
+        Complex[][] C = {{Complex.ZERO, Complex.ONE}, {Complex.IMAG_UNIT, Complex.IMAG_UNIT.conjugate()}};
+        Complex[][] D = {{Complex.IMAG_UNIT, Complex.IMAG_UNIT.conjugate()}, {Complex.ZERO, Complex.ONE}};
+
+        // Define expected outputs
+        double[][] expectedAB = {{-6, -6, -6}, {-6, -6, -6}};
+        Complex[][] expectedCD = {
+                {Complex.IMAG_UNIT.conjugate(), new Complex(1, 1)},
+                {Complex.IMAG_UNIT, new Complex(-1, -1)}
+        };
+
+        // Compute matrix sums
+        double[][] resultAB = ArrayUtils.matsub(A, B);
+        Complex[][] resultCD = ArrayUtils.matsub(C, D);
+
+        // Assertions
+        assertArrayEquals(expectedAB, resultAB);
+        assertArrayEquals(expectedCD, resultCD);
+
+        // Assert exceptions
+        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matsub(new double[3][4], new double[4][4]));
+        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matsub(new double[3][4], new double[3][5]));
+        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matsub(new double[3][4], new double[4][5]));
+
+        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matsub(new Complex[3][4], new Complex[4][4]));
+        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matsub(new Complex[3][4], new Complex[3][5]));
+        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matsub(new Complex[3][4], new Complex[4][5]));
+    }
+
+    @Test
     void matmulComplex() {
         // Define matrices
         Complex[][] A = new Complex[][]{

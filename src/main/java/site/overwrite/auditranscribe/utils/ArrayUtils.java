@@ -854,6 +854,118 @@ public final class ArrayUtils {
     }
 
     /**
+     * Matrix add the two matrices.
+     *
+     * @param A The first matrix.
+     * @param B The second matrix.
+     * @return The sum of the two matrices.
+     */
+    public static Complex[][] matadd(Complex[][] A, Complex[][] B) {
+        // Check if the matrices can be added
+        if ((A.length != B.length) || (A[0].length != B[0].length)) {
+            throw new LengthException("Matrix sizes not suitable for addition");
+        }
+
+        // Perform matrix addition
+        int m = A.length;
+        int n = A[0].length;
+
+        Complex[][] output = new Complex[m][n];
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                output[i][j] = A[i][j].plus(B[i][j]);
+            }
+        }
+
+        return output;
+    }
+
+    /**
+     * Matrix add the two matrices.
+     *
+     * @param A The first matrix.
+     * @param B The second matrix.
+     * @return The sum of the two matrices.
+     */
+    public static double[][] matadd(double[][] A, double[][] B) {
+        // Check if the matrices can be added
+        if ((A.length != B.length) || (A[0].length != B[0].length)) {
+            throw new LengthException("Matrix sizes not suitable for addition");
+        }
+
+        // Perform matrix addition
+        int m = A.length;
+        int n = A[0].length;
+
+        double[][] output = new double[m][n];
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                output[i][j] = A[i][j] + B[i][j];
+            }
+        }
+
+        return output;
+    }
+
+    /**
+     * Matrix subtract the two matrices.
+     *
+     * @param A The first matrix.
+     * @param B The second matrix.
+     * @return The difference (<code>A - B</code>) of the two matrices.
+     */
+    public static Complex[][] matsub(Complex[][] A, Complex[][] B) {
+        // Check if the matrices can be added
+        if ((A.length != B.length) || (A[0].length != B[0].length)) {
+            throw new LengthException("Matrix sizes not suitable for subtraction");
+        }
+
+        // Perform matrix subtraction
+        int m = A.length;
+        int n = A[0].length;
+
+        Complex[][] output = new Complex[m][n];
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                output[i][j] = A[i][j].minus(B[i][j]);
+            }
+        }
+
+        return output;
+    }
+
+    /**
+     * Matrix subtract the two matrices.
+     *
+     * @param A The first matrix.
+     * @param B The second matrix.
+     * @return The difference (<code>A - B</code>) of the two matrices.
+     */
+    public static double[][] matsub(double[][] A, double[][] B) {
+        // Check if the matrices can be added
+        if ((A.length != B.length) || (A[0].length != B[0].length)) {
+            throw new LengthException("Matrix sizes not suitable for subtraction");
+        }
+
+        // Perform matrix subtraction
+        int m = A.length;
+        int n = A[0].length;
+
+        double[][] output = new double[m][n];
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                output[i][j] = A[i][j] - B[i][j];
+            }
+        }
+
+        return output;
+    }
+
+    /**
      * Matrix multiply two complex numbered matrices.
      *
      * @param A The first matrix.
