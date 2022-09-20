@@ -480,32 +480,19 @@ class ArrayUtilsTest {
         double[][] A = {{1, 2, 3}, {4, 5, 6}};
         double[][] B = {{7, 8, 9}, {10, 11, 12}};
 
-        Complex[][] C = {{Complex.ZERO, Complex.ONE}, {Complex.IMAG_UNIT, Complex.IMAG_UNIT.conjugate()}};
-        Complex[][] D = {{Complex.IMAG_UNIT, Complex.IMAG_UNIT.conjugate()}, {Complex.ZERO, Complex.ONE}};
-
-        // Define expected outputs
+        // Define expected output
         double[][] expectedAB = {{8, 10, 12}, {14, 16, 18}};
-        Complex[][] expectedCD = {
-                {Complex.IMAG_UNIT, new Complex(1, -1)},
-                {Complex.IMAG_UNIT, new Complex(1, -1)}
-        };
 
-        // Compute matrix sums
+        // Compute matrix sum
         double[][] resultAB = ArrayUtils.matadd(A, B);
-        Complex[][] resultCD = ArrayUtils.matadd(C, D);
 
-        // Assertions
+        // Assertion
         assertArrayEquals(expectedAB, resultAB);
-        assertArrayEquals(expectedCD, resultCD);
 
         // Assert exceptions
         assertThrowsExactly(LengthException.class, () -> ArrayUtils.matadd(new double[3][4], new double[4][4]));
         assertThrowsExactly(LengthException.class, () -> ArrayUtils.matadd(new double[3][4], new double[3][5]));
         assertThrowsExactly(LengthException.class, () -> ArrayUtils.matadd(new double[3][4], new double[4][5]));
-
-        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matadd(new Complex[3][4], new Complex[4][4]));
-        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matadd(new Complex[3][4], new Complex[3][5]));
-        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matadd(new Complex[3][4], new Complex[4][5]));
     }
 
     @Test
@@ -514,32 +501,19 @@ class ArrayUtilsTest {
         double[][] A = {{1, 2, 3}, {4, 5, 6}};
         double[][] B = {{7, 8, 9}, {10, 11, 12}};
 
-        Complex[][] C = {{Complex.ZERO, Complex.ONE}, {Complex.IMAG_UNIT, Complex.IMAG_UNIT.conjugate()}};
-        Complex[][] D = {{Complex.IMAG_UNIT, Complex.IMAG_UNIT.conjugate()}, {Complex.ZERO, Complex.ONE}};
-
         // Define expected outputs
         double[][] expectedAB = {{-6, -6, -6}, {-6, -6, -6}};
-        Complex[][] expectedCD = {
-                {Complex.IMAG_UNIT.conjugate(), new Complex(1, 1)},
-                {Complex.IMAG_UNIT, new Complex(-1, -1)}
-        };
 
         // Compute matrix sums
         double[][] resultAB = ArrayUtils.matsub(A, B);
-        Complex[][] resultCD = ArrayUtils.matsub(C, D);
 
-        // Assertions
+        // Assertion
         assertArrayEquals(expectedAB, resultAB);
-        assertArrayEquals(expectedCD, resultCD);
 
         // Assert exceptions
         assertThrowsExactly(LengthException.class, () -> ArrayUtils.matsub(new double[3][4], new double[4][4]));
         assertThrowsExactly(LengthException.class, () -> ArrayUtils.matsub(new double[3][4], new double[3][5]));
         assertThrowsExactly(LengthException.class, () -> ArrayUtils.matsub(new double[3][4], new double[4][5]));
-
-        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matsub(new Complex[3][4], new Complex[4][4]));
-        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matsub(new Complex[3][4], new Complex[3][5]));
-        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matsub(new Complex[3][4], new Complex[4][5]));
     }
 
     @Test
@@ -648,16 +622,12 @@ class ArrayUtilsTest {
     }
 
     @Test
-    void matmulComplexStrassenCheck() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    void matmulComplexStrassenCheck() {
         // Test constants
         final int matrixSize = 256;
         final int leafSize = 64;
 
         final Random random = new Random(67890);
-
-        // Make the IJK multiplication method available to the test
-        Method matmulIJK = ArrayUtils.class.getDeclaredMethod("matmulIJK", Complex[][].class, Complex[][].class);
-        matmulIJK.setAccessible(true);
 
         // Initialize matrices
         Complex[][] A = new Complex[matrixSize][matrixSize];
@@ -665,21 +635,85 @@ class ArrayUtilsTest {
 
         for (int i = 0; i < matrixSize; i++) {
             for (int j = 0; j < matrixSize; j++) {
-                A[i][j] = new Complex(random.nextDouble(-1, 1), random.nextDouble(-1, 1));
-                B[i][j] = new Complex(random.nextDouble(-1, 1), random.nextDouble(-1, 1));
+                A[i][j] = new Complex(random.nextDouble(-1e3, 1e3), random.nextDouble(-1e3, 1e3));
+                B[i][j] = new Complex(random.nextDouble(-1e3, 1e3), random.nextDouble(-1e3, 1e3));
             }
         }
 
         // Compute matrix multiplications
-        Complex[][] ijkResult = (Complex[][]) matmulIJK.invoke(null, A, B);
+        Complex[][] ijkResult = complexMatmulIJK(A, B);
         Complex[][] strassenResult = ArrayUtils.matmul(A, B, leafSize);
 
         // Check if equal
         for (int i = 0; i < matrixSize; i++) {
             for (int j = 0; j < matrixSize; j++) {
-                assertEquals(ijkResult[i][j].roundNicely(5), strassenResult[i][j].roundNicely(5));
+                assertEquals(ijkResult[i][j].roundNicely(3), strassenResult[i][j].roundNicely(3));
             }
         }
+
+//        // Test constants
+//        final int leafSize = 512;
+//        final int numTrials = 5;
+//
+//        int numARows = 60;
+//        int numCommon = 513;
+//        int numBCols = 10607;
+//
+//        final Random random = new Random();
+//
+//        // Initialize matrices
+//        Complex[][] A = new Complex[numARows][numCommon];
+//        Complex[][] B = new Complex[numCommon][numBCols];
+//
+//        long[] ijkTimes = new long[numTrials];
+//        long[] strassenTimes = new long[numTrials];
+//
+//        for (int iteration = 1; iteration <= numTrials; iteration++) {
+//            System.out.println("--- ITERATION " + iteration + " OF " + numTrials + " ---");
+//            for (int i = 0; i < numARows; i++) {
+//                for (int j = 0; j < numCommon; j++) {
+//                    A[i][j] = new Complex(random.nextDouble(-1, 1), random.nextDouble(-1, 1));
+//                }
+//            }
+//
+//            for (int i = 0; i < numCommon; i++) {
+//                for (int j = 0; j < numBCols; j++) {
+//                    B[i][j] = new Complex(random.nextDouble(-1, 1), random.nextDouble(-1, 1));
+//                }
+//            }
+//
+//            // Compute matrix multiplications
+//            long startTime = System.currentTimeMillis();
+//            Complex[][] ijkResult = complexMatmulIJK(A, B);
+//            long endTime = System.currentTimeMillis();
+//            System.out.println("     IJK multiplication took " + (endTime - startTime) + "ms");
+//
+//            ijkTimes[iteration - 1] = endTime - startTime;
+//
+//            startTime = System.currentTimeMillis();
+//            Complex[][] strassenResult = ArrayUtils.matmul(A, B, leafSize);
+//            endTime = System.currentTimeMillis();
+//            System.out.println("Strassen multiplication took " + (endTime - startTime) + "ms");
+//
+//            strassenTimes[iteration - 1] = endTime - startTime;
+//
+//            // Check if equal
+//            for (int i = 0; i < numARows; i++) {
+//                for (int j = 0; j < numBCols; j++) {
+//                    assertEquals(ijkResult[i][j].roundNicely(5), strassenResult[i][j].roundNicely(5));
+//                }
+//            }
+//        }
+//
+//        System.out.println("IJK times");
+//        for (int i = 0; i < numTrials; i++) {
+//            System.out.println(ijkTimes[i]);
+//        }
+//
+//        System.out.println("Strassen times");
+//        for (int i = 0; i < numTrials; i++) {
+//            System.out.println(strassenTimes[i]);
+//        }
     }
 
     @Test
@@ -742,5 +776,28 @@ class ArrayUtilsTest {
         assertArrayEquals(correct1, ArrayUtils.flatten(array1, Integer.class).toArray());
         assertArrayEquals(correct2, ArrayUtils.flatten(array2, Double.class).toArray());
         assertNull(ArrayUtils.flatten(null, String.class));
+    }
+
+    // Helper functions
+    static Complex[][] complexMatmulIJK(Complex[][] A, Complex[][] B) {
+        // Lengths
+        int numRowsA = A.length;
+        int numCommon = A[0].length;
+        int numColsB = B[0].length;
+
+        // Multiplication
+        Complex[][] C = new Complex[numRowsA][numColsB];
+
+        for (int i = 0; i < numRowsA; i++) {
+            for (int j = 0; j < numColsB; j++) {
+                Complex currElem = Complex.ZERO;
+                for (int k = 0; k < numCommon; k++) {
+                    currElem = currElem.plus(A[i][k].times(B[k][j]));
+                }
+                C[i][j] = currElem;
+            }
+        }
+
+        return C;
     }
 }
