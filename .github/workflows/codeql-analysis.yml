@@ -16,14 +16,6 @@ jobs:
       actions: read
       contents: read
       security-events: write
-
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [ "java" ]
-        # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby' ]
-        # Learn more about CodeQL language support at https://aka.ms/codeql-docs/language-support
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -36,7 +28,7 @@ jobs:
         with:
           java-version: "17"
           distribution: "adopt"
-          cache: maven
+          cache: "maven"
       - name: Install Custom Maven Dependencies
         run: xvfb-run mvn validate
       - name: Build AudiTranscribe
@@ -44,4 +36,4 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
         with:
-          category: "/language:${{matrix.language}}"
+          category: "/language:java"

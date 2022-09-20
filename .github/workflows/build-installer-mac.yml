@@ -23,7 +23,7 @@ jobs:
         with:
           java-version: "17"
           distribution: "adopt"
-          cache: maven
+          cache: "maven"
       - name: Setup FFmpeg
         uses: FedericoCarboni/setup-ffmpeg@v1
         with:
