@@ -176,7 +176,7 @@ public final class Popups {
 
         // Disable the OK button if the input field is empty
         BooleanBinding isInvalid = Bindings.createBooleanBinding(
-                () -> inputField.getText().length() != 0,
+                () -> inputField.getText().length() == 0,  // Invalid if the length is 0
                 inputField.textProperty()
         );
         okButton.disableProperty().bind(isInvalid);
