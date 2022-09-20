@@ -53,6 +53,12 @@ public class FFmpegDownloadManager {
      * @param maxAttempts Number of attempts to try and download the FFmpeg zip file before failing.
      */
     public FFmpegDownloadManager(int maxAttempts) {
+        MyLogger.log(
+                Level.FINE,
+                "Starting FFmpeg download manager",
+                this.getClass().getName()
+        );
+
         // Update attributes
         this.maxAttempts = maxAttempts;
         this.os = OSMethods.getOS();
@@ -71,6 +77,28 @@ public class FFmpegDownloadManager {
                 ffmpegFolder = null;
             }
         }
+
+        MyLogger.log(
+                Level.FINE,
+                "FFmpeg download manager initialized with:",
+                this.getClass().getName()
+        );
+        MyLogger.log(
+                Level.FINE,
+                "downloadURL = " + downloadURL,
+                this.getClass().getName()
+        );
+        MyLogger.log(
+                Level.FINE,
+                "signature = " + signature,
+                this.getClass().getName()
+        );
+        MyLogger.log(
+                Level.FINE,
+                "ffmpegFolder = " + ffmpegFolder,
+                this.getClass().getName()
+        );
+
     }
 
     // Public methods
