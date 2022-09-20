@@ -122,6 +122,8 @@ class MathUtilsTest {
         assertEquals(1.23, MathUtils.round(1.23, 2));
         assertEquals(1.23, MathUtils.round(1.23456, 2));
         assertEquals(1, MathUtils.round(1, 3));
+
+        assertThrowsExactly(ValueException.class, () -> MathUtils.round(123.45, -1));
     }
 
     @Test
