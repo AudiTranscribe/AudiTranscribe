@@ -137,6 +137,7 @@ public class TranscriptionViewController implements Initializable {
     private final DoubleProperty playheadX = new SimpleDoubleProperty(0);
 
     private boolean hasUnsavedChanges = true;
+    private boolean changedProjectName = false;
     private int fileVersion;
 
     private Theme theme;
@@ -190,8 +191,8 @@ public class TranscriptionViewController implements Initializable {
     private MenuBar menuBar;
 
     @FXML
-    private MenuItem newProjectMenuItem, openProjectMenuItem, saveProjectMenuItem, saveAsMenuItem,
-            exportMIDIMenuItem, preferencesMenuItem, aboutMenuItem;
+    private MenuItem newProjectMenuItem, openProjectMenuItem, renameProjectMenuItem, saveProjectMenuItem,
+            saveAsMenuItem, exportMIDIMenuItem, preferencesMenuItem, aboutMenuItem;
 
     // Main elements
     @FXML
@@ -521,6 +522,7 @@ public class TranscriptionViewController implements Initializable {
         // Add methods to menu items
         newProjectMenuItem.setOnAction(this::handleNewProject);
         openProjectMenuItem.setOnAction(this::handleOpenProject);
+        renameProjectMenuItem.setOnAction(this::handleRenameProject);
         saveProjectMenuItem.setOnAction(event -> handleSavingProject(false, false));
         saveAsMenuItem.setOnAction(event -> handleSavingProject(false, true));
         exportMIDIMenuItem.setOnAction(event -> handleExportMIDI());
@@ -1311,6 +1313,40 @@ public class TranscriptionViewController implements Initializable {
     }
 
     /**
+     * Helper method that helps with the renaming of the current project.
+     * @param event Event that triggered this function.
+     */
+    private void handleRenameProject(Event event) {
+        // Ask user for new project name
+        Optional<String> newProjectNameResponse = Popups.showTextInputDialog(
+                "Rename Project",
+                "Enter New Project Name",
+                "New project name:",
+                projectName
+        );
+
+        // Do nothing if nothing was entered, or if the project name was not changed
+        if ((newProjectNameResponse.isEmpty()) || (newProjectNameResponse.get().equals(projectName))) return;
+
+        // Otherwise, get new project name proper
+        String newProjectName = newProjectNameResponse.get();
+
+        // Change stage title
+        ((Stage) rootPane.getScene().getWindow()).setTitle(newProjectName);
+
+        // Update attributes
+        MyLogger.log(
+                Level.INFO,
+                "Changed project name from '" + projectName + "' to '" + newProjectName + "'",
+                this.getClass().toString()
+        );
+
+        projectName = newProjectName;
+        changedProjectName = true;
+        hasUnsavedChanges = true;
+    }
+
+    /**
      * Helper method that handles the saving of the project.
      *
      * @param isAutosave      Whether this is an autosave or not.
@@ -1339,11 +1375,18 @@ public class TranscriptionViewController implements Initializable {
 
         // Methods to run after task succeeded
         task.setOnSucceeded(event -> {
-            // Update the project file list
+            // Handle database operations
             try {
+                // Update the project file list
                 if (projectsDB.checkIfProjectDoesNotExist(audtFilePath)) {
                     // Insert the record into the database
                     projectsDB.insertProjectRecord(audtFilePath, projectName);
+                }
+
+                // If changed project name, also update
+                if (changedProjectName) {
+                    projectsDB.updateProjectName(audtFilePath, projectName);
+                    changedProjectName = false;  // Revert once complete
                 }
             } catch (SQLException e) {
                 MyLogger.logException(e);
