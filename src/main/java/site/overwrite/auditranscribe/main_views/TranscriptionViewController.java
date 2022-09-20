@@ -1314,6 +1314,7 @@ public class TranscriptionViewController implements Initializable {
 
     /**
      * Helper method that helps with the renaming of the current project.
+     *
      * @param event Event that triggered this function.
      */
     private void handleRenameProject(Event event) {

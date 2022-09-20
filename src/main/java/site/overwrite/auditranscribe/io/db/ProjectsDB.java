@@ -308,7 +308,8 @@ public class ProjectsDB {
 
     /**
      * Method that updates a specific project's project name in the database.
-     * @param filepath <b>Absolute</b> path to the project file.
+     *
+     * @param filepath       <b>Absolute</b> path to the project file.
      * @param newProjectName New project name to rename the project to.
      * @throws SQLException If something went wrong when executing the SQL query.
      */
