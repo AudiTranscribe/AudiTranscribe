@@ -36,7 +36,7 @@ public class ProjectsDB {
     public static int SQL_DATABASE_VERSION = 0x00070001;  // Database version 0.7.0, revision 1 -> 00 07 00 01
 
     // SQL Queries
-    public static String SQL_CREATE_PROJECTS_TABLE = """
+    static String SQL_CREATE_PROJECTS_TABLE = """
             CREATE TABLE IF NOT EXISTS "Projects" (
                 "id"			INTEGER,
             	"filepath"		TEXT UNIQUE,
@@ -44,29 +44,34 @@ public class ProjectsDB {
             	PRIMARY KEY("id")
             );
             """;
-    public static String SQL_CREATE_VERSION_TABLE = """
+    static String SQL_CREATE_VERSION_TABLE = """
             CREATE TABLE IF NOT EXISTS "Version" (
             	"version_number"	INTEGER NOT NULL
             );
             """;
-    public static String SQL_GET_ALL_PROJECTS = """
+    static String SQL_GET_ALL_PROJECTS = """
             SELECT * FROM "Projects";
             """;
-    public static String SQL_GET_ID_OF_PROJECT_WITH_FILEPATH = """
+    static String SQL_GET_ID_OF_PROJECT_WITH_FILEPATH = """
             SELECT "id" FROM "Projects"
             WHERE "filepath" = ?;
             """;
-    public static String SQL_CHECK_IF_PROJECT_EXISTS = """
+    static String SQL_CHECK_IF_PROJECT_EXISTS = """
             SELECT "id" FROM "Projects"
             WHERE "filepath" = ?;
             """;
-    public static String SQL_INSERT_PROJECT_RECORD = """
+    static String SQL_INSERT_PROJECT_RECORD = """
             INSERT INTO "Projects" ("filepath", "project_name")
             VALUES (?, ?);
             """;
-    public static String SQL_DELETE_PROJECT_RECORD = """
+    static String SQL_DELETE_PROJECT_RECORD = """
             DELETE FROM "Projects"
             WHERE "id" = ?;
+            """;
+    static String SQL_UPDATE_PROJECT_NAME = """
+            UPDATE "Projects" SET
+            	"project_name" = ?
+            WHERE "filepath" = ?;
             """;
 
     // Constants
@@ -295,6 +300,30 @@ public class ProjectsDB {
 
             // Execute the statement
             dbManager.executeUpdate(deleteProjectStatement);
+        }
+
+        // Close connection with database
+        dbManager.dbDisconnect();
+    }
+
+    /**
+     * Method that updates a specific project's project name in the database.
+     *
+     * @param filepath       <b>Absolute</b> path to the project file.
+     * @param newProjectName New project name to rename the project to.
+     * @throws SQLException If something went wrong when executing the SQL query.
+     */
+    public void updateProjectName(String filepath, String newProjectName) throws SQLException {
+        // Start connection with the database
+        dbManager.dbConnect();
+
+        try (PreparedStatement updateProjectNameStatement = dbManager.prepareStatement(SQL_UPDATE_PROJECT_NAME)) {
+            // Prepare the statement for execution
+            updateProjectNameStatement.setString(1, newProjectName);
+            updateProjectNameStatement.setString(2, filepath);
+
+            // Execute the statement
+            dbManager.executeUpdate(updateProjectNameStatement);
         }
 
         // Close connection with database
