@@ -342,7 +342,7 @@
                     <execution>
                         <id>mac</id>
                         <configuration>
-                            <appVersion>1.${project.version}</appVersion> <!-- For macOS, ignore the 1 -->
+                            <appVersion>1.0.0</appVersion> <!-- For macOS, must make version at least 1.0.0 -->
                             <resourceDir>${project.basedir}/Production Assets/mac</resourceDir>
                             <type>DMG</type>
                         </configuration>
