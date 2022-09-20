@@ -5,7 +5,7 @@
 
     <groupId>site.overwrite</groupId>
     <artifactId>AudiTranscribe</artifactId>
-    <version>0.7.0</version>
+    <version>0.7.1</version>
     <name>AudiTranscribe</name>
 
     <properties>
