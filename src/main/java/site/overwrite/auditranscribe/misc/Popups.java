@@ -18,6 +18,8 @@
 
 package site.overwrite.auditranscribe.misc;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -140,6 +142,38 @@ public final class Popups {
 
         // Show the alert
         alert.showAndWait();
+    }
+
+    /**
+     * Method that shows a text input dialog with the specified header and content texts.
+     *
+     * @param title       Title of the text input dialog.
+     * @param headerText  Header text for the dialog.
+     * @param contentText Content text for the dialog.
+     * @return The value that was entered in the text input dialog.
+     */
+    public static Optional<String> showTextInputDialog(
+            String title, String headerText, String contentText, String defaultText
+    ) {
+        // Set up text input dialog
+        TextInputDialog td = new TextInputDialog(contentText);
+        td.setTitle(title);
+        td.setHeaderText(headerText);
+
+        // Get the nodes on the dialog
+        Button okButton = (Button) td.getDialogPane().lookupButton(ButtonType.OK);
+        TextField inputField = td.getEditor();
+        inputField.setText(defaultText);
+
+        // Disable the OK button if the input field is empty
+        BooleanBinding isInvalid = Bindings.createBooleanBinding(
+                () -> inputField.getText().length() != 0,
+                inputField.textProperty()
+        );
+        okButton.disableProperty().bind(isInvalid);
+
+        // Wait for user's response
+        return td.showAndWait();
     }
 
     // Private methods
