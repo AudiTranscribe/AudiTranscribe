@@ -860,12 +860,44 @@ public class TranscriptionViewController implements Initializable {
                     // Create a music key estimator
                     MusicKeyEstimator musicKeyEstimator = new MusicKeyEstimator(audio.getMonoSamples(), sampleRate);
 
-                    // Get the top 3 most likely keys
-                    List<MusicKey> mostLikelyKeys = musicKeyEstimator.getMostLikelyKeys(3, this);
+                    // Get the top 4 most likely keys
+                    List<Pair<MusicKey, Double>> mostLikelyKeys =
+                            musicKeyEstimator.getMostLikelyKeysWithCorrelation(4, this);
+
+                    // Get most likely key and its correlation
+                    Pair<MusicKey, Double> mostLikelyKeyPair = mostLikelyKeys.get(0);
+                    MusicKey mostLikelyKey = mostLikelyKeyPair.value0();
+                    double mostLikelyKeyCorr = mostLikelyKeyPair.value1();
+
+                    // Get other likely keys
+                    List<Pair<MusicKey, Double>> otherLikelyKeys = new ArrayList<>();
+                    for (Pair<MusicKey, Double> pair : mostLikelyKeys.subList(1, 4)) {
+                        if (pair.value1() >= 0.9 * mostLikelyKeyCorr) {
+                            otherLikelyKeys.add(pair);
+                        }
+                    }
+
+                    // Inform user if there are other likely keys
+                    if (otherLikelyKeys.size() != 0) {
+                        // Form the string to show user
+                        StringBuilder sb = new StringBuilder();
+                        for (Pair<MusicKey, Double> pair : otherLikelyKeys) {
+                            sb.append(pair.value0().name).append(": ").append(MathUtils.round(pair.value1(), 3))
+                                    .append("\n");
+                        }
+
+                        // Show alert
+                        Platform.runLater(() -> Popups.showInformationAlert(
+                                "Music Key Estimation Found Other Possible Keys",
+                                "Most likely music key, with decreasing correlation:\n" +
+                                        mostLikelyKey.name + ": " + MathUtils.round(mostLikelyKeyCorr, 3) + "\n" +
+                                        sb + "\n" +
+                                        "We will select " + mostLikelyKey.name + " as the key of the audio file."
+                        ));
+                    }
 
                     // Return the most likely key
-                    // Todo: show the other keys as well
-                    key = mostLikelyKeys.get(0).name;
+                    key = mostLikelyKey.name;
                 } else {
                     key = sceneSwitchingData.musicKeyString;
                 }
