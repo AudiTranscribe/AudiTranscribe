@@ -155,14 +155,23 @@ public final class Popups {
     public static Optional<String> showTextInputDialog(
             String title, String headerText, String contentText, String defaultText
     ) {
+        // Get active theme
+        Theme currentTheme = Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal];
+
         // Set up text input dialog
-        TextInputDialog td = new TextInputDialog(contentText);
-        td.setTitle(title);
-        td.setHeaderText(headerText);
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle(title);
+        dialog.setHeaderText(headerText);
+        dialog.setContentText(contentText);
+
+        // Add styling to the dialog
+        dialog.getDialogPane().getStylesheets().add(
+                IOMethods.getFileURL(IOMethods.joinPaths("views", "css", currentTheme.cssFile)).toExternalForm()
+        );
 
         // Get the nodes on the dialog
-        Button okButton = (Button) td.getDialogPane().lookupButton(ButtonType.OK);
-        TextField inputField = td.getEditor();
+        Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
+        TextField inputField = dialog.getEditor();
         inputField.setText(defaultText);
 
         // Disable the OK button if the input field is empty
@@ -173,7 +182,7 @@ public final class Popups {
         okButton.disableProperty().bind(isInvalid);
 
         // Wait for user's response
-        return td.showAndWait();
+        return dialog.showAndWait();
     }
 
     // Private methods
