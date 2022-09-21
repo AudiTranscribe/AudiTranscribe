@@ -72,33 +72,15 @@ public class FFmpegDownloadManager {
             try {
                 defineAttributes(os.toString().toLowerCase());
             } catch (IOException e) {
+                // Note that an exception has occurred
+                MyLogger.logException(e);
+
+                // Make all the attributes `null`
                 downloadURL = null;
                 signature = null;
                 ffmpegFolder = null;
             }
         }
-
-        MyLogger.log(
-                Level.FINE,
-                "FFmpeg download manager initialized with:",
-                this.getClass().getName()
-        );
-        MyLogger.log(
-                Level.FINE,
-                "downloadURL = " + downloadURL,
-                this.getClass().getName()
-        );
-        MyLogger.log(
-                Level.FINE,
-                "signature = " + signature,
-                this.getClass().getName()
-        );
-        MyLogger.log(
-                Level.FINE,
-                "ffmpegFolder = " + ffmpegFolder,
-                this.getClass().getName()
-        );
-
     }
 
     // Public methods
