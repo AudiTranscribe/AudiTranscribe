@@ -121,10 +121,10 @@ public class FFmpegDownloadManager {
         CompressionHandlers.zipDecompress(outputFolder, IOMethods.joinPaths(destFolder, "ffmpeg.zip"));
 
         // Define a variable to store the FFmpeg binary path
-        String ffmpegBinPath = null;
+        String ffmpegBinPath;
 
-        // Set executable status if needed
         if (os == OSType.MAC) {
+            // Set executable status if needed
             if (!new File(IOMethods.joinPaths(outputFolder, "ffmpeg")).setExecutable(true)) {
                 MyLogger.log(
                         Level.SEVERE,
@@ -144,24 +144,7 @@ public class FFmpegDownloadManager {
                 ffmpegBinPath = IOMethods.joinPaths(outputFolder, "ffmpeg");
             }
         } else if (os == OSType.WINDOWS) {
-            // Get all files and folders from the destination folder
-            String[] filesAndFolders = new File(destFolder).list();
-
-            // Get the folder that contains FFmpeg
-            if (filesAndFolders != null) {
-                String folder = null;
-
-                for (String fileOrFolder : filesAndFolders) {
-                    if (fileOrFolder.matches("ffmpeg-[0-9.]+-.+")) {
-                        folder = fileOrFolder;
-                        break;
-                    }
-                }
-
-                if (folder != null) {
-                    ffmpegBinPath = IOMethods.joinPaths(destFolder, folder, "bin", "ffmpeg.exe");
-                }
-            }
+            ffmpegBinPath = IOMethods.joinPaths(outputFolder, "ffmpeg.exe");
         } else {
             throw new IOException("Unrecognised OS");
         }
