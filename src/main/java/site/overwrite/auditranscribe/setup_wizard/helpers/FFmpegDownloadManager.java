@@ -19,13 +19,15 @@
 package site.overwrite.auditranscribe.setup_wizard.helpers;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import site.overwrite.auditranscribe.exceptions.network.APIServerException;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.misc.MyLogger;
+import site.overwrite.auditranscribe.network.APICallHandler;
 import site.overwrite.auditranscribe.network.DownloadFileHandler;
-import site.overwrite.auditranscribe.network.WebContentHandler;
 import site.overwrite.auditranscribe.setup_wizard.helpers.data_encapsulators.FFmpegDownloadData;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
@@ -215,15 +217,11 @@ public class FFmpegDownloadManager {
             downloadURL = new URL(data.url);
             ffmpegFolder = data.outputFolder;
 
-            // Handle signature setting
-            if (data.signature != null) {
-                signature = data.signature;
-            } else {
-                // Get signature from signature URL
-                signature = WebContentHandler.readContentOnWebpage(new URL(data.signatureURL));
-            }
+            // Get signature from signature page
+            JsonObject returnedData = APICallHandler.sendAPIGetRequest(data.signaturePage);
+            signature = returnedData.get("signature").getAsString();
 
-        } catch (JsonSyntaxException e) {
+        } catch (JsonSyntaxException | APIServerException e) {
             throw new IOException(e);
         }
     }

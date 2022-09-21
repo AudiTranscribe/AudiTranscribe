@@ -1,6 +1,5 @@
 {
-  "url": "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip",
-  "signature": null,
-  "signatureURL": "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip.sha256",
+  "url": "https://api.auditranscribe.app/download-ffmpeg?platform=windows",
+  "signaturePage": "download-ffmpeg?platform=windows&signature_needed=true",
   "outputFolder": null
 }
