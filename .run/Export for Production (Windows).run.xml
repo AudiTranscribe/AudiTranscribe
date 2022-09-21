@@ -12,7 +12,6 @@
             <list>
               <option value="clean:clean" />
               <option value="test" />
-              <option value="compiler:compile" />
               <option value="javafx:jlink" />
               <option value="jpackage:jpackage@win" />
             </list>
