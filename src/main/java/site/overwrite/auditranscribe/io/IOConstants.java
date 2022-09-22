@@ -40,6 +40,9 @@ public final class IOConstants {
     public static final String PROJECT_BACKUPS_FOLDER_PATH = IOMethods.joinPaths(
             IOConstants.APP_DATA_FOLDER_PATH, "project_backups"
     );
+    public static final String OTHER_RESOURCES_DATA_FOLDER_PATH = IOMethods.joinPaths(
+            IOConstants.APP_DATA_FOLDER_PATH, "other_resources"
+    );
 
     public static final String RESOURCES_FOLDER_PATH = IOMethods.joinPaths("site", "overwrite", "auditranscribe");
 
