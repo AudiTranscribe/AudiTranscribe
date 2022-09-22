@@ -160,6 +160,7 @@ public final class Popups {
 
         // Set up text input dialog
         TextInputDialog dialog = new TextInputDialog();
+        dialog.initStyle(StageStyle.UTILITY);
         dialog.setTitle(title);
         dialog.setHeaderText(headerText);
         dialog.setContentText(contentText);
