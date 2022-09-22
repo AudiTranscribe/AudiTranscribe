@@ -231,7 +231,7 @@ public final class DownloadFileHandler {
             } catch (IOException e) {
                 MyLogger.log(
                         Level.WARNING,
-                        "Failed to download file, trying again (attempt " + (i + 1) + " of " + maxAttempts + ")",
+                        "File download failed, trying again (attempt " + (i + 1) + " of " + maxAttempts + ")",
                         DownloadFileHandler.class.getName()
                 );
                 continue;  // Try again
