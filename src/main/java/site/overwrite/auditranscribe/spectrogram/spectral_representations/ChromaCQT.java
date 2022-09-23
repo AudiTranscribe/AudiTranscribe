@@ -92,7 +92,7 @@ public final class ChromaCQT {
 
         // Build the CQT
         Complex[][] cqt = CQT.cqt(
-                y, sr, hopLength, fmin, numOctaves * binsPerOctave, binsPerOctave, Double.NaN,
+                y, sr, hopLength, fmin, numOctaves * binsPerOctave, binsPerOctave, 0,  // Todo: re-enable tuning
                 WindowFunction.HANN_WINDOW, task
         );
 

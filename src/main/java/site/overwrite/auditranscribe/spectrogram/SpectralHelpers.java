@@ -19,7 +19,6 @@
 package site.overwrite.auditranscribe.spectrogram;
 
 import site.overwrite.auditranscribe.audio.WindowFunction;
-import site.overwrite.auditranscribe.misc.Complex;
 import site.overwrite.auditranscribe.misc.tuples.Pair;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.FrequencyBins;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.STFT;
@@ -172,18 +171,8 @@ public final class SpectralHelpers {
         double fmin = 150;
         double fmax = 4000;
 
-        // Generate the STFT spectrogram
-        Complex[][] stft = STFT.stft(x, numFFT, hopLength, WindowFunction.HANN_WINDOW);
-
-        // Obtain only the magnitudes
-        double[][] S = new double[stft.length][];
-
-        for (int i = 0; i < stft.length; i++) {
-            S[i] = new double[stft[i].length];
-            for (int j = 0; j < stft[i].length; j++) {
-                S[i][j] = stft[i][j].abs();
-            }
-        }
+        // Get STFT magnitudes
+        double[][] S = STFT.stftMags(x, numFFT, hopLength, WindowFunction.HANN_WINDOW);
 
         // Truncate to feasible region
         fmax = Math.min(fmax, sr / 2);
@@ -192,30 +181,19 @@ public final class SpectralHelpers {
         double[] fftFreqs = FrequencyBins.getFFTFreqBins(numFFT, sr);
 
         // Perform parabolic interpolation
-        double[][] avg = new double[S.length][S[0].length];
-        avg[0] = new double[S[0].length];
-        for (int i = 1; i < S.length - 1; i++) {
-            for (int j = 0; j < S[0].length; j++) {
-                avg[i][j] = 0.5 * (S[i + 1][j] - S[i - 1][j]);
-            }
-        }
-        avg[S.length - 1] = new double[S[0].length];
-
-        double[][] shift = new double[S.length][S[0].length];
-        shift[0] = new double[S[0].length];
-        for (int i = 1; i < S.length - 1; i++) {
-            for (int j = 0; j < S[0].length; j++) {
-                double shiftVal = 2 * S[i][j] - S[i - 1][j] - S[i + 1][j];
-                shift[i][j] = shiftVal != 0 ? avg[i][j] / shiftVal : avg[i][j];  // Suppress divide-by-zeros
-            }
-        }
-        shift[S.length - 1] = new double[S[0].length];
+        Pair<Double[][], Double[][]> parabolicInterpPair = parabolicInterp(S);
+        Double[][] avg = parabolicInterpPair.value0();
+        Double[][] shift = parabolicInterpPair.value1();
 
         // Compute skew difference
         double[][] dskew = new double[S.length][S[0].length];
         for (int i = 0; i < S.length; i++) {
             for (int j = 0; j < S[0].length; j++) {
-                dskew[i][j] = 0.5 * avg[i][j] * shift[i][j];
+                if ((avg[i][j] == null) || (shift[i][j] == null)) {
+                    dskew[i][j] = 0;
+                } else {
+                    dskew[i][j] = 0.5 * avg[i][j] * shift[i][j];
+                }
             }
         }
 
@@ -242,19 +220,7 @@ public final class SpectralHelpers {
         }
 
         // Generate masked local maxima of the spectrogram magnitudes
-        double[][] transposedS = ArrayUtils.transpose(S);
-        boolean[][] maskedLocalMaxTransposed = new boolean[S[0].length][S.length];
-
-        for (int i = 0; i < S[0].length; i++) {
-            // Generate the masked `S` array
-            double[] relevantRow = new double[S.length];
-            for (int j = 0; j < S.length; j++) {
-                relevantRow[j] = transposedS[i][j] > refVals[i] ? transposedS[i][j] : 0;
-            }
-            maskedLocalMaxTransposed[i] = ArrayUtils.localMaximum(relevantRow);
-        }
-
-        boolean[][] maskedLocalMax = ArrayUtils.transpose(maskedLocalMaxTransposed);
+        boolean[][] maskedLocalMax = generateMaskedLocalMaximum(S, refVals);
 
         // Get relevant indices
         List<Integer> idxI = new ArrayList<>();
@@ -280,5 +246,57 @@ public final class SpectralHelpers {
 
         // Return as a pair
         return new Pair<>(pitches, mags);
+    }
+
+    /**
+     * Perform parabolic interpolation on the STFT magnitudes.
+     *
+     * @param S STFT magnitudes matrix.
+     * @return A pair. First value is the 'average' matrix. The second value is the 'shuft' matrix.
+     */
+    private static Pair<Double[][], Double[][]> parabolicInterp(double[][] S) {
+        Double[][] avg = new Double[S.length][S[0].length];
+        avg[0] = new Double[S[0].length];
+        for (int i = 1; i < S.length - 1; i++) {
+            for (int j = 0; j < S[0].length; j++) {
+                avg[i][j] = 0.5 * (S[i + 1][j] - S[i - 1][j]);
+            }
+        }
+        avg[S.length - 1] = new Double[S[0].length];
+
+        Double[][] shift = new Double[S.length][S[0].length];
+        shift[0] = new Double[S[0].length];
+        for (int i = 1; i < S.length - 1; i++) {
+            for (int j = 0; j < S[0].length; j++) {
+                double shiftVal = 2 * S[i][j] - S[i - 1][j] - S[i + 1][j];
+                shift[i][j] = shiftVal != 0 ? avg[i][j] / shiftVal : avg[i][j];  // Suppress divide-by-zeros
+            }
+        }
+        shift[S.length - 1] = new Double[S[0].length];
+
+        return new Pair<>(avg, shift);
+    }
+
+    /**
+     * Generates a boolean mask of the local maxima in the STFT magnitudes matrix.
+     *
+     * @param S       STFT magnitudes matrix.
+     * @param refVals Reference values for each row.
+     * @return A boolean mask determining whether the element is a local maxima.
+     */
+    private static boolean[][] generateMaskedLocalMaximum(double[][] S, double[] refVals) {
+        double[][] transposedS = ArrayUtils.transpose(S);
+        boolean[][] maskedLocalMaxTransposed = new boolean[S[0].length][S.length];
+
+        for (int i = 0; i < S[0].length; i++) {
+            // Generate the masked `S` array
+            double[] relevantRow = new double[S.length];
+            for (int j = 0; j < S.length; j++) {
+                relevantRow[j] = transposedS[i][j] > refVals[i] ? transposedS[i][j] : 0;
+            }
+            maskedLocalMaxTransposed[i] = ArrayUtils.localMaximum(relevantRow);
+        }
+
+        return ArrayUtils.transpose(maskedLocalMaxTransposed);
     }
 }
