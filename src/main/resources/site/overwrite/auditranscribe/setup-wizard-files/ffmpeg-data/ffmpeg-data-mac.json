@@ -1,6 +1,5 @@
 {
-  "url": "https://evermeet.cx/ffmpeg/ffmpeg-5.1.1.zip",
-  "signature": "9cd8808b50da3fcf434110572464db67f9ea3613b0731d27ce2eddddea3dfc14",
-  "signatureURL": null,
+  "url": "https://api.auditranscribe.app/download-ffmpeg?platform=macOS",
+  "signaturePage": "download-ffmpeg?platform=macOS&signature_needed=true",
   "outputFolder": "ffmpeg/bin"
 }

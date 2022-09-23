@@ -25,17 +25,17 @@ import site.overwrite.auditranscribe.misc.Complex;
 import static org.junit.jupiter.api.Assertions.*;
 
 class STFTTest {
+    // Define the arrays
+    double[] array1 = {1, 2, -3, -4, 5, 6, -7, -8};
+    double[] array2 = {
+            25.442832341330558, 67.35970565394922, 35.09989960920626, 61.77920972475006,
+            62.4223934582534, 34.63818528787935, 10.867667057159514, 19.66065078483943,
+            68.66050464419456, 98.64623871074612, 20.397346011908567, 33.125277868376244,
+            13.969015082960123, 58.838543552236466, 27.565901473219746, 81.41318148048603
+    };
+
     @Test
     void stft() {
-        // Define the arrays
-        double[] array1 = {1, 2, -3, -4, 5, 6, -7, -8};
-        double[] array2 = {
-                25.442832341330558, 67.35970565394922, 35.09989960920626, 61.77920972475006,
-                62.4223934582534, 34.63818528787935, 10.867667057159514, 19.66065078483943,
-                68.66050464419456, 98.64623871074612, 20.397346011908567, 33.125277868376244,
-                13.969015082960123, 58.838543552236466, 27.565901473219746, 81.41318148048603
-        };
-
         // Generate the STFT output
         Complex[][] stftArray1Ones = STFT.stft(array1, 4, 3, WindowFunction.ONES_WINDOW);
         Complex[][] stftArray1Hann = STFT.stft(array1, 4, 3, WindowFunction.HANN_WINDOW);
@@ -85,5 +85,33 @@ class STFTTest {
         assertEquals(new Complex(-47.4669936, -35.5405515), stftArray2Hann[3][1].roundNicely(7));
         assertEquals(new Complex(-23.5496788), stftArray2Hann[4][0].roundNicely(7));
         assertEquals(new Complex(45.3863248), stftArray2Hann[4][1].roundNicely(7));
+    }
+
+    @Test
+    void stftMags() {
+        // Generate the STFT magnitude outputs
+        double[][] stftMags1Ones = STFT.stftMags(array1, 4, 3, WindowFunction.ONES_WINDOW);
+        double[][] stftMags1Hann = STFT.stftMags(array1, 4, 3, WindowFunction.HANN_WINDOW);
+
+        // Check the outputs
+        assertEquals(3, stftMags1Ones[0][0], 1e-3);
+        assertEquals(0, stftMags1Ones[0][1], 1e-3);
+        assertEquals(4, stftMags1Ones[0][2], 1e-3);
+        assertEquals(2.236, stftMags1Ones[1][0], 1e-3);
+        assertEquals(10, stftMags1Ones[1][1], 1e-3);
+        assertEquals(18.439, stftMags1Ones[1][2], 1e-3);
+        assertEquals(1, stftMags1Ones[2][0], 1e-3);
+        assertEquals(4, stftMags1Ones[2][1], 1e-3);
+        assertEquals(0, stftMags1Ones[2][2], 1e-3);
+
+        assertEquals(2, stftMags1Hann[0][0], 1e-3);
+        assertEquals(3, stftMags1Hann[0][1], 1e-3);
+        assertEquals(8, stftMags1Hann[0][2], 1e-3);
+        assertEquals(1.414, stftMags1Hann[1][0], 1e-3);
+        assertEquals(5.657, stftMags1Hann[1][1], 1e-3);
+        assertEquals(9.899, stftMags1Hann[1][2], 1e-3);
+        assertEquals(0, stftMags1Hann[2][0], 1e-3);
+        assertEquals(5, stftMags1Hann[2][1], 1e-3);
+        assertEquals(6, stftMags1Hann[2][2], 1e-3);
     }
 }

@@ -20,6 +20,7 @@ package site.overwrite.auditranscribe.music;
 
 import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.misc.CustomTask;
+import site.overwrite.auditranscribe.misc.tuples.Pair;
 import site.overwrite.auditranscribe.misc.tuples.Triple;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.ChromaCQT;
 import site.overwrite.auditranscribe.utils.StatisticalUtils;
@@ -65,6 +66,29 @@ public class MusicKeyEstimator {
      * actual music key.
      */
     public List<MusicKey> getMostLikelyKeys(int numKeys, CustomTask<?> task) {
+        // Get the keys with correlation
+        List<Pair<MusicKey, Double>> keysWithCorr = getMostLikelyKeysWithCorrelation(numKeys, task);
+
+        // Get only the keys
+        List<MusicKey> keys = new ArrayList<>(keysWithCorr.size());
+        for (Pair<MusicKey, Double> pair : keysWithCorr) {
+            keys.add(pair.value0());
+        }
+        return keys;
+    }
+
+    /**
+     * Method that returns the most likely keys for the audio sequence.
+     *
+     * @param numKeys Number of music keys to return.<br>
+     *                This number cannot be less than 1 or more than 30.
+     * @param task    The <code>CustomTask</code> object that is handling the generation. Pass in
+     *                <code>null</code> if no such task is being used.
+     * @return A list of pairs.<br>
+     * First element in each pair is a likely music key. Second element is the correlation of that key.<br>
+     * Keys are sorted in <b>decreasing </b> likelihood of being the actual music key.
+     */
+    public List<Pair<MusicKey, Double>> getMostLikelyKeysWithCorrelation(int numKeys, CustomTask<?> task) {
         // Check that `numKeys` is valid
         if ((numKeys < 1) || (numKeys > 30)) throw new ValueException("Invalid value for `numKeys`: " + numKeys);
 
@@ -72,7 +96,7 @@ public class MusicKeyEstimator {
         List<Triple<Integer, Boolean, Double>> correlations = getKeyCorrelations(task);
 
         // Now get the needed keys
-        List<MusicKey> keys = new ArrayList<>();
+        List<Pair<MusicKey, Double>> keys = new ArrayList<>();
         int corrIndex = 0;
         while (keys.size() < numKeys) {
             // Get the next triplet of correlation values
@@ -82,10 +106,13 @@ public class MusicKeyEstimator {
             // Get the required properties from the triplet
             int keyOffset = triplet.value0();
             boolean isMinor = triplet.value1();
+            double correlation = triplet.value2();
 
             // Attempt to match to music key(s) and add to master list
             List<MusicKey> possibleMatches = MusicKey.getPossibleMatches(keyOffset, isMinor);
-            keys.addAll(possibleMatches);
+            for (MusicKey possibleMatch : possibleMatches) {
+                keys.add(new Pair<>(possibleMatch, correlation));
+            }
         }
 
         // Truncate until the size is exactly `numKeys`

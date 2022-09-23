@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="rootPane" prefHeight="250.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="site.overwrite.auditranscribe.setup_wizard.view_controllers.DownloadingAudioResourceViewController">
+   <stylesheets>
+      <URL value="@../../css/base.css" />
+      <URL value="@../../css/light-mode.css" />
+   </stylesheets>
+   <children>
+      <VBox prefHeight="100.0" prefWidth="500.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="75.0">
+         <children>
+            <Label alignment="CENTER" prefHeight="30.0" prefWidth="500.0" styleClass="download-ffmpeg-label" text="Downloading Audio Resource" />
+            <HBox alignment="CENTER" prefHeight="35.0" prefWidth="200.0" spacing="5.0">
+               <children>
+                  <ProgressBar fx:id="downloadProgressBar" prefHeight="25.0" prefWidth="300.0" progress="0.0" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" />
+               </padding>
+            </HBox>
+            <Label alignment="CENTER" prefWidth="500.0" text="Please wait while we download the audio resource needed to fix the note playback delay." textAlignment="CENTER" wrapText="true">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

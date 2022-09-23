@@ -58,8 +58,6 @@ import java.util.logging.Level;
  */
 public class FixNoteDelayViewController implements Initializable {
     // Constants
-    private final String AUDIO_FILE = IOMethods.joinPaths("setup-wizard-files", "audio", "Breakfast.wav");
-
     private final double[] NOTE_ONSET_TIMES = {
             0.5, 0.75, 1, 1.25, 1.5, 3,
             3.5, 3.75, 4, 4.25, 4.5
@@ -104,16 +102,6 @@ public class FixNoteDelayViewController implements Initializable {
         // Get the width and height of the spectrogram
         double width = spectrogramPane.getPrefWidth();
         double height = spectrogramPane.getPrefHeight();
-
-        // Create the audio object for playback
-        try {
-            audio = new Audio(
-                    new File(IOMethods.getAbsoluteFilePath(AUDIO_FILE)),
-                    AudioProcessingMode.PLAYBACK_ONLY
-            );
-        } catch (UnsupportedAudioFileException | IOException | AudioTooLongException e) {
-            throw new RuntimeException(e);
-        }
 
         // Create a note player sequencer for note playback
         setupNotePlayerSequencer();
@@ -197,6 +185,21 @@ public class FixNoteDelayViewController implements Initializable {
 
         rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
         rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/" + theme.cssFile));
+    }
+
+    /**
+     * Method that sets the audio resource for the audio object.
+     *
+     * @param audioResourcePath <b>Absolute</b> path to the audio resource.
+     */
+    public void setAudioResource(String audioResourcePath) {
+        // Create the audio object for playback
+        try {
+            audio = new Audio(new File(audioResourcePath), AudioProcessingMode.PLAYBACK_ONLY);
+        } catch (UnsupportedAudioFileException | IOException | AudioTooLongException e) {
+            MyLogger.logException(e);
+            throw new RuntimeException(e);
+        }
     }
 
     /**

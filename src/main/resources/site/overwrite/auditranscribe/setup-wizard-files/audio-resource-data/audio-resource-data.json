@@ -1,0 +1,4 @@
+{
+  "url": "https://api.auditranscribe.app/download-audio-resource",
+  "signaturePage": "download-audio-resource?signature_needed=true"
+}
