@@ -1967,15 +1967,6 @@ public class TranscriptionViewController implements Initializable {
         CustomTask<Boolean> masterTask = new CustomTask<>() {
             @Override
             protected Boolean call() {
-                // Define a worker thread pool
-                ExecutorService executor = Executors.newFixedThreadPool(
-                        tasks.length, runnable -> {
-                            Thread thread = Executors.defaultThreadFactory().newThread(runnable);
-                            thread.setDaemon(true);  // Place thread in background so it can shut down gracefully
-                            return thread;
-                        }
-                );
-
                 // Convert the array of tasks into a list of tasks
                 Collection<CustomTask<?>> taskList = List.of(tasks);
 
@@ -2006,23 +1997,26 @@ public class TranscriptionViewController implements Initializable {
                 // Update the progress bar section
                 markTaskAsCompleted(null);
 
-                // Execute all tasks
-                taskList.forEach(executor::execute);
-                MyLogger.log(Level.INFO, "Started all transcription view tasks", this.getClass().toString());
+                // Execute tasks one-by-one
+                for (CustomTask<?> task : taskList) {
+                    // Create a new thread to start the task
+                    Thread thread = new Thread(task);
+                    thread.setDaemon(true);
+                    thread.start();
 
-                // Await for all tasks' completion
-                executor.shutdown();  // Prevent new tasks from being submitted
+                    MyLogger.log(Level.INFO, "Started task: '" + task.name + "'", this.getClass().toString());
 
-                boolean hasTerminated;
-                try {
-                    hasTerminated = executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
-                } catch (InterruptedException e) {
-                    MyLogger.logException(e);
-                    throw new RuntimeException(e);
+                    // Await for completion
+                    try {
+                        thread.join();
+                    } catch (InterruptedException e) {
+                        MyLogger.logException(e);
+                        throw new RuntimeException(e);
+                    }
                 }
 
                 MyLogger.log(Level.INFO, "All tasks complete", this.getClass().toString());
-                return hasTerminated;
+                return true;
             }
         };
         masterTask.setOnSucceeded(event -> {
