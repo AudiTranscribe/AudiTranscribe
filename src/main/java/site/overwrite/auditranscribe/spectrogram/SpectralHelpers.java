@@ -189,11 +189,7 @@ public final class SpectralHelpers {
         double[][] dskew = new double[S.length][S[0].length];
         for (int i = 0; i < S.length; i++) {
             for (int j = 0; j < S[0].length; j++) {
-                if ((avg[i][j] == null) || (shift[i][j] == null)) {
-                    dskew[i][j] = 0;
-                } else {
-                    dskew[i][j] = 0.5 * avg[i][j] * shift[i][j];
-                }
+                dskew[i][j] = 0.5 * avg[i][j] * shift[i][j];
             }
         }
 
@@ -255,26 +251,43 @@ public final class SpectralHelpers {
      * @return A pair. First value is the 'average' matrix. The second value is the 'shuft' matrix.
      */
     private static Pair<Double[][], Double[][]> parabolicInterp(double[][] S) {
-        Double[][] avg = new Double[S.length][S[0].length];
-        avg[0] = new Double[S[0].length];
+        // Perform parabolic interpolation
+        double[][] avg = new double[S.length][S[0].length];
+        avg[0] = new double[S[0].length];
         for (int i = 1; i < S.length - 1; i++) {
             for (int j = 0; j < S[0].length; j++) {
                 avg[i][j] = 0.5 * (S[i + 1][j] - S[i - 1][j]);
             }
         }
-        avg[S.length - 1] = new Double[S[0].length];
+        avg[S.length - 1] = new double[S[0].length];
 
-        Double[][] shift = new Double[S.length][S[0].length];
-        shift[0] = new Double[S[0].length];
+        double[][] shift = new double[S.length][S[0].length];
+        shift[0] = new double[S[0].length];
         for (int i = 1; i < S.length - 1; i++) {
             for (int j = 0; j < S[0].length; j++) {
                 double shiftVal = 2 * S[i][j] - S[i - 1][j] - S[i + 1][j];
                 shift[i][j] = shiftVal != 0 ? avg[i][j] / shiftVal : avg[i][j];  // Suppress divide-by-zeros
             }
         }
-        shift[S.length - 1] = new Double[S[0].length];
+        shift[S.length - 1] = new double[S[0].length];
 
-        return new Pair<>(avg, shift);
+        // Convert into needed format
+        Double[][] avgOut = new Double[S.length][S[0].length];
+        for (int i = 0; i < S.length; i++) {
+            for (int j = 0; j < S[0].length; j++) {
+                avgOut[i][j] = avg[i][j];
+            }
+        }
+
+        Double[][] shiftOut = new Double[S.length][S[0].length];
+        for (int i = 0; i < S.length; i++) {
+            for (int j = 0; j < S[0].length; j++) {
+                shiftOut[i][j] = shift[i][j];
+            }
+        }
+
+        // Return the converted arrays
+        return new Pair<>(avgOut, shiftOut);
     }
 
     /**
