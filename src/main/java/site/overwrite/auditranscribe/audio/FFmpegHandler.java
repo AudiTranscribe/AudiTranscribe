@@ -170,6 +170,42 @@ public class FFmpegHandler {
         }
     }
 
+    /**
+     * Method that adjusts the tempo the original audio file <code>file</code> and saves the
+     * adjusted audio into a new audio file with extension <code>extension</code>.<br>
+     * Note that this method produces a new audio file, <code>output.ext</code> (with the
+     * extension <code>.ext</code>).
+     *
+     * @param file           File object representing the original audio file.
+     * @param outputFilePath Absolute path to the output file, <b>including the extension</b>.
+     * @return A string, representing the output file's path after processing it.
+     */
+    public String generateAltTempoAudio(File file, String outputFilePath, double tempo) {
+        // Obtain the processed input and output file paths
+        Pair<String, String> filePathPair = processPaths(file, outputFilePath);
+        String inputFilePath = filePathPair.value0();
+        outputFilePath = filePathPair.value1();
+
+        // Generate the command to execute
+        ProcessBuilder builder = new ProcessBuilder();
+        builder.command(
+                ffmpegPath,
+                "-y",                            // Override output file
+                "-i", inputFilePath,             // Specify input file
+                "-filter:a", "atempo=" + tempo,  // Specify tempo
+                "-vn",                           // Disable video recording
+                outputFilePath                   // Specify output file
+        );
+
+        // Execute FFmpeg command
+        boolean success = handleFFmpegCommandExec(builder);
+        if (success) {
+            return outputFilePath;
+        } else {
+            throw new FFmpegCommandFailedException("FFmpeg command " + builder.command() + " failed");
+        }
+    }
+
     // Private methods
 
     /**
