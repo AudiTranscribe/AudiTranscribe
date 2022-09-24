@@ -38,11 +38,11 @@ class BPMEstimatorTest {
     // Get the audio files
     Audio audio1 = new Audio(
             new File(IOMethods.getAbsoluteFilePath("testing-files/audio/175bpm.wav")),
-            AudioProcessingMode.SAMPLES_ONLY
+            AudioProcessingMode.SAMPLES
     );
     Audio audio2 = new Audio(
             new File(IOMethods.getAbsoluteFilePath("testing-files/audio/137bpmNoisy.wav")),
-            AudioProcessingMode.SAMPLES_ONLY
+            AudioProcessingMode.SAMPLES
     );
 
     // Extract samples and sample rate

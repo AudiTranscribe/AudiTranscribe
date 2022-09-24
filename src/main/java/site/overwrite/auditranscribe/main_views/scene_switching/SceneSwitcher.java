@@ -18,7 +18,6 @@
 
 package site.overwrite.auditranscribe.main_views.scene_switching;
 
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -224,7 +223,7 @@ public class SceneSwitcher {
 
             // Try and read the auxiliary WAV file as an `Audio` object
             // (Failure to read will throw exceptions)
-            Audio audio = new Audio(auxiliaryWAVFile, AudioProcessingMode.SAMPLES_AND_PLAYBACK);
+            Audio audio = new Audio(auxiliaryWAVFile, AudioProcessingMode.SAMPLES, AudioProcessingMode.PLAYBACK);
 
             // Delete auxiliary WAV file
             boolean successfullyDeleted = IOMethods.delete(auxiliaryWAVFile.getAbsolutePath());

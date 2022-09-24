@@ -22,7 +22,6 @@ package site.overwrite.auditranscribe.audio;
  * Enum that contains the different audio processing modes.
  */
 public enum AudioProcessingMode {
-    SAMPLES_ONLY,
-    PLAYBACK_ONLY,
-    SAMPLES_AND_PLAYBACK
+    SAMPLES,
+    PLAYBACK
 }

@@ -38,7 +38,7 @@ class MusicKeyEstimatorTest {
         // Test 1
         Audio audio1 = new Audio(
                 new File(IOMethods.getAbsoluteFilePath("testing-files/audio/Choice.wav")),
-                AudioProcessingMode.SAMPLES_ONLY
+                AudioProcessingMode.SAMPLES
         );
 
         double[] samples1 = audio1.getMonoSamples();
@@ -53,7 +53,7 @@ class MusicKeyEstimatorTest {
         // Test 2
         Audio audio2 = new Audio(
                 new File(IOMethods.getAbsoluteFilePath("testing-files/audio/Trumpet.wav")),
-                AudioProcessingMode.SAMPLES_ONLY
+                AudioProcessingMode.SAMPLES
         );
 
         double[] samples2 = audio2.getMonoSamples();

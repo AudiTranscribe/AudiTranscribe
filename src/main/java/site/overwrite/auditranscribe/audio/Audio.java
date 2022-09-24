@@ -41,6 +41,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -69,44 +70,31 @@ public class Audio {
     /**
      * Initializes an <code>Audio</code> object based on a file.
      *
-     * @param wavFile        File object representing the WAV file to be used for both samples
-     *                       generation and audio playback.
-     * @param processingMode The processing mode when handling the audio file.
-     *                       <ul>
-     *                       <li>
-     *                           <code>SAMPLES_ONLY</code>: Only generate samples.
-     *                       </li>
-     *                       <li>
-     *                           <code>PLAYBACK_ONLY</code>: Only permit playback.
-     *                       </li>
-     *                       <li>
-     *                           <code>SAMPLES_AND_PLAYBACK</code>: Permit samples' generation and
-     *                           playback.
-     *                       </li>
-     *                       </ul>
+     * @param wavFile         File object representing the WAV file to be used for both samples
+     *                        generation and audio playback.
+     * @param processingModes The processing modes when handling the audio file. Any number of
+     *                        processing modes can be included.
+     *                        <ul>
+     *                        <li>
+     *                            <code>SAMPLES</code>: Generate audio samples.
+     *                        </li>
+     *                        <li>
+     *                            <code>PLAYBACK</code>: Allow audio playback.
+     *                        </li>
+     *                        </ul>
      * @throws IOException                   If there was a problem reading in the audio stream.
      * @throws UnsupportedAudioFileException If there was a problem reading in the audio file.
      * @throws AudioTooLongException         If the audio file exceeds the maximum audio duration
      *                                       permitted.
      */
     public Audio(
-            File wavFile, AudioProcessingMode processingMode
+            File wavFile, AudioProcessingMode... processingModes
     ) throws UnsupportedAudioFileException, IOException, AudioTooLongException {
-        // Set flags
-        boolean needPlayback = false;
-        boolean needSamples = false;
-
-        if (processingMode == AudioProcessingMode.SAMPLES_ONLY) {
-            needSamples = true;
-        } else if (processingMode == AudioProcessingMode.PLAYBACK_ONLY) {
-            needPlayback = true;
-        } else if (processingMode == AudioProcessingMode.SAMPLES_AND_PLAYBACK) {
-            needSamples = true;
-            needPlayback = true;
-        }
+        // Convert the given processing modes as a list
+        List<AudioProcessingMode> modes = List.of(processingModes);
 
         // Create the media player object if needed
-        if (needPlayback) {
+        if (modes.contains(AudioProcessingMode.PLAYBACK)) {
             // Get the media player for the audio file
             MediaPlayer tempMediaPlayer;
 
@@ -130,7 +118,7 @@ public class Audio {
         }
 
         // Generate audio samples
-        if (needSamples) {
+        if (modes.contains(AudioProcessingMode.SAMPLES)) {
             // Attempt to convert the input stream into an audio input stream
             InputStream bufferedIn = new BufferedInputStream(new FileInputStream(wavFile));
             audioStream = AudioSystem.getAudioInputStream(bufferedIn);
