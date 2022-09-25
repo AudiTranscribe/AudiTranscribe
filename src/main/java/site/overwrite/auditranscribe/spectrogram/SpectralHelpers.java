@@ -163,6 +163,7 @@ public final class SpectralHelpers {
      * article</a> by Center for Computer Research in Music and Acoustics (CCRMA),
      * Stanford University.
      */
+    // Todo: need to improve efficiency of this method (this takes the bulk of the time for the estimating of tuning)
     private static Pair<Double[][], Double[][]> piptack(double[] x, double sr) {
         // Constants
         int numFFT = 2048;

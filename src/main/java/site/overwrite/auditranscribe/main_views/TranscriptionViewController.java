@@ -823,7 +823,7 @@ public class TranscriptionViewController implements Initializable {
                         WindowFunction.values()[DataFiles.SETTINGS_DATA_FILE.data.windowFunctionEnumOrdinal]
                 );
                 long end = System.currentTimeMillis();
-                System.out.println("Time taken: " + (end - start));
+                System.out.println("Spectrogram magnitudes' time taken: " + (end - start));
 
                 // Update attributes
                 this.setMessage("Compressing spectrogram data...");
