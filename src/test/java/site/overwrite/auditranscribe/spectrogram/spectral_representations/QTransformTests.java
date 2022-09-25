@@ -279,4 +279,21 @@ class QTransformTests {
                 8, 0, 0, WindowFunction.HANN_WINDOW, null
         ));  // Input signal length of 0 is too short for 7-octave VQT
     }
+
+    @Test
+    @Order(4)
+    void vqtUseTuning() {
+        Complex[][] vqtMatrix = VQT.vqt(
+                samples, audio.getSampleRate(), 511, UnitConversionUtils.noteToFreq("C1"), 28,
+                4, Double.NaN, 0, WindowFunction.HANN_WINDOW, null
+        );
+
+        // Check specific values in this resultant VQT matrix
+        assertEquals(-0.001, MathUtils.round(vqtMatrix[10][32].re(), 3), 0.005);
+        assertEquals(-0.001, MathUtils.round(vqtMatrix[10][32].im(), 3), 0.005);
+        assertEquals(0.005, MathUtils.round(vqtMatrix[15][425].re(), 3), 0.005);
+        assertEquals(-0.006, MathUtils.round(vqtMatrix[15][425].im(), 3), 0.005);
+        assertEquals(0.005, MathUtils.round(vqtMatrix[27][87].re(), 3), 0.005);
+        assertEquals(0.005, MathUtils.round(vqtMatrix[27][87].im(), 3), 0.005);
+    }
 }

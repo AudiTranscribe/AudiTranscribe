@@ -24,10 +24,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import javafx.stage.Window;
+import javafx.stage.*;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingData;
@@ -223,6 +220,7 @@ public class ProjectSetupViewController implements Initializable {
             // Set stage properties
             Stage projectSetupStage = new Stage();
             projectSetupStage.initStyle(StageStyle.UTILITY);
+            projectSetupStage.initModality(Modality.APPLICATION_MODAL);
             projectSetupStage.setTitle("Project Setup");
             projectSetupStage.setScene(scene);
             projectSetupStage.setResizable(false);

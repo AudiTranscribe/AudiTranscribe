@@ -79,11 +79,9 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InvalidObjectException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -137,6 +135,7 @@ public class TranscriptionViewController implements Initializable {
     private final DoubleProperty playheadX = new SimpleDoubleProperty(0);
 
     private boolean hasUnsavedChanges = true;
+    private boolean changedProjectName = false;
     private int fileVersion;
 
     private Theme theme;
@@ -190,8 +189,8 @@ public class TranscriptionViewController implements Initializable {
     private MenuBar menuBar;
 
     @FXML
-    private MenuItem newProjectMenuItem, openProjectMenuItem, saveProjectMenuItem, saveAsMenuItem,
-            exportMIDIMenuItem, preferencesMenuItem, aboutMenuItem;
+    private MenuItem newProjectMenuItem, openProjectMenuItem, renameProjectMenuItem, saveProjectMenuItem,
+            saveAsMenuItem, exportMIDIMenuItem, preferencesMenuItem, aboutMenuItem;
 
     // Main elements
     @FXML
@@ -521,6 +520,7 @@ public class TranscriptionViewController implements Initializable {
         // Add methods to menu items
         newProjectMenuItem.setOnAction(this::handleNewProject);
         openProjectMenuItem.setOnAction(this::handleOpenProject);
+        renameProjectMenuItem.setOnAction(this::handleRenameProject);
         saveProjectMenuItem.setOnAction(event -> handleSavingProject(false, false));
         saveAsMenuItem.setOnAction(event -> handleSavingProject(false, true));
         exportMIDIMenuItem.setOnAction(event -> handleExportMIDI());
@@ -862,12 +862,44 @@ public class TranscriptionViewController implements Initializable {
                     // Create a music key estimator
                     MusicKeyEstimator musicKeyEstimator = new MusicKeyEstimator(audio.getMonoSamples(), sampleRate);
 
-                    // Get the top 3 most likely keys
-                    List<MusicKey> mostLikelyKeys = musicKeyEstimator.getMostLikelyKeys(3, this);
+                    // Get the top 4 most likely keys
+                    List<Pair<MusicKey, Double>> mostLikelyKeys =
+                            musicKeyEstimator.getMostLikelyKeysWithCorrelation(4, this);
+
+                    // Get most likely key and its correlation
+                    Pair<MusicKey, Double> mostLikelyKeyPair = mostLikelyKeys.get(0);
+                    MusicKey mostLikelyKey = mostLikelyKeyPair.value0();
+                    double mostLikelyKeyCorr = mostLikelyKeyPair.value1();
+
+                    // Get other likely keys
+                    List<Pair<MusicKey, Double>> otherLikelyKeys = new ArrayList<>();
+                    for (Pair<MusicKey, Double> pair : mostLikelyKeys.subList(1, 4)) {
+                        if (pair.value1() >= 0.9 * mostLikelyKeyCorr) {
+                            otherLikelyKeys.add(pair);
+                        }
+                    }
+
+                    // Inform user if there are other likely keys
+                    if (otherLikelyKeys.size() != 0) {
+                        // Form the string to show user
+                        StringBuilder sb = new StringBuilder();
+                        for (Pair<MusicKey, Double> pair : otherLikelyKeys) {
+                            sb.append(pair.value0().name).append(": ").append(MathUtils.round(pair.value1(), 3))
+                                    .append("\n");
+                        }
+
+                        // Show alert
+                        Platform.runLater(() -> Popups.showInformationAlert(
+                                "Music Key Estimation Found Other Possible Keys",
+                                "Most likely music key, with decreasing correlation:\n" +
+                                        mostLikelyKey.name + ": " + MathUtils.round(mostLikelyKeyCorr, 3) + "\n" +
+                                        sb + "\n" +
+                                        "We will select " + mostLikelyKey.name + " as the key of the audio file."
+                        ));
+                    }
 
                     // Return the most likely key
-                    // Todo: show the other keys as well
-                    key = mostLikelyKeys.get(0).name;
+                    key = mostLikelyKey.name;
                 } else {
                     key = sceneSwitchingData.musicKeyString;
                 }
@@ -1182,12 +1214,7 @@ public class TranscriptionViewController implements Initializable {
             )));
 
             // Pause the audio
-            try {
-                audio.pause();
-            } catch (InvalidObjectException e) {
-                MyLogger.logException(e);
-                throw new RuntimeException(e);
-            }
+            audio.pause();
 
             // Stop note sequencer playback
             notePlayerSequencer.stop();
@@ -1315,6 +1342,41 @@ public class TranscriptionViewController implements Initializable {
     }
 
     /**
+     * Helper method that helps with the renaming of the current project.
+     *
+     * @param event Event that triggered this function.
+     */
+    private void handleRenameProject(Event event) {
+        // Ask user for new project name
+        Optional<String> newProjectNameResponse = Popups.showTextInputDialog(
+                "Rename Project",
+                "Enter New Project Name",
+                "New project name:",
+                projectName
+        );
+
+        // Do nothing if nothing was entered, or if the project name was not changed
+        if ((newProjectNameResponse.isEmpty()) || (newProjectNameResponse.get().equals(projectName))) return;
+
+        // Otherwise, get new project name proper
+        String newProjectName = newProjectNameResponse.get();
+
+        // Change stage title
+        ((Stage) rootPane.getScene().getWindow()).setTitle(newProjectName);
+
+        // Update attributes
+        MyLogger.log(
+                Level.INFO,
+                "Changed project name from '" + projectName + "' to '" + newProjectName + "'",
+                this.getClass().toString()
+        );
+
+        projectName = newProjectName;
+        changedProjectName = true;
+        hasUnsavedChanges = true;
+    }
+
+    /**
      * Helper method that handles the saving of the project.
      *
      * @param isAutosave      Whether this is an autosave or not.
@@ -1343,11 +1405,18 @@ public class TranscriptionViewController implements Initializable {
 
         // Methods to run after task succeeded
         task.setOnSucceeded(event -> {
-            // Update the project file list
+            // Handle database operations
             try {
+                // Update the project file list
                 if (projectsDB.checkIfProjectDoesNotExist(audtFilePath)) {
                     // Insert the record into the database
                     projectsDB.insertProjectRecord(audtFilePath, projectName);
+                }
+
+                // If changed project name, also update
+                if (changedProjectName) {
+                    projectsDB.updateProjectName(audtFilePath, projectName);
+                    changedProjectName = false;  // Revert once complete
                 }
             } catch (SQLException e) {
                 MyLogger.logException(e);
@@ -1743,13 +1812,8 @@ public class TranscriptionViewController implements Initializable {
                         audio.setAudioStartTime(0);
 
                         // We need to do this so that the status is set to paused
-                        try {
-                            audio.stop();
-                            audio.pause();
-                        } catch (InvalidObjectException e) {
-                            MyLogger.logException(e);
-                            throw new RuntimeException(e);
-                        }
+                        audio.stop();
+                        audio.pause();
                     }
 
                     // Update scrolling
@@ -1895,15 +1959,6 @@ public class TranscriptionViewController implements Initializable {
         CustomTask<Boolean> masterTask = new CustomTask<>() {
             @Override
             protected Boolean call() {
-                // Define a worker thread pool
-                ExecutorService executor = Executors.newFixedThreadPool(
-                        tasks.length, runnable -> {
-                            Thread thread = Executors.defaultThreadFactory().newThread(runnable);
-                            thread.setDaemon(true);  // Place thread in background so it can shut down gracefully
-                            return thread;
-                        }
-                );
-
                 // Convert the array of tasks into a list of tasks
                 Collection<CustomTask<?>> taskList = List.of(tasks);
 
@@ -1934,23 +1989,26 @@ public class TranscriptionViewController implements Initializable {
                 // Update the progress bar section
                 markTaskAsCompleted(null);
 
-                // Execute all tasks
-                taskList.forEach(executor::execute);
-                MyLogger.log(Level.INFO, "Started all transcription view tasks", this.getClass().toString());
+                // Execute tasks one-by-one
+                for (CustomTask<?> task : taskList) {
+                    // Create a new thread to start the task
+                    Thread thread = new Thread(task);
+                    thread.setDaemon(true);
+                    thread.start();
 
-                // Await for all tasks' completion
-                executor.shutdown();  // Prevent new tasks from being submitted
+                    MyLogger.log(Level.INFO, "Started task: '" + task.name + "'", this.getClass().toString());
 
-                boolean hasTerminated;
-                try {
-                    hasTerminated = executor.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
-                } catch (InterruptedException e) {
-                    MyLogger.logException(e);
-                    throw new RuntimeException(e);
+                    // Await for completion
+                    try {
+                        thread.join();
+                    } catch (InterruptedException e) {
+                        MyLogger.logException(e);
+                        throw new RuntimeException(e);
+                    }
                 }
 
                 MyLogger.log(Level.INFO, "All tasks complete", this.getClass().toString());
-                return hasTerminated;
+                return true;
             }
         };
         masterTask.setOnSucceeded(event -> {

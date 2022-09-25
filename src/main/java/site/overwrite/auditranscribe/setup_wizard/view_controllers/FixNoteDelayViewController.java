@@ -45,7 +45,6 @@ import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
-import java.io.InvalidObjectException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
@@ -58,8 +57,6 @@ import java.util.logging.Level;
  */
 public class FixNoteDelayViewController implements Initializable {
     // Constants
-    private final String AUDIO_FILE = IOMethods.joinPaths("setup-wizard-files", "audio", "Breakfast.wav");
-
     private final double[] NOTE_ONSET_TIMES = {
             0.5, 0.75, 1, 1.25, 1.5, 3,
             3.5, 3.75, 4, 4.25, 4.5
@@ -104,16 +101,6 @@ public class FixNoteDelayViewController implements Initializable {
         // Get the width and height of the spectrogram
         double width = spectrogramPane.getPrefWidth();
         double height = spectrogramPane.getPrefHeight();
-
-        // Create the audio object for playback
-        try {
-            audio = new Audio(
-                    new File(IOMethods.getAbsoluteFilePath(AUDIO_FILE)),
-                    AudioProcessingMode.PLAYBACK_ONLY
-            );
-        } catch (UnsupportedAudioFileException | IOException | AudioTooLongException e) {
-            throw new RuntimeException(e);
-        }
 
         // Create a note player sequencer for note playback
         setupNotePlayerSequencer();
@@ -200,6 +187,21 @@ public class FixNoteDelayViewController implements Initializable {
     }
 
     /**
+     * Method that sets the audio resource for the audio object.
+     *
+     * @param audioResourcePath <b>Absolute</b> path to the audio resource.
+     */
+    public void setAudioResource(String audioResourcePath) {
+        // Create the audio object for playback
+        try {
+            audio = new Audio(new File(audioResourcePath), AudioProcessingMode.PLAYBACK_ONLY);
+        } catch (UnsupportedAudioFileException | IOException | AudioTooLongException e) {
+            MyLogger.logException(e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * Method that gets the note playing delay offset set by the user and returns it.<br>
      * Note that there is a further offset applied to the returned value. This is to account for any
      * delays arising from the actual program having more 'stuff' to process than in the setup
@@ -276,13 +278,8 @@ public class FixNoteDelayViewController implements Initializable {
      * Helper method that stops the playback of the audio and the notes.
      */
     private void stopAudio() {
-        try {
-            audio.stop();
-            audio.pause();
-        } catch (InvalidObjectException e) {
-            MyLogger.logException(e);
-            throw new RuntimeException(e);
-        }
+        audio.stop();
+        audio.pause();
         sequencer.stop();
     }
 }

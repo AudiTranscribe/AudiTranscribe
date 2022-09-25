@@ -35,11 +35,15 @@ public class MainApplication extends Application {
     // Initialization method
     @Override
     public void start(Stage stage) throws IOException {
-        // Ensure that an application folder exists
-        IOMethods.createFolder(IOConstants.APP_DATA_FOLDER_PATH);
-
-        // Create a backup folder for old project files
-        IOMethods.createFolder(IOConstants.PROJECT_BACKUPS_FOLDER_PATH);
+        // Ensure the needed application folders exists
+        String[] neededFolders = new String[]{
+                IOConstants.APP_DATA_FOLDER_PATH,
+                IOConstants.PROJECT_BACKUPS_FOLDER_PATH,
+                IOConstants.OTHER_RESOURCES_DATA_FOLDER_PATH
+        };
+        for (String path : neededFolders) {
+            IOMethods.createFolder(path);
+        }
 
         // Clear any old logs
         MyLogger.clearOldLogs(DataFiles.SETTINGS_DATA_FILE.data.logFilePersistence);

@@ -18,9 +18,11 @@ reviewed. Vulnerabilities in *non-supported versions* would not be reviewed.
 
 ## Reporting a Vulnerability
 
-Report security vulnerabilities to 
+Report security vulnerabilities to
+
 ```
 contact@overwrite.site
 ```
+
 with an email with a subject that contains the text `[SECURITY]`. We will get back to you as soon as
 possible (typically within 48 hours).

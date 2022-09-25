@@ -19,13 +19,15 @@
 package site.overwrite.auditranscribe.setup_wizard.helpers;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import site.overwrite.auditranscribe.exceptions.network.APIServerException;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.misc.MyLogger;
+import site.overwrite.auditranscribe.network.APICallHandler;
 import site.overwrite.auditranscribe.network.DownloadFileHandler;
-import site.overwrite.auditranscribe.network.WebContentHandler;
 import site.overwrite.auditranscribe.setup_wizard.helpers.data_encapsulators.FFmpegDownloadData;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
@@ -53,6 +55,12 @@ public class FFmpegDownloadManager {
      * @param maxAttempts Number of attempts to try and download the FFmpeg zip file before failing.
      */
     public FFmpegDownloadManager(int maxAttempts) {
+        MyLogger.log(
+                Level.FINE,
+                "Starting FFmpeg download manager",
+                this.getClass().getName()
+        );
+
         // Update attributes
         this.maxAttempts = maxAttempts;
         this.os = OSMethods.getOS();
@@ -66,6 +74,10 @@ public class FFmpegDownloadManager {
             try {
                 defineAttributes(os.toString().toLowerCase());
             } catch (IOException e) {
+                // Note that an exception has occurred
+                MyLogger.logException(e);
+
+                // Make all the attributes `null`
                 downloadURL = null;
                 signature = null;
                 ffmpegFolder = null;
@@ -109,10 +121,10 @@ public class FFmpegDownloadManager {
         CompressionHandlers.zipDecompress(outputFolder, IOMethods.joinPaths(destFolder, "ffmpeg.zip"));
 
         // Define a variable to store the FFmpeg binary path
-        String ffmpegBinPath = null;
+        String ffmpegBinPath;
 
-        // Set executable status if needed
         if (os == OSType.MAC) {
+            // Set executable status if needed
             if (!new File(IOMethods.joinPaths(outputFolder, "ffmpeg")).setExecutable(true)) {
                 MyLogger.log(
                         Level.SEVERE,
@@ -132,24 +144,7 @@ public class FFmpegDownloadManager {
                 ffmpegBinPath = IOMethods.joinPaths(outputFolder, "ffmpeg");
             }
         } else if (os == OSType.WINDOWS) {
-            // Get all files and folders from the destination folder
-            String[] filesAndFolders = new File(destFolder).list();
-
-            // Get the folder that contains FFmpeg
-            if (filesAndFolders != null) {
-                String folder = null;
-
-                for (String fileOrFolder : filesAndFolders) {
-                    if (fileOrFolder.matches("ffmpeg-[0-9.]+-.+")) {
-                        folder = fileOrFolder;
-                        break;
-                    }
-                }
-
-                if (folder != null) {
-                    ffmpegBinPath = IOMethods.joinPaths(destFolder, folder, "bin", "ffmpeg.exe");
-                }
-            }
+            ffmpegBinPath = IOMethods.joinPaths(outputFolder, "ffmpeg.exe");
         } else {
             throw new IOException("Unrecognised OS");
         }
@@ -205,15 +200,11 @@ public class FFmpegDownloadManager {
             downloadURL = new URL(data.url);
             ffmpegFolder = data.outputFolder;
 
-            // Handle signature setting
-            if (data.signature != null) {
-                signature = data.signature;
-            } else {
-                // Get signature from signature URL
-                signature = WebContentHandler.readContentOnWebpage(new URL(data.signatureURL));
-            }
+            // Get signature from signature page
+            JsonObject returnedData = APICallHandler.sendAPIGetRequest(data.signaturePage);
+            signature = returnedData.get("signature").getAsString();
 
-        } catch (JsonSyntaxException e) {
+        } catch (JsonSyntaxException | APIServerException e) {
             throw new IOException(e);
         }
     }

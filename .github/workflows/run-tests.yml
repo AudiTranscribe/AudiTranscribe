@@ -23,7 +23,7 @@ jobs:
         with:
           java-version: "17"
           distribution: "adopt"
-          cache: maven
+          cache: "maven"
       - name: Test with Maven
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
@@ -41,8 +41,3 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           files: target/site/jacoco/jacoco.xml
-#      - name: Upload JaCoCo HTML File
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: JaCoCo_Report_For_${{ matrix.os }}
-#          path: target/site/jacoco

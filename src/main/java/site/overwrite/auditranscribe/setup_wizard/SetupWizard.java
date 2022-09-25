@@ -130,8 +130,11 @@ public class SetupWizard {
         // Show view that confirms that FFmpeg was installed successfully
         showFinishFFmpegSetupView();
 
+        // Show view that downloads the audio resource
+        String audioResourcePath = showDownloadingAudioResourceView();
+
         // Show view that helps fix the note playback delay
-        double notePlaybackDelay = showFixNoteDelayView();
+        double notePlaybackDelay = showFixNoteDelayView(audioResourcePath);
 
         // Show view that sets the update interval
         int updateInterval = showUpdateIntervalSetupView();
@@ -369,11 +372,46 @@ public class SetupWizard {
     }
 
     /**
+     * Helper method that shows the view that helps download the audio resource to fix the note
+     * playback delay.
+     *
+     * @return String representing the path to the audio resource.
+     */
+    private String showDownloadingAudioResourceView() {
+        try {
+            // Load the FXML file into the scene
+            FXMLLoader fxmlLoader = new FXMLLoader(getSetupWizardView("downloading-audio-resource-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+
+            // Get the view controller
+            DownloadingAudioResourceViewController controller = fxmlLoader.getController();
+
+            // Set the theme on the scene
+            controller.setThemeOnScene(theme);
+
+            // Set the stage's scene
+            stage.setScene(scene);
+
+            controller.startDownload();
+
+            // Show the stage
+            stage.showAndWait();
+
+            // Return the value of the audio resource path
+            return controller.getAudioResourcePath();
+
+        } catch (IOException ignored) {
+        }
+        return null;
+    }
+
+    /**
      * Helper method that shows the view that helps the user fix any note playback delays.
      *
+     * @param audioResourcePath Path to the downloaded audio resource.
      * @return A double, representing the note playing delay value that the user has set.
      */
-    private double showFixNoteDelayView() {
+    private double showFixNoteDelayView(String audioResourcePath) {
         try {
             // Load the FXML file into the scene
             FXMLLoader fxmlLoader = new FXMLLoader(getSetupWizardView("fix-note-delay-view.fxml"));
@@ -382,8 +420,9 @@ public class SetupWizard {
             // Get the view controller
             FixNoteDelayViewController controller = fxmlLoader.getController();
 
-            // Set the theme on the scene
+            // Set the required things on the scene
             controller.setThemeOnScene(theme);
+            controller.setAudioResource(audioResourcePath);
 
             // Set the stage's scene
             stage.setScene(scene);
