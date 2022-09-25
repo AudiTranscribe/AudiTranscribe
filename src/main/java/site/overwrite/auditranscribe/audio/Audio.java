@@ -199,7 +199,7 @@ public class Audio {
     /**
      * Method that pauses the current audio that is playing.
      */
-    public void pause() throws InvalidObjectException {
+    public void pause() {
         if (mediaPlayer != null) {
             mediaPlayer.pause();
         } else {

@@ -45,7 +45,6 @@ import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
-import java.io.InvalidObjectException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
@@ -279,13 +278,8 @@ public class FixNoteDelayViewController implements Initializable {
      * Helper method that stops the playback of the audio and the notes.
      */
     private void stopAudio() {
-        try {
-            audio.stop();
-            audio.pause();
-        } catch (InvalidObjectException e) {
-            MyLogger.logException(e);
-            throw new RuntimeException(e);
-        }
+        audio.stop();
+        audio.pause();
         sequencer.stop();
     }
 }
