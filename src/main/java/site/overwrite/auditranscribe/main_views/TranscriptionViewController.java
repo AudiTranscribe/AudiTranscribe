@@ -79,11 +79,9 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InvalidObjectException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -1212,12 +1210,7 @@ public class TranscriptionViewController implements Initializable {
             )));
 
             // Pause the audio
-            try {
-                audio.pause();
-            } catch (InvalidObjectException e) {
-                MyLogger.logException(e);
-                throw new RuntimeException(e);
-            }
+            audio.pause();
 
             // Stop note sequencer playback
             notePlayerSequencer.stop();
@@ -1815,13 +1808,8 @@ public class TranscriptionViewController implements Initializable {
                         audio.setAudioStartTime(0);
 
                         // We need to do this so that the status is set to paused
-                        try {
-                            audio.stop();
-                            audio.pause();
-                        } catch (InvalidObjectException e) {
-                            MyLogger.logException(e);
-                            throw new RuntimeException(e);
-                        }
+                        audio.stop();
+                        audio.pause();
                     }
 
                     // Update scrolling
