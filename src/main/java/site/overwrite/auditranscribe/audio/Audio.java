@@ -66,6 +66,7 @@ public class Audio {
     private double[] monoAudioSamples;  // Average of stereo samples
 
     private final MediaPlayer mediaPlayer;
+    private final MediaPlayer slowedMediaPlayer;
 
     /**
      * Initializes an <code>Audio</code> object based on a file.
@@ -82,6 +83,8 @@ public class Audio {
      *                            <code>PLAYBACK</code>: Allow audio playback.
      *                        </li>
      *                        </ul>
+     *                        Note that processing mode <code>WITH_SLOWDOWN</code> is <b>invalid</b>
+     *                        for this constructor.
      * @throws IOException                   If there was a problem reading in the audio stream.
      * @throws UnsupportedAudioFileException If there was a problem reading in the audio file.
      * @throws AudioTooLongException         If the audio file exceeds the maximum audio duration
@@ -90,32 +93,41 @@ public class Audio {
     public Audio(
             File wavFile, AudioProcessingMode... processingModes
     ) throws UnsupportedAudioFileException, IOException, AudioTooLongException {
+        this(wavFile, null, processingModes);
+    }
+
+    /**
+     * Initializes an <code>Audio</code> object based on a file.
+     *
+     * @param wavFile         File object representing the WAV file to be used for both samples
+     *                        generation and audio playback.
+     * @param slowedAudioFile File object representing a slowed MP3 file that will be used for
+     *                        slowed audio playback.<br>
+     *                        Note that the tempo for this audio track should be <b>half</b> that
+     *                        of the original <code>wavFile</code>'s tempo.
+     * @param processingModes The processing modes when handling the audio file. Any number of
+     *                        processing modes can be included.
+     *                        <ul>
+     *                        <li>
+     *                            <code>SAMPLES</code>: Generate audio samples.
+     *                        </li>
+     *                        <li>
+     *                            <code>PLAYBACK</code>: Allow audio playback.
+     *                        </li>
+     *                        <li>
+     *                            <code>WITH_SLOWDOWN</code>: Allow audio slowdown.
+     *                        </li>
+     *                        </ul>
+     * @throws IOException                   If there was a problem reading in the audio stream.
+     * @throws UnsupportedAudioFileException If there was a problem reading in the audio file.
+     * @throws AudioTooLongException         If the audio file exceeds the maximum audio duration
+     *                                       permitted.
+     */
+    public Audio(
+            File wavFile, File slowedAudioFile, AudioProcessingMode... processingModes
+    ) throws UnsupportedAudioFileException, IOException, AudioTooLongException {
         // Convert the given processing modes as a list
         List<AudioProcessingMode> modes = List.of(processingModes);
-
-        // Create the media player object if needed
-        if (modes.contains(AudioProcessingMode.PLAYBACK)) {
-            // Get the media player for the audio file
-            MediaPlayer tempMediaPlayer;
-
-            try {
-                tempMediaPlayer = new MediaPlayer(new Media(wavFile.toURI().toString()));
-            } catch (IllegalStateException e) {
-                tempMediaPlayer = null;
-
-                MyLogger.log(
-                        Level.SEVERE,
-                        "JavaFX Toolkit not initialized. Audio playback will not work.",
-                        this.getClass().toString()
-                );
-            }
-
-            // Update attributes
-            mediaPlayer = tempMediaPlayer;
-
-        } else {
-            mediaPlayer = null;
-        }
 
         // Generate audio samples
         if (modes.contains(AudioProcessingMode.SAMPLES)) {
@@ -147,6 +159,52 @@ public class Audio {
             audioStream = null;
             audioFormat = null;
             sampleRate = Double.NaN;
+        }
+
+        // Create the media player object if needed
+        if (modes.contains(AudioProcessingMode.PLAYBACK)) {
+            // Get the media player for the audio file
+            MediaPlayer tempMediaPlayer;
+
+            try {
+                tempMediaPlayer = new MediaPlayer(new Media(wavFile.toURI().toString()));
+            } catch (IllegalStateException e) {
+                tempMediaPlayer = null;
+
+                MyLogger.log(
+                        Level.SEVERE,
+                        "JavaFX Toolkit not initialized. Audio playback will not work.",
+                        this.getClass().toString()
+                );
+            }
+
+            // Update attributes
+            mediaPlayer = tempMediaPlayer;
+        } else {
+            mediaPlayer = null;
+        }
+
+        // Handle the two different kinds of playback options
+        if (modes.contains(AudioProcessingMode.WITH_SLOWDOWN)) {
+            // Get the media player for the audio file
+            MediaPlayer tempMediaPlayer;
+
+            try {
+                tempMediaPlayer = new MediaPlayer(new Media(slowedAudioFile.toURI().toString()));
+            } catch (IllegalStateException e) {
+                tempMediaPlayer = null;
+
+                MyLogger.log(
+                        Level.SEVERE,
+                        "JavaFX Toolkit not initialized. Audio playback will not work.",
+                        this.getClass().toString()
+                );
+            }
+
+            // Update attributes
+            slowedMediaPlayer = tempMediaPlayer;
+        } else {
+            slowedMediaPlayer = null;
         }
 
         // Save the audio file's raw WAV bytes
@@ -189,10 +247,28 @@ public class Audio {
      * Method that plays the audio.
      */
     public void play() {
-        if (mediaPlayer != null) {
-            mediaPlayer.play();
+        play(false);
+    }
+
+    /**
+     * Method that plays the audio.
+     *
+     * @param isSlowed Whether to use the slowed down media player or the normal media player.
+     */
+    public void play(boolean isSlowed) {
+        // Todo: adjust time for the media players
+        if (!isSlowed) {
+            if (mediaPlayer != null) {
+                mediaPlayer.play();
+            } else {
+                throw new AudioIsSamplesOnlyException("Media player was not initialized.");
+            }
         } else {
-            throw new AudioIsSamplesOnlyException("Media player was not initialized.");
+            if (slowedMediaPlayer != null) {
+                slowedMediaPlayer.play();
+            } else {
+                throw new AudioIsSamplesOnlyException("Media player was not initialized.");
+            }
         }
     }
 
@@ -200,10 +276,27 @@ public class Audio {
      * Method that pauses the current audio that is playing.
      */
     public void pause() {
-        if (mediaPlayer != null) {
-            mediaPlayer.pause();
+        pause(false);
+    }
+
+    /**
+     * Method that pauses the current audio that is playing.
+     *
+     * @param isSlowed Whether to use the slowed down media player or the normal media player.
+     */
+    public void pause(boolean isSlowed) {
+        if (!isSlowed) {
+            if (mediaPlayer != null) {
+                mediaPlayer.pause();
+            } else {
+                throw new AudioIsSamplesOnlyException("Media player was not initialized.");
+            }
         } else {
-            throw new AudioIsSamplesOnlyException("Media player was not initialized.");
+            if (slowedMediaPlayer != null) {
+                slowedMediaPlayer.pause();
+            } else {
+                throw new AudioIsSamplesOnlyException("Media player was not initialized.");
+            }
         }
     }
 
@@ -211,36 +304,73 @@ public class Audio {
      * Method that stops the audio.
      */
     public void stop() {
-        if (mediaPlayer != null) {
-            mediaPlayer.stop();
+        stop(false);
+    }
+
+    /**
+     * Method that stops the audio.
+     *
+     * @param isSlowed Whether to use the slowed down media player or the normal media player.
+     */
+    public void stop(boolean isSlowed) {
+        if (!isSlowed) {
+            if (mediaPlayer != null) {
+                mediaPlayer.stop();
+            } else {
+                throw new AudioIsSamplesOnlyException("Media player was not initialized.");
+            }
         } else {
-            throw new AudioIsSamplesOnlyException("Media player was not initialized.");
+            if (slowedMediaPlayer != null) {
+                slowedMediaPlayer.stop();
+            } else {
+                throw new AudioIsSamplesOnlyException("Media player was not initialized.");
+            }
         }
     }
 
     /**
-     * Set the current audio's playback time to <code>playbackTime</code> <b>seconds</b>.
+     * Set the current audio's playback time to <code>playbackTime</code> <b>seconds</b>.<br>
+     * If <code>slowedMediaPlayer</code> is not <code>null</code>, its playback time will be set to
+     * <b>twice</b> the value of <code>playbackTime</code>.
      *
-     * @param playbackTime The playback time in seconds.
+     * @param playbackTime The playback time in <b>seconds</b>.
      */
     public void setAudioPlaybackTime(double playbackTime) {
+        // Declare the duration to seek to
+        Duration seekTime = new Duration(playbackTime * 1000);
+
+        // Update seek times
         if (mediaPlayer != null) {
-            mediaPlayer.seek(new Duration(playbackTime * 1000));
+            mediaPlayer.seek(seekTime);
         } else {
             throw new AudioIsSamplesOnlyException("Media player was not initialized.");
+        }
+
+        if (slowedMediaPlayer != null) {
+            slowedMediaPlayer.seek(seekTime.multiply(2));
         }
     }
 
     /**
-     * Set the current audio's starting time to <code>startTime</code> <b>seconds</b>.
+     * Set the current audio's starting time to <code>startTime</code> <b>seconds</b>.<br>
+     * If <code>slowedMediaPlayer</code> is not <code>null</code>, its start time will be set to
+     * <b>twice</b> the value of <code>startTime</code>.
      *
      * @param startTime The start time of the audio in seconds.
      */
     public void setAudioStartTime(double startTime) {
+        // Declare the duration of the start time
+        Duration start = new Duration(startTime * 1000);
+
+        // Update start times
         if (mediaPlayer != null) {
-            mediaPlayer.setStartTime(new Duration(startTime * 1000));
+            mediaPlayer.setStartTime(start);
         } else {
             throw new AudioIsSamplesOnlyException("Media player was not initialized.");
+        }
+
+        if (slowedMediaPlayer != null) {
+            slowedMediaPlayer.setStartTime(start.multiply(2));
         }
     }
 
@@ -259,7 +389,8 @@ public class Audio {
     }
 
     /**
-     * Method that sets the volume to the volume provided.
+     * Method that sets the volume to the volume provided.<br>
+     * Also sets the slowed audio's media player's volume if it is provided.
      *
      * @param volume Volume value. This value should be in the interval [0, 1] where 0 means
      *               silent and 1 means full volume.
@@ -269,6 +400,10 @@ public class Audio {
             mediaPlayer.setVolume(volume);
         } else {
             throw new AudioIsSamplesOnlyException("Media player was not initialized.");
+        }
+
+        if (slowedMediaPlayer != null) {
+            slowedMediaPlayer.setVolume(volume);
         }
     }
 

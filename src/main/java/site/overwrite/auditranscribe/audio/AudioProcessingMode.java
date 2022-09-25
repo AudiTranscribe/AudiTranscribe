@@ -23,5 +23,6 @@ package site.overwrite.auditranscribe.audio;
  */
 public enum AudioProcessingMode {
     SAMPLES,
-    PLAYBACK
+    PLAYBACK,
+    WITH_SLOWDOWN
 }
