@@ -1,0 +1,256 @@
+/* GENERAL STYLING */
+.root {
+    -fx-base: #000000ff;
+    -fx-background: #000000ff;
+    -fx-accent: #ffffffff;
+
+    -fx-inner-border: -fx-base;
+    -fx-inner-border-horizontal: -fx-base;
+    -fx-inner-border-bottomup: -fx-base;
+    -fx-body-color: -fx-base;
+    -fx-body-color-bottomup: -fx-base;
+    -fx-body-color-to-right: -fx-base;
+
+    -default-text-fill: #ffffffff;
+}
+
+/* Buttons */
+.button {
+    -fx-border-color: #ffffffff;
+    -fx-border-radius: 3px;
+    -fx-background-color: #000000ff;
+    -fx-text-fill: -default-text-fill;
+}
+
+.button:hover {
+    -fx-background-color: #ffffffff;
+    -fx-text-fill: #000000ff;
+}
+
+.button.error {
+    -fx-border-color: #ff0000ff;
+}
+
+.image-button {
+    -fx-background-color: transparent !important;
+    -fx-border-color: transparent !important;
+}
+
+.image-button:hover {
+    -fx-background-color: #000000ff !important;
+    -fx-border-color: #ffffffff !important;
+}
+
+/* Hyperlinks */
+.hyperlink {
+    -fx-text-fill: #00ffffff;
+}
+
+/* Radio Buttons */
+.radio-button {
+    -fx-text-fill: -default-text-fill;
+}
+
+.radio-button .radio {
+    -fx-background-color: #000000ff;
+    -fx-padding: 5px;
+    -fx-border-radius: 50%;
+    -fx-border-width: 1px;
+    -fx-border-color: #ffffffff;
+}
+
+.radio-button .dot {
+    -fx-background-radius: 50%;
+    -fx-padding: 3px;
+}
+
+.radio-button:selected .radio .dot {
+    -fx-background-color: #ffffffff;
+}
+
+/* Spinners/Choice Boxes */
+.choice-box, .spinner {
+    -fx-background-color: #ffffffff, #000000ff;
+    -fx-background-insets: 0, 1px;
+}
+
+.choice-box .menu-item {
+    -fx-background-color: #000000ff;
+}
+
+.choice-box .menu-item > .label {
+    -fx-text-fill: -default-text-fill;
+}
+
+.choice-box .menu-item:focused {
+    -fx-background-color: #000000ff;
+}
+
+.spinner > .text-field {
+    -fx-text-fill: -default-text-fill;
+    -fx-background-color: transparent;
+}
+
+.arrow, .left-arrow, .right-arrow, .increment-arrow, .decrement-arrow {
+    -fx-background-color: -default-text-fill;
+    -fx-cursor: hand;
+}
+
+.spinner > .increment-arrow-button, .spinner > .decrement-arrow-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 1px;
+    -fx-cursor: hand;
+}
+
+.spinner > .increment-arrow-button:hover, .spinner > .decrement-arrow-button:hover {
+    -fx-background-color: #000000ff;
+    -fx-border-width: 0;
+}
+
+/* Text */
+.text {
+    -fx-text-fill: -default-text-fill;
+}
+
+.label {
+    -fx-text-fill: -default-text-fill;
+}
+
+.text-field {
+    -fx-border-color: #ffffff;
+    -fx-border-radius: 3px;
+    -fx-background-color: #000000ff;
+    -fx-prompt-text-fill: #aaaaaaff;
+    -fx-text-fill: -default-text-fill;
+}
+
+.text-field.error {
+    -fx-border-color: #ff0000ff;
+}
+
+/* Others */
+.menu:hover, .menu:showing {
+    -fx-background-color: #515659ff;
+}
+
+.menu-bar {
+    -fx-padding: 0 0 2 0;
+    -fx-background-color: #555555ff, #282828ff, #3c3f41ff;
+    -fx-background-insets: 0, 0 0 1 0, 0 0 2 0;
+}
+
+.menu-item {
+    -fx-background-color: #3c3f41ff;
+}
+
+.menu-item:hover {
+    -fx-background-color: #515659ff;
+    -fx-cursor: hand;
+}
+
+.separator *.line {
+    -fx-border-color: #ffffffff;
+    -fx-border-style: solid;
+    -fx-border-width: 1px;
+}
+
+.tab {
+    -fx-border-color: #ffffffff;
+}
+
+.tab-label {
+    -fx-fill: -default-text-fill;
+    -fx-text-fill: -default-text-fill;
+}
+
+/* MAIN PAGE */
+/* Text */
+.short-name-text {
+    -fx-fill: -default-text-fill;
+}
+
+/* Others */
+.no-projects-vbox {
+    -fx-background-color: #000000ff;
+    -fx-border-color: #ffffffff;
+}
+
+.short-name-rectangle {
+    -fx-stroke: #ffffffff;
+}
+
+.list-view {
+    -fx-background-color: #000000ff;
+}
+
+.list-cell:hover {
+    -fx-border-color: #ffffffff;
+}
+
+.list-cell:selected .text {
+    -fx-fill: -default-text-fill;
+    -fx-text-fill: -default-text-fill;
+}
+
+/* TRANSCRIPTION PAGE */
+/* Labels */
+.display-label {
+    -fx-fill: -default-text-fill;
+}
+
+/* Spectrogram */
+.note-line, .beat-line {
+    -fx-stroke: #ffffff80;
+}
+
+.bar-line {
+    -fx-stroke: #00ff0080;
+}
+
+.bar-number-ellipse {
+    -fx-stroke: -default-text-fill;
+}
+
+.current-octave-rectangle {
+    -fx-fill: #ffff007f;
+}
+
+/* Playback */
+.clickable-progress-pane {
+    -fx-background-color: #00000000;
+}
+
+.coloured-progress-pane {
+    -fx-background-color: #009fff80;
+}
+
+.playhead-line {
+    -fx-stroke: #00cfffff;
+}
+
+.volume-slider .track {
+    -slider-unfilled-colour: #777777ff;
+    -slider-filled-colour: #00cfffff;
+}
+
+.volume-slider .thumb {
+    -fx-background-color: #ffffffff;
+}
+
+/* Others */
+.progress-bar > .bar {
+    -fx-background-color: #00cfffff;
+}
+
+/* PREFERENCES / PROJECT SETUP PAGE */
+/* Buttons */
+.ok-button {
+    -fx-background-color: #0000ffff;
+    -fx-text-fill: #ffffffff;
+}
+
+.ok-button:hover {
+    -fx-background-color: #ffffffff;
+    -fx-text-fill: #000000ff;
+}

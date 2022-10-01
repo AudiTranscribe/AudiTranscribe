@@ -24,7 +24,8 @@ package site.overwrite.auditranscribe.misc;
 public enum Theme {
     // Enum values
     LIGHT_MODE("Light Mode", "light-mode"),
-    DARK_MODE("Dark Mode", "dark-mode");
+    DARK_MODE("Dark Mode", "dark-mode"),
+    HIGH_CONTRAST("High Contrast", "high-contrast");
 
     // Enum attributes
     private final String name;
