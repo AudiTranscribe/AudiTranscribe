@@ -29,6 +29,9 @@ import java.util.*;
  * Array utility methods to modify, change, and search within arrays.
  */
 public final class ArrayUtils {
+    // Constants
+    static final int LEAF_SIZE = 2048;
+
     private ArrayUtils() {
         // Private constructor to signal this is a utility class
     }
@@ -854,42 +857,131 @@ public final class ArrayUtils {
     }
 
     /**
-     * Matrix multiply two complex numbered matrices.
+     * Matrix add the two matrices.
      *
      * @param A The first matrix.
      * @param B The second matrix.
-     * @return The multiplied matrix.
-     * @throws LengthException If the matrix sizes are not suitable for multiplication.
-     * @see <a href="https://en.wikipedia.org/wiki/Matrix_multiplication_algorithm">This article</a>
-     * on the naiive implementation on the Matrix Multiplication algorithm.
+     * @return The sum of the two matrices.
      */
-    // Todo: see if can make this more efficient.
-    public static Complex[][] matmul(Complex[][] A, Complex[][] B) {
-        // Check if the matrices can be multiplied
-        if (A[0].length != B.length) {
-            throw new LengthException("Matrix sizes not suitable for multiplication");
+    public static double[][] matadd(double[][] A, double[][] B) {
+        // Check if the matrices can be added
+        if ((A.length != B.length) || (A[0].length != B[0].length)) {
+            throw new LengthException("Matrix sizes not suitable for addition");
         }
 
-        // Otherwise, perform matrix multiplication
-        int n = A.length;
-        int m = A[0].length;
-        int p = B[0].length;
+        // Perform matrix addition
+        int m = A.length;
+        int n = A[0].length;
 
-        Complex[][] output = new Complex[A.length][B[0].length];
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < p; j++) {
-                // Calculate the value of the current element
-                Complex currElem = new Complex(0, 0);
-                for (int k = 0; k < m; k++) {
-                    currElem = currElem.plus(Complex.times(A[i][k], B[k][j]));
-                }
+        double[][] output = new double[m][n];
 
-                // Set the current element to the output matrix
-                output[i][j] = currElem;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                output[i][j] = A[i][j] + B[i][j];
             }
         }
 
-        // Return the output
+        return output;
+    }
+
+    /**
+     * Matrix subtract the two matrices.
+     *
+     * @param A The first matrix.
+     * @param B The second matrix.
+     * @return The difference (<code>A - B</code>) of the two matrices.
+     */
+    public static double[][] matsub(double[][] A, double[][] B) {
+        // Check if the matrices can be added
+        if ((A.length != B.length) || (A[0].length != B[0].length)) {
+            throw new LengthException("Matrix sizes not suitable for subtraction");
+        }
+
+        // Perform matrix subtraction
+        int m = A.length;
+        int n = A[0].length;
+
+        double[][] output = new double[m][n];
+
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                output[i][j] = A[i][j] - B[i][j];
+            }
+        }
+
+        return output;
+    }
+
+    /**
+     * Matrix multiply two complex-numbered matrices.
+     *
+     * @param P The first matrix.
+     * @param Q The second matrix.
+     * @return The multiplied matrix.
+     * @throws LengthException If the matrix sizes are not suitable for multiplication.
+     */
+    public static Complex[][] matmul(Complex[][] P, Complex[][] Q) {
+        return matmul(P, Q, LEAF_SIZE);
+    }
+
+    /**
+     * Matrix multiply two complex-numbered matrices.
+     *
+     * @param P        The first matrix.
+     * @param Q        The second matrix.
+     * @param leafSize Size of the matrix before switching to standard IJK multiplication instead of
+     *                 Strassen multiplication.
+     * @return The multiplied matrix.
+     * @throws LengthException If the matrix sizes are not suitable for multiplication.
+     */
+    public static Complex[][] matmul(Complex[][] P, Complex[][] Q, int leafSize) {
+        // Check if the matrices can be multiplied
+        if (P[0].length != Q.length) {
+            throw new LengthException("Matrix sizes not suitable for multiplication");
+        }
+
+        // Get the relevant lengths
+        int numPRows = P.length;
+        int numCommon = P[0].length;
+        int numQCols = Q[0].length;
+
+        // Split the complex matrices into 4 real-valued matrices
+        double[][] A = new double[numPRows][numCommon];
+        double[][] B = new double[numPRows][numCommon];
+        double[][] C = new double[numCommon][numQCols];
+        double[][] D = new double[numCommon][numQCols];
+
+        for (int i = 0; i < numPRows; i++) {
+            for (int j = 0; j < numCommon; j++) {
+                A[i][j] = P[i][j].re();
+                B[i][j] = P[i][j].im();
+            }
+        }
+
+        for (int i = 0; i < numCommon; i++) {
+            for (int j = 0; j < numQCols; j++) {
+                C[i][j] = Q[i][j].re();
+                D[i][j] = Q[i][j].im();
+            }
+        }
+
+        // Perform required matrix multiplication
+        double[][] AC = matmul(A, C, leafSize);
+        double[][] BD = matmul(B, D, leafSize);
+        double[][] AD = matmul(A, D, leafSize);
+        double[][] BC = matmul(B, C, leafSize);
+
+        // Form the final matrix
+        double[][] realPart = matsub(AC, BD);
+        double[][] imaginaryPart = matadd(AD, BC);
+
+        Complex[][] output = new Complex[numPRows][numQCols];
+        for (int i = 0; i < numPRows; i++) {
+            for (int j = 0; j < numQCols; j++) {
+                output[i][j] = new Complex(realPart[i][j], imaginaryPart[i][j]);
+            }
+        }
+
         return output;
     }
 
@@ -900,37 +992,39 @@ public final class ArrayUtils {
      * @param B The second matrix.
      * @return The multiplied matrix.
      * @throws LengthException If the matrix sizes are not suitable for multiplication.
-     * @see <a href="https://en.wikipedia.org/wiki/Matrix_multiplication_algorithm">This article</a>
-     * on the naiive implementation on the Matrix Multiplication algorithm.
      */
-    // Todo: see if can make this more efficient.
     public static double[][] matmul(double[][] A, double[][] B) {
+        return matmul(A, B, LEAF_SIZE);
+    }
+
+    /**
+     * Matrix multiply two real-numbered matrices.
+     *
+     * @param A        The first matrix.
+     * @param B        The second matrix.
+     * @param leafSize Size of the matrix before switching to standard IJK multiplication instead of
+     *                 Strassen multiplication.
+     * @return The multiplied matrix.
+     * @throws LengthException If the matrix sizes are not suitable for multiplication.
+     */
+    public static double[][] matmul(double[][] A, double[][] B, int leafSize) {
         // Check if the matrices can be multiplied
         if (A[0].length != B.length) {
             throw new LengthException("Matrix sizes not suitable for multiplication");
         }
 
         // Otherwise, perform matrix multiplication
-        int n = A.length;
-        int m = A[0].length;
-        int p = B[0].length;
+        int numARows = A.length;
+        int numCommon = A[0].length;
+        int numBCols = B[0].length;
 
-        double[][] output = new double[A.length][B[0].length];
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < p; j++) {
-                // Calculate the value of the current element
-                double currElem = 0;
-                for (int k = 0; k < m; k++) {
-                    currElem += A[i][k] * B[k][j];
-                }
-
-                // Set the current element to the output matrix
-                output[i][j] = currElem;
-            }
+        if ((numARows <= leafSize) && (numCommon <= leafSize) && (numBCols <= leafSize)) {
+            return matmulIJK(A, B);
+        } else if ((numARows == 1) || (numCommon == 1) || (numBCols == 1)) {
+            return matmulIJK(A, B);
+        } else {
+            return matmulStrassen(A, B, leafSize);
         }
-
-        // Return the output
-        return output;
     }
 
     /**
@@ -975,6 +1069,166 @@ public final class ArrayUtils {
         for (int y = 0; y < Y; y++) {
             for (int x = 0; x < X; x++) {
                 finalArray[y][x] = originalArray[x][y];
+            }
+        }
+    }
+
+    /**
+     * IJK matrix multiplication. Assumes that matrices <code>A</code> and <code>B</code> can be
+     * multiplied.
+     *
+     * @param A First matrix.
+     * @param B Second matrix.
+     * @return Product of the matrices.
+     */
+    private static double[][] matmulIJK(double[][] A, double[][] B) {
+        // Lengths
+        int numRowsA = A.length;
+        int numCommon = A[0].length;
+        int numColsB = B[0].length;
+
+        // Multiplication
+        double[][] C = new double[numRowsA][numColsB];
+
+        for (int i = 0; i < numRowsA; i++) {
+            for (int j = 0; j < numColsB; j++) {
+                double currElem = 0;
+                for (int k = 0; k < numCommon; k++) {
+                    currElem += A[i][k] * B[k][j];
+                }
+                C[i][j] = currElem;
+            }
+        }
+
+        return C;
+    }
+
+    /**
+     * Strassen matrix multiplication. Assumes that matrices <code>A</code> and <code>B</code> can
+     * be multiplied.
+     *
+     * @param A        First matrix.
+     * @param B        Second matrix.
+     * @param leafSize Size of the matrix before switching to standard IJK multiplication instead of
+     *                 Strassen multiplication.
+     * @return Product of the matrices.
+     * @see <a href="https://en.wikipedia.org/wiki/Strassen_algorithm">This article</a>
+     * on Strassen algorithm for matrix multiplication.
+     */
+    private static double[][] matmulStrassen(double[][] A, double[][] B, int leafSize) {
+        // Lengths
+        int numRowsA = A.length;
+        int numCommon = A[0].length;
+        int numColsB = B[0].length;
+
+        if ((numRowsA <= leafSize) && (numCommon <= leafSize) && (numColsB <= leafSize)) {
+            return matmulIJK(A, B);
+        } else if ((numRowsA == 1) || (numCommon == 1) || (numColsB == 1)) {
+            return matmulIJK(A, B);
+        } else {
+            // Compute new lengths
+            int numRowsANew = numRowsA % 2 == 0 ? numRowsA : numRowsA + 1;
+            int numCommonNew = numCommon % 2 == 0 ? numCommon : numCommon + 1;
+            int numColsBNew = numColsB % 2 == 0 ? numColsB : numColsB + 1;
+
+            // Pad rows until even
+            double[][] Anew = new double[numRowsANew][numCommonNew];
+            double[][] Bnew = new double[numCommonNew][numColsBNew];
+
+            for (int i = 0; i < numRowsA; i++) {
+                System.arraycopy(A[i], 0, Anew[i], 0, numCommon);
+            }
+
+            for (int i = 0; i < numCommon; i++) {
+                System.arraycopy(B[i], 0, Bnew[i], 0, numColsB);
+            }
+
+            // Define new matrices
+            double[][] A11 = new double[numRowsANew / 2][numCommonNew / 2];
+            double[][] A12 = new double[numRowsANew / 2][numCommonNew / 2];
+            double[][] A21 = new double[numRowsANew / 2][numCommonNew / 2];
+            double[][] A22 = new double[numRowsANew / 2][numCommonNew / 2];
+
+            double[][] B11 = new double[numCommonNew / 2][numColsBNew / 2];
+            double[][] B12 = new double[numCommonNew / 2][numColsBNew / 2];
+            double[][] B21 = new double[numCommonNew / 2][numColsBNew / 2];
+            double[][] B22 = new double[numCommonNew / 2][numColsBNew / 2];
+
+            // Copy elements into the matrices
+            splitMatrix(Anew, A11, 0, numRowsANew / 2, 0, numCommonNew / 2);
+            splitMatrix(Anew, A12, 0, numRowsANew / 2, numCommonNew / 2, numCommonNew);
+            splitMatrix(Anew, A21, numRowsANew / 2, numRowsANew, 0, numCommonNew / 2);
+            splitMatrix(Anew, A22, numRowsANew / 2, numRowsANew, numCommonNew / 2, numCommonNew);
+
+            splitMatrix(Bnew, B11, 0, numCommonNew / 2, 0, numColsBNew / 2);
+            splitMatrix(Bnew, B12, 0, numCommonNew / 2, numColsBNew / 2, numColsBNew);
+            splitMatrix(Bnew, B21, numCommonNew / 2, numCommonNew, 0, numColsBNew / 2);
+            splitMatrix(Bnew, B22, numCommonNew / 2, numCommonNew, numColsBNew / 2, numColsBNew);
+
+            // Apply Strassen Formulae
+            double[][] M1 = matmulStrassen(matadd(A11, A22), matadd(B11, B22), leafSize);
+            double[][] M2 = matmulStrassen(matadd(A21, A22), B11, leafSize);
+            double[][] M3 = matmulStrassen(A11, matsub(B12, B22), leafSize);
+            double[][] M4 = matmulStrassen(A22, matsub(B21, B11), leafSize);
+            double[][] M5 = matmulStrassen(matadd(A11, A12), B22, leafSize);
+            double[][] M6 = matmulStrassen(matsub(A21, A11), matadd(B11, B12), leafSize);
+            double[][] M7 = matmulStrassen(matsub(A12, A22), matadd(B21, B22), leafSize);
+
+            double[][] C11 = matadd(matsub(matadd(M1, M4), M5), M7);
+            double[][] C12 = matadd(M3, M5);
+            double[][] C21 = matadd(M2, M4);
+            double[][] C22 = matadd(matadd(matsub(M1, M2), M3), M6);
+
+            // Join into one matrix
+            double[][] CNew = new double[numRowsANew][numColsBNew];
+            joinMatrices(CNew, C11, 0, 0);
+            joinMatrices(CNew, C12, 0, numColsBNew / 2);
+            joinMatrices(CNew, C21, numRowsANew / 2, 0);
+            joinMatrices(CNew, C22, numRowsANew / 2, numColsBNew / 2);
+
+            // Remove unneeded elements
+            double[][] C = new double[numRowsA][numColsB];
+            for (int i = 0; i < numRowsA; i++) {
+                System.arraycopy(CNew[i], 0, C[i], 0, numColsB);
+            }
+
+            return C;
+        }
+    }
+
+    /**
+     * Splits a matrix and places the resulting split into the <code>newMatrix</code>.
+     *
+     * @param matrix    Original matrix to split.
+     * @param newMatrix New matrix that contains the split elements.
+     * @param rowStart  Starting row index to start the splitting (inclusive).
+     * @param rowEnd    Ending row index to end the splitting (exclusive).
+     * @param colStart  Starting column index to start the splitting (inclusive).
+     * @param colEnd    Ending column index to end the splitting (exclusive).
+     */
+    private static void splitMatrix(
+            double[][] matrix, double[][] newMatrix, int rowStart, int rowEnd, int colStart, int colEnd
+    ) {
+        for (int i = rowStart; i < rowEnd; i++) {
+            System.arraycopy(matrix[i], colStart, newMatrix[i - rowStart], 0, colEnd - colStart);
+        }
+    }
+
+    /**
+     * Joins the <code>childMatrix</code> into the <code>parentMatrix</code> at the position
+     * (<code>rowStart</code>, <code>colStart</code>).
+     *
+     * @param parentMatrix Parent matrix.
+     * @param childMatrix  Matrix to join.
+     * @param rowStart     Starting point of the join for the rows.
+     * @param colStart     Starting point of the join for the columns.
+     */
+    private static void joinMatrices(
+            double[][] parentMatrix, double[][] childMatrix, int rowStart, int colStart
+    ) {
+        for (int i1 = 0, i2 = rowStart; i1 < childMatrix.length; i1++, i2++) {
+            for (int j1 = 0, j2 = colStart; j1 < childMatrix[0].length; j1++, j2++) {
+                parentMatrix[i2][j2] = childMatrix[i1][j1];
             }
         }
     }

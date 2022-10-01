@@ -24,7 +24,10 @@ import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 import site.overwrite.auditranscribe.misc.Complex;
 import site.overwrite.auditranscribe.misc.tuples.Pair;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.NoSuchElementException;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -472,6 +475,48 @@ class ArrayUtilsTest {
     }
 
     @Test
+    void matadd() {
+        // Define matrices
+        double[][] A = {{1, 2, 3}, {4, 5, 6}};
+        double[][] B = {{7, 8, 9}, {10, 11, 12}};
+
+        // Define expected output
+        double[][] expectedAB = {{8, 10, 12}, {14, 16, 18}};
+
+        // Compute matrix sum
+        double[][] resultAB = ArrayUtils.matadd(A, B);
+
+        // Assertion
+        assertArrayEquals(expectedAB, resultAB);
+
+        // Assert exceptions
+        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matadd(new double[3][4], new double[4][4]));
+        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matadd(new double[3][4], new double[3][5]));
+        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matadd(new double[3][4], new double[4][5]));
+    }
+
+    @Test
+    void matsub() {
+        // Define matrices
+        double[][] A = {{1, 2, 3}, {4, 5, 6}};
+        double[][] B = {{7, 8, 9}, {10, 11, 12}};
+
+        // Define expected outputs
+        double[][] expectedAB = {{-6, -6, -6}, {-6, -6, -6}};
+
+        // Compute matrix sums
+        double[][] resultAB = ArrayUtils.matsub(A, B);
+
+        // Assertion
+        assertArrayEquals(expectedAB, resultAB);
+
+        // Assert exceptions
+        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matsub(new double[3][4], new double[4][4]));
+        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matsub(new double[3][4], new double[3][5]));
+        assertThrowsExactly(LengthException.class, () -> ArrayUtils.matsub(new double[3][4], new double[4][5]));
+    }
+
+    @Test
     void matmulComplex() {
         // Define matrices
         Complex[][] A = new Complex[][]{
@@ -577,6 +622,134 @@ class ArrayUtilsTest {
     }
 
     @Test
+    void matmulComplexStrassenCheck() {
+        // Test constants
+        final int matrixSize = 256;
+        final int leafSize = 64;
+
+        final Random random = new Random(67890);
+
+        // Initialize matrices
+        Complex[][] A = new Complex[matrixSize][matrixSize];
+        Complex[][] B = new Complex[matrixSize][matrixSize];
+
+        for (int i = 0; i < matrixSize; i++) {
+            for (int j = 0; j < matrixSize; j++) {
+                A[i][j] = new Complex(random.nextDouble(-1e3, 1e3), random.nextDouble(-1e3, 1e3));
+                B[i][j] = new Complex(random.nextDouble(-1e3, 1e3), random.nextDouble(-1e3, 1e3));
+            }
+        }
+
+        // Compute matrix multiplications
+        Complex[][] ijkResult = complexMatmulIJK(A, B);
+        Complex[][] strassenResult = ArrayUtils.matmul(A, B, leafSize);
+
+        // Check if equal
+        for (int i = 0; i < matrixSize; i++) {
+            for (int j = 0; j < matrixSize; j++) {
+                assertEquals(ijkResult[i][j].roundNicely(3), strassenResult[i][j].roundNicely(3));
+            }
+        }
+
+//        // Test constants
+//        final int leafSize = 512;
+//        final int numTrials = 5;
+//
+//        int numARows = 60;
+//        int numCommon = 513;
+//        int numBCols = 10607;
+//
+//        final Random random = new Random();
+//
+//        // Initialize matrices
+//        Complex[][] A = new Complex[numARows][numCommon];
+//        Complex[][] B = new Complex[numCommon][numBCols];
+//
+//        long[] ijkTimes = new long[numTrials];
+//        long[] strassenTimes = new long[numTrials];
+//
+//        for (int iteration = 1; iteration <= numTrials; iteration++) {
+//            System.out.println("--- ITERATION " + iteration + " OF " + numTrials + " ---");
+//            for (int i = 0; i < numARows; i++) {
+//                for (int j = 0; j < numCommon; j++) {
+//                    A[i][j] = new Complex(random.nextDouble(-1, 1), random.nextDouble(-1, 1));
+//                }
+//            }
+//
+//            for (int i = 0; i < numCommon; i++) {
+//                for (int j = 0; j < numBCols; j++) {
+//                    B[i][j] = new Complex(random.nextDouble(-1, 1), random.nextDouble(-1, 1));
+//                }
+//            }
+//
+//            // Compute matrix multiplications
+//            long startTime = System.currentTimeMillis();
+//            Complex[][] ijkResult = complexMatmulIJK(A, B);
+//            long endTime = System.currentTimeMillis();
+//            System.out.println("     IJK multiplication took " + (endTime - startTime) + "ms");
+//
+//            ijkTimes[iteration - 1] = endTime - startTime;
+//
+//            startTime = System.currentTimeMillis();
+//            Complex[][] strassenResult = ArrayUtils.matmul(A, B, leafSize);
+//            endTime = System.currentTimeMillis();
+//            System.out.println("Strassen multiplication took " + (endTime - startTime) + "ms");
+//
+//            strassenTimes[iteration - 1] = endTime - startTime;
+//
+//            // Check if equal
+//            for (int i = 0; i < numARows; i++) {
+//                for (int j = 0; j < numBCols; j++) {
+//                    assertEquals(ijkResult[i][j].roundNicely(5), strassenResult[i][j].roundNicely(5));
+//                }
+//            }
+//        }
+//
+//        System.out.println("IJK times");
+//        for (int i = 0; i < numTrials; i++) {
+//            System.out.println(ijkTimes[i]);
+//        }
+//
+//        System.out.println("Strassen times");
+//        for (int i = 0; i < numTrials; i++) {
+//            System.out.println(strassenTimes[i]);
+//        }
+    }
+
+    @Test
+    void matmulDoubleStrassenCheck() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        // Test constants
+        final int matrixSize = 256;
+        final int leafSize = 64;
+
+        final Random random = new Random(12345);
+
+        // Make the IJK multiplication method available to the test
+        Method matmulIJK = ArrayUtils.class.getDeclaredMethod("matmulIJK", double[][].class, double[][].class);
+        matmulIJK.setAccessible(true);
+
+        // Initialize matrices
+        double[][] A = new double[matrixSize][matrixSize];
+        double[][] B = new double[matrixSize][matrixSize];
+
+        for (int i = 0; i < matrixSize; i++) {
+            for (int j = 0; j < matrixSize; j++) {
+                A[i][j] = random.nextDouble(-1e3, 1e3);
+                B[i][j] = random.nextDouble(-1e3, 1e3);
+            }
+        }
+
+        // Compute matrix multiplications
+        double[][] ijkResult = (double[][]) matmulIJK.invoke(null, A, B);
+        double[][] strassenResult = ArrayUtils.matmul(A, B, leafSize);
+
+        // Check if equal
+        for (int i = 0; i < matrixSize; i++) {
+            assertArrayEquals(ijkResult[i], strassenResult[i], 1e-5);
+        }
+    }
+
+    @Test
     void flatten() {
         // Define test arrays
         Integer[][] array1 = {
@@ -603,5 +776,28 @@ class ArrayUtilsTest {
         assertArrayEquals(correct1, ArrayUtils.flatten(array1, Integer.class).toArray());
         assertArrayEquals(correct2, ArrayUtils.flatten(array2, Double.class).toArray());
         assertNull(ArrayUtils.flatten(null, String.class));
+    }
+
+    // Helper functions
+    static Complex[][] complexMatmulIJK(Complex[][] A, Complex[][] B) {
+        // Lengths
+        int numRowsA = A.length;
+        int numCommon = A[0].length;
+        int numColsB = B[0].length;
+
+        // Multiplication
+        Complex[][] C = new Complex[numRowsA][numColsB];
+
+        for (int i = 0; i < numRowsA; i++) {
+            for (int j = 0; j < numColsB; j++) {
+                Complex currElem = Complex.ZERO;
+                for (int k = 0; k < numCommon; k++) {
+                    currElem = currElem.plus(A[i][k].times(B[k][j]));
+                }
+                C[i][j] = currElem;
+            }
+        }
+
+        return C;
     }
 }

@@ -219,25 +219,26 @@ public final class SpectralHelpers {
         boolean[][] maskedLocalMax = generateMaskedLocalMaximum(S, refVals);
 
         // Get relevant indices
-        List<Integer> idxI = new ArrayList<>();
-        List<Integer> idxJ = new ArrayList<>();
+        List<Pair<Integer, Integer>> indices = new ArrayList<>();
         for (int i = 0; i < S.length; i++) {
             for (int j = 0; j < S[0].length; j++) {
                 // Get the current FFT frequency
                 double currFFTFreq = fftFreqs[i];
                 if ((fmin <= currFFTFreq) && (currFFTFreq < fmax) && (maskedLocalMax[i][j])) {
-                    idxI.add(i);
-                    idxJ.add(j);
+                    indices.add(new Pair<>(i, j));
                 }
             }
         }
 
         // Store pitch and magnitudes
-        for (Integer i : idxI) {
-            for (Integer j : idxJ) {
-                pitches[i][j] = (i + shift[i][j]) * (sr / numFFT);
-                mags[i][j] = S[i][j] + dskew[i][j];
-            }
+        for (Pair<Integer, Integer> pair : indices) {
+            // Get the i and j index
+            int i = pair.value0();
+            int j = pair.value1();
+
+            // Set pitch and magnitude
+            pitches[i][j] = (i + shift[i][j]) * (sr / numFFT);
+            mags[i][j] = S[i][j] + dskew[i][j];
         }
 
         // Return as a pair
