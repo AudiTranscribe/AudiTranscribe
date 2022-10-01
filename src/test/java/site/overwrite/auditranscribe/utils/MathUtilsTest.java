@@ -118,17 +118,20 @@ class MathUtilsTest {
     }
 
     @Test
-    void roundDouble() {
+    void round() {
+        // Double rounding
         assertEquals(1.23, MathUtils.round(1.23, 2));
         assertEquals(1.23, MathUtils.round(1.23456, 2));
         assertEquals(1, MathUtils.round(1, 3));
-    }
+        assertEquals(Double.NaN, MathUtils.round(Double.NaN, 4));
 
-    @Test
-    void roundFloat() {
+        // Float rounding
         assertEquals(1.23f, MathUtils.round(1.23f, 2));
         assertEquals(1.23f, MathUtils.round(1.23456f, 2));
         assertEquals(1f, MathUtils.round(1f, 3));
+
+        // Exception handling
+        assertThrowsExactly(ValueException.class, () -> MathUtils.round(123.45, -1));
     }
 
     // Combinatorial methods

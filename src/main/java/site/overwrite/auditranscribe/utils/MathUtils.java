@@ -21,6 +21,7 @@ package site.overwrite.auditranscribe.utils;
 import site.overwrite.auditranscribe.exceptions.generic.ValueException;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * Mathematical utility methods.
@@ -204,9 +205,17 @@ public final class MathUtils {
      * @param x  The double.
      * @param dp Number of decimal places to round to.
      * @return Rounded double.
+     * @throws ValueException If the number of decimal places (<code>dp</code>) is less than 0.
+     * @implNote If <code>x</code> is <code>NaN</code> then the rounding will also return
+     * <code>NaN</code>.
      */
     public static double round(double x, int dp) {
-        return Math.round(x * Math.pow(10, dp)) / Math.pow(10, dp);
+        if (Double.isNaN(x)) return Double.NaN;
+        if (dp < 0) throw new ValueException("Invalid number of decimal places: " + dp);
+
+        BigDecimal bd = new BigDecimal(Double.toString(x));
+        bd = bd.setScale(dp, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 
     // Combinatorial methods
