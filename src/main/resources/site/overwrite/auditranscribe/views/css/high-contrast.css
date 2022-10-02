@@ -104,7 +104,7 @@
 }
 
 .spinner > .increment-arrow-button:hover, .spinner > .decrement-arrow-button:hover {
-    -fx-background-color: #000000ff;
+    -fx-background-color: #888888ff;
     -fx-border-width: 0;
 }
 
