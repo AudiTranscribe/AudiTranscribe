@@ -622,6 +622,63 @@ class ArrayUtilsTest {
     }
 
     @Test
+    void matmulCheckConditions() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        // Test constants
+        int leafSize = 2;
+        final Random random = new Random(11235);
+
+        // Make the private matrix multiplication methods available to the test
+        Method matmulIJK = ArrayUtils.class.getDeclaredMethod("matmulIJK", double[][].class, double[][].class);
+        Method matmulStrassen = ArrayUtils.class.getDeclaredMethod(
+                "matmulStrassen", double[][].class, double[][].class, int.class
+        );
+
+        matmulIJK.setAccessible(true);
+        matmulStrassen.setAccessible(true);
+
+        // Test all possible 'small' matrix sizes
+        int[] numARowsVals = {1, 2, 3};
+        int[] numCommonVals = {1, 2, 3};
+        int[] numBColsVals = {1, 2, 3};
+
+        // Generate product of indices
+        int[][] indexProduct = MathUtils.selfProduct(3, 3);  // 3 different sets of numbers
+        for (int[] indices : indexProduct) {
+            // Get the lengths of the matrices
+            int numARows = numARowsVals[indices[0]];
+            int numCommon = numCommonVals[indices[1]];
+            int numBCols = numBColsVals[indices[2]];
+
+            // Initialize matrices
+            double[][] A = new double[numARows][numCommon];
+            double[][] B = new double[numCommon][numBCols];
+
+            for (int i = 0; i < numARows; i++) {
+                for (int j = 0; j < numCommon; j++) {
+                    A[i][j] = random.nextDouble(-1e3, 1e3);
+                }
+            }
+
+            for (int i = 0; i < numCommon; i++) {
+                for (int j = 0; j < numBCols; j++) {
+                    B[i][j] = random.nextDouble(-1e3, 1e3);
+                }
+            }
+
+            // Compute matrix multiplications
+            double[][] ijkResult = (double[][]) matmulIJK.invoke(null, A, B);
+            double[][] matmulNormalResult = ArrayUtils.matmul(A, B, leafSize);
+            double[][] matmulStrassenResult = (double[][]) matmulStrassen.invoke(null, A, B, leafSize);
+
+            // Check if equal
+            for (int i = 0; i < numARows; i++) {
+                assertArrayEquals(ijkResult[i], matmulNormalResult[i], 1e-5);
+                assertArrayEquals(ijkResult[i], matmulStrassenResult[i], 1e-5);
+            }
+        }
+    }
+
+    @Test
     void matmulComplexStrassenCheck() {
         // Test constants
         final int matrixSize = 256;
@@ -650,70 +707,6 @@ class ArrayUtilsTest {
                 assertEquals(ijkResult[i][j].roundNicely(3), strassenResult[i][j].roundNicely(3));
             }
         }
-
-//        // Test constants
-//        final int leafSize = 512;
-//        final int numTrials = 5;
-//
-//        int numARows = 60;
-//        int numCommon = 513;
-//        int numBCols = 10607;
-//
-//        final Random random = new Random();
-//
-//        // Initialize matrices
-//        Complex[][] A = new Complex[numARows][numCommon];
-//        Complex[][] B = new Complex[numCommon][numBCols];
-//
-//        long[] ijkTimes = new long[numTrials];
-//        long[] strassenTimes = new long[numTrials];
-//
-//        for (int iteration = 1; iteration <= numTrials; iteration++) {
-//            System.out.println("--- ITERATION " + iteration + " OF " + numTrials + " ---");
-//            for (int i = 0; i < numARows; i++) {
-//                for (int j = 0; j < numCommon; j++) {
-//                    A[i][j] = new Complex(random.nextDouble(-1, 1), random.nextDouble(-1, 1));
-//                }
-//            }
-//
-//            for (int i = 0; i < numCommon; i++) {
-//                for (int j = 0; j < numBCols; j++) {
-//                    B[i][j] = new Complex(random.nextDouble(-1, 1), random.nextDouble(-1, 1));
-//                }
-//            }
-//
-//            // Compute matrix multiplications
-//            long startTime = System.currentTimeMillis();
-//            Complex[][] ijkResult = complexMatmulIJK(A, B);
-//            long endTime = System.currentTimeMillis();
-//            System.out.println("     IJK multiplication took " + (endTime - startTime) + "ms");
-//
-//            ijkTimes[iteration - 1] = endTime - startTime;
-//
-//            startTime = System.currentTimeMillis();
-//            Complex[][] strassenResult = ArrayUtils.matmul(A, B, leafSize);
-//            endTime = System.currentTimeMillis();
-//            System.out.println("Strassen multiplication took " + (endTime - startTime) + "ms");
-//
-//            strassenTimes[iteration - 1] = endTime - startTime;
-//
-//            // Check if equal
-//            for (int i = 0; i < numARows; i++) {
-//                for (int j = 0; j < numBCols; j++) {
-//                    assertEquals(ijkResult[i][j].roundNicely(5), strassenResult[i][j].roundNicely(5));
-//                }
-//            }
-//        }
-//
-//        System.out.println("IJK times");
-//        for (int i = 0; i < numTrials; i++) {
-//            System.out.println(ijkTimes[i]);
-//        }
-//
-//        System.out.println("Strassen times");
-//        for (int i = 0; i < numTrials; i++) {
-//            System.out.println(strassenTimes[i]);
-//        }
     }
 
     @Test
