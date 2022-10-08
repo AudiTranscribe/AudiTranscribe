@@ -36,7 +36,7 @@ public class AUDTFileReader0x00050002 extends AUDTFileReader {
     private String originalFileName;  // To be used as input to the project info data object later
 
     /**
-     * Initialization method to make an <code>AUDTFileReader</code> object.
+     * Initialization method to make an <code>AUDTFileReader0x00050002</code> object.
      *
      * @param filepath    Path to the AUDT file. The file name at the end of the file path should
      *                    <b>include</b> the extension of the AUDT file.

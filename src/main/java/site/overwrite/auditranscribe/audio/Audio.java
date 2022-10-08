@@ -58,10 +58,12 @@ public class Audio {
     private final double sampleRate;
 
     private double pausedTime = 0;  // In seconds, for the main media player
-    private double duration = 0;  // In seconds
+    private double duration = 0;    // In seconds
 
-    private final byte[] rawWAVBytes;  // Would be an empty array unless set
-    private byte[] rawMP3Bytes;
+    private final byte[] rawOriginalWAVBytes;
+    private byte[] rawSlowedWAVBytes;  // Empty unless set
+    private byte[] rawOriginalMP3Bytes;
+    private byte[] rawSlowedMP3Bytes;
 
     private int numSamples;
     private double[] audioSamples;
@@ -101,12 +103,12 @@ public class Audio {
     /**
      * Initializes an <code>Audio</code> object based on a file.
      *
-     * @param wavFile         File object representing the WAV file to be used for both samples
+     * @param originalWAVFile File object representing the WAV file to be used for both samples
      *                        generation and audio playback.
-     * @param slowedAudioFile File object representing a slowed MP3 file that will be used for
+     * @param slowedWAVFile   File object representing a slowed MP3 file that will be used for
      *                        slowed audio playback.<br>
      *                        Note that the tempo for this audio track should be <b>half</b> that
-     *                        of the original <code>wavFile</code>'s tempo.
+     *                        of the original <code>originalWAVFile</code>'s tempo.
      * @param processingModes The processing modes when handling the audio file. Any number of
      *                        processing modes can be included.
      *                        <ul>
@@ -126,7 +128,7 @@ public class Audio {
      *                                       permitted.
      */
     public Audio(
-            File wavFile, File slowedAudioFile, AudioProcessingMode... processingModes
+            File originalWAVFile, File slowedWAVFile, AudioProcessingMode... processingModes
     ) throws UnsupportedAudioFileException, IOException, AudioTooLongException {
         // Convert the given processing modes as a list
         List<AudioProcessingMode> modes = List.of(processingModes);
@@ -134,7 +136,7 @@ public class Audio {
         // Generate audio samples
         if (modes.contains(AudioProcessingMode.SAMPLES)) {
             // Attempt to convert the input stream into an audio input stream
-            InputStream bufferedIn = new BufferedInputStream(new FileInputStream(wavFile));
+            InputStream bufferedIn = new BufferedInputStream(new FileInputStream(originalWAVFile));
             audioStream = AudioSystem.getAudioInputStream(bufferedIn);
 
             // Get the audio file's audio format and audio file's sample rate
@@ -169,7 +171,7 @@ public class Audio {
             MediaPlayer tempMediaPlayer;
 
             try {
-                tempMediaPlayer = new MediaPlayer(new Media(wavFile.toURI().toString()));
+                tempMediaPlayer = new MediaPlayer(new Media(originalWAVFile.toURI().toString()));
             } catch (IllegalStateException e) {
                 tempMediaPlayer = null;
 
@@ -189,7 +191,7 @@ public class Audio {
         // Handle the two different kinds of playback options
         if (modes.contains(AudioProcessingMode.WITH_SLOWDOWN)) {
             // If no slowed audio was provided, throw an error
-            if (slowedAudioFile == null) {
+            if (slowedWAVFile == null) {
                 RuntimeException e = new RuntimeException(
                         "Processing modes contains `WITH_SLOWDOWN` but provided no slowed audio"
                 );
@@ -201,7 +203,7 @@ public class Audio {
             MediaPlayer tempMediaPlayer;
 
             try {
-                tempMediaPlayer = new MediaPlayer(new Media(slowedAudioFile.toURI().toString()));
+                tempMediaPlayer = new MediaPlayer(new Media(slowedWAVFile.toURI().toString()));
             } catch (IllegalStateException e) {
                 tempMediaPlayer = null;
 
@@ -218,8 +220,9 @@ public class Audio {
             slowedMediaPlayer = null;
         }
 
-        // Save the audio file's raw WAV bytes
-        rawWAVBytes = Files.readAllBytes(wavFile.toPath());
+        // Save the files' raw WAV bytes
+        rawOriginalWAVBytes = Files.readAllBytes(originalWAVFile.toPath());
+        if (slowedWAVFile != null) rawSlowedWAVBytes = Files.readAllBytes(slowedWAVFile.toPath());
     }
 
     // Getter/Setter methods
@@ -248,8 +251,12 @@ public class Audio {
         return monoAudioSamples;
     }
 
-    public void setRawMP3Bytes(byte[] rawMP3Bytes) {
-        this.rawMP3Bytes = rawMP3Bytes;
+    public void setRawOriginalMP3Bytes(byte[] rawOriginalMP3Bytes) {
+        this.rawOriginalMP3Bytes = rawOriginalMP3Bytes;
+    }
+
+    public void setRawSlowedMP3Bytes(byte[] rawSlowedMP3Bytes) {
+        this.rawSlowedMP3Bytes = rawSlowedMP3Bytes;
     }
 
     // Audio methods
@@ -534,6 +541,102 @@ public class Audio {
         return yHat;
     }
 
+    /**
+     * Helper method that converts the raw WAV bytes into MP3 bytes.
+     *
+     * @param rawWAVBytes The raw WAV bytes to convert.
+     * @param ffmpegPath  The path to the ffmpeg executable.
+     * @throws FFmpegNotFoundException If FFmpeg was not found at the specified path.
+     * @throws IOException             If writing to the final audio file encounters an error.
+     */
+    public static byte[] wavBytesToMP3Bytes(
+            byte[] rawWAVBytes, String ffmpegPath
+    ) throws FFmpegNotFoundException, IOException {
+        MyLogger.log(Level.FINE, "Converting WAV bytes to MP3 bytes", FFmpegHandler.class.getName());
+
+        // Ensure that the temporary directory exists
+        IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
+        MyLogger.log(
+                Level.FINE,
+                "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH,
+                FFmpegHandler.class.getName()
+        );
+
+        // Define a new FFmpeg handler
+        FFmpegHandler FFmpegHandler = new FFmpegHandler(ffmpegPath);
+
+        // Generate the output path to the MP3 file
+        String inputPath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-1.wav");
+        String outputPath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-2.mp3");
+
+        // Write WAV bytes into a file specified at the input path
+        IOMethods.createFile(inputPath);
+        Files.write(Paths.get(inputPath), rawWAVBytes);
+
+        // Convert the original WAV file to a temporary MP3 file
+        outputPath = FFmpegHandler.convertAudio(new File(inputPath), outputPath);
+
+        // Read the raw MP3 bytes into a temporary file
+        byte[] rawMP3Bytes = Files.readAllBytes(Paths.get(outputPath));
+
+        // Delete the temporary files
+        IOMethods.delete(inputPath);
+        IOMethods.delete(outputPath);
+
+        // Return the raw MP3 bytes
+        MyLogger.log(Level.FINE, "Done converting WAV to MP3 bytes", FFmpegHandler.class.getName());
+        return rawMP3Bytes;
+    }
+
+    /**
+     * Helper method that converts the original WAV bytes into MP3 bytes.
+     *
+     * @param ffmpegPath The path to the ffmpeg executable.
+     * @throws FFmpegNotFoundException If FFmpeg was not found at the specified path.
+     * @throws IOException             If writing to the final audio file encounters an error.
+     */
+    public byte[] originalWAVBytesToMP3Bytes(String ffmpegPath) throws FFmpegNotFoundException, IOException {
+        // Check if we have already processed the audio
+        if (rawOriginalMP3Bytes != null) {
+            MyLogger.log(
+                    Level.FINE,
+                    "Returning previously processed original MP3 bytes",
+                    this.getClass().toString()
+            );
+
+        } else {
+            // Otherwise, process using the static method
+            rawOriginalMP3Bytes = wavBytesToMP3Bytes(rawOriginalWAVBytes, ffmpegPath);
+        }
+
+        return rawOriginalMP3Bytes;
+    }
+
+
+    /**
+     * Helper method that converts the slowed WAV bytes into MP3 bytes.
+     *
+     * @param ffmpegPath The path to the ffmpeg executable.
+     * @throws FFmpegNotFoundException If FFmpeg was not found at the specified path.
+     * @throws IOException             If writing to the final audio file encounters an error.
+     */
+    public byte[] slowedWAVBytesToMP3Bytes(String ffmpegPath) throws FFmpegNotFoundException, IOException {
+        // Check if we have already processed the audio
+        if (rawSlowedMP3Bytes != null) {
+            MyLogger.log(
+                    Level.FINE,
+                    "Returning previously processed slowed MP3 bytes",
+                    this.getClass().toString()
+            );
+
+        } else {
+            // Otherwise, process using the static method
+            rawSlowedMP3Bytes = wavBytesToMP3Bytes(rawSlowedWAVBytes, ffmpegPath);
+        }
+
+        return rawSlowedMP3Bytes;
+    }
+
     // Private methods
 
     /**
@@ -814,55 +917,4 @@ public class Audio {
             samples[i] = (float) transfer[i] / (float) fullScale;
         }
     }
-
-    /**
-     * Helper method that converts the audio object into MP3 bytes.
-     *
-     * @param ffmpegPath The path to the ffmpeg executable.
-     * @throws FFmpegNotFoundException If FFmpeg was not found at the specified path.
-     * @throws IOException             If writing to the final audio file encounters an error.
-     */
-    public byte[] wavBytesToMP3Bytes(String ffmpegPath) throws FFmpegNotFoundException, IOException {
-        // Check if we have already processed the audio
-        if (rawMP3Bytes != null) {
-            MyLogger.log(Level.FINE, "Returning previously processed MP3 bytes", this.getClass().toString());
-            return rawMP3Bytes;
-        }
-
-        MyLogger.log(Level.FINE, "Converting WAV bytes to MP3 bytes", this.getClass().toString());
-
-        // Ensure that the temporary directory exists
-        IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
-        MyLogger.log(
-                Level.FINE,
-                "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH,
-                this.getClass().toString()
-        );
-
-        // Define a new FFmpeg handler
-        FFmpegHandler FFmpegHandler = new FFmpegHandler(ffmpegPath);
-
-        // Generate the output path to the MP3 file
-        String inputPath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-1.wav");
-        String outputPath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-2.mp3");
-
-        // Write WAV bytes into a file specified at the input path
-        IOMethods.createFile(inputPath);
-        Files.write(Paths.get(inputPath), rawWAVBytes);
-
-        // Convert the original WAV file to a temporary MP3 file
-        outputPath = FFmpegHandler.convertAudio(new File(inputPath), outputPath);
-
-        // Read the raw MP3 bytes into a temporary file
-        rawMP3Bytes = Files.readAllBytes(Paths.get(outputPath));
-
-        // Delete the temporary files
-        IOMethods.delete(inputPath);
-        IOMethods.delete(outputPath);
-
-        // Return the raw MP3 bytes
-        MyLogger.log(Level.FINE, "Done converting", this.getClass().toString());
-        return rawMP3Bytes;
-    }
 }
-

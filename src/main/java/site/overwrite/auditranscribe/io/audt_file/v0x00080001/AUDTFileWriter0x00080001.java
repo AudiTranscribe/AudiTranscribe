@@ -1,7 +1,7 @@
 /*
- * AUDTFileWriter401.java
+ * AUDTFileWriter0x00080001.java
  * Description: Class that handles the writing of the AudiTranscribe (AUDT) file for file version
- *              401.
+ *              0x00080001.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -17,38 +17,38 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.io.audt_file.v401;
+package site.overwrite.auditranscribe.io.audt_file.v0x00080001;
 
 import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileWriter;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import site.overwrite.auditranscribe.io.audt_file.v401.data_encapsulators.*;
+import site.overwrite.auditranscribe.io.audt_file.v0x00080001.data_encapsulators.*;
 import site.overwrite.auditranscribe.misc.MyLogger;
 
 import java.io.IOException;
 import java.util.logging.Level;
 
-public class AUDTFileWriter401 extends AUDTFileWriter {
+public class AUDTFileWriter0x00080001 extends AUDTFileWriter {
     /**
-     * Initialization method to make an <code>AUDTFileWriter401</code> object.
+     * Initialization method to make an <code>AUDTFileWriter0x00080001</code> object.
      *
      * @param filepath       Path to the AUDT file. The file name at the end of the file path should
      *                       <b>include</b> the extension of the AUDT file.
      * @param numBytesToSkip Number of bytes to skip at the beginning of the file.
      */
-    public AUDTFileWriter401(String filepath, int numBytesToSkip) {
-        super(401, filepath, numBytesToSkip);
-        MyLogger.log(Level.INFO, "Using Version 401 AUDT file writer", AUDTFileWriter.class.getName());
+    public AUDTFileWriter0x00080001(String filepath, int numBytesToSkip) {
+        super(0x00080001, filepath, numBytesToSkip);
+        MyLogger.log(Level.INFO, "Using Version 0x00080001 AUDT file writer", AUDTFileWriter.class.getName());
     }
 
     /**
-     * Initialization method to make an <code>AUDTFileWriter401</code> object.
+     * Initialization method to make an <code>AUDTFileWriter0x00080001</code> object.
      *
      * @param filepath Path to the AUDT file. The file name at the end of the file path should
      *                 <b>include</b> the extension of the AUDT file.
      */
-    public AUDTFileWriter401(String filepath) {
-        super(401, filepath);
-        MyLogger.log(Level.INFO, "Using Version 401 AUDT file writer", AUDTFileWriter.class.getName());
+    public AUDTFileWriter0x00080001(String filepath) {
+        super(0x00080001, filepath);
+        MyLogger.log(Level.INFO, "Using Version 0x00080001 AUDT file writer", AUDTFileWriter.class.getName());
     }
 
     // Public methods
@@ -56,14 +56,14 @@ public class AUDTFileWriter401 extends AUDTFileWriter {
     /**
      * Method that writes the unchanging data properties to file.
      *
-     * @param unchangingDataProperties Data object that contains the unchanging data's properties.
+     * @param object Data object that contains the unchanging data's properties.
      */
-    public void writeUnchangingDataProperties(UnchangingDataPropertiesObject unchangingDataProperties) {
-        // Cast to the 401 version of the data object
-        UnchangingDataPropertiesObject401 obj = (UnchangingDataPropertiesObject401) unchangingDataProperties;
+    public void writeUnchangingDataProperties(UnchangingDataPropertiesObject object) {
+        // Cast to the correct version of the object
+        UnchangingDataPropertiesObject0x00080001 obj = (UnchangingDataPropertiesObject0x00080001) object;
 
         // Write to file
-        writeSectionID(UnchangingDataPropertiesObject401.SECTION_ID);
+        writeSectionID(UnchangingDataPropertiesObject0x00080001.SECTION_ID);
         writeInteger(obj.numSkippableBytes);
         writeEOSDelimiter();
     }
@@ -71,14 +71,14 @@ public class AUDTFileWriter401 extends AUDTFileWriter {
     /**
      * Method that writes the Q-Transform data to file.
      *
-     * @param qTransformDataObj Data object that holds all the Q-Transform data.
+     * @param object Data object that holds all the Q-Transform data.
      */
-    public void writeQTransformData(QTransformDataObject qTransformDataObj) {
-        // Cast to the 401 version of the data object
-        QTransformDataObject401 obj = (QTransformDataObject401) qTransformDataObj;
+    public void writeQTransformData(QTransformDataObject object) {
+        // Cast to the correct version of the object
+        QTransformDataObject0x00080001 obj = (QTransformDataObject0x00080001) object;
 
         // Write to file
-        writeSectionID(QTransformDataObject401.SECTION_ID);
+        writeSectionID(QTransformDataObject0x00080001.SECTION_ID);
         writeDouble(obj.minMagnitude);
         writeDouble(obj.maxMagnitude);
         writeByteArray(obj.qTransformBytes);
@@ -88,32 +88,33 @@ public class AUDTFileWriter401 extends AUDTFileWriter {
     /**
      * Method that writes the audio data to file.
      *
-     * @param audioDataObj Data object that holds all the audio data.
+     * @param object Data object that holds all the audio data.
      */
-    public void writeAudioData(AudioDataObject audioDataObj) {
-        // Cast to the 401 version of the data object
-        AudioDataObject401 obj = (AudioDataObject401) audioDataObj;
+    public void writeAudioData(AudioDataObject object) {
+        // Cast to the correct version of the object
+        AudioDataObject0x00080001 obj = (AudioDataObject0x00080001) object;
 
         // Write to file
-        writeSectionID(AudioDataObject401.SECTION_ID);
-        writeByteArray(obj.compressedMP3Bytes);
+        writeSectionID(AudioDataObject0x00080001.SECTION_ID);
+        writeByteArray(obj.compressedOriginalMP3Bytes);
+        writeByteArray(obj.compressedSlowedMP3Bytes);
         writeDouble(obj.sampleRate);
         writeInteger(obj.totalDurationInMS);
-        writeString(obj.getAudioFileName());
         writeEOSDelimiter();
     }
 
     /**
      * Method that writes the project info data to file.
      *
-     * @param projectInfoDataObj Data object that holds all the project info data.
+     * @param object Data object that holds all the project info data.
      */
-    public void writeProjectInfoData(ProjectInfoDataObject projectInfoDataObj) {
-        // Cast to the 401 version of the data object
-        ProjectInfoDataObject401 obj = (ProjectInfoDataObject401) projectInfoDataObj;
+    public void writeProjectInfoData(ProjectInfoDataObject object) {
+        // Cast to the correct version of the object
+        ProjectInfoDataObject0x00080001 obj = (ProjectInfoDataObject0x00080001) object;
 
         // Write to file
-        writeSectionID(ProjectInfoDataObject401.SECTION_ID);
+        writeSectionID(ProjectInfoDataObject0x00080001.SECTION_ID);
+        writeString(obj.projectName);
         writeInteger(obj.musicKeyIndex);
         writeInteger(obj.timeSignatureIndex);
         writeDouble(obj.bpm);
@@ -126,15 +127,15 @@ public class AUDTFileWriter401 extends AUDTFileWriter {
     /**
      * Method that writes the music notes data to file.
      *
-     * @param musicNotesDataObj Data object that holds all the music notes data.
+     * @param object Data object that holds all the music notes data.
      * @throws IOException If something went wrong when LZ4 compressing.
      */
-    public void writeMusicNotesData(MusicNotesDataObject musicNotesDataObj) throws IOException {
-        // Cast to the 401 version of the data object
-        MusicNotesDataObject401 obj = (MusicNotesDataObject401) musicNotesDataObj;
+    public void writeMusicNotesData(MusicNotesDataObject object) throws IOException {
+        // Cast to the correct version of the object
+        MusicNotesDataObject0x00080001 obj = (MusicNotesDataObject0x00080001) object;
 
         // Write to file
-        writeSectionID(MusicNotesDataObject401.SECTION_ID);
+        writeSectionID(MusicNotesDataObject0x00080001.SECTION_ID);
         write1DDoubleArray(obj.timesToPlaceRectangles);
         write1DDoubleArray(obj.noteDurations);
         write1DIntegerArray(obj.noteNums);

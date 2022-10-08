@@ -195,4 +195,26 @@ public final class MiscUtils {
         // Return the shortened name
         return shortNameBuff.toString();
     }
+
+    // Randomisation utils
+
+    /**
+     * Method that generates a UUID string based on a given seed.
+     *
+     * @param seed Seed to generate the UUID on.
+     * @return Generated UUID string.
+     */
+    public static String generateUUID(long seed) {
+        // Declare random generator
+        Random random = new Random(seed);
+
+        // Generate UUID seed
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 16; i++) {
+            sb.append(random.nextInt());
+        }
+
+        // Generate UUID from bytes
+        return UUID.nameUUIDFromBytes(sb.toString().getBytes()).toString();
+    }
 }

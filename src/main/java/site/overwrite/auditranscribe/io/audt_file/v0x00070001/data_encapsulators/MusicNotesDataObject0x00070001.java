@@ -18,14 +18,12 @@
 
 package site.overwrite.auditranscribe.io.audt_file.v0x00070001.data_encapsulators;
 
-import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.MusicNotesDataObject;
-
-import java.util.Arrays;
+import site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.MusicNotesDataObject0x00050002;
 
 /**
  * Data object that stores the music notes' data.
  */
-public class MusicNotesDataObject0x00070001 extends MusicNotesDataObject {
+public class MusicNotesDataObject0x00070001 extends MusicNotesDataObject0x00050002 {
     /**
      * Initialization method for the music notes data object.
      *
@@ -34,38 +32,6 @@ public class MusicNotesDataObject0x00070001 extends MusicNotesDataObject {
      * @param noteNums               The note number of each note rectangle.
      */
     public MusicNotesDataObject0x00070001(double[] timesToPlaceRectangles, double[] noteDurations, int[] noteNums) {
-        this.timesToPlaceRectangles = timesToPlaceRectangles;
-        this.noteDurations = noteDurations;
-        this.noteNums = noteNums;
-    }
-
-    // Overwritten methods
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        MusicNotesDataObject0x00070001 that = (MusicNotesDataObject0x00070001) o;
-        return (
-                Arrays.equals(timesToPlaceRectangles, that.timesToPlaceRectangles) &&
-                        Arrays.equals(noteDurations, that.noteDurations) &&
-                        Arrays.equals(noteNums, that.noteNums)
-        );
-    }
-
-    @Override
-    public int hashCode() {
-        int result = Arrays.hashCode(timesToPlaceRectangles);
-        result = 31 * result + Arrays.hashCode(noteDurations);
-        result = 31 * result + Arrays.hashCode(noteNums);
-        return result;
-    }
-
-    @Override
-    public int numBytesNeeded() {
-        return 4 +  // Section ID
-                (4 + 8 * timesToPlaceRectangles.length) +  // +4 for the integer telling how many notes there are
-                (4 + 8 * noteDurations.length) +
-                (4 + 4 * noteNums.length) +
-                4;  // EOS delimiter
+        super(timesToPlaceRectangles, noteDurations, noteNums);
     }
 }

@@ -33,7 +33,7 @@ import java.util.logging.Level;
 
 public class AUDTFileReader0x00070001 extends AUDTFileReader {
     /**
-     * Initialization method to make an <code>AUDTFileReader</code> object.
+     * Initialization method to make an <code>AUDTFileReader0x00070001</code> object.
      *
      * @param filepath    Path to the AUDT file. The file name at the end of the file path should
      *                    <b>include</b> the extension of the AUDT file.

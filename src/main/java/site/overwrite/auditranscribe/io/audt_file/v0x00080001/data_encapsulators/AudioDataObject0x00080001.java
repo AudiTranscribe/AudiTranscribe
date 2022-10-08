@@ -1,5 +1,5 @@
 /*
- * AudioDataObject401.java
+ * AudioDataObject0x00080001.java
  * Description: Data object that stores the audio data.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.io.audt_file.v401.data_encapsulators;
+package site.overwrite.auditranscribe.io.audt_file.v0x00080001.data_encapsulators;
 
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.AudioDataObject;
 
@@ -26,38 +26,22 @@ import java.util.Objects;
 /**
  * Data object that stores the audio data.
  */
-public class AudioDataObject401 extends AudioDataObject {
-    // Attributes
-    private final String audioFileName;
-
+public class AudioDataObject0x00080001 extends AudioDataObject {
     /**
      * Initialization method for the audio data object.
      *
-     * @param compressedMP3Bytes The LZ4 compressed bytes of the MP3 audio file.
-     * @param sampleRate         Sample rate of the audio file
-     * @param totalDurationInMS  Total duration of the audio in <b>milliseconds</b>.
-     * @param audioFileName      The name of the audio file.
+     * @param compressedOriginalMP3Bytes The LZ4 compressed bytes of the original MP3 audio file.
+     * @param compressedSlowedMP3Bytes   The LZ4 compressed bytes of the slowed MP3 audio file.
+     * @param sampleRate                 Sample rate of the audio file
+     * @param totalDurationInMS          Total duration of the audio in <b>milliseconds</b>.
      */
-    public AudioDataObject401(
-            byte[] compressedMP3Bytes, double sampleRate, int totalDurationInMS, String audioFileName
+    public AudioDataObject0x00080001(
+            byte[] compressedOriginalMP3Bytes, byte[] compressedSlowedMP3Bytes, double sampleRate, int totalDurationInMS
     ) {
-        this.compressedMP3Bytes = compressedMP3Bytes;
+        this.compressedOriginalMP3Bytes = compressedOriginalMP3Bytes;
+        this.compressedSlowedMP3Bytes = compressedSlowedMP3Bytes;
         this.sampleRate = sampleRate;
         this.totalDurationInMS = totalDurationInMS;
-
-        this.audioFileName = audioFileName;  // No longer in the superclass
-    }
-
-    // Public methods
-
-    /**
-     * Method that gets the audio file name.<br>
-     * This method needs to be implemented to maintain backwards compatability with version 401.
-     *
-     * @return Audio file name.
-     */
-    public String getAudioFileName() {
-        return audioFileName;
     }
 
     // Overwritten methods
@@ -65,29 +49,30 @@ public class AudioDataObject401 extends AudioDataObject {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        AudioDataObject401 that = (AudioDataObject401) o;
+        AudioDataObject that = (AudioDataObject) o;
         return (
                 Double.compare(that.sampleRate, sampleRate) == 0 &&
                         totalDurationInMS == that.totalDurationInMS &&
-                        Arrays.equals(compressedMP3Bytes, that.compressedMP3Bytes) &&
-                        audioFileName.equals(that.audioFileName)
+                        Arrays.equals(compressedOriginalMP3Bytes, that.compressedOriginalMP3Bytes) &&
+                        Arrays.equals(compressedSlowedMP3Bytes, that.compressedSlowedMP3Bytes)
         );
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(sampleRate, totalDurationInMS, audioFileName);
-        result = 31 * result + Arrays.hashCode(compressedMP3Bytes);
+        int result = Objects.hash(sampleRate, totalDurationInMS);
+        result = 31 * result + Arrays.hashCode(compressedOriginalMP3Bytes);
+        result = 31 * result + Arrays.hashCode(compressedSlowedMP3Bytes);
         return result;
     }
 
     @Override
     public int numBytesNeeded() {
         return 4 +  // Section ID
-                (4 + compressedMP3Bytes.length) +  // +4 for the length of the MP3 audio data
+                (4 + compressedOriginalMP3Bytes.length) +  // +4 for the length of the original MP3 audio data
+                (4 + compressedSlowedMP3Bytes.length) +    // +4 for the length of the slowed MP3 audio data
                 8 +   // Sample rate
                 4 +   // Total duration in milliseconds
-                (4 + audioFileName.getBytes().length) +  // String length + string bytes of audio file name
                 4;    // EOS delimiter
     }
 }
