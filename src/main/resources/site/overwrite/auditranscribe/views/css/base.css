@@ -119,6 +119,10 @@
     -fx-font-size: 16px;
 }
 
+.button-label {
+    -fx-font-size: 16px;
+}
+
 /* Spectrogram */
 .note-line {
     -fx-stroke-width: 2px;
