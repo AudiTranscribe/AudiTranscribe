@@ -20,7 +20,7 @@ colourScaleVals = COLOUR_SCALE[::-1]
 for i in range(len(colourScaleVals)):
     if colourScaleVals[i].find("rgb") != -1:
         # Parse the RGB into red, green, blue parts
-        matches = re.match("rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)", colourScaleVals[i])
+        matches = re.match("rgb\\((\\d{1,3}), (\\d{1,3}), (\\d{1,3})\\)", colourScaleVals[i])
         rgb = tuple(int(matches.group(i)) for i in range(1, 4))
 
         # Convert each part to hex
