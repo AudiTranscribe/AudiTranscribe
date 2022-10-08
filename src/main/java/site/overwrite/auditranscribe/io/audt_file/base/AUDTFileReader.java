@@ -27,7 +27,6 @@ import site.overwrite.auditranscribe.exceptions.io.audt_file.FailedToReadDataExc
 import site.overwrite.auditranscribe.exceptions.io.audt_file.IncorrectFileFormatException;
 import site.overwrite.auditranscribe.io.audt_file.v0x00050002.AUDTFileReader0x00050002;
 import site.overwrite.auditranscribe.io.audt_file.v0x00070001.AUDTFileReader0x00070001;
-import site.overwrite.auditranscribe.io.audt_file.v401.AUDTFileReader401;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -111,7 +110,6 @@ public abstract class AUDTFileReader {
         try (InputStream inputStream = new FileInputStream(filepath)) {  // Do this so that the read point is the start
             // Get the appropriate file reader objects
             return switch (fileVersion) {
-                case 401 -> new AUDTFileReader401(filepath, inputStream);  // Todo: eventually depreciate this
                 case 0x00050002 -> new AUDTFileReader0x00050002(filepath, inputStream);
                 case 0x00070001 -> new AUDTFileReader0x00070001(filepath, inputStream);
                 default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");

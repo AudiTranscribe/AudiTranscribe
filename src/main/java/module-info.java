@@ -47,10 +47,6 @@ module site.overwrite.auditranscribe {
     exports site.overwrite.auditranscribe.io.audt_file;
     exports site.overwrite.auditranscribe.io.audt_file.base;
     exports site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators;
-    exports site.overwrite.auditranscribe.io.audt_file.v401;
-    exports site.overwrite.auditranscribe.io.audt_file.v401.data_encapsulators;
-    exports site.overwrite.auditranscribe.io.audt_file.v0x00050002;
-    exports site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators;
     exports site.overwrite.auditranscribe.io.data_files;
     exports site.overwrite.auditranscribe.io.data_files.data_encapsulators;
     exports site.overwrite.auditranscribe.io.data_files.file_classes;
