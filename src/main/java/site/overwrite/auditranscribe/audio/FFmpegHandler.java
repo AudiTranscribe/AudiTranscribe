@@ -22,6 +22,7 @@ import site.overwrite.auditranscribe.exceptions.audio.FFmpegCommandFailedExcepti
 import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.StreamGobbler;
+import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.tuples.Pair;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
@@ -30,6 +31,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
 
 /**
  * Methods that handle FFmpeg interactions.
@@ -164,6 +166,11 @@ public class FFmpegHandler {
         // Execute FFmpeg command
         boolean success = handleFFmpegCommandExec(builder);
         if (success) {
+            MyLogger.log(
+                    Level.FINE,
+                    "Successfully converted '" + file.getName() + "'",
+                    FFmpegHandler.class.getName()
+            );
             return outputFilePath;
         } else {
             throw new FFmpegCommandFailedException("FFmpeg command " + builder.command() + " failed");
@@ -200,6 +207,12 @@ public class FFmpegHandler {
         // Execute FFmpeg command
         boolean success = handleFFmpegCommandExec(builder);
         if (success) {
+            MyLogger.log(
+                    Level.FINE,
+                    "Successfully generated alternate tempo audio for '" + file.getName() + "' at " + tempo +
+                            "x tempo",
+                    FFmpegHandler.class.getName()
+            );
             return outputFilePath;
         } else {
             throw new FFmpegCommandFailedException("FFmpeg command " + builder.command() + " failed");

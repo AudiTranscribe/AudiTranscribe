@@ -151,6 +151,9 @@ public class TranscriptionViewController implements Initializable {
     private String audtFilePath;
     private String audtFileName;
     private Audio audio;
+    private boolean isPaused = true;
+    private boolean isAudioMuted = false;
+    private boolean usingSlowedAudio = false;
 
     private byte[] qTransformBytes;  // These bytes are LZ4 compressed
     private double minQTransformMagnitude;
@@ -158,8 +161,6 @@ public class TranscriptionViewController implements Initializable {
 
     private String musicKey = "C Major";
     private int beatsPerBar = 4;
-    private boolean isPaused = true;
-    private boolean isAudioMuted = false;
     private boolean areNotesMuted = false;
 
     private boolean scrollToPlayhead = false;
@@ -242,7 +243,7 @@ public class TranscriptionViewController implements Initializable {
 
     @FXML
     private Button audioVolumeButton, notesVolumeButton, playButton, stopButton, playSkipBackButton,
-            playSkipForwardButton, scrollButton, editNotesButton;
+            playSkipForwardButton, toggleSlowedAudioButton, scrollButton, editNotesButton;
 
     @FXML
     private ImageView audioVolumeButtonImage, notesVolumeButtonImage, playButtonImage, stopButtonImage,
@@ -403,7 +404,28 @@ public class TranscriptionViewController implements Initializable {
 
             // Force the audio to play at the end
             // (This is to avoid a nasty seek to end issue where user needs to click on play button twice)
+            // Fixme: this bug is back!
             isPaused = togglePaused(true);
+        });
+
+        toggleSlowedAudioButton.setOnAction(event -> {
+            // Update the text that is shown
+            if (usingSlowedAudio) {
+                // Now no longer using it
+                toggleSlowedAudioButton.setText("1.0x");
+            } else {
+                // Starting to use it
+                toggleSlowedAudioButton.setText("0.5x");
+            }
+
+            // Update the flag
+            usingSlowedAudio = !usingSlowedAudio;
+
+            MyLogger.log(
+                    Level.FINE,
+                    "Toggled audio slowdown; audio playback speed is now " + (usingSlowedAudio ? "0.5x" : "1.0x"),
+                    this.getClass().toString()
+            );
         });
 
         scrollButton.setOnAction(event -> toggleScrollButton());
@@ -932,6 +954,8 @@ public class TranscriptionViewController implements Initializable {
     public void setAudioAndSpectrogramData(
             QTransformDataObject qTransformData, AudioDataObject audioData
     ) throws IOException, FFmpegNotFoundException, UnsupportedAudioFileException, AudioTooLongException {
+        // Todo: need to use slowed audio
+
         // Set attributes
         sampleRate = audioData.sampleRate;
         audioDuration = audioData.totalDurationInMS / 1000.;
@@ -1046,7 +1070,7 @@ public class TranscriptionViewController implements Initializable {
      */
     public void handleSceneClosing() {
         // Stop the audio playing
-        audio.stop();
+        audio.stop(usingSlowedAudio);
 
         // Clear the note rectangles
         NoteRectangle.allNoteRectangles.clear();
@@ -1201,7 +1225,7 @@ public class TranscriptionViewController implements Initializable {
             )));
 
             // Unpause the audio (i.e. play the audio)
-            audio.play();
+            audio.play(usingSlowedAudio);
         } else {  // Is currently playing; want to make audio pause
             // Change the icon of the play button from the paused icon to the play icon
             // (So that the user knows that the next interaction with button will play audio)
@@ -1210,7 +1234,7 @@ public class TranscriptionViewController implements Initializable {
             )));
 
             // Pause the audio
-            audio.pause();
+            audio.pause(usingSlowedAudio);
 
             // Stop note sequencer playback
             notePlayerSequencer.stop();
@@ -1218,6 +1242,9 @@ public class TranscriptionViewController implements Initializable {
 
         // Toggle paused state for note rectangles
         NoteRectangle.setIsPaused(!isPaused);
+
+        // Toggle disabled state of the toggle slowdown button
+        toggleSlowedAudioButton.setDisable(isPaused);  // If currently paused, will block
 
         // Return the toggled version of the `isPaused` flag
         MyLogger.log(
@@ -1320,7 +1347,7 @@ public class TranscriptionViewController implements Initializable {
 
             // If a file was selected, stop the audio completely
             if (file != null) {
-                audio.stop();
+                audio.stop(usingSlowedAudio);
             }
 
             // Verify that the user actually chose a file
@@ -1784,7 +1811,7 @@ public class TranscriptionViewController implements Initializable {
                 // Nothing really changes if the audio is paused
                 if (!isPaused) {
                     // Get the current audio time
-                    currTime = audio.getCurrAudioTime();
+                    currTime = audio.getCurrAudioTime(usingSlowedAudio);
 
                     // Update the current time label
                     Platform.runLater(() -> currTimeLabel.setText(UnitConversionUtils.secondsToTimeString(currTime)));
@@ -1808,8 +1835,8 @@ public class TranscriptionViewController implements Initializable {
                         audio.setAudioStartTime(0);
 
                         // We need to do this so that the status is set to paused
-                        audio.stop();
-                        audio.pause();
+                        audio.stop(usingSlowedAudio);
+                        audio.pause(usingSlowedAudio);
                     }
 
                     // Update scrolling
@@ -2072,7 +2099,7 @@ public class TranscriptionViewController implements Initializable {
                         // Bottom Hbox
                         audioVolumeButton, audioVolumeSlider, notesVolumeButton, notesVolumeSlider,
                         playButton, stopButton, playSkipBackButton, playSkipForwardButton,
-                        scrollButton, editNotesButton
+                        toggleSlowedAudioButton, scrollButton, editNotesButton
                 };
 
                 for (Node node : disabledNodes) {

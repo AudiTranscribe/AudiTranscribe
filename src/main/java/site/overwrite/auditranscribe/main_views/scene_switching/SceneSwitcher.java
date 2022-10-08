@@ -212,30 +212,44 @@ public class SceneSwitcher {
                     this.getClass().toString()
             );
 
-            // Get the base path for the auxiliary files
+            // Get the paths for the auxiliary files
             String baseName = IOMethods.joinPaths(
                     IOConstants.TEMP_FOLDER_PATH,
                     audioFile.getName().replace(fileExt, "")
             );
+            String samplesWAVPath = baseName + "-samples.wav";
+            String slowedWAVPath = baseName + "-slowed.wav";
 
-            // Generate a new WAV file
+            // Set up FFmpeg handler
+            // (Failure to do so will throw exceptions)
             FFmpegHandler FFmpegHandler = new FFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
-            File auxiliaryWAVFile = new File(
-                    FFmpegHandler.convertAudio(audioFile, baseName + "-auxiliary-wav.wav")
+
+            // Generate the WAV files
+            // Todo: perhaps find a way to save the slowed audio?
+            File samplesWAVFile = new File(
+                    FFmpegHandler.convertAudio(audioFile, samplesWAVPath)
+            );
+            File slowedWAVFile = new File(
+                    FFmpegHandler.generateAltTempoAudio(audioFile, slowedWAVPath, 0.5)
             );
 
-            // Try and read the auxiliary WAV file as an `Audio` object
+            // Try and read the WAV files as an `Audio` object
             // (Failure to read will throw exceptions)
-            Audio audio = new Audio(auxiliaryWAVFile, AudioProcessingMode.SAMPLES, AudioProcessingMode.PLAYBACK);
+            Audio audio = new Audio(
+                    samplesWAVFile, slowedWAVFile,
+                    AudioProcessingMode.SAMPLES, AudioProcessingMode.PLAYBACK, AudioProcessingMode.WITH_SLOWDOWN
+            );
 
-            // Delete auxiliary WAV file
-            boolean successfullyDeleted = IOMethods.delete(auxiliaryWAVFile.getAbsolutePath());
+            // Delete auxiliary WAV files
+            boolean successfullyDeleted = IOMethods.delete(samplesWAVFile.getAbsolutePath());
+            successfullyDeleted = (successfullyDeleted && IOMethods.delete(slowedWAVFile.getAbsolutePath()));
+
             if (successfullyDeleted) {
-                MyLogger.log(Level.FINE, "Successfully deleted auxiliary WAV file.", this.getClass().toString());
+                MyLogger.log(Level.FINE, "Successfully deleted auxiliary WAV files.", this.getClass().toString());
             } else {
                 MyLogger.log(
                         Level.WARNING,
-                        "Failed to delete auxiliary WAV file now; will attempt delete after exit.",
+                        "Failed to delete auxiliary WAV files now; will attempt delete after exit.",
                         this.getClass().toString());
             }
 

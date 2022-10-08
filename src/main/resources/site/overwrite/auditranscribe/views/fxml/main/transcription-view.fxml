@@ -175,7 +175,7 @@
                             <children>
                                 <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <children>
-                                        <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="0.0" spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <HBox alignment="CENTER_RIGHT" spacing="5.0" HBox.hgrow="ALWAYS">
                                             <children>
                                                 <Label fx:id="currTimeLabel" text="00:00">
                                                     <font>
@@ -198,7 +198,7 @@
                                             </padding>
                                         </HBox>
                                         <Separator orientation="VERTICAL" prefHeight="200.0" />
-                                        <HBox alignment="CENTER_LEFT" layoutX="421.0" layoutY="10.0" prefHeight="100.0" prefWidth="0.0" spacing="5.0" HBox.hgrow="NEVER">
+                                        <HBox alignment="CENTER_LEFT" layoutX="421.0" layoutY="10.0" spacing="5.0" HBox.hgrow="NEVER">
                                             <children>
                                                 <Button fx:id="scrollButton" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button">
                                                     <graphic>
@@ -224,7 +224,7 @@
                                             </padding>
                                         </HBox>
                                         <Separator orientation="VERTICAL" prefHeight="200.0" />
-                                        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="0.0" spacing="5.0" HBox.hgrow="NEVER">
+                                        <HBox alignment="CENTER" spacing="5.0" HBox.hgrow="NEVER">
                                             <children>
                                                 <Button fx:id="playButton" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button">
                                                     <graphic>
@@ -262,13 +262,14 @@
                                                         </ImageView>
                                                     </graphic>
                                                 </Button>
+                                    <Button fx:id="toggleSlowedAudioButton" contentDisplay="CENTER" disable="true" minHeight="34.0" minWidth="42.0" mnemonicParsing="false" text="1.0x" HBox.hgrow="SOMETIMES" />
                                             </children>
                                             <padding>
                                                 <Insets left="10.0" right="10.0" />
                                             </padding>
                                         </HBox>
                                         <Separator orientation="VERTICAL" prefHeight="200.0" />
-                                        <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="0.0" spacing="5.0" HBox.hgrow="ALWAYS">
+                                        <HBox alignment="CENTER_LEFT" spacing="5.0" HBox.hgrow="ALWAYS">
                                             <children>
                                                 <Button fx:id="audioVolumeButton" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button">
                                                     <graphic>
