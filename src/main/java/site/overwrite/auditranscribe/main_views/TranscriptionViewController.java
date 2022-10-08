@@ -1189,7 +1189,6 @@ public class TranscriptionViewController implements Initializable {
      *
      * @param seekTime Time to seek to.
      */
-    // Fixme: seek to time not working with new slowdown protocol
     private void seekToTime(double seekTime) {
         // Update the `hasUnsavedChanges` flag
         hasUnsavedChanges = true;
