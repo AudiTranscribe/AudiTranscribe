@@ -148,8 +148,8 @@ public class SceneSwitcher {
     /**
      * Helper method that shows the main scene on the screen.
      *
-     * @return Pair of values. First value is the scene switching state, and the second is the
-     * selected file.
+     * @return Pair of values. First value is the scene switching state, and the second is the scene
+     * switching data. Returns <code>null</code> if an unrecoverable exception occurs.
      */
     private Pair<SceneSwitchingState, SceneSwitchingData> showMainScene() {
         try {
@@ -188,6 +188,9 @@ public class SceneSwitcher {
 
     /**
      * Helper method that handles the creation of a new project in the transcription scene.
+     *
+     * @return Pair of values. First value is the scene switching state, and the second is the scene
+     * switching data. Returns <code>null</code> if an unrecoverable exception occurs.
      */
     private Pair<SceneSwitchingState, SceneSwitchingData> newProjectInTranscriptionScene() {
         // Obtain the audio file from the scene switching data
@@ -285,7 +288,6 @@ public class SceneSwitcher {
                     e
             );
             MyLogger.logException(e);
-            e.printStackTrace();
         } catch (FFmpegNotFoundException e) {
             Popups.showExceptionAlert(
                     "Error finding FFmpeg.",
@@ -293,7 +295,6 @@ public class SceneSwitcher {
                     e
             );
             MyLogger.logException(e);
-            e.printStackTrace();
         } catch (AudioTooLongException e) {
             Popups.showExceptionAlert(
                     "Audio too long.",
@@ -301,7 +302,6 @@ public class SceneSwitcher {
                     e
             );
             MyLogger.logException(e);
-            e.printStackTrace();
         }
 
         // If an exception occurred, return `null`
@@ -310,6 +310,9 @@ public class SceneSwitcher {
 
     /**
      * Helper method that handles the opening of an existing project in the transcription scene.
+     *
+     * @return Pair of values. First value is the scene switching state, and the second is the scene
+     * switching data. Returns <code>null</code> if an unrecoverable exception occurs.
      */
     private Pair<SceneSwitchingState, SceneSwitchingData> openProjectInTranscriptionScene() {
         // Obtain the AUDT file from the scene switching data
@@ -430,7 +433,6 @@ public class SceneSwitcher {
                     e
             );
             MyLogger.logException(e);
-            e.printStackTrace();
         } catch (InvalidFileVersionException e) {
             Popups.showExceptionAlert(
                     "Invalid file version in '" + audtFile.getName() + "'.",
@@ -439,7 +441,6 @@ public class SceneSwitcher {
                     e
             );
             MyLogger.logException(e);
-            e.printStackTrace();
         } catch (IOException | IncorrectFileFormatException | FailedToReadDataException e) {
             Popups.showExceptionAlert(
                     "Failed to read '" + audtFile.getName() + "' as an AUDT ile.",
@@ -448,7 +449,6 @@ public class SceneSwitcher {
                     e
             );
             MyLogger.logException(e);
-            e.printStackTrace();
         }
 
         // If an exception occurred, return `null`
