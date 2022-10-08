@@ -375,6 +375,8 @@ public class Audio {
         if (slowedMediaPlayer != null) {
             slowedMediaPlayer.seek(seekTime.multiply(2));
         }
+
+        pausedTime = playbackTime;
     }
 
     /**
@@ -398,6 +400,8 @@ public class Audio {
         if (slowedMediaPlayer != null) {
             slowedMediaPlayer.setStartTime(start.multiply(2));
         }
+
+        pausedTime = startTime;
     }
 
     /**
