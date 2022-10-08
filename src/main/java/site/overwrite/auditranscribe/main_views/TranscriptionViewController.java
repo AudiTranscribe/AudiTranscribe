@@ -406,7 +406,6 @@ public class TranscriptionViewController implements Initializable {
 
             // Force the audio to play at the end
             // (This is to avoid a nasty seek to end issue where user needs to click on play button twice)
-            // Fixme: this bug is back!
             isPaused = togglePaused(true);
         });
 
@@ -1096,7 +1095,7 @@ public class TranscriptionViewController implements Initializable {
      */
     public void handleSceneClosing() {
         // Stop the audio playing
-        audio.stop(usingSlowedAudio);
+        audio.stop();
 
         // Clear the note rectangles
         NoteRectangle.allNoteRectangles.clear();
@@ -1260,7 +1259,7 @@ public class TranscriptionViewController implements Initializable {
             )));
 
             // Pause the audio
-            audio.pause(usingSlowedAudio);
+            audio.pause();
 
             // Stop note sequencer playback
             notePlayerSequencer.stop();
@@ -1373,7 +1372,7 @@ public class TranscriptionViewController implements Initializable {
 
             // If a file was selected, stop the audio completely
             if (file != null) {
-                audio.stop(usingSlowedAudio);
+                audio.stop();
             }
 
             // Verify that the user actually chose a file
@@ -1872,8 +1871,8 @@ public class TranscriptionViewController implements Initializable {
                         audio.setAudioStartTime(0);
 
                         // We need to do this so that the status is set to paused
-                        audio.stop(usingSlowedAudio);
-                        audio.pause(usingSlowedAudio);
+                        audio.stop();
+                        audio.pause();
                     }
 
                     // Update scrolling

@@ -297,35 +297,22 @@ public class Audio {
      * Method that pauses the current audio that is playing.
      */
     public void pause() {
-        pause(false);
-    }
+        if (mediaPlayer != null) {
+            // Pause the audio first
+            mediaPlayer.pause();
 
-    /**
-     * Method that pauses the current audio that is playing.
-     *
-     * @param isSlowed Whether to use the slowed down media player or the normal media player.
-     */
-    public void pause(boolean isSlowed) {
-        if (!isSlowed) {
-            if (mediaPlayer != null) {
-                // Pause the audio first
-                mediaPlayer.pause();
-
-                // Update the pause time
-                pausedTime = MathUtils.round(mediaPlayer.getCurrentTime().toSeconds(), 3);
-            } else {
-                throw new AudioIsSamplesOnlyException("Media player was not initialized.");
-            }
+            // Update the pause time
+            pausedTime = MathUtils.round(mediaPlayer.getCurrentTime().toSeconds(), 3);
         } else {
-            if (slowedMediaPlayer != null) {
-                // Pause the audio first
-                slowedMediaPlayer.pause();
+            throw new AudioIsSamplesOnlyException("Media player was not initialized.");
+        }
 
-                // Update the pause time
-                pausedTime = MathUtils.round(slowedMediaPlayer.getCurrentTime().toSeconds() / 2, 3);
-            } else {
-                throw new AudioIsSamplesOnlyException("Media player was not initialized.");
-            }
+        if (slowedMediaPlayer != null) {
+            // Pause the audio first
+            slowedMediaPlayer.pause();
+
+            // Update the pause time
+            pausedTime = MathUtils.round(slowedMediaPlayer.getCurrentTime().toSeconds() / 2, 3);
         }
     }
 
@@ -333,28 +320,15 @@ public class Audio {
      * Method that stops the audio.
      */
     public void stop() {
-        stop(false);
-    }
-
-    /**
-     * Method that stops the audio.
-     *
-     * @param isSlowed Whether to use the slowed down media player or the normal media player.
-     */
-    public void stop(boolean isSlowed) {
-        // Stop the audio
-        if (!isSlowed) {
-            if (mediaPlayer != null) {
-                mediaPlayer.stop();
-            } else {
-                throw new AudioIsSamplesOnlyException("Media player was not initialized.");
-            }
+        // Stop the media players
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
         } else {
-            if (slowedMediaPlayer != null) {
-                slowedMediaPlayer.stop();
-            } else {
-                throw new AudioIsSamplesOnlyException("Media player was not initialized.");
-            }
+            throw new AudioIsSamplesOnlyException("Media player was not initialized.");
+        }
+
+        if (slowedMediaPlayer != null) {
+            slowedMediaPlayer.stop();
         }
 
         // Reset pause time back to 0 (since it is paused)
