@@ -50,7 +50,7 @@ import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
 import site.overwrite.auditranscribe.io.audt_file.ProjectData;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import site.overwrite.auditranscribe.io.audt_file.v0x00070001.data_encapsulators.*;
+import site.overwrite.auditranscribe.io.audt_file.v0x00080001.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingData;
@@ -1570,22 +1570,22 @@ public class TranscriptionViewController implements Initializable {
         }
 
         // Package project info data and music notes data for saving
-        // (Note: current file version is 0x00070001, so all data objects used will be for that version)
+        // (Note: current file version is 0x00080001, so all data objects used will be for that version)
         MyLogger.log(Level.INFO, "Packaging data for saving", this.getClass().toString());
-        ProjectInfoDataObject projectInfoData = new ProjectInfoDataObject0x00070001(
+        ProjectInfoDataObject projectInfoData = new ProjectInfoDataObject0x00080001(
                 projectName, musicKeyIndex, timeSignatureIndex, bpm, offset, audioVolume,
                 (int) (currTime * 1000)
         );
-        MusicNotesDataObject musicNotesData = new MusicNotesDataObject0x00070001(
+        MusicNotesDataObject musicNotesData = new MusicNotesDataObject0x00080001(
                 timesToPlaceRectangles, noteDurations, noteNums
         );
 
         // Determine what mode of the writer should be used
         if (numSkippableBytes == 0 || forceChooseFile || fileVersion != AUDTFileConstants.FILE_VERSION_NUMBER) {
             // Compress the audio data
-            byte[] compressedMP3Bytes;
+            byte[] compressedOriginalMP3Bytes;
             try {
-                compressedMP3Bytes = CompressionHandlers.lz4Compress(
+                compressedOriginalMP3Bytes = CompressionHandlers.lz4Compress(
                         audio.originalWAVBytesToMP3Bytes(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath),
                         task
                 );
@@ -1594,12 +1594,23 @@ public class TranscriptionViewController implements Initializable {
                 throw new RuntimeException(e);
             }
 
+            byte[] compressedSlowedMP3Bytes;
+            try {
+                compressedSlowedMP3Bytes = CompressionHandlers.lz4Compress(
+                        audio.slowedWAVBytesToMP3Bytes(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath),
+                        task
+                );
+            } catch (IOException e) {
+                MyLogger.logException(e);
+                throw new RuntimeException(e);
+            }
+
             // Package Q-transform data and audio data for saving
-            QTransformDataObject qTransformData = new QTransformDataObject0x00070001(
+            QTransformDataObject qTransformData = new QTransformDataObject0x00080001(
                     qTransformBytes, minQTransformMagnitude, maxQTransformMagnitude
             );
-            AudioDataObject audioData = new AudioDataObject0x00070001(
-                    compressedMP3Bytes, sampleRate, (int) (audioDuration * 1000)
+            AudioDataObject audioData = new AudioDataObject0x00080001(
+                    compressedOriginalMP3Bytes, compressedSlowedMP3Bytes, sampleRate, (int) (audioDuration * 1000)
             );
 
             // Calculate the number of skippable bytes
@@ -1609,7 +1620,7 @@ public class TranscriptionViewController implements Initializable {
                     audioData.numBytesNeeded();
 
             // Update the unchanging data properties
-            UnchangingDataPropertiesObject unchangingDataProperties = new UnchangingDataPropertiesObject0x00070001(
+            UnchangingDataPropertiesObject unchangingDataProperties = new UnchangingDataPropertiesObject0x00080001(
                     numSkippableBytes
             );
 

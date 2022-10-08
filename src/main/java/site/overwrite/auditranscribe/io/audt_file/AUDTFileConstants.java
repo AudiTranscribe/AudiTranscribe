@@ -41,8 +41,7 @@ public final class AUDTFileConstants {
             (byte) 0xad, (byte) 0x75, (byte) 0xc1, (byte) 0xbe
     };
 
-    // Todo: update file version number
-    public static final int FILE_VERSION_NUMBER = 0x00070001;  // File version 0.7.0, revision 1 -> 00 07 00 01
+    public static final int FILE_VERSION_NUMBER = 0x00080001;  // File version 0.8.0, revision 1 -> 00 08 00 01
     public static final int COMPRESSOR_VERSION_NUMBER = CompressionHandlers.VERSION_NUMBER;
 
     private AUDTFileConstants() {
