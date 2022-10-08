@@ -27,6 +27,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import site.overwrite.auditranscribe.io.IOMethods;
@@ -102,6 +103,7 @@ public class AboutViewController implements Initializable {
             // Set stage properties
             Stage aboutStage = new Stage();
             aboutStage.initStyle(StageStyle.UTILITY);
+            aboutStage.initModality(Modality.APPLICATION_MODAL);
             aboutStage.setTitle("About AudiTranscribe");
             aboutStage.setScene(scene);
             aboutStage.setResizable(false);
