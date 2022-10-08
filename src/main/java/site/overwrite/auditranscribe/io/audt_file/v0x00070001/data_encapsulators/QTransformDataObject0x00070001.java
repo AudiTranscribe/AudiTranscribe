@@ -18,11 +18,7 @@
 
 package site.overwrite.auditranscribe.io.audt_file.v0x00070001.data_encapsulators;
 
-import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.QTransformDataObject;
 import site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.QTransformDataObject0x00050002;
-
-import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * Data object that stores the Q-Transform data.

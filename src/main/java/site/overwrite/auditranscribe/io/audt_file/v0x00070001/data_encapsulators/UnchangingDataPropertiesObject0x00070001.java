@@ -18,10 +18,7 @@
 
 package site.overwrite.auditranscribe.io.audt_file.v0x00070001.data_encapsulators;
 
-import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.UnchangingDataPropertiesObject;
 import site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.UnchangingDataPropertiesObject0x00050002;
-
-import java.util.Objects;
 
 /**
  * Data object that stores the unchanging data's properties.
