@@ -35,7 +35,6 @@ public class QTransformDataObject0x00050002 extends QTransformDataObject {
      * @param minMagnitude    The minimum magnitude of the Q-Transform data.
      */
     public QTransformDataObject0x00050002(byte[] qTransformBytes, double minMagnitude, double maxMagnitude) {
-        // Update attributes
         this.qTransformBytes = qTransformBytes;
         this.minMagnitude = minMagnitude;
         this.maxMagnitude = maxMagnitude;
