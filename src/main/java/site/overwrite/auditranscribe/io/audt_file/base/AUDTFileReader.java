@@ -19,6 +19,7 @@
 package site.overwrite.auditranscribe.io.audt_file.base;
 
 import site.overwrite.auditranscribe.exceptions.io.audt_file.InvalidFileVersionException;
+import site.overwrite.auditranscribe.io.audt_file.v0x00080001.AUDTFileReader0x00080001;
 import site.overwrite.auditranscribe.utils.ByteConversionUtils;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
@@ -37,7 +38,7 @@ public abstract class AUDTFileReader {
     // Attributes
     public final String filepath;
     public int fileFormatVersion;
-    public int lz4Version;
+    public int compressorVersion;
 
     protected final byte[] bytes;
     protected int bytePos = 0;  // Position of the NEXT byte to read
@@ -112,6 +113,7 @@ public abstract class AUDTFileReader {
             return switch (fileVersion) {
                 case 0x00050002 -> new AUDTFileReader0x00050002(filepath, inputStream);
                 case 0x00070001 -> new AUDTFileReader0x00070001(filepath, inputStream);
+                case 0x00080001 -> new AUDTFileReader0x00080001(filepath, inputStream);
                 default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
             };
         }
@@ -205,15 +207,15 @@ public abstract class AUDTFileReader {
         // Update byte position
         bytePos = 20;
 
-        // Get the file format version and the LZ4 version
+        // Get the file format version and the compressor version
         fileFormatVersion = readInteger();
-        lz4Version = readInteger();
+        compressorVersion = readInteger();
 
-        // Check if the LZ4 version is outdated
-        if (lz4Version < AUDTFileConstants.LZ4_VERSION_NUMBER) {
+        // Check if the compressor version is outdated
+        if (compressorVersion < AUDTFileConstants.COMPRESSOR_VERSION_NUMBER) {
             throw new InvalidFileVersionException(
-                    "Outdated LZ4 version (file version is " + lz4Version + " but current version is " +
-                            AUDTFileConstants.LZ4_VERSION_NUMBER + ")"
+                    "Outdated compressor version (compressor version is " + compressorVersion +
+                            " but current version is " + AUDTFileConstants.COMPRESSOR_VERSION_NUMBER + ")"
             );
         }
 

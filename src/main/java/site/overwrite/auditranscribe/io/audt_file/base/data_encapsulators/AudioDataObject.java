@@ -27,6 +27,7 @@ public abstract class AudioDataObject extends AbstractAUDTDataObject {
 
     // Attributes
     public byte[] compressedOriginalMP3Bytes;
+    public byte[] compressedSlowedMP3Bytes;
     public double sampleRate;
     public int totalDurationInMS;
 }

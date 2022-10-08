@@ -19,6 +19,7 @@
 package site.overwrite.auditranscribe.io.audt_file.base;
 
 import site.overwrite.auditranscribe.exceptions.io.audt_file.InvalidFileVersionException;
+import site.overwrite.auditranscribe.io.audt_file.v0x00080001.AUDTFileWriter0x00080001;
 import site.overwrite.auditranscribe.utils.ByteConversionUtils;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
@@ -89,6 +90,7 @@ public abstract class AUDTFileWriter {
         return switch (fileVersion) {
             case 0x00050002 -> new AUDTFileWriter0x00050002(filepath);
             case 0x00070001 -> new AUDTFileWriter0x00070001(filepath);
+            case 0x00080001 -> new AUDTFileWriter0x00080001(filepath);
             default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
         };
     }
@@ -107,6 +109,7 @@ public abstract class AUDTFileWriter {
         return switch (fileVersion) {
             case 0x00050002 -> new AUDTFileWriter0x00050002(filepath, numBytesToSkip);
             case 0x00070001 -> new AUDTFileWriter0x00070001(filepath, numBytesToSkip);
+            case 0x00080001 -> new AUDTFileWriter0x00080001(filepath, numBytesToSkip);
             default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
         };
     }
@@ -311,7 +314,7 @@ public abstract class AUDTFileWriter {
 
         // Write version numbers
         byte[] fileVersionBytes = ByteConversionUtils.intToBytes(fileVersion);
-        byte[] lz4VersionBytes = ByteConversionUtils.intToBytes(AUDTFileConstants.LZ4_VERSION_NUMBER);
+        byte[] lz4VersionBytes = ByteConversionUtils.intToBytes(AUDTFileConstants.COMPRESSOR_VERSION_NUMBER);
 
         AUDTFileHelpers.addBytesIntoBytesList(bytes, fileVersionBytes);
         AUDTFileHelpers.addBytesIntoBytesList(bytes, lz4VersionBytes);
