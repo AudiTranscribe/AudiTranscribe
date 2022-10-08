@@ -1,6 +1,6 @@
 /*
- * QTransformDataObject0x00070001Test.java
- * Description: Test `QTransformDataObject0x00070001.java`.
+ * QTransformDataObject0x00080001Test.java
+ * Description: Test `QTransformDataObject0x00080001.java`.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,15 +16,16 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.io.audt_file.v0x00070001.data_encapsulators;
+package site.overwrite.auditranscribe.io.audt_file.v0x00080001.data_encapsulators;
 
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.QTransformDataObject;
 import site.overwrite.auditranscribe.utils.MathUtils;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-class QTransformDataObject0x00070001Test {
+class QTransformDataObject0x00080001Test {
     // Attributes
     byte[] qTransformBytes1 = new byte[]{(byte) 0xab, (byte) 0xcd, (byte) 0xef};  // Not real data; do NOT decompress
     byte[] qTransformBytes2 = new byte[]{(byte) 0x12, (byte) 0x34, (byte) 0x56, (byte) 0x78, (byte) 0x9a};
@@ -39,10 +40,10 @@ class QTransformDataObject0x00070001Test {
     @Test
     void numBytesNeeded() {
         // Define the two Q-Transform data objects to test number of bytes needed
-        QTransformDataObject one = new QTransformDataObject0x00070001(
+        QTransformDataObject one = new QTransformDataObject0x00080001(
                 qTransformBytes1, minMagnitude1, maxMagnitude1
         );
-        QTransformDataObject two = new QTransformDataObject0x00070001(
+        QTransformDataObject two = new QTransformDataObject0x00080001(
                 qTransformBytes2, minMagnitude2, maxMagnitude2
         );
 
@@ -54,7 +55,7 @@ class QTransformDataObject0x00070001Test {
     @Test
     void testEquals() {
         // Define temporary data object for testing the initial checks
-        QTransformDataObject temp = new QTransformDataObject0x00070001(
+        QTransformDataObject temp = new QTransformDataObject0x00080001(
                 qTransformBytes1, minMagnitude1, maxMagnitude1
         );
 
@@ -75,14 +76,14 @@ class QTransformDataObject0x00070001Test {
         // Generate product of indices
         int[][] indexProduct = MathUtils.selfProduct(2, 3);  // 3 data attributes
         for (int[] indices1 : indexProduct) {
-            QTransformDataObject one = new QTransformDataObject0x00070001(
+            QTransformDataObject one = new QTransformDataObject0x00080001(
                     qTransformBytes[indices1[0]],
                     minMagnitudes[indices1[1]],
                     maxMagnitudes[indices1[2]]
             );
 
             for (int[] indices2 : indexProduct) {
-                QTransformDataObject two = new QTransformDataObject0x00070001(
+                QTransformDataObject two = new QTransformDataObject0x00080001(
                         qTransformBytes[indices2[0]],
                         minMagnitudes[indices2[1]],
                         maxMagnitudes[indices2[2]]
@@ -103,10 +104,10 @@ class QTransformDataObject0x00070001Test {
     @Test
     void testHashCode() {
         // Define the two Q-Transform data objects to test hash code computation
-        QTransformDataObject one = new QTransformDataObject0x00070001(
+        QTransformDataObject one = new QTransformDataObject0x00080001(
                 qTransformBytes1, minMagnitude1, maxMagnitude1
         );
-        QTransformDataObject two = new QTransformDataObject0x00070001(
+        QTransformDataObject two = new QTransformDataObject0x00080001(
                 qTransformBytes2, minMagnitude2, maxMagnitude2
         );
 

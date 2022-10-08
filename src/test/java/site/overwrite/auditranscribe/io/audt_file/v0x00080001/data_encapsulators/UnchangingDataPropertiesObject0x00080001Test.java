@@ -1,6 +1,6 @@
 /*
- * UnchangingDataPropertiesObject0x00070001Test.java
- * Description: Test `UnchangingDataPropertiesObject0x00070001.java`.
+ * UnchangingDataPropertiesObject0x00080001Test.java
+ * Description: Test `UnchangingDataPropertiesObject0x00080001.java`.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.io.audt_file.v0x00070001.data_encapsulators;
+package site.overwrite.auditranscribe.io.audt_file.v0x00080001.data_encapsulators;
 
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.UnchangingDataPropertiesObject;
@@ -25,7 +25,7 @@ import site.overwrite.auditranscribe.utils.MathUtils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-class UnchangingDataPropertiesObject0x00070001Test {
+class UnchangingDataPropertiesObject0x00080001Test {
     // Attributes
     int numSkippableBytes1 = 1234;
     int numSkippableBytes2 = 56789;
@@ -34,8 +34,8 @@ class UnchangingDataPropertiesObject0x00070001Test {
     @Test
     void numBytesNeeded() {
         // Define the two objects to test number of bytes needed
-        UnchangingDataPropertiesObject one = new UnchangingDataPropertiesObject0x00070001(numSkippableBytes1);
-        UnchangingDataPropertiesObject two = new UnchangingDataPropertiesObject0x00070001(numSkippableBytes2);
+        UnchangingDataPropertiesObject one = new UnchangingDataPropertiesObject0x00080001(numSkippableBytes1);
+        UnchangingDataPropertiesObject two = new UnchangingDataPropertiesObject0x00080001(numSkippableBytes2);
 
         // Tests
         assertEquals(12, one.numBytesNeeded());
@@ -45,7 +45,7 @@ class UnchangingDataPropertiesObject0x00070001Test {
     @Test
     void testEquals() {
         // Define temporary data object for testing the initial checks
-        UnchangingDataPropertiesObject temp = new UnchangingDataPropertiesObject0x00070001(numSkippableBytes1);
+        UnchangingDataPropertiesObject temp = new UnchangingDataPropertiesObject0x00080001(numSkippableBytes1);
 
         // Define other objects to test comparison
         String otherTypedVar = "hello";
@@ -62,12 +62,12 @@ class UnchangingDataPropertiesObject0x00070001Test {
         // Generate product of indices
         int[][] indexProduct = MathUtils.selfProduct(2, 1);  // 1 data attribute
         for (int[] indices1 : indexProduct) {
-            UnchangingDataPropertiesObject one = new UnchangingDataPropertiesObject0x00070001(
+            UnchangingDataPropertiesObject one = new UnchangingDataPropertiesObject0x00080001(
                     numSkippableBytes[indices1[0]]
             );
 
             for (int[] indices2 : indexProduct) {
-                UnchangingDataPropertiesObject two = new UnchangingDataPropertiesObject0x00070001(
+                UnchangingDataPropertiesObject two = new UnchangingDataPropertiesObject0x00080001(
                         numSkippableBytes[indices2[0]]
                 );
 
@@ -86,8 +86,8 @@ class UnchangingDataPropertiesObject0x00070001Test {
     @Test
     void testHashCode() {
         // Define the two objects to test hash code calculation
-        UnchangingDataPropertiesObject one = new UnchangingDataPropertiesObject0x00070001(numSkippableBytes1);
-        UnchangingDataPropertiesObject two = new UnchangingDataPropertiesObject0x00070001(numSkippableBytes2);
+        UnchangingDataPropertiesObject one = new UnchangingDataPropertiesObject0x00080001(numSkippableBytes1);
+        UnchangingDataPropertiesObject two = new UnchangingDataPropertiesObject0x00080001(numSkippableBytes2);
 
         // Tests
         assertEquals(1265, one.hashCode());

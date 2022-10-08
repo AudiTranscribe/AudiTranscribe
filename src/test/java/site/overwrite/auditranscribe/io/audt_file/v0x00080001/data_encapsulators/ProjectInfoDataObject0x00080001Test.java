@@ -1,6 +1,6 @@
 /*
- * ProjectInfoDataObject0x00070001Test.java
- * Description: Test `ProjectInfoDataObject0x00070001.java`.
+ * ProjectInfoDataObject0x00080001Test.java
+ * Description: Test `ProjectInfoDataObject0x00080001.java`.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.io.audt_file.v0x00070001.data_encapsulators;
+package site.overwrite.auditranscribe.io.audt_file.v0x00080001.data_encapsulators;
 
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.ProjectInfoDataObject;
@@ -25,7 +25,7 @@ import site.overwrite.auditranscribe.utils.MathUtils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-class ProjectInfoDataObject0x00070001Test {
+class ProjectInfoDataObject0x00080001Test {
     // Attributes
     String projectName1 = "First Project Name";
     String projectName2 = "Second Project Name";
@@ -52,10 +52,10 @@ class ProjectInfoDataObject0x00070001Test {
     @Test
     void numBytesNeeded() {
         // Define the two data objects to test number of bytes needed
-        ProjectInfoDataObject one = new ProjectInfoDataObject0x00070001(
+        ProjectInfoDataObject one = new ProjectInfoDataObject0x00080001(
                 projectName1, musicKeyIndex1, timeSignatureIndex1, bpm1, offsetSeconds1, playbackVolume1, currTimeInMS1
         );
-        ProjectInfoDataObject two = new ProjectInfoDataObject0x00070001(
+        ProjectInfoDataObject two = new ProjectInfoDataObject0x00080001(
                 projectName2, musicKeyIndex2, timeSignatureIndex2, bpm2, offsetSeconds2, playbackVolume2, currTimeInMS2
         );
 
@@ -67,7 +67,7 @@ class ProjectInfoDataObject0x00070001Test {
     @Test
     void testEquals() {
         // Define temporary data object for testing the initial checks
-        ProjectInfoDataObject temp = new ProjectInfoDataObject0x00070001(
+        ProjectInfoDataObject temp = new ProjectInfoDataObject0x00080001(
                 projectName1, musicKeyIndex1, timeSignatureIndex1, bpm1, offsetSeconds1, playbackVolume1, currTimeInMS1
         );
 
@@ -92,7 +92,7 @@ class ProjectInfoDataObject0x00070001Test {
         // Generate product of indices
         int[][] indexProduct = MathUtils.selfProduct(2, 7);  // 7 data attributes
         for (int[] indices1 : indexProduct) {
-            ProjectInfoDataObject one = new ProjectInfoDataObject0x00070001(
+            ProjectInfoDataObject one = new ProjectInfoDataObject0x00080001(
                     projectNames[indices1[0]],
                     musicKeyIndices[indices1[1]],
                     timeSignatureIndices[indices1[2]],
@@ -103,7 +103,7 @@ class ProjectInfoDataObject0x00070001Test {
             );
 
             for (int[] indices2 : indexProduct) {
-                ProjectInfoDataObject two = new ProjectInfoDataObject0x00070001(
+                ProjectInfoDataObject two = new ProjectInfoDataObject0x00080001(
                         projectNames[indices2[0]],
                         musicKeyIndices[indices2[1]],
                         timeSignatureIndices[indices2[2]],
@@ -128,10 +128,10 @@ class ProjectInfoDataObject0x00070001Test {
     @Test
     void testHashCode() {
         // Define the two data objects to test hash code
-        ProjectInfoDataObject one = new ProjectInfoDataObject0x00070001(
+        ProjectInfoDataObject one = new ProjectInfoDataObject0x00080001(
                 projectName1, musicKeyIndex1, timeSignatureIndex1, bpm1, offsetSeconds1, playbackVolume1, currTimeInMS1
         );
-        ProjectInfoDataObject two = new ProjectInfoDataObject0x00070001(
+        ProjectInfoDataObject two = new ProjectInfoDataObject0x00080001(
                 projectName2, musicKeyIndex2, timeSignatureIndex2, bpm2, offsetSeconds2, playbackVolume2, currTimeInMS2
         );
 

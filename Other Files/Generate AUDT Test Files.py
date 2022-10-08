@@ -6,7 +6,7 @@ Python program that generates the testing files for the specific file version.
 import re
 
 # CONSTANTS
-ORIGINAL_AUDT_FILE = "test-AUDTFile0x00070001Test.audt"  # Original file to be edited
+ORIGINAL_AUDT_FILE = "test-AUDTFile0x00080001Test.audt"  # Original file to be edited
 TESTING_FILES_FOLDER = "../src/main/resources/site/overwrite/auditranscribe/testing-files/audt-test-files"
 
 NUM_SECTIONS = 5
