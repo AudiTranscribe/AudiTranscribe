@@ -26,7 +26,7 @@ public abstract class AudioDataObject extends AbstractAUDTDataObject {
     public static final int SECTION_ID = 3;
 
     // Attributes
-    public byte[] compressedMP3Bytes;
+    public byte[] compressedOriginalMP3Bytes;
     public double sampleRate;
     public int totalDurationInMS;
 }

@@ -965,7 +965,7 @@ public class TranscriptionViewController implements Initializable {
         maxQTransformMagnitude = qTransformData.maxMagnitude;
 
         // Decompress the MP3 bytes
-        byte[] rawMP3Bytes = CompressionHandlers.lz4Decompress(audioData.compressedMP3Bytes);
+        byte[] rawMP3Bytes = CompressionHandlers.lz4Decompress(audioData.compressedOriginalMP3Bytes);
 
         // Ensure that the temporary directory exists
         IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
