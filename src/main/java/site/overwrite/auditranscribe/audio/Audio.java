@@ -56,6 +56,8 @@ public class Audio {
     private final AudioInputStream audioStream;
     private final AudioFormat audioFormat;
     private final double sampleRate;
+
+    private double currTime = 0;  // In seconds, for the main media player
     private double duration = 0;  // In seconds
 
     private final byte[] rawWAVBytes;  // Would be an empty array unless set
@@ -186,6 +188,15 @@ public class Audio {
 
         // Handle the two different kinds of playback options
         if (modes.contains(AudioProcessingMode.WITH_SLOWDOWN)) {
+            // If no slowed audio was provided, throw an error
+            if (slowedAudioFile == null) {
+                RuntimeException e = new RuntimeException(
+                        "Processing modes contains `WITH_SLOWDOWN` but provided no slowed audio"
+                );
+                MyLogger.logException(e);
+                throw e;
+            }
+
             // Get the media player for the audio file
             MediaPlayer tempMediaPlayer;
 
@@ -256,7 +267,10 @@ public class Audio {
      * @param isSlowed Whether to use the slowed down media player or the normal media player.
      */
     public void play(boolean isSlowed) {
-        // Todo: adjust time for the media players
+        // Set playback time of both media players
+        setAudioPlaybackTime(currTime);
+
+        // Play the correct audio
         if (!isSlowed) {
             if (mediaPlayer != null) {
                 mediaPlayer.play();
@@ -287,13 +301,21 @@ public class Audio {
     public void pause(boolean isSlowed) {
         if (!isSlowed) {
             if (mediaPlayer != null) {
+                // Pause the audio first
                 mediaPlayer.pause();
+
+                // Update the current time
+                currTime = MathUtils.round(mediaPlayer.getCurrentTime().toSeconds(), 3);
             } else {
                 throw new AudioIsSamplesOnlyException("Media player was not initialized.");
             }
         } else {
             if (slowedMediaPlayer != null) {
+                // Pause the audio first
                 slowedMediaPlayer.pause();
+
+                // Update the current time
+                currTime = MathUtils.round(slowedMediaPlayer.getCurrentTime().toSeconds() / 2, 3);
             } else {
                 throw new AudioIsSamplesOnlyException("Media player was not initialized.");
             }
@@ -313,6 +335,7 @@ public class Audio {
      * @param isSlowed Whether to use the slowed down media player or the normal media player.
      */
     public void stop(boolean isSlowed) {
+        // Stop the audio
         if (!isSlowed) {
             if (mediaPlayer != null) {
                 mediaPlayer.stop();
@@ -326,6 +349,9 @@ public class Audio {
                 throw new AudioIsSamplesOnlyException("Media player was not initialized.");
             }
         }
+
+        // Reset current time back to 0 (since it is paused)
+        currTime = 0;
     }
 
     /**
@@ -381,10 +407,10 @@ public class Audio {
      * @return Returns the current audio time in <b>seconds</b>, correct to the nearest millisecond.
      */
     public double getCurrAudioTime() {
-        if (mediaPlayer != null) {
-            return MathUtils.round(mediaPlayer.getCurrentTime().toSeconds(), 3);
-        } else {
+        if ((mediaPlayer == null) && (slowedMediaPlayer == null)) {
             throw new AudioIsSamplesOnlyException("Media player was not initialized.");
+        } else {
+            return currTime;
         }
     }
 
