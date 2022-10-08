@@ -106,15 +106,15 @@ class AUDTFile0x00050002Test {
         );
         audioDataObject = new AudioDataObject0x00050002(
                 CompressionHandlers.lz4Compress(Files.readAllBytes(Paths.get(
-                        IOMethods.getAbsoluteFilePath("testing-files/audio/A440.mp3")
+                        IOMethods.getAbsoluteFilePath("testing-files/audio/VeryShortAudio.mp3")
                 ))),
-                44100, 120000, "A440.wav");
+                44100, 200, "VeryShortAudio.mp3");
 
         projectInfoDataObject1 = new ProjectInfoDataObject0x00050002(
-                11, 9, 123.45, 0.01, 0.55, 9000
+                11, 9, 123.45, 0.01, 0.55, 12
         );
         projectInfoDataObject2 = new ProjectInfoDataObject0x00050002(
-                15, 14, 67.89, -1.23, 0.124, 2048
+                15, 14, 67.89, -1.23, 0.124, 34
         );
 
         musicNotesDataObject1 = new MusicNotesDataObject0x00050002(
