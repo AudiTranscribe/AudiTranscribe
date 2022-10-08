@@ -80,6 +80,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -954,8 +956,6 @@ public class TranscriptionViewController implements Initializable {
     public void setAudioAndSpectrogramData(
             QTransformDataObject qTransformData, AudioDataObject audioData
     ) throws IOException, FFmpegNotFoundException, UnsupportedAudioFileException, AudioTooLongException {
-        // Todo: need to use slowed audio
-
         // Set attributes
         sampleRate = audioData.sampleRate;
         audioDuration = audioData.totalDurationInMS / 1000.;
@@ -964,48 +964,74 @@ public class TranscriptionViewController implements Initializable {
         minQTransformMagnitude = qTransformData.minMagnitude;
         maxQTransformMagnitude = qTransformData.maxMagnitude;
 
-        // Decompress the MP3 bytes
-        byte[] rawMP3Bytes = CompressionHandlers.lz4Decompress(audioData.compressedOriginalMP3Bytes);
-
         // Ensure that the temporary directory exists
         IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
         MyLogger.log(
                 Level.FINE,
-                "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH, this.getClass().toString()
+                "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH,
+                this.getClass().toString()
         );
 
-        // Create an empty MP3 file in the temporary directory
-        File auxiliaryMP3File = new File(IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-1.mp3"));
-        IOMethods.createFile(auxiliaryMP3File.getAbsolutePath());
+        // Define a FFmpeg handler
+        FFmpegHandler ffmpegHandler = new FFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
 
-        // Write the raw MP3 bytes into a temporary file
-        FileOutputStream fos = new FileOutputStream(auxiliaryMP3File);
-        fos.write(rawMP3Bytes);
-        fos.close();
+        // Handle the compressed original MP3 bytes
+        Pair<Byte[], File> returnedData = handleCompressedMP3Bytes(ffmpegHandler, audioData.compressedOriginalMP3Bytes);
+        byte[] rawOriginalMP3Bytes = TypeConversionUtils.toByteArray(returnedData.value0());
+        File auxOriginalWAVFile = returnedData.value1();
 
-        // Define a new FFmpeg handler
-        FFmpegHandler FFmpegHandler = new FFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
+        // Attempt to process the slowed MP3 bytes
+        byte[] rawSlowedMP3Bytes;
+        File auxSlowedWAVFile;
+        if (audioData.compressedSlowedMP3Bytes != null) {
+            returnedData = handleCompressedMP3Bytes(ffmpegHandler, audioData.compressedSlowedMP3Bytes);
+            rawSlowedMP3Bytes = TypeConversionUtils.toByteArray(returnedData.value0());
+            auxSlowedWAVFile = returnedData.value1();
+        } else {
+            MyLogger.log(
+                    Level.INFO,
+                    "Slowed audio not yet generated; generating now",
+                    this.getClass().getName()
+            );
 
-        // Generate the output path to the MP3 file
-        String outputPath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-2.wav");
+            // Slow down the original WAV file
+            String auxSlowedMP3Path = ffmpegHandler.generateAltTempoAudio(
+                    auxOriginalWAVFile,
+                    IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "slowed-temp-1.mp3"),
+                    0.5
+            );
+            File auxSlowedMP3File = new File(auxSlowedMP3Path);
+            rawSlowedMP3Bytes = Files.readAllBytes(Path.of(auxSlowedMP3Path));
 
-        // Convert the auxiliary MP3 file to a WAV file
-        outputPath = FFmpegHandler.convertAudio(auxiliaryMP3File, outputPath);
+            // Convert the returned MP3 file into a WAV file
+            String auxSlowedWAVPath = ffmpegHandler.convertAudio(
+                    auxSlowedMP3File, IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "slowed-temp-2.wav")
+            );
+            auxSlowedWAVFile = new File(auxSlowedWAVPath);
 
-        // Read the newly created WAV file
-        File auxiliaryWAVFile = new File(outputPath);
+            // Delete unneeded files
+            IOMethods.delete(auxSlowedMP3Path);
+
+            MyLogger.log(
+                    Level.INFO,
+                    "Slowed audio generated",
+                    this.getClass().getName()
+            );
+        }
 
         // Create the `Audio` object
         audio = new Audio(
-                auxiliaryWAVFile, AudioProcessingMode.PLAYBACK
+                auxOriginalWAVFile, auxSlowedWAVFile, AudioProcessingMode.PLAYBACK, AudioProcessingMode.WITH_SLOWDOWN
         );
 
         // Update the raw MP3 bytes of the audio object
-        audio.setRawMP3Bytes(rawMP3Bytes);  // This is to reduce the time needed to save the file later
+        // (This is to reduce the time needed to save the file later)
+        audio.setRawOriginalMP3Bytes(rawOriginalMP3Bytes);
+        audio.setRawSlowedMP3Bytes(rawSlowedMP3Bytes);
 
         // Delete the auxiliary files
-        IOMethods.delete(auxiliaryMP3File.getAbsolutePath());
-        IOMethods.delete(auxiliaryWAVFile.getAbsolutePath());
+        IOMethods.delete(auxOriginalWAVFile.getAbsolutePath());
+        IOMethods.delete(auxSlowedWAVFile.getAbsolutePath());
 
         // Update the audio object's duration
         // (The `MediaPlayer` duration cannot be trusted)
@@ -1163,6 +1189,7 @@ public class TranscriptionViewController implements Initializable {
      *
      * @param seekTime Time to seek to.
      */
+    // Fixme: seek to time not working with new slowdown protocol
     private void seekToTime(double seekTime) {
         // Update the `hasUnsavedChanges` flag
         hasUnsavedChanges = true;
@@ -1559,7 +1586,7 @@ public class TranscriptionViewController implements Initializable {
             byte[] compressedMP3Bytes;
             try {
                 compressedMP3Bytes = CompressionHandlers.lz4Compress(
-                        audio.wavBytesToMP3Bytes(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath),
+                        audio.originalWAVBytesToMP3Bytes(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath),
                         task
                 );
             } catch (IOException e) {
@@ -2513,5 +2540,49 @@ public class TranscriptionViewController implements Initializable {
 
         // Return the needed data
         return saveDest;
+    }
+
+    /**
+     * Helper method that handles the compressed MP3 bytes.
+     *
+     * @param ffmpegHandler      FFmpeg handler.
+     * @param compressedMP3Bytes Compressed MP3 bytes.
+     * @return A pair. The first value is a byte array, representing the raw MP3 bytes. The second
+     * is a <code>File</code> object pointing to a WAV file representing the audio data.
+     * @throws IOException If the auxiliary MP3 file does not exist, or if the decompression process
+     *                     fails.
+     */
+    private Pair<Byte[], File> handleCompressedMP3Bytes(
+            FFmpegHandler ffmpegHandler, byte[] compressedMP3Bytes
+    ) throws IOException {
+        // Obtain the raw MP3 bytes
+        byte[] rawMP3Bytes = CompressionHandlers.lz4Decompress(compressedMP3Bytes);
+
+        // Generate a UUID for unique file identification
+        String uuid = MiscUtils.generateUUID(rawMP3Bytes.length);
+
+        // Create an empty temporary MP3 file in the temporary directory
+        File auxiliaryMP3File = new File(IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, uuid + ".mp3"));
+        IOMethods.createFile(auxiliaryMP3File.getAbsolutePath());
+
+        // Write the raw MP3 bytes into the temporary files
+        FileOutputStream fos = new FileOutputStream(auxiliaryMP3File);
+        fos.write(rawMP3Bytes);
+        fos.close();
+
+        // Generate the output path to the MP3 file
+        String auxiliaryWAVFilePath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, uuid + "-temp.wav");
+
+        // Convert the auxiliary MP3 files to a WAV files
+        auxiliaryWAVFilePath = ffmpegHandler.convertAudio(auxiliaryMP3File, auxiliaryWAVFilePath);
+
+        // Read the newly created WAV files
+        File auxiliaryWAVFile = new File(auxiliaryWAVFilePath);
+
+        // Delete the original MP3 file
+        IOMethods.delete(auxiliaryMP3File.getAbsolutePath());
+
+        // Return needed information
+        return new Pair<>(TypeConversionUtils.toByteArray(rawMP3Bytes), auxiliaryWAVFile);
     }
 }
