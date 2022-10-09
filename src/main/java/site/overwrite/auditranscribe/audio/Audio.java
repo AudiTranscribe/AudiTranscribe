@@ -57,6 +57,8 @@ public class Audio {
     private final AudioFormat audioFormat;
     private final double sampleRate;
 
+    private boolean isLatestPlayerSlowedPlayer;
+
     private double pausedTime = 0;  // In seconds, for the main media player
     private double duration = 0;    // In seconds
 
@@ -281,12 +283,14 @@ public class Audio {
         if (!isSlowed) {
             if (mediaPlayer != null) {
                 mediaPlayer.play();
+                isLatestPlayerSlowedPlayer = false;
             } else {
                 throw new AudioIsSamplesOnlyException("Media player was not initialized.");
             }
         } else {
             if (slowedMediaPlayer != null) {
                 slowedMediaPlayer.play();
+                isLatestPlayerSlowedPlayer = true;
             } else {
                 throw new AudioIsSamplesOnlyException("Media player was not initialized.");
             }
@@ -302,7 +306,9 @@ public class Audio {
             mediaPlayer.pause();
 
             // Update the pause time
-            pausedTime = MathUtils.round(mediaPlayer.getCurrentTime().toSeconds(), 3);
+            if (!isLatestPlayerSlowedPlayer) {
+                pausedTime = MathUtils.round(mediaPlayer.getCurrentTime().toSeconds(), 3);
+            }
         } else {
             throw new AudioIsSamplesOnlyException("Media player was not initialized.");
         }
@@ -312,7 +318,9 @@ public class Audio {
             slowedMediaPlayer.pause();
 
             // Update the pause time
-            pausedTime = MathUtils.round(slowedMediaPlayer.getCurrentTime().toSeconds() / 2, 3);
+            if (isLatestPlayerSlowedPlayer) {
+                pausedTime = MathUtils.round(slowedMediaPlayer.getCurrentTime().toSeconds() / 2, 3);
+            }
         }
     }
 
