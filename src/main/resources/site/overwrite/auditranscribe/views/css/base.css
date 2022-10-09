@@ -80,6 +80,10 @@
     -fx-stroke: #000000ff;
 }
 
+.no-projects-vbox {
+    -fx-border-width: 0;
+}
+
 .search-text-field {
     -fx-font-size: 14px;
 }
