@@ -36,6 +36,9 @@ public final class MyLogger {
     private static final long MAX_LOG_FILE_SIZE = 5_000_000;  // In bytes
 
     // Static attributes
+    public static String currentLogName;
+    public static String loggingFolder;
+
     private static Logger logger;
 
     private MyLogger() {
@@ -83,16 +86,8 @@ public final class MyLogger {
      * @param persistenceInDays Number of days to keep any log.
      */
     public static void clearOldLogs(int persistenceInDays) {
-        // Determine logging folder path
-        String loggingFolder;
-        if (new File(IOConstants.APP_DATA_FOLDER_PATH).exists()) {
-            loggingFolder = IOMethods.joinPaths(IOConstants.APP_DATA_FOLDER_PATH, "logs");
-        } else {
-            loggingFolder = IOConstants.USER_HOME_PATH;
-        }
-
-        // Create logging folder (if it doesn't already exist)
-        IOMethods.createFolder(loggingFolder);
+        // Set logging folder path
+        setLoggingFolder();
 
         // Obtain all files in the logging folder
         File[] files = new File(loggingFolder).listFiles();
@@ -123,7 +118,7 @@ public final class MyLogger {
                         MyLogger.log(
                                 Level.FINE,
                                 "Deleted old log '" + file.getName() + "' (Older than " +
-                                        persistenceInDays + " days).",
+                                        persistenceInDays + " days)",
                                 MyLogger.class.getName()
                         );
                     }
@@ -145,16 +140,8 @@ public final class MyLogger {
                 // Get initialization time
                 int initTime = (int) (MiscUtils.getUnixTimestamp());
 
-                // Determine logging folder path
-                String loggingFolder;
-                if (new File(IOConstants.APP_DATA_FOLDER_PATH).exists()) {
-                    loggingFolder = IOMethods.joinPaths(IOConstants.APP_DATA_FOLDER_PATH, "logs");
-                } else {
-                    loggingFolder = IOConstants.USER_HOME_PATH;
-                }
-
-                // Create logging folder (if it doesn't already exist)
-                IOMethods.createFolder(loggingFolder);
+                // Set logging folder path
+                setLoggingFolder();
 
                 // Try to read logging config from the logging properties file
                 try (InputStream is = IOMethods.getInputStream("conf/logging.properties")) {
@@ -166,8 +153,9 @@ public final class MyLogger {
 
                 // Create file handler if not running a test
                 if (!TestingUtils.isRunningTest()) {
+                    currentLogName = "Log-" + initTime + ".log";
                     FileHandler fileHandler = new FileHandler(
-                            IOMethods.joinPaths(loggingFolder, "Log-" + initTime + ".log"),
+                            IOMethods.joinPaths(loggingFolder, currentLogName),
                             MAX_LOG_FILE_SIZE,
                             1,
                             true
@@ -188,5 +176,22 @@ public final class MyLogger {
             }
         }
         return logger;
+    }
+
+    /**
+     * Helper method that sets the logging folder path.
+     */
+    private static void setLoggingFolder() {
+        if (loggingFolder == null) {
+            // Determine the path
+            if (new File(IOConstants.APP_DATA_FOLDER_PATH).exists()) {
+                loggingFolder = IOMethods.joinPaths(IOConstants.APP_DATA_FOLDER_PATH, "logs");
+            } else {
+                loggingFolder = IOConstants.USER_HOME_PATH;
+            }
+
+            // Create if not exists
+            IOMethods.createFolder(loggingFolder);
+        }
     }
 }
