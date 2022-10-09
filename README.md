@@ -1,9 +1,8 @@
 ![AudiTranscribe Banner](Designs/banner/banner.png "AudiTranscribe Banner")
 
 [![Latest GitHub Release](https://img.shields.io/github/v/release/AudiTranscribe/AudiTranscribe)](https://github.com/AudiTranscribe/AudiTranscribe/releases/latest)
+[![Licence](https://img.shields.io/github/license/AudiTranscribe/AudiTranscribe)](https://github.com/AudiTranscribe/AudiTranscribe/blob/main/LICENSE)
 [![FOSSA Status](https://app.fossa.com/api/projects/custom%2B32213%2Fgithub.com%2FAudiTranscribe%2FAudiTranscribe.svg?type=shield)](https://app.fossa.com/projects/custom%2B32213%2Fgithub.com%2FAudiTranscribe%2FAudiTranscribe?ref=badge_shield)
-[![Run Tests On Push To Main](https://github.com/AudiTranscribe/AudiTranscribe/actions/workflows/run-tests-on-push-to-main.yml/badge.svg)](https://github.com/AudiTranscribe/AudiTranscribe/actions/workflows/run-tests-on-push-to-main.yml)
-[![Run Tests On Push To Staging](https://github.com/AudiTranscribe/AudiTranscribe/actions/workflows/run-tests-on-push-to-staging.yml/badge.svg)](https://github.com/AudiTranscribe/AudiTranscribe/actions/workflows/run-tests-on-push-to-staging.yml)
 [![CodeCov](https://codecov.io/gh/AudiTranscribe/AudiTranscribe/branch/main/graph/badge.svg?token=1WQO7ZGKVJ)](https://codecov.io/gh/AudiTranscribe/AudiTranscribe)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4.svg)](.github/CODE_OF_CONDUCT.md)
 
