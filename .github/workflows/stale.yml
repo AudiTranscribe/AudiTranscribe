@@ -1,0 +1,23 @@
+name: Mark Stale Issues and Pull Requests
+
+on:
+  schedule:
+    - cron: "00 00 * * *"
+
+jobs:
+  stale:
+    name: Locate Stale Issues and Pull Requests
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Find And Mark Stale Issues/PRs
+        uses: actions/stale@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          days-before-stale: 30
+          stale-issue-message: "No progress made on issue for 30 days; marking as stale."
+          stale-pr-message: "No progress made on pull request for 30 days; marking as stale."
+          stale-issue-label: "stale"
+          stale-pr-label: "stale"
