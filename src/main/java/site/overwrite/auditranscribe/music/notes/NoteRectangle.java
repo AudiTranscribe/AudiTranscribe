@@ -274,20 +274,42 @@ public class NoteRectangle extends StackPane {
                         newX, getRectangleWidth(), newNoteNum, verticalMovement
                 );
 
-                if (collisionLoc == CollisionLocation.NONE) {
-                    // Move the note rectangle if it is within range
+//                if (collisionLoc == CollisionLocation.NONE) {
+//                    // Move the note rectangle if it is within range
+//                    if (newX >= 0 && newX + getRectangleWidth() <= spectrogramWidth) {
+//                        this.setTranslateX(newX);
+//                    }
+//                    if (newY >= 0 && newY + rectangleHeight <= spectrogramHeight) {
+//                        this.setTranslateY(newY);
+//                        this.noteNum = newNoteNum;
+//                    }
+//                } else {
+//                    if (collisionLoc == CollisionLocation.LEFT) {
+//                        this.setTranslateX(leftBoundingRectangle.getEndX());
+//                    } else if (collisionLoc == CollisionLocation.RIGHT) {
+//                        this.setTranslateX(rightBoundingRectangle.getStartX() - getRectangleWidth());
+//                    }
+//                }
+
+                if (collisionLoc == CollisionLocation.LEFT) {  // Collided with left rectangle
+                    // Move current rectangle to the right edge of the left rectangle
+                    this.setTranslateX(leftBoundingRectangle.getEndX());
+                } else if (collisionLoc == CollisionLocation.RIGHT) {  // Collided with right rectangle
+                    // Move current rectangle to the left edge of the right rectangle
+                    this.setTranslateX(rightBoundingRectangle.getStartX() - getRectangleWidth());
+                } else {
+                    // Permit horizontal movement if within range
                     if (newX >= 0 && newX + getRectangleWidth() <= spectrogramWidth) {
                         this.setTranslateX(newX);
                     }
+                }
+
+                // If not vertical collision, permit movement vertically
+                if (collisionLoc != CollisionLocation.UP && collisionLoc != CollisionLocation.DOWN) {
+                    // Move the note rectangle if it is within range
                     if (newY >= 0 && newY + rectangleHeight <= spectrogramHeight) {
                         this.setTranslateY(newY);
                         this.noteNum = newNoteNum;
-                    }
-                } else {
-                    if (collisionLoc == CollisionLocation.LEFT) {
-                        this.setTranslateX(leftBoundingRectangle.getEndX());
-                    } else if (collisionLoc == CollisionLocation.RIGHT) {
-                        this.setTranslateX(rightBoundingRectangle.getStartX() - getRectangleWidth());
                     }
                 }
 
