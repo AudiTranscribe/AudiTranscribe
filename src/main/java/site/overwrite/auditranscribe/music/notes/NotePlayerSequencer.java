@@ -176,35 +176,6 @@ public class NotePlayerSequencer {
     }
 
     /**
-     * Method that returns strings that represent the events that are currently on the track.
-     *
-     * @return A string that represents the events on the track.
-     */
-    public String[] getEventsOnTrack() {
-        // Get all MIDI events
-        MidiEvent[] allEvents = getMidiEventsFromTrack();
-
-        // Convert each event into a string
-        String[] strings = new String[allEvents.length];
-        for (int i = 0; i < strings.length; i++) {
-            strings[i] = midiEventToHumanReadableString(allEvents[i]);
-        }
-
-        return strings;
-    }
-
-    /**
-     * Method that neatly organizes the events on the track as a string.
-     */
-    public String eventsOnTrackToString() {
-        StringBuilder sb = new StringBuilder();
-        for (String s : getEventsOnTrack()) {
-            sb.append(s).append("\n");
-        }
-        return sb.toString();
-    }
-
-    /**
      * Method that writes the MIDI sequence to a MIDI file.
      *
      * @param timeSignature  Time signature string (e.g. <code>6/8</code>, <code>3/4</code>).
@@ -270,7 +241,11 @@ public class NotePlayerSequencer {
             sequencer.stop();
             MyLogger.log(Level.FINE, "Note sequencer playback stopped", this.getClass().toString());
         } catch (IllegalStateException e) {
-            MyLogger.log(Level.FINE, "Note sequencer playback is not running, not stopping", this.getClass().toString());
+            MyLogger.log(
+                    Level.FINE,
+                    "Note sequencer playback is not running, not stopping",
+                    this.getClass().toString()
+            );
         }
     }
 
@@ -503,40 +478,5 @@ public class NotePlayerSequencer {
         } catch (InvalidMidiDataException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * Helper method that gets the MIDI events from the track.
-     *
-     * @return An array of MIDI events.
-     */
-    private MidiEvent[] getMidiEventsFromTrack() {
-        // Get size of the track
-        int n = track.size();
-
-        // Create array of `MidiEvents` and return
-        MidiEvent[] midiEvents = new MidiEvent[n];
-        for (int i = 0; i < n; i++) {
-            midiEvents[i] = track.get(i);
-        }
-        return midiEvents;
-    }
-
-    /**
-     * Helper method that converts a MIDI event into a human-readable string.
-     *
-     * @param midiEvent The MIDI event to convert.
-     * @return A string representation of the MIDI event.
-     */
-    private String midiEventToHumanReadableString(MidiEvent midiEvent) {
-        // Get the MIDI message and tick from the `midiEvent`
-        MidiMessage midiMessage = midiEvent.getMessage();
-        long tick = midiEvent.getTick();
-
-        // Convert the MIDI message to a human-readable string
-        String messageString = MIDIMessageDecoder.midiMessageToString(midiMessage);
-
-        // Return the string
-        return messageString + " at " + tick + " µs";
     }
 }
