@@ -80,6 +80,10 @@
     -fx-stroke: #000000ff;
 }
 
+.no-projects-vbox {
+    -fx-border-width: 0;
+}
+
 .search-text-field {
     -fx-font-size: 14px;
 }
@@ -116,6 +120,10 @@
 /* Labels */
 .display-label {
     -fx-font-weight: bold;
+    -fx-font-size: 16px;
+}
+
+.button-label {
     -fx-font-size: 16px;
 }
 

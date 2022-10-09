@@ -8,6 +8,7 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
@@ -94,6 +95,7 @@
                   <Insets left="30.0" right="30.0" />
                </padding>
             </StackPane>
+            <Separator prefWidth="200.0" />
             <StackPane prefHeight="357.0" prefWidth="800.0">
                <children>
                   <VBox alignment="CENTER" prefHeight="357.0" prefWidth="800.0" styleClass="no-projects-vbox">

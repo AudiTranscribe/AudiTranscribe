@@ -68,7 +68,7 @@ public class PreferencesViewController implements Initializable {
     private Spinner<Double> notePlayingDelayOffsetSpinner;
 
     @FXML
-    private Button selectFFmpegBinaryButton;
+    private Button selectFFmpegBinaryButton, deleteLogsButton;
 
     @FXML
     private TextField ffmpegBinaryPathTextField;
@@ -105,6 +105,37 @@ public class PreferencesViewController implements Initializable {
                 ffmpegBinaryPathTextField.setText(possibleFFmpegBinary.getAbsolutePath());
             } else {
                 Popups.showInformationAlert("Info", "No file selected.");
+            }
+        });
+
+        deleteLogsButton.setOnAction(event -> {
+            // Get the files in the logging folder
+            File[] files = new File(MyLogger.loggingFolder).listFiles();
+
+            // Exclude current log and its lock file
+            if (files != null) {
+                int numDeleted = 0;
+                for (File file : files) {
+                    if (!file.getName().equals(MyLogger.currentLogName) && !file.getName().endsWith(".lck")) {
+                        IOMethods.delete(file);
+                        MyLogger.log(
+                                Level.FINE,
+                                "Deleted log '" + file.getName() + "'",
+                                PreferencesViewController.class.getName()
+                        );
+                        numDeleted++;
+                    }
+                }
+
+                if (numDeleted != 0) {
+                    Popups.showInformationAlert(
+                            "Deleted Logs",
+                            "Deleted " + numDeleted + " " + (numDeleted == 1 ? "log" : "logs")+
+                                    " from the logs folder."
+                    );
+                } else {
+                    Popups.showInformationAlert("", "No logs to delete.");
+                }
             }
         });
 
