@@ -3,6 +3,9 @@ name: CodeQL Analysis
 on:
   push:
     branches: [ "main", "staging" ]
+    paths:
+      - 'src/main/java/site/overwrite/auditranscribe/**'
+      - 'src/test/java/site/overwrite/auditranscribe/**'
   pull_request:
     branches: [ "main" ]
   schedule:
