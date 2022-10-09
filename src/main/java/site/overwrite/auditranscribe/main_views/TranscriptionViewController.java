@@ -1009,7 +1009,7 @@ public class TranscriptionViewController implements Initializable {
             auxSlowedWAVFile = new File(auxSlowedWAVPath);
 
             // Delete unneeded files
-            IOMethods.delete(auxSlowedMP3Path);
+            IOMethods.delete(auxSlowedMP3File);
 
             MyLogger.log(
                     Level.INFO,
@@ -1029,8 +1029,8 @@ public class TranscriptionViewController implements Initializable {
         audio.setRawSlowedMP3Bytes(rawSlowedMP3Bytes);
 
         // Delete the auxiliary files
-        IOMethods.delete(auxOriginalWAVFile.getAbsolutePath());
-        IOMethods.delete(auxSlowedWAVFile.getAbsolutePath());
+        IOMethods.delete(auxOriginalWAVFile);
+        IOMethods.delete(auxSlowedWAVFile);
 
         // Update the audio object's duration
         // (The `MediaPlayer` duration cannot be trusted)
@@ -2572,7 +2572,7 @@ public class TranscriptionViewController implements Initializable {
 
         // Create an empty temporary MP3 file in the temporary directory
         File auxiliaryMP3File = new File(IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, uuid + ".mp3"));
-        IOMethods.createFile(auxiliaryMP3File.getAbsolutePath());
+        IOMethods.createFile(auxiliaryMP3File);
 
         // Write the raw MP3 bytes into the temporary files
         FileOutputStream fos = new FileOutputStream(auxiliaryMP3File);
@@ -2589,7 +2589,7 @@ public class TranscriptionViewController implements Initializable {
         File auxiliaryWAVFile = new File(auxiliaryWAVFilePath);
 
         // Delete the original MP3 file
-        IOMethods.delete(auxiliaryMP3File.getAbsolutePath());
+        IOMethods.delete(auxiliaryMP3File);
 
         // Return needed information
         return new Pair<>(TypeConversionUtils.toByteArray(rawMP3Bytes), auxiliaryWAVFile);

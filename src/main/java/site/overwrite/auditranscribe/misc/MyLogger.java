@@ -117,7 +117,7 @@ public final class MyLogger {
                     // Check if the days delta exceeds the persistence value
                     if (daysDelta > persistenceInDays) {
                         // Delete old log
-                        IOMethods.delete(file.getAbsolutePath());
+                        IOMethods.delete(file);
 
                         // Log it
                         MyLogger.log(

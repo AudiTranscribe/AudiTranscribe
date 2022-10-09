@@ -200,13 +200,13 @@ public final class CompressionHandlers {
 
             // Determine what was just created
             if (zipEntry.isDirectory()) {
-                if (!newFile.isDirectory() && !IOMethods.createFolder(newFile.getAbsolutePath())) {
+                if (!newFile.isDirectory() && !IOMethods.createFolder(newFile)) {
                     throw new IOException("Failed to create directory " + newFile);
                 }
             } else {
                 // Fix for Windows-created archives
                 File parent = newFile.getParentFile();
-                if (!parent.isDirectory() && !IOMethods.createFolder(parent.getAbsolutePath())) {
+                if (!parent.isDirectory() && !IOMethods.createFolder(parent)) {
                     throw new IOException("Failed to create directory " + parent);
                 }
 

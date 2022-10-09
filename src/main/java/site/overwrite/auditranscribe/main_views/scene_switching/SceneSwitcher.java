@@ -241,8 +241,8 @@ public class SceneSwitcher {
             );
 
             // Delete auxiliary WAV files
-            boolean successfullyDeleted = IOMethods.delete(samplesWAVFile.getAbsolutePath());
-            successfullyDeleted = (successfullyDeleted && IOMethods.delete(slowedWAVFile.getAbsolutePath()));
+            boolean successfullyDeleted = IOMethods.delete(samplesWAVFile);
+            successfullyDeleted = (successfullyDeleted && IOMethods.delete(slowedWAVFile));
 
             if (successfullyDeleted) {
                 MyLogger.log(Level.FINE, "Successfully deleted auxiliary WAV files.", this.getClass().toString());

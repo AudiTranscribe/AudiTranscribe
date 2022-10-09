@@ -92,6 +92,22 @@ public final class IOMethods {
     }
 
     /**
+     * Method that creates a file.
+     *
+     * @param file File object. Contains the absolute path of the file to create.
+     * @return An integer.
+     * <ul>
+     *     <li>Returns <code>0</code> if the file was successfully created.</li>
+     *     <li>Returns <code>1</code> if the file already exists.</li>
+     *     <li>Returns <code>-1</code> if the file failed to be created (<em>and does not already
+     *     exist</em>).</li>
+     * </ul>
+     */
+    public static int createFile(File file) {
+        return createFile(file.getAbsolutePath());
+    }
+
+    /**
      * Method that creates a file at the specified <code>absolutePath</code>.
      *
      * @param absolutePath <b>Absolute path</b> to the file.
@@ -117,19 +133,15 @@ public final class IOMethods {
     }
 
     /**
-     * Method that deletes a file or <b>empty</b> folder at the specified <code>absolutePath</code>.
+     * Method that creates a folder, if it does not already exist.<br>
+     * This method will also create any parent directories that does not already exist.
      *
-     * @param absolutePath <b>Absolute path</b> to the file or <b>empty</b> folder.
-     * @return Boolean. Is <code>true</code> is the file or folder was deleted and
+     * @param folder File object representing the folder to create.
+     * @return A boolean. Returns <code>true</code> if folder was created successfully, and
      * <code>false</code> otherwise.
      */
-    public static boolean delete(String absolutePath) {
-        try {
-            return Files.deleteIfExists(Paths.get(absolutePath));
-        } catch (IOException e) {
-            new File(absolutePath).deleteOnExit();
-            return false;
-        }
+    public static boolean createFolder(File folder) {
+        return createFolder(folder.getAbsolutePath());
     }
 
     /**
@@ -168,6 +180,33 @@ public final class IOMethods {
             Files.copy(origPath, copyPath, StandardCopyOption.REPLACE_EXISTING);
             return true;
         } catch (IOException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Method that deletes a file or <b>empty</b> folder at the specified <code>absolutePath</code>.
+     *
+     * @param file File object to delete.
+     * @return Boolean. Is <code>true</code> is the file or folder was deleted and
+     * <code>false</code> otherwise.
+     */
+    public static boolean delete(File file) {
+        return delete(file.getAbsolutePath());
+    }
+
+    /**
+     * Method that deletes a file or <b>empty</b> folder at the specified <code>absolutePath</code>.
+     *
+     * @param absolutePath <b>Absolute path</b> to the file or <b>empty</b> folder.
+     * @return Boolean. Is <code>true</code> is the file or folder was deleted and
+     * <code>false</code> otherwise.
+     */
+    public static boolean delete(String absolutePath) {
+        try {
+            return Files.deleteIfExists(Paths.get(absolutePath));
+        } catch (IOException e) {
+            new File(absolutePath).deleteOnExit();
             return false;
         }
     }
