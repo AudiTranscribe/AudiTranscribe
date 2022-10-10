@@ -147,10 +147,14 @@ public class NoteRectangle extends StackPane {
                 rectangleHeight / 2;
 
         // Check for collision
-        if (checkCollision(xCoord, initialRectangleWidth, noteNum, VerticalMovement.NONE) != CollisionLocation.NONE) {
+        CollisionLocation collisionLocation = checkCollision(
+                xCoord, initialRectangleWidth, noteNum, VerticalMovement.NONE
+        );
+
+        if (collisionLocation != CollisionLocation.NONE) {
             MyLogger.log(
                     Level.FINE,
-                    "Note rectangle collision detected; not placing note",
+                    "Note rectangle collision detected (" + collisionLocation + "); not placing note",
                     this.getClass().toString()
             );
             throw new NoteRectangleCollisionException("Note rectangle collision detected; not placing note");
