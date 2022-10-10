@@ -274,23 +274,6 @@ public class NoteRectangle extends StackPane {
                         newX, getRectangleWidth(), newNoteNum, verticalMovement
                 );
 
-//                if (collisionLoc == CollisionLocation.NONE) {
-//                    // Move the note rectangle if it is within range
-//                    if (newX >= 0 && newX + getRectangleWidth() <= spectrogramWidth) {
-//                        this.setTranslateX(newX);
-//                    }
-//                    if (newY >= 0 && newY + rectangleHeight <= spectrogramHeight) {
-//                        this.setTranslateY(newY);
-//                        this.noteNum = newNoteNum;
-//                    }
-//                } else {
-//                    if (collisionLoc == CollisionLocation.LEFT) {
-//                        this.setTranslateX(leftBoundingRectangle.getEndX());
-//                    } else if (collisionLoc == CollisionLocation.RIGHT) {
-//                        this.setTranslateX(rightBoundingRectangle.getStartX() - getRectangleWidth());
-//                    }
-//                }
-
                 if (collisionLoc == CollisionLocation.LEFT) {  // Collided with left rectangle
                     // Move current rectangle to the right edge of the left rectangle
                     this.setTranslateX(leftBoundingRectangle.getEndX());
@@ -304,9 +287,8 @@ public class NoteRectangle extends StackPane {
                     }
                 }
 
-                // If not vertical collision, permit movement vertically
                 if (collisionLoc != CollisionLocation.UP && collisionLoc != CollisionLocation.DOWN) {
-                    // Move the note rectangle if it is within range
+                    // Permit vertical movement if within range
                     if (newY >= 0 && newY + rectangleHeight <= spectrogramHeight) {
                         this.setTranslateY(newY);
                         this.noteNum = newNoteNum;
@@ -335,7 +317,7 @@ public class NoteRectangle extends StackPane {
                     noteRectanglesByNoteNumber.get(this.noteNum).add(this);
 
                     // Unset the bounding rectangles
-                    unsetBoundingRectangles();
+                    setBoundingRectangles(null, null);
                 }
 
                 // Update the `isEditing` flag
@@ -409,7 +391,7 @@ public class NoteRectangle extends StackPane {
                     noteRectanglesByNoteNumber.get(this.noteNum).add(this);
 
                     // Unset the bounding rectangles
-                    unsetBoundingRectangles();
+                    setBoundingRectangles(null, null);
                 }
 
                 // Update the `isEditing` flag
@@ -476,7 +458,7 @@ public class NoteRectangle extends StackPane {
                     noteRectanglesByNoteNumber.get(this.noteNum).add(this);
 
                     // Unset the bounding rectangles
-                    unsetBoundingRectangles();
+                    setBoundingRectangles(null, null);
                 }
 
                 // Update the `isEditing` flag
@@ -562,11 +544,11 @@ public class NoteRectangle extends StackPane {
     // Private methods
 
     /**
-     * Helper method that unsets the bounding rectangles.
+     * Helper method that sets the bounding rectangles.
      */
-    private void unsetBoundingRectangles() {
-        leftBoundingRectangle = null;
-        rightBoundingRectangle = null;
+    private void setBoundingRectangles(NoteRectangle leftBoundingRectangle, NoteRectangle rightBoundingRectangle) {
+        this.leftBoundingRectangle = leftBoundingRectangle;
+        this.rightBoundingRectangle = rightBoundingRectangle;
     }
 
     /**
@@ -583,25 +565,32 @@ public class NoteRectangle extends StackPane {
     private CollisionLocation checkCollision(
             double xPos, double rectangleWidth, int noteNumber, VerticalMovement verticalMovement
     ) {
-        // Check if bounding rectangles need updating
+        // Determine bounding rectangles
+        NoteRectangle leftBounder;
+        NoteRectangle rightBounder;
         if ((leftBoundingRectangle == null && rightBoundingRectangle == null) ||
                 (leftBoundingRectangle != null && xPos + rectangleWidth < leftBoundingRectangle.getStartX()) ||
                 (rightBoundingRectangle != null && xPos > rightBoundingRectangle.getEndX()) ||
                 verticalMovement != VerticalMovement.NONE) {
-            // Update bounding rectangles
+            // Recalculate the bounding rectangles and use the new ones
             Pair<NoteRectangle, NoteRectangle> rectangles = getLeftAndRightRectangles(xPos, noteNumber);
-            leftBoundingRectangle = rectangles.value0();
-            rightBoundingRectangle = rectangles.value1();
+            leftBounder = rectangles.value0();
+            rightBounder = rectangles.value1();
+        } else {
+            // No changes made; use the old ones
+            leftBounder = leftBoundingRectangle;
+            rightBounder = rightBoundingRectangle;
         }
 
         // Handle edge cases
-        if (leftBoundingRectangle == null && rightBoundingRectangle == null) {
+        if (leftBounder == null && rightBounder == null) {
             // No rectangles present at all (other than itself) => no collision
+            setBoundingRectangles(null, null);
             return CollisionLocation.NONE;
 
-        } else if (leftBoundingRectangle == null) {  // No left rectangle
+        } else if (leftBounder == null) {  // No left rectangle
             // If the end of this rectangle is before the start of the right rectangle, then there is no collision
-            if (xPos + rectangleWidth >= rightBoundingRectangle.getStartX()) {
+            if (xPos + rectangleWidth >= rightBounder.getStartX()) {
                 if (verticalMovement == VerticalMovement.NONE) {  // No vertical movement
                     return CollisionLocation.RIGHT;  // Collides with the rectangle on the right
                 } else {
@@ -609,12 +598,13 @@ public class NoteRectangle extends StackPane {
                     return CollisionLocation.DOWN;
                 }
             } else {
+                setBoundingRectangles(null, rightBounder);
                 return CollisionLocation.NONE;
             }
 
-        } else if (rightBoundingRectangle == null) {  // No right rectangle
+        } else if (rightBounder == null) {  // No right rectangle
             // If the start of this rectangle is after the end of the left rectangle, then there is no collision
-            if (xPos <= leftBoundingRectangle.getEndX()) {
+            if (xPos <= leftBounder.getEndX()) {
                 if (verticalMovement == VerticalMovement.NONE) {  // No vertical movement
                     return CollisionLocation.LEFT;  // Collides with the rectangle on the left
                 } else {
@@ -622,6 +612,7 @@ public class NoteRectangle extends StackPane {
                     return CollisionLocation.DOWN;
                 }
             } else {
+                setBoundingRectangles(leftBounder, null);
                 return CollisionLocation.NONE;
             }
 
@@ -630,13 +621,16 @@ public class NoteRectangle extends StackPane {
             // collision; otherwise there is a collision.
             CollisionLocation tempCollisionLoc = CollisionLocation.NONE;
 
-            if (leftBoundingRectangle.getEndX() >= xPos) {
+            if (leftBounder.getEndX() >= xPos) {
                 tempCollisionLoc = CollisionLocation.LEFT;
-            } else if (xPos + rectangleWidth >= rightBoundingRectangle.getStartX()) {
+            } else if (xPos + rectangleWidth >= rightBounder.getStartX()) {
                 tempCollisionLoc = CollisionLocation.RIGHT;
             }
 
-            if (tempCollisionLoc == CollisionLocation.NONE) return CollisionLocation.NONE;
+            if (tempCollisionLoc == CollisionLocation.NONE) {
+                setBoundingRectangles(leftBounder, rightBounder);
+                return CollisionLocation.NONE;
+            }
 
             // Otherwise, there was a collision; check if there was vertical movement
             if (verticalMovement == VerticalMovement.UP) return CollisionLocation.UP;
