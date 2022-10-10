@@ -65,8 +65,13 @@ public class FFmpegDownloadManager {
         this.maxAttempts = maxAttempts;
         this.os = OSMethods.getOS();
 
-        // Linux is currently not supported
-        if (os == OSType.LINUX) {
+        // Other OS are not supported
+        if (os == OSType.OTHER) {
+            downloadURL = null;
+            signature = null;
+            ffmpegFolder = null;
+        } else if (os == OSType.UBUNTU) {
+            // Todo: support Ubuntu
             downloadURL = null;
             signature = null;
             ffmpegFolder = null;

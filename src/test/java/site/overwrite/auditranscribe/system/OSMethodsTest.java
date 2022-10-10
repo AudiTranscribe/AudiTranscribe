@@ -50,7 +50,7 @@ class OSMethodsTest {
 
     @Test
     @EnabledOnOs({OS.LINUX})
-    void getOSNameLinux() {
-        assertEquals(OSType.LINUX, OSMethods.getOS());
+    void getOSNameUbuntu() {
+        assertEquals(OSType.UBUNTU, OSMethods.getOS());
     }
 }

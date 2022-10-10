@@ -18,6 +18,12 @@
 
 package site.overwrite.auditranscribe.system;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.Objects;
+import java.util.Scanner;
+
 public final class OSMethods {
     private OSMethods() {
         // Private constructor to signal this is a utility class
@@ -49,7 +55,31 @@ public final class OSMethods {
         // Split by spaces
         String[] split = osName.split(" ");
 
-        // Get the OS based on the first value
-        return OSType.valueOf(split[0]);
+        // Get the first value of the split
+        String proposedOSName = split[0];
+
+        // If the proposed OS name is "WINDOWS" or "MAC" we are OK
+        if (Objects.equals(proposedOSName, "WINDOWS") || Objects.equals(proposedOSName, "MAC")) {
+            return OSType.valueOf(proposedOSName);
+        } else {  // More work needed...
+            // Check if the "/etc/lsb-release" file exists
+            File lsbReleaseFile = new File("/etc/lsb-release");
+            try {
+                // Check that the LSB release file contains "Ubuntu"
+                StringBuilder sb = new StringBuilder();
+                Scanner s = new Scanner(new FileInputStream(lsbReleaseFile));
+                while (s.hasNext()) {
+                    sb.append(s.nextLine());
+                }
+
+                if (sb.toString().toUpperCase().contains("UBUNTU")) {
+                    return OSType.UBUNTU;
+                }
+            } catch (FileNotFoundException ignored) {
+            }
+
+            // Failure to find the file, or failure to find "UBUNTU" in the file, means that the OS is not Ubuntu
+            return OSType.OTHER;
+        }
     }
 }
