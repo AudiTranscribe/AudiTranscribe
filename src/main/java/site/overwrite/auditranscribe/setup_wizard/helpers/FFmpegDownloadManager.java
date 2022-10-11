@@ -70,8 +70,8 @@ public class FFmpegDownloadManager {
             downloadURL = null;
             signature = null;
             ffmpegFolder = null;
-        } else if (os == OSType.UBUNTU) {
-            // Todo: support Ubuntu
+        } else if (os == OSType.LINUX) {
+            // Todo: support linux
             downloadURL = null;
             signature = null;
             ffmpegFolder = null;
