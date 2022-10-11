@@ -1,6 +1,6 @@
 /*
- * FailedToMakeJSONFileException.java
- * Description: Exception to mark when a JSON file could not be created.
+ * FilterNotFoundException.java
+ * Description: Exception thrown if the audio filter file could not be found.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,28 +16,29 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.exceptions.io;
+package site.overwrite.auditranscribe.audio.exceptions;
 
 /**
- * Exception to mark when a JSON file could not be created.
+ * Exception thrown if the audio filter file could not be found.
  */
-public class FailedToMakeJSONFileException extends RuntimeException {
-    public FailedToMakeJSONFileException() {
+public class FilterNotFoundException extends RuntimeException {
+    public FilterNotFoundException() {
+        super();
     }
 
-    public FailedToMakeJSONFileException(String message) {
+    public FilterNotFoundException(String message) {
         super(message);
     }
 
-    public FailedToMakeJSONFileException(String message, Throwable cause) {
+    public FilterNotFoundException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public FailedToMakeJSONFileException(Throwable cause) {
+    public FilterNotFoundException(Throwable cause) {
         super(cause);
     }
 
-    public FailedToMakeJSONFileException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    protected FilterNotFoundException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

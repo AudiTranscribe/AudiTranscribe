@@ -1,6 +1,6 @@
 /*
- * InvalidFileVersionException.java
- * Description: Exception to mark that a requested AUDT file version is invalid.
+ * AudioTooLongException.java
+ * Description: Exception thrown when an audio file is too long.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,24 +16,29 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.exceptions.io.audt_file;
+package site.overwrite.auditranscribe.audio.exceptions;
 
 /**
- * Exception to mark that a requested AUDT file version is invalid.
+ * Exception thrown when an audio file is too long.
  */
-public class InvalidFileVersionException extends Exception {
-    public InvalidFileVersionException() {
+public class AudioTooLongException extends Exception {
+    public AudioTooLongException() {
+        super();
     }
 
-    public InvalidFileVersionException(String message) {
+    public AudioTooLongException(String message) {
         super(message);
     }
 
-    public InvalidFileVersionException(String message, Throwable cause) {
+    public AudioTooLongException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public InvalidFileVersionException(Throwable cause) {
+    public AudioTooLongException(Throwable cause) {
         super(cause);
+    }
+
+    protected AudioTooLongException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

@@ -1,6 +1,6 @@
 /*
- * FFmpegNotFoundException.java
- * Description: Exception that is thrown when the ffmpeg binary path is not found.
+ * InvalidFileVersionException.java
+ * Description: Exception to mark that a requested AUDT file version is invalid.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,29 +16,24 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.exceptions.audio;
+package site.overwrite.auditranscribe.io.exceptions;
 
 /**
- * Exception that is thrown when the ffmpeg binary path is not found.
+ * Exception to mark that a requested AUDT file version is invalid.
  */
-public class FFmpegNotFoundException extends Exception {
-    public FFmpegNotFoundException() {
-        super();
+public class InvalidFileVersionException extends Exception {
+    public InvalidFileVersionException() {
     }
 
-    public FFmpegNotFoundException(String message) {
+    public InvalidFileVersionException(String message) {
         super(message);
     }
 
-    public FFmpegNotFoundException(String message, Throwable cause) {
+    public InvalidFileVersionException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public FFmpegNotFoundException(Throwable cause) {
+    public InvalidFileVersionException(Throwable cause) {
         super(cause);
-    }
-
-    protected FFmpegNotFoundException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

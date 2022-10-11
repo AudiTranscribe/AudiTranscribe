@@ -18,8 +18,8 @@
 
 package site.overwrite.auditranscribe.audio;
 
-import site.overwrite.auditranscribe.exceptions.audio.FFmpegCommandFailedException;
-import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
+import site.overwrite.auditranscribe.audio.exceptions.FFmpegCommandFailedException;
+import site.overwrite.auditranscribe.audio.exceptions.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.StreamGobbler;
 import site.overwrite.auditranscribe.misc.MyLogger;

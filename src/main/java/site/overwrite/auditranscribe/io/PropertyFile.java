@@ -19,7 +19,7 @@
 package site.overwrite.auditranscribe.io;
 
 import site.overwrite.auditranscribe.MainApplication;
-import site.overwrite.auditranscribe.exceptions.io.NoSuchPropertyException;
+import site.overwrite.auditranscribe.io.exceptions.NoSuchPropertyException;
 
 import java.io.IOException;
 import java.util.Properties;

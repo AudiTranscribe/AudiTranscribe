@@ -1,6 +1,6 @@
 /*
- * AudioIsSamplesOnlyException.java
- * Description: Exception thrown when the audio object is only meant for processing its samples.
+ * IncorrectFileFormatException.java
+ * Description: Exception to mark that the AUDT file does not have the file format.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,29 +16,24 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.exceptions.audio;
+package site.overwrite.auditranscribe.io.exceptions;
 
 /**
- * Exception thrown when the audio object is only meant for processing its samples.
+ * Exception to mark that the AUDT file does not have the file format
  */
-public class AudioIsSamplesOnlyException extends RuntimeException {
-    public AudioIsSamplesOnlyException() {
-        super();
+public class IncorrectFileFormatException extends Exception {
+    public IncorrectFileFormatException() {
     }
 
-    public AudioIsSamplesOnlyException(String message) {
+    public IncorrectFileFormatException(String message) {
         super(message);
     }
 
-    public AudioIsSamplesOnlyException(String message, Throwable cause) {
+    public IncorrectFileFormatException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public AudioIsSamplesOnlyException(Throwable cause) {
+    public IncorrectFileFormatException(Throwable cause) {
         super(cause);
-    }
-
-    protected AudioIsSamplesOnlyException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

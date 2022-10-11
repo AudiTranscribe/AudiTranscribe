@@ -21,7 +21,7 @@ package site.overwrite.auditranscribe.spectrogram;
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
-import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
+import site.overwrite.auditranscribe.audio.exceptions.AudioTooLongException;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.utils.MathUtils;
 

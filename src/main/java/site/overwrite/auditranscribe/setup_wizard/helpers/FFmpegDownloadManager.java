@@ -21,7 +21,7 @@ package site.overwrite.auditranscribe.setup_wizard.helpers;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import site.overwrite.auditranscribe.exceptions.network.APIServerException;
+import site.overwrite.auditranscribe.network.exceptions.APIServerException;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.CustomTask;

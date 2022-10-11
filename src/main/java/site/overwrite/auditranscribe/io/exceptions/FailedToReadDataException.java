@@ -1,6 +1,6 @@
 /*
- * FilterNotFoundException.java
- * Description: Exception thrown if the audio filter file could not be found.
+ * FailedToReadDataException.java
+ * Description: Exception to mark that the program failed to read the data stored in an AUDT file.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,29 +16,24 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.exceptions.audio;
+package site.overwrite.auditranscribe.io.exceptions;
 
 /**
- * Exception thrown if the audio filter file could not be found.
+ * Exception to mark that the program failed to read the data stored in an AUDT file.
  */
-public class FilterNotFoundException extends RuntimeException {
-    public FilterNotFoundException() {
-        super();
+public class FailedToReadDataException extends Exception {
+    public FailedToReadDataException() {
     }
 
-    public FilterNotFoundException(String message) {
+    public FailedToReadDataException(String message) {
         super(message);
     }
 
-    public FilterNotFoundException(String message, Throwable cause) {
+    public FailedToReadDataException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public FilterNotFoundException(Throwable cause) {
+    public FailedToReadDataException(Throwable cause) {
         super(cause);
-    }
-
-    protected FilterNotFoundException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

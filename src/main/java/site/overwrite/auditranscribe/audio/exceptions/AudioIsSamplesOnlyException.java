@@ -1,6 +1,6 @@
 /*
- * FileDownloadFailedException.java
- * Description: Exception thrown to mark that the file download failed.
+ * AudioIsSamplesOnlyException.java
+ * Description: Exception thrown when the audio object is only meant for processing its samples.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,29 +16,29 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.exceptions.network;
+package site.overwrite.auditranscribe.audio.exceptions;
 
 /**
- * Exception thrown to mark that the file download failed.
+ * Exception thrown when the audio object is only meant for processing its samples.
  */
-public class FileDownloadFailedException extends Exception {
-    public FileDownloadFailedException() {
+public class AudioIsSamplesOnlyException extends RuntimeException {
+    public AudioIsSamplesOnlyException() {
         super();
     }
 
-    public FileDownloadFailedException(String message) {
+    public AudioIsSamplesOnlyException(String message) {
         super(message);
     }
 
-    public FileDownloadFailedException(String message, Throwable cause) {
+    public AudioIsSamplesOnlyException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public FileDownloadFailedException(Throwable cause) {
+    public AudioIsSamplesOnlyException(Throwable cause) {
         super(cause);
     }
 
-    protected FileDownloadFailedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    protected AudioIsSamplesOnlyException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

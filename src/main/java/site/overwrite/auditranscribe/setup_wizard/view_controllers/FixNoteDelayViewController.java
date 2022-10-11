@@ -31,7 +31,7 @@ import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
-import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
+import site.overwrite.auditranscribe.audio.exceptions.AudioTooLongException;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Popups;

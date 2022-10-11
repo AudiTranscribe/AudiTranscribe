@@ -19,8 +19,8 @@
 package site.overwrite.auditranscribe.io.audt_file;
 
 import org.junit.jupiter.api.Test;
-import site.overwrite.auditranscribe.exceptions.io.audt_file.IncorrectFileFormatException;
-import site.overwrite.auditranscribe.exceptions.io.audt_file.InvalidFileVersionException;
+import site.overwrite.auditranscribe.io.exceptions.IncorrectFileFormatException;
+import site.overwrite.auditranscribe.io.exceptions.InvalidFileVersionException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileReader;

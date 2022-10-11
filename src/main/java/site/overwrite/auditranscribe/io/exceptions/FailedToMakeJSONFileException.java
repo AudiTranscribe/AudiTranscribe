@@ -1,7 +1,6 @@
 /*
- * LengthException.java
- * Description: Exception to mark when an array does not have an appropriate length (i.e. length
- *              check failed).
+ * FailedToMakeJSONFileException.java
+ * Description: Exception to mark when a JSON file could not be created.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -17,28 +16,28 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.exceptions.generic;
+package site.overwrite.auditranscribe.io.exceptions;
 
 /**
- * Exception to mark when an array does not have an appropriate length (i.e. length check failed).
+ * Exception to mark when a JSON file could not be created.
  */
-public class LengthException extends RuntimeException {
-    public LengthException() {
+public class FailedToMakeJSONFileException extends RuntimeException {
+    public FailedToMakeJSONFileException() {
     }
 
-    public LengthException(String message) {
+    public FailedToMakeJSONFileException(String message) {
         super(message);
     }
 
-    public LengthException(String message, Throwable cause) {
+    public FailedToMakeJSONFileException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public LengthException(Throwable cause) {
+    public FailedToMakeJSONFileException(Throwable cause) {
         super(cause);
     }
 
-    public LengthException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public FailedToMakeJSONFileException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

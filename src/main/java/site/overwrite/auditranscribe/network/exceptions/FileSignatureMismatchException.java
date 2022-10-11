@@ -1,6 +1,7 @@
 /*
- * NoSuchPropertyException.java
- * Description: Exception to mark when a property file does not have the specified property.
+ * FileSignatureMismatchException.java
+ * Description: Exception to mark when the calculated file hash does not match the expected file
+ *              hash.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,28 +17,29 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.exceptions.io;
+package site.overwrite.auditranscribe.network.exceptions;
 
 /**
- * Exception to mark when a property file does not have the specified property.
+ * Exception to mark when the calculated file hash does not match the expected file hash.
  */
-public class NoSuchPropertyException extends RuntimeException {
-    public NoSuchPropertyException() {
+public class FileSignatureMismatchException extends Exception {
+    public FileSignatureMismatchException() {
+        super();
     }
 
-    public NoSuchPropertyException(String message) {
+    public FileSignatureMismatchException(String message) {
         super(message);
     }
 
-    public NoSuchPropertyException(String message, Throwable cause) {
+    public FileSignatureMismatchException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public NoSuchPropertyException(Throwable cause) {
+    public FileSignatureMismatchException(Throwable cause) {
         super(cause);
     }
 
-    public NoSuchPropertyException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    protected FileSignatureMismatchException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

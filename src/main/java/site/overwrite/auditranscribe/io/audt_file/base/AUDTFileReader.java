@@ -18,14 +18,14 @@
 
 package site.overwrite.auditranscribe.io.audt_file.base;
 
-import site.overwrite.auditranscribe.exceptions.io.audt_file.InvalidFileVersionException;
+import site.overwrite.auditranscribe.io.exceptions.InvalidFileVersionException;
 import site.overwrite.auditranscribe.io.audt_file.v0x00080001.AUDTFileReader0x00080001;
 import site.overwrite.auditranscribe.utils.ByteConversionUtils;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import site.overwrite.auditranscribe.exceptions.io.audt_file.FailedToReadDataException;
-import site.overwrite.auditranscribe.exceptions.io.audt_file.IncorrectFileFormatException;
+import site.overwrite.auditranscribe.io.exceptions.FailedToReadDataException;
+import site.overwrite.auditranscribe.io.exceptions.IncorrectFileFormatException;
 import site.overwrite.auditranscribe.io.audt_file.v0x00050002.AUDTFileReader0x00050002;
 import site.overwrite.auditranscribe.io.audt_file.v0x00070001.AUDTFileReader0x00070001;
 

@@ -21,7 +21,7 @@ package site.overwrite.auditranscribe.main_views;
 import com.google.gson.JsonObject;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import site.overwrite.auditranscribe.exceptions.network.APIServerException;
+import site.overwrite.auditranscribe.network.exceptions.APIServerException;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Popups;

@@ -1,6 +1,7 @@
 /*
- * FFmpegCommandFailedException.java
- * Description: Exception that is thrown when the ffmpeg command fails to run.
+ * NoteRectangleCollisionException.java
+ * Description: Exception that is raised if there is a collision between note rectangles during the
+ *              creation of a new note rectangle.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,29 +17,26 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.exceptions.audio;
+package site.overwrite.auditranscribe.music.exceptions;
 
 /**
- * Exception that is thrown when the ffmpeg command fails to run.
+ * Exception that is raised if there is a collision between note rectangles during the creation of a
+ * new note rectangle.
  */
-public class FFmpegCommandFailedException extends RuntimeException {
-    public FFmpegCommandFailedException() {
+public class NoteRectangleCollisionException extends Exception {
+    public NoteRectangleCollisionException() {
         super();
     }
 
-    public FFmpegCommandFailedException(String message) {
+    public NoteRectangleCollisionException(String message) {
         super(message);
     }
 
-    public FFmpegCommandFailedException(String message, Throwable cause) {
+    public NoteRectangleCollisionException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public FFmpegCommandFailedException(Throwable cause) {
+    public NoteRectangleCollisionException(Throwable cause) {
         super(cause);
-    }
-
-    protected FFmpegCommandFailedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

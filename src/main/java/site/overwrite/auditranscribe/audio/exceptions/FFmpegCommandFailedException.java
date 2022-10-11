@@ -1,6 +1,6 @@
 /*
- * FormatException.java
- * Description: Exception to mark when a string does not have the correct format.
+ * FFmpegCommandFailedException.java
+ * Description: Exception that is thrown when the ffmpeg command fails to run.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,28 +16,29 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.exceptions.generic;
+package site.overwrite.auditranscribe.audio.exceptions;
 
 /**
- * Exception to mark when a string does not have the correct format.
+ * Exception that is thrown when the ffmpeg command fails to run.
  */
-public class FormatException extends RuntimeException {
-    public FormatException() {
+public class FFmpegCommandFailedException extends RuntimeException {
+    public FFmpegCommandFailedException() {
+        super();
     }
 
-    public FormatException(String message) {
+    public FFmpegCommandFailedException(String message) {
         super(message);
     }
 
-    public FormatException(String message, Throwable cause) {
+    public FFmpegCommandFailedException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public FormatException(Throwable cause) {
+    public FFmpegCommandFailedException(Throwable cause) {
         super(cause);
     }
 
-    public FormatException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    protected FFmpegCommandFailedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

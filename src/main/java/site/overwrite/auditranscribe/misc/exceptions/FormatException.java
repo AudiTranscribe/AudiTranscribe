@@ -1,7 +1,6 @@
 /*
- * NoteRectangleCollisionException.java
- * Description: Exception that is raised if there is a collision between note rectangles during the
- *              creation of a new note rectangle.
+ * FormatException.java
+ * Description: Exception to mark when a string does not have the correct format.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -17,26 +16,28 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.exceptions.notes;
+package site.overwrite.auditranscribe.misc.exceptions;
 
 /**
- * Exception that is raised if there is a collision between note rectangles during the creation of a
- * new note rectangle.
+ * Exception to mark when a string does not have the correct format.
  */
-public class NoteRectangleCollisionException extends Exception {
-    public NoteRectangleCollisionException() {
-        super();
+public class FormatException extends RuntimeException {
+    public FormatException() {
     }
 
-    public NoteRectangleCollisionException(String message) {
+    public FormatException(String message) {
         super(message);
     }
 
-    public NoteRectangleCollisionException(String message, Throwable cause) {
+    public FormatException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public NoteRectangleCollisionException(Throwable cause) {
+    public FormatException(Throwable cause) {
         super(cause);
+    }
+
+    public FormatException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

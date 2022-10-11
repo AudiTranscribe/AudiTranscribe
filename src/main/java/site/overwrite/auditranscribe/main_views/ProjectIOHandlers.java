@@ -19,7 +19,7 @@
 package site.overwrite.auditranscribe.main_views;
 
 import javafx.stage.*;
-import site.overwrite.auditranscribe.exceptions.io.audt_file.InvalidFileVersionException;
+import site.overwrite.auditranscribe.io.exceptions.InvalidFileVersionException;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
 import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileWriter;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.ProjectInfoDataObject;

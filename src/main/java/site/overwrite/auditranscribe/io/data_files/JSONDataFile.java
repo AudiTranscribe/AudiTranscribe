@@ -22,7 +22,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
-import site.overwrite.auditranscribe.exceptions.io.FailedToMakeJSONFileException;
+import site.overwrite.auditranscribe.io.exceptions.FailedToMakeJSONFileException;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;

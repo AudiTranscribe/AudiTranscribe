@@ -18,7 +18,7 @@
 
 package site.overwrite.auditranscribe.network;
 
-import site.overwrite.auditranscribe.exceptions.network.FileSignatureMismatchException;
+import site.overwrite.auditranscribe.network.exceptions.FileSignatureMismatchException;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.misc.MyLogger;

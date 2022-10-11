@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.exceptions.generic;
+package site.overwrite.auditranscribe.misc.exceptions;
 
 /**
  * Exception to mark when an operation or function receives an argument that has the right type but

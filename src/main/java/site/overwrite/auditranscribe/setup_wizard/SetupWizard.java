@@ -23,7 +23,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import site.overwrite.auditranscribe.audio.FFmpegHandler;
-import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
+import site.overwrite.auditranscribe.audio.exceptions.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.misc.MyLogger;

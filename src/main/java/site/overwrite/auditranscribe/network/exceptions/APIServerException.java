@@ -1,6 +1,7 @@
 /*
- * AudioTooLongException.java
- * Description: Exception thrown when an audio file is too long.
+ * APIServerException.java
+ * Description: Exception to mark when the API server connection encounters a problem, like a
+ *              timeout or a refusal to connect.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,29 +17,30 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.exceptions.audio;
+package site.overwrite.auditranscribe.network.exceptions;
 
 /**
- * Exception thrown when an audio file is too long.
+ * Exception to mark when the API server connection encounters a problem, like a timeout or a
+ * refusal to connect.
  */
-public class AudioTooLongException extends Exception {
-    public AudioTooLongException() {
+public class APIServerException extends Exception {
+    public APIServerException() {
         super();
     }
 
-    public AudioTooLongException(String message) {
+    public APIServerException(String message) {
         super(message);
     }
 
-    public AudioTooLongException(String message, Throwable cause) {
+    public APIServerException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public AudioTooLongException(Throwable cause) {
+    public APIServerException(Throwable cause) {
         super(cause);
     }
 
-    protected AudioTooLongException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    protected APIServerException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

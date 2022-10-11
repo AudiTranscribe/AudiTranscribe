@@ -18,7 +18,7 @@
 
 package site.overwrite.auditranscribe.audio.filters;
 
-import site.overwrite.auditranscribe.exceptions.audio.FilterNotFoundException;
+import site.overwrite.auditranscribe.audio.exceptions.FilterNotFoundException;
 import site.overwrite.auditranscribe.io.IOMethods;
 
 import java.io.IOException;

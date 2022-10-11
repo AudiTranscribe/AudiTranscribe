@@ -1,6 +1,6 @@
 /*
- * IncorrectFileFormatException.java
- * Description: Exception to mark that the AUDT file does not have the file format.
+ * NoSuchPropertyException.java
+ * Description: Exception to mark when a property file does not have the specified property.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,24 +16,28 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.exceptions.io.audt_file;
+package site.overwrite.auditranscribe.io.exceptions;
 
 /**
- * Exception to mark that the AUDT file does not have the file format
+ * Exception to mark when a property file does not have the specified property.
  */
-public class IncorrectFileFormatException extends Exception {
-    public IncorrectFileFormatException() {
+public class NoSuchPropertyException extends RuntimeException {
+    public NoSuchPropertyException() {
     }
 
-    public IncorrectFileFormatException(String message) {
+    public NoSuchPropertyException(String message) {
         super(message);
     }
 
-    public IncorrectFileFormatException(String message, Throwable cause) {
+    public NoSuchPropertyException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public IncorrectFileFormatException(Throwable cause) {
+    public NoSuchPropertyException(Throwable cause) {
         super(cause);
+    }
+
+    public NoSuchPropertyException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

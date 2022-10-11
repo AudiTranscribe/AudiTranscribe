@@ -18,7 +18,7 @@
 
 package site.overwrite.auditranscribe.utils;
 
-import site.overwrite.auditranscribe.exceptions.generic.LengthException;
+import site.overwrite.auditranscribe.misc.exceptions.LengthException;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

@@ -1,6 +1,7 @@
 /*
- * FailedToReadDataException.java
- * Description: Exception to mark that the program failed to read the data stored in an AUDT file.
+ * LengthException.java
+ * Description: Exception to mark when an array does not have an appropriate length (i.e. length
+ *              check failed).
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,24 +17,28 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.exceptions.io.audt_file;
+package site.overwrite.auditranscribe.misc.exceptions;
 
 /**
- * Exception to mark that the program failed to read the data stored in an AUDT file.
+ * Exception to mark when an array does not have an appropriate length (i.e. length check failed).
  */
-public class FailedToReadDataException extends Exception {
-    public FailedToReadDataException() {
+public class LengthException extends RuntimeException {
+    public LengthException() {
     }
 
-    public FailedToReadDataException(String message) {
+    public LengthException(String message) {
         super(message);
     }
 
-    public FailedToReadDataException(String message, Throwable cause) {
+    public LengthException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public FailedToReadDataException(Throwable cause) {
+    public LengthException(Throwable cause) {
         super(cause);
+    }
+
+    public LengthException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
     }
 }

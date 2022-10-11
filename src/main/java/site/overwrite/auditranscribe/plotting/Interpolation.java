@@ -18,7 +18,7 @@
 
 package site.overwrite.auditranscribe.plotting;
 
-import site.overwrite.auditranscribe.exceptions.generic.LengthException;
+import site.overwrite.auditranscribe.misc.exceptions.LengthException;
 
 /**
  * Class that handles the interpolation of a 2D array.

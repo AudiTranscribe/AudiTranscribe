@@ -23,7 +23,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import site.overwrite.auditranscribe.exceptions.network.FileSignatureMismatchException;
+import site.overwrite.auditranscribe.network.exceptions.FileSignatureMismatchException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.CustomTask;

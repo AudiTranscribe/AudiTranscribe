@@ -18,7 +18,7 @@
 
 package site.overwrite.auditranscribe.io.audt_file.base;
 
-import site.overwrite.auditranscribe.exceptions.io.audt_file.InvalidFileVersionException;
+import site.overwrite.auditranscribe.io.exceptions.InvalidFileVersionException;
 import site.overwrite.auditranscribe.io.audt_file.v0x00080001.AUDTFileWriter0x00080001;
 import site.overwrite.auditranscribe.utils.ByteConversionUtils;
 import site.overwrite.auditranscribe.io.CompressionHandlers;

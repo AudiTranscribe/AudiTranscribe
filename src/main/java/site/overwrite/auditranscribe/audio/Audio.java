@@ -19,10 +19,10 @@
 package site.overwrite.auditranscribe.audio;
 
 import javafx.util.Duration;
-import site.overwrite.auditranscribe.exceptions.audio.AudioIsSamplesOnlyException;
-import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
-import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
-import site.overwrite.auditranscribe.exceptions.generic.ValueException;
+import site.overwrite.auditranscribe.audio.exceptions.AudioIsSamplesOnlyException;
+import site.overwrite.auditranscribe.audio.exceptions.AudioTooLongException;
+import site.overwrite.auditranscribe.audio.exceptions.FFmpegNotFoundException;
+import site.overwrite.auditranscribe.misc.exceptions.ValueException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.MyLogger;

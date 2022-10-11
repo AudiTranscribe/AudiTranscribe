@@ -1,7 +1,6 @@
 /*
- * APIServerException.java
- * Description: Exception to mark when the API server connection encounters a problem, like a
- *              timeout or a refusal to connect.
+ * FileDownloadFailedException.java
+ * Description: Exception thrown to mark that the file download failed.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -17,30 +16,29 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.exceptions.network;
+package site.overwrite.auditranscribe.network.exceptions;
 
 /**
- * Exception to mark when the API server connection encounters a problem, like a timeout or a
- * refusal to connect.
+ * Exception thrown to mark that the file download failed.
  */
-public class APIServerException extends Exception {
-    public APIServerException() {
+public class FileDownloadFailedException extends Exception {
+    public FileDownloadFailedException() {
         super();
     }
 
-    public APIServerException(String message) {
+    public FileDownloadFailedException(String message) {
         super(message);
     }
 
-    public APIServerException(String message, Throwable cause) {
+    public FileDownloadFailedException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public APIServerException(Throwable cause) {
+    public FileDownloadFailedException(Throwable cause) {
         super(cause);
     }
 
-    protected APIServerException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    protected FileDownloadFailedException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

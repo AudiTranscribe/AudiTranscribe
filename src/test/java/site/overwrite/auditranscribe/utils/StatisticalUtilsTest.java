@@ -19,7 +19,7 @@
 package site.overwrite.auditranscribe.utils;
 
 import org.junit.jupiter.api.Test;
-import site.overwrite.auditranscribe.exceptions.generic.LengthException;
+import site.overwrite.auditranscribe.misc.exceptions.LengthException;
 
 import static org.junit.jupiter.api.Assertions.*;
 

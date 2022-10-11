@@ -18,7 +18,7 @@
 
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
-import site.overwrite.auditranscribe.exceptions.generic.LengthException;
+import site.overwrite.auditranscribe.misc.exceptions.LengthException;
 import site.overwrite.auditranscribe.misc.Complex;
 import site.overwrite.auditranscribe.utils.MathUtils;
 import site.overwrite.auditranscribe.utils.MiscUtils;

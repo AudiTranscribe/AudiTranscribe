@@ -18,8 +18,8 @@
 
 package site.overwrite.auditranscribe.music.notes;
 
-import site.overwrite.auditranscribe.exceptions.generic.LengthException;
-import site.overwrite.auditranscribe.exceptions.generic.ValueException;
+import site.overwrite.auditranscribe.misc.exceptions.LengthException;
+import site.overwrite.auditranscribe.misc.exceptions.ValueException;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.tuples.Pair;
 import site.overwrite.auditranscribe.misc.tuples.Triple;
