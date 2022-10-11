@@ -18,7 +18,7 @@
 
 package site.overwrite.auditranscribe.utils;
 
-import site.overwrite.auditranscribe.misc.exceptions.LengthException;
+import site.overwrite.auditranscribe.generic.exceptions.LengthException;
 
 import java.util.Arrays;
 

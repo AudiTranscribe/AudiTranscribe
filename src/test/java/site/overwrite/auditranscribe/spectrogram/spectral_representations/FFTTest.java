@@ -19,7 +19,7 @@
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
 import org.junit.jupiter.api.Test;
-import site.overwrite.auditranscribe.misc.exceptions.LengthException;
+import site.overwrite.auditranscribe.generic.exceptions.LengthException;
 import site.overwrite.auditranscribe.misc.Complex;
 
 import java.lang.reflect.InvocationTargetException;

@@ -18,7 +18,7 @@
 
 package site.overwrite.auditranscribe.music.notes;
 
-import site.overwrite.auditranscribe.misc.exceptions.ValueException;
+import site.overwrite.auditranscribe.generic.exceptions.ValueException;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 import javax.sound.midi.*;

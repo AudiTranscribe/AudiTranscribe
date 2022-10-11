@@ -22,7 +22,7 @@ import javafx.util.Duration;
 import site.overwrite.auditranscribe.audio.exceptions.AudioIsSamplesOnlyException;
 import site.overwrite.auditranscribe.audio.exceptions.AudioTooLongException;
 import site.overwrite.auditranscribe.audio.exceptions.FFmpegNotFoundException;
-import site.overwrite.auditranscribe.misc.exceptions.ValueException;
+import site.overwrite.auditranscribe.generic.exceptions.ValueException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.MyLogger;

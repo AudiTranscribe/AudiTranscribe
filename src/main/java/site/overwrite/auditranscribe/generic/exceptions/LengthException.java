@@ -17,7 +17,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.misc.exceptions;
+package site.overwrite.auditranscribe.generic.exceptions;
 
 /**
  * Exception to mark when an array does not have an appropriate length (i.e. length check failed).

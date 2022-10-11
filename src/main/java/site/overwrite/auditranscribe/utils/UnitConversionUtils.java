@@ -18,8 +18,8 @@
 
 package site.overwrite.auditranscribe.utils;
 
-import site.overwrite.auditranscribe.misc.exceptions.FormatException;
-import site.overwrite.auditranscribe.misc.exceptions.ValueException;
+import site.overwrite.auditranscribe.generic.exceptions.FormatException;
+import site.overwrite.auditranscribe.generic.exceptions.ValueException;
 
 import java.util.Map;
 import java.util.regex.Matcher;

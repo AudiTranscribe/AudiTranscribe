@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.misc.exceptions;
+package site.overwrite.auditranscribe.generic.exceptions;
 
 /**
  * Exception to mark when a string does not have the correct format.

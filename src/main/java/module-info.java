@@ -49,7 +49,7 @@ module site.overwrite.auditranscribe {
     exports site.overwrite.auditranscribe.main_views;
     exports site.overwrite.auditranscribe.main_views.scene_switching;
     exports site.overwrite.auditranscribe.misc;
-    exports site.overwrite.auditranscribe.misc.exceptions;
+    exports site.overwrite.auditranscribe.generic.exceptions;
     exports site.overwrite.auditranscribe.misc.tuples;
     exports site.overwrite.auditranscribe.music.exceptions;
     exports site.overwrite.auditranscribe.music.notes;
