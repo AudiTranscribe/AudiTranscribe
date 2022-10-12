@@ -26,11 +26,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.misc.MyLogger;
-import site.overwrite.auditranscribe.misc.Theme;
-import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.main_views.ProjectIOHandlers;
+import site.overwrite.auditranscribe.misc.Popups;
+import site.overwrite.auditranscribe.misc.Theme;
 
 import java.io.File;
 import java.net.URL;
@@ -40,7 +40,7 @@ import java.util.logging.Level;
 /**
  * View controller of the view that allows the user to manually specify the path to FFmpeg.
  */
-public class SpecifyFFmpegPathViewController implements Initializable {
+public class SpecifyFFmpegPathViewController extends ClassWithLogging implements Initializable {
     // FXML Elements
     @FXML
     private AnchorPane rootPane;
@@ -70,18 +70,14 @@ public class SpecifyFFmpegPathViewController implements Initializable {
             if (possibleFFmpegBinary != null) {
                 // Update the value of the FFmpeg path text field
                 ffmpegBinaryPathTextField.setText(possibleFFmpegBinary.getAbsolutePath());
-                MyLogger.log(
-                        Level.INFO,
-                        "FFmpeg path set to " + ffmpegBinaryPathTextField.getText(),
-                        this.getClass().getName()
-                );
+                log(Level.INFO, "FFmpeg path set to " + ffmpegBinaryPathTextField.getText());
             } else {
                 Popups.showInformationAlert("Info", "No file selected.");
             }
         });
         checkFFmpegPathButton.setOnAction(event -> ((Stage) rootPane.getScene().getWindow()).close());
 
-        MyLogger.log(Level.INFO, "Allowing user to select FFmpeg path", this.getClass().getName());
+        log(Level.INFO, "Allowing user to select FFmpeg path");
     }
 
     // Getter methods

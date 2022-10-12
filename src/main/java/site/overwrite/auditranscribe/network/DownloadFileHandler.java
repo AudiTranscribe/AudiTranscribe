@@ -18,10 +18,10 @@
 
 package site.overwrite.auditranscribe.network;
 
-import site.overwrite.auditranscribe.network.exceptions.FileSignatureMismatchException;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.CustomTask;
-import site.overwrite.auditranscribe.misc.MyLogger;
+import site.overwrite.auditranscribe.network.exceptions.FileSignatureMismatchException;
 import site.overwrite.auditranscribe.utils.HashingUtils;
 
 import java.io.File;
@@ -37,7 +37,7 @@ import java.util.logging.Level;
 /**
  * Methods that handles the downloading of files.
  */
-public final class DownloadFileHandler {
+public final class DownloadFileHandler extends ClassWithLogging {
     // Constants
     public static int DOWNLOAD_FILE_BUFFER_SIZE = 8192;  // In bytes
 
@@ -174,10 +174,10 @@ public final class DownloadFileHandler {
             try {
                 downloadFile(url, outputFilePath, task);
             } catch (IOException e) {
-                MyLogger.log(
+                log(
+                        DownloadFileHandler.class.getName(),
                         Level.WARNING,
-                        "Failed to download file, trying again (attempt " + (i + 1) + " of " + maxAttempts + ")",
-                        DownloadFileHandler.class.getName()
+                        "Failed to download file, trying again (attempt " + (i + 1) + " of " + maxAttempts + ")"
                 );
                 continue;  // Try again
             }
@@ -187,10 +187,10 @@ public final class DownloadFileHandler {
         }
 
         // If reached here, that means maximum number of tries was exceeded. Throw an IO exception
-        MyLogger.log(
+        log(
+                DownloadFileHandler.class.getName(),
                 Level.WARNING,
-                "Failed to download file '" + url.toString() + "' after " + maxAttempts + " attempts",
-                DownloadFileHandler.class.getName()
+                "Failed to download file '" + url.toString() + "' after " + maxAttempts + " attempts"
         );
         throw new IOException("File download from '" + url + "' failed after " + maxAttempts + " attempts");
     }
@@ -229,17 +229,17 @@ public final class DownloadFileHandler {
             try {
                 downloadFile(url, outputFilePath, task, algorithm, correctHash);
             } catch (IOException e) {
-                MyLogger.log(
+                log(
+                        DownloadFileHandler.class.getName(),
                         Level.WARNING,
-                        "File download failed, trying again (attempt " + (i + 1) + " of " + maxAttempts + ")",
-                        DownloadFileHandler.class.getName()
+                        "File download failed, trying again (attempt " + (i + 1) + " of " + maxAttempts + ")"
                 );
                 continue;  // Try again
             } catch (FileSignatureMismatchException e) {
-                MyLogger.log(
+                log(
+                        DownloadFileHandler.class.getName(),
                         Level.WARNING,
-                        e.getMessage() + " Trying again (attempt " + (i + 1) + " of " + maxAttempts + ")",
-                        DownloadFileHandler.class.getName()
+                        e.getMessage() + " Trying again (attempt " + (i + 1) + " of " + maxAttempts + ")"
                 );
                 continue;
             }
@@ -249,10 +249,10 @@ public final class DownloadFileHandler {
         }
 
         // If reached here, that means maximum number of tries was exceeded. Throw an IO exception
-        MyLogger.log(
+        log(
+                DownloadFileHandler.class.getName(),
                 Level.WARNING,
-                "Failed to download file '" + url.toString() + "' after " + maxAttempts + " attempts",
-                DownloadFileHandler.class.getName()
+                "Failed to download file '" + url.toString() + "' after " + maxAttempts + " attempts"
         );
         throw new IOException("File download from '" + url + "' failed after " + maxAttempts + " attempts");
     }

@@ -20,9 +20,9 @@ package site.overwrite.auditranscribe.audio;
 
 import site.overwrite.auditranscribe.audio.exceptions.FFmpegCommandFailedException;
 import site.overwrite.auditranscribe.audio.exceptions.FFmpegNotFoundException;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.StreamGobbler;
-import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.tuples.Pair;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
@@ -36,7 +36,7 @@ import java.util.logging.Level;
 /**
  * Methods that handle FFmpeg interactions.
  */
-public class FFmpegHandler {
+public class FFmpegHandler extends ClassWithLogging {
     // Constants
     public static final List<String> VALID_EXTENSIONS = List.of(new String[]{
             ".wav", ".mp3", ".flac", ".ogg", ".aif", ".aiff"
@@ -166,11 +166,7 @@ public class FFmpegHandler {
         // Execute FFmpeg command
         boolean success = handleFFmpegCommandExec(builder);
         if (success) {
-            MyLogger.log(
-                    Level.FINE,
-                    "Successfully converted '" + file.getName() + "'",
-                    FFmpegHandler.class.getName()
-            );
+            log(Level.FINE, "Successfully converted '" + file.getName() + "'");
             return outputFilePath;
         } else {
             throw new FFmpegCommandFailedException("FFmpeg command " + builder.command() + " failed");
@@ -207,11 +203,10 @@ public class FFmpegHandler {
         // Execute FFmpeg command
         boolean success = handleFFmpegCommandExec(builder);
         if (success) {
-            MyLogger.log(
+            log(
                     Level.FINE,
-                    "Successfully generated alternate tempo audio for '" + file.getName() + "' at " + tempo +
-                            "x tempo",
-                    FFmpegHandler.class.getName()
+                    "Successfully generated alternate tempo audio for '" +
+                            file.getName() + "' at " + tempo + "x tempo"
             );
             return outputFilePath;
         } else {

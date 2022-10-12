@@ -21,13 +21,13 @@ package site.overwrite.auditranscribe.setup_wizard.helpers;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import site.overwrite.auditranscribe.network.exceptions.APIServerException;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.CustomTask;
-import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.network.APICallHandler;
 import site.overwrite.auditranscribe.network.DownloadFileHandler;
+import site.overwrite.auditranscribe.network.exceptions.APIServerException;
 import site.overwrite.auditranscribe.setup_wizard.helpers.data_encapsulators.FFmpegDownloadData;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
@@ -40,7 +40,7 @@ import java.util.logging.Level;
 /**
  * Class that handles the downloading, unpackaging, and installation of FFmpeg.
  */
-public class FFmpegDownloadManager {
+public class FFmpegDownloadManager extends ClassWithLogging {
     // Attributes
     private final int maxAttempts;
     private final OSType os;
@@ -55,11 +55,7 @@ public class FFmpegDownloadManager {
      * @param maxAttempts Number of attempts to try and download the FFmpeg zip file before failing.
      */
     public FFmpegDownloadManager(int maxAttempts) {
-        MyLogger.log(
-                Level.FINE,
-                "Starting FFmpeg download manager",
-                this.getClass().getName()
-        );
+        log(Level.FINE, "Starting FFmpeg download manager");
 
         // Update attributes
         this.maxAttempts = maxAttempts;
@@ -75,7 +71,7 @@ public class FFmpegDownloadManager {
                 defineAttributes(os.toString().toLowerCase());
             } catch (IOException e) {
                 // Note that an exception has occurred
-                MyLogger.logException(e);
+                logException(e);
 
                 // Make all the attributes `null`
                 downloadURL = null;
@@ -104,11 +100,7 @@ public class FFmpegDownloadManager {
 
         // Download the FFmpeg zip file
         try {
-            MyLogger.log(
-                    Level.INFO,
-                    "Downloading FFmpeg for " + os + " from '" + downloadURL.toString() + "'.",
-                    FFmpegDownloadManager.class.getName()
-            );
+            log(Level.INFO, "Downloading FFmpeg for " + os + " from '" + downloadURL.toString() + "'.");
             DownloadFileHandler.downloadFileWithRetry(
                     downloadURL, IOMethods.joinPaths(destFolder, "ffmpeg.zip"), task, "SHA256", signature,
                     maxAttempts
@@ -117,7 +109,7 @@ public class FFmpegDownloadManager {
         }
 
         // Unzip the downloaded file
-        MyLogger.log(Level.INFO, "Unzipping FFmpeg", FFmpegDownloadManager.class.getName());
+        log(Level.INFO, "Unzipping FFmpeg");
         CompressionHandlers.zipDecompress(outputFolder, IOMethods.joinPaths(destFolder, "ffmpeg.zip"));
 
         // Define a variable to store the FFmpeg binary path
@@ -126,21 +118,13 @@ public class FFmpegDownloadManager {
         if (os == OSType.MAC) {
             // Set executable status if needed
             if (!new File(IOMethods.joinPaths(outputFolder, "ffmpeg")).setExecutable(true)) {
-                MyLogger.log(
-                        Level.SEVERE,
-                        "Failed to set executable status for FFmpeg",
-                        FFmpegDownloadManager.class.getName()
+                IOException e = new IOException(
+                        "Failed to set executable status for '" + IOMethods.joinPaths(outputFolder, "ffmpeg") + "'."
                 );
-                throw new IOException(
-                        "Failed to set executable status for '" +
-                                IOMethods.joinPaths(outputFolder, "ffmpeg") + "'."
-                );
+                logException(e);
+                throw e;
             } else {
-                MyLogger.log(
-                        Level.INFO,
-                        "Set executable status for FFmpeg",
-                        FFmpegDownloadManager.class.getName()
-                );
+                log(Level.INFO, "Set executable status for FFmpeg");
                 ffmpegBinPath = IOMethods.joinPaths(outputFolder, "ffmpeg");
             }
         } else if (os == OSType.WINDOWS) {
@@ -152,11 +136,7 @@ public class FFmpegDownloadManager {
         // Delete the downloaded zip file
         IOMethods.delete(IOMethods.joinPaths(destFolder, "ffmpeg.zip"));
 
-        MyLogger.log(
-                Level.INFO,
-                "FFmpeg installation complete",
-                FFmpegDownloadManager.class.getName()
-        );
+        log(Level.INFO, "FFmpeg installation complete");
 
         // Return the FFmpeg binary path
         return ffmpegBinPath;

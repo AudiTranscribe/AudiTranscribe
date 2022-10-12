@@ -18,13 +18,14 @@
 
 package site.overwrite.auditranscribe.main_views;
 
-import javafx.stage.*;
-import site.overwrite.auditranscribe.io.exceptions.InvalidFileVersionException;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
-import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileWriter;
-import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.ProjectInfoDataObject;
-import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.MusicNotesDataObject;
 import site.overwrite.auditranscribe.io.audt_file.ProjectData;
+import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileWriter;
+import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.MusicNotesDataObject;
+import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.ProjectInfoDataObject;
+import site.overwrite.auditranscribe.io.exceptions.InvalidFileVersionException;
 
 import java.io.File;
 import java.io.IOException;

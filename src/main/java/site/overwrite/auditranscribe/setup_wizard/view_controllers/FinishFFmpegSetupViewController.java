@@ -24,8 +24,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 
 import java.net.URL;
@@ -35,7 +35,7 @@ import java.util.logging.Level;
 /**
  * View controller that informs the user that the FFmpeg portion of the setup is complete.
  */
-public class FinishFFmpegSetupViewController implements Initializable {
+public class FinishFFmpegSetupViewController extends ClassWithLogging implements Initializable {
     // FXML Elements
     @FXML
     private AnchorPane rootPane;
@@ -47,7 +47,7 @@ public class FinishFFmpegSetupViewController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         confirmButton.setOnAction(event -> ((Stage) rootPane.getScene().getWindow()).close());
-        MyLogger.log(Level.INFO, "FFmpeg setup complete", this.getClass().getName());
+        log(Level.INFO, "FFmpeg setup section complete");
     }
 
     // Public methods

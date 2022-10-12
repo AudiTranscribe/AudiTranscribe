@@ -18,11 +18,11 @@
 
 package site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators;
 
-import site.overwrite.auditranscribe.misc.tuples.Triple;
-import site.overwrite.auditranscribe.utils.ByteConversionUtils;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileHelpers;
 import site.overwrite.auditranscribe.misc.CustomTask;
+import site.overwrite.auditranscribe.misc.tuples.Triple;
+import site.overwrite.auditranscribe.utils.ByteConversionUtils;
 import site.overwrite.auditranscribe.utils.TypeConversionUtils;
 
 import java.io.IOException;

@@ -22,7 +22,6 @@ package site.overwrite.auditranscribe.io.audt_file.v0x00070001;
 import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileWriter;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.audt_file.v0x00070001.data_encapsulators.*;
-import site.overwrite.auditranscribe.misc.MyLogger;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -37,7 +36,7 @@ public class AUDTFileWriter0x00070001 extends AUDTFileWriter {
      */
     public AUDTFileWriter0x00070001(String filepath, int numBytesToSkip) {
         super(0x00070001, filepath, numBytesToSkip);
-        MyLogger.log(Level.INFO, "Using Version 0x00070001 AUDT file writer", AUDTFileWriter.class.getName());
+        log(Level.INFO, "Using Version 0x00070001 AUDT file writer");
     }
 
     /**
@@ -48,7 +47,7 @@ public class AUDTFileWriter0x00070001 extends AUDTFileWriter {
      */
     public AUDTFileWriter0x00070001(String filepath) {
         super(0x00070001, filepath);
-        MyLogger.log(Level.INFO, "Using Version 0x00070001 AUDT file writer", AUDTFileWriter.class.getName());
+        log(Level.INFO, "Using Version 0x00070001 AUDT file writer");
     }
 
     // Public methods

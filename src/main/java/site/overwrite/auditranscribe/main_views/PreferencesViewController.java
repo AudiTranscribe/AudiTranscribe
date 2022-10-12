@@ -22,21 +22,25 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import site.overwrite.auditranscribe.audio.FFmpegHandler;
 import site.overwrite.auditranscribe.audio.WindowFunction;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.misc.MyLogger;
+import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
 import site.overwrite.auditranscribe.misc.spinners.CustomIntegerSpinnerValueFactory;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
-import site.overwrite.auditranscribe.misc.Popups;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +48,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 
-public class PreferencesViewController implements Initializable {
+public class PreferencesViewController extends ClassWithLogging implements Initializable {
     // Attributes
     private String lastValidFFmpegPath;
 
@@ -118,11 +122,7 @@ public class PreferencesViewController implements Initializable {
                 for (File file : files) {
                     if (!file.getName().equals(MyLogger.currentLogName) && !file.getName().endsWith(".lck")) {
                         IOMethods.delete(file);
-                        MyLogger.log(
-                                Level.FINE,
-                                "Deleted log '" + file.getName() + "'",
-                                PreferencesViewController.class.getName()
-                        );
+                        log(Level.FINE, "Deleted log '" + file.getName() + "'");
                         numDeleted++;
                     }
                 }
@@ -164,11 +164,7 @@ public class PreferencesViewController implements Initializable {
                     applyButton.setDisable(false);
 
                     // Report success
-                    MyLogger.log(
-                            Level.INFO,
-                            "FFmpeg binary path updated to: " + ffmpegBinaryPath,
-                            this.getClass().toString()
-                    );
+                    log(Level.INFO, "FFmpeg binary path updated to: " + ffmpegBinaryPath);
                 } else {
                     // Reset the value of the text field to the last valid FFmpeg path
                     ffmpegBinaryPathTextField.setText(lastValidFFmpegPath);
@@ -180,17 +176,13 @@ public class PreferencesViewController implements Initializable {
                     );
 
                     // Report failure
-                    MyLogger.log(
-                            Level.WARNING,
-                            "Selected FFmpeg binary path \"" + ffmpegBinaryPath + "\" invalid",
-                            this.getClass().toString()
-                    );
+                    log(Level.WARNING, "Selected FFmpeg binary path \"" + ffmpegBinaryPath + "\" invalid");
                 }
             }
         });
 
         // Report that the preferences view is ready to be shown
-        MyLogger.log(Level.INFO, "Preferences view ready to be shown", this.getClass().toString());
+        log(Level.INFO, "Preferences view ready to be shown");
     }
 
     // Public methods
@@ -299,7 +291,7 @@ public class PreferencesViewController implements Initializable {
             // Show the stage
             preferencesStage.show();
         } catch (IOException e) {
-            MyLogger.logException(e);
+            logException(e);
             throw new RuntimeException(e);
         }
     }

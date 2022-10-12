@@ -36,20 +36,20 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
-import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.io.data_files.data_encapsulators.SettingsData;
+import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingData;
-import site.overwrite.auditranscribe.misc.MyLogger;
+import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingState;
+import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.tuples.Pair;
 import site.overwrite.auditranscribe.misc.tuples.Quadruple;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
 import site.overwrite.auditranscribe.utils.MiscUtils;
-import site.overwrite.auditranscribe.misc.Popups;
-import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingState;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,7 +63,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
 
-public class MainViewController implements Initializable {
+public class MainViewController extends ClassWithLogging implements Initializable {
     // Attributes
     private ProjectsDB projectsDB;
 
@@ -159,7 +159,7 @@ public class MainViewController implements Initializable {
         aboutMenuItem.setOnAction(actionEvent -> AboutViewController.showAboutWindow());
 
         // Report that the main view is ready to be shown
-        MyLogger.log(Level.INFO, "Main view ready to be shown", this.getClass().toString());
+        log(Level.INFO, "Main view ready to be shown");
     }
 
     // Getter/Setter methods
@@ -249,7 +249,7 @@ public class MainViewController implements Initializable {
             projects.sort(new SortByTimestamp());
 
         } catch (SQLException | IOException e) {
-            MyLogger.logException(e);
+            logException(e);
             throw new RuntimeException(e);
         }
 
@@ -266,7 +266,7 @@ public class MainViewController implements Initializable {
                     )
             );
         } else {
-            MyLogger.log(Level.INFO, "No projects found", this.getClass().toString());
+            log(Level.INFO, "No projects found");
             projectsListView.opacityProperty().set(0);
         }
     }
@@ -399,7 +399,7 @@ public class MainViewController implements Initializable {
                 try {
                     pk = db.getPKOfProjectWithFilepath(filepath);
                 } catch (SQLException e) {
-                    MyLogger.logException(e);
+                    logException(e);
                     throw new RuntimeException(e);
                 }
 
@@ -407,14 +407,15 @@ public class MainViewController implements Initializable {
                 try {
                     db.deleteProjectRecord(pk);
                 } catch (SQLException e) {
-                    MyLogger.logException(e);
+                    logException(e);
                     throw new RuntimeException(e);
                 }
 
-                MyLogger.log(
+                log(
+                        MainViewController.class.getName(),
                         Level.INFO,
-                        "Removed " + nameLabel.getText() + " with primary key " + pk + " from projects' database",
-                        this.getClass().toString());
+                        "Removed " + nameLabel.getText() + " with primary key " + pk + " from projects' database"
+                );
 
                 // Remove this list item from the list view
                 SortedList<?> sortedList = (SortedList<?>) getListView().getItems();

@@ -19,8 +19,8 @@
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
 import site.overwrite.auditranscribe.audio.WindowFunction;
-import site.overwrite.auditranscribe.utils.ArrayUtils;
 import site.overwrite.auditranscribe.misc.Complex;
+import site.overwrite.auditranscribe.utils.ArrayUtils;
 
 /**
  * Class that implements the Short-Time Fourier Transform (STFT) algorithm.

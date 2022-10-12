@@ -25,10 +25,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.*;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingData;
-import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
@@ -41,7 +41,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 
-public class ProjectSetupViewController implements Initializable {
+public class ProjectSetupViewController extends ClassWithLogging implements Initializable {
     // Attributes
     private File audioFile;
 
@@ -259,7 +259,7 @@ public class ProjectSetupViewController implements Initializable {
             return new Pair<>(controller.shouldProceed, data);
 
         } catch (IOException e) {
-            MyLogger.logException(e);
+            logException(e);
             throw new RuntimeException(e);
         }
     }
@@ -288,20 +288,12 @@ public class ProjectSetupViewController implements Initializable {
      */
     private boolean validateValues() {
         if (projectNameField.getText().length() == 0) {
-            MyLogger.log(
-                    Level.INFO,
-                    "No project name specified",
-                    this.getClass().getName()
-            );
+            log(Level.INFO, "No project name specified");
             projectNameField.getStyleClass().add("error");
         }
 
         if (audioFile == null) {
-            MyLogger.log(
-                    Level.INFO,
-                    "No audio file selected",
-                    this.getClass().getName()
-            );
+            log(Level.INFO, "No audio file selected");
             selectAudioFileButton.getStyleClass().add("error");
         }
 

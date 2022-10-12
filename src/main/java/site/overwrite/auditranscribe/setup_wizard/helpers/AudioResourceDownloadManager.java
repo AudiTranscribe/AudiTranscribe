@@ -21,12 +21,12 @@ package site.overwrite.auditranscribe.setup_wizard.helpers;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import site.overwrite.auditranscribe.network.exceptions.APIServerException;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.CustomTask;
-import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.network.APICallHandler;
 import site.overwrite.auditranscribe.network.DownloadFileHandler;
+import site.overwrite.auditranscribe.network.exceptions.APIServerException;
 import site.overwrite.auditranscribe.setup_wizard.helpers.data_encapsulators.AudioResourceDownloadData;
 
 import java.io.*;
@@ -37,7 +37,7 @@ import java.util.logging.Level;
 /**
  * Class that handles the downloading of the audio resource.
  */
-public class AudioResourceDownloadManager {
+public class AudioResourceDownloadManager extends ClassWithLogging {
     // Attributes
     private final int maxAttempts;
 
@@ -50,11 +50,7 @@ public class AudioResourceDownloadManager {
      * @param maxAttempts Number of attempts to try and download the audio resource before failing.
      */
     public AudioResourceDownloadManager(int maxAttempts) {
-        MyLogger.log(
-                Level.FINE,
-                "Starting audio resource download manager",
-                this.getClass().getName()
-        );
+        log(Level.FINE, "Starting audio resource download manager");
 
         // Update attributes
         this.maxAttempts = maxAttempts;
@@ -92,7 +88,7 @@ public class AudioResourceDownloadManager {
             }
         } catch (IOException e) {
             // Note that an exception has occurred
-            MyLogger.logException(e);
+            logException(e);
 
             // Make all the attributes `null`
             downloadURL = null;
@@ -116,11 +112,7 @@ public class AudioResourceDownloadManager {
 
         // Download the audio resource file
         try {
-            MyLogger.log(
-                    Level.INFO,
-                    "Downloading audio resource from '" + downloadURL.toString() + "'.",
-                    this.getClass().getName()
-            );
+            log(Level.INFO, "Downloading audio resource from '" + downloadURL.toString() + "'.");
             DownloadFileHandler.downloadFileWithRetry(
                     downloadURL, IOMethods.joinPaths(destFolder, "Breakfast.wav"), task, "SHA256", signature,
                     maxAttempts
@@ -128,11 +120,7 @@ public class AudioResourceDownloadManager {
         } catch (NoSuchAlgorithmException ignored) {
         }
 
-        MyLogger.log(
-                Level.INFO,
-                "Audio resource download complete",
-                this.getClass().getName()
-        );
+        log(Level.INFO, "Audio resource download complete");
 
         return IOMethods.joinPaths(destFolder, "Breakfast.wav");
     }

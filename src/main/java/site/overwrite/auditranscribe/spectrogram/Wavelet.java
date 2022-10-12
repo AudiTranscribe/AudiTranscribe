@@ -19,9 +19,9 @@
 package site.overwrite.auditranscribe.spectrogram;
 
 import site.overwrite.auditranscribe.audio.WindowFunction;
+import site.overwrite.auditranscribe.misc.Complex;
 import site.overwrite.auditranscribe.misc.tuples.Pair;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
-import site.overwrite.auditranscribe.misc.Complex;
 import site.overwrite.auditranscribe.utils.MathUtils;
 
 import java.util.ArrayList;

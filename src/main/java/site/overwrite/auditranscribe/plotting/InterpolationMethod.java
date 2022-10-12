@@ -19,8 +19,8 @@
 
 package site.overwrite.auditranscribe.plotting;
 
-import site.overwrite.auditranscribe.plotting.interpolation_methods.Bilinear;
 import site.overwrite.auditranscribe.plotting.interpolation_methods.AbstractInterpolation;
+import site.overwrite.auditranscribe.plotting.interpolation_methods.Bilinear;
 import site.overwrite.auditranscribe.plotting.interpolation_methods.NearestNeighbour;
 
 /**

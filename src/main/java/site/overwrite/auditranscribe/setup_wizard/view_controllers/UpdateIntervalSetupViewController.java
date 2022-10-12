@@ -24,8 +24,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Spinner;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomIntegerSpinnerValueFactory;
 
@@ -36,7 +36,7 @@ import java.util.logging.Level;
 /**
  * View controller that helps the user set up the update checking interval.
  */
-public class UpdateIntervalSetupViewController implements Initializable {
+public class UpdateIntervalSetupViewController extends ClassWithLogging implements Initializable {
     // FXML elements
     @FXML
     private AnchorPane rootPane;
@@ -55,7 +55,7 @@ public class UpdateIntervalSetupViewController implements Initializable {
         ));
         confirmButton.setOnAction(event -> ((Stage) rootPane.getScene().getWindow()).close());
 
-        MyLogger.log(Level.INFO, "Showing update interval setup view", this.getClass().getName());
+        log(Level.INFO, "Showing update interval setup view");
     }
 
     // Public methods

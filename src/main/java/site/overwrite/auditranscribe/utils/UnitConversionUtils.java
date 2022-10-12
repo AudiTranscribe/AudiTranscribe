@@ -25,8 +25,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static java.util.Map.entry;
-
 /**
  * Unit conversion utility methods.
  */
@@ -65,23 +63,23 @@ public final class UnitConversionUtils {
      */
     public static int noteToNoteNumber(String note) {
         // Define constants
-        final Map<String, Integer> PITCH_MAP = Map.ofEntries(
-                entry("C", 0),
-                entry("D", 2),
-                entry("E", 4),
-                entry("F", 5),
-                entry("G", 7),
-                entry("A", 9),
-                entry("B", 11)
+        final Map<String, Integer> PITCH_MAP = Map.of(
+                "C", 0,
+                "D", 2,
+                "E", 4,
+                "F", 5,
+                "G", 7,
+                "A", 9,
+                "B", 11
         );
 
-        final Map<String, Integer> ACC_MAP = Map.ofEntries(
-                entry("#", 1),
-                entry("", 0),
-                entry("b", -1),
-                entry("!", -1),
-                entry("♯", 1),
-                entry("♭", -1)
+        final Map<String, Integer> ACC_MAP = Map.of(
+                "#", 1,
+                "", 0,
+                "b", -1,
+                "!", -1,
+                "♯", 1,
+                "♭", -1
         );
 
         final Pattern NOTE_PATTERN = Pattern.compile(
