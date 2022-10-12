@@ -203,6 +203,12 @@
                             site/overwrite/auditranscribe/audio/Audio.class
                         </exclude>
                         <exclude>
+                            site/overwrite/auditranscribe/generic/exceptions/**
+                        </exclude>
+                        <exclude>
+                            site/overwrite/auditranscribe/generic/ClassWithLogging.class
+                        </exclude>
+                        <exclude>
                             site/overwrite/auditranscribe/io/data_files/DataFiles.class
                         </exclude>
                         <exclude>
@@ -236,7 +242,7 @@
                             site/overwrite/auditranscribe/misc/Theme.class
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/music/notes/*.class
+                            site/overwrite/auditranscribe/music/notes/**
                         </exclude>
                         <exclude>
                             site/overwrite/auditranscribe/plotting/Plotter.class
