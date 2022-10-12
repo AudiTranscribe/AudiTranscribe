@@ -197,10 +197,10 @@
                             site/overwrite/auditranscribe/MainApplication.class
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/audio/Audio.class
+                            site/overwrite/auditranscribe/**/exceptions/**
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/exceptions/**
+                            site/overwrite/auditranscribe/audio/Audio.class
                         </exclude>
                         <exclude>
                             site/overwrite/auditranscribe/io/data_files/DataFiles.class
