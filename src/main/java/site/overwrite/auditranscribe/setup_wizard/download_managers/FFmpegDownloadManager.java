@@ -16,38 +16,36 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.setup_wizard.helpers;
+package site.overwrite.auditranscribe.setup_wizard.download_managers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.network.APICallHandler;
-import site.overwrite.auditranscribe.network.DownloadFileHandler;
 import site.overwrite.auditranscribe.network.exceptions.APIServerException;
-import site.overwrite.auditranscribe.setup_wizard.helpers.data_encapsulators.FFmpegDownloadData;
+import site.overwrite.auditranscribe.setup_wizard.data_encapsulators.FFmpegDownloadData;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
 
 import java.io.*;
 import java.net.URL;
-import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
 
 /**
  * Class that handles the downloading, unpackaging, and installation of FFmpeg.
  */
-public class FFmpegDownloadManager extends ClassWithLogging {
+public class FFmpegDownloadManager extends AbstractDownloadManager {
     // Attributes
-    private final int maxAttempts;
     private final OSType os;
 
-    private URL downloadURL;
-    private String signature;
-    private String ffmpegFolder;
+    public String destFolder;
+    public String ffmpegFolder;
+    public String outputFolder;
+
+    public String ffmpegBinPath;
 
     /**
      * Initialization method for a <code>FFmpegDownloadManager</code>.
@@ -55,11 +53,13 @@ public class FFmpegDownloadManager extends ClassWithLogging {
      * @param maxAttempts Number of attempts to try and download the FFmpeg zip file before failing.
      */
     public FFmpegDownloadManager(int maxAttempts) {
+        super(maxAttempts);
+
         log(Level.FINE, "Starting FFmpeg download manager");
 
         // Update attributes
-        this.maxAttempts = maxAttempts;
-        this.os = OSMethods.getOS();
+        os = OSMethods.getOS();
+        downloadFileName = "ffmpeg.zip";
 
         // Linux is currently not supported
         if (os == OSType.LINUX) {
@@ -88,33 +88,25 @@ public class FFmpegDownloadManager extends ClassWithLogging {
      *
      * @param destFolder <b>Absolute</b> path to the folder to place the FFmpeg folder within.
      * @param task       A <code>CustomTask</code> object to show the progress of the download.
-     * @return A string, representing the path to the FFmpeg binary.
-     * @throws IOException If the downloading and unzipping of the FFmpeg binary fails.
+     * @return A string, representing the <b>absolute</b> path to the FFmpeg zip file.
+     * @throws IOException If the downloading of the FFmpeg zip fails.
      */
-    public String downloadFFmpeg(String destFolder, CustomTask<?> task) throws IOException {
-        // Define the output folder
-        String outputFolder = IOMethods.joinPaths(destFolder, ffmpegFolder);
+    public String downloadResource(String destFolder, CustomTask<?> task) throws IOException {
+        // Update attributes
+        this.destFolder = destFolder;
+        outputFolder = IOMethods.joinPaths(destFolder, ffmpegFolder);
 
-        // Create all parent directories
-        IOMethods.createFolder(outputFolder);
+        // Handle download proper
+        return super.downloadResource(destFolder, task);
+    }
 
-        // Download the FFmpeg zip file
-        try {
-            log(Level.INFO, "Downloading FFmpeg for " + os + " from '" + downloadURL.toString() + "'.");
-            DownloadFileHandler.downloadFileWithRetry(
-                    downloadURL, IOMethods.joinPaths(destFolder, "ffmpeg.zip"), task, "SHA256", signature,
-                    maxAttempts
-            );
-        } catch (NoSuchAlgorithmException ignored) {
-        }
-
+    @Override
+    public void processDownload(String downloadedResourcePath) throws IOException {
         // Unzip the downloaded file
         log(Level.INFO, "Unzipping FFmpeg");
-        CompressionHandlers.zipDecompress(outputFolder, IOMethods.joinPaths(destFolder, "ffmpeg.zip"));
+        CompressionHandlers.zipDecompress(outputFolder, downloadedResourcePath);
 
         // Define a variable to store the FFmpeg binary path
-        String ffmpegBinPath;
-
         if (os == OSType.MAC) {
             // Set executable status if needed
             if (!new File(IOMethods.joinPaths(outputFolder, "ffmpeg")).setExecutable(true)) {
@@ -137,9 +129,6 @@ public class FFmpegDownloadManager extends ClassWithLogging {
         IOMethods.delete(IOMethods.joinPaths(destFolder, "ffmpeg.zip"));
 
         log(Level.INFO, "FFmpeg installation complete");
-
-        // Return the FFmpeg binary path
-        return ffmpegBinPath;
     }
 
     // Private methods

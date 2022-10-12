@@ -16,44 +16,36 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.setup_wizard.helpers;
+package site.overwrite.auditranscribe.setup_wizard.download_managers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.network.APICallHandler;
-import site.overwrite.auditranscribe.network.DownloadFileHandler;
 import site.overwrite.auditranscribe.network.exceptions.APIServerException;
-import site.overwrite.auditranscribe.setup_wizard.helpers.data_encapsulators.AudioResourceDownloadData;
+import site.overwrite.auditranscribe.setup_wizard.data_encapsulators.AudioResourceDownloadData;
 
 import java.io.*;
 import java.net.URL;
-import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
 
 /**
  * Class that handles the downloading of the audio resource.
  */
-public class AudioResourceDownloadManager extends ClassWithLogging {
-    // Attributes
-    private final int maxAttempts;
-
-    private URL downloadURL;
-    private String signature;
-
+public class AudioResourceDownloadManager extends AbstractDownloadManager {
     /**
      * Initialization method for an <code>AudioResourceDownloadManager</code>.
      *
      * @param maxAttempts Number of attempts to try and download the audio resource before failing.
      */
     public AudioResourceDownloadManager(int maxAttempts) {
+        super(maxAttempts);
+
         log(Level.FINE, "Starting audio resource download manager");
 
         // Update attributes
-        this.maxAttempts = maxAttempts;
+        downloadFileName = "Breakfast.wav";
 
         try {
             // Define the data file path
@@ -96,32 +88,9 @@ public class AudioResourceDownloadManager extends ClassWithLogging {
         }
     }
 
-    // Public methods
-
-    /**
-     * Method that downloads the audio resource.
-     *
-     * @param destFolder Folder that stores the audio resource.
-     * @param task       A <code>CustomTask</code> object to show the progress of the download.
-     * @return The <b>absolute</b> path to the downloaded audio resource.
-     * @throws IOException If the downloading of the audio resource fails.
-     */
-    public String downloadAudioResource(String destFolder, CustomTask<?> task) throws IOException {
-        // Create all parent directories
-        IOMethods.createFolder(destFolder);
-
-        // Download the audio resource file
-        try {
-            log(Level.INFO, "Downloading audio resource from '" + downloadURL.toString() + "'.");
-            DownloadFileHandler.downloadFileWithRetry(
-                    downloadURL, IOMethods.joinPaths(destFolder, "Breakfast.wav"), task, "SHA256", signature,
-                    maxAttempts
-            );
-        } catch (NoSuchAlgorithmException ignored) {
-        }
-
-        log(Level.INFO, "Audio resource download complete");
-
-        return IOMethods.joinPaths(destFolder, "Breakfast.wav");
+    // Overwritten methods
+    @Override
+    public void processDownload(String downloadedResourcePath) {
+        // No processing needed
     }
 }

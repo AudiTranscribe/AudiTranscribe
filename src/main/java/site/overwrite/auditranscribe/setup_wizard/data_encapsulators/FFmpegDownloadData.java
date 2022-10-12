@@ -1,6 +1,6 @@
 /*
- * AudioResourceDownloadData.json
- * Description: Data object that stores the audio resource download data.
+ * FFmpegDownloadData.java
+ * Description: Data object that stores the FFmpeg download data.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,12 +16,13 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.setup_wizard.helpers.data_encapsulators;
+package site.overwrite.auditranscribe.setup_wizard.data_encapsulators;
 
 /**
- * Data object that stores the audio resource download data.
+ * Data object that stores the FFmpeg download data.
  */
-public class AudioResourceDownloadData {
+public class FFmpegDownloadData {
     public String url;
     public String signaturePage;
+    public String outputFolder;
 }

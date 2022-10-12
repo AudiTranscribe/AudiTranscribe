@@ -55,8 +55,8 @@ module site.overwrite.auditranscribe {
     exports site.overwrite.auditranscribe.music.notes;
     exports site.overwrite.auditranscribe.network.exceptions;
     exports site.overwrite.auditranscribe.setup_wizard;
-    exports site.overwrite.auditranscribe.setup_wizard.helpers;
-    exports site.overwrite.auditranscribe.setup_wizard.helpers.data_encapsulators;
+    exports site.overwrite.auditranscribe.setup_wizard.data_encapsulators;
+    exports site.overwrite.auditranscribe.setup_wizard.download_managers;
     exports site.overwrite.auditranscribe.setup_wizard.view_controllers;
     exports site.overwrite.auditranscribe.spectrogram;
     exports site.overwrite.auditranscribe.utils;

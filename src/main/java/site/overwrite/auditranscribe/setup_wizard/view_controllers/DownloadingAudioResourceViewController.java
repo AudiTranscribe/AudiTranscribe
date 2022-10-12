@@ -29,7 +29,7 @@ import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.misc.Theme;
-import site.overwrite.auditranscribe.setup_wizard.helpers.AudioResourceDownloadManager;
+import site.overwrite.auditranscribe.setup_wizard.download_managers.AudioResourceDownloadManager;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -75,7 +75,7 @@ public class DownloadingAudioResourceViewController extends ClassWithLogging imp
         CustomTask<String> downloadTask = new CustomTask<>() {
             @Override
             protected String call() throws Exception {
-                return downloadManager.downloadAudioResource(DEST_FOLDER, this);
+                return downloadManager.downloadResource(DEST_FOLDER, this);
             }
         };
         downloadTask.setOnFailed((event) -> {

@@ -28,7 +28,7 @@ import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.misc.Theme;
-import site.overwrite.auditranscribe.setup_wizard.helpers.FFmpegDownloadManager;
+import site.overwrite.auditranscribe.setup_wizard.download_managers.FFmpegDownloadManager;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -80,7 +80,10 @@ public class DownloadingFFmpegViewController extends ClassWithLogging implements
         CustomTask<String> downloadTask = new CustomTask<>() {
             @Override
             protected String call() throws Exception {
-                return downloadManager.downloadFFmpeg(DEST_FOLDER, this);
+                String ffmpegZipPath = downloadManager.downloadResource(DEST_FOLDER, this);
+                downloadManager.processDownload(ffmpegZipPath);
+
+                return downloadManager.ffmpegBinPath;
             }
         };
         downloadTask.setOnFailed((event) -> {
