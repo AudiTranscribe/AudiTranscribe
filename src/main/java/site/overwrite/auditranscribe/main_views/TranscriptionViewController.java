@@ -384,26 +384,18 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         playSkipBackButton.setOnAction(event -> {
             log(Level.FINE, "Pressed skip back button");
 
-            // Pause the audio
-            isPaused = togglePaused(false);
-
-            // Seek to the start of the audio
+            notePlayerSequencer.stop();
+            isPaused = togglePaused(false);  // Pause the audio
             seekToTime(0);
-
-            // Scroll to beginning
             updateScrollPosition(0, finalWidth);
         });
 
         playSkipForwardButton.setOnAction(event -> {
             log(Level.FINE, "Pressed skip forward button");
 
-            // Pause the audio
-            isPaused = togglePaused(true);
-
-            // Seek to the end of the audio
+            notePlayerSequencer.stop();
+            isPaused = togglePaused(true);  // Seeking to end later will toggle paused again
             seekToTime(audioDuration);
-
-            // Scroll to end
             updateScrollPosition(finalWidth, finalWidth);
         });
 
