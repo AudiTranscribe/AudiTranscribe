@@ -88,6 +88,8 @@ public class NoteRectangle extends StackPane {
     private NoteRectangle leftBoundingRectangle;
     private NoteRectangle rightBoundingRectangle;
 
+    private boolean isDragging;
+
     /**
      * Initialization method for a <code>NoteRectangle</code> object.<br>
      * Expects all required static values to be set.
@@ -192,7 +194,7 @@ public class NoteRectangle extends StackPane {
         resizeLeftRegion.hoverProperty().addListener((observable, oldValue, newValue) -> {
             if (canEdit && isPaused && newValue) {
                 this.setCursor(Cursor.W_RESIZE);
-            } else {
+            } else if (!isDragging) {
                 this.setCursor(Cursor.DEFAULT);
             }
         });
@@ -200,7 +202,7 @@ public class NoteRectangle extends StackPane {
         resizeRightRegion.hoverProperty().addListener((observable, oldValue, newValue) -> {
             if (canEdit && isPaused && newValue) {
                 this.setCursor(Cursor.E_RESIZE);
-            } else {
+            } else if (!isDragging) {
                 this.setCursor(Cursor.DEFAULT);
             }
         });
@@ -353,8 +355,12 @@ public class NoteRectangle extends StackPane {
                 // Disable scrolling
                 this.getParent().addEventHandler(ScrollEvent.ANY, cancelScroll);
 
-                // Update the `isEditing` flag
-                isEditing = true;
+                // Update cursor
+                this.setCursor(Cursor.W_RESIZE);
+
+                // Update flags
+                isEditing = true;  // Static attribute
+                isDragging = true;  // Instance attribute
 
                 // Prevent default action
                 event.consume();
@@ -402,8 +408,12 @@ public class NoteRectangle extends StackPane {
                     setBoundingRectangles(null, null);
                 }
 
-                // Update the `isEditing` flag
-                isEditing = false;
+                // Reset cursor back to default if cursor is no longer on the resizing region
+                if (!resizeLeftRegion.isHover()) this.setCursor(Cursor.DEFAULT);
+
+                // Update flags
+                isEditing = false;  // Static attribute
+                isDragging = false;  // Instance attribute
             }
         });
 
@@ -421,8 +431,12 @@ public class NoteRectangle extends StackPane {
                 // Disable scrolling
                 this.getParent().addEventHandler(ScrollEvent.ANY, cancelScroll);
 
-                // Update the `isEditing` flag
-                isEditing = true;
+                // Update cursor
+                this.setCursor(Cursor.E_RESIZE);
+
+                // Update flags
+                isEditing = true;  // Static attribute
+                isDragging = true;  // Instance attribute
 
                 // Prevent default action
                 event.consume();
@@ -469,8 +483,12 @@ public class NoteRectangle extends StackPane {
                     setBoundingRectangles(null, null);
                 }
 
-                // Update the `isEditing` flag
-                isEditing = false;
+                // Reset cursor back to default if cursor is no longer on the resizing region
+                if (!resizeRightRegion.isHover()) this.setCursor(Cursor.DEFAULT);
+
+                // Update flags
+                isEditing = false;  // Static attribute
+                isDragging = false;  // Instance attribute
             }
         });
 
