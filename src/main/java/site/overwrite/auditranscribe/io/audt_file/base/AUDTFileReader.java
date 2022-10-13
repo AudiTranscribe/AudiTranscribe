@@ -371,6 +371,6 @@ public abstract class AUDTFileReader extends ClassWithLogging {
     // Overwritten methods
     @Override
     public void log(Level level, String msg) {
-        log(AUDTFileReader.class.getName(), level, msg);
+        log(level, msg, AUDTFileReader.class.getName());
     }
 }

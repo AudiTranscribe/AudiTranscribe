@@ -52,7 +52,7 @@ public class CheckForUpdatesHelper extends ClassWithLogging {
         String newVersionTag = response.value1();
 
         if (!isLatest) {
-            log(CheckForUpdatesHelper.class.getName(), Level.INFO, "New version available: " + newVersionTag);
+            log(Level.INFO, "New version available: " + newVersionTag, CheckForUpdatesHelper.class.getName());
 
             // Convert the new version tag into a semver
             String semver = newVersionTag.substring(1);
@@ -77,7 +77,7 @@ public class CheckForUpdatesHelper extends ClassWithLogging {
                 }
             }
         } else {
-            log(CheckForUpdatesHelper.class.getName(), Level.INFO, "AudiTranscribe is up to date");
+            log(Level.INFO, "AudiTranscribe is up to date", CheckForUpdatesHelper.class.getName());
         }
 
         // Supress alert for a set duration
@@ -105,9 +105,7 @@ public class CheckForUpdatesHelper extends ClassWithLogging {
         } catch (APIServerException e) {
             // Return a value that says that the current version is latest
             log(
-                    CheckForUpdatesHelper.class.getName(),
-                    Level.WARNING,
-                    "Error for API request on checking new version: timed out or connection refused"
+                    Level.WARNING, "Error for API request on checking new version: timed out or connection refused", CheckForUpdatesHelper.class.getName()
             );
             return new Pair<>(true, null);
         } catch (IOException e) {

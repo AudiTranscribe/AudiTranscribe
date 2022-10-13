@@ -175,9 +175,7 @@ public final class DownloadFileHandler extends ClassWithLogging {
                 downloadFile(url, outputFilePath, task);
             } catch (IOException e) {
                 log(
-                        DownloadFileHandler.class.getName(),
-                        Level.WARNING,
-                        "Failed to download file, trying again (attempt " + (i + 1) + " of " + maxAttempts + ")"
+                        Level.WARNING, "Failed to download file, trying again (attempt " + (i + 1) + " of " + maxAttempts + ")", DownloadFileHandler.class.getName()
                 );
                 continue;  // Try again
             }
@@ -188,9 +186,7 @@ public final class DownloadFileHandler extends ClassWithLogging {
 
         // If reached here, that means maximum number of tries was exceeded. Throw an IO exception
         log(
-                DownloadFileHandler.class.getName(),
-                Level.WARNING,
-                "Failed to download file '" + url.toString() + "' after " + maxAttempts + " attempts"
+                Level.WARNING, "Failed to download file '" + url.toString() + "' after " + maxAttempts + " attempts", DownloadFileHandler.class.getName()
         );
         throw new IOException("File download from '" + url + "' failed after " + maxAttempts + " attempts");
     }
@@ -230,16 +226,12 @@ public final class DownloadFileHandler extends ClassWithLogging {
                 downloadFile(url, outputFilePath, task, algorithm, correctHash);
             } catch (IOException e) {
                 log(
-                        DownloadFileHandler.class.getName(),
-                        Level.WARNING,
-                        "File download failed, trying again (attempt " + (i + 1) + " of " + maxAttempts + ")"
+                        Level.WARNING, "File download failed, trying again (attempt " + (i + 1) + " of " + maxAttempts + ")", DownloadFileHandler.class.getName()
                 );
                 continue;  // Try again
             } catch (FileSignatureMismatchException e) {
                 log(
-                        DownloadFileHandler.class.getName(),
-                        Level.WARNING,
-                        e.getMessage() + " Trying again (attempt " + (i + 1) + " of " + maxAttempts + ")"
+                        Level.WARNING, e.getMessage() + " Trying again (attempt " + (i + 1) + " of " + maxAttempts + ")", DownloadFileHandler.class.getName()
                 );
                 continue;
             }
@@ -250,9 +242,7 @@ public final class DownloadFileHandler extends ClassWithLogging {
 
         // If reached here, that means maximum number of tries was exceeded. Throw an IO exception
         log(
-                DownloadFileHandler.class.getName(),
-                Level.WARNING,
-                "Failed to download file '" + url.toString() + "' after " + maxAttempts + " attempts"
+                Level.WARNING, "Failed to download file '" + url.toString() + "' after " + maxAttempts + " attempts", DownloadFileHandler.class.getName()
         );
         throw new IOException("File download from '" + url + "' failed after " + maxAttempts + " attempts");
     }

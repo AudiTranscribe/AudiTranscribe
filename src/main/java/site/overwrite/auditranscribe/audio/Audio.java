@@ -524,14 +524,12 @@ public class Audio extends ClassWithLogging {
     public static byte[] wavBytesToMP3Bytes(
             byte[] rawWAVBytes, String ffmpegPath
     ) throws FFmpegNotFoundException, IOException {
-        log(Audio.class.getName(), Level.FINE, "Converting WAV bytes to MP3 bytes");
+        log(Level.FINE, "Converting WAV bytes to MP3 bytes", Audio.class.getName());
 
         // Ensure that the temporary directory exists
         IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
         log(
-                Audio.class.getName(),
-                Level.FINE,
-                "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH
+                Level.FINE, "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH, Audio.class.getName()
         );
 
         // Define a new FFmpeg handler
@@ -556,7 +554,7 @@ public class Audio extends ClassWithLogging {
         IOMethods.delete(outputPath);
 
         // Return the raw MP3 bytes
-        log(Audio.class.getName(), Level.FINE, "Done converting WAV to MP3 bytes");
+        log(Level.FINE, "Done converting WAV to MP3 bytes", Audio.class.getName());
         return rawMP3Bytes;
     }
 

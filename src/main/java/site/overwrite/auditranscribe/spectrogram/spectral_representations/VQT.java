@@ -300,9 +300,7 @@ public final class VQT extends ClassWithLogging {
 
         // Return VQT matrix
         log(
-                VQT.class.getName(),
-                Level.FINE,
-                "VQT Matrix generated; has shape (" + V.length + ", " + V[0].length + ")"
+                Level.FINE, "VQT Matrix generated; has shape (" + V.length + ", " + V[0].length + ")", VQT.class.getName()
         );
         return V;
     }

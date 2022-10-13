@@ -412,9 +412,7 @@ public class MainViewController extends ClassWithLogging implements Initializabl
                 }
 
                 log(
-                        MainViewController.class.getName(),
-                        Level.INFO,
-                        "Removed " + nameLabel.getText() + " with primary key " + pk + " from projects' database"
+                        Level.INFO, "Removed " + nameLabel.getText() + " with primary key " + pk + " from projects' database", MainViewController.class.getName()
                 );
 
                 // Remove this list item from the list view

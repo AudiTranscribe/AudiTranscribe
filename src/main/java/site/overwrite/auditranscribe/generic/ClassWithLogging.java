@@ -31,11 +31,11 @@ public abstract class ClassWithLogging {
     /**
      * Method that logs a specific message with the specified level.
      *
-     * @param className Name of the class that called this method.
      * @param level     One of the message level identifiers, e.g., <code>SEVERE</code>.
      * @param msg       Message to log.
+     * @param className Name of the class that called this method.
      */
-    public static void log(String className, Level level, String msg) {
+    public static void log(Level level, String msg, String className) {
         MyLogger.log(level, msg, className);
     }
 
