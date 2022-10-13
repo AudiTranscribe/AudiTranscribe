@@ -52,6 +52,7 @@ public class NotePlayerSequencer extends ClassWithLogging {
     public int instrumentNum;
 
     public double bpm;
+    public double notePlayingDelayOffset;
 
     private final Map<Triple<Double, Double, Integer>, Pair<MidiEvent, MidiEvent>> allMIDIEventPairs = new HashMap<>();
     public boolean areNotesSet = false;
@@ -62,7 +63,7 @@ public class NotePlayerSequencer extends ClassWithLogging {
      * Ensure that code checks if the sequencer is available before attempting to play the sequence
      * of MIDI notes.
      */
-    public NotePlayerSequencer() {
+    public NotePlayerSequencer(double notePlayingDelayOffset) {
         // Get MIDI sequencer
         Sequencer tempSequencer;  // So that we may assign null later
 
@@ -85,6 +86,9 @@ public class NotePlayerSequencer extends ClassWithLogging {
 
         } catch (InvalidMidiDataException ignored) {
         }
+
+        // Update other attributes
+        this.notePlayingDelayOffset = notePlayingDelayOffset;
     }
 
     // Getter/Setter methods
@@ -137,8 +141,11 @@ public class NotePlayerSequencer extends ClassWithLogging {
      * @param noteOnsetTimes The onset times of the notes to set.
      * @param durations      The durations of the notes to set.
      * @param noteNums       The note numbers of the notes to set.
+     * @param isSlowed       Whether the playback of the notes should be slowed.
      */
-    public void setNotesOnTrack(double[] noteOnsetTimes, double[] durations, int[] noteNums) {
+    public void setNotesOnTrack(
+            double[] noteOnsetTimes, double[] durations, int[] noteNums, boolean isSlowed
+    ) {
         // Check that the three arrays are of the same length
         int noteOnsetTimesLength = noteOnsetTimes.length;
         int durationsLength = durations.length;
@@ -153,7 +160,16 @@ public class NotePlayerSequencer extends ClassWithLogging {
 
         // Add new MIDI events
         for (int i = 0; i < noteOnsetTimesLength; i++) {
-            addNote(noteOnsetTimes[i], durations[i], noteNums[i]);
+            // Determine the actual time to set
+            double onsetTime = noteOnsetTimes[i];
+            double duration = durations[i];
+
+            if (isSlowed) {
+                onsetTime *= 2;
+                duration *= 2;
+            }
+
+            addNote(onsetTime, duration, noteNums[i]);
         }
 
         // Update the `areNotesSet` flag
@@ -197,8 +213,9 @@ public class NotePlayerSequencer extends ClassWithLogging {
      * Start playback of the MIDI sequence.
      *
      * @param currTime The time to start playback at, <b>in seconds</b>.
+     * @param isSlowed Whether the playback of the notes should be slowed.
      */
-    public void play(double currTime) {
+    public void play(double currTime, boolean isSlowed) {
         // Check if there is a sequencer to use in the first place
         if (sequencer == null) {
             log(Level.INFO, "No sequencer to use, so not playing");
@@ -219,7 +236,7 @@ public class NotePlayerSequencer extends ClassWithLogging {
         }
 
         // Set current time
-        setCurrTime(currTime);
+        setCurrTime((isSlowed ? currTime * 2 : currTime) + notePlayingDelayOffset);
 
         // Start playback
         sequencer.start();

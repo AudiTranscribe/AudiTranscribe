@@ -46,7 +46,7 @@ class NotePlayerSequencerTest {
         }
 
         // Create a multi-note player object
-        NotePlayerSequencer notePlayerSequencer = new NotePlayerSequencer();
+        NotePlayerSequencer notePlayerSequencer = new NotePlayerSequencer(0);
 
         // Check if the sequencer is available
         if (notePlayerSequencer.isSequencerAvailable()) {
@@ -61,10 +61,10 @@ class NotePlayerSequencerTest {
             notePlayerSequencer.setInstrument(MIDIInstrument.FLUTE);
 
             // Set the notes
-            notePlayerSequencer.setNotesOnTrack(noteOnsetTimes, noteDurations, noteNumbers);
+            notePlayerSequencer.setNotesOnTrack(noteOnsetTimes, noteDurations, noteNumbers, false);
 
             // Play the notes
-            notePlayerSequencer.play(0);
+            notePlayerSequencer.play(0, false);
 
             while (true) {
                 // Exit the program when sequencer has stopped playing

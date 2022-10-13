@@ -226,7 +226,7 @@ public class FixNoteDelayViewController extends ClassWithLogging implements Init
         }
 
         // Create the sequencer
-        sequencer = new NotePlayerSequencer();
+        sequencer = new NotePlayerSequencer(0);
 
         // Check if the sequencer is available
         if (sequencer.isSequencerAvailable()) {
@@ -241,10 +241,10 @@ public class FixNoteDelayViewController extends ClassWithLogging implements Init
             sequencer.setInstrument(INSTRUMENT);
 
             // Set the notes
-            sequencer.setNotesOnTrack(NOTE_ONSET_TIMES, NOTE_DURATIONS, noteNumbers);
+            sequencer.setNotesOnTrack(NOTE_ONSET_TIMES, NOTE_DURATIONS, noteNumbers, false);
 
             // Start & Stop the sequencer to correctly set timings
-            sequencer.play(0);
+            sequencer.play(0, false);
             sequencer.stop();
 
         } else {
@@ -271,7 +271,7 @@ public class FixNoteDelayViewController extends ClassWithLogging implements Init
         // Play the things
         audio.setPlaybackVolume(0.5);
         audio.play();
-        sequencer.play(offsetTime);
+        sequencer.play(offsetTime, false);
     }
 
     /**
