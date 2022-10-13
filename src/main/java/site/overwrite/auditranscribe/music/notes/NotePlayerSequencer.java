@@ -140,7 +140,11 @@ public class NotePlayerSequencer extends ClassWithLogging {
      */
     public void setNotesOnTrack(double[] noteOnsetTimes, double[] durations, int[] noteNums) {
         // Check that the three arrays are of the same length
-        if (noteOnsetTimes.length != durations.length || noteOnsetTimes.length != noteNums.length) {
+        int noteOnsetTimesLength = noteOnsetTimes.length;
+        int durationsLength = durations.length;
+        int noteNumsLength = noteNums.length;
+
+        if (!(noteOnsetTimesLength == durationsLength && durationsLength == noteNumsLength)) {
             throw new LengthException("The three arrays must be of the same length");
         }
 
@@ -148,8 +152,7 @@ public class NotePlayerSequencer extends ClassWithLogging {
         clearNotesOnTrack();
 
         // Add new MIDI events
-        int n = noteOnsetTimes.length;
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < noteOnsetTimesLength; i++) {
             addNote(noteOnsetTimes[i], durations[i], noteNums[i]);
         }
 
