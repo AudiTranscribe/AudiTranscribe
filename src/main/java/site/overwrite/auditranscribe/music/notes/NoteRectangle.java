@@ -280,10 +280,14 @@ public class NoteRectangle extends StackPane {
 
                 if (collisionLoc == CollisionLocation.LEFT) {  // Collided with left rectangle
                     // Move current rectangle to the right edge of the left rectangle
-                    this.setTranslateX(leftBoundingRectangle.getEndX());
+                    if (leftBoundingRectangle != null) {
+                        this.setTranslateX(leftBoundingRectangle.getEndX());
+                    }
                 } else if (collisionLoc == CollisionLocation.RIGHT) {  // Collided with right rectangle
                     // Move current rectangle to the left edge of the right rectangle
-                    this.setTranslateX(rightBoundingRectangle.getStartX() - getRectangleWidth());
+                    if (rightBoundingRectangle != null) {
+                        this.setTranslateX(rightBoundingRectangle.getStartX() - getRectangleWidth());
+                    }
                 } else {
                     // Permit horizontal movement if within range
                     if (newX >= 0 && newX + getRectangleWidth() <= spectrogramWidth) {
