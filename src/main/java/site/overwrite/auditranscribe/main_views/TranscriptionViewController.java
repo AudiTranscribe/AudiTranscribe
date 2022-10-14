@@ -1101,7 +1101,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         if (saveProjectButton.isDisabled()) return false;
 
         // Now check if there are unsaved changes
-        if (hasUnsavedChanges) {
+        if (hasUnsavedChanges || NoteRectangle.getHasEditedNoteRectangles()) {
             // Prompt user to save work first
             ButtonType dontSaveButExit = new ButtonType("Don't Save");
             ButtonType dontSaveDontExit = new ButtonType("Cancel");
@@ -1604,8 +1604,9 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             ProjectIOHandlers.saveProject(saveDest, numSkippableBytes, projectInfoData, musicNotesData);
         }
 
-        // Set the `hasUnsavedChanges` flag to false
+        // Set flags
         hasUnsavedChanges = false;
+        NoteRectangle.setHasEditedNoteRectangles(false);
 
         log(Level.INFO, "File saved successfully");
     }
@@ -2094,7 +2095,10 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
                 // If we are using existing data (i.e., AUDT file path was already set), then initially there are no
                 // unsaved changes
-                if (audtFilePath != null) hasUnsavedChanges = false;
+                if (audtFilePath != null) {
+                    hasUnsavedChanges = false;
+                    NoteRectangle.setHasEditedNoteRectangles(false);
+                }
             }
         });
 
