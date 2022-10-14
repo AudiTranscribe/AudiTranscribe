@@ -230,7 +230,7 @@
                             site/overwrite/auditranscribe/misc/CustomTask.class
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/misc/MouseHandler.class
+                            site/overwrite/auditranscribe/misc/IconHelpers.class
                         </exclude>
                         <exclude>
                             site/overwrite/auditranscribe/misc/MyLogger.class
