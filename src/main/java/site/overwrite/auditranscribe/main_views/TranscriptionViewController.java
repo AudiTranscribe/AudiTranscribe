@@ -27,7 +27,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.*;
@@ -253,11 +252,8 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             toggleSlowedAudioButton, audioVolumeButton, notesVolumeButton;
 
     @FXML
-    private SVGPath scrollButtonImage, editNotesButtonImage;
-
-    @FXML
-    private ImageView playButtonImage, stopButtonImage, playSkipBackButtonImage, playSkipForwardButtonImage,
-            audioVolumeButtonImage, notesVolumeButtonImage;
+    private SVGPath scrollButtonImage, editNotesButtonImage, playButtonImage, stopButtonImage, playSkipBackButtonImage,
+            playSkipForwardButtonImage, audioVolumeButtonImage, notesVolumeButtonImage;
 
     @FXML
     private Slider audioVolumeSlider, notesVolumeSlider;
@@ -616,32 +612,22 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/" + theme.cssFile));
 
         // Set graphics
-        IconHelpers.setSVGPath(newProjectButtonImage, 25, "plus-circle-solid", theme.shortName);
-        IconHelpers.setSVGPath(openProjectButtonImage, 25, "folder-open-solid", theme.shortName);
-        IconHelpers.setSVGPath(saveProjectButtonImage, 25, "floppy-solid", theme.shortName);
+        IconHelpers.setSVGPath(newProjectButtonImage, 20, "plus-circle-solid", theme.shortName);
+        IconHelpers.setSVGPath(openProjectButtonImage, 20, "folder-open-solid", theme.shortName);
+        IconHelpers.setSVGPath(saveProjectButtonImage, 20, "floppy-solid", theme.shortName);
 
         IconHelpers.setSVGPath(scrollButtonImage, 15, 22.5, "map-marker-line", theme.shortName);
         IconHelpers.setSVGPath(editNotesButtonImage, 20, "pencil-line", theme.shortName);
 
-        playButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/play-solid.png"
-        )));
-        stopButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/stop-solid.png"
-        )));
-        playSkipBackButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/step-backward-solid.png"
-        )));
-        playSkipForwardButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/step-forward-solid.png"
-        )));
+        IconHelpers.setSVGPath(playButtonImage, 20, "play-solid", theme.shortName);
+        IconHelpers.setSVGPath(stopButtonImage, 20, "stop-solid", theme.shortName);
+        IconHelpers.setSVGPath(playSkipBackButtonImage, 20, "step-backward-solid", theme.shortName);
+        IconHelpers.setSVGPath(playSkipForwardButtonImage, 20, "step-forward-solid", theme.shortName);
 
-        audioVolumeButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/volume-up-solid.png"
-        )));
-        notesVolumeButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/music-note-solid.png"
-        )));
+        IconHelpers.setSVGPath(audioVolumeButtonImage, 20, "volume-up-solid", theme.shortName);
+        IconHelpers.setSVGPath(
+                notesVolumeButtonImage, 15, 20, "music-note-solid", theme.shortName
+        );
     }
 
     /**
@@ -675,11 +661,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
             // Change the icon of the audio volume button from mute to non-mute
             if (isAudioMuted) {
-                audioVolumeButtonImage.setImage(
-                        new Image(IOMethods.getFileURLAsString(
-                                "images/icons/PNGs/" + theme.shortName + "/volume-up-solid.png"
-                        ))
-                );
+                IconHelpers.setSVGPath(audioVolumeButtonImage, 20, "volume-up-solid", theme.shortName);
                 isAudioMuted = false;
             }
 
@@ -698,11 +680,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
             // Change the icon of the notes' volume button from off to on
             if (areNotesMuted) {
-                notesVolumeButtonImage.setImage(
-                        new Image(IOMethods.getFileURLAsString(
-                                "images/icons/PNGs/" + theme.shortName + "/music-note-solid.png"
-                        ))
-                );
+                IconHelpers.setSVGPath(notesVolumeButtonImage, 15, 20,"music-note-solid", theme.shortName);
                 isAudioMuted = false;
             }
 
@@ -1218,21 +1196,19 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
      * @return New paused state.
      */
     private boolean togglePaused(boolean isPaused) {
+        // Change the icon
+        String iconToUse;
         if (isPaused) {  // Is currently paused; want to make audio play
             // Change the icon of the play button from the play icon to the paused icon
             // (So that the user knows that the next interaction with button will pause audio)
-            playButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                    "images/icons/PNGs/" + theme.shortName + "/pause-solid.png"
-            )));
+            iconToUse = "pause-solid";
 
             // Unpause the audio (i.e. play the audio)
             audio.play(usingSlowedAudio);
         } else {  // Is currently playing; want to make audio pause
             // Change the icon of the play button from the paused icon to the play icon
             // (So that the user knows that the next interaction with button will play audio)
-            playButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                    "images/icons/PNGs/" + theme.shortName + "/play-solid.png"
-            )));
+            iconToUse = "play-solid";
 
             // Pause the audio
             audio.pause();
@@ -1240,6 +1216,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             // Stop note sequencer playback
             notePlayerSequencer.stop();
         }
+        IconHelpers.setSVGPath(playButtonImage, 20, iconToUse, theme.shortName);
 
         // Toggle paused state for note rectangles
         NoteRectangle.setIsPaused(!isPaused);
@@ -2200,27 +2177,25 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
      * Helper method that toggles the audio mute button.
      */
     private void toggleAudioMuteButton() {
+        // Determine icon to use
+        String iconToUse;
+
         if (isAudioMuted) {
-            // Change the icon of the volume button from mute to non-mute
-            audioVolumeButtonImage.setImage(
-                    new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/volume-up-solid.png"
-                    ))
-            );
+            // Want to change from mute to non-mute
+            iconToUse = "volume-up-solid";
 
             // Unmute the audio by setting the volume back to the value before the mute
             audio.setPlaybackVolume(audioVolume);
         } else {
-            // Change the icon of the volume button from non-mute to mute
-            audioVolumeButtonImage.setImage(
-                    new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/volume-mute-solid.png"
-                    ))
-            );
+            // Want to change from non-mute to mute
+            iconToUse = "volume-mute-solid";
 
             // Mute the audio by setting the volume to zero
             audio.setPlaybackVolume(0);
         }
+
+        // Change the icon
+        IconHelpers.setSVGPath(audioVolumeButtonImage, 20, iconToUse, theme.shortName);
 
         // Toggle the `isAudioMuted` flag
         isAudioMuted = !isAudioMuted;
@@ -2232,22 +2207,10 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
      * Helper method that toggles the note mute button.
      */
     private void toggleNoteMuteButton() {
-        if (areNotesMuted) {
-            // Change the icon of the notes button from off to on
-            notesVolumeButtonImage.setImage(
-                    new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/music-note-solid.png"
-                    ))
-            );
-
-        } else {
-            // Change the icon of the notes button from on to off
-            notesVolumeButtonImage.setImage(
-                    new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/music-note-line.png"
-                    ))
-            );
-        }
+        // Change the icon
+        String iconToUse = "music-note-line";
+        if (areNotesMuted) iconToUse = "music-note-solid";  // Want to change icon from off to on
+        IconHelpers.setSVGPath(notesVolumeButtonImage, 15, 20, iconToUse, theme.shortName);
 
         // Toggle the `areNotesMuted` flag
         areNotesMuted = !areNotesMuted;

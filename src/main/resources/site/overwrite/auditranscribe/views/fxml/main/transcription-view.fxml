@@ -14,7 +14,6 @@
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.Spinner?>
-<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
@@ -208,40 +207,24 @@
                                         <HBox alignment="CENTER" spacing="5.0" HBox.hgrow="NEVER">
                                             <children>
                                                 <Button fx:id="playButton" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button">
-                                                    <graphic>
-                                                        <ImageView fx:id="playButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                                                            <image>
-                                                                <Image url="@../../../images/icons/PNGs/light-mode/play.png" />
-                                                            </image>
-                                                        </ImageView>
-                                                    </graphic>
+                                       <graphic>
+                                          <SVGPath fx:id="playButtonImage" content="M32.16,16.08,8.94,4.47A2.07,2.07,0,0,0,6,6.32V29.53a2.06,2.06,0,0,0,3,1.85L32.16,19.77a2.07,2.07,0,0,0,0-3.7ZM32.16,16.08,8.94,4.47A2.07,2.07,0,0,0,6,6.32V29.53a2.06,2.06,0,0,0,3,1.85L32.16,19.77a2.07,2.07,0,0,0,0-3.7Z" />
+                                       </graphic>
                                                 </Button>
                                                 <Button fx:id="stopButton" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button">
-                                                    <graphic>
-                                                        <ImageView fx:id="stopButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                                                            <image>
-                                                                <Image url="@../../../images/icons/PNGs/light-mode/stop.png" />
-                                                            </image>
-                                                        </ImageView>
-                                                    </graphic>
+                                       <graphic>
+                                          <SVGPath fx:id="stopButtonImage" content="M5.96 4h23.99s2 0 2 2v24s0 2 -2 2h-23.99s-2 0 -2 -2v-24s0 -2 2 -2M5.96 4h23.99s2 0 2 2v24s0 2 -2 2h-23.99s-2 0 -2 -2v-24s0 -2 2 -2" />
+                                       </graphic>
                                                 </Button>
                                                 <Button fx:id="playSkipBackButton" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button">
-                                                    <graphic>
-                                                        <ImageView fx:id="playSkipBackButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                                                            <image>
-                                                                <Image url="@../../../images/icons/PNGs/light-mode/play-skip-back.png" />
-                                                            </image>
-                                                        </ImageView>
-                                                    </graphic>
+                                       <graphic>
+                                          <SVGPath fx:id="playSkipBackButtonImage" content="M31 4.1a2 2 0 0 1 2 2v24.46a2 2 0 0 1-3.12 1.63l-17.06-12.19a2 2 0 0 1 0-3.25l17.06-12.27a2 2 0 0 1 1.12-0.38zm-22.95 28.23h-3s-2 0-2-2v-24s0-2 2-2h3s2 0 2 2v24s0 2-2 2M31 4.1a2 2 0 0 1 2 2v24.46a2 2 0 0 1-3.12 1.63l-17.06-12.19a2 2 0 0 1 0-3.25l17.06-12.27a2 2 0 0 1 1.12-0.38zm-22.95 28.23h-3s-2 0-2-2v-24s0-2 2-2h3s2 0 2 2v24s0 2-2 2" />
+                                       </graphic>
                                                 </Button>
                                                 <Button fx:id="playSkipForwardButton" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button">
-                                                    <graphic>
-                                                        <ImageView fx:id="playSkipForwardButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                                                            <image>
-                                                                <Image url="@../../../images/icons/PNGs/light-mode/play-skip-forward.png" />
-                                                            </image>
-                                                        </ImageView>
-                                                    </graphic>
+                                       <graphic>
+                                          <SVGPath fx:id="playSkipForwardButtonImage" content="M5,31.9a2,2,0,0,1-2-2V5.44A2,2,0,0,1,6.12,3.81L23.18,16a2,2,0,0,1,0,3.25h0L6.12,31.52A2,2,0,0,1,5,31.9Z M27.95 3.67h3s2 0 2 2v24s0 2 -2 2h-3s-2 0 -2 -2v-24s0 -2 2 -2M5,31.9a2,2,0,0,1-2-2V5.44A2,2,0,0,1,6.12,3.81L23.18,16a2,2,0,0,1,0,3.25h0L6.12,31.52A2,2,0,0,1,5,31.9Z M27.95 3.67h3s2 0 2 2v24s0 2 -2 2h-3s-2 0 -2 -2v-24s0 -2 2 -2" />
+                                       </graphic>
                                                 </Button>
                                     <Button fx:id="toggleSlowedAudioButton" contentDisplay="CENTER" disable="true" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="34.0" prefWidth="55.0" styleClass="button-label" text="1.0x" HBox.hgrow="SOMETIMES" />
                                             </children>
@@ -253,23 +236,15 @@
                                         <HBox alignment="CENTER_LEFT" spacing="5.0" HBox.hgrow="ALWAYS">
                                             <children>
                                                 <Button fx:id="audioVolumeButton" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button">
-                                                    <graphic>
-                                                        <ImageView fx:id="audioVolumeButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                                                            <image>
-                                                                <Image url="@../../../images/icons/PNGs/light-mode/volume-high.png" />
-                                                            </image>
-                                                        </ImageView>
-                                                    </graphic>
+                                       <graphic>
+                                          <SVGPath fx:id="audioVolumeButtonImage" content="M23.41,25.25a1,1,0,0,1-.54-1.85,6.21,6.21,0,0,0-.19-10.65,1,1,0,1,1,1-1.73,8.21,8.21,0,0,1,.24,14.06A1,1,0,0,1,23.41,25.25Z M25.62,31.18a1,1,0,0,1-.45-1.89A12.44,12.44,0,0,0,25,6.89a1,1,0,1,1,.87-1.8,14.44,14.44,0,0,1,.24,26A1,1,0,0,1,25.62,31.18Z M18.33,4,9.07,12h-6a1,1,0,0,0-1,1v9.92a1,1,0,0,0,1,1H8.88l9.46,8.24A1,1,0,0,0,20,31.43V4.72A1,1,0,0,0,18.33,4ZM23.41,25.25a1,1,0,0,1-.54-1.85,6.21,6.21,0,0,0-.19-10.65,1,1,0,1,1,1-1.73,8.21,8.21,0,0,1,.24,14.06A1,1,0,0,1,23.41,25.25Z M25.62,31.18a1,1,0,0,1-.45-1.89A12.44,12.44,0,0,0,25,6.89a1,1,0,1,1,.87-1.8,14.44,14.44,0,0,1,.24,26A1,1,0,0,1,25.62,31.18Z M18.33,4,9.07,12h-6a1,1,0,0,0-1,1v9.92a1,1,0,0,0,1,1H8.88l9.46,8.24A1,1,0,0,0,20,31.43V4.72A1,1,0,0,0,18.33,4Z" />
+                                       </graphic>
                                                 </Button>
                                                 <Slider fx:id="audioVolumeSlider" disable="true" max="1.0" styleClass="volume-slider" value="0.5" />
                                                 <Button fx:id="notesVolumeButton" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button">
-                                                    <graphic>
-                                                        <ImageView fx:id="notesVolumeButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                                                            <image>
-                                                                <Image url="@../../../images/icons/PNGs/light-mode/musical-notes.png" />
-                                                            </image>
-                                                        </ImageView>
-                                                    </graphic>
+                                       <graphic>
+                                          <SVGPath fx:id="notesVolumeButtonImage" content="M31.68,6.16c-1.92-3.3-10.6-4-11.58-4.09L19,2V22.29a5.88,5.88,0,0,0-.81-.55,8.33,8.33,0,0,0-6.53-.41c-4.12,1.33-6.77,5.13-5.91,8.47a5.33,5.33,0,0,0,2.66,3.32,7.48,7.48,0,0,0,3.61.88A9.54,9.54,0,0,0,15,33.52c3.7-1.19,6.2-4.37,6.06-7.42,0,0,0,0,0,0V8.49c1,.12,2.37.33,3.82.64a11.17,11.17,0,0,1,4.06,1.46c1,.66.38,1.9.33,2a11.8,11.8,0,0,1-1.66,2,1,1,0,0,0,1.33,1.49C29.15,15.85,34.5,11,31.68,6.16ZM31.68,6.16c-1.92-3.3-10.6-4-11.58-4.09L19,2V22.29a5.88,5.88,0,0,0-.81-.55,8.33,8.33,0,0,0-6.53-.41c-4.12,1.33-6.77,5.13-5.91,8.47a5.33,5.33,0,0,0,2.66,3.32,7.48,7.48,0,0,0,3.61.88A9.54,9.54,0,0,0,15,33.52c3.7-1.19,6.2-4.37,6.06-7.42,0,0,0,0,0,0V8.49c1,.12,2.37.33,3.82.64a11.17,11.17,0,0,1,4.06,1.46c1,.66.38,1.9.33,2a11.8,11.8,0,0,1-1.66,2,1,1,0,0,0,1.33,1.49C29.15,15.85,34.5,11,31.68,6.16Z" />
+                                       </graphic>
                                                 </Button>
                                                 <Slider fx:id="notesVolumeSlider" disable="true" max="127.0" min="33.0" styleClass="volume-slider" value="80.0" />
                                             </children>
