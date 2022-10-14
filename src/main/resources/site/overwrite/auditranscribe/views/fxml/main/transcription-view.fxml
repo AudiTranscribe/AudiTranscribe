@@ -14,12 +14,12 @@
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.Spinner?>
-<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane fx:id="rootPane" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="site.overwrite.auditranscribe.main_views.TranscriptionViewController">
@@ -58,31 +58,19 @@
                                         <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="0.0" spacing="10.0">
                                             <children>
                                                 <Button fx:id="newProjectButton" contentDisplay="CENTER" disable="true" mnemonicParsing="false" prefHeight="30.0" styleClass="image-button">
-                                                    <graphic>
-                                                        <ImageView fx:id="newProjectButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                                                            <image>
-                                                                <Image url="@../../../images/icons/PNGs/light-mode/create.png" />
-                                                            </image>
-                                                        </ImageView>
-                                                    </graphic>
+                                       <graphic>
+                                          <SVGPath fx:id="newProjectButtonImage" content="M34,18A16,16,0,1,1,18,2,16,16,0,0,1,34,18Zm-8.41-1.5H19.5V10.41a1.5,1.5,0,0,0-3,0V16.5H10.41a1.5,1.5,0,0,0,0,3H16.5v6.09a1.5,1.5,0,0,0,3,0V19.5h6.09a1.5,1.5,0,0,0,0-3ZM34,18A16,16,0,1,1,18,2,16,16,0,0,1,34,18Zm-8.41-1.5H19.5V10.41a1.5,1.5,0,0,0-3,0V16.5H10.41a1.5,1.5,0,0,0,0,3H16.5v6.09a1.5,1.5,0,0,0,3,0V19.5h6.09a1.5,1.5,0,0,0,0-3Z" />
+                                       </graphic>
                                                 </Button>
                                                 <Button fx:id="openProjectButton" contentDisplay="CENTER" disable="true" layoutX="20.0" layoutY="18.0" mnemonicParsing="false" prefHeight="30.0" styleClass="image-button">
-                                                    <graphic>
-                                                        <ImageView fx:id="openProjectButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                                                            <image>
-                                                                <Image url="@../../../images/icons/PNGs/light-mode/folder-open.png" />
-                                                            </image>
-                                                        </ImageView>
-                                                    </graphic>
+                                       <graphic>
+                                          <SVGPath fx:id="openProjectButtonImage" content="M35.32,13.74A1.71,1.71,0,0,0,33.87,13H11.17a2.59,2.59,0,0,0-2.25,1.52,1,1,0,0,0,0,.14L6,25V7h6.49l2.61,3.59a1,1,0,0,0,.81.41H32a2,2,0,0,0-2-2H16.42L14.11,5.82A2,2,0,0,0,12.49,5H6A2,2,0,0,0,4,7V29.69A1.37,1.37,0,0,0,5.41,31H30.34a1,1,0,0,0,1-.72l4.19-15.1A1.64,1.64,0,0,0,35.32,13.74ZM35.32,13.74A1.71,1.71,0,0,0,33.87,13H11.17a2.59,2.59,0,0,0-2.25,1.52,1,1,0,0,0,0,.14L6,25V7h6.49l2.61,3.59a1,1,0,0,0,.81.41H32a2,2,0,0,0-2-2H16.42L14.11,5.82A2,2,0,0,0,12.49,5H6A2,2,0,0,0,4,7V29.69A1.37,1.37,0,0,0,5.41,31H30.34a1,1,0,0,0,1-.72l4.19-15.1A1.64,1.64,0,0,0,35.32,13.74Z" />
+                                       </graphic>
                                                 </Button>
                                                 <Button fx:id="saveProjectButton" contentDisplay="CENTER" disable="true" layoutX="72.0" layoutY="18.0" mnemonicParsing="false" prefHeight="30.0" styleClass="image-button">
-                                                    <graphic>
-                                                        <ImageView fx:id="saveProjectButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                                                            <image>
-                                                                <Image url="@../../../images/icons/PNGs/light-mode/save.png" />
-                                                            </image>
-                                                        </ImageView>
-                                                    </graphic>
+                                       <graphic>
+                                          <SVGPath fx:id="saveProjectButtonImage" content="M27.36,4H6A2,2,0,0,0,4,6V30a2,2,0,0,0,2,2H30a2,2,0,0,0,2-2V8.78ZM26,30H10V21.5A1.5,1.5,0,0,1,11.5,20h13A1.5,1.5,0,0,1,26,21.5ZM24,14H12a2,2,0,0,1-2-2V6h2v6H26A2,2,0,0,1,24,14ZM27.36,4H6A2,2,0,0,0,4,6V30a2,2,0,0,0,2,2H30a2,2,0,0,0,2-2V8.78ZM26,30H10V21.5A1.5,1.5,0,0,1,11.5,20h13A1.5,1.5,0,0,1,26,21.5ZM24,14H12a2,2,0,0,1-2-2V6h2v6H26A2,2,0,0,1,24,14ZM27.36,4H6A2,2,0,0,0,4,6V30a2,2,0,0,0,2,2H30a2,2,0,0,0,2-2V8.78ZM26,30H10V21.5A1.5,1.5,0,0,1,11.5,20h13A1.5,1.5,0,0,1,26,21.5ZM24,14H12a2,2,0,0,1-2-2V6h2v6H26A2,2,0,0,1,24,14ZM27.36,4H6A2,2,0,0,0,4,6V30a2,2,0,0,0,2,2H30a2,2,0,0,0,2-2V8.78ZM26,30H10V21.5A1.5,1.5,0,0,1,11.5,20h13A1.5,1.5,0,0,1,26,21.5ZM24,14H12a2,2,0,0,1-2-2V6h2v6H26A2,2,0,0,1,24,14Z" />
+                                       </graphic>
                                                 </Button>
                                             </children>
                                             <padding>
@@ -201,22 +189,14 @@
                                         <HBox alignment="CENTER_LEFT" layoutX="421.0" layoutY="10.0" spacing="5.0" HBox.hgrow="NEVER">
                                             <children>
                                                 <Button fx:id="scrollButton" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button">
-                                                    <graphic>
-                                                        <ImageView fx:id="scrollButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                                                            <image>
-                                                                <Image url="@../../../images/icons/PNGs/light-mode/footsteps-outline.png" />
-                                                            </image>
-                                                        </ImageView>
-                                                    </graphic>
+                                       <graphic>
+                                          <SVGPath fx:id="scrollButtonImage" content="M18,6.72a5.73,5.73,0,1,0,5.73,5.73A5.73,5.73,0,0,0,18,6.72Zm0,9.46a3.73,3.73,0,1,1,3.73-3.73A3.73,3.73,0,0,1,18,16.17Z M18,2A11.79,11.79,0,0,0,6.22,13.73c0,4.67,2.62,8.58,4.54,11.43l.35.52a99.61,99.61,0,0,0,6.14,8l.76.89.76-.89a99.82,99.82,0,0,0,6.14-8l.35-.53c1.91-2.85,4.53-6.75,4.53-11.42A11.79,11.79,0,0,0,18,2ZM23.59,24l-.36.53c-1.72,2.58-4,5.47-5.23,6.9-1.18-1.43-3.51-4.32-5.23-6.9L12.42,24c-1.77-2.64-4.2-6.25-4.2-10.31a9.78,9.78,0,1,1,19.56,0C27.78,17.79,25.36,21.4,23.59,24ZM18,6.72a5.73,5.73,0,1,0,5.73,5.73A5.73,5.73,0,0,0,18,6.72Zm0,9.46a3.73,3.73,0,1,1,3.73-3.73A3.73,3.73,0,0,1,18,16.17Z M18,2A11.79,11.79,0,0,0,6.22,13.73c0,4.67,2.62,8.58,4.54,11.43l.35.52a99.61,99.61,0,0,0,6.14,8l.76.89.76-.89a99.82,99.82,0,0,0,6.14-8l.35-.53c1.91-2.85,4.53-6.75,4.53-11.42A11.79,11.79,0,0,0,18,2ZM23.59,24l-.36.53c-1.72,2.58-4,5.47-5.23,6.9-1.18-1.43-3.51-4.32-5.23-6.9L12.42,24c-1.77-2.64-4.2-6.25-4.2-10.31a9.78,9.78,0,1,1,19.56,0C27.78,17.79,25.36,21.4,23.59,24Z" />
+                                       </graphic>
                                                 </Button>
                                                 <Button fx:id="editNotesButton" contentDisplay="CENTER" disable="true" layoutX="10.0" layoutY="23.0" mnemonicParsing="false" styleClass="image-button">
-                                                    <graphic>
-                                                        <ImageView fx:id="editNotesButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                                                            <image>
-                                                                <Image url="@../../../images/icons/PNGs/light-mode/edit-notes-outline.png" />
-                                                            </image>
-                                                        </ImageView>
-                                                    </graphic>
+                                       <graphic>
+                                          <SVGPath fx:id="editNotesButtonImage" content="M33.87,8.32,28,2.42a2.07,2.07,0,0,0-2.92,0L4.27,23.2l-1.9,8.2a2.06,2.06,0,0,0,2,2.5,2.14,2.14,0,0,0,.43,0L13.09,32,33.87,11.24A2.07,2.07,0,0,0,33.87,8.32ZM12.09,30.2,4.32,31.83l1.77-7.62L21.66,8.7l6,6ZM29,13.25l-6-6,3.48-3.46,5.9,6ZM33.87,8.32,28,2.42a2.07,2.07,0,0,0-2.92,0L4.27,23.2l-1.9,8.2a2.06,2.06,0,0,0,2,2.5,2.14,2.14,0,0,0,.43,0L13.09,32,33.87,11.24A2.07,2.07,0,0,0,33.87,8.32ZM12.09,30.2,4.32,31.83l1.77-7.62L21.66,8.7l6,6ZM29,13.25l-6-6,3.48-3.46,5.9,6Z" />
+                                       </graphic>
                                                 </Button>
                                             </children>
                                             <padding>
@@ -227,40 +207,24 @@
                                         <HBox alignment="CENTER" spacing="5.0" HBox.hgrow="NEVER">
                                             <children>
                                                 <Button fx:id="playButton" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button">
-                                                    <graphic>
-                                                        <ImageView fx:id="playButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                                                            <image>
-                                                                <Image url="@../../../images/icons/PNGs/light-mode/play.png" />
-                                                            </image>
-                                                        </ImageView>
-                                                    </graphic>
+                                       <graphic>
+                                          <SVGPath fx:id="playButtonImage" content="M32.16,16.08,8.94,4.47A2.07,2.07,0,0,0,6,6.32V29.53a2.06,2.06,0,0,0,3,1.85L32.16,19.77a2.07,2.07,0,0,0,0-3.7ZM32.16,16.08,8.94,4.47A2.07,2.07,0,0,0,6,6.32V29.53a2.06,2.06,0,0,0,3,1.85L32.16,19.77a2.07,2.07,0,0,0,0-3.7Z" />
+                                       </graphic>
                                                 </Button>
                                                 <Button fx:id="stopButton" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button">
-                                                    <graphic>
-                                                        <ImageView fx:id="stopButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                                                            <image>
-                                                                <Image url="@../../../images/icons/PNGs/light-mode/stop.png" />
-                                                            </image>
-                                                        </ImageView>
-                                                    </graphic>
+                                       <graphic>
+                                          <SVGPath fx:id="stopButtonImage" content="M5.96 4h23.99s2 0 2 2v24s0 2 -2 2h-23.99s-2 0 -2 -2v-24s0 -2 2 -2M5.96 4h23.99s2 0 2 2v24s0 2 -2 2h-23.99s-2 0 -2 -2v-24s0 -2 2 -2" />
+                                       </graphic>
                                                 </Button>
                                                 <Button fx:id="playSkipBackButton" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button">
-                                                    <graphic>
-                                                        <ImageView fx:id="playSkipBackButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                                                            <image>
-                                                                <Image url="@../../../images/icons/PNGs/light-mode/play-skip-back.png" />
-                                                            </image>
-                                                        </ImageView>
-                                                    </graphic>
+                                       <graphic>
+                                          <SVGPath fx:id="playSkipBackButtonImage" content="M31 4.1a2 2 0 0 1 2 2v24.46a2 2 0 0 1-3.12 1.63l-17.06-12.19a2 2 0 0 1 0-3.25l17.06-12.27a2 2 0 0 1 1.12-0.38zm-22.95 28.23h-3s-2 0-2-2v-24s0-2 2-2h3s2 0 2 2v24s0 2-2 2M31 4.1a2 2 0 0 1 2 2v24.46a2 2 0 0 1-3.12 1.63l-17.06-12.19a2 2 0 0 1 0-3.25l17.06-12.27a2 2 0 0 1 1.12-0.38zm-22.95 28.23h-3s-2 0-2-2v-24s0-2 2-2h3s2 0 2 2v24s0 2-2 2" />
+                                       </graphic>
                                                 </Button>
                                                 <Button fx:id="playSkipForwardButton" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button">
-                                                    <graphic>
-                                                        <ImageView fx:id="playSkipForwardButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                                                            <image>
-                                                                <Image url="@../../../images/icons/PNGs/light-mode/play-skip-forward.png" />
-                                                            </image>
-                                                        </ImageView>
-                                                    </graphic>
+                                       <graphic>
+                                          <SVGPath fx:id="playSkipForwardButtonImage" content="M5,31.9a2,2,0,0,1-2-2V5.44A2,2,0,0,1,6.12,3.81L23.18,16a2,2,0,0,1,0,3.25h0L6.12,31.52A2,2,0,0,1,5,31.9Z M27.95 3.67h3s2 0 2 2v24s0 2 -2 2h-3s-2 0 -2 -2v-24s0 -2 2 -2M5,31.9a2,2,0,0,1-2-2V5.44A2,2,0,0,1,6.12,3.81L23.18,16a2,2,0,0,1,0,3.25h0L6.12,31.52A2,2,0,0,1,5,31.9Z M27.95 3.67h3s2 0 2 2v24s0 2 -2 2h-3s-2 0 -2 -2v-24s0 -2 2 -2" />
+                                       </graphic>
                                                 </Button>
                                     <Button fx:id="toggleSlowedAudioButton" contentDisplay="CENTER" disable="true" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="34.0" prefWidth="55.0" styleClass="button-label" text="1.0x" HBox.hgrow="SOMETIMES" />
                                             </children>
@@ -272,23 +236,15 @@
                                         <HBox alignment="CENTER_LEFT" spacing="5.0" HBox.hgrow="ALWAYS">
                                             <children>
                                                 <Button fx:id="audioVolumeButton" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button">
-                                                    <graphic>
-                                                        <ImageView fx:id="audioVolumeButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                                                            <image>
-                                                                <Image url="@../../../images/icons/PNGs/light-mode/volume-high.png" />
-                                                            </image>
-                                                        </ImageView>
-                                                    </graphic>
+                                       <graphic>
+                                          <SVGPath fx:id="audioVolumeButtonImage" content="M23.41,25.25a1,1,0,0,1-.54-1.85,6.21,6.21,0,0,0-.19-10.65,1,1,0,1,1,1-1.73,8.21,8.21,0,0,1,.24,14.06A1,1,0,0,1,23.41,25.25Z M25.62,31.18a1,1,0,0,1-.45-1.89A12.44,12.44,0,0,0,25,6.89a1,1,0,1,1,.87-1.8,14.44,14.44,0,0,1,.24,26A1,1,0,0,1,25.62,31.18Z M18.33,4,9.07,12h-6a1,1,0,0,0-1,1v9.92a1,1,0,0,0,1,1H8.88l9.46,8.24A1,1,0,0,0,20,31.43V4.72A1,1,0,0,0,18.33,4ZM23.41,25.25a1,1,0,0,1-.54-1.85,6.21,6.21,0,0,0-.19-10.65,1,1,0,1,1,1-1.73,8.21,8.21,0,0,1,.24,14.06A1,1,0,0,1,23.41,25.25Z M25.62,31.18a1,1,0,0,1-.45-1.89A12.44,12.44,0,0,0,25,6.89a1,1,0,1,1,.87-1.8,14.44,14.44,0,0,1,.24,26A1,1,0,0,1,25.62,31.18Z M18.33,4,9.07,12h-6a1,1,0,0,0-1,1v9.92a1,1,0,0,0,1,1H8.88l9.46,8.24A1,1,0,0,0,20,31.43V4.72A1,1,0,0,0,18.33,4Z" />
+                                       </graphic>
                                                 </Button>
                                                 <Slider fx:id="audioVolumeSlider" disable="true" max="1.0" styleClass="volume-slider" value="0.5" />
                                                 <Button fx:id="notesVolumeButton" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button">
-                                                    <graphic>
-                                                        <ImageView fx:id="notesVolumeButtonImage" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                                                            <image>
-                                                                <Image url="@../../../images/icons/PNGs/light-mode/musical-notes.png" />
-                                                            </image>
-                                                        </ImageView>
-                                                    </graphic>
+                                       <graphic>
+                                          <SVGPath fx:id="notesVolumeButtonImage" content="M31.68,6.16c-1.92-3.3-10.6-4-11.58-4.09L19,2V22.29a5.88,5.88,0,0,0-.81-.55,8.33,8.33,0,0,0-6.53-.41c-4.12,1.33-6.77,5.13-5.91,8.47a5.33,5.33,0,0,0,2.66,3.32,7.48,7.48,0,0,0,3.61.88A9.54,9.54,0,0,0,15,33.52c3.7-1.19,6.2-4.37,6.06-7.42,0,0,0,0,0,0V8.49c1,.12,2.37.33,3.82.64a11.17,11.17,0,0,1,4.06,1.46c1,.66.38,1.9.33,2a11.8,11.8,0,0,1-1.66,2,1,1,0,0,0,1.33,1.49C29.15,15.85,34.5,11,31.68,6.16ZM31.68,6.16c-1.92-3.3-10.6-4-11.58-4.09L19,2V22.29a5.88,5.88,0,0,0-.81-.55,8.33,8.33,0,0,0-6.53-.41c-4.12,1.33-6.77,5.13-5.91,8.47a5.33,5.33,0,0,0,2.66,3.32,7.48,7.48,0,0,0,3.61.88A9.54,9.54,0,0,0,15,33.52c3.7-1.19,6.2-4.37,6.06-7.42,0,0,0,0,0,0V8.49c1,.12,2.37.33,3.82.64a11.17,11.17,0,0,1,4.06,1.46c1,.66.38,1.9.33,2a11.8,11.8,0,0,1-1.66,2,1,1,0,0,0,1.33,1.49C29.15,15.85,34.5,11,31.68,6.16Z" />
+                                       </graphic>
                                                 </Button>
                                                 <Slider fx:id="notesVolumeSlider" disable="true" max="127.0" min="33.0" styleClass="volume-slider" value="80.0" />
                                             </children>
