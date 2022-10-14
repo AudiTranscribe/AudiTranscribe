@@ -20,7 +20,7 @@ package site.overwrite.auditranscribe.utils;
 
 import site.overwrite.auditranscribe.generic.exceptions.FormatException;
 import site.overwrite.auditranscribe.generic.exceptions.ValueException;
-import site.overwrite.auditranscribe.misc.tuples.Pair;
+import site.overwrite.auditranscribe.generic.tuples.Pair;
 import site.overwrite.auditranscribe.music.MusicKey;
 
 import java.util.HashSet;

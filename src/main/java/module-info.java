@@ -39,6 +39,8 @@ module site.overwrite.auditranscribe {
     exports site.overwrite.auditranscribe.audio.exceptions;
     exports site.overwrite.auditranscribe.audio.filters;
     exports site.overwrite.auditranscribe.audio.window_functions;
+    exports site.overwrite.auditranscribe.generic.exceptions;
+    exports site.overwrite.auditranscribe.generic.tuples;
     exports site.overwrite.auditranscribe.io.audt_file;
     exports site.overwrite.auditranscribe.io.audt_file.base;
     exports site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators;
@@ -49,8 +51,6 @@ module site.overwrite.auditranscribe {
     exports site.overwrite.auditranscribe.main_views;
     exports site.overwrite.auditranscribe.main_views.scene_switching;
     exports site.overwrite.auditranscribe.misc;
-    exports site.overwrite.auditranscribe.generic.exceptions;
-    exports site.overwrite.auditranscribe.misc.tuples;
     exports site.overwrite.auditranscribe.music.exceptions;
     exports site.overwrite.auditranscribe.music.notes;
     exports site.overwrite.auditranscribe.network.exceptions;

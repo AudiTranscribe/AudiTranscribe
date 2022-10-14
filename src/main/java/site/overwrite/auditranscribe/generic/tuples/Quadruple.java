@@ -1,6 +1,6 @@
 /*
- * Triple.java
- * Description: An implementation of a 3-tuple (triple).
+ * Quadruple.java
+ * Description: An implementation of a 4-tuple (quadruple).
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,17 +16,19 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.misc.tuples;
+package site.overwrite.auditranscribe.generic.tuples;
 
 /**
- * An implementation of a 3-tuple (triple).
+ * An implementation of a 4-tuple (quadruple).
  *
  * @param value0 The first value.
  * @param value1 The second value.
  * @param value2 The third value.
+ * @param value3 The fourth value.
  * @param <A>    The first type.
  * @param <B>    The second type.
  * @param <C>    The third type.
+ * @param <D>    The fourth type.
  */
-public record Triple<A, B, C>(A value0, B value1, C value2) {
+public record Quadruple<A, B, C, D>(A value0, B value1, C value2, D value3) {
 }

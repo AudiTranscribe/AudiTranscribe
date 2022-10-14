@@ -19,7 +19,7 @@
 package site.overwrite.auditranscribe.spectrogram;
 
 import site.overwrite.auditranscribe.audio.WindowFunction;
-import site.overwrite.auditranscribe.misc.tuples.Pair;
+import site.overwrite.auditranscribe.generic.tuples.Pair;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.FrequencyBins;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.STFT;
 import site.overwrite.auditranscribe.utils.ArrayUtils;

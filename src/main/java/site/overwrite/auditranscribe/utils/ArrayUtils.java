@@ -20,8 +20,8 @@ package site.overwrite.auditranscribe.utils;
 
 import site.overwrite.auditranscribe.generic.exceptions.LengthException;
 import site.overwrite.auditranscribe.generic.exceptions.ValueException;
+import site.overwrite.auditranscribe.generic.tuples.Pair;
 import site.overwrite.auditranscribe.misc.Complex;
-import site.overwrite.auditranscribe.misc.tuples.Pair;
 
 import java.util.*;
 
