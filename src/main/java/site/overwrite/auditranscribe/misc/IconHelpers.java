@@ -36,14 +36,32 @@ public final class IconHelpers {
      * Method that sets up the <code>SVGPath</code> FXML element.
      *
      * @param svgPath   Object to set up.
-     * @param width     Width of the image.
+     * @param length    Length of the image.<br>
+     *                  Note that the width and the height will be exactly the same.
      * @param iconName  Name of the icon to set.
      * @param themeName Theme name, which determines the colour of the icon.
      */
-    public static void setSVGPath(SVGPath svgPath, double width, String iconName, String themeName) {
+    public static void setSVGPath(SVGPath svgPath, double length, String iconName, String themeName) {
         svgPath.setContent(getIconSVGPath(iconName));
         svgPath.setFill(getIconColour(themeName));
-        resize(svgPath, width);
+        resize(svgPath, length);
+    }
+
+    /**
+     * Method that sets up the <code>SVGPath</code> FXML element.
+     *
+     * @param svgPath   Object to set up.
+     * @param width     Width of the image.
+     * @param height    Height of the image.
+     * @param iconName  Name of the icon to set.
+     * @param themeName Theme name, which determines the colour of the icon.
+     */
+    public static void setSVGPath(
+            SVGPath svgPath, double width, double height, String iconName, String themeName
+    ) {
+        svgPath.setContent(getIconSVGPath(iconName));
+        svgPath.setFill(getIconColour(themeName));
+        resize(svgPath, width, height);
     }
 
     // Private methods
@@ -71,16 +89,27 @@ public final class IconHelpers {
     /**
      * Helper method that helps resize the SVG object correctly.
      *
-     * @param svgPath  Object to resize.
-     * @param newWidth New width to resize.<br>
-     *                 Note that the width and the height will be exactly the same.
+     * @param svgPath   Object to resize.
+     * @param newLength New length to resize.<br>
+     *                  Note that the width and the height will be exactly the same.
      */
-    private static void resize(SVGPath svgPath, double newWidth) {
+    private static void resize(SVGPath svgPath, double newLength) {
+        resize(svgPath, newLength, newLength);
+    }
+
+    /**
+     * Helper method that helps resize the SVG object correctly.
+     *
+     * @param svgPath   Object to resize.
+     * @param newWidth  New width to resize to.
+     * @param newHeight New height to resize to.
+     */
+    private static void resize(SVGPath svgPath, double newWidth, double newHeight) {
         double originalWidth = svgPath.prefWidth(-1);
-        double originalHeight = svgPath.prefHeight(originalWidth);
+        double originalHeight = svgPath.prefHeight(-1);
 
         double scaleX = newWidth / originalWidth;
-        double scaleY = newWidth / originalHeight;
+        double scaleY = newHeight / originalHeight;
 
         svgPath.setScaleX(scaleX);
         svgPath.setScaleY(scaleY);

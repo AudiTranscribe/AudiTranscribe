@@ -34,6 +34,7 @@ import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.SVGPath;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -58,6 +59,7 @@ import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingData;
 import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingState;
 import site.overwrite.auditranscribe.misc.CustomTask;
+import site.overwrite.auditranscribe.misc.IconHelpers;
 import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
@@ -210,7 +212,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
     private Button newProjectButton, openProjectButton, saveProjectButton;
 
     @FXML
-    private ImageView newProjectButtonImage, openProjectButtonImage, saveProjectButtonImage;
+    private SVGPath newProjectButtonImage, openProjectButtonImage, saveProjectButtonImage;
 
     @FXML
     private ChoiceBox<String> musicKeyChoice, timeSignatureChoice;
@@ -247,12 +249,15 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
     private Label currTimeLabel, totalTimeLabel;
 
     @FXML
-    private Button audioVolumeButton, notesVolumeButton, playButton, stopButton, playSkipBackButton,
-            playSkipForwardButton, toggleSlowedAudioButton, scrollButton, editNotesButton;
+    private Button scrollButton, editNotesButton, playButton, stopButton, playSkipBackButton, playSkipForwardButton,
+            toggleSlowedAudioButton, audioVolumeButton, notesVolumeButton;
 
     @FXML
-    private ImageView audioVolumeButtonImage, notesVolumeButtonImage, playButtonImage, stopButtonImage,
-            playSkipBackButtonImage, playSkipForwardButtonImage, editNotesButtonImage, scrollButtonImage;
+    private SVGPath scrollButtonImage, editNotesButtonImage;
+
+    @FXML
+    private ImageView playButtonImage, stopButtonImage, playSkipBackButtonImage, playSkipForwardButtonImage,
+            audioVolumeButtonImage, notesVolumeButtonImage;
 
     @FXML
     private Slider audioVolumeSlider, notesVolumeSlider;
@@ -611,15 +616,12 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/" + theme.cssFile));
 
         // Set graphics
-        newProjectButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/plus-circle-solid.png"
-        )));
-        openProjectButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/folder-open-solid.png"
-        )));
-        saveProjectButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/floppy-solid.png"
-        )));
+        IconHelpers.setSVGPath(newProjectButtonImage, 25, "plus-circle-solid", theme.shortName);
+        IconHelpers.setSVGPath(openProjectButtonImage, 25, "folder-open-solid", theme.shortName);
+        IconHelpers.setSVGPath(saveProjectButtonImage, 25, "floppy-solid", theme.shortName);
+
+        IconHelpers.setSVGPath(scrollButtonImage, 15, 22.5, "map-marker-line", theme.shortName);
+        IconHelpers.setSVGPath(editNotesButtonImage, 20, "pencil-line", theme.shortName);
 
         playButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
                 "images/icons/PNGs/" + theme.shortName + "/play-solid.png"
@@ -632,12 +634,6 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         )));
         playSkipForwardButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
                 "images/icons/PNGs/" + theme.shortName + "/step-forward-solid.png"
-        )));
-        scrollButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/map-marker-line.png"
-        )));
-        editNotesButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/pencil-line.png"
         )));
 
         audioVolumeButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
@@ -2173,21 +2169,10 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
      * Helper method that toggles the scroll button.
      */
     private void toggleScrollButton() {
-        if (scrollToPlayhead) {
-            // Change the icon of the scroll button from filled to non-filled
-            scrollButtonImage.setImage(
-                    new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/map-marker-line.png"
-                    ))
-            );
-        } else {
-            // Change the icon of the scroll button from non-filled to filled
-            scrollButtonImage.setImage(
-                    new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/map-marker-solid.png"
-                    ))
-            );
-        }
+        // Change the icon
+        String iconToUse = "map-marker-solid";
+        if (scrollToPlayhead) iconToUse = "map-marker-line";  // Want to change from filled to non-filled
+        IconHelpers.setSVGPath(scrollButtonImage, 15, 22.5, iconToUse, theme.shortName);
 
         // Toggle the `scrollToPlayhead` flag
         scrollToPlayhead = !scrollToPlayhead;
@@ -2199,22 +2184,10 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
      * Helper method that toggles the edit notes button.
      */
     private void toggleEditNotesButton() {
-        if (canEditNotes) {
-            // Change the icon of the edit notes button from filled to non-filled
-            editNotesButtonImage.setImage(
-                    new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/pencil-line.png"
-                    ))
-            );
-
-        } else {
-            // Change the icon of the edit notes button from non-filled to filled
-            editNotesButtonImage.setImage(
-                    new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/pencil-solid.png"
-                    ))
-            );
-        }
+        // Change the icon
+        String iconToUse = "pencil-solid";
+        if (canEditNotes) iconToUse = "pencil-line";  // Want to change from filled to non-filled
+        IconHelpers.setSVGPath(editNotesButtonImage, 20, iconToUse, theme.shortName);
 
         // Toggle the `canEditNotes` flag
         canEditNotes = !canEditNotes;
