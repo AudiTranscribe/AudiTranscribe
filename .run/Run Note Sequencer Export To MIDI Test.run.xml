@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Run Note Player Sequencer Test" type="JUnit" factoryName="JUnit">
+  <configuration default="false" name="Run Note Sequencer Export To MIDI Test" type="JUnit" factoryName="JUnit">
     <module name="AudiTranscribe" />
     <extension name="coverage">
       <pattern>
@@ -9,7 +9,7 @@
     </extension>
     <option name="PACKAGE_NAME" value="site.overwrite.auditranscribe.notes" />
     <option name="MAIN_CLASS_NAME" value="site.overwrite.auditranscribe.notes.NotePlayerSequencerTest" />
-    <option name="METHOD_NAME" value="testNotePlayerSequencer" />
+    <option name="METHOD_NAME" value="exportToMIDI" />
     <option name="TEST_OBJECT" value="method" />
     <method v="2">
       <option name="Make" enabled="true" />
