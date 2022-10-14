@@ -189,7 +189,7 @@ public class MainViewController extends ClassWithLogging implements Initializabl
 
         // Set graphics
         searchImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/search.png"
+                "images/icons/PNGs/" + theme.shortName + "/search-line.png"
         )));
     }
 
@@ -379,7 +379,7 @@ public class MainViewController extends ClassWithLogging implements Initializabl
                     new Image(IOMethods.getFileURLAsString(
                             "images/icons/PNGs/" +
                                     Theme.values()[settingsData.themeEnumOrdinal].shortName +
-                                    "/close.png"
+                                    "/window-close-line.png"
                     ))
             );
             removeButtonGraphic.setFitWidth(40);

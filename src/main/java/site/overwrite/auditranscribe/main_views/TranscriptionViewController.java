@@ -612,39 +612,39 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
         // Set graphics
         newProjectButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/create.png"
+                "images/icons/PNGs/" + theme.shortName + "/plus-circle-solid.png"
         )));
         openProjectButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/folder-open.png"
+                "images/icons/PNGs/" + theme.shortName + "/folder-open-solid.png"
         )));
         saveProjectButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/save.png"
+                "images/icons/PNGs/" + theme.shortName + "/floppy-solid.png"
         )));
 
         playButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/play.png"
+                "images/icons/PNGs/" + theme.shortName + "/play-solid.png"
         )));
         stopButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/stop.png"
+                "images/icons/PNGs/" + theme.shortName + "/stop-solid.png"
         )));
         playSkipBackButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/play-skip-back.png"
+                "images/icons/PNGs/" + theme.shortName + "/step-backward-solid.png"
         )));
         playSkipForwardButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/play-skip-forward.png"
+                "images/icons/PNGs/" + theme.shortName + "/step-forward-solid.png"
         )));
         scrollButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/footsteps-outline.png"
+                "images/icons/PNGs/" + theme.shortName + "/map-marker-line.png"
         )));
         editNotesButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/edit-notes-outline.png"
+                "images/icons/PNGs/" + theme.shortName + "/pencil-line.png"
         )));
 
         audioVolumeButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/volume-high.png"
+                "images/icons/PNGs/" + theme.shortName + "/volume-up-solid.png"
         )));
         notesVolumeButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/musical-notes.png"
+                "images/icons/PNGs/" + theme.shortName + "/music-note-solid.png"
         )));
     }
 
@@ -681,7 +681,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             if (isAudioMuted) {
                 audioVolumeButtonImage.setImage(
                         new Image(IOMethods.getFileURLAsString(
-                                "images/icons/PNGs/" + theme.shortName + "/volume-high.png"
+                                "images/icons/PNGs/" + theme.shortName + "/volume-up-solid.png"
                         ))
                 );
                 isAudioMuted = false;
@@ -704,7 +704,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             if (areNotesMuted) {
                 notesVolumeButtonImage.setImage(
                         new Image(IOMethods.getFileURLAsString(
-                                "images/icons/PNGs/" + theme.shortName + "/musical-notes.png"
+                                "images/icons/PNGs/" + theme.shortName + "/music-note-solid.png"
                         ))
                 );
                 isAudioMuted = false;
@@ -1226,7 +1226,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             // Change the icon of the play button from the play icon to the paused icon
             // (So that the user knows that the next interaction with button will pause audio)
             playButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                    "images/icons/PNGs/" + theme.shortName + "/pause.png"
+                    "images/icons/PNGs/" + theme.shortName + "/pause-solid.png"
             )));
 
             // Unpause the audio (i.e. play the audio)
@@ -1235,7 +1235,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             // Change the icon of the play button from the paused icon to the play icon
             // (So that the user knows that the next interaction with button will play audio)
             playButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                    "images/icons/PNGs/" + theme.shortName + "/play.png"
+                    "images/icons/PNGs/" + theme.shortName + "/play-solid.png"
             )));
 
             // Pause the audio
@@ -2177,14 +2177,14 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             // Change the icon of the scroll button from filled to non-filled
             scrollButtonImage.setImage(
                     new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/footsteps-outline.png"
+                            "images/icons/PNGs/" + theme.shortName + "/map-marker-line.png"
                     ))
             );
         } else {
             // Change the icon of the scroll button from non-filled to filled
             scrollButtonImage.setImage(
                     new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/footsteps-filled.png"
+                            "images/icons/PNGs/" + theme.shortName + "/map-marker-solid.png"
                     ))
             );
         }
@@ -2203,7 +2203,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             // Change the icon of the edit notes button from filled to non-filled
             editNotesButtonImage.setImage(
                     new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/edit-notes-outline.png"
+                            "images/icons/PNGs/" + theme.shortName + "/pencil-line.png"
                     ))
             );
 
@@ -2211,7 +2211,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             // Change the icon of the edit notes button from non-filled to filled
             editNotesButtonImage.setImage(
                     new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/edit-notes.png"
+                            "images/icons/PNGs/" + theme.shortName + "/pencil-solid.png"
                     ))
             );
         }
@@ -2231,7 +2231,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             // Change the icon of the volume button from mute to non-mute
             audioVolumeButtonImage.setImage(
                     new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/volume-high.png"
+                            "images/icons/PNGs/" + theme.shortName + "/volume-up-solid.png"
                     ))
             );
 
@@ -2241,7 +2241,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             // Change the icon of the volume button from non-mute to mute
             audioVolumeButtonImage.setImage(
                     new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/volume-mute.png"
+                            "images/icons/PNGs/" + theme.shortName + "/volume-mute-solid.png"
                     ))
             );
 
@@ -2263,7 +2263,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             // Change the icon of the notes button from off to on
             notesVolumeButtonImage.setImage(
                     new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/musical-notes.png"
+                            "images/icons/PNGs/" + theme.shortName + "/music-note-solid.png"
                     ))
             );
 
@@ -2271,7 +2271,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             // Change the icon of the notes button from on to off
             notesVolumeButtonImage.setImage(
                     new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/musical-notes-outline.png"
+                            "images/icons/PNGs/" + theme.shortName + "/music-note-line.png"
                     ))
             );
         }
