@@ -40,7 +40,7 @@ OUTPUT_SIZE = 500
 os.makedirs("temp", exist_ok=True)
 
 # Convert all SVG files into PNG files
-for svgPath in tqdm(glob.glob("SVGs/*.svg"), desc="Processing SVG Files"):
+for svgPath in tqdm(glob.glob("svg/*.svg"), desc="Processing SVG Files"):
     filename = os.path.basename(svgPath)
     cairosvg.svg2png(
         url=svgPath, write_to="temp/" + filename[:-4] + ".png", output_width=OUTPUT_SIZE, output_height=OUTPUT_SIZE
