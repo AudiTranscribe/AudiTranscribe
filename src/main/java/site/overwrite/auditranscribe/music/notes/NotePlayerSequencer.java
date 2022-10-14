@@ -465,11 +465,11 @@ public class NotePlayerSequencer extends ClassWithLogging {
     /**
      * Helper method that sets the instrument of the note player.
      *
-     * @param instrumentNum The instrument number to set. <b>Must be an instrument that is present
-     *                      on Bank 0</b>.
+     * @param instrumentNum The instrument number to set.<br>
+     *                      <b>Must be an instrument that is present on Bank 0</b>.
      */
-    // Fixme: changing instrument before playback is a little buggy; instrument does not change for first note but
-    //        subsequent notes' playback has changed
+    // Fixme: Setting instrument type is buggy; although MIDI exports for instrument is correct, playback using the
+    //        changed instrument does not change first note's instrument, but changes subsequent notes
     private void setInstrumentOfNotePlayer(int instrumentNum) {
         try {
             // Define messages to set the instrument
