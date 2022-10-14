@@ -37,6 +37,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import site.overwrite.auditranscribe.generic.ClassWithLogging;
+import site.overwrite.auditranscribe.generic.tuples.Pair;
+import site.overwrite.auditranscribe.generic.tuples.Quadruple;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.io.data_files.data_encapsulators.SettingsData;
@@ -45,8 +47,6 @@ import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingDa
 import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingState;
 import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.misc.Theme;
-import site.overwrite.auditranscribe.misc.tuples.Pair;
-import site.overwrite.auditranscribe.misc.tuples.Quadruple;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
 import site.overwrite.auditranscribe.utils.MiscUtils;

@@ -25,7 +25,7 @@ import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.*;
-import site.overwrite.auditranscribe.misc.tuples.Triple;
+import site.overwrite.auditranscribe.generic.tuples.Triple;
 import site.overwrite.auditranscribe.utils.MathUtils;
 import site.overwrite.auditranscribe.utils.TypeConversionUtils;
 

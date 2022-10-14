@@ -18,7 +18,7 @@
 
 package site.overwrite.auditranscribe.audio.window_functions;
 
-import site.overwrite.auditranscribe.misc.tuples.Pair;
+import site.overwrite.auditranscribe.generic.tuples.Pair;
 
 /**
  * Abstract window class that implements most methods needed by window classes.
