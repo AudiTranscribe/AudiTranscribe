@@ -52,6 +52,7 @@ public class NotePlayerSequencer extends ClassWithLogging {
     public int instrumentNum;
 
     public double bpm;
+    public double notePlayingDelayOffset;
 
     private final Map<Triple<Double, Double, Integer>, Pair<MidiEvent, MidiEvent>> allMIDIEventPairs = new HashMap<>();
     public boolean areNotesSet = false;
@@ -62,7 +63,7 @@ public class NotePlayerSequencer extends ClassWithLogging {
      * Ensure that code checks if the sequencer is available before attempting to play the sequence
      * of MIDI notes.
      */
-    public NotePlayerSequencer() {
+    public NotePlayerSequencer(double notePlayingDelayOffset) {
         // Get MIDI sequencer
         Sequencer tempSequencer;  // So that we may assign null later
 
@@ -85,6 +86,9 @@ public class NotePlayerSequencer extends ClassWithLogging {
 
         } catch (InvalidMidiDataException ignored) {
         }
+
+        // Update other attributes
+        this.notePlayingDelayOffset = notePlayingDelayOffset;
     }
 
     // Getter/Setter methods
@@ -137,10 +141,17 @@ public class NotePlayerSequencer extends ClassWithLogging {
      * @param noteOnsetTimes The onset times of the notes to set.
      * @param durations      The durations of the notes to set.
      * @param noteNums       The note numbers of the notes to set.
+     * @param isSlowed       Whether the playback of the notes should be slowed.
      */
-    public void setNotesOnTrack(double[] noteOnsetTimes, double[] durations, int[] noteNums) {
+    public void setNotesOnTrack(
+            double[] noteOnsetTimes, double[] durations, int[] noteNums, boolean isSlowed
+    ) {
         // Check that the three arrays are of the same length
-        if (noteOnsetTimes.length != durations.length || noteOnsetTimes.length != noteNums.length) {
+        int noteOnsetTimesLength = noteOnsetTimes.length;
+        int durationsLength = durations.length;
+        int noteNumsLength = noteNums.length;
+
+        if (!(noteOnsetTimesLength == durationsLength && durationsLength == noteNumsLength)) {
             throw new LengthException("The three arrays must be of the same length");
         }
 
@@ -148,9 +159,17 @@ public class NotePlayerSequencer extends ClassWithLogging {
         clearNotesOnTrack();
 
         // Add new MIDI events
-        int n = noteOnsetTimes.length;
-        for (int i = 0; i < n; i++) {
-            addNote(noteOnsetTimes[i], durations[i], noteNums[i]);
+        for (int i = 0; i < noteOnsetTimesLength; i++) {
+            // Determine the actual time to set
+            double onsetTime = noteOnsetTimes[i];
+            double duration = durations[i];
+
+            if (isSlowed) {
+                onsetTime *= 2;
+                duration *= 2;
+            }
+
+            addNote(onsetTime, duration, noteNums[i]);
         }
 
         // Update the `areNotesSet` flag
@@ -194,8 +213,9 @@ public class NotePlayerSequencer extends ClassWithLogging {
      * Start playback of the MIDI sequence.
      *
      * @param currTime The time to start playback at, <b>in seconds</b>.
+     * @param isSlowed Whether the playback of the notes should be slowed.
      */
-    public void play(double currTime) {
+    public void play(double currTime, boolean isSlowed) {
         // Check if there is a sequencer to use in the first place
         if (sequencer == null) {
             log(Level.INFO, "No sequencer to use, so not playing");
@@ -216,7 +236,7 @@ public class NotePlayerSequencer extends ClassWithLogging {
         }
 
         // Set current time
-        setCurrTime(currTime);
+        setCurrTime((isSlowed ? currTime * 2 : currTime) + notePlayingDelayOffset);
 
         // Start playback
         sequencer.start();
@@ -445,11 +465,11 @@ public class NotePlayerSequencer extends ClassWithLogging {
     /**
      * Helper method that sets the instrument of the note player.
      *
-     * @param instrumentNum The instrument number to set. <b>Must be an instrument that is present
-     *                      on Bank 0</b>.
+     * @param instrumentNum The instrument number to set.<br>
+     *                      <b>Must be an instrument that is present on Bank 0</b>.
      */
-    // Fixme: changing instrument before playback is a little buggy; instrument does not change for first note but
-    //        subsequent notes' playback has changed
+    // Fixme: Setting instrument type is buggy; although MIDI exports for instrument is correct, playback using the
+    //        changed instrument does not change first note's instrument, but changes subsequent notes
     private void setInstrumentOfNotePlayer(int instrumentNum) {
         try {
             // Define messages to set the instrument

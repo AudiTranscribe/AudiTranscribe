@@ -286,7 +286,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         } catch (MidiUnavailableException ignored) {  // We will notify the user that MIDI unavailable later
         }
 
-        notePlayerSequencer = new NotePlayerSequencer();
+        notePlayerSequencer = new NotePlayerSequencer(DataFiles.SETTINGS_DATA_FILE.data.notePlayingDelayOffset);
 
         // Update spinners' ranges
         bpmSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
@@ -384,26 +384,18 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         playSkipBackButton.setOnAction(event -> {
             log(Level.FINE, "Pressed skip back button");
 
-            // Pause the audio
-            isPaused = togglePaused(false);
-
-            // Seek to the start of the audio
+            notePlayerSequencer.stop();
+            isPaused = togglePaused(false);  // Pause the audio
             seekToTime(0);
-
-            // Scroll to beginning
             updateScrollPosition(0, finalWidth);
         });
 
         playSkipForwardButton.setOnAction(event -> {
             log(Level.FINE, "Pressed skip forward button");
 
-            // Pause the audio
-            isPaused = togglePaused(true);
-
-            // Seek to the end of the audio
+            notePlayerSequencer.stop();
+            isPaused = togglePaused(true);  // Seeking to end later will toggle paused again
             seekToTime(audioDuration);
-
-            // Scroll to end
             updateScrollPosition(finalWidth, finalWidth);
         });
 
@@ -1199,9 +1191,9 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         // Update note sequencer current time
         if (!areNotesMuted && notePlayerSequencer.isSequencerAvailable()) {
             if (!notePlayerSequencer.getSequencer().isRunning() && !isPaused) {  // Not running but unpaused
-                notePlayerSequencer.play(seekTime + DataFiles.SETTINGS_DATA_FILE.data.notePlayingDelayOffset);
+                notePlayerSequencer.play(seekTime, usingSlowedAudio);
             } else {
-                notePlayerSequencer.setCurrTime(seekTime + DataFiles.SETTINGS_DATA_FILE.data.notePlayingDelayOffset);
+                notePlayerSequencer.setCurrTime(seekTime);
             }
         }
 
@@ -1280,8 +1272,8 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         notePlayerSequencer.setBPM(bpm);
         notePlayerSequencer.setInstrument(NOTE_INSTRUMENT);
 
-        // Set notes
-        notePlayerSequencer.setNotesOnTrack(noteOnsetTimes, noteDurations, noteNums);  // Will clear existing notes
+        // Clear existing notes, and set new notes
+        notePlayerSequencer.setNotesOnTrack(noteOnsetTimes, noteDurations, noteNums, usingSlowedAudio);
     }
 
     // IO methods
@@ -2163,7 +2155,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         // Play notes on note player sequencer
         // (We separate this method from above to ensure a more accurate note playing delay)
         if (!isPaused && !areNotesMuted) {  // We use `!isPaused` here because it was toggled already
-            notePlayerSequencer.play(currTime + DataFiles.SETTINGS_DATA_FILE.data.notePlayingDelayOffset);
+            notePlayerSequencer.play(currTime, usingSlowedAudio);
         }
 
         // Disable note volume slider and note muting button if playing
