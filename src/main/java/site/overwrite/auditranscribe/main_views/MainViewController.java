@@ -27,11 +27,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -45,6 +44,7 @@ import site.overwrite.auditranscribe.io.data_files.data_encapsulators.SettingsDa
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingData;
 import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingState;
+import site.overwrite.auditranscribe.misc.IconHelpers;
 import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.system.OSMethods;
@@ -94,7 +94,7 @@ public class MainViewController extends ClassWithLogging implements Initializabl
     private TextField searchTextField;
 
     @FXML
-    private ImageView searchImage;
+    private SVGPath searchImage;
 
     @FXML
     private ListView<Quadruple<Long, String, String, String>> projectsListView;
@@ -188,9 +188,7 @@ public class MainViewController extends ClassWithLogging implements Initializabl
         rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/" + theme.cssFile));
 
         // Set graphics
-        searchImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/search.png"
-        )));
+        IconHelpers.setSVGPath(searchImage, 20,"search-line", theme.shortName);
     }
 
     /**
@@ -375,15 +373,13 @@ public class MainViewController extends ClassWithLogging implements Initializabl
             shortNameDisplayArea.getChildren().addAll(shortNameRectangle, shortNameText);
 
             // Set the removal button's style and method
-            ImageView removeButtonGraphic = new ImageView(
-                    new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" +
-                                    Theme.values()[settingsData.themeEnumOrdinal].shortName +
-                                    "/close.png"
-                    ))
+            SVGPath removeButtonGraphic = new SVGPath();
+            IconHelpers.setSVGPath(
+                    removeButtonGraphic,
+                    20,
+                    "window-close-line",
+                    Theme.values()[settingsData.themeEnumOrdinal].shortName
             );
-            removeButtonGraphic.setFitWidth(40);
-            removeButtonGraphic.setFitHeight(40);
 
             removeButton = new Button();
             removeButton.setGraphic(removeButtonGraphic);
@@ -412,7 +408,10 @@ public class MainViewController extends ClassWithLogging implements Initializabl
                 }
 
                 log(
-                        Level.INFO, "Removed " + nameLabel.getText() + " with primary key " + pk + " from projects' database", MainViewController.class.getName()
+                        Level.INFO,
+                        "Removed '" + nameLabel.getText() + "' with primary key " +
+                                pk + " from projects' database",
+                        MainViewController.class.getName()
                 );
 
                 // Remove this list item from the list view
