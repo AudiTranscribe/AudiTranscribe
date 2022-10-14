@@ -8,7 +8,7 @@
       </pattern>
     </extension>
     <option name="PACKAGE_NAME" value="site.overwrite.auditranscribe.notes" />
-    <option name="MAIN_CLASS_NAME" value="site.overwrite.auditranscribe.notes.NotePlayerSequencerTest" />
+    <option name="MAIN_CLASS_NAME" value="site.overwrite.auditranscribe.music.notes.NotePlayerSequencerTest" />
     <option name="METHOD_NAME" value="testNotePlayerSequencer" />
     <option name="TEST_OBJECT" value="method" />
     <method v="2">
