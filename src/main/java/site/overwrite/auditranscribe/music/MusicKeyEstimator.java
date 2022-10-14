@@ -19,9 +19,9 @@
 package site.overwrite.auditranscribe.music;
 
 import site.overwrite.auditranscribe.generic.exceptions.ValueException;
+import site.overwrite.auditranscribe.generic.tuples.Pair;
+import site.overwrite.auditranscribe.generic.tuples.Triple;
 import site.overwrite.auditranscribe.misc.CustomTask;
-import site.overwrite.auditranscribe.misc.tuples.Pair;
-import site.overwrite.auditranscribe.misc.tuples.Triple;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.ChromaCQT;
 import site.overwrite.auditranscribe.utils.StatisticalUtils;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;

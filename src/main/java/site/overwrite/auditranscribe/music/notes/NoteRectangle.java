@@ -31,8 +31,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
+import site.overwrite.auditranscribe.generic.tuples.Pair;
 import site.overwrite.auditranscribe.misc.MyLogger;
-import site.overwrite.auditranscribe.misc.tuples.Pair;
 import site.overwrite.auditranscribe.music.exceptions.NoteRectangleCollisionException;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 

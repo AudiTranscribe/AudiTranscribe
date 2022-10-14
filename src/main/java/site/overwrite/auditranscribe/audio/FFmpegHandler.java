@@ -21,9 +21,9 @@ package site.overwrite.auditranscribe.audio;
 import site.overwrite.auditranscribe.audio.exceptions.FFmpegCommandFailedException;
 import site.overwrite.auditranscribe.audio.exceptions.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.generic.ClassWithLogging;
+import site.overwrite.auditranscribe.generic.tuples.Pair;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.StreamGobbler;
-import site.overwrite.auditranscribe.misc.tuples.Pair;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
 

@@ -31,6 +31,7 @@ import site.overwrite.auditranscribe.audio.FFmpegHandler;
 import site.overwrite.auditranscribe.audio.exceptions.AudioTooLongException;
 import site.overwrite.auditranscribe.audio.exceptions.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.generic.ClassWithLogging;
+import site.overwrite.auditranscribe.generic.tuples.Pair;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
@@ -44,7 +45,6 @@ import site.overwrite.auditranscribe.io.exceptions.InvalidFileVersionException;
 import site.overwrite.auditranscribe.main_views.MainViewController;
 import site.overwrite.auditranscribe.main_views.TranscriptionViewController;
 import site.overwrite.auditranscribe.misc.Popups;
-import site.overwrite.auditranscribe.misc.tuples.Pair;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
 

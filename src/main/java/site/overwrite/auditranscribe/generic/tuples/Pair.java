@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.misc.tuples;
+package site.overwrite.auditranscribe.generic.tuples;
 
 /**
  * An implementation of a 2-tuple (pair).

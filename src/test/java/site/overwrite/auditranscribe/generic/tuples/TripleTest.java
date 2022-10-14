@@ -16,9 +16,10 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.misc.tuples;
+package site.overwrite.auditranscribe.generic.tuples;
 
 import org.junit.jupiter.api.Test;
+import site.overwrite.auditranscribe.generic.tuples.Triple;
 
 import static org.junit.jupiter.api.Assertions.*;
 
