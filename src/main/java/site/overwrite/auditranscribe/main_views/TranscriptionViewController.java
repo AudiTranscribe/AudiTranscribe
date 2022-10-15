@@ -1235,7 +1235,9 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             notePlayerSequencer.stop();
         }
 
-        IconHelpers.setSVGOnButton(playButton, 20, IMAGE_BUTTON_LENGTH, iconToUse, theme.shortName);
+        Platform.runLater(() -> IconHelpers.setSVGOnButton(
+                playButton, 20, IMAGE_BUTTON_LENGTH, iconToUse, theme.shortName
+        ));
 
         // Toggle paused state for note rectangles
         NoteRectangle.setIsPaused(!isPaused);
