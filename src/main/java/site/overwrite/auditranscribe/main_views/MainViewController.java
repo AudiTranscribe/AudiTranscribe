@@ -42,9 +42,10 @@ import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.io.data_files.data_encapsulators.SettingsData;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
+import site.overwrite.auditranscribe.main_views.helpers.IconHelpers;
+import site.overwrite.auditranscribe.main_views.helpers.ProjectIOHandlers;
 import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingData;
 import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingState;
-import site.overwrite.auditranscribe.misc.IconHelpers;
 import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.system.OSMethods;
@@ -188,7 +189,7 @@ public class MainViewController extends ClassWithLogging implements Initializabl
         rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/" + theme.cssFile));
 
         // Set graphics
-        IconHelpers.setSVGPath(searchImage, 20,"search-line", theme.shortName);
+        IconHelpers.setSVGPath(searchImage, 20, "search-line", theme.shortName);
     }
 
     /**
@@ -373,18 +374,14 @@ public class MainViewController extends ClassWithLogging implements Initializabl
             shortNameDisplayArea.getChildren().addAll(shortNameRectangle, shortNameText);
 
             // Set the removal button's style and method
-            SVGPath removeButtonGraphic = new SVGPath();
-            IconHelpers.setSVGPath(
-                    removeButtonGraphic,
-                    20,
-                    "window-close-line",
-                    Theme.values()[settingsData.themeEnumOrdinal].shortName
-            );
-
             removeButton = new Button();
-            removeButton.setGraphic(removeButtonGraphic);
             removeButton.getStyleClass().add("image-button");
             removeButton.getStyleClass().add("remove-project-button");
+
+            IconHelpers.setSVGOnButton(
+                    removeButton, 20, 50, "window-close-line",
+                    Theme.values()[settingsData.themeEnumOrdinal].shortName
+            );
 
             removeButton.setOnAction(actionEvent -> {
                 // Get the filepath of the project
