@@ -41,6 +41,11 @@
                                 <MenuItem fx:id="preferencesMenuItem" mnemonicParsing="false" text="Preferences..." />
                             </items>
                         </Menu>
+                  <Menu mnemonicParsing="false" text="Edit">
+                    <items>
+                        <MenuItem fx:id="quantizeNotesMenuItem" mnemonicParsing="false" text="Quantize Notes" />
+                    </items>
+                  </Menu>
                         <Menu mnemonicParsing="false" text="Help">
                             <items>
                                 <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" text="About AudiTranscribe" />
