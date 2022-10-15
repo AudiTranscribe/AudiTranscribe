@@ -192,8 +192,8 @@
                                             <children>
                                                 <Button fx:id="playButton" accessibleText="Play or Pause" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button" text="Play/Pause" />
                                                 <Button fx:id="stopButton" accessibleText="Stop" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button" text="Stop" />
-                                                <Button fx:id="playSkipBackButton" accessibleText="Skip Backward" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button" text="Skip Backward" />
-                                                <Button fx:id="playSkipForwardButton" accessibleText="Skip Forward" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button" text="Skip Forward" />
+                                                <Button fx:id="playStepBackwardButton" accessibleText="Step Backward" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button" text="Skip Backward" />
+                                                <Button fx:id="playStepForwardButton" accessibleText="Step Forward" contentDisplay="CENTER" disable="true" mnemonicParsing="false" styleClass="image-button" text="Skip Forward" />
                                     <Button fx:id="toggleSlowedAudioButton" accessibleText="Speed Up or Slow Down" contentDisplay="CENTER" disable="true" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" styleClass="button-label" text="1.0x" HBox.hgrow="SOMETIMES" />
                                             </children>
                                             <padding>

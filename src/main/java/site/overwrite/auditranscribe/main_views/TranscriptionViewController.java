@@ -247,7 +247,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
     private Label currTimeLabel, totalTimeLabel;
 
     @FXML
-    private Button scrollButton, editNotesButton, playButton, stopButton, playSkipBackButton, playSkipForwardButton,
+    private Button scrollButton, editNotesButton, playButton, stopButton, playStepBackwardButton, playStepForwardButton,
             toggleSlowedAudioButton, audioVolumeButton, notesVolumeButton;
 
     @FXML
@@ -377,7 +377,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             isPaused = togglePaused(false);
         });
 
-        playSkipBackButton.setOnAction(event -> {
+        playStepBackwardButton.setOnAction(event -> {
             log(Level.FINE, "Pressed skip back button");
 
             notePlayerSequencer.stop();
@@ -386,7 +386,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             updateScrollPosition(0, finalWidth);
         });
 
-        playSkipForwardButton.setOnAction(event -> {
+        playStepForwardButton.setOnAction(event -> {
             log(Level.FINE, "Pressed skip forward button");
 
             notePlayerSequencer.stop();
@@ -625,11 +625,11 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
                 stopButton, 20, IMAGE_BUTTON_LENGTH, "stop-solid", theme.shortName
         );
         IconHelpers.setSVGOnButton(
-                playSkipBackButton, 20, IMAGE_BUTTON_LENGTH, "step-backward-solid",
+                playStepBackwardButton, 20, IMAGE_BUTTON_LENGTH, "step-backward-solid",
                 theme.shortName
         );
         IconHelpers.setSVGOnButton(
-                playSkipForwardButton, 20, IMAGE_BUTTON_LENGTH, "step-forward-solid",
+                playStepForwardButton, 20, IMAGE_BUTTON_LENGTH, "step-forward-solid",
                 theme.shortName
         );
 
@@ -2078,7 +2078,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
                         // Bottom Hbox
                         audioVolumeButton, audioVolumeSlider, notesVolumeButton, notesVolumeSlider,
-                        playButton, stopButton, playSkipBackButton, playSkipForwardButton,
+                        playButton, stopButton, playStepBackwardButton, playStepForwardButton,
                         toggleSlowedAudioButton, scrollButton, editNotesButton
                 };
 
