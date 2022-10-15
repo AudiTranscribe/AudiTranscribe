@@ -103,6 +103,7 @@ public final class IconHelpers {
 
         // Set the SVG path on the button
         button.setGraphic(svgPath);
+        button.setText("");  // Clear text on button as well
 
         // Update its width and height
         button.setPrefSize(buttonWidth, buttonHeight);
