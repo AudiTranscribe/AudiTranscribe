@@ -199,7 +199,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
     @FXML
     private MenuItem newProjectMenuItem, openProjectMenuItem, renameProjectMenuItem, saveProjectMenuItem,
-            saveAsMenuItem, exportMIDIMenuItem, preferencesMenuItem, aboutMenuItem;
+            saveAsMenuItem, exportMIDIMenuItem, preferencesMenuItem, quantizeNotesMenuItem, aboutMenuItem;
 
     // Main elements
     @FXML
@@ -535,8 +535,9 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         saveProjectMenuItem.setOnAction(event -> handleSavingProject(false, false));
         saveAsMenuItem.setOnAction(event -> handleSavingProject(false, true));
         exportMIDIMenuItem.setOnAction(event -> handleExportMIDI());
-        preferencesMenuItem.setOnAction(actionEvent -> PreferencesViewController.showPreferencesWindow());
-        aboutMenuItem.setOnAction(actionEvent -> AboutViewController.showAboutWindow());
+        preferencesMenuItem.setOnAction(event -> PreferencesViewController.showPreferencesWindow());
+        quantizeNotesMenuItem.setOnAction(event -> handleQuantizeNotes());
+        aboutMenuItem.setOnAction(event -> AboutViewController.showAboutWindow());
 
         // Create scheduler to update memory available
         memoryAvailableScheduler = Executors.newScheduledThreadPool(0, runnable -> {
@@ -1499,6 +1500,12 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
                     e
             );
         }
+    }
+
+    private void handleQuantizeNotes() {
+        log(Level.FINE, "Quantize notes");
+
+        // Todo: handle quantize notes
     }
 
     /**
