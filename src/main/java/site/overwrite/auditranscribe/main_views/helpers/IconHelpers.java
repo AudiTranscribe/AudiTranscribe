@@ -16,8 +16,9 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.misc;
+package site.overwrite.auditranscribe.main_views.helpers;
 
+import javafx.scene.control.Button;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.SVGPath;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
@@ -62,6 +63,52 @@ public final class IconHelpers {
         svgPath.setContent(getIconSVGPath(iconName));
         svgPath.setFill(getIconColour(themeName));
         resize(svgPath, width, height);
+    }
+
+    /**
+     * Method that helps set an SVG on a button.
+     *
+     * @param button       Button to set the SVG on.
+     * @param svgLength    Length of the SVG to be placed on the button.<br>
+     *                     Note that both the width and the height will be the same.
+     * @param buttonLength The final length of the button.<br>
+     *                     Note that both the width and the height will be the same.
+     * @param iconName     Name of the icon to set.
+     * @param themeName    Theme name, which determines the colour of the icon.
+     */
+    public static void setSVGOnButton(
+            Button button, double svgLength, double buttonLength, String iconName, String themeName
+    ) {
+        setSVGOnButton(button, svgLength, svgLength, buttonLength, buttonLength, iconName, themeName);
+    }
+
+    /**
+     * Method that helps set an SVG on a button.
+     *
+     * @param button       Button to set the SVG on.
+     * @param svgWidth     Width of the SVG to be placed on the button.
+     * @param svgHeight    Height of the SVG to be placed on the button.
+     * @param buttonWidth  The final width of the button.
+     * @param buttonHeight The final height of the button.
+     * @param iconName     Name of the icon to set.
+     * @param themeName    Theme name, which determines the colour of the icon.
+     */
+    public static void setSVGOnButton(
+            Button button, double svgWidth, double svgHeight, double buttonWidth, double buttonHeight,
+            String iconName, String themeName
+    ) {
+        // Create the SVG path object first
+        SVGPath svgPath = new SVGPath();
+        setSVGPath(svgPath, svgWidth, svgHeight, iconName, themeName);
+
+        // Set the SVG path on the button
+        button.setGraphic(svgPath);
+        button.setText("");  // Clear text on button as well
+
+        // Update its width and height
+        button.setPrefSize(buttonWidth, buttonHeight);
+        button.setMinSize(buttonWidth, buttonHeight);
+        button.setMaxSize(buttonWidth, buttonHeight);
     }
 
     // Private methods

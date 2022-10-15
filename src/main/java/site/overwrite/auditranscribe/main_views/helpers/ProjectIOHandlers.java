@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.main_views;
+package site.overwrite.auditranscribe.main_views.helpers;
 
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
