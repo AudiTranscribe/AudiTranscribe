@@ -1502,10 +1502,12 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         }
     }
 
+    /**
+     * Helper method that helps quantize the notes.
+     */
     private void handleQuantizeNotes() {
-        log(Level.FINE, "Quantize notes");
-
-        // Todo: handle quantize notes
+        NoteRectangle.quantizeNotes(bpm, offset, timeSignatureChoice.getValue());
+        log(Level.FINE, "Quantized notes");
     }
 
     /**
