@@ -19,16 +19,16 @@
 package site.overwrite.auditranscribe.spectrogram;
 
 import javafx.scene.image.WritableImage;
-import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.WindowFunction;
-import site.overwrite.auditranscribe.exceptions.generic.ValueException;
-import site.overwrite.auditranscribe.misc.MyLogger;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
+import site.overwrite.auditranscribe.generic.exceptions.ValueException;
+import site.overwrite.auditranscribe.misc.Complex;
+import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.plotting.Plotter;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.CQT;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.FrequencyBins;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.VQT;
-import site.overwrite.auditranscribe.misc.Complex;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 import java.util.logging.Level;
@@ -36,7 +36,7 @@ import java.util.logging.Level;
 /**
  * Class that handles the creation of the spectrogram image.
  */
-public class Spectrogram {
+public class Spectrogram extends ClassWithLogging {
     // Constants
     final double INTENSITY_PRECISION = 0.001;
     final double TOP_DB = 80;
@@ -110,17 +110,13 @@ public class Spectrogram {
 
         this.task = task;
 
-        MyLogger.log(Level.FINE, "Audio sample rate is " + sampleRate, this.getClass().toString());
+        log(Level.FINE, "Audio sample rate is " + sampleRate);
 
         // Set the width and height of the image
         width = (int) (audioObj.getDuration() * numPxPerSecond);
         height = (int) (numOctaves * numPxPerOctave);
 
-        MyLogger.log(
-                Level.FINE,
-                "Spectrogram width is " + width + " and height is " + height,
-                this.getClass().toString()
-        );
+        log(Level.FINE, "Spectrogram width is " + width + " and height is " + height);
 
         // Get the mono samples
         samples = audioObj.getMonoSamples();
@@ -176,25 +172,17 @@ public class Spectrogram {
 
         this.task = task;
 
-        MyLogger.log(Level.FINE, "Audio sample rate is " + sampleRate, this.getClass().toString());
+        log(Level.FINE, "Audio sample rate is " + sampleRate);
 
         // Set the width and height of the image
         width = (int) (duration * numPxPerSecond);
         height = (int) (numOctaves * numPxPerOctave);
 
-        MyLogger.log(
-                Level.FINE,
-                "Spectrogram width is " + width + " and height is " + height,
-                this.getClass().toString()
-        );
+        log(Level.FINE, "Spectrogram width is " + width + " and height is " + height);
 
         // We don't need samples in this case
         samples = null;
-        MyLogger.log(
-                Level.FINE,
-                "Spectrogram creation occurring WITHOUT audio file; samples not available",
-                this.getClass().toString()
-        );
+        log(Level.FINE, "Spectrogram creation occurring WITHOUT audio file; samples not available");
 
         // Get the frequency bins
         frequencyBins = FrequencyBins.getQTFreqBins(numFreqBins, binsPerOctave, minFreq);
@@ -212,7 +200,7 @@ public class Spectrogram {
      */
     public double[][] getSpectrogramMagnitudes(WindowFunction windowFunction) throws NullPointerException {
         // Perform the spectrogram transform on the samples
-        MyLogger.log(Level.FINE, "Starting spectral matrix generation", this.getClass().toString());
+        log(Level.FINE, "Starting spectral matrix generation");
 
         Complex[][] QTMatrix;
         if (IS_CQT) {
@@ -250,7 +238,7 @@ public class Spectrogram {
         }
 
         // Compute the magnitudes and return
-        MyLogger.log(Level.FINE, "Calculating magnitudes", this.getClass().toString());
+        log(Level.FINE, "Calculating magnitudes");
         return calculateMagnitudes(QTMatrixFinal);
     }
 
@@ -263,12 +251,12 @@ public class Spectrogram {
      */
     public WritableImage generateSpectrogram(double[][] magnitudes, ColourScale colourScale) {
         // Plot spectrogram data
-        MyLogger.log(Level.FINE, "Plotting data", this.getClass().toString());
+        log(Level.FINE, "Plotting data");
         Plotter plotter = new Plotter(colourScale, INTENSITY_PRECISION);
         plotter.plot(magnitudes, width, height);
 
         // Return the writable image
-        MyLogger.log(Level.FINE, "Returning image", this.getClass().toString());
+        log(Level.FINE, "Returning image");
         return plotter.getImage();
     }
 

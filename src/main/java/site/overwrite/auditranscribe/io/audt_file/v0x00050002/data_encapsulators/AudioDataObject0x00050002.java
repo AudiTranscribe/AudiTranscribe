@@ -41,7 +41,7 @@ public class AudioDataObject0x00050002 extends AudioDataObject {
     public AudioDataObject0x00050002(
             byte[] compressedMP3Bytes, double sampleRate, int totalDurationInMS, String audioFileName
     ) {
-        this.compressedMP3Bytes = compressedMP3Bytes;
+        this.compressedOriginalMP3Bytes = compressedMP3Bytes;
         this.sampleRate = sampleRate;
         this.totalDurationInMS = totalDurationInMS;
 
@@ -70,7 +70,7 @@ public class AudioDataObject0x00050002 extends AudioDataObject {
         return (
                 Double.compare(that.sampleRate, sampleRate) == 0 &&
                         totalDurationInMS == that.totalDurationInMS &&
-                        Arrays.equals(compressedMP3Bytes, that.compressedMP3Bytes) &&
+                        Arrays.equals(compressedOriginalMP3Bytes, that.compressedOriginalMP3Bytes) &&
                         audioFileName.equals(that.audioFileName)
         );
     }
@@ -78,14 +78,14 @@ public class AudioDataObject0x00050002 extends AudioDataObject {
     @Override
     public int hashCode() {
         int result = Objects.hash(sampleRate, totalDurationInMS, audioFileName);
-        result = 31 * result + Arrays.hashCode(compressedMP3Bytes);
+        result = 31 * result + Arrays.hashCode(compressedOriginalMP3Bytes);
         return result;
     }
 
     @Override
     public int numBytesNeeded() {
         return 4 +  // Section ID
-                (4 + compressedMP3Bytes.length) +  // +4 for the length of the MP3 audio data
+                (4 + compressedOriginalMP3Bytes.length) +  // +4 for the length of the MP3 audio data
                 8 +   // Sample rate
                 4 +   // Total duration in milliseconds
                 (4 + audioFileName.getBytes().length) +  // String length + string bytes of audio file name

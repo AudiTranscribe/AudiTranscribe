@@ -21,12 +21,12 @@ package site.overwrite.auditranscribe.main_views;
 import com.google.gson.JsonObject;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import site.overwrite.auditranscribe.exceptions.network.APIServerException;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
+import site.overwrite.auditranscribe.generic.tuples.Pair;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
-import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Popups;
-import site.overwrite.auditranscribe.misc.tuples.Pair;
 import site.overwrite.auditranscribe.network.APICallHandler;
+import site.overwrite.auditranscribe.network.exceptions.APIServerException;
 import site.overwrite.auditranscribe.utils.GUIUtils;
 import site.overwrite.auditranscribe.utils.MiscUtils;
 
@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.logging.Level;
 
-public class CheckForUpdatesHelper {
+public class CheckForUpdatesHelper extends ClassWithLogging {
     // Public methods
     public static void checkForUpdates(String currentVersion) {
         // Determine if we need to check for updates
@@ -52,11 +52,7 @@ public class CheckForUpdatesHelper {
         String newVersionTag = response.value1();
 
         if (!isLatest) {
-            MyLogger.log(
-                    Level.INFO,
-                    "New version available: " + newVersionTag,
-                    CheckForUpdatesHelper.class.getName()
-            );
+            log(Level.INFO, "New version available: " + newVersionTag, CheckForUpdatesHelper.class.getName());
 
             // Convert the new version tag into a semver
             String semver = newVersionTag.substring(1);
@@ -81,11 +77,7 @@ public class CheckForUpdatesHelper {
                 }
             }
         } else {
-            MyLogger.log(
-                    Level.INFO,
-                    "AudiTranscribe is up to date",
-                    CheckForUpdatesHelper.class.getName()
-            );
+            log(Level.INFO, "AudiTranscribe is up to date", CheckForUpdatesHelper.class.getName());
         }
 
         // Supress alert for a set duration
@@ -112,14 +104,12 @@ public class CheckForUpdatesHelper {
             response = APICallHandler.sendAPIGetRequest("check-if-have-new-version", params, 5000);
         } catch (APIServerException e) {
             // Return a value that says that the current version is latest
-            MyLogger.log(
-                    Level.WARNING,
-                    "Error for API request on checking new version: timed out or connection refused",
-                    CheckForUpdatesHelper.class.getName()
+            log(
+                    Level.WARNING, "Error for API request on checking new version: timed out or connection refused", CheckForUpdatesHelper.class.getName()
             );
             return new Pair<>(true, null);
         } catch (IOException e) {
-            MyLogger.logException(e);
+            logException(e);
             throw new RuntimeException(e);
         }
 

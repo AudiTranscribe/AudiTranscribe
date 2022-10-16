@@ -21,7 +21,7 @@ package site.overwrite.auditranscribe.spectrogram;
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
-import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
+import site.overwrite.auditranscribe.audio.exceptions.AudioTooLongException;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.utils.MathUtils;
 
@@ -35,7 +35,7 @@ class SpectralHelpersTest {
     // Load samples and sample rate for some tests
     Audio audio = new Audio(
             new File(IOMethods.getAbsoluteFilePath("testing-files/audio/Trumpet.wav")),
-            AudioProcessingMode.SAMPLES_ONLY
+            AudioProcessingMode.SAMPLES
     );
 
     double[] samples = audio.getMonoSamples();

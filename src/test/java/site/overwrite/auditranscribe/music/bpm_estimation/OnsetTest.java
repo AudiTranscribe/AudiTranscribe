@@ -21,7 +21,7 @@ package site.overwrite.auditranscribe.music.bpm_estimation;
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
-import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
+import site.overwrite.auditranscribe.audio.exceptions.AudioTooLongException;
 import site.overwrite.auditranscribe.io.IOMethods;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -36,11 +36,11 @@ class OnsetTest {
         // Get the audio files
         Audio audio1 = new Audio(
                 new File(IOMethods.getAbsoluteFilePath("testing-files/audio/Choice.wav")),
-                AudioProcessingMode.SAMPLES_ONLY
+                AudioProcessingMode.SAMPLES
         );
         Audio audio2 = new Audio(
                 new File(IOMethods.getAbsoluteFilePath("testing-files/audio/LevelsOfC.wav")),
-                AudioProcessingMode.SAMPLES_ONLY
+                AudioProcessingMode.SAMPLES
         );
 
         // Extract samples and sample rate

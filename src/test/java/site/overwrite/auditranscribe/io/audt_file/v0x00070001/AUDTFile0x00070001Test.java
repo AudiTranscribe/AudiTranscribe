@@ -1,6 +1,6 @@
 /*
- * AUDTFile0x00050002Test.java
- * Description: Test AUDT file reading and writing for file version 0x00050002.
+ * AUDTFile0x00070001Test.java
+ * Description: Test AUDT file reading and writing for file version 0x00070001.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -19,9 +19,9 @@
 package site.overwrite.auditranscribe.io.audt_file.v0x00070001;
 
 import org.junit.jupiter.api.*;
-import site.overwrite.auditranscribe.exceptions.io.audt_file.FailedToReadDataException;
-import site.overwrite.auditranscribe.exceptions.io.audt_file.IncorrectFileFormatException;
-import site.overwrite.auditranscribe.exceptions.io.audt_file.InvalidFileVersionException;
+import site.overwrite.auditranscribe.io.exceptions.FailedToReadDataException;
+import site.overwrite.auditranscribe.io.exceptions.IncorrectFileFormatException;
+import site.overwrite.auditranscribe.io.exceptions.InvalidFileVersionException;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
@@ -30,7 +30,7 @@ import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileReader;
 import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileWriter;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.audt_file.v0x00070001.data_encapsulators.*;
-import site.overwrite.auditranscribe.misc.tuples.Triple;
+import site.overwrite.auditranscribe.generic.tuples.Triple;
 import site.overwrite.auditranscribe.utils.TypeConversionUtils;
 
 import java.io.IOException;
@@ -106,15 +106,15 @@ class AUDTFile0x00070001Test {
         );
         audioDataObject = new AudioDataObject0x00070001(
                 CompressionHandlers.lz4Compress(Files.readAllBytes(Paths.get(
-                        IOMethods.getAbsoluteFilePath("testing-files/audio/A440.mp3")
+                        IOMethods.getAbsoluteFilePath("testing-files/audio/VeryShortAudio.mp3")
                 ))),
-                44100, 120000);
+                44100, 200);
 
         projectInfoDataObject1 = new ProjectInfoDataObject0x00070001(
-                "A440-1", 11, 9, 123.45, 0.01, 0.55, 9000
+                "Test-1", 11, 9, 123.45, 0.01, 0.55, 12
         );
         projectInfoDataObject2 = new ProjectInfoDataObject0x00070001(
-                "A440-2", 15, 14, 67.89, -1.23, 0.124, 2048
+                "Test-2", 15, 14, 67.89, -1.23, 0.124, 34
         );
 
         musicNotesDataObject1 = new MusicNotesDataObject0x00070001(

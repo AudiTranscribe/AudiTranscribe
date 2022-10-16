@@ -23,19 +23,18 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
-import site.overwrite.auditranscribe.setup_wizard.SetupWizard;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 
 /**
- * View controller that handles the initial view for the FFmpeg installation procedure.
+ * View controller that handles the initial view for the setup wizard.
  */
-public class InitialViewController implements Initializable {
+public class InitialViewController extends ClassWithLogging implements Initializable {
     // Attributes
     private boolean hasFFmpegInstalled = false;
 
@@ -58,8 +57,7 @@ public class InitialViewController implements Initializable {
             hasFFmpegInstalled = false;
             ((Stage) rootPane.getScene().getWindow()).close();
         });
-
-        MyLogger.log(Level.INFO, "Showing setup wizard initial view", this.getClass().getName());
+        log(Level.INFO, "Showing setup wizard initial view");
     }
 
     // Getter methods

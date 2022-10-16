@@ -2,7 +2,7 @@
 .root {
     -fx-base: #3c3f41ff;
     -fx-background: #3c3f41ff;
-    -fx-accent: #808080;
+    -fx-accent: #808080ff;
 
     -fx-inner-border: -fx-base;
     -fx-inner-border-horizontal: -fx-base;

@@ -18,18 +18,26 @@
 
 package site.overwrite.auditranscribe.audio;
 
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import site.overwrite.auditranscribe.exceptions.audio.FFmpegCommandFailedException;
-import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
+import org.junit.jupiter.api.TestMethodOrder;
+import site.overwrite.auditranscribe.audio.exceptions.FFmpegCommandFailedException;
+import site.overwrite.auditranscribe.audio.exceptions.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class FFmpegHandlerTest {
     @Test
+    @Order(1)
     void getPathToFFmpeg() {
         // Check if the FFmpeg binary can be accessed using CLI
         if (FFmpegHandler.checkFFmpegPath("ffmpeg")) {
@@ -44,6 +52,7 @@ class FFmpegHandlerTest {
     }
 
     @Test
+    @Order(2)
     void checkFFmpegPath() {
         try {
             assertTrue(FFmpegHandler.checkFFmpegPath("ffmpeg"));  // Should exist => true
@@ -55,6 +64,14 @@ class FFmpegHandlerTest {
     }
 
     @Test
+    @Order(3)
+    void ffmpegHandlerInitFailureTest() {
+        // Try to define a handler with a non-existent FFmpeg binary
+        assertThrowsExactly(FFmpegNotFoundException.class, () -> new FFmpegHandler("not-ffmpeg"));
+    }
+
+    @Test
+    @Order(4)
     void convertAudio() throws FFmpegNotFoundException {
         // Get a testing MP3 file
         File testFile = new File(IOMethods.getAbsoluteFilePath("testing-files/audio/A440.mp3"));
@@ -85,6 +102,7 @@ class FFmpegHandlerTest {
     }
 
     @Test
+    @Order(4)
     void convertAudioFailureTest() throws FFmpegNotFoundException {
         // Determine the FFmpeg path
         FFmpegHandler handler;
@@ -100,8 +118,65 @@ class FFmpegHandlerTest {
         assertThrowsExactly(FFmpegCommandFailedException.class, () -> finalHandler.convertAudio(
                 new File("non-existent-file.mp3"), "no-output.mp3"
         ));
+    }
 
-        // Try to define a handler with a non-existent FFmpeg binary
-        assertThrowsExactly(FFmpegNotFoundException.class, () -> new FFmpegHandler("not-ffmpeg"));
+    @Test
+    @Order(5)
+    void generateAltTempoAudio() throws FFmpegNotFoundException, IOException {
+        // Get a testing audio file
+        File testFile = new File(IOMethods.getAbsoluteFilePath("testing-files/audio/137bpmNoisyShort.wav"));
+
+        // Get the absolute path to the testing folder
+        String testingFolderPath = testFile.getParent();
+
+        // Determine the FFmpeg path
+        FFmpegHandler handler;
+        try {
+            handler = new FFmpegHandler("ffmpeg");
+        } catch (FFmpegNotFoundException e) {
+            // Try to get the path from the settings file
+            handler = new FFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
+        }
+
+        // Determine the output paths
+        String outputFilePath1 = handler.generateAltTempoAudio(
+                testFile, IOMethods.joinPaths(testingFolderPath, "test-output-sped-up.WAV"), 2
+        );
+        String outputFilePath2 = handler.generateAltTempoAudio(
+                testFile, IOMethods.joinPaths(testingFolderPath, "test-output-slowed.WAV"), 0.5
+        );
+
+        // Check the output file path, and ensure that the extension is no longer in capitals
+        String correctOutputPath1 = IOMethods.joinPaths(testingFolderPath, "test-output-sped-up.wav");
+        String correctOutputPath2 = IOMethods.joinPaths(testingFolderPath, "test-output-slowed.wav");
+
+        assertEquals(correctOutputPath1, outputFilePath1);
+        assertEquals(45048, Files.size(Path.of(correctOutputPath1)), 2.5e3);
+
+        assertEquals(correctOutputPath2, outputFilePath2);
+        assertEquals(172970, Files.size(Path.of(correctOutputPath2)), 2.5e3);
+
+        // Remove the files
+        IOMethods.delete(correctOutputPath1);
+        IOMethods.delete(correctOutputPath2);
+    }
+
+    @Test
+    @Order(5)
+    void generateAltTempoAudioFailureTest() throws FFmpegNotFoundException {
+        // Determine the FFmpeg path
+        FFmpegHandler handler;
+        try {
+            handler = new FFmpegHandler("ffmpeg");
+        } catch (FFmpegNotFoundException e) {
+            // Try to get the path from the settings file
+            handler = new FFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
+        }
+
+        // Try to test on a non-existent MP3 file
+        FFmpegHandler finalHandler = handler;
+        assertThrowsExactly(FFmpegCommandFailedException.class, () -> finalHandler.generateAltTempoAudio(
+                new File("non-existent-file.mp3"), "no-output.mp3", 1.234
+        ));
     }
 }

@@ -20,7 +20,7 @@ package site.overwrite.auditranscribe.io.audt_file;
 
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.QTransformDataObject;
-import site.overwrite.auditranscribe.misc.tuples.Triple;
+import site.overwrite.auditranscribe.generic.tuples.Triple;
 import site.overwrite.auditranscribe.utils.TypeConversionUtils;
 
 import java.io.IOException;

@@ -64,7 +64,7 @@ class IOMethodsTest {
         assertEquals(1, IOMethods.createFile(FILE_FOR_TESTING_CREATION_AND_DELETION_PATH));
 
         // Attempt to make a file in a folder that does not exist should return -1
-        assertEquals(-1, IOMethods.createFile(FILE_THAT_SHOULD_NOT_BE_CREATED_OR_DELETED));
+        assertEquals(-1, IOMethods.createFile(new File(FILE_THAT_SHOULD_NOT_BE_CREATED_OR_DELETED)));
     }
 
     @Test
@@ -77,7 +77,7 @@ class IOMethodsTest {
         assertFalse(IOMethods.delete(FILE_FOR_TESTING_CREATION_AND_DELETION_PATH));
 
         // Attempt to delete a file in a folder that does not exist should return `false`
-        assertFalse(IOMethods.delete(FILE_THAT_SHOULD_NOT_BE_CREATED_OR_DELETED));
+        assertFalse(IOMethods.delete(new File(FILE_THAT_SHOULD_NOT_BE_CREATED_OR_DELETED)));
     }
 
     @Test
@@ -135,15 +135,15 @@ class IOMethodsTest {
 
         // Now delete the folders
         assertTrue(IOMethods.delete(testDirectory));
-        assertTrue(IOMethods.delete(new File(testDirectory).getParent()));
-        assertTrue(IOMethods.delete(new File(new File(testDirectory).getParent()).getParent()));
+        assertTrue(IOMethods.delete(new File(testDirectory).getParentFile()));  // Test delete on file object
+        assertTrue(IOMethods.delete(new File(testDirectory).getParentFile().getParent()));  // Test delete on path
 
         // Attempting to delete again should return false
         assertFalse(IOMethods.delete(testDirectory));
-        assertFalse(IOMethods.delete(new File(testDirectory).getParent()));
-        assertFalse(IOMethods.delete(new File(new File(testDirectory).getParent()).getParent()));
+        assertFalse(IOMethods.delete(new File(testDirectory).getParent()));  // Delete on file object
+        assertFalse(IOMethods.delete(new File(testDirectory).getParentFile().getParent()));  // Delete on path
     }
-    
+
     @Test
     void copyFile() throws IOException {
         try {

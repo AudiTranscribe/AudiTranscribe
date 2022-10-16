@@ -18,15 +18,12 @@
 
 package site.overwrite.auditranscribe.io.audt_file.v0x00070001.data_encapsulators;
 
-import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.QTransformDataObject;
-
-import java.util.Arrays;
-import java.util.Objects;
+import site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.QTransformDataObject0x00050002;
 
 /**
  * Data object that stores the Q-Transform data.
  */
-public class QTransformDataObject0x00070001 extends QTransformDataObject {
+public class QTransformDataObject0x00070001 extends QTransformDataObject0x00050002 {
     /**
      * Initialization method for the Q-Transform data object.
      *
@@ -35,38 +32,6 @@ public class QTransformDataObject0x00070001 extends QTransformDataObject {
      * @param minMagnitude    The minimum magnitude of the Q-Transform data.
      */
     public QTransformDataObject0x00070001(byte[] qTransformBytes, double minMagnitude, double maxMagnitude) {
-        // Update attributes
-        this.qTransformBytes = qTransformBytes;
-        this.minMagnitude = minMagnitude;
-        this.maxMagnitude = maxMagnitude;
-    }
-
-    // Overwritten methods
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        QTransformDataObject0x00070001 that = (QTransformDataObject0x00070001) o;
-        return (
-                Double.compare(that.minMagnitude, minMagnitude) == 0 &&
-                        Double.compare(that.maxMagnitude, maxMagnitude) == 0 &&
-                        Arrays.equals(qTransformBytes, that.qTransformBytes)
-        );
-    }
-
-    @Override
-    public int hashCode() {
-        int result = Objects.hash(minMagnitude, maxMagnitude);
-        result = 31 * result + Arrays.hashCode(qTransformBytes);
-        return result;
-    }
-
-    @Override
-    public int numBytesNeeded() {
-        return 4 +  // Section ID
-                (4 + qTransformBytes.length) +  // +4 for the length of the Q-Transform data
-                8 +  // 8 bytes for the min magnitude
-                8 +  // 8 bytes for the max magnitude
-                4;   // EOS delimiter
+        super(qTransformBytes, minMagnitude, maxMagnitude);
     }
 }

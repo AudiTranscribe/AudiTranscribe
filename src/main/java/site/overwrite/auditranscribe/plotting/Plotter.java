@@ -20,7 +20,7 @@ package site.overwrite.auditranscribe.plotting;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.WritableImage;
-import site.overwrite.auditranscribe.misc.MyLogger;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
 import site.overwrite.auditranscribe.utils.MathUtils;
@@ -33,7 +33,7 @@ import java.util.logging.Level;
  * Class that contains plotting functions.<br>
  * This is a class that helps generate an image, given spectrogram magnitude data.
  */
-public class Plotter {
+public class Plotter extends ClassWithLogging {
     // Constants
     public final InterpolationMethod interpolationMethod = InterpolationMethod.BILINEAR;
 
@@ -65,7 +65,7 @@ public class Plotter {
 
         // Generate the colourmap
         generateColourMap();
-        MyLogger.log(Level.FINE, "Colourmap generated", this.getClass().toString());
+        log(Level.FINE, "Colourmap generated");
     }
 
     // Getter/setter methods
@@ -95,11 +95,11 @@ public class Plotter {
     public void plot(double[][] spectrogramMagnitudes, int imgWidth, int imgHeight) {
         // Define the image that will show the spectrogram
         bufferedImage = new BufferedImage(imgWidth, imgHeight, BufferedImage.TYPE_INT_RGB);
-        MyLogger.log(Level.FINE, "Defined buffer image", this.getClass().toString());
+        log(Level.FINE, "Defined buffer image");
 
         // Get the pixels of the spectrogram image
         int[] pixels = ((DataBufferInt) bufferedImage.getRaster().getDataBuffer()).getData();
-        MyLogger.log(Level.FINE, "Got pixels of buffer image", this.getClass().toString());
+        log(Level.FINE, "Got pixels of buffer image");
 
         // Generate the values of each packet on the image
         /*
@@ -109,12 +109,12 @@ public class Plotter {
          *   representing the relative 'intensity' that should be shown on the pixel.
          */
         double[][] packets = Interpolation.interpolate(spectrogramMagnitudes, imgHeight, imgWidth, interpolationMethod);
-        MyLogger.log(Level.FINE, "Interpolated spectrogram magnitudes", this.getClass().toString());
+        log(Level.FINE, "Interpolated spectrogram magnitudes");
 
         // Transpose packets
         // (Make dimensions (width, height) instead of (height, width) for easier indexing)
         packets = ArrayUtils.transpose(packets);
-        MyLogger.log(Level.FINE, "Image packets generated", this.getClass().toString());
+        log(Level.FINE, "Image packets generated");
 
         // Get min and max of packet values
         double minPacketVal = Double.MAX_VALUE;
@@ -126,7 +126,7 @@ public class Plotter {
                 if (maxPacketVal < packet) maxPacketVal = packet;
             }
         }
-        MyLogger.log(Level.FINE, "Got min and max packet values", this.getClass().toString());
+        log(Level.FINE, "Got min and max packet values");
 
         // Normalise packet values
         for (int w = 0; w < imgWidth; w++) {
@@ -134,7 +134,7 @@ public class Plotter {
                 packets[w][h] = MathUtils.normalize(packets[w][h], minPacketVal, maxPacketVal);
             }
         }
-        MyLogger.log(Level.FINE, "Image packets normalised", this.getClass().toString());
+        log(Level.FINE, "Image packets normalised");
 
         // Finally, modify the image according to the packet specifications
         for (int h = 0; h < imgHeight; h++) {
@@ -146,7 +146,7 @@ public class Plotter {
                 pixels[h * imgWidth + w] = colourMap[numDifferentColours - intensity - 1];  // Reverse intensity order
             }
         }
-        MyLogger.log(Level.FINE, "Image pixels set", this.getClass().toString());
+        log(Level.FINE, "Image pixels set");
     }
 
     // Private methods

@@ -26,8 +26,8 @@ import org.junit.jupiter.api.TestMethodOrder;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.audio.WindowFunction;
-import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
-import site.overwrite.auditranscribe.exceptions.generic.ValueException;
+import site.overwrite.auditranscribe.audio.exceptions.AudioTooLongException;
+import site.overwrite.auditranscribe.generic.exceptions.ValueException;
 import site.overwrite.auditranscribe.misc.Complex;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.CustomTask;
@@ -46,7 +46,7 @@ class QTransformTests {
     // Get audio file and audio samples for the tests
     Audio audio = new Audio(
             new File(IOMethods.getAbsoluteFilePath("testing-files/audio/Choice.wav")),
-            AudioProcessingMode.SAMPLES_ONLY
+            AudioProcessingMode.SAMPLES
     );
     double[] samples = audio.getMonoSamples();
 

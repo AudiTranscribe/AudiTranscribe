@@ -24,9 +24,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
-import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 
 import java.net.URL;
@@ -36,7 +36,7 @@ import java.util.logging.Level;
 /**
  * View controller that helps the user set up the theme.
  */
-public class ThemeSetupViewController implements Initializable {
+public class ThemeSetupViewController extends ClassWithLogging implements Initializable {
     // FXML elements
     @FXML
     private AnchorPane rootPane;
@@ -55,12 +55,12 @@ public class ThemeSetupViewController implements Initializable {
         themeChoiceBox.setValue(Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal]);
         themeChoiceBox.setOnAction(event -> {
             setThemeOnScene(themeChoiceBox.getValue());
-            MyLogger.log(Level.INFO, "Changed theme to " + themeChoiceBox.getValue(), this.getClass().getName());
+            log(Level.INFO, "Changed theme to " + themeChoiceBox.getValue());
         });
 
         confirmButton.setOnAction(event -> ((Stage) rootPane.getScene().getWindow()).close());
 
-        MyLogger.log(Level.INFO, "Showing theme setup view", this.getClass().getName());
+        log(Level.INFO, "Showing theme setup view");
     }
 
     // Public methods

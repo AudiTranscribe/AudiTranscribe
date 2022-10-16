@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import site.overwrite.auditranscribe.audio.filters.*;
-import site.overwrite.auditranscribe.exceptions.audio.FilterNotFoundException;
+import site.overwrite.auditranscribe.audio.exceptions.FilterNotFoundException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 

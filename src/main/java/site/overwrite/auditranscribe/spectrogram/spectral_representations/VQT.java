@@ -18,18 +18,18 @@
 
 package site.overwrite.auditranscribe.spectrogram.spectral_representations;
 
-import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.Filter;
 import site.overwrite.auditranscribe.audio.WindowFunction;
-import site.overwrite.auditranscribe.exceptions.generic.ValueException;
-import site.overwrite.auditranscribe.misc.MyLogger;
-import site.overwrite.auditranscribe.misc.tuples.Pair;
-import site.overwrite.auditranscribe.misc.tuples.Triple;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
+import site.overwrite.auditranscribe.generic.exceptions.ValueException;
+import site.overwrite.auditranscribe.generic.tuples.Pair;
+import site.overwrite.auditranscribe.generic.tuples.Triple;
+import site.overwrite.auditranscribe.misc.Complex;
+import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.spectrogram.SpectralHelpers;
 import site.overwrite.auditranscribe.spectrogram.Wavelet;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
-import site.overwrite.auditranscribe.misc.Complex;
 import site.overwrite.auditranscribe.utils.MathUtils;
 
 import java.security.InvalidParameterException;
@@ -47,7 +47,7 @@ import java.util.logging.Level;
  * Christian, and Anssi Klapuri. "Constant-Q transform toolbox for music processing." 7th Sound and
  * Music Computing Conference, Barcelona, Spain. 2010.
  */
-public final class VQT {
+public final class VQT extends ClassWithLogging {
     // Constants
     static final double BW_FASTEST = 0.85;
 
@@ -299,10 +299,8 @@ public final class VQT {
         }
 
         // Return VQT matrix
-        MyLogger.log(
-                Level.FINE,
-                "VQT Matrix generated; has shape (" + V.length + ", " + V[0].length + ")",
-                VQT.class.toString()
+        log(
+                Level.FINE, "VQT Matrix generated; has shape (" + V.length + ", " + V[0].length + ")", VQT.class.getName()
         );
         return V;
     }

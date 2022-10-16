@@ -18,18 +18,18 @@
 
 package site.overwrite.auditranscribe.audio;
 
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
-import site.overwrite.auditranscribe.exceptions.audio.AudioIsSamplesOnlyException;
-import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
-import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
-import site.overwrite.auditranscribe.exceptions.generic.ValueException;
+
+import site.overwrite.auditranscribe.audio.exceptions.AudioIsSamplesOnlyException;
+import site.overwrite.auditranscribe.audio.exceptions.AudioTooLongException;
+import site.overwrite.auditranscribe.audio.exceptions.FFmpegNotFoundException;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
+import site.overwrite.auditranscribe.generic.exceptions.ValueException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
-
-import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.Media;
 import site.overwrite.auditranscribe.utils.MathUtils;
 
 import javax.sound.sampled.AudioFormat;
@@ -41,12 +41,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 
 /**
  * Audio class that handles audio processing and audio playback.
  */
-public class Audio {
+public class Audio extends ClassWithLogging {
     // Constants
     public static final int SAMPLES_BUFFER_SIZE = 1024;  // In bits; 1024 = 2^10
     public static final double MAX_AUDIO_LENGTH = 5;  // Maximum length of audio in minutes
@@ -55,84 +56,89 @@ public class Audio {
     private final AudioInputStream audioStream;
     private final AudioFormat audioFormat;
     private final double sampleRate;
-    private double duration = 0;  // In seconds
 
-    private final byte[] rawWAVBytes;  // Would be an empty array unless set
-    private byte[] rawMP3Bytes;
+    private boolean isLatestPlayerSlowedPlayer;
+
+    private double pausedTime = 0;  // In seconds, for the main media player
+    private double duration = 0;    // In seconds
+
+    private final byte[] rawOriginalWAVBytes;
+    private byte[] rawSlowedWAVBytes;  // Empty unless set
+    private byte[] rawOriginalMP3Bytes;
+    private byte[] rawSlowedMP3Bytes;
 
     private int numSamples;
     private double[] audioSamples;
     private double[] monoAudioSamples;  // Average of stereo samples
 
     private final MediaPlayer mediaPlayer;
+    private final MediaPlayer slowedMediaPlayer;
 
     /**
      * Initializes an <code>Audio</code> object based on a file.
      *
-     * @param wavFile        File object representing the WAV file to be used for both samples
-     *                       generation and audio playback.
-     * @param processingMode The processing mode when handling the audio file.
-     *                       <ul>
-     *                       <li>
-     *                           <code>SAMPLES_ONLY</code>: Only generate samples.
-     *                       </li>
-     *                       <li>
-     *                           <code>PLAYBACK_ONLY</code>: Only permit playback.
-     *                       </li>
-     *                       <li>
-     *                           <code>SAMPLES_AND_PLAYBACK</code>: Permit samples' generation and
-     *                           playback.
-     *                       </li>
-     *                       </ul>
+     * @param wavFile         File object representing the WAV file to be used for both samples
+     *                        generation and audio playback.
+     * @param processingModes The processing modes when handling the audio file. Any number of
+     *                        processing modes can be included.
+     *                        <ul>
+     *                        <li>
+     *                            <code>SAMPLES</code>: Generate audio samples.
+     *                        </li>
+     *                        <li>
+     *                            <code>PLAYBACK</code>: Allow audio playback.
+     *                        </li>
+     *                        </ul>
+     *                        Note that processing mode <code>WITH_SLOWDOWN</code> is <b>invalid</b>
+     *                        for this constructor.
      * @throws IOException                   If there was a problem reading in the audio stream.
      * @throws UnsupportedAudioFileException If there was a problem reading in the audio file.
      * @throws AudioTooLongException         If the audio file exceeds the maximum audio duration
      *                                       permitted.
      */
     public Audio(
-            File wavFile, AudioProcessingMode processingMode
+            File wavFile, AudioProcessingMode... processingModes
     ) throws UnsupportedAudioFileException, IOException, AudioTooLongException {
-        // Set flags
-        boolean needPlayback = false;
-        boolean needSamples = false;
+        this(wavFile, null, processingModes);
+    }
 
-        if (processingMode == AudioProcessingMode.SAMPLES_ONLY) {
-            needSamples = true;
-        } else if (processingMode == AudioProcessingMode.PLAYBACK_ONLY) {
-            needPlayback = true;
-        } else if (processingMode == AudioProcessingMode.SAMPLES_AND_PLAYBACK) {
-            needSamples = true;
-            needPlayback = true;
-        }
-
-        // Create the media player object if needed
-        if (needPlayback) {
-            // Get the media player for the audio file
-            MediaPlayer tempMediaPlayer;
-
-            try {
-                tempMediaPlayer = new MediaPlayer(new Media(wavFile.toURI().toString()));
-            } catch (IllegalStateException e) {
-                tempMediaPlayer = null;
-
-                MyLogger.log(
-                        Level.SEVERE,
-                        "JavaFX Toolkit not initialized. Audio playback will not work.",
-                        this.getClass().toString()
-                );
-            }
-
-            // Update attributes
-            mediaPlayer = tempMediaPlayer;
-
-        } else {
-            mediaPlayer = null;
-        }
+    /**
+     * Initializes an <code>Audio</code> object based on a file.
+     *
+     * @param originalWAVFile File object representing the WAV file to be used for both samples
+     *                        generation and audio playback.
+     * @param slowedWAVFile   File object representing a slowed MP3 file that will be used for
+     *                        slowed audio playback.<br>
+     *                        Note that the tempo for this audio track should be <b>half</b> that
+     *                        of the original <code>originalWAVFile</code>'s tempo.
+     * @param processingModes The processing modes when handling the audio file. Any number of
+     *                        processing modes can be included.
+     *                        <ul>
+     *                        <li>
+     *                            <code>SAMPLES</code>: Generate audio samples.
+     *                        </li>
+     *                        <li>
+     *                            <code>PLAYBACK</code>: Allow audio playback.
+     *                        </li>
+     *                        <li>
+     *                            <code>WITH_SLOWDOWN</code>: Allow audio slowdown.
+     *                        </li>
+     *                        </ul>
+     * @throws IOException                   If there was a problem reading in the audio stream.
+     * @throws UnsupportedAudioFileException If there was a problem reading in the audio file.
+     * @throws AudioTooLongException         If the audio file exceeds the maximum audio duration
+     *                                       permitted.
+     */
+    public Audio(
+            File originalWAVFile, File slowedWAVFile, AudioProcessingMode... processingModes
+    ) throws UnsupportedAudioFileException, IOException, AudioTooLongException {
+        // Convert the given processing modes as a list
+        List<AudioProcessingMode> modes = List.of(processingModes);
 
         // Generate audio samples
-        if (needSamples) {
+        if (modes.contains(AudioProcessingMode.SAMPLES)) {
             // Attempt to convert the input stream into an audio input stream
-            InputStream bufferedIn = new BufferedInputStream(new FileInputStream(wavFile));
+            InputStream bufferedIn = new BufferedInputStream(new FileInputStream(originalWAVFile));
             audioStream = AudioSystem.getAudioInputStream(bufferedIn);
 
             // Get the audio file's audio format and audio file's sample rate
@@ -161,8 +167,54 @@ public class Audio {
             sampleRate = Double.NaN;
         }
 
-        // Save the audio file's raw WAV bytes
-        rawWAVBytes = Files.readAllBytes(wavFile.toPath());
+        // Create the media player object if needed
+        if (modes.contains(AudioProcessingMode.PLAYBACK)) {
+            // Get the media player for the audio file
+            MediaPlayer tempMediaPlayer;
+
+            try {
+                tempMediaPlayer = new MediaPlayer(new Media(originalWAVFile.toURI().toString()));
+            } catch (IllegalStateException e) {
+                tempMediaPlayer = null;
+                log(Level.SEVERE, "JavaFX Toolkit not initialized. Audio playback will not work.");
+            }
+
+            // Update attributes
+            mediaPlayer = tempMediaPlayer;
+        } else {
+            mediaPlayer = null;
+        }
+
+        // Handle the two different kinds of playback options
+        if (modes.contains(AudioProcessingMode.WITH_SLOWDOWN)) {
+            // If no slowed audio was provided, throw an error
+            if (slowedWAVFile == null) {
+                RuntimeException e = new RuntimeException(
+                        "Processing modes contains `WITH_SLOWDOWN` but provided no slowed audio"
+                );
+                logException(e);
+                throw e;
+            }
+
+            // Get the media player for the audio file
+            MediaPlayer tempMediaPlayer;
+
+            try {
+                tempMediaPlayer = new MediaPlayer(new Media(slowedWAVFile.toURI().toString()));
+            } catch (IllegalStateException e) {
+                tempMediaPlayer = null;
+                log(Level.SEVERE, "JavaFX Toolkit not initialized. Audio playback will not work.");
+            }
+
+            // Update attributes
+            slowedMediaPlayer = tempMediaPlayer;
+        } else {
+            slowedMediaPlayer = null;
+        }
+
+        // Save the files' raw WAV bytes
+        rawOriginalWAVBytes = Files.readAllBytes(originalWAVFile.toPath());
+        if (slowedWAVFile != null) rawSlowedWAVBytes = Files.readAllBytes(slowedWAVFile.toPath());
     }
 
     // Getter/Setter methods
@@ -191,8 +243,12 @@ public class Audio {
         return monoAudioSamples;
     }
 
-    public void setRawMP3Bytes(byte[] rawMP3Bytes) {
-        this.rawMP3Bytes = rawMP3Bytes;
+    public void setRawOriginalMP3Bytes(byte[] rawOriginalMP3Bytes) {
+        this.rawOriginalMP3Bytes = rawOriginalMP3Bytes;
+    }
+
+    public void setRawSlowedMP3Bytes(byte[] rawSlowedMP3Bytes) {
+        this.rawSlowedMP3Bytes = rawSlowedMP3Bytes;
     }
 
     // Audio methods
@@ -201,21 +257,60 @@ public class Audio {
      * Method that plays the audio.
      */
     public void play() {
-        if (mediaPlayer != null) {
-            mediaPlayer.play();
+        play(false);
+    }
+
+    /**
+     * Method that plays the audio.
+     *
+     * @param isSlowed Whether to use the slowed down media player or the normal media player.
+     */
+    public void play(boolean isSlowed) {
+        // Set playback time of both media players
+        setAudioPlaybackTime(pausedTime);
+
+        // Play the correct audio
+        if (!isSlowed) {
+            if (mediaPlayer != null) {
+                mediaPlayer.play();
+                isLatestPlayerSlowedPlayer = false;
+            } else {
+                throw new AudioIsSamplesOnlyException("Media player was not initialized.");
+            }
         } else {
-            throw new AudioIsSamplesOnlyException("Media player was not initialized.");
+            if (slowedMediaPlayer != null) {
+                slowedMediaPlayer.play();
+                isLatestPlayerSlowedPlayer = true;
+            } else {
+                throw new AudioIsSamplesOnlyException("Media player was not initialized.");
+            }
         }
     }
 
     /**
      * Method that pauses the current audio that is playing.
      */
-    public void pause() throws InvalidObjectException {
+    public void pause() {
         if (mediaPlayer != null) {
+            // Pause the audio first
             mediaPlayer.pause();
+
+            // Update the pause time
+            if (!isLatestPlayerSlowedPlayer) {
+                pausedTime = MathUtils.round(mediaPlayer.getCurrentTime().toSeconds(), 3);
+            }
         } else {
             throw new AudioIsSamplesOnlyException("Media player was not initialized.");
+        }
+
+        if (slowedMediaPlayer != null) {
+            // Pause the audio first
+            slowedMediaPlayer.pause();
+
+            // Update the pause time
+            if (isLatestPlayerSlowedPlayer) {
+                pausedTime = MathUtils.round(slowedMediaPlayer.getCurrentTime().toSeconds() / 2, 3);
+            }
         }
     }
 
@@ -223,37 +318,69 @@ public class Audio {
      * Method that stops the audio.
      */
     public void stop() {
+        // Stop the media players
         if (mediaPlayer != null) {
             mediaPlayer.stop();
         } else {
             throw new AudioIsSamplesOnlyException("Media player was not initialized.");
         }
+
+        if (slowedMediaPlayer != null) {
+            slowedMediaPlayer.stop();
+        }
+
+        // Reset pause time back to 0 (since it is paused)
+        pausedTime = 0;
     }
 
     /**
-     * Set the current audio's playback time to <code>playbackTime</code> <b>seconds</b>.
+     * Set the current audio's playback time to <code>playbackTime</code> <b>seconds</b>.<br>
+     * If <code>slowedMediaPlayer</code> is not <code>null</code>, its playback time will be set to
+     * <b>twice</b> the value of <code>playbackTime</code>.
      *
-     * @param playbackTime The playback time in seconds.
+     * @param playbackTime The playback time in <b>seconds</b>.
      */
     public void setAudioPlaybackTime(double playbackTime) {
+        // Declare the duration to seek to
+        Duration seekTime = new Duration(playbackTime * 1000);
+
+        // Update seek times
         if (mediaPlayer != null) {
-            mediaPlayer.seek(new Duration(playbackTime * 1000));
+            mediaPlayer.seek(seekTime);
         } else {
             throw new AudioIsSamplesOnlyException("Media player was not initialized.");
         }
+
+        if (slowedMediaPlayer != null) {
+            slowedMediaPlayer.seek(seekTime.multiply(2));
+        }
+
+        pausedTime = playbackTime;
     }
 
     /**
-     * Set the current audio's starting time to <code>startTime</code> <b>seconds</b>.
+     * Set the current audio's starting time to <code>startTime</code> <b>seconds</b>.<br>
+     * If <code>slowedMediaPlayer</code> is not <code>null</code>, its start time will be set to
+     * <b>twice</b> the value of <code>startTime</code>.
      *
      * @param startTime The start time of the audio in seconds.
      */
     public void setAudioStartTime(double startTime) {
+        // Declare the duration of the start time
+        Duration start = new Duration(startTime * 1000);
+
+        // Update start times
         if (mediaPlayer != null) {
-            mediaPlayer.setStartTime(new Duration(startTime * 1000));
+            mediaPlayer.setStartTime(start);
         } else {
             throw new AudioIsSamplesOnlyException("Media player was not initialized.");
         }
+
+        if (slowedMediaPlayer != null) {
+            slowedMediaPlayer.setStartTime(start.multiply(2));
+        }
+
+        pausedTime = startTime;
     }
 
     /**
@@ -263,15 +390,29 @@ public class Audio {
      * @return Returns the current audio time in <b>seconds</b>, correct to the nearest millisecond.
      */
     public double getCurrAudioTime() {
-        if (mediaPlayer != null) {
+        return getCurrAudioTime(false);
+    }
+
+    /**
+     * Method that gets the current audio time in <b>seconds</b>, correct to the nearest
+     * millisecond.
+     *
+     * @param isSlowed Whether to use the slowed down media player or the normal media player.
+     * @return Returns the current audio time in <b>seconds</b>, correct to the nearest millisecond.
+     */
+    public double getCurrAudioTime(boolean isSlowed) {
+        if (!isSlowed && mediaPlayer != null) {
             return MathUtils.round(mediaPlayer.getCurrentTime().toSeconds(), 3);
+        } else if (isSlowed && slowedMediaPlayer != null) {
+            return MathUtils.round(slowedMediaPlayer.getCurrentTime().toSeconds() / 2, 3);
         } else {
             throw new AudioIsSamplesOnlyException("Media player was not initialized.");
         }
     }
 
     /**
-     * Method that sets the volume to the volume provided.
+     * Method that sets the volume to the volume provided.<br>
+     * Also sets the slowed audio's media player's volume if it is provided.
      *
      * @param volume Volume value. This value should be in the interval [0, 1] where 0 means
      *               silent and 1 means full volume.
@@ -281,6 +422,10 @@ public class Audio {
             mediaPlayer.setVolume(volume);
         } else {
             throw new AudioIsSamplesOnlyException("Media player was not initialized.");
+        }
+
+        if (slowedMediaPlayer != null) {
+            slowedMediaPlayer.setVolume(volume);
         }
     }
 
@@ -366,6 +511,91 @@ public class Audio {
 
         // Return the resampled array
         return yHat;
+    }
+
+    /**
+     * Helper method that converts the raw WAV bytes into MP3 bytes.
+     *
+     * @param rawWAVBytes The raw WAV bytes to convert.
+     * @param ffmpegPath  The path to the ffmpeg executable.
+     * @throws FFmpegNotFoundException If FFmpeg was not found at the specified path.
+     * @throws IOException             If writing to the final audio file encounters an error.
+     */
+    public static byte[] wavBytesToMP3Bytes(
+            byte[] rawWAVBytes, String ffmpegPath
+    ) throws FFmpegNotFoundException, IOException {
+        log(Level.FINE, "Converting WAV bytes to MP3 bytes", Audio.class.getName());
+
+        // Ensure that the temporary directory exists
+        IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
+        log(
+                Level.FINE, "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH, Audio.class.getName()
+        );
+
+        // Define a new FFmpeg handler
+        FFmpegHandler FFmpegHandler = new FFmpegHandler(ffmpegPath);
+
+        // Generate the output path to the MP3 file
+        String inputPath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-1.wav");
+        String outputPath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-2.mp3");
+
+        // Write WAV bytes into a file specified at the input path
+        IOMethods.createFile(inputPath);
+        Files.write(Paths.get(inputPath), rawWAVBytes);
+
+        // Convert the original WAV file to a temporary MP3 file
+        outputPath = FFmpegHandler.convertAudio(new File(inputPath), outputPath);
+
+        // Read the raw MP3 bytes into a temporary file
+        byte[] rawMP3Bytes = Files.readAllBytes(Paths.get(outputPath));
+
+        // Delete the temporary files
+        IOMethods.delete(inputPath);
+        IOMethods.delete(outputPath);
+
+        // Return the raw MP3 bytes
+        log(Level.FINE, "Done converting WAV to MP3 bytes", Audio.class.getName());
+        return rawMP3Bytes;
+    }
+
+    /**
+     * Helper method that converts the original WAV bytes into MP3 bytes.
+     *
+     * @param ffmpegPath The path to the ffmpeg executable.
+     * @throws FFmpegNotFoundException If FFmpeg was not found at the specified path.
+     * @throws IOException             If writing to the final audio file encounters an error.
+     */
+    public byte[] originalWAVBytesToMP3Bytes(String ffmpegPath) throws FFmpegNotFoundException, IOException {
+        // Check if we have already processed the audio
+        if (rawOriginalMP3Bytes != null) {
+            log(Level.FINE, "Returning previously processed original MP3 bytes");
+        } else {
+            // Otherwise, process using the static method
+            rawOriginalMP3Bytes = wavBytesToMP3Bytes(rawOriginalWAVBytes, ffmpegPath);
+        }
+
+        return rawOriginalMP3Bytes;
+    }
+
+
+    /**
+     * Helper method that converts the slowed WAV bytes into MP3 bytes.
+     *
+     * @param ffmpegPath The path to the ffmpeg executable.
+     * @throws FFmpegNotFoundException If FFmpeg was not found at the specified path.
+     * @throws IOException             If writing to the final audio file encounters an error.
+     */
+    public byte[] slowedWAVBytesToMP3Bytes(String ffmpegPath) throws FFmpegNotFoundException, IOException {
+        // Check if we have already processed the audio
+        if (rawSlowedMP3Bytes != null) {
+            log(Level.FINE, "Returning previously processed slowed MP3 bytes");
+
+        } else {
+            // Otherwise, process using the static method
+            rawSlowedMP3Bytes = wavBytesToMP3Bytes(rawSlowedWAVBytes, ffmpegPath);
+        }
+
+        return rawSlowedMP3Bytes;
     }
 
     // Private methods
@@ -509,7 +739,7 @@ public class Audio {
                 monoAudioSamples = new double[numMonoSamples];
 
                 for (int i = 0; i < numMonoSamples; i++) {
-                    // Take average of left and right channels' samples
+                    // Take mean of left and right channels' samples
                     monoAudioSamples[i] = (audioSamples[i * 2] + audioSamples[i * 2 + 1]) / 2;
                 }
             } else {  // Mono
@@ -648,55 +878,4 @@ public class Audio {
             samples[i] = (float) transfer[i] / (float) fullScale;
         }
     }
-
-    /**
-     * Helper method that converts the audio object into MP3 bytes.
-     *
-     * @param ffmpegPath The path to the ffmpeg executable.
-     * @throws FFmpegNotFoundException If FFmpeg was not found at the specified path.
-     * @throws IOException             If writing to the final audio file encounters an error.
-     */
-    public byte[] wavBytesToMP3Bytes(String ffmpegPath) throws FFmpegNotFoundException, IOException {
-        // Check if we have already processed the audio
-        if (rawMP3Bytes != null) {
-            MyLogger.log(Level.FINE, "Returning previously processed MP3 bytes", this.getClass().toString());
-            return rawMP3Bytes;
-        }
-
-        MyLogger.log(Level.FINE, "Converting WAV bytes to MP3 bytes", this.getClass().toString());
-
-        // Ensure that the temporary directory exists
-        IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
-        MyLogger.log(
-                Level.FINE,
-                "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH,
-                this.getClass().toString()
-        );
-
-        // Define a new FFmpeg handler
-        FFmpegHandler FFmpegHandler = new FFmpegHandler(ffmpegPath);
-
-        // Generate the output path to the MP3 file
-        String inputPath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-1.wav");
-        String outputPath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-2.mp3");
-
-        // Write WAV bytes into a file specified at the input path
-        IOMethods.createFile(inputPath);
-        Files.write(Paths.get(inputPath), rawWAVBytes);
-
-        // Convert the original WAV file to a temporary MP3 file
-        outputPath = FFmpegHandler.convertAudio(new File(inputPath), outputPath);
-
-        // Read the raw MP3 bytes into a temporary file
-        rawMP3Bytes = Files.readAllBytes(Paths.get(outputPath));
-
-        // Delete the temporary files
-        IOMethods.delete(inputPath);
-        IOMethods.delete(outputPath);
-
-        // Return the raw MP3 bytes
-        MyLogger.log(Level.FINE, "Done converting", this.getClass().toString());
-        return rawMP3Bytes;
-    }
 }
-

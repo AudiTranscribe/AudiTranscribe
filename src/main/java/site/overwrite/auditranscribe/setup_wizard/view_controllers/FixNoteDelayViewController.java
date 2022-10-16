@@ -31,9 +31,9 @@ import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
-import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
+import site.overwrite.auditranscribe.audio.exceptions.AudioTooLongException;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
@@ -45,7 +45,6 @@ import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
-import java.io.InvalidObjectException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
@@ -56,7 +55,7 @@ import java.util.logging.Level;
 /**
  * View controller that helps the user fix any note playback delays.
  */
-public class FixNoteDelayViewController implements Initializable {
+public class FixNoteDelayViewController extends ClassWithLogging implements Initializable {
     // Constants
     private final double[] NOTE_ONSET_TIMES = {
             0.5, 0.75, 1, 1.25, 1.5, 3,
@@ -170,7 +169,7 @@ public class FixNoteDelayViewController implements Initializable {
             }
         }, 0, 50, TimeUnit.MILLISECONDS);
 
-        MyLogger.log(Level.INFO, "Showing note delay fix view", this.getClass().getName());
+        log(Level.INFO, "Showing fix note delay view");
     }
 
     // Public methods
@@ -195,9 +194,9 @@ public class FixNoteDelayViewController implements Initializable {
     public void setAudioResource(String audioResourcePath) {
         // Create the audio object for playback
         try {
-            audio = new Audio(new File(audioResourcePath), AudioProcessingMode.PLAYBACK_ONLY);
+            audio = new Audio(new File(audioResourcePath), AudioProcessingMode.PLAYBACK);
         } catch (UnsupportedAudioFileException | IOException | AudioTooLongException e) {
-            MyLogger.logException(e);
+            logException(e);
             throw new RuntimeException(e);
         }
     }
@@ -227,7 +226,7 @@ public class FixNoteDelayViewController implements Initializable {
         }
 
         // Create the sequencer
-        sequencer = new NotePlayerSequencer();
+        sequencer = new NotePlayerSequencer(0);
 
         // Check if the sequencer is available
         if (sequencer.isSequencerAvailable()) {
@@ -242,10 +241,10 @@ public class FixNoteDelayViewController implements Initializable {
             sequencer.setInstrument(INSTRUMENT);
 
             // Set the notes
-            sequencer.setNotesOnTrack(NOTE_ONSET_TIMES, NOTE_DURATIONS, noteNumbers);
+            sequencer.setNotesOnTrack(NOTE_ONSET_TIMES, NOTE_DURATIONS, noteNumbers, false);
 
             // Start & Stop the sequencer to correctly set timings
-            sequencer.play(0);
+            sequencer.play(0, false);
             sequencer.stop();
 
         } else {
@@ -254,7 +253,7 @@ public class FixNoteDelayViewController implements Initializable {
                     "The note player sequencer is not available on your system. This part of the setup " +
                             "wizard will not function. Simply skip to the next part."
             );
-            MyLogger.log(Level.WARNING, "Sequencer not available", FixNoteDelayViewController.class.getName());
+            log(Level.WARNING, "Note sequencer not available");
         }
     }
 
@@ -272,20 +271,15 @@ public class FixNoteDelayViewController implements Initializable {
         // Play the things
         audio.setPlaybackVolume(0.5);
         audio.play();
-        sequencer.play(offsetTime);
+        sequencer.play(offsetTime, false);
     }
 
     /**
      * Helper method that stops the playback of the audio and the notes.
      */
     private void stopAudio() {
-        try {
-            audio.stop();
-            audio.pause();
-        } catch (InvalidObjectException e) {
-            MyLogger.logException(e);
-            throw new RuntimeException(e);
-        }
+        audio.stop();
+        audio.pause();
         sequencer.stop();
     }
 }

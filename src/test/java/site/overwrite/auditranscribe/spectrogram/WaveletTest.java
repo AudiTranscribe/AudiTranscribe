@@ -21,7 +21,7 @@ package site.overwrite.auditranscribe.spectrogram;
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.misc.Complex;
-import site.overwrite.auditranscribe.misc.tuples.Pair;
+import site.overwrite.auditranscribe.generic.tuples.Pair;
 
 import static org.junit.jupiter.api.Assertions.*;
 

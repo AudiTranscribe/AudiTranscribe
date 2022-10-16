@@ -18,15 +18,16 @@
 
 package site.overwrite.auditranscribe.io.audt_file.base;
 
-import site.overwrite.auditranscribe.exceptions.io.audt_file.InvalidFileVersionException;
-import site.overwrite.auditranscribe.utils.ByteConversionUtils;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileHelpers;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.audt_file.v0x00050002.AUDTFileWriter0x00050002;
 import site.overwrite.auditranscribe.io.audt_file.v0x00070001.AUDTFileWriter0x00070001;
-import site.overwrite.auditranscribe.io.audt_file.v401.AUDTFileWriter401;
+import site.overwrite.auditranscribe.io.audt_file.v0x00080001.AUDTFileWriter0x00080001;
+import site.overwrite.auditranscribe.io.exceptions.InvalidFileVersionException;
+import site.overwrite.auditranscribe.utils.ByteConversionUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,8 +35,12 @@ import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
-public abstract class AUDTFileWriter {
+/**
+ * Class that handles the writing of the AudiTranscribe (AUDT) file.
+ */
+public abstract class AUDTFileWriter extends ClassWithLogging {
     // Attributes
     public final String filepath;
 
@@ -88,9 +93,9 @@ public abstract class AUDTFileWriter {
     public static AUDTFileWriter getWriter(int fileVersion, String filepath) throws InvalidFileVersionException {
         // Get the appropriate file reader objects
         return switch (fileVersion) {
-            case 401 -> new AUDTFileWriter401(filepath);  // Todo: eventually depreciate this
             case 0x00050002 -> new AUDTFileWriter0x00050002(filepath);
             case 0x00070001 -> new AUDTFileWriter0x00070001(filepath);
+            case 0x00080001 -> new AUDTFileWriter0x00080001(filepath);
             default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
         };
     }
@@ -107,9 +112,9 @@ public abstract class AUDTFileWriter {
             throws InvalidFileVersionException {
         // Get the appropriate file reader objects
         return switch (fileVersion) {
-            case 401 -> new AUDTFileWriter401(filepath, numBytesToSkip);  // Todo: eventually depreciate this
             case 0x00050002 -> new AUDTFileWriter0x00050002(filepath, numBytesToSkip);
             case 0x00070001 -> new AUDTFileWriter0x00070001(filepath, numBytesToSkip);
+            case 0x00080001 -> new AUDTFileWriter0x00080001(filepath, numBytesToSkip);
             default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
         };
     }
@@ -314,7 +319,7 @@ public abstract class AUDTFileWriter {
 
         // Write version numbers
         byte[] fileVersionBytes = ByteConversionUtils.intToBytes(fileVersion);
-        byte[] lz4VersionBytes = ByteConversionUtils.intToBytes(AUDTFileConstants.LZ4_VERSION_NUMBER);
+        byte[] lz4VersionBytes = ByteConversionUtils.intToBytes(AUDTFileConstants.COMPRESSOR_VERSION_NUMBER);
 
         AUDTFileHelpers.addBytesIntoBytesList(bytes, fileVersionBytes);
         AUDTFileHelpers.addBytesIntoBytesList(bytes, lz4VersionBytes);
@@ -328,5 +333,11 @@ public abstract class AUDTFileWriter {
      */
     private void writeEOFDelimiter() {
         AUDTFileHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_END_OF_FILE_DELIMITER);
+    }
+
+    // Overwritten methods
+    @Override
+    public void log(Level level, String msg) {
+        log(level, msg, AUDTFileWriter.class.getName());
     }
 }

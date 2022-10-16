@@ -24,8 +24,8 @@ import org.junit.jupiter.api.condition.OS;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import site.overwrite.auditranscribe.io.audt_file.v401.data_encapsulators.*;
-import site.overwrite.auditranscribe.misc.tuples.Triple;
+import site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.*;
+import site.overwrite.auditranscribe.generic.tuples.Triple;
 import site.overwrite.auditranscribe.utils.MathUtils;
 import site.overwrite.auditranscribe.utils.TypeConversionUtils;
 
@@ -62,8 +62,8 @@ class ProjectDataTest {
     MusicNotesDataObject musicNotesDataObject1;
     MusicNotesDataObject musicNotesDataObject2;
 
-    UnchangingDataPropertiesObject401 unchangingDataPropertiesObject1;
-    UnchangingDataPropertiesObject401 unchangingDataPropertiesObject2;
+    UnchangingDataPropertiesObject unchangingDataPropertiesObject1;
+    UnchangingDataPropertiesObject unchangingDataPropertiesObject2;
 
     // Initialization method
     public ProjectDataTest() throws IOException {
@@ -101,45 +101,45 @@ class ProjectDataTest {
         double maxMagnitude2 = conversionTuple2.value2();
 
         // Define data to be used within the tests
-        qTransformDataObject1 = new QTransformDataObject401(
+        qTransformDataObject1 = new QTransformDataObject0x00050002(
                 qTransformBytes1, minMagnitude1, maxMagnitude1
         );
-        qTransformDataObject2 = new QTransformDataObject401(
+        qTransformDataObject2 = new QTransformDataObject0x00050002(
                 qTransformBytes2, minMagnitude2, maxMagnitude2
         );
 
-        audioDataObject1 = new AudioDataObject401(
+        audioDataObject1 = new AudioDataObject0x00050002(
                 CompressionHandlers.lz4Compress(Files.readAllBytes(Paths.get(
                         IOMethods.getAbsoluteFilePath("testing-files/audio/A440.mp3")
                 ))),
                 44100, 8000, "A440.wav");
-        audioDataObject2 = new AudioDataObject401(
+        audioDataObject2 = new AudioDataObject0x00050002(
                 CompressionHandlers.lz4Compress(Files.readAllBytes(Paths.get(
                         IOMethods.getAbsoluteFilePath("testing-files/audio/Choice.wav")
                 ))),
                 44100, 5000, "Choice.wav");
 
-        projectInfoDataObject1 = new ProjectInfoDataObject401(
+        projectInfoDataObject1 = new ProjectInfoDataObject0x00050002(
                 11, 9, 123.45, 0.01, 0.55, 9000
         );
-        projectInfoDataObject2 = new ProjectInfoDataObject401(
+        projectInfoDataObject2 = new ProjectInfoDataObject0x00050002(
                 15, 14, 67.89, -1.23, 0.124, 2048
         );
 
-        musicNotesDataObject1 = new MusicNotesDataObject401(
+        musicNotesDataObject1 = new MusicNotesDataObject0x00050002(
                 timesToPlaceRectangles1, noteDurations1, noteNums1
         );
-        musicNotesDataObject2 = new MusicNotesDataObject401(
+        musicNotesDataObject2 = new MusicNotesDataObject0x00050002(
                 timesToPlaceRectangles2, noteDurations2, noteNums2
         );
 
-        unchangingDataPropertiesObject1 = new UnchangingDataPropertiesObject401(
+        unchangingDataPropertiesObject1 = new UnchangingDataPropertiesObject0x00050002(
                 32 +  // Header section
                         UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
                         qTransformDataObject1.numBytesNeeded() +
                         audioDataObject1.numBytesNeeded()
         );
-        unchangingDataPropertiesObject2 = new UnchangingDataPropertiesObject401(
+        unchangingDataPropertiesObject2 = new UnchangingDataPropertiesObject0x00050002(
                 32 +  // Header section
                         UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
                         qTransformDataObject2.numBytesNeeded() +
@@ -165,7 +165,7 @@ class ProjectDataTest {
         assertNotEquals(temp, otherTypedVar);  // Not redundant to test the equality method
 
         // Define arrays to pick the data objects from
-        UnchangingDataPropertiesObject401[] unchangingDataPropertiesObjects = {
+        UnchangingDataPropertiesObject[] unchangingDataPropertiesObjects = {
                 unchangingDataPropertiesObject1, unchangingDataPropertiesObject2
         };
         QTransformDataObject[] qTransformDataObjects = {

@@ -23,10 +23,10 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import site.overwrite.auditranscribe.audio.FFmpegHandler;
-import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
+import site.overwrite.auditranscribe.audio.exceptions.FFmpegNotFoundException;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
-import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.setup_wizard.view_controllers.*;
 
@@ -37,7 +37,7 @@ import java.util.logging.Level;
 /**
  * Class that handles the setup wizard.
  */
-public class SetupWizard {
+public class SetupWizard extends ClassWithLogging {
     // Attributes
     private final Stage stage;
     private Theme theme;
@@ -432,11 +432,7 @@ public class SetupWizard {
 
             // Return the value of the note playing delay offset
             double notePlayingDelayOffset = controller.getNotePlayingDelayOffset();
-            MyLogger.log(
-                    Level.INFO,
-                    "Note playing delay offset set to " + notePlayingDelayOffset,
-                    this.getClass().getName()
-            );
+            log(Level.INFO, "Note playing delay offset set to " + notePlayingDelayOffset);
             return notePlayingDelayOffset;
 
         } catch (IOException ignored) {
@@ -469,11 +465,7 @@ public class SetupWizard {
 
             // Return the value of the update checking interval
             int updateCheckingInterval = controller.getUpdateCheckingInterval();
-            MyLogger.log(
-                    Level.INFO,
-                    "Update checking interval set to " + updateCheckingInterval,
-                    this.getClass().getName()
-            );
+            log(Level.INFO, "Update checking interval set to " + updateCheckingInterval);
             return updateCheckingInterval;
 
         } catch (IOException ignored) {
@@ -506,11 +498,7 @@ public class SetupWizard {
 
             // Return the value of the update checking interval
             int themeOrdinal = controller.getSelectedThemeOrdinal();
-            MyLogger.log(
-                    Level.INFO,
-                    "Theme set to " + Theme.values()[themeOrdinal],
-                    this.getClass().getName()
-            );
+            log(Level.INFO, "Theme set to " + Theme.values()[themeOrdinal]);
             return themeOrdinal;
 
         } catch (IOException ignored) {

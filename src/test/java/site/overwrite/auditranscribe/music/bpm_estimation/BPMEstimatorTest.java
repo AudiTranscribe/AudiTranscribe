@@ -23,8 +23,8 @@ import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
-import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
-import site.overwrite.auditranscribe.exceptions.generic.ValueException;
+import site.overwrite.auditranscribe.audio.exceptions.AudioTooLongException;
+import site.overwrite.auditranscribe.generic.exceptions.ValueException;
 import site.overwrite.auditranscribe.io.IOMethods;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -38,11 +38,11 @@ class BPMEstimatorTest {
     // Get the audio files
     Audio audio1 = new Audio(
             new File(IOMethods.getAbsoluteFilePath("testing-files/audio/175bpm.wav")),
-            AudioProcessingMode.SAMPLES_ONLY
+            AudioProcessingMode.SAMPLES
     );
     Audio audio2 = new Audio(
             new File(IOMethods.getAbsoluteFilePath("testing-files/audio/137bpmNoisy.wav")),
-            AudioProcessingMode.SAMPLES_ONLY
+            AudioProcessingMode.SAMPLES
     );
 
     // Extract samples and sample rate

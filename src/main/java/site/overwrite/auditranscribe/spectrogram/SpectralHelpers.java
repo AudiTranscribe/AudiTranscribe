@@ -19,7 +19,7 @@
 package site.overwrite.auditranscribe.spectrogram;
 
 import site.overwrite.auditranscribe.audio.WindowFunction;
-import site.overwrite.auditranscribe.misc.tuples.Pair;
+import site.overwrite.auditranscribe.generic.tuples.Pair;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.FrequencyBins;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.STFT;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
@@ -219,25 +219,26 @@ public final class SpectralHelpers {
         boolean[][] maskedLocalMax = generateMaskedLocalMaximum(S, refVals);
 
         // Get relevant indices
-        List<Integer> idxI = new ArrayList<>();
-        List<Integer> idxJ = new ArrayList<>();
+        List<Pair<Integer, Integer>> indices = new ArrayList<>();
         for (int i = 0; i < S.length; i++) {
             for (int j = 0; j < S[0].length; j++) {
                 // Get the current FFT frequency
                 double currFFTFreq = fftFreqs[i];
                 if ((fmin <= currFFTFreq) && (currFFTFreq < fmax) && (maskedLocalMax[i][j])) {
-                    idxI.add(i);
-                    idxJ.add(j);
+                    indices.add(new Pair<>(i, j));
                 }
             }
         }
 
         // Store pitch and magnitudes
-        for (Integer i : idxI) {
-            for (Integer j : idxJ) {
-                pitches[i][j] = (i + shift[i][j]) * (sr / numFFT);
-                mags[i][j] = S[i][j] + dskew[i][j];
-            }
+        for (Pair<Integer, Integer> pair : indices) {
+            // Get the i and j index
+            int i = pair.value0();
+            int j = pair.value1();
+
+            // Set pitch and magnitude
+            pitches[i][j] = (i + shift[i][j]) * (sr / numFFT);
+            mags[i][j] = S[i][j] + dskew[i][j];
         }
 
         // Return as a pair
@@ -248,7 +249,7 @@ public final class SpectralHelpers {
      * Perform parabolic interpolation on the STFT magnitudes.
      *
      * @param S STFT magnitudes matrix.
-     * @return A pair. First value is the 'average' matrix. The second value is the 'shuft' matrix.
+     * @return A pair. First value is the 'average' matrix. The second value is the 'shift' matrix.
      */
     private static Pair<Double[][], Double[][]> parabolicInterp(double[][] S) {
         // Perform parabolic interpolation

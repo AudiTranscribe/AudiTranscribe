@@ -18,9 +18,10 @@
 
 package site.overwrite.auditranscribe.utils;
 
-import site.overwrite.auditranscribe.exceptions.generic.ValueException;
+import site.overwrite.auditranscribe.generic.exceptions.ValueException;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * Mathematical utility methods.
@@ -63,72 +64,7 @@ public final class MathUtils {
         return Math.log(x) / Math.log(n);
     }
 
-    /**
-     * Method that quickly calculates the modulo of a number by a
-     * <a href="https://en.wikipedia.org/wiki/Mersenne_prime">Mersenne Prime</a>.
-     *
-     * @param x Number to find the modulo of.
-     * @param n Exponent of "2" in the mersenne prime expression "2<sup>n</sup> - 1". This assumes
-     *          that <b>"2<sup>n</sup> - 1" is a Mersenne prime</b>, as no further checks on its
-     *          primality are conducted.
-     * @return Value of <code>x</code> modulo 2<sup>n</sup> - 1.
-     * @see <a href="https://ariya.io/2007/02/modulus-with-mersenne-prime">This article</a> on the
-     * implementation of the modulo with Mersenne primes.
-     */
-    public static int modWithMersennePrime(int x, int n) {
-        int p = (int) (Math.pow(2, n) - 1);  // Mersenne prime
-        int i = (x & p) + (x >> n);          // Bit shift magic
-        return (i >= p) ? (i - p) : i;
-    }
-
-    /**
-     * Computes the Euclidian norm of the given array.
-     *
-     * @param array Array of numbers.
-     * @return Euclidian norm of the array.
-     */
-    public static double norm(double[] array) {
-        double norm = 0;
-        for (double elem : array) {
-            norm += elem * elem;
-        }
-
-        return Math.sqrt(norm);
-    }
-
-    /**
-     * Computes the arithmetic mean of the given array.
-     *
-     * @param array Array of numbers.
-     * @return Arithmetic mean of the array.
-     */
-    public static double mean(double[] array) {
-        double sum = 0;
-        for (double elem : array) {
-            sum += elem;
-        }
-
-        return sum / array.length;
-    }
-
-    /**
-     * Returns the index of the maximum value of an array.
-     *
-     * @param array Array of numbers.
-     * @return Index of the maximum value of the array.
-     */
-    public static int argmax(double[] array) {
-        int argmax = 0;
-        double max = array[0];
-        for (int i = 1; i < array.length; i++) {
-            if (array[i] > max) {
-                max = array[i];
-                argmax = i;
-            }
-        }
-
-        return argmax;
-    }
+    // Data-related methods
 
     /**
      * Linearly interpolate the two values <code>a</code> and <code>b</code> by the scaling factor
@@ -188,25 +124,22 @@ public final class MathUtils {
     }
 
     /**
-     * Rounds the float <code>x</code> to <code>dp</code> decimal places.
-     *
-     * @param x  The float.
-     * @param dp Number of decimal places to round to.
-     * @return Rounded float.
-     */
-    public static float round(float x, int dp) {
-        return (float) round((double) x, dp);
-    }
-
-    /**
      * Rounds the double <code>x</code> to <code>dp</code> decimal places.
      *
      * @param x  The double.
      * @param dp Number of decimal places to round to.
      * @return Rounded double.
+     * @throws ValueException If the number of decimal places (<code>dp</code>) is less than 0.
+     * @implNote If <code>x</code> is <code>NaN</code> then the rounding will also return
+     * <code>NaN</code>.
      */
     public static double round(double x, int dp) {
-        return Math.round(x * Math.pow(10, dp)) / Math.pow(10, dp);
+        if (Double.isNaN(x)) return Double.NaN;
+        if (dp < 0) throw new ValueException("Invalid number of decimal places: " + dp);
+
+        BigDecimal bd = new BigDecimal(Double.toString(x));
+        bd = bd.setScale(dp, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 
     // Combinatorial methods
@@ -265,17 +198,6 @@ public final class MathUtils {
     }
 
     // Checking-related methods
-
-    /**
-     * Method to check if the double <code>x</code> is an integer.
-     *
-     * @param x The number that should be tested.
-     * @return A boolean, <code>true</code> if the double is an integer and <code>false</code>
-     * otherwise.
-     */
-    public static boolean isInteger(double x) {
-        return x % 1 == 0;
-    }
 
     /**
      * Method to check if the integer <code>x</code> is a power of 2.<br>

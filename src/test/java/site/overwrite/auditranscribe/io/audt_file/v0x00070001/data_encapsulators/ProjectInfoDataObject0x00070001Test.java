@@ -1,6 +1,6 @@
 /*
  * ProjectInfoDataObject0x00070001Test.java
- * Description: Test `ProjectInfoDataObject0x00050002.java`.
+ * Description: Test `ProjectInfoDataObject0x00070001.java`.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the

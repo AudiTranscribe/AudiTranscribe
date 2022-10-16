@@ -27,12 +27,13 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.PropertyFile;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
-import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.utils.GUIUtils;
 
@@ -41,7 +42,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 
-public class AboutViewController implements Initializable {
+public class AboutViewController extends ClassWithLogging implements Initializable {
     // FXML Elements
     @FXML
     private Pane rootPane;
@@ -74,10 +75,10 @@ public class AboutViewController implements Initializable {
             );
 
             // Report that the "about" view is ready to be shown
-            MyLogger.log(Level.INFO, "About view ready to be shown", this.getClass().toString());
+            log(Level.INFO, "About view ready to be shown");
 
         } catch (IOException e) {
-            MyLogger.logException(e);
+            logException(e);
             throw new RuntimeException(e);
         }
     }
@@ -102,6 +103,7 @@ public class AboutViewController implements Initializable {
             // Set stage properties
             Stage aboutStage = new Stage();
             aboutStage.initStyle(StageStyle.UTILITY);
+            aboutStage.initModality(Modality.APPLICATION_MODAL);
             aboutStage.setTitle("About AudiTranscribe");
             aboutStage.setScene(scene);
             aboutStage.setResizable(false);
@@ -113,7 +115,7 @@ public class AboutViewController implements Initializable {
             controller.rootPane.requestFocus();
 
         } catch (IOException e) {
-            MyLogger.logException(e);
+            logException(e);
             throw new RuntimeException(e);
         }
     }

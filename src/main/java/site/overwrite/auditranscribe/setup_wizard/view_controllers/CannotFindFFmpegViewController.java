@@ -23,8 +23,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 
 import java.net.URL;
@@ -34,7 +34,7 @@ import java.util.logging.Level;
 /**
  * View controller of the view that reports the FFmpeg could not be found.
  */
-public class CannotFindFFmpegViewController implements Initializable {
+public class CannotFindFFmpegViewController extends ClassWithLogging implements Initializable {
     // Attributes
     private boolean isSpecifyManually;
 
@@ -57,7 +57,7 @@ public class CannotFindFFmpegViewController implements Initializable {
             ((Stage) rootPane.getScene().getWindow()).close();
         });
 
-        MyLogger.log(Level.INFO, "Can't find FFmpeg", this.getClass().getName());
+        log(Level.INFO, "Can't find FFmpeg");
     }
 
     // Getter methods

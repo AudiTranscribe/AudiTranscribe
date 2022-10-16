@@ -24,8 +24,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 
 import java.net.URL;
@@ -36,7 +36,7 @@ import java.util.logging.Level;
  * View controller of the view that asks the user whether to install FFmpeg manually or
  * automatically.
  */
-public class AskToInstallManuallyViewController implements Initializable {
+public class AskToInstallManuallyViewController extends ClassWithLogging implements Initializable {
     // Attributes
     private boolean isManualInstallation;
 
@@ -59,7 +59,7 @@ public class AskToInstallManuallyViewController implements Initializable {
             ((Stage) rootPane.getScene().getWindow()).close();
         });
 
-        MyLogger.log(Level.INFO, "Asking whether to install FFmpeg automatically", this.getClass().getName());
+        log(Level.INFO, "Asking whether to install FFmpeg automatically");
     }
 
     // Getter methods

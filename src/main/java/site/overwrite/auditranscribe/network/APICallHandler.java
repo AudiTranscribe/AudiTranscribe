@@ -20,7 +20,7 @@ package site.overwrite.auditranscribe.network;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import site.overwrite.auditranscribe.exceptions.network.APIServerException;
+import site.overwrite.auditranscribe.network.exceptions.APIServerException;
 
 import java.io.*;
 import java.net.*;

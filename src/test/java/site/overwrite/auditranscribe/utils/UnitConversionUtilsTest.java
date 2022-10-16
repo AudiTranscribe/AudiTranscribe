@@ -19,8 +19,8 @@
 package site.overwrite.auditranscribe.utils;
 
 import org.junit.jupiter.api.Test;
-import site.overwrite.auditranscribe.exceptions.generic.FormatException;
-import site.overwrite.auditranscribe.exceptions.generic.ValueException;
+import site.overwrite.auditranscribe.generic.exceptions.FormatException;
+import site.overwrite.auditranscribe.generic.exceptions.ValueException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -162,36 +162,13 @@ class UnitConversionUtilsTest {
         assertEquals(-1, UnitConversionUtils.midiNumberToNoteNumber(-12));   // C-1
     }
 
-    @Test
-    void noteToMIDINumber() {
-        assertEquals(12, UnitConversionUtils.noteToMIDINumber("C0"));
-        assertEquals(127, UnitConversionUtils.noteToMIDINumber("G9"));
-        assertEquals(60, UnitConversionUtils.noteToMIDINumber("C4"));
-        assertEquals(113, UnitConversionUtils.noteToMIDINumber("F8"));
-        assertEquals(68, UnitConversionUtils.noteToMIDINumber("G#4"));
-        assertEquals(-1, UnitConversionUtils.noteToMIDINumber("B9"));
-    }
-
-    @Test
-    void midiNumberToNote() {
-        assertEquals("C0", UnitConversionUtils.midiNumberToNote(12, false));
-        assertEquals("G9", UnitConversionUtils.midiNumberToNote(127, false));
-        assertEquals("C4", UnitConversionUtils.midiNumberToNote(60, false));
-        assertEquals("F8", UnitConversionUtils.midiNumberToNote(113, false));
-
-        assertEquals("G#4", UnitConversionUtils.midiNumberToNote(68, false));
-        assertEquals("G♯4", UnitConversionUtils.midiNumberToNote(68, true));
-    }
-
     // Audio unit conversion
     @Test
     void powerToDecibel() {
-        // With `refVal` equals to 1
-        assertEquals(3.010, UnitConversionUtils.powerToDecibel(2), 0.001);
-        assertEquals(10, UnitConversionUtils.powerToDecibel(10), 0.001);
-        assertEquals(10.915, UnitConversionUtils.powerToDecibel(12.345), 0.001);
-
-        // With variable `refVal`
+        // With double
+        assertEquals(3.010, UnitConversionUtils.powerToDecibel(2, 1), 0.001);
+        assertEquals(10, UnitConversionUtils.powerToDecibel(10, 1), 0.001);
+        assertEquals(10.915, UnitConversionUtils.powerToDecibel(12.345, 1), 0.001);
         assertEquals(-7.782, UnitConversionUtils.powerToDecibel(2, 12), 0.001);
         assertEquals(3.010, UnitConversionUtils.powerToDecibel(10, 5), 0.001);
         assertEquals(2.597, UnitConversionUtils.powerToDecibel(12.345, 6.789), 0.001);
@@ -235,22 +212,9 @@ class UnitConversionUtilsTest {
 
     @Test
     void hzToOctaves() {
-        assertEquals(2.11768, UnitConversionUtils.hzToOctaves(123, 1, 23), 1e-5);
-        assertEquals(8.36675, UnitConversionUtils.hzToOctaves(9123, 0.56, 78), 1e-5);
-        assertEquals(4, UnitConversionUtils.hzToOctaves(440, 0, 1234), 1e-5);
         assertEquals(4, UnitConversionUtils.hzToOctaves(440), 1e-5);
         assertEquals(6.21864, UnitConversionUtils.hzToOctaves(2048), 1e-5);
         assertEquals(8.81028, UnitConversionUtils.hzToOctaves(12345), 1e-5);
-    }
-
-    @Test
-    void octavesToHz() {
-        assertEquals(123, UnitConversionUtils.octavesToHz(2.117676530945015, 1, 23), 1e-5);
-        assertEquals(9123, UnitConversionUtils.octavesToHz(8.366753401047808, 0.56, 78), 1e-5);
-        assertEquals(440, UnitConversionUtils.octavesToHz(4, 0, 12));
-        assertEquals(440, UnitConversionUtils.octavesToHz(4), 1e-5);
-        assertEquals(2048, UnitConversionUtils.octavesToHz(6.21864028647534), 1e-5);
-        assertEquals(12345, UnitConversionUtils.octavesToHz(8.810279502505484), 1e-5);
     }
 
     // Time unit conversion
@@ -323,23 +287,6 @@ class UnitConversionUtilsTest {
         // Run tests
         assertArrayEquals(correctOutput1, UnitConversionUtils.timeToFrames(times1, 22050, 512));
         assertArrayEquals(correctOutput2, UnitConversionUtils.timeToFrames(times2, 44100, 256, 1024));
-    }
-
-    // Graphics Units Conversion
-    @Test
-    void pxToPt() {
-        assertEquals(15, UnitConversionUtils.pxToPt(20), 0.001);
-        assertEquals(51.25, UnitConversionUtils.pxToPt(68.3333333333), 0.001);
-        assertEquals(0, UnitConversionUtils.pxToPt(0), 0.001);
-        assertEquals(164.25, UnitConversionUtils.pxToPt(219), 0.001);
-    }
-
-    @Test
-    void ptToPx() {
-        assertEquals(20, UnitConversionUtils.ptToPx(15), 0.001);
-        assertEquals(68.333, UnitConversionUtils.ptToPx(51.25), 0.001);
-        assertEquals(0, UnitConversionUtils.ptToPx(0), 0.001);
-        assertEquals(219, UnitConversionUtils.ptToPx(164.25), 0.001);
     }
 
     // Other unit conversions

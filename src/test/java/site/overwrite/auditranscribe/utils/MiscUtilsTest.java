@@ -95,4 +95,10 @@ class MiscUtilsTest {
         assertEquals("?", MiscUtils.getShortenedName(""));
         assertEquals("?", MiscUtils.getShortenedName("    "));
     }
+
+    @Test
+    void generateUUID() {
+        assertEquals("af487555-f3e8-354d-9add-85857f8e566f", MiscUtils.generateUUID(12345));
+        assertEquals("5d160dad-cdd6-3978-9cab-38b831e09b71", MiscUtils.generateUUID(67890));
+    }
 }

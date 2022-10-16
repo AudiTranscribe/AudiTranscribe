@@ -18,11 +18,11 @@
 
 package site.overwrite.auditranscribe.music.notes;
 
-import site.overwrite.auditranscribe.exceptions.generic.LengthException;
-import site.overwrite.auditranscribe.exceptions.generic.ValueException;
-import site.overwrite.auditranscribe.misc.MyLogger;
-import site.overwrite.auditranscribe.misc.tuples.Pair;
-import site.overwrite.auditranscribe.misc.tuples.Triple;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
+import site.overwrite.auditranscribe.generic.exceptions.LengthException;
+import site.overwrite.auditranscribe.generic.exceptions.ValueException;
+import site.overwrite.auditranscribe.generic.tuples.Pair;
+import site.overwrite.auditranscribe.generic.tuples.Triple;
 import site.overwrite.auditranscribe.utils.MathUtils;
 import site.overwrite.auditranscribe.utils.MusicUtils;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
@@ -36,7 +36,7 @@ import java.util.logging.Level;
 /**
  * Class that handles the playing of notes as a MIDI sequence.
  */
-public class NotePlayerSequencer {
+public class NotePlayerSequencer extends ClassWithLogging {
     // Constants
     public static int TICKS_PER_QUARTER = 10_000;  // Number of ticks per quarter note
     public static int MIDI_FILE_TYPE = 1;  // See https://tinyurl.com/2m9tcvzb for MIDI file types
@@ -52,6 +52,7 @@ public class NotePlayerSequencer {
     public int instrumentNum;
 
     public double bpm;
+    public double notePlayingDelayOffset;
 
     private final Map<Triple<Double, Double, Integer>, Pair<MidiEvent, MidiEvent>> allMIDIEventPairs = new HashMap<>();
     public boolean areNotesSet = false;
@@ -62,7 +63,7 @@ public class NotePlayerSequencer {
      * Ensure that code checks if the sequencer is available before attempting to play the sequence
      * of MIDI notes.
      */
-    public NotePlayerSequencer() {
+    public NotePlayerSequencer(double notePlayingDelayOffset) {
         // Get MIDI sequencer
         Sequencer tempSequencer;  // So that we may assign null later
 
@@ -85,6 +86,9 @@ public class NotePlayerSequencer {
 
         } catch (InvalidMidiDataException ignored) {
         }
+
+        // Update other attributes
+        this.notePlayingDelayOffset = notePlayingDelayOffset;
     }
 
     // Getter/Setter methods
@@ -116,10 +120,7 @@ public class NotePlayerSequencer {
      */
     public void setCurrTime(double currTime) {
         sequencer.setMicrosecondPosition((long) (currTime * 1e6));
-        MyLogger.log(
-                Level.FINE,
-                "Set note sequencer current time to " + sequencer.getMicrosecondPosition() + " µs",
-                this.getClass().toString());
+        log(Level.FINE, "Set note sequencer current time to " + sequencer.getMicrosecondPosition() + " µs");
     }
 
     // Public methods
@@ -140,10 +141,17 @@ public class NotePlayerSequencer {
      * @param noteOnsetTimes The onset times of the notes to set.
      * @param durations      The durations of the notes to set.
      * @param noteNums       The note numbers of the notes to set.
+     * @param isSlowed       Whether the playback of the notes should be slowed.
      */
-    public void setNotesOnTrack(double[] noteOnsetTimes, double[] durations, int[] noteNums) {
+    public void setNotesOnTrack(
+            double[] noteOnsetTimes, double[] durations, int[] noteNums, boolean isSlowed
+    ) {
         // Check that the three arrays are of the same length
-        if (noteOnsetTimes.length != durations.length || noteOnsetTimes.length != noteNums.length) {
+        int noteOnsetTimesLength = noteOnsetTimes.length;
+        int durationsLength = durations.length;
+        int noteNumsLength = noteNums.length;
+
+        if (!(noteOnsetTimesLength == durationsLength && durationsLength == noteNumsLength)) {
             throw new LengthException("The three arrays must be of the same length");
         }
 
@@ -151,14 +159,22 @@ public class NotePlayerSequencer {
         clearNotesOnTrack();
 
         // Add new MIDI events
-        int n = noteOnsetTimes.length;
-        for (int i = 0; i < n; i++) {
-            addNote(noteOnsetTimes[i], durations[i], noteNums[i]);
+        for (int i = 0; i < noteOnsetTimesLength; i++) {
+            // Determine the actual time to set
+            double onsetTime = noteOnsetTimes[i];
+            double duration = durations[i];
+
+            if (isSlowed) {
+                onsetTime *= 2;
+                duration *= 2;
+            }
+
+            addNote(onsetTime, duration, noteNums[i]);
         }
 
         // Update the `areNotesSet` flag
         areNotesSet = true;
-        MyLogger.log(Level.FINE, "Notes set on track", this.getClass().toString());
+        log(Level.FINE, "Set notes on track");
     }
 
     /**
@@ -172,36 +188,7 @@ public class NotePlayerSequencer {
         }
         sequence.deleteTrack(track);
         track = sequence.createTrack();
-        MyLogger.log(Level.FINE, "Notes cleared from track", this.getClass().toString());
-    }
-
-    /**
-     * Method that returns strings that represent the events that are currently on the track.
-     *
-     * @return A string that represents the events on the track.
-     */
-    public String[] getEventsOnTrack() {
-        // Get all MIDI events
-        MidiEvent[] allEvents = getMidiEventsFromTrack();
-
-        // Convert each event into a string
-        String[] strings = new String[allEvents.length];
-        for (int i = 0; i < strings.length; i++) {
-            strings[i] = midiEventToHumanReadableString(allEvents[i]);
-        }
-
-        return strings;
-    }
-
-    /**
-     * Method that neatly organizes the events on the track as a string.
-     */
-    public String eventsOnTrackToString() {
-        StringBuilder sb = new StringBuilder();
-        for (String s : getEventsOnTrack()) {
-            sb.append(s).append("\n");
-        }
-        return sb.toString();
+        log(Level.FINE, "Cleared notes from track");
     }
 
     /**
@@ -226,11 +213,12 @@ public class NotePlayerSequencer {
      * Start playback of the MIDI sequence.
      *
      * @param currTime The time to start playback at, <b>in seconds</b>.
+     * @param isSlowed Whether the playback of the notes should be slowed.
      */
-    public void play(double currTime) {
+    public void play(double currTime, boolean isSlowed) {
         // Check if there is a sequencer to use in the first place
         if (sequencer == null) {
-            MyLogger.log(Level.INFO, "No sequencer to use, so not playing", this.getClass().toString());
+            log(Level.INFO, "No sequencer to use, so not playing");
             return;
         }
 
@@ -248,11 +236,11 @@ public class NotePlayerSequencer {
         }
 
         // Set current time
-        setCurrTime(currTime);
+        setCurrTime((isSlowed ? currTime * 2 : currTime) + notePlayingDelayOffset);
 
         // Start playback
         sequencer.start();
-        MyLogger.log(Level.FINE, "Note sequencer playback started", this.getClass().toString());
+        log(Level.FINE, "Note sequencer playback started");
     }
 
     /**
@@ -261,16 +249,16 @@ public class NotePlayerSequencer {
     public void stop() {
         // Check if there is a sequencer to use in the first place
         if (sequencer == null) {
-            MyLogger.log(Level.INFO, "No sequencer to use, so not stopping", this.getClass().toString());
+            log(Level.INFO, "No sequencer to use; not stopping");
             return;
         }
 
         // Attempt to stop the sequencer
         try {
             sequencer.stop();
-            MyLogger.log(Level.FINE, "Note sequencer playback stopped", this.getClass().toString());
+            log(Level.FINE, "Note sequencer playback stopped");
         } catch (IllegalStateException e) {
-            MyLogger.log(Level.FINE, "Note sequencer playback is not running, not stopping", this.getClass().toString());
+            log(Level.FINE, "Note sequencer playback is not running; not stopping");
         }
     }
 
@@ -280,7 +268,7 @@ public class NotePlayerSequencer {
     public void close() {
         // Check if there is a sequencer to use in the first place
         if (sequencer == null) {
-            MyLogger.log(Level.INFO, "No sequencer to use, so not closing", this.getClass().toString());
+            log(Level.INFO, "No sequencer to use; not closing");
             return;
         }
 
@@ -289,7 +277,7 @@ public class NotePlayerSequencer {
 
         // Then close sequencer
         sequencer.close();
-        MyLogger.log(Level.FINE, "Note sequencer playback closed", this.getClass().toString());
+        log(Level.FINE, "Note sequencer playback closed");
     }
 
     // Private methods
@@ -477,11 +465,11 @@ public class NotePlayerSequencer {
     /**
      * Helper method that sets the instrument of the note player.
      *
-     * @param instrumentNum The instrument number to set. <b>Must be an instrument that is present
-     *                      on Bank 0</b>.
+     * @param instrumentNum The instrument number to set.<br>
+     *                      <b>Must be an instrument that is present on Bank 0</b>.
      */
-    // Fixme: changing instrument before playback is a little buggy; instrument does not change for first note but
-    //        subsequent notes' playback has changed
+    // Fixme: Setting instrument type is buggy; although MIDI exports for instrument is correct, playback using the
+    //        changed instrument does not change first note's instrument, but changes subsequent notes
     private void setInstrumentOfNotePlayer(int instrumentNum) {
         try {
             // Define messages to set the instrument
@@ -503,40 +491,5 @@ public class NotePlayerSequencer {
         } catch (InvalidMidiDataException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * Helper method that gets the MIDI events from the track.
-     *
-     * @return An array of MIDI events.
-     */
-    private MidiEvent[] getMidiEventsFromTrack() {
-        // Get size of the track
-        int n = track.size();
-
-        // Create array of `MidiEvents` and return
-        MidiEvent[] midiEvents = new MidiEvent[n];
-        for (int i = 0; i < n; i++) {
-            midiEvents[i] = track.get(i);
-        }
-        return midiEvents;
-    }
-
-    /**
-     * Helper method that converts a MIDI event into a human-readable string.
-     *
-     * @param midiEvent The MIDI event to convert.
-     * @return A string representation of the MIDI event.
-     */
-    private String midiEventToHumanReadableString(MidiEvent midiEvent) {
-        // Get the MIDI message and tick from the `midiEvent`
-        MidiMessage midiMessage = midiEvent.getMessage();
-        long tick = midiEvent.getTick();
-
-        // Convert the MIDI message to a human-readable string
-        String messageString = MIDIMessageDecoder.midiMessageToString(midiMessage);
-
-        // Return the string
-        return messageString + " at " + tick + " µs";
     }
 }

@@ -18,8 +18,10 @@
 
 package site.overwrite.auditranscribe.audio;
 
-import site.overwrite.auditranscribe.exceptions.audio.FFmpegCommandFailedException;
-import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
+import site.overwrite.auditranscribe.audio.exceptions.FFmpegCommandFailedException;
+import site.overwrite.auditranscribe.audio.exceptions.FFmpegNotFoundException;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
+import site.overwrite.auditranscribe.generic.tuples.Pair;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.StreamGobbler;
 import site.overwrite.auditranscribe.system.OSMethods;
@@ -29,11 +31,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
 
 /**
  * Methods that handle FFmpeg interactions.
  */
-public class FFmpegHandler {
+public class FFmpegHandler extends ClassWithLogging {
     // Constants
     public static final List<String> VALID_EXTENSIONS = List.of(new String[]{
             ".wav", ".mp3", ".flac", ".ogg", ".aif", ".aiff"
@@ -145,6 +148,83 @@ public class FFmpegHandler {
      * @return A string, representing the output file's path after processing it.
      */
     public String convertAudio(File file, String outputFilePath) {
+        // Obtain the processed input and output file paths
+        Pair<String, String> filePathPair = processPaths(file, outputFilePath);
+        String inputFilePath = filePathPair.value0();
+        outputFilePath = filePathPair.value1();
+
+        // Generate the command to execute
+        ProcessBuilder builder = new ProcessBuilder();
+        builder.command(
+                ffmpegPath,
+                "-y",                 // Override output file
+                "-i", inputFilePath,  // Specify input file
+                "-b:a", "96k",        // Constant bitrate for MP3 and related files of 96,000 bits
+                outputFilePath        // Specify output file
+        );
+
+        // Execute FFmpeg command
+        boolean success = handleFFmpegCommandExec(builder);
+        if (success) {
+            log(Level.FINE, "Successfully converted '" + file.getName() + "'");
+            return outputFilePath;
+        } else {
+            throw new FFmpegCommandFailedException("FFmpeg command " + builder.command() + " failed");
+        }
+    }
+
+    /**
+     * Method that adjusts the tempo the original audio file <code>file</code> and saves the
+     * adjusted audio into a new audio file with extension <code>extension</code>.<br>
+     * Note that this method produces a new audio file, <code>output.ext</code> (with the
+     * extension <code>.ext</code>).
+     *
+     * @param file           File object representing the original audio file.
+     * @param outputFilePath Absolute path to the output file, <b>including the extension</b>.
+     * @return A string, representing the output file's path after processing it.
+     */
+    public String generateAltTempoAudio(File file, String outputFilePath, double tempo) {
+        // Obtain the processed input and output file paths
+        Pair<String, String> filePathPair = processPaths(file, outputFilePath);
+        String inputFilePath = filePathPair.value0();
+        outputFilePath = filePathPair.value1();
+
+        // Generate the command to execute
+        ProcessBuilder builder = new ProcessBuilder();
+        builder.command(
+                ffmpegPath,
+                "-y",                            // Override output file
+                "-i", inputFilePath,             // Specify input file
+                "-filter:a", "atempo=" + tempo,  // Specify tempo
+                "-vn",                           // Disable video recording
+                outputFilePath                   // Specify output file
+        );
+
+        // Execute FFmpeg command
+        boolean success = handleFFmpegCommandExec(builder);
+        if (success) {
+            log(
+                    Level.FINE,
+                    "Successfully generated alternate tempo audio for '" +
+                            file.getName() + "' at " + tempo + "x tempo"
+            );
+            return outputFilePath;
+        } else {
+            throw new FFmpegCommandFailedException("FFmpeg command " + builder.command() + " failed");
+        }
+    }
+
+    // Private methods
+
+    /**
+     * Helper method to process the paths.
+     *
+     * @param file           Input file.
+     * @param outputFilePath Output file path, <b>including the extension</b>.
+     * @return A pair. First value is the processed <em>input</em> path. Second value is the
+     * processed <em>output</em> path.
+     */
+    private static Pair<String, String> processPaths(File file, String outputFilePath) {
         // Obtain the extension from the file path
         String[] split = outputFilePath.split("\\.");
         String extension = "." + split[split.length - 1];  // The extension is the last one
@@ -159,16 +239,18 @@ public class FFmpegHandler {
         String inputFilePath = IOMethods.treatPath(file.getAbsolutePath());
         outputFilePath = IOMethods.treatPath(outputFilePath);
 
-        // Generate the command to execute
-        ProcessBuilder builder = new ProcessBuilder();
-        builder.command(
-                ffmpegPath,
-                "-y",                 // Override output file
-                "-i", inputFilePath,  // Specify input file
-                "-b:a", "96k",        // Constant bitrate for MP3 and related files of 96,000 bits
-                outputFilePath        // Specify output file
-        );
+        // Return as a pair
+        return new Pair<>(inputFilePath, outputFilePath);
+    }
 
+    /**
+     * Helper method that handles the FFmpeg output.
+     *
+     * @param builder Process builder object that is used to run the FFmpeg command.
+     * @return A boolean, describing whether the FFmpeg command was successful (<code>true</code>)
+     * or not (<code>false</code>).
+     */
+    private static boolean handleFFmpegCommandExec(ProcessBuilder builder) {
         // Specify the working directory
         builder.directory(new File(System.getProperty("user.home")));
 
@@ -181,12 +263,12 @@ public class FFmpegHandler {
             int exitCode = process.waitFor();
             if (exitCode == 0) {
                 // Exit code 0 => exited successfully => can return
-                return outputFilePath;
+                return true;
             } else {
                 throw new IOException("Command execution failed");
             }
         } catch (IOException | InterruptedException e) {
-            throw new FFmpegCommandFailedException("FFmpeg command " + builder.command() + " failed");
+            return false;
         }
     }
 }

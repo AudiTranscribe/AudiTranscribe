@@ -22,7 +22,7 @@ import com.google.gson.JsonIOException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
-import site.overwrite.auditranscribe.exceptions.io.FailedToMakeJSONFileException;
+import site.overwrite.auditranscribe.io.exceptions.FailedToMakeJSONFileException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 
