@@ -47,37 +47,6 @@ class MathUtilsTest {
         assertThrowsExactly(ValueException.class, () -> MathUtils.logN(123, -1.23));
     }
 
-    @Test
-    void modWithMersennePrime() {
-        assertEquals(1, MathUtils.modWithMersennePrime(10, 2));
-        assertEquals(4, MathUtils.modWithMersennePrime(11, 3));
-        assertEquals(67, MathUtils.modWithMersennePrime(1337, 7));
-        assertEquals(32, MathUtils.modWithMersennePrime(65536, 11));
-        assertEquals(7382, MathUtils.modWithMersennePrime(-9000, 13));
-    }
-
-    @Test
-    void norm() {
-        assertEquals(5., MathUtils.norm(new double[]{3, 4}), 0.01);
-        assertEquals(19.105, MathUtils.norm(new double[]{10, 11, 12}), 0.001);
-        assertEquals(16.882, MathUtils.norm(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9}), 0.001);
-    }
-
-    @Test
-    void mean() {
-        assertEquals(2.5, MathUtils.mean(new double[]{1, 2, 3, 4}), 0.001);
-        assertEquals(3, MathUtils.mean(new double[]{1, 2, 3, 4, 5}), 0.001);
-        assertEquals(9, MathUtils.mean(new double[]{10, 8, 13, 9, 11, 14, 6, 4, 12, 7, 5}), 0.001);
-        assertEquals(7.50, MathUtils.mean(new double[]{8.04, 6.95, 7.58, 8.81, 8.33, 9.96, 7.24, 4.26, 10.84, 4.82, 5.68}), 0.001);
-    }
-
-    @Test
-    void argmax() {
-        assertEquals(1, MathUtils.argmax(new double[]{1, 3, 2}));
-        assertEquals(5, MathUtils.argmax(new double[]{10, 11, 12, 13, 14, 15}));
-        assertEquals(1, MathUtils.argmax(new double[]{0, 5, 2, 3, 4, 5}));
-    }
-
     // Data-related methods
     @Test
     void intLerp() {
@@ -119,16 +88,11 @@ class MathUtilsTest {
 
     @Test
     void round() {
-        // Double rounding
+        // Main rounding
         assertEquals(1.23, MathUtils.round(1.23, 2));
         assertEquals(1.23, MathUtils.round(1.23456, 2));
         assertEquals(1, MathUtils.round(1, 3));
         assertEquals(Double.NaN, MathUtils.round(Double.NaN, 4));
-
-        // Float rounding
-        assertEquals(1.23f, MathUtils.round(1.23f, 2));
-        assertEquals(1.23f, MathUtils.round(1.23456f, 2));
-        assertEquals(1f, MathUtils.round(1f, 3));
 
         // Exception handling
         assertThrowsExactly(ValueException.class, () -> MathUtils.round(123.45, -1));
@@ -165,11 +129,6 @@ class MathUtilsTest {
     }
 
     // Checking-related methods
-    @Test
-    void isInteger() {
-        assertTrue(MathUtils.isInteger(3.));
-        assertFalse(MathUtils.isInteger(123.456));
-    }
 
     @Test
     void isPowerOf2() {

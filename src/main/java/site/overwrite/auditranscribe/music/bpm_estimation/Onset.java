@@ -20,6 +20,7 @@ package site.overwrite.auditranscribe.music.bpm_estimation;
 
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.MelSpectrogram;
 import site.overwrite.auditranscribe.utils.MathUtils;
+import site.overwrite.auditranscribe.utils.StatisticalUtils;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 /**
@@ -73,7 +74,7 @@ public final class Onset {
             }
 
             // Now compute the mean
-            onsetEnvNew[0][j] = MathUtils.mean(channelData);
+            onsetEnvNew[0][j] = StatisticalUtils.mean(channelData);
         }
 
         // Counter-act framing effects by shifting the onsets by `numFFT / hopLength`

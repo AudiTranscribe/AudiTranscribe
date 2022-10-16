@@ -249,7 +249,7 @@ public final class SpectralHelpers {
      * Perform parabolic interpolation on the STFT magnitudes.
      *
      * @param S STFT magnitudes matrix.
-     * @return A pair. First value is the 'average' matrix. The second value is the 'shuft' matrix.
+     * @return A pair. First value is the 'average' matrix. The second value is the 'shift' matrix.
      */
     private static Pair<Double[][], Double[][]> parabolicInterp(double[][] S) {
         // Perform parabolic interpolation

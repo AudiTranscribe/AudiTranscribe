@@ -739,7 +739,7 @@ public class Audio extends ClassWithLogging {
                 monoAudioSamples = new double[numMonoSamples];
 
                 for (int i = 0; i < numMonoSamples; i++) {
-                    // Take average of left and right channels' samples
+                    // Take mean of left and right channels' samples
                     monoAudioSamples[i] = (audioSamples[i * 2] + audioSamples[i * 2 + 1]) / 2;
                 }
             } else {  // Mono

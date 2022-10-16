@@ -46,7 +46,13 @@ public final class StatisticalUtils {
         return sum;
     }
 
-    public static double average(double[] x) {
+    /**
+     * Compute the mean of an array <code>x</code>.
+     *
+     * @param x Array to compute the mean of.
+     * @return The mean of the array <code>x</code>.
+     */
+    public static double mean(double[] x) {
         return sum(x) / x.length;
     }
 
@@ -82,7 +88,7 @@ public final class StatisticalUtils {
      * Numpy's Implementation</a> of the <code>cov</code> method.
      */
     public static double[][] cov(double[] x, double[] y) {
-        // The delta degrees of freedom is 0
+        // The delta degrees of freedom is 1
         int ddof = 1;
 
         // Ensure that `x` and `y` have elements
@@ -103,15 +109,15 @@ public final class StatisticalUtils {
             M[1][i] = y[i];
         }
 
-        // Compute the average and the weight sum
+        // Compute the mean and the weight sum
         double[] avg = new double[2];
-        avg[0] = average(x);
-        avg[1] = average(y);
+        avg[0] = mean(x);
+        avg[1] = mean(y);
 
         // Determine the normalization
-        double fact = M[0].length - ddof;
+        double normalizationFactor = M[0].length - ddof;
 
-        // Adjust the matrix by the average amount
+        // Adjust the matrix by the mean amount
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < x.length; j++) {
                 M[i][j] -= avg[i];
@@ -122,7 +128,7 @@ public final class StatisticalUtils {
         double[][] C = ArrayUtils.matmul(M, ArrayUtils.transpose(M));
         for (int i = 0; i < C.length; i++) {
             for (int j = 0; j < C[i].length; j++) {
-                C[i][j] /= fact;
+                C[i][j] /= normalizationFactor;
             }
         }
 
