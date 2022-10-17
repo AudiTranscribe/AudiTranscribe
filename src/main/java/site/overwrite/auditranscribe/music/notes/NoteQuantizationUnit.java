@@ -23,10 +23,10 @@ package site.overwrite.auditranscribe.music.notes;
  */
 public enum NoteQuantizationUnit {
     // Enum values
-    THIRTY_SECOND_NOTE("Thirty-Second Note", 32),
-    SIXTEENTH_NOTE("Sixteenth Note", 16),
+    QUARTER_NOTE("Quarter Note", 4),
     EIGHTH_NOTE("Eighth Note", 8),
-    QUARTER_NOTE("Quarter Note", 4);
+    SIXTEENTH_NOTE("Sixteenth Note", 16),
+    THIRTY_SECOND_NOTE("Thirty-Second Note", 32);
 
     // Attribute
     public final String name;
