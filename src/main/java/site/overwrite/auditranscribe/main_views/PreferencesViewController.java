@@ -41,6 +41,7 @@ import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
 import site.overwrite.auditranscribe.misc.spinners.CustomIntegerSpinnerValueFactory;
+import site.overwrite.auditranscribe.music.notes.NoteQuantizationUnit;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
 
 import java.io.File;
@@ -64,6 +65,9 @@ public class PreferencesViewController extends ClassWithLogging implements Initi
     private ChoiceBox<WindowFunction> windowFunctionChoiceBox;
 
     @FXML
+    private ChoiceBox<NoteQuantizationUnit> noteQuantizationChoiceBox;
+
+    @FXML
     private ChoiceBox<Theme> themeChoiceBox;
 
     @FXML
@@ -85,11 +89,15 @@ public class PreferencesViewController extends ClassWithLogging implements Initi
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Set choice box selections
-        for (Theme theme : Theme.values()) themeChoiceBox.getItems().add(theme);
-
-        for (ColourScale colourScale : ColourScale.values()) colourScaleChoiceBox.getItems().add(colourScale);
+        for (ColourScale colourScale : ColourScale.values())
+            colourScaleChoiceBox.getItems().add(colourScale);
         for (WindowFunction windowFunction : WindowFunction.values())
             windowFunctionChoiceBox.getItems().add(windowFunction);
+        for (NoteQuantizationUnit noteQuantizationUnit : NoteQuantizationUnit.values())
+            noteQuantizationChoiceBox.getItems().add(noteQuantizationUnit);
+
+        for (Theme theme : Theme.values())
+            themeChoiceBox.getItems().add(theme);
 
         // Add methods to buttons
         selectFFmpegBinaryButton.setOnAction(event -> {
@@ -131,7 +139,7 @@ public class PreferencesViewController extends ClassWithLogging implements Initi
                 if (numDeleted != 0) {
                     Popups.showInformationAlert(
                             "Deleted Logs",
-                            "Deleted " + numDeleted + " " + (numDeleted == 1 ? "log" : "logs")+
+                            "Deleted " + numDeleted + " " + (numDeleted == 1 ? "log" : "logs") +
                                     " from the logs folder."
                     );
                 } else {
@@ -215,19 +223,26 @@ public class PreferencesViewController extends ClassWithLogging implements Initi
      */
     public void setUpFields() {
         // Arrays that store the fields that just need to disable the apply button
-        ChoiceBox<?>[] choiceBoxes = new ChoiceBox[]{colourScaleChoiceBox, windowFunctionChoiceBox};
+        ChoiceBox<?>[] choiceBoxes = new ChoiceBox[]{
+                colourScaleChoiceBox, windowFunctionChoiceBox, noteQuantizationChoiceBox
+        };
         Spinner<?>[] spinners = new Spinner[]{
                 notePlayingDelayOffsetSpinner, autosaveIntervalSpinner, logFilePersistenceSpinner,
                 checkForUpdateIntervalSpinner
         };
 
         // Set choice box values
-        themeChoiceBox.setValue(Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal]);
-
-        colourScaleChoiceBox.setValue(ColourScale.values()[DataFiles.SETTINGS_DATA_FILE.data.colourScaleEnumOrdinal]);
+        colourScaleChoiceBox.setValue(
+                ColourScale.values()[DataFiles.SETTINGS_DATA_FILE.data.colourScaleEnumOrdinal]
+        );
         windowFunctionChoiceBox.setValue(
                 WindowFunction.values()[DataFiles.SETTINGS_DATA_FILE.data.windowFunctionEnumOrdinal]
         );
+        noteQuantizationChoiceBox.setValue(
+                NoteQuantizationUnit.values()[DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal]
+        );
+
+        themeChoiceBox.setValue(Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal]);
 
         // Add methods to choice boxes
         for (ChoiceBox<?> choiceBox : choiceBoxes) {
@@ -241,7 +256,8 @@ public class PreferencesViewController extends ClassWithLogging implements Initi
 
         // Set spinner factories and methods
         notePlayingDelayOffsetSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
-                -1, 1, DataFiles.SETTINGS_DATA_FILE.data.notePlayingDelayOffset, 0.01, 2
+                -1, 1, DataFiles.SETTINGS_DATA_FILE.data.notePlayingDelayOffset, 0.01,
+                2
         ));
         autosaveIntervalSpinner.setValueFactory(new CustomIntegerSpinnerValueFactory(
                 1, Integer.MAX_VALUE, DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval, 1
@@ -319,6 +335,8 @@ public class PreferencesViewController extends ClassWithLogging implements Initi
 
         DataFiles.SETTINGS_DATA_FILE.data.colourScaleEnumOrdinal = colourScaleChoiceBox.getValue().ordinal();
         DataFiles.SETTINGS_DATA_FILE.data.windowFunctionEnumOrdinal = windowFunctionChoiceBox.getValue().ordinal();
+        DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal =
+                noteQuantizationChoiceBox.getValue().ordinal();
 
         DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal = themeChoiceBox.getValue().ordinal();
         DataFiles.SETTINGS_DATA_FILE.data.checkForUpdateInterval = checkForUpdateIntervalSpinner.getValue();

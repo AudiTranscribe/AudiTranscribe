@@ -105,7 +105,7 @@ public final class CompressionHandlers {
         byte[] buf = new byte[BUFFER_SIZE];
 
         // Define needed byte streams
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(lz4Bytes);  // Takes bytes from the input bytes array
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(lz4Bytes);  // Take bytes from input byte array
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         // Define the LZ4 decompressor stream
@@ -196,22 +196,29 @@ public final class CompressionHandlers {
         ZipEntry zipEntry = zis.getNextEntry();
         while (zipEntry != null) {
             // Create a new file based on the zip entry
-            File newFile = zipMakeFile(outputDir, zipEntry);
+            File newFileObj = getFileObjectFromZipEntry(outputDir, zipEntry);
 
-            // Determine what was just created
-            if (zipEntry.isDirectory()) {
-                if (!newFile.isDirectory() && !IOMethods.createFolder(newFile)) {
-                    throw new IOException("Failed to create directory " + newFile);
-                }
-            } else {
-                // Fix for Windows-created archives
-                File parent = newFile.getParentFile();
-                if (!parent.isDirectory() && !IOMethods.createFolder(parent)) {
-                    throw new IOException("Failed to create directory " + parent);
-                }
+            // Check if the new file object can be created
+            /*
+            The file cannot be created if:
+            - The file object's parent directory does not exist, and cannot be created; or
+            - The file object itself represents a directory, and cannot be created.
+             */
+            File folder = newFileObj;
+            if (!zipEntry.isDirectory()) {  // Is not a directory entry
+                folder = newFileObj.getParentFile();  // Get parent file object to see if it is a folder
+            }
 
+            if (!folder.exists()) {  // Doesn't exist
+                if (!IOMethods.createFolder(folder)) {  // Failed to create folder
+                    throw new IOException("Failed to create directory " + newFileObj);
+                }
+            }
+
+            // Fill in file contents
+            if (!zipEntry.isDirectory()) {
                 // Define output stream for the created file
-                FileOutputStream fos = new FileOutputStream(newFile);
+                FileOutputStream fos = new FileOutputStream(newFileObj);
 
                 // Write file content to the created file
                 int len;
@@ -233,6 +240,31 @@ public final class CompressionHandlers {
     }
 
     // Private methods
+
+    /**
+     * Helper method that gets a <code>File</code> object based on the zip entry received.
+     *
+     * @param destinationDir <b>Absolute</b> path to the destination directory that the file/folder
+     *                       is in.
+     * @param zipEntry       The <code>ZipEntry</code> object.
+     * @return A new <code>File</code> object, representing the file/folder.
+     * @throws IOException If the zip entry points to a file that is <b>outside</b> the target
+     *                     directory (which usually indicates a path traversal attempt such as
+     *                     <a href="https://security.snyk.io/research/zip-slip-vulnerability">
+     *                     ZipSlip</a>).
+     */
+    private static File getFileObjectFromZipEntry(File destinationDir, ZipEntry zipEntry) throws IOException {
+        File destFile = new File(destinationDir, zipEntry.getName());
+
+        String destDirPath = destinationDir.getCanonicalPath();
+        String destFilePath = destFile.getCanonicalPath();
+
+        if (!destFilePath.startsWith(destDirPath + File.separator)) {
+            throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
+        }
+
+        return destFile;
+    }
 
     /**
      * Helper method that helps zip compress a file/folder recursively.
@@ -259,12 +291,11 @@ public final class CompressionHandlers {
             zos.closeEntry();
 
             // Add the children
-            File[] children = file.listFiles();
+            File[] children = file.listFiles();  // Since `file` represents a directory, it will never be `null`
 
-            if (children != null) {
-                for (File childFile : children) {
-                    zipCompressHelper(childFile, IOMethods.joinPaths(filePath, childFile.getName()), zos);
-                }
+            //noinspection ConstantConditions
+            for (File childFile : children) {
+                zipCompressHelper(childFile, IOMethods.joinPaths(filePath, childFile.getName()), zos);
             }
         } else {  // Otherwise, it is a file
             // Create a byte buffer
@@ -285,27 +316,5 @@ public final class CompressionHandlers {
             }
             fis.close();
         }
-    }
-
-    /**
-     * Helper method that creates a file/folder based on the zip entry received.
-     *
-     * @param destinationDir <b>Absolute</b> path to the destination directory to create the
-     *                       file/folder in.
-     * @param zipEntry       The <code>ZipEntry</code> object.
-     * @return A new <code>File</code> object, representing the file that was created.
-     * @throws IOException If the file creation process encounters an error.
-     */
-    private static File zipMakeFile(File destinationDir, ZipEntry zipEntry) throws IOException {
-        File destFile = new File(destinationDir, zipEntry.getName());
-
-        String destDirPath = destinationDir.getCanonicalPath();
-        String destFilePath = destFile.getCanonicalPath();
-
-        if (!destFilePath.startsWith(destDirPath + File.separator)) {
-            throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
-        }
-
-        return destFile;
     }
 }

@@ -32,6 +32,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import site.overwrite.auditranscribe.generic.tuples.Pair;
+import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.music.exceptions.NoteRectangleCollisionException;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
@@ -46,8 +47,6 @@ public class NoteRectangle extends StackPane {
     // Constants
     private static final double BORDER_WIDTH = 3;  // In pixels
     private static final double RESIZING_REGIONS_WIDTH = 8;  // In pixels
-
-    private static final int SMALLEST_QUANTIZE_UNIT = 32;  // Smallest note unit that will NOT be quantized
 
     // Static attributes
     public static List<NoteRectangle> allNoteRectangles = new ArrayList<>();
@@ -598,37 +597,40 @@ public class NoteRectangle extends StackPane {
      * @param timeSignature Time signature string.
      */
     public static void quantizeNotes(double bpm, double offset, String timeSignature) {
-        double pixelsPerSecond = spectrogramWidth / totalDuration;
+        // Only allow quantization if the playback is paused
+        if (isPaused) {
+            double pixelsPerSecond = spectrogramWidth / totalDuration;
 
-        // Determine the note 'unit' we are working with
-        int noteUnit = MusicUtils.parseTimeSignature(timeSignature).value1();  // What "one beat" represents
+            // Determine the note 'unit' we are working with
+            int noteUnit = MusicUtils.parseTimeSignature(timeSignature).value1();  // What "one beat" represents
 
-        // Get the number of seconds per beat
-        double spb = 1. / bpm * 60.;  // spb = seconds per beat
+            // Get the number of seconds per beat
+            double spb = 1. / bpm * 60.;  // spb = seconds per beat
 
-        // Determine resolution of the quantization
-        int divisionFactor = SMALLEST_QUANTIZE_UNIT / noteUnit;
-        double resolution = spb / divisionFactor;
+            // Determine resolution of the quantization
+            NoteQuantizationUnit quantizationUnit =
+                    NoteQuantizationUnit.values()[DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal];
+            int divisionFactor = quantizationUnit.numericValue / noteUnit;
+            double resolution = spb / divisionFactor;
 
-        // Process each note rectangle
-        for (NoteRectangle rectangle : allNoteRectangles) {
-            // Get the onset time and duration
-            double onsetTime = rectangle.getNoteOnsetTime();
-            double duration = rectangle.getNoteDuration();
+            // Process each note rectangle
+            for (NoteRectangle rectangle : allNoteRectangles) {
+                // Get the onset time and duration
+                double onsetTime = rectangle.getNoteOnsetTime();
+                double duration = rectangle.getNoteDuration();
 
-            // Quantize both onset time and duration
-            double onsetTimeRes = (onsetTime - offset) / resolution;  // Minus offset to nicely place everything first
-            double durationRes = duration / resolution;
+                // Compute the number of resolution 'units' for the offset and the duration
+                int numOffsetResolutions = (int) Math.round((onsetTime - offset) / resolution);
+                int numDurationResolutions = (int) Math.round(duration / resolution);
 
-            onsetTimeRes = Math.round(onsetTimeRes);
-            durationRes = Math.round(durationRes);
+                // Quantize both onset time and duration
+                onsetTime = numOffsetResolutions * resolution + offset;
+                duration = numDurationResolutions * resolution;
 
-            onsetTime = onsetTimeRes * resolution + offset;
-            duration = durationRes * resolution;
-
-            // Update rectangle's position and width
-            rectangle.setTranslateX(onsetTime * pixelsPerSecond);
-            rectangle.setWidth(duration * pixelsPerSecond);
+                // Update rectangle's position and width
+                rectangle.setTranslateX(onsetTime * pixelsPerSecond);
+                rectangle.bordersRegion.setPrefWidth(duration * pixelsPerSecond);
+            }
         }
     }
 
