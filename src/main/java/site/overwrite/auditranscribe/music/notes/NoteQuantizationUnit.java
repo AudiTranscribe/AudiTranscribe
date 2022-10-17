@@ -1,6 +1,6 @@
 /*
- * Theme.java
- * Description: Enum that contains the different possible themes that AudiTranscribe supports.
+ * NoteQuantizationUnit.java
+ * Description: Enum that contains the possible note quantization units.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,27 +16,26 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.misc;
+package site.overwrite.auditranscribe.music.notes;
 
 /**
- * Enum that contains the different possible themes that AudiTranscribe supports.
+ * Enum that contains the possible note quantization units.
  */
-public enum Theme {
+public enum NoteQuantizationUnit {
     // Enum values
-    LIGHT_MODE("Light Mode", "light-mode"),
-    DARK_MODE("Dark Mode", "dark-mode"),
-    HIGH_CONTRAST("High Contrast", "high-contrast");
+    THIRTY_SECOND_NOTE("Thirty-Second Note", 32),
+    SIXTEENTH_NOTE("Sixteenth Note", 16),
+    EIGHTH_NOTE("Eighth Note", 8),
+    QUARTER_NOTE("Quarter Note", 4);
 
-    // Enum attributes
-    private final String name;
-    public final String shortName;
-    public final String cssFile;
+    // Attribute
+    public final String name;
+    public final int numericValue;
 
     // Enum constructor
-    Theme(String name, String shortName) {
+    NoteQuantizationUnit(String name, int numericValue) {
         this.name = name;
-        this.shortName = shortName;
-        this.cssFile = shortName + ".css";
+        this.numericValue = numericValue;
     }
 
     // Overridden methods

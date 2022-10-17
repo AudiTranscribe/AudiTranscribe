@@ -32,6 +32,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import site.overwrite.auditranscribe.generic.tuples.Pair;
+import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.music.exceptions.NoteRectangleCollisionException;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
@@ -46,8 +47,6 @@ public class NoteRectangle extends StackPane {
     // Constants
     private static final double BORDER_WIDTH = 3;  // In pixels
     private static final double RESIZING_REGIONS_WIDTH = 8;  // In pixels
-
-    private static final int SMALLEST_QUANTIZE_UNIT = 32;  // Smallest note unit that will NOT be quantized
 
     // Static attributes
     public static List<NoteRectangle> allNoteRectangles = new ArrayList<>();
@@ -607,7 +606,9 @@ public class NoteRectangle extends StackPane {
         double spb = 1. / bpm * 60.;  // spb = seconds per beat
 
         // Determine resolution of the quantization
-        int divisionFactor = SMALLEST_QUANTIZE_UNIT / noteUnit;
+        NoteQuantizationUnit quantizationUnit =
+                NoteQuantizationUnit.values()[DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal];
+        int divisionFactor = quantizationUnit.numericValue / noteUnit;
         double resolution = spb / divisionFactor;
 
         // Process each note rectangle
