@@ -617,19 +617,17 @@ public class NoteRectangle extends StackPane {
             double onsetTime = rectangle.getNoteOnsetTime();
             double duration = rectangle.getNoteDuration();
 
+            // Compute the number of resolution 'units' for the offset and the duration
+            int numOffsetResolutions = (int) Math.round((onsetTime - offset) / resolution);
+            int numDurationResolutions = (int) Math.round(duration / resolution);
+
             // Quantize both onset time and duration
-            double onsetTimeRes = (onsetTime - offset) / resolution;  // Minus offset to nicely place everything first
-            double durationRes = duration / resolution;
-
-            onsetTimeRes = Math.round(onsetTimeRes);
-            durationRes = Math.round(durationRes);
-
-            onsetTime = onsetTimeRes * resolution + offset;
-            duration = durationRes * resolution;
+            onsetTime = numOffsetResolutions * resolution + offset;
+            duration = numDurationResolutions * resolution;
 
             // Update rectangle's position and width
             rectangle.setTranslateX(onsetTime * pixelsPerSecond);
-            rectangle.setWidth(duration * pixelsPerSecond);
+            rectangle.bordersRegion.setPrefWidth(duration * pixelsPerSecond);
         }
     }
 
