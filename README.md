@@ -27,21 +27,13 @@ Also, professional music transcription services cost *a lot*, especially if you 
 a few times over a year. In that case, the cost of these services (which range from $40 to $120) are not worth it.
 AudiTranscribe is meant to be an Open-Source and free alternative.
 
-# Limitations
-
-The software is not perfect. There are a few limitations with the software in its current state:
-
-- The spectrogram may make it hard to distinguish between different notes.
-- The application's functionality and features are missing tutorials.
-
 # Dependencies
 
-The only dependency needed is [FFmpeg](https://ffmpeg.org/): a complete, cross-platform solution to
-record, convert and stream audio and video. AudiTranscribe uses it to help process different audio
-files.
+The only dependency needed is [FFmpeg](https://ffmpeg.org/): a complete, cross-platform solution to record, convert and
+stream audio and video. AudiTranscribe uses it to help process different audio files.
 
-- Note: AudiTranscribe will attempt to automatically install FFmpeg. You do **not** need to manually
-  install this unless specified.
+**Note**: AudiTranscribe will attempt to automatically install FFmpeg. You do **not** need to manually install FFmpeg
+unless specified.
 
 ## For Developers
 
@@ -51,7 +43,7 @@ files.
 
 # Installation
 
-Currently, the only supported platforms for AudiTranscribe are Windows and macOS. We are working on a Linux port.
+Currently, the only supported platforms for AudiTranscribe are Windows and macOS. We are working on a Linux release.
 
 ## Using An Installer
 
@@ -64,6 +56,7 @@ Currently, the only supported platforms for AudiTranscribe are Windows and macOS
 4. Run the application.
     - It is highly likely that an alert like "Windows protected your PC" would pop up. This is normal, and is due to
       AudiTranscribe not being a recognized app yet.
+    - If you see such an alert, click on "More Info", and then click on "Run Anyway" at the bottom of the screen.
 5. Follow the installation instructions.
 6. The application should be installed once completed.
 
@@ -72,16 +65,17 @@ Currently, the only supported platforms for AudiTranscribe are Windows and macOS
 1. Head to the latest releases section.
     - If there are no current releases, you may want to choose a pre-release version instead.
 2. Under the downloads section, download the macOS file.
-3. Unzip the installer package. The package should contain one `.dmg` file.
-4. The `.dmg` file would likely be quarantined by Apple due to it lacking a proper signing key. To fix this, run the
-   following command, which removes all attributes from the `.dmg` file and makes it no longer quarantined.
+3. Unzip the installer package. The package should contain one `.dmg` file. **Do not open the `.dmg` file yet**.
+4. If you were to open the `.dmg` file now, it would likely be quarantined by Apple due to it lacking a proper signing
+   key. To fix this, open Terminal and run the following command. The command will remove all attributes from the `.dmg`
+   file and makes it no longer quarantined. (**Note**: You may be prompted to enter your password.)
 
 ```bash
 sudo xattr -cr path/to/the/dmg/file
 ```
 
-5. Open the `.dmg` file.
-6. Drag the `AudiTranscribe.app` into the Applications folder.
+5. Once the command is run, open the `.dmg` file.
+6. Drag `AudiTranscribe.app` into the Applications folder.
 7. Run the application!
 
 ## From Source
