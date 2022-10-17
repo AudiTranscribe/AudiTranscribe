@@ -18,7 +18,6 @@
 
 package site.overwrite.auditranscribe.io.data_files;
 
-import site.overwrite.auditranscribe.io.data_files.file_classes.IconsDataFile;
 import site.overwrite.auditranscribe.io.data_files.file_classes.PersistentDataFile;
 import site.overwrite.auditranscribe.io.data_files.file_classes.SettingsDataFile;
 
@@ -29,7 +28,6 @@ public final class DataFiles {
     // Constants
     public static final PersistentDataFile PERSISTENT_DATA_FILE = new PersistentDataFile();
     public static final SettingsDataFile SETTINGS_DATA_FILE = new SettingsDataFile();
-    public static final IconsDataFile ICONS_DATA_FILE = new IconsDataFile();
 
     private DataFiles() {
         // Private constructor to signal this is a utility class

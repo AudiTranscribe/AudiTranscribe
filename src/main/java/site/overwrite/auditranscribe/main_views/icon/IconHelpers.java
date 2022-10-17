@@ -16,12 +16,11 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.main_views.helpers;
+package site.overwrite.auditranscribe.main_views.icon;
 
 import javafx.scene.control.Button;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.SVGPath;
-import site.overwrite.auditranscribe.io.data_files.DataFiles;
 
 /**
  * Helper methods for setting icons on SVG path objects.
@@ -120,7 +119,7 @@ public final class IconHelpers {
      * @return SVG path of the icon.
      */
     private static String getIconSVGPath(String iconName) {
-        return DataFiles.ICONS_DATA_FILE.data.svgPaths.get(iconName);
+        return IconsData.ICONS_DATA.svgPaths.get(iconName);
     }
 
     /**
@@ -130,7 +129,7 @@ public final class IconHelpers {
      * @return A <code>Paint</code> object representing the colour of the icon.
      */
     private static Paint getIconColour(String themeName) {
-        return Paint.valueOf(DataFiles.ICONS_DATA_FILE.data.themeColours.get(themeName));
+        return Paint.valueOf(IconsData.ICONS_DATA.themeColours.get(themeName));
     }
 
     /**
