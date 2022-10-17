@@ -597,37 +597,40 @@ public class NoteRectangle extends StackPane {
      * @param timeSignature Time signature string.
      */
     public static void quantizeNotes(double bpm, double offset, String timeSignature) {
-        double pixelsPerSecond = spectrogramWidth / totalDuration;
+        // Only allow quantization if the playback is paused
+        if (isPaused) {
+            double pixelsPerSecond = spectrogramWidth / totalDuration;
 
-        // Determine the note 'unit' we are working with
-        int noteUnit = MusicUtils.parseTimeSignature(timeSignature).value1();  // What "one beat" represents
+            // Determine the note 'unit' we are working with
+            int noteUnit = MusicUtils.parseTimeSignature(timeSignature).value1();  // What "one beat" represents
 
-        // Get the number of seconds per beat
-        double spb = 1. / bpm * 60.;  // spb = seconds per beat
+            // Get the number of seconds per beat
+            double spb = 1. / bpm * 60.;  // spb = seconds per beat
 
-        // Determine resolution of the quantization
-        NoteQuantizationUnit quantizationUnit =
-                NoteQuantizationUnit.values()[DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal];
-        int divisionFactor = quantizationUnit.numericValue / noteUnit;
-        double resolution = spb / divisionFactor;
+            // Determine resolution of the quantization
+            NoteQuantizationUnit quantizationUnit =
+                    NoteQuantizationUnit.values()[DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal];
+            int divisionFactor = quantizationUnit.numericValue / noteUnit;
+            double resolution = spb / divisionFactor;
 
-        // Process each note rectangle
-        for (NoteRectangle rectangle : allNoteRectangles) {
-            // Get the onset time and duration
-            double onsetTime = rectangle.getNoteOnsetTime();
-            double duration = rectangle.getNoteDuration();
+            // Process each note rectangle
+            for (NoteRectangle rectangle : allNoteRectangles) {
+                // Get the onset time and duration
+                double onsetTime = rectangle.getNoteOnsetTime();
+                double duration = rectangle.getNoteDuration();
 
-            // Compute the number of resolution 'units' for the offset and the duration
-            int numOffsetResolutions = (int) Math.round((onsetTime - offset) / resolution);
-            int numDurationResolutions = (int) Math.round(duration / resolution);
+                // Compute the number of resolution 'units' for the offset and the duration
+                int numOffsetResolutions = (int) Math.round((onsetTime - offset) / resolution);
+                int numDurationResolutions = (int) Math.round(duration / resolution);
 
-            // Quantize both onset time and duration
-            onsetTime = numOffsetResolutions * resolution + offset;
-            duration = numDurationResolutions * resolution;
+                // Quantize both onset time and duration
+                onsetTime = numOffsetResolutions * resolution + offset;
+                duration = numDurationResolutions * resolution;
 
-            // Update rectangle's position and width
-            rectangle.setTranslateX(onsetTime * pixelsPerSecond);
-            rectangle.bordersRegion.setPrefWidth(duration * pixelsPerSecond);
+                // Update rectangle's position and width
+                rectangle.setTranslateX(onsetTime * pixelsPerSecond);
+                rectangle.bordersRegion.setPrefWidth(duration * pixelsPerSecond);
+            }
         }
     }
 
