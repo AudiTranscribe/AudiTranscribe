@@ -12,13 +12,6 @@ permissions:
   contents: write
 
 jobs:
-  # Run Final Tests
-  run_tests:
-    name: Run Tests
-    uses: ./.github/workflows/run-tests.yml
-    with:
-      upload_to_codecov: "NO"
-
   # Build Installers
   build_installer_windows:
     name: Build Windows Installer
