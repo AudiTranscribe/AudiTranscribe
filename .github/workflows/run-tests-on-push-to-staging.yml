@@ -11,5 +11,3 @@ jobs:
   run_tests:
     name: Run Tests
     uses: ./.github/workflows/run-tests.yml
-    with:
-      upload_to_codecov: "YES"

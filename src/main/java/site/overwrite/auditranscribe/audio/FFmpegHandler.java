@@ -95,9 +95,8 @@ public class FFmpegHandler extends ClassWithLogging {
 
             // Check exit code of the command
             int exitCode = process.waitFor();
-            if (exitCode != 0) {
-                throw new FFmpegNotFoundException("FFmpeg binary cannot be located at '" + ffmpegPath[0] + "'");
-            }
+            if (exitCode != 0) throw new FFmpegNotFoundException("FFmpeg binary cannot be located.\n" + ffmpegPath[0]);
+
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }

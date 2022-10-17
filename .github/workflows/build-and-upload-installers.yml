@@ -7,33 +7,25 @@ on:
         description: "Specify Release Tag"
         default: "Example: v1.2.3"
         required: true
+      branch:
+        description: "Specify Branch"
+        required: true
+        default: "staging"
 
 permissions:
   contents: write
 
 jobs:
-  # Run Final Tests
-  run_tests:
-    name: Run Tests
-    uses: ./.github/workflows/run-tests.yml
-    with:
-      upload_to_codecov: "NO"
-
-  # Build Installers
   build_installer_windows:
     name: Build Windows Installer
-    needs: [ run_tests ]
     uses: ./.github/workflows/build-installer-windows.yml
     with:
-      branch: "staging"
+      branch: ${{ inputs.branch }}
   build_installer_mac:
     name: Build macOS Installer
-    needs: [ run_tests ]
     uses: ./.github/workflows/build-installer-mac.yml
     with:
-      branch: "staging"
-
-  # Upload Installers
+      branch: ${{ inputs.branch }}
   upload_to_release_page:
     name: Upload To Release Page
     needs: [ build_installer_windows, build_installer_mac ]

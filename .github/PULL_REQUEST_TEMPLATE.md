@@ -2,7 +2,8 @@
 
 Please include a summary of the change and which issue is fixed. Please also include relevant motivation and context.
 List any dependencies that are required for this change.
-Include any issues that are fixed in this pull request by using the octothorpe (#) followed by the issue number.
+
+Fixes # (issue)
 
 ## Type Of Change
 

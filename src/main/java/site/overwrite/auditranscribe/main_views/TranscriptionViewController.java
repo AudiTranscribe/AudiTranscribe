@@ -1069,16 +1069,17 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         // Stop the audio playing
         audio.stop();
 
-        // Close the note player sequencer
-        notePlayerSequencer.close();
-
         // Clear the note rectangles
         NoteRectangle.allNoteRectangles.clear();
 
-        // Shut down the schedulers
+        // Shutdown the schedulers
         if (scheduler != null) scheduler.shutdown();
         if (autosaveScheduler != null) autosaveScheduler.shutdown();
         if (memoryAvailableScheduler != null) memoryAvailableScheduler.shutdown();
+
+        // Stop and close the note player sequencer
+        notePlayerSequencer.stop();
+        notePlayerSequencer.close();
     }
 
     /**

@@ -31,7 +31,7 @@
                                  <children>
                                     <VBox alignment="TOP_RIGHT" prefHeight="30.0">
                                        <children>
-                                          <Label alignment="CENTER_RIGHT" styleClass="setting-label" text="Note Playing Delay Offset" />
+                                          <Label alignment="CENTER_RIGHT" styleClass="setting-label" text="Note playing delay offset" />
                                           <Label alignment="CENTER_RIGHT" styleClass="setting-caption" text="To account for note playing delay; in seconds" />
                                        </children>
                                     </VBox>
@@ -103,7 +103,7 @@
                   </AnchorPane>
                </content>
             </Tab>
-          <Tab text="Transcription">
+          <Tab text="Spectrogram">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
@@ -126,12 +126,6 @@
                                           <Label styleClass="setting-caption" text="Function to generate the spectrogram windows" />
                                        </children>
                                     </VBox>
-                                    <VBox alignment="TOP_RIGHT" layoutX="20.0" layoutY="60.0" prefHeight="30.0">
-                                       <children>
-                                          <Label styleClass="setting-label" text="Note Quantization Unit" />
-                                          <Label styleClass="setting-caption" text="Smallest note unit that notes will be quantized to" />
-                                       </children>
-                                    </VBox>
                                  </children>
                               </VBox>
                               <VBox prefHeight="200.0" prefWidth="300.0" spacing="10.0" HBox.hgrow="ALWAYS">
@@ -141,7 +135,6 @@
                                  <children>
                                     <ChoiceBox fx:id="colourScaleChoiceBox" prefHeight="30.0" prefWidth="150.0" />
                                     <ChoiceBox fx:id="windowFunctionChoiceBox" layoutX="20.0" layoutY="20.0" prefHeight="30.0" prefWidth="150.0" />
-                                    <ChoiceBox fx:id="noteQuantizationChoiceBox" layoutX="20.0" layoutY="60.0" prefHeight="30.0" prefWidth="150.0" />
                                  </children>
                               </VBox>
                            </children>
