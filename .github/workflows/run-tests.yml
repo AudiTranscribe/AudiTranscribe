@@ -7,12 +7,14 @@ on:
         description: "Upload to CodeCov?"
         default: "YES"
         required: true
+        type: string
   workflow_dispatch:
     inputs:
       upload_to_codecov:
         description: "Upload to CodeCov?"
         default: "Enter either 'YES' or 'NO'"
         required: true
+        type: string
 
 jobs:
   main_tests:
