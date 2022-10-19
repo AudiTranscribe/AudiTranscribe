@@ -128,6 +128,9 @@ public class FixNoteDelayViewController extends ClassWithLogging implements Init
                 // By pressing the button we want to stop the audio
                 stopAudio();
 
+                // Reset playhead line position
+                playheadX.set(0);
+
                 // Update text on the button
                 togglePlaybackButton.setText("Play Test Audio");
             } else {
@@ -140,6 +143,9 @@ public class FixNoteDelayViewController extends ClassWithLogging implements Init
 
             // Toggle the `isPlaying` flag
             isPlaying = !isPlaying;
+
+            // Disable spinner if playing audio
+            notePlayingDelayOffsetSpinner.setDisable(isPlaying);
         });
 
         setNotePlaybackDelayButton.setOnAction(event -> ((Stage) rootPane.getScene().getWindow()).close());
