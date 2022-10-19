@@ -26,7 +26,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Spinner;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import site.overwrite.auditranscribe.audio.Audio;
@@ -73,6 +72,8 @@ public class FixNoteDelayViewController extends ClassWithLogging implements Init
 
     public static final double OFFSET_OF_OFFSET = 0.1;
 
+    public static final double LINE_MISALIGNMENT_OFFSET_CONSTANT = 2.5;  // To correct weird line misalignment
+
     // Attributes
     private final DoubleProperty playheadX = new SimpleDoubleProperty(0);
 
@@ -84,10 +85,7 @@ public class FixNoteDelayViewController extends ClassWithLogging implements Init
 
     // FXML elements
     @FXML
-    private AnchorPane rootPane;
-
-    @FXML
-    private Pane spectrogramPane;
+    private AnchorPane rootPane, spectrogramPane;
 
     @FXML
     private Spinner<Double> notePlayingDelayOffsetSpinner;
@@ -106,7 +104,9 @@ public class FixNoteDelayViewController extends ClassWithLogging implements Init
         setupNotePlayerSequencer();
 
         // Add playhead line to the spectrogram pane
-        Line playheadLine = PlottingStuffHandler.createPlayheadLine(height);
+        Line playheadLine = PlottingStuffHandler.createPlayheadLine(
+                LINE_MISALIGNMENT_OFFSET_CONSTANT, height - LINE_MISALIGNMENT_OFFSET_CONSTANT
+        );
         spectrogramPane.getChildren().add(playheadLine);
 
         // Bind properties
