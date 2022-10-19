@@ -29,6 +29,7 @@ out/
 *.iws
 
 # Others
+.mscbackup
 [Tt]est-*
 !lib/*.jar
 
