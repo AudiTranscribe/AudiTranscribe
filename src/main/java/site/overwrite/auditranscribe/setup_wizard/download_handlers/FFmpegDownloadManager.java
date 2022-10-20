@@ -16,15 +16,15 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.setup_wizard.download_managers;
+package site.overwrite.auditranscribe.setup_wizard.download_handlers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.network.APICallHandler;
+import site.overwrite.auditranscribe.network.DownloadTask;
 import site.overwrite.auditranscribe.network.exceptions.APIServerException;
 import site.overwrite.auditranscribe.setup_wizard.data_encapsulators.FFmpegDownloadData;
 import site.overwrite.auditranscribe.system.OSMethods;
@@ -91,7 +91,7 @@ public class FFmpegDownloadManager extends AbstractDownloadManager {
      * @return A string, representing the <b>absolute</b> path to the FFmpeg zip file.
      * @throws IOException If the downloading of the FFmpeg zip fails.
      */
-    public String downloadResource(String destFolder, CustomTask<?> task) throws IOException {
+    public String downloadResource(String destFolder, DownloadTask<?> task) throws IOException {
         // Update attributes
         this.destFolder = destFolder;
         outputFolder = IOMethods.joinPaths(destFolder, ffmpegFolder);

@@ -26,9 +26,9 @@ import javafx.stage.Stage;
 import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.misc.Theme;
-import site.overwrite.auditranscribe.setup_wizard.download_managers.FFmpegDownloadManager;
+import site.overwrite.auditranscribe.network.DownloadTask;
+import site.overwrite.auditranscribe.setup_wizard.download_handlers.FFmpegDownloadManager;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -77,7 +77,7 @@ public class DownloadingFFmpegViewController extends ClassWithLogging implements
      */
     public void startDownload() {
         // Define the task that handles the downloading of the FFmpeg binary
-        CustomTask<String> downloadTask = new CustomTask<>() {
+        DownloadTask<String> downloadTask = new DownloadTask<>() {
             @Override
             protected String call() throws Exception {
                 String ffmpegZipPath = downloadManager.downloadResource(DEST_FOLDER, this);

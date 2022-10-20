@@ -23,16 +23,17 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.network.exceptions.FileSignatureMismatchException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.utils.HashingUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
+import java.util.logging.Level;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -160,12 +161,15 @@ class DownloadFileHandlerTest {
         new JFXPanel();
 
         // Define the task
-        CustomTask<Void> task = new CustomTask<>() {
+        DownloadTask<Void> task = new DownloadTask<>() {
             @Override
             protected Void call() {
                 return null;
             }
         };
+
+        // Check that the downloaded amount is currently 0
+        assertEquals(0, task.getDownloadedAmount());
 
         // Specify the output file path
         String outputFilePath = IOMethods.joinPaths(IOConstants.ROOT_ABSOLUTE_PATH, "test-file-3.txt");
@@ -186,6 +190,18 @@ class DownloadFileHandlerTest {
                     "aa458767a7305cfb2ad50bd017c35e6e",
                     HashingUtils.getHash(new File(outputFilePath), "MD5")
             );
+
+            // Check the value of the download amount
+            assertEquals(248, task.getDownloadFileSize());
+            if (task.progressProperty().get() > 0) {
+                assertEquals(248, task.getDownloadedAmount());
+            } else {
+                MyLogger.log(
+                        Level.WARNING,
+                        "Got indeterminate progress; skipping a check",
+                        DownloadFileHandlerTest.class.getName()
+                );
+            }
 
             // Test the method that downloads the file and checks the signature at the same time
             assertDoesNotThrow(() -> DownloadFileHandler.downloadFile(
@@ -211,7 +227,7 @@ class DownloadFileHandlerTest {
         new JFXPanel();
 
         // Define the task
-        CustomTask<Void> task = new CustomTask<>() {
+        DownloadTask<Void> task = new DownloadTask<>() {
             @Override
             protected Void call() {
                 return null;
