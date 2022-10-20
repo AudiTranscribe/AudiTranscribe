@@ -79,6 +79,21 @@ public final class DownloadFileHandler extends ClassWithLogging {
      * @throws IOException If downloading the file fails.
      */
     public static void downloadFile(URL url, String outputFilePath, DownloadTask<?> task) throws IOException {
+        downloadFile(url, outputFilePath, task, DOWNLOAD_FILE_BUFFER_SIZE);
+    }
+
+    /**
+     * Method that downloads a file from a URL.
+     *
+     * @param url            URL to download the file from.
+     * @param outputFilePath <b>Absolute</b> file path to the output file.
+     * @param task           A <code>DownloadTask</code> object to show the progress of the download.
+     * @param buffSize       Buffer size for the download process.
+     * @throws IOException If downloading the file fails.
+     */
+    public static void downloadFile(
+            URL url, String outputFilePath, DownloadTask<?> task, int buffSize
+    ) throws IOException {
         // Get file size
         int fileSize = getFileSize(url);
 
@@ -86,10 +101,10 @@ public final class DownloadFileHandler extends ClassWithLogging {
         if (task != null) task.setDownloadFileSize(fileSize);
 
         // Determine the number of passes needed to download the full data
-        int numPasses = (int) Math.ceil((double) fileSize / DOWNLOAD_FILE_BUFFER_SIZE);
+        int numPasses = (int) Math.ceil((double) fileSize / buffSize);
 
         // Define a buffer to handle the incoming bytes
-        byte[] buf = new byte[DOWNLOAD_FILE_BUFFER_SIZE];
+        byte[] buf = new byte[buffSize];
 
         // Download the file
         int len;
@@ -98,7 +113,9 @@ public final class DownloadFileHandler extends ClassWithLogging {
         try (InputStream in = url.openStream(); FileOutputStream fos = new FileOutputStream(outputFilePath)) {
             while ((len = in.read(buf)) > 0) {
                 fos.write(buf, 0, len);
-                if (task != null) task.updateProgress(++currPass, numPasses);
+                if (task != null) {
+                    task.updateProgress(++currPass, numPasses);
+                }
             }
         }
     }

@@ -23,7 +23,6 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.network.exceptions.FileSignatureMismatchException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
@@ -33,7 +32,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
-import java.util.logging.Level;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -170,6 +168,7 @@ class DownloadFileHandlerTest {
 
         // Check that the downloaded amount is currently 0
         assertEquals(0, task.getDownloadedAmount());
+        assertEquals(0, task.downloadedAmountProperty().get());
 
         // Specify the output file path
         String outputFilePath = IOMethods.joinPaths(IOConstants.ROOT_ABSOLUTE_PATH, "test-file-3.txt");
@@ -182,7 +181,8 @@ class DownloadFileHandlerTest {
                                     "90ba622e09c867250c24b3a2e437e888b2740027/Feature%20Plan.txt"
                     ),
                     outputFilePath,
-                    task
+                    task,
+                    16
             );
 
             // Check the hash manually
@@ -191,9 +191,8 @@ class DownloadFileHandlerTest {
                     HashingUtils.getHash(new File(outputFilePath), "MD5")
             );
 
-            // Check the value of the download amount
+            // Check the value of the download file size
             assertEquals(248, task.getDownloadFileSize());
-            assertEquals(248, task.getDownloadedAmount());
 
             // Test the method that downloads the file and checks the signature at the same time
             assertDoesNotThrow(() -> DownloadFileHandler.downloadFile(
