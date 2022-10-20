@@ -29,6 +29,8 @@ import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.setup_wizard.view_controllers.*;
+import site.overwrite.auditranscribe.system.OSMethods;
+import site.overwrite.auditranscribe.system.OSType;
 
 import java.io.IOException;
 import java.net.URL;
@@ -40,6 +42,7 @@ import java.util.logging.Level;
 public class SetupWizard extends ClassWithLogging {
     // Attributes
     private final Stage stage;
+    private final OSType os;
     private Theme theme;
 
     /**
@@ -48,6 +51,7 @@ public class SetupWizard extends ClassWithLogging {
     public SetupWizard() {
         // Set attributes
         this.stage = new Stage(StageStyle.UTILITY);
+        this.os = OSMethods.getOS();
         this.theme = Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal];
 
         // Set stage properties
@@ -71,7 +75,8 @@ public class SetupWizard extends ClassWithLogging {
 
         // If user says that they have not installed FFmpeg, show relevant scenes
         if (!userSayFFmpegInstalled) {
-            if (!showAskToInstallManuallyView()) {  // Automatic installation
+            if ((os != OSType.LINUX && os != OSType.OTHER) && !showAskToInstallManuallyView()) {
+                // User selected automatic installation
                 ffmpegPath = showDownloadingFFmpegView();
                 userSayFFmpegInstalled = true;
             }
