@@ -20,7 +20,7 @@ package site.overwrite.auditranscribe.network;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import site.overwrite.auditranscribe.exceptions.network.APIServerException;
+import site.overwrite.auditranscribe.network.exceptions.APIServerException;
 
 import java.io.*;
 import java.net.*;
@@ -196,32 +196,28 @@ public final class APICallHandler {
     /**
      * Helper method that gets the connection's output.
      *
-     * @param con Connection.
+     * @param con The connection object.
      * @return String representing the output from the connection.
      * @throws IOException If something went wrong when reading the content.
      */
-    private static String getConnectionOutput(HttpURLConnection con) throws IOException, APIServerException {
+    private static String getConnectionOutput(HttpURLConnection con) throws IOException {
         StringBuilder content = new StringBuilder();
         Reader streamReader;
 
-        try {
-            if (con.getResponseCode() > 299) {
-                streamReader = new InputStreamReader(con.getErrorStream());
-            } else {
-                streamReader = new InputStreamReader(con.getInputStream());
-            }
-
-            BufferedReader in = new BufferedReader(streamReader);
-            String inputLine;
-            while ((inputLine = in.readLine()) != null) {
-                content.append(inputLine);
-            }
-
-            in.close();
-
-            return content.toString();
-        } catch (UnknownHostException e) {
-            throw new APIServerException(e);
+        if (con.getResponseCode() > 299) {
+            streamReader = new InputStreamReader(con.getErrorStream());
+        } else {
+            streamReader = new InputStreamReader(con.getInputStream());
         }
+
+        BufferedReader in = new BufferedReader(streamReader);
+        String inputLine;
+        while ((inputLine = in.readLine()) != null) {
+            content.append(inputLine);
+        }
+
+        in.close();
+
+        return content.toString();
     }
 }

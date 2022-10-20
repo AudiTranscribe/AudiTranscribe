@@ -23,7 +23,7 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import site.overwrite.auditranscribe.exceptions.network.APIServerException;
+import site.overwrite.auditranscribe.network.exceptions.APIServerException;
 
 import java.io.IOException;
 import java.util.HashMap;

@@ -18,7 +18,7 @@
 
 package site.overwrite.auditranscribe.io.audt_file;
 
-import site.overwrite.auditranscribe.misc.tuples.Triple;
+import site.overwrite.auditranscribe.generic.tuples.Triple;
 import site.overwrite.auditranscribe.utils.MathUtils;
 
 import java.util.List;

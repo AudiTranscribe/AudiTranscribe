@@ -18,14 +18,12 @@
 
 package site.overwrite.auditranscribe.utils;
 
-import site.overwrite.auditranscribe.exceptions.generic.FormatException;
-import site.overwrite.auditranscribe.exceptions.generic.ValueException;
+import site.overwrite.auditranscribe.generic.exceptions.FormatException;
+import site.overwrite.auditranscribe.generic.exceptions.ValueException;
 
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static java.util.Map.entry;
 
 /**
  * Unit conversion utility methods.
@@ -65,23 +63,23 @@ public final class UnitConversionUtils {
      */
     public static int noteToNoteNumber(String note) {
         // Define constants
-        final Map<String, Integer> PITCH_MAP = Map.ofEntries(
-                entry("C", 0),
-                entry("D", 2),
-                entry("E", 4),
-                entry("F", 5),
-                entry("G", 7),
-                entry("A", 9),
-                entry("B", 11)
+        final Map<String, Integer> PITCH_MAP = Map.of(
+                "C", 0,
+                "D", 2,
+                "E", 4,
+                "F", 5,
+                "G", 7,
+                "A", 9,
+                "B", 11
         );
 
-        final Map<String, Integer> ACC_MAP = Map.ofEntries(
-                entry("#", 1),
-                entry("", 0),
-                entry("b", -1),
-                entry("!", -1),
-                entry("♯", 1),
-                entry("♭", -1)
+        final Map<String, Integer> ACC_MAP = Map.of(
+                "#", 1,
+                "", 0,
+                "b", -1,
+                "!", -1,
+                "♯", 1,
+                "♭", -1
         );
 
         final Pattern NOTE_PATTERN = Pattern.compile(
@@ -236,32 +234,6 @@ public final class UnitConversionUtils {
         return midiNumber - 12;
     }
 
-    /**
-     * Converts a note string to its corresponding MIDI number.
-     *
-     * @param note Note string. Notes may be spelled out with optional accidentals or octave
-     *             numbers. The leading note name is case-insensitive. Sharps are indicated with
-     *             <code>#</code> or <code>♯</code>, flats may be indicated with <code>!</code>,
-     *             <code>b</code>, or <code>♭</code>.
-     * @return Corresponding MIDI number. Note that this will return <code>-1</code> is there is no
-     * corresponding MIDI number (say above G9).
-     */
-    public static int noteToMIDINumber(String note) {
-        return noteNumberToMIDINumber(noteToNoteNumber(note));
-    }
-
-    /**
-     * Converts a MIDI number to its corresponding note string.
-     *
-     * @param midiNumber       MIDI number.
-     * @param fancyAccidentals Whether <em>fancier accidentals</em> (i.e. ♯ instead of # and ♭
-     *                         instead of b) should be used.
-     * @return Corresponding note string.
-     */
-    public static String midiNumberToNote(int midiNumber, boolean fancyAccidentals) {
-        return noteNumberToNote(midiNumberToNoteNumber(midiNumber), "C Major", fancyAccidentals);
-    }
-
     // Audio unit conversion
 
     /**
@@ -286,19 +258,6 @@ public final class UnitConversionUtils {
 
         // Return it
         return logSpec;
-    }
-
-    /**
-     * Convert a power value (amplitude squared) to decibel (dB) units.
-     *
-     * @param power Input power.
-     * @return Decibel value for the given power.
-     * @implNote See
-     * <a href="https://librosa.org/doc/main/_modules/librosa/core/spectrum.html#power_to_db">
-     * Librosa's Implementation</a> of this function.
-     */
-    public static double powerToDecibel(double power) {
-        return powerToDecibel(power, 1.0);
     }
 
     /**
@@ -414,19 +373,6 @@ public final class UnitConversionUtils {
     }
 
     /**
-     * Method that converts a frequency in Hertz (Hz) into (fractional) octave numbers.
-     *
-     * @param hz            Frequency in Hertz.
-     * @param tuning        Tuning deviation from A440 in (fractional) bins per octave.
-     * @param binsPerOctave Number of bins per octave.
-     * @return Octave number for the specified frequency.
-     */
-    public static double hzToOctaves(double hz, double tuning, int binsPerOctave) {
-        double a440 = 440 * Math.pow(2, tuning / binsPerOctave);
-        return MathUtils.log2(16 * hz / a440);
-    }
-
-    /**
      * Method that converts a frequency in Hertz (Hz) into (fractional) octave numbers.<br>
      * This method assumes that there is no tuning deviation from A440 (i.e.
      * <code>tuning = 0</code>).
@@ -436,31 +382,6 @@ public final class UnitConversionUtils {
      */
     public static double hzToOctaves(double hz) {
         return MathUtils.log2(hz) - 4.781359713524659604069682476215;  // log2(16/440) to 30 dp
-    }
-
-    /**
-     * Method that converts a (fractional) octave number into a frequency in Hertz (Hz).
-     *
-     * @param octaves       Octave number.
-     * @param tuning        Tuning deviation from A440 in (fractional) bins per octave.
-     * @param binsPerOctave Number of bins per octave.
-     * @return Frequency in Hertz.
-     */
-    public static double octavesToHz(double octaves, double tuning, int binsPerOctave) {
-        double a440 = 440 * Math.pow(2, tuning / binsPerOctave);
-        return (a440 / 16) * Math.pow(2, octaves);
-    }
-
-    /**
-     * Method that converts a (fractional) octave number into a frequency in Hertz (Hz).<br>
-     * This method assumes that there is no tuning deviation from A440 (i.e.
-     * <code>tuning = 0</code>).
-     *
-     * @param octaves Octave number.
-     * @return Frequency in Hertz.
-     */
-    public static double octavesToHz(double octaves) {
-        return 27.5 * Math.pow(2, octaves);
     }
 
     // Time unit conversion
@@ -486,6 +407,17 @@ public final class UnitConversionUtils {
      *
      * @param samples   Sample indices to convert.
      * @param hopLength Hop length of the STFT.
+     * @return STFT frames corresponding to the given sample indices.
+     */
+    public static int[] samplesToFrames(int[] samples, int hopLength) {
+        return samplesToFrames(samples, hopLength, 0);
+    }
+
+    /**
+     * Method that converts sample indices into STFT frames.
+     *
+     * @param samples   Sample indices to convert.
+     * @param hopLength Hop length of the STFT.
      * @param numFFT    Number of FFT bins.
      * @return STFT frames corresponding to the given sample indices.
      */
@@ -502,19 +434,15 @@ public final class UnitConversionUtils {
     }
 
     /**
-     * Method that converts sample indices into STFT frames.
+     * Method that converts time stamps into STFT frames.
      *
-     * @param samples   Sample indices to convert.
-     * @param hopLength Hop length of the STFT.
-     * @return STFT frames corresponding to the given sample indices.
+     * @param times      Timestamps to convert.
+     * @param sampleRate Sample rate of the audio.
+     * @param hopLength  Hop length of the STFT.
+     * @return STFT frames corresponding to the given timestamps.
      */
-    public static int[] samplesToFrames(int[] samples, int hopLength) {
-        // Compute frame indices
-        int[] frames = new int[samples.length];
-        for (int i = 0; i < samples.length; i++) {
-            frames[i] = (int) Math.floor((double) samples[i] / hopLength);
-        }
-        return frames;
+    public static int[] timeToFrames(double[] times, double sampleRate, int hopLength) {
+        return timeToFrames(times, sampleRate, hopLength, 0);
     }
 
     /**
@@ -532,44 +460,6 @@ public final class UnitConversionUtils {
 
         // Then convert the samples into frames
         return samplesToFrames(samples, hopLength, numFFT);
-    }
-
-    /**
-     * Method that converts time stamps into STFT frames.
-     *
-     * @param times      Timestamps to convert.
-     * @param sampleRate Sample rate of the audio.
-     * @param hopLength  Hop length of the STFT.
-     * @return STFT frames corresponding to the given timestamps.
-     */
-    public static int[] timeToFrames(double[] times, double sampleRate, int hopLength) {
-        // Convert time to samples
-        int[] samples = timeToSamples(times, sampleRate);
-
-        // Then convert the samples into frames
-        return samplesToFrames(samples, hopLength);
-    }
-
-    // Graphics Units Conversion
-
-    /**
-     * Function that converts pixels to points.
-     *
-     * @param px Number of pixels.
-     * @return Point value.
-     */
-    public static double pxToPt(double px) {
-        return 0.75 * px;
-    }
-
-    /**
-     * Function that converts points to pixels.
-     *
-     * @param pt Number of points.
-     * @return Pixel value.
-     */
-    public static double ptToPx(double pt) {
-        return (4. / 3) * pt;
     }
 
     // Other unit conversions

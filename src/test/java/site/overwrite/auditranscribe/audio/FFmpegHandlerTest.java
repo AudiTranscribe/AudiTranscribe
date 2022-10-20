@@ -22,8 +22,8 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import site.overwrite.auditranscribe.exceptions.audio.FFmpegCommandFailedException;
-import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
+import site.overwrite.auditranscribe.audio.exceptions.FFmpegCommandFailedException;
+import site.overwrite.auditranscribe.audio.exceptions.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 

@@ -31,10 +31,12 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
-import site.overwrite.auditranscribe.exceptions.notes.NoteRectangleCollisionException;
+import site.overwrite.auditranscribe.generic.tuples.Pair;
+import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.misc.MyLogger;
-import site.overwrite.auditranscribe.misc.tuples.Pair;
+import site.overwrite.auditranscribe.music.exceptions.NoteRectangleCollisionException;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
+import site.overwrite.auditranscribe.utils.MusicUtils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -62,6 +64,8 @@ public class NoteRectangle extends StackPane {
     public static boolean canEdit = false;
     public static boolean isEditing = false;
 
+    private static boolean hasEditedNoteRectangles = false;
+
     // Instance attributes
     public int noteNum;
     private boolean isRemoved = false;
@@ -88,6 +92,8 @@ public class NoteRectangle extends StackPane {
     private NoteRectangle leftBoundingRectangle;
     private NoteRectangle rightBoundingRectangle;
 
+    private boolean isDragging;
+
     /**
      * Initialization method for a <code>NoteRectangle</code> object.<br>
      * Expects all required static values to be set.
@@ -99,7 +105,9 @@ public class NoteRectangle extends StackPane {
      * @throws NoteRectangleCollisionException If the creation of this note rectangle would cause a
      *                                         collision with another note rectangle.
      */
-    public NoteRectangle(double timeToPlaceRect, double noteDuration, int noteNum) throws NoteRectangleCollisionException {
+    public NoteRectangle(
+            double timeToPlaceRect, double noteDuration, int noteNum
+    ) throws NoteRectangleCollisionException {
         // Calculate the pixels per second for the spectrogram
         double pixelsPerSecond = spectrogramWidth / totalDuration;
         double secondsPerPixel = totalDuration / spectrogramWidth;
@@ -145,8 +153,16 @@ public class NoteRectangle extends StackPane {
                 rectangleHeight / 2;
 
         // Check for collision
-        if (checkCollision(xCoord, initialRectangleWidth, noteNum, false)) {
-            MyLogger.log(Level.FINE, "Note rectangle collision detected; not placing note", this.getClass().toString());
+        CollisionLocation collisionLocation = checkCollision(
+                xCoord, initialRectangleWidth, noteNum, VerticalMovement.NONE
+        );
+
+        if (collisionLocation != CollisionLocation.NONE) {
+            MyLogger.log(
+                    Level.FINE,
+                    "Note rectangle collision detected (" + collisionLocation + "); not placing note",
+                    this.getClass().toString()
+            );
             throw new NoteRectangleCollisionException("Note rectangle collision detected; not placing note");
         }
 
@@ -182,7 +198,7 @@ public class NoteRectangle extends StackPane {
         resizeLeftRegion.hoverProperty().addListener((observable, oldValue, newValue) -> {
             if (canEdit && isPaused && newValue) {
                 this.setCursor(Cursor.W_RESIZE);
-            } else {
+            } else if (!isDragging) {
                 this.setCursor(Cursor.DEFAULT);
             }
         });
@@ -190,7 +206,7 @@ public class NoteRectangle extends StackPane {
         resizeRightRegion.hoverProperty().addListener((observable, oldValue, newValue) -> {
             if (canEdit && isPaused && newValue) {
                 this.setCursor(Cursor.E_RESIZE);
-            } else {
+            } else if (!isDragging) {
                 this.setCursor(Cursor.DEFAULT);
             }
         });
@@ -199,38 +215,6 @@ public class NoteRectangle extends StackPane {
         EventHandler<ScrollEvent> cancelScroll = Event::consume;  // To be used so that we can remove this handler
 
         // Set mouse events for the main rectangle
-        mainRectangle.setOnMouseDragged(event -> {
-            // Check if editing is permitted
-            if (canEdit && isPaused) {
-                // Set cursor
-                this.setCursor(Cursor.CLOSED_HAND);
-
-                // Calculate new X position
-                double newX = event.getSceneX() - initXDiff;
-
-                // Calculate number of rectangles' heights to shift the note and calculate new note number
-                double diffY = event.getSceneY() - initYEvent;
-                int numIncrements = (int) (diffY / rectangleHeight);
-                double newY = numIncrements * rectangleHeight + initYTrans;
-                int newNoteNum = initNoteNum - numIncrements;  // Higher Y -> Lower on screen => need to subtract
-
-                // Check for collision
-                if (!checkCollision(newX, getRectangleWidth(), newNoteNum, numIncrements != 0)) {
-                    // Move the note rectangle if it is within range
-                    if (newX >= 0 && newX + getRectangleWidth() <= spectrogramWidth) {
-                        this.setTranslateX(newX);
-                    }
-                    if (newY >= 0 && newY + rectangleHeight <= spectrogramHeight) {
-                        this.setTranslateY(newY);
-                        this.noteNum = newNoteNum;
-                    }
-                }
-
-                // Prevent default scrolling action
-                event.consume();
-            }
-        });
-
         mainRectangle.setOnMousePressed(event -> {
             // Check if editing is permitted
             if (canEdit && isPaused) {
@@ -249,7 +233,8 @@ public class NoteRectangle extends StackPane {
                     isRemoved = true;
                 } else {
                     // Set initial values
-                    initXDiff = event.getSceneX() - this.getTranslateX();
+                    initXTrans = this.getTranslateX();
+                    initXDiff = event.getSceneX() - initXTrans;
 
                     initYTrans = this.getTranslateY();
                     initYEvent = event.getSceneY();
@@ -263,8 +248,70 @@ public class NoteRectangle extends StackPane {
                     event.consume();
                 }
 
-                // Update the `isEditing` flag
+                // Update flags
                 isEditing = true;
+                hasEditedNoteRectangles = true;
+            }
+        });
+
+        mainRectangle.setOnMouseDragged(event -> {
+            // Check if editing is permitted
+            if (canEdit && isPaused) {
+                // Set cursor
+                this.setCursor(Cursor.CLOSED_HAND);
+
+                // Calculate new X position
+                double newX = event.getSceneX() - initXDiff;
+
+                // Calculate number of rectangles' heights to shift the note and calculate new note number
+                double diffY = event.getSceneY() - initYEvent;
+                int numIncrements = (int) (diffY / rectangleHeight);
+                int changeInNoteNumber = -numIncrements;  // Higher Y -> Lower on screen => need to negate
+                double newY = numIncrements * rectangleHeight + initYTrans;
+                int newNoteNum = initNoteNum + changeInNoteNumber;
+
+                // Determine vertical movement from where the rectangle is CURRENTLY at
+                VerticalMovement verticalMovement;
+                if (newNoteNum == this.noteNum) {
+                    verticalMovement = VerticalMovement.NONE;
+                } else if (newNoteNum > this.noteNum) {
+                    verticalMovement = VerticalMovement.UP;
+                } else {
+                    verticalMovement = VerticalMovement.DOWN;
+                }
+
+                // Check for collision
+                CollisionLocation collisionLoc = checkCollision(
+                        newX, getRectangleWidth(), newNoteNum, verticalMovement
+                );
+
+                if (collisionLoc == CollisionLocation.LEFT) {  // Collided with left rectangle
+                    // Move current rectangle to the right edge of the left rectangle
+                    if (leftBoundingRectangle != null) {
+                        this.setTranslateX(leftBoundingRectangle.getEndX());
+                    }
+                } else if (collisionLoc == CollisionLocation.RIGHT) {  // Collided with right rectangle
+                    // Move current rectangle to the left edge of the right rectangle
+                    if (rightBoundingRectangle != null) {
+                        this.setTranslateX(rightBoundingRectangle.getStartX() - getRectangleWidth());
+                    }
+                } else {
+                    // Permit horizontal movement if within range
+                    if (newX >= 0 && newX + getRectangleWidth() <= spectrogramWidth) {
+                        this.setTranslateX(newX);
+                    }
+                }
+
+                if (collisionLoc != CollisionLocation.UP && collisionLoc != CollisionLocation.DOWN) {
+                    // Permit vertical movement if within range
+                    if (newY >= 0 && newY + rectangleHeight <= spectrogramHeight) {
+                        this.setTranslateY(newY);
+                        this.noteNum = newNoteNum;
+                    }
+                }
+
+                // Prevent default scrolling action
+                event.consume();
             }
         });
 
@@ -285,43 +332,21 @@ public class NoteRectangle extends StackPane {
                     noteRectanglesByNoteNumber.get(this.noteNum).add(this);
 
                     // Unset the bounding rectangles
-                    unsetBoundingRectangles();
+                    setBoundingRectangles(null, null);
                 }
 
-                // Update the `isEditing` flag
+                // Update flags
                 isEditing = false;
             }
 
             MyLogger.log(
                     Level.FINE,
                     "Moved rectangle to " + getNoteOnsetTime() + " seconds with note number " + this.noteNum,
-                    this.getClass().toString());
+                    this.getClass().toString()
+            );
         });
 
         // Set mouse events for the resizing regions
-        resizeLeftRegion.setOnMouseDragged(event -> {
-            // Check if editing is permitted
-            if (canEdit && isPaused) {
-                // Get the new X position
-                double newX = event.getSceneX() - initXDiff;
-
-                // Calculate new width of the rectangle
-                double newWidth = initWidth + (initXTrans - newX);
-
-                // Check if collision will occur
-                if (!checkCollision(newX, newWidth, this.noteNum, false)) {
-                    // If the new width is at least the resizing regions' width then resize
-                    if (newWidth >= RESIZING_REGIONS_WIDTH) {
-                        this.setTranslateX(newX);
-                        bordersRegion.setPrefWidth(newWidth);
-                    }
-                }
-
-                // Prevent default action
-                event.consume();
-            }
-        });
-
         resizeLeftRegion.setOnMousePressed(event -> {
             // Check if editing is permitted
             if (canEdit && isPaused) {
@@ -336,8 +361,37 @@ public class NoteRectangle extends StackPane {
                 // Disable scrolling
                 this.getParent().addEventHandler(ScrollEvent.ANY, cancelScroll);
 
-                // Update the `isEditing` flag
-                isEditing = true;
+                // Update cursor
+                this.setCursor(Cursor.W_RESIZE);
+
+                // Update flags
+                isEditing = true;  // Static attribute
+                isDragging = true;  // Instance attribute
+                hasEditedNoteRectangles = true;  // Static attribute
+
+                // Prevent default action
+                event.consume();
+            }
+        });
+
+        resizeLeftRegion.setOnMouseDragged(event -> {
+            // Check if editing is permitted
+            if (canEdit && isPaused) {
+                // Get the new X position
+                double newX = event.getSceneX() - initXDiff;
+
+                // Calculate new width of the rectangle
+                double newWidth = initWidth + (initXTrans - newX);
+
+                // Check if collision will occur
+                CollisionLocation collisionLoc = checkCollision(newX, newWidth, this.noteNum, VerticalMovement.NONE);
+                if (collisionLoc == CollisionLocation.NONE) {
+                    // If the new width is at least the resizing regions' width then resize
+                    if (newWidth >= RESIZING_REGIONS_WIDTH) {
+                        this.setTranslateX(newX);
+                        bordersRegion.setPrefWidth(newWidth);
+                    }
+                }
 
                 // Prevent default action
                 event.consume();
@@ -358,33 +412,15 @@ public class NoteRectangle extends StackPane {
                     noteRectanglesByNoteNumber.get(this.noteNum).add(this);
 
                     // Unset the bounding rectangles
-                    unsetBoundingRectangles();
+                    setBoundingRectangles(null, null);
                 }
 
-                // Update the `isEditing` flag
-                isEditing = false;
-            }
-        });
+                // Reset cursor back to default if cursor is no longer on the resizing region
+                if (!resizeLeftRegion.isHover()) this.setCursor(Cursor.DEFAULT);
 
-        resizeRightRegion.setOnMouseDragged(event -> {
-            // Check if editing is permitted
-            if (canEdit && isPaused) {
-                // Get the new X position
-                double newX = event.getSceneX() - initXDiff;
-
-                // Update the width of the note rectangle
-                double newWidth = initWidth + (newX - initXTrans);
-
-                // Check if collision will occur
-                if (!checkCollision(newX, newWidth, this.noteNum, false)) {
-                    // If the new width is at least the resizing regions' width then resize
-                    if (newWidth >= RESIZING_REGIONS_WIDTH) {
-                        bordersRegion.setPrefWidth(newWidth);
-                    }
-                }
-
-                // Prevent default action
-                event.consume();
+                // Update flags
+                isEditing = false;  // Static attribute
+                isDragging = false;  // Instance attribute
             }
         });
 
@@ -402,8 +438,36 @@ public class NoteRectangle extends StackPane {
                 // Disable scrolling
                 this.getParent().addEventHandler(ScrollEvent.ANY, cancelScroll);
 
-                // Update the `isEditing` flag
-                isEditing = true;
+                // Update cursor
+                this.setCursor(Cursor.E_RESIZE);
+
+                // Update flags
+                isEditing = true;  // Static attribute
+                isDragging = true;  // Instance attribute
+                hasEditedNoteRectangles = true;  // Static attribute
+
+                // Prevent default action
+                event.consume();
+            }
+        });
+
+        resizeRightRegion.setOnMouseDragged(event -> {
+            // Check if editing is permitted
+            if (canEdit && isPaused) {
+                // Get the new X position
+                double newX = event.getSceneX() - initXDiff;
+
+                // Update the width of the note rectangle
+                double newWidth = initWidth + (newX - initXTrans);
+
+                // Check if collision will occur
+                CollisionLocation collisionLoc = checkCollision(newX, newWidth, this.noteNum, VerticalMovement.NONE);
+                if (collisionLoc == CollisionLocation.NONE) {
+                    // If the new width is at least the resizing regions' width then resize
+                    if (newWidth >= RESIZING_REGIONS_WIDTH) {
+                        bordersRegion.setPrefWidth(newWidth);
+                    }
+                }
 
                 // Prevent default action
                 event.consume();
@@ -424,17 +488,24 @@ public class NoteRectangle extends StackPane {
                     noteRectanglesByNoteNumber.get(this.noteNum).add(this);
 
                     // Unset the bounding rectangles
-                    unsetBoundingRectangles();
+                    setBoundingRectangles(null, null);
                 }
 
-                // Update the `isEditing` flag
-                isEditing = false;
+                // Reset cursor back to default if cursor is no longer on the resizing region
+                if (!resizeRightRegion.isHover()) this.setCursor(Cursor.DEFAULT);
+
+                // Update flags
+                isEditing = false;  // Static attribute
+                isDragging = false;  // Instance attribute
             }
         });
 
         // Add this new note rectangle into the note rectangles' lists
         allNoteRectangles.add(this);
         noteRectanglesByNoteNumber.get(noteNum).add(this);
+
+        // Mark that the note rectangles were edited
+        hasEditedNoteRectangles = true;
     }
 
     // Getter/Setter methods
@@ -464,6 +535,14 @@ public class NoteRectangle extends StackPane {
 
     public static void setIsPaused(boolean isPaused) {
         NoteRectangle.isPaused = isPaused;
+    }
+
+    public static boolean getHasEditedNoteRectangles() {
+        return hasEditedNoteRectangles;
+    }
+
+    public static void setHasEditedNoteRectangles(boolean hasEditedNoteRectangles) {
+        NoteRectangle.hasEditedNoteRectangles = hasEditedNoteRectangles;
     }
 
     public double getNoteOnsetTime() {
@@ -505,61 +584,151 @@ public class NoteRectangle extends StackPane {
                     new SortedList<>(NoteRectangle.noteRectanglesByNoteNumber.get(i), new SortByTimeToPlace())
             );
         }
+
+        // Make sure that `hasEditedNoteRectangles` is `false` (because user did not edit the notes)
+        hasEditedNoteRectangles = false;
+    }
+
+    /**
+     * Method that quantizes the notes.
+     *
+     * @param bpm           Beats per minute.
+     * @param offset        Offset value.
+     * @param timeSignature Time signature string.
+     */
+    public static void quantizeNotes(double bpm, double offset, String timeSignature) {
+        // Only allow quantization if the playback is paused
+        if (isPaused) {
+            double pixelsPerSecond = spectrogramWidth / totalDuration;
+
+            // Determine the note 'unit' we are working with
+            int noteUnit = MusicUtils.parseTimeSignature(timeSignature).value1();  // What "one beat" represents
+
+            // Get the number of seconds per beat
+            double spb = 1. / bpm * 60.;  // spb = seconds per beat
+
+            // Determine resolution of the quantization
+            NoteQuantizationUnit quantizationUnit =
+                    NoteQuantizationUnit.values()[DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal];
+            int divisionFactor = quantizationUnit.numericValue / noteUnit;
+            double resolution = spb / divisionFactor;
+
+            // Process each note rectangle
+            for (NoteRectangle rectangle : allNoteRectangles) {
+                // Get the onset time and duration
+                double onsetTime = rectangle.getNoteOnsetTime();
+                double duration = rectangle.getNoteDuration();
+
+                // Compute the number of resolution 'units' for the offset and the duration
+                int numOffsetResolutions = (int) Math.round((onsetTime - offset) / resolution);
+                int numDurationResolutions = (int) Math.round(duration / resolution);
+
+                // Quantize both onset time and duration
+                onsetTime = numOffsetResolutions * resolution + offset;
+                duration = numDurationResolutions * resolution;
+
+                // Update rectangle's position and width
+                rectangle.setTranslateX(onsetTime * pixelsPerSecond);
+                rectangle.bordersRegion.setPrefWidth(duration * pixelsPerSecond);
+            }
+        }
     }
 
     // Private methods
 
     /**
-     * Helper method that unsets the bounding rectangles.
+     * Helper method that sets the bounding rectangles.
      */
-    private void unsetBoundingRectangles() {
-        leftBoundingRectangle = null;
-        rightBoundingRectangle = null;
+    private void setBoundingRectangles(NoteRectangle leftBoundingRectangle, NoteRectangle rightBoundingRectangle) {
+        this.leftBoundingRectangle = leftBoundingRectangle;
+        this.rightBoundingRectangle = rightBoundingRectangle;
     }
 
     /**
      * Helper method that checks if the proposed X position, width, and note number will cause a
      * collision with another note rectangle.
      *
-     * @param xPos               X position.
-     * @param rectangleWidth     Width of the rectangle.
-     * @param noteNumber         Note number.
-     * @param isVerticalMovement Whether there is vertical movement.<br>
-     *                           Vertical movement will result in recalculation of the bounding
-     *                           rectangles.
-     * @return A boolean, <code>true</code> if there is a collision, and <code>false</code>
-     * otherwise.
+     * @param xPos             X position.
+     * @param rectangleWidth   Width of the rectangle.
+     * @param noteNumber       Note number.
+     * @param verticalMovement Vertical movement value.
+     * @return A <code>CollisionLocation</code> value, describing the <em>direction</em> of the collision, or
+     * <code>NONE</code> if there was no collision.
      */
-    private boolean checkCollision(double xPos, double rectangleWidth, int noteNumber, boolean isVerticalMovement) {
-        // Check if bounding rectangles need updating
+    private CollisionLocation checkCollision(
+            double xPos, double rectangleWidth, int noteNumber, VerticalMovement verticalMovement
+    ) {
+        // Determine bounding rectangles
+        NoteRectangle leftBounder;
+        NoteRectangle rightBounder;
         if ((leftBoundingRectangle == null && rightBoundingRectangle == null) ||
                 (leftBoundingRectangle != null && xPos + rectangleWidth < leftBoundingRectangle.getStartX()) ||
                 (rightBoundingRectangle != null && xPos > rightBoundingRectangle.getEndX()) ||
-                isVerticalMovement) {
-            // Update bounding rectangles
+                verticalMovement != VerticalMovement.NONE) {
+            // Recalculate the bounding rectangles and use the new ones
             Pair<NoteRectangle, NoteRectangle> rectangles = getLeftAndRightRectangles(xPos, noteNumber);
-            leftBoundingRectangle = rectangles.value0();
-            rightBoundingRectangle = rectangles.value1();
+            leftBounder = rectangles.value0();
+            rightBounder = rectangles.value1();
+        } else {
+            // No changes made; use the old ones
+            leftBounder = leftBoundingRectangle;
+            rightBounder = rightBoundingRectangle;
         }
 
         // Handle edge cases
-        if (leftBoundingRectangle == null && rightBoundingRectangle == null) {
+        if (leftBounder == null && rightBounder == null) {
             // No rectangles present at all (other than itself) => no collision
-            return false;
-        } else if (leftBoundingRectangle == null) {
-            // No left rectangle; if the end of this rectangle is before the start of the right rectangle, then there is
-            // no collision
-            return xPos + rectangleWidth >= rightBoundingRectangle.getStartX();
+            setBoundingRectangles(null, null);
+            return CollisionLocation.NONE;
 
-        } else if (rightBoundingRectangle == null) {
-            // No right rectangle; if the start of this rectangle is after the end of the left rectangle, then there is
-            // no collision
-            return xPos <= leftBoundingRectangle.getEndX();
+        } else if (leftBounder == null) {  // No left rectangle
+            // If the end of this rectangle is before the start of the right rectangle, then there is no collision
+            if (xPos + rectangleWidth >= rightBounder.getStartX()) {
+                if (verticalMovement == VerticalMovement.NONE) {  // No vertical movement
+                    return CollisionLocation.RIGHT;  // Collides with the rectangle on the right
+                } else {
+                    if (verticalMovement == VerticalMovement.UP) return CollisionLocation.UP;
+                    return CollisionLocation.DOWN;
+                }
+            } else {
+                setBoundingRectangles(null, rightBounder);
+                return CollisionLocation.NONE;
+            }
+
+        } else if (rightBounder == null) {  // No right rectangle
+            // If the start of this rectangle is after the end of the left rectangle, then there is no collision
+            if (xPos <= leftBounder.getEndX()) {
+                if (verticalMovement == VerticalMovement.NONE) {  // No vertical movement
+                    return CollisionLocation.LEFT;  // Collides with the rectangle on the left
+                } else {
+                    if (verticalMovement == VerticalMovement.UP) return CollisionLocation.UP;
+                    return CollisionLocation.DOWN;
+                }
+            } else {
+                setBoundingRectangles(leftBounder, null);
+                return CollisionLocation.NONE;
+            }
+
         } else {
             // Check if start and end of this rectangle lies between the left and right rectangles. If so, there is no
             // collision; otherwise there is a collision.
-            return (leftBoundingRectangle.getEndX() >= xPos ||
-                    xPos + rectangleWidth >= rightBoundingRectangle.getStartX());
+            CollisionLocation tempCollisionLoc = CollisionLocation.NONE;
+
+            if (leftBounder.getEndX() >= xPos) {
+                tempCollisionLoc = CollisionLocation.LEFT;
+            } else if (xPos + rectangleWidth >= rightBounder.getStartX()) {
+                tempCollisionLoc = CollisionLocation.RIGHT;
+            }
+
+            if (tempCollisionLoc == CollisionLocation.NONE) {
+                setBoundingRectangles(leftBounder, rightBounder);
+                return CollisionLocation.NONE;
+            }
+
+            // Otherwise, there was a collision; check if there was vertical movement
+            if (verticalMovement == VerticalMovement.UP) return CollisionLocation.UP;
+            if (verticalMovement == VerticalMovement.DOWN) return CollisionLocation.DOWN;
+            return tempCollisionLoc;
         }
     }
 
@@ -669,5 +838,19 @@ public class NoteRectangle extends StackPane {
         public int compare(NoteRectangle o1, NoteRectangle o2) {
             return Double.compare(o1.noteOnsetTime.getValue(), o2.noteOnsetTime.getValue());
         }
+    }
+
+    enum CollisionLocation {
+        LEFT,
+        RIGHT,
+        UP,
+        DOWN,
+        NONE
+    }
+
+    enum VerticalMovement {
+        UP,
+        DOWN,
+        NONE
     }
 }

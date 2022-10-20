@@ -18,23 +18,26 @@
 
 package site.overwrite.auditranscribe.io.audt_file.base;
 
-import site.overwrite.auditranscribe.exceptions.io.audt_file.InvalidFileVersionException;
-import site.overwrite.auditranscribe.io.audt_file.v0x00080001.AUDTFileReader0x00080001;
-import site.overwrite.auditranscribe.utils.ByteConversionUtils;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import site.overwrite.auditranscribe.exceptions.io.audt_file.FailedToReadDataException;
-import site.overwrite.auditranscribe.exceptions.io.audt_file.IncorrectFileFormatException;
 import site.overwrite.auditranscribe.io.audt_file.v0x00050002.AUDTFileReader0x00050002;
 import site.overwrite.auditranscribe.io.audt_file.v0x00070001.AUDTFileReader0x00070001;
+import site.overwrite.auditranscribe.io.audt_file.v0x00080001.AUDTFileReader0x00080001;
+import site.overwrite.auditranscribe.io.exceptions.*;
+import site.overwrite.auditranscribe.utils.ByteConversionUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.logging.Level;
 
-public abstract class AUDTFileReader {
+/**
+ * Class that handles the reading of the AudiTranscribe (AUDT) file.
+ */
+public abstract class AUDTFileReader extends ClassWithLogging {
     // Attributes
     public final String filepath;
     public int fileFormatVersion;
@@ -363,5 +366,11 @@ public abstract class AUDTFileReader {
         // Check if the last 8 bytes corresponds to the EOF bytes
         byte[] eofBytes = Arrays.copyOfRange(bytes, numBytes - 8, numBytes);
         return checkBytesMatch(AUDTFileConstants.AUDT_END_OF_FILE_DELIMITER, eofBytes);
+    }
+
+    // Overwritten methods
+    @Override
+    public void log(Level level, String msg) {
+        log(level, msg, AUDTFileReader.class.getName());
     }
 }

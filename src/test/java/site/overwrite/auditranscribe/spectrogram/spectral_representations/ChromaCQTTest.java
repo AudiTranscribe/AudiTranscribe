@@ -24,8 +24,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
-import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
-import site.overwrite.auditranscribe.exceptions.generic.ValueException;
+import site.overwrite.auditranscribe.audio.exceptions.AudioTooLongException;
+import site.overwrite.auditranscribe.generic.exceptions.ValueException;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 

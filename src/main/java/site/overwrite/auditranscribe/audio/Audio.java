@@ -18,18 +18,18 @@
 
 package site.overwrite.auditranscribe.audio;
 
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
-import site.overwrite.auditranscribe.exceptions.audio.AudioIsSamplesOnlyException;
-import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
-import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
-import site.overwrite.auditranscribe.exceptions.generic.ValueException;
+
+import site.overwrite.auditranscribe.audio.exceptions.AudioIsSamplesOnlyException;
+import site.overwrite.auditranscribe.audio.exceptions.AudioTooLongException;
+import site.overwrite.auditranscribe.audio.exceptions.FFmpegNotFoundException;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
+import site.overwrite.auditranscribe.generic.exceptions.ValueException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
-
-import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.Media;
 import site.overwrite.auditranscribe.utils.MathUtils;
 
 import javax.sound.sampled.AudioFormat;
@@ -47,7 +47,7 @@ import java.util.logging.Level;
 /**
  * Audio class that handles audio processing and audio playback.
  */
-public class Audio {
+public class Audio extends ClassWithLogging {
     // Constants
     public static final int SAMPLES_BUFFER_SIZE = 1024;  // In bits; 1024 = 2^10
     public static final double MAX_AUDIO_LENGTH = 5;  // Maximum length of audio in minutes
@@ -176,12 +176,7 @@ public class Audio {
                 tempMediaPlayer = new MediaPlayer(new Media(originalWAVFile.toURI().toString()));
             } catch (IllegalStateException e) {
                 tempMediaPlayer = null;
-
-                MyLogger.log(
-                        Level.SEVERE,
-                        "JavaFX Toolkit not initialized. Audio playback will not work.",
-                        this.getClass().toString()
-                );
+                log(Level.SEVERE, "JavaFX Toolkit not initialized. Audio playback will not work.");
             }
 
             // Update attributes
@@ -197,7 +192,7 @@ public class Audio {
                 RuntimeException e = new RuntimeException(
                         "Processing modes contains `WITH_SLOWDOWN` but provided no slowed audio"
                 );
-                MyLogger.logException(e);
+                logException(e);
                 throw e;
             }
 
@@ -208,12 +203,7 @@ public class Audio {
                 tempMediaPlayer = new MediaPlayer(new Media(slowedWAVFile.toURI().toString()));
             } catch (IllegalStateException e) {
                 tempMediaPlayer = null;
-
-                MyLogger.log(
-                        Level.SEVERE,
-                        "JavaFX Toolkit not initialized. Audio playback will not work.",
-                        this.getClass().toString()
-                );
+                log(Level.SEVERE, "JavaFX Toolkit not initialized. Audio playback will not work.");
             }
 
             // Update attributes
@@ -534,14 +524,12 @@ public class Audio {
     public static byte[] wavBytesToMP3Bytes(
             byte[] rawWAVBytes, String ffmpegPath
     ) throws FFmpegNotFoundException, IOException {
-        MyLogger.log(Level.FINE, "Converting WAV bytes to MP3 bytes", FFmpegHandler.class.getName());
+        log(Level.FINE, "Converting WAV bytes to MP3 bytes", Audio.class.getName());
 
         // Ensure that the temporary directory exists
         IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
-        MyLogger.log(
-                Level.FINE,
-                "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH,
-                FFmpegHandler.class.getName()
+        log(
+                Level.FINE, "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH, Audio.class.getName()
         );
 
         // Define a new FFmpeg handler
@@ -566,7 +554,7 @@ public class Audio {
         IOMethods.delete(outputPath);
 
         // Return the raw MP3 bytes
-        MyLogger.log(Level.FINE, "Done converting WAV to MP3 bytes", FFmpegHandler.class.getName());
+        log(Level.FINE, "Done converting WAV to MP3 bytes", Audio.class.getName());
         return rawMP3Bytes;
     }
 
@@ -580,12 +568,7 @@ public class Audio {
     public byte[] originalWAVBytesToMP3Bytes(String ffmpegPath) throws FFmpegNotFoundException, IOException {
         // Check if we have already processed the audio
         if (rawOriginalMP3Bytes != null) {
-            MyLogger.log(
-                    Level.FINE,
-                    "Returning previously processed original MP3 bytes",
-                    this.getClass().toString()
-            );
-
+            log(Level.FINE, "Returning previously processed original MP3 bytes");
         } else {
             // Otherwise, process using the static method
             rawOriginalMP3Bytes = wavBytesToMP3Bytes(rawOriginalWAVBytes, ffmpegPath);
@@ -605,11 +588,7 @@ public class Audio {
     public byte[] slowedWAVBytesToMP3Bytes(String ffmpegPath) throws FFmpegNotFoundException, IOException {
         // Check if we have already processed the audio
         if (rawSlowedMP3Bytes != null) {
-            MyLogger.log(
-                    Level.FINE,
-                    "Returning previously processed slowed MP3 bytes",
-                    this.getClass().toString()
-            );
+            log(Level.FINE, "Returning previously processed slowed MP3 bytes");
 
         } else {
             // Otherwise, process using the static method
@@ -760,7 +739,7 @@ public class Audio {
                 monoAudioSamples = new double[numMonoSamples];
 
                 for (int i = 0; i < numMonoSamples; i++) {
-                    // Take average of left and right channels' samples
+                    // Take mean of left and right channels' samples
                     monoAudioSamples[i] = (audioSamples[i * 2] + audioSamples[i * 2 + 1]) / 2;
                 }
             } else {  // Mono

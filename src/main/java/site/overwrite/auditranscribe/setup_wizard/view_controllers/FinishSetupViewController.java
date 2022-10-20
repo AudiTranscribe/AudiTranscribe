@@ -23,8 +23,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 
 import java.net.URL;
@@ -34,7 +34,7 @@ import java.util.logging.Level;
 /**
  * View controller for the view that signals the end of the setup process.
  */
-public class FinishSetupViewController implements Initializable {
+public class FinishSetupViewController extends ClassWithLogging implements Initializable {
     // FXML Elements
     @FXML
     private AnchorPane rootPane;
@@ -46,7 +46,7 @@ public class FinishSetupViewController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         closeButton.setOnAction(event -> ((Stage) rootPane.getScene().getWindow()).close());
-        MyLogger.log(Level.INFO, "AudiTranscribe setup complete", this.getClass().getName());
+        log(Level.INFO, "AudiTranscribe setup complete");
     }
 
     // Public methods

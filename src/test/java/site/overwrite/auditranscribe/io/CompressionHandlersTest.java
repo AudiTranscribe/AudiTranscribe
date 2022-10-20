@@ -150,8 +150,6 @@ class CompressionHandlersTest {
                 IOMethods.joinPaths(baseDir, "testing-directory/")
         ));
 
-        // Todo: run tests for `children != null` (line 256)
-
         // Delete generated zip files
         IOMethods.delete(IOMethods.joinPaths(baseDir, "zip-file-2.zip"));
         IOMethods.delete(IOMethods.joinPaths(baseDir, "zip-file-3.zip"));

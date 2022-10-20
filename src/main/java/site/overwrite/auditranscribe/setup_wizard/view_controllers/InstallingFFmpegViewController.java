@@ -24,8 +24,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.utils.GUIUtils;
 
@@ -36,7 +36,7 @@ import java.util.logging.Level;
 /**
  * View controller that show instructions on how to install FFmpeg.
  */
-public class InstallingFFmpegViewController implements Initializable {
+public class InstallingFFmpegViewController extends ClassWithLogging implements Initializable {
     // FXML Elements
     @FXML
     private AnchorPane rootPane;
@@ -53,7 +53,7 @@ public class InstallingFFmpegViewController implements Initializable {
         ffmpegHyperlink.setOnAction(event -> GUIUtils.openURLInBrowser("https://ffmpeg.org/"));
         confirmButton.setOnAction(event -> ((Stage) rootPane.getScene().getWindow()).close());
 
-        MyLogger.log(Level.INFO, "Showing instructions to install FFmpeg", this.getClass().getName());
+        log(Level.INFO, "Showing instructions to install FFmpeg");
     }
 
     // Public methods

@@ -20,6 +20,7 @@
 package site.overwrite.auditranscribe.music.bpm_estimation;
 
 import site.overwrite.auditranscribe.utils.MathUtils;
+import site.overwrite.auditranscribe.utils.StatisticalUtils;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 import java.util.ArrayList;
@@ -67,7 +68,7 @@ public final class BPMEstimator {
         // Aggregate the tempogram using the mean
         double[] tempogramAggregated = new double[tempogram.length];
         for (int i = 0; i < tempogram.length; i++) {
-            tempogramAggregated[i] = MathUtils.mean(tempogram[i]);
+            tempogramAggregated[i] = StatisticalUtils.mean(tempogram[i]);
         }
 
         // Get the BPM values for each bin, skipping the 0-lag bin

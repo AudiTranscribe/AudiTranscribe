@@ -5,7 +5,7 @@
 
     <groupId>site.overwrite</groupId>
     <artifactId>AudiTranscribe</artifactId>
-    <version>0.8.0</version>
+    <version>0.8.1</version>
     <name>AudiTranscribe</name>
 
     <properties>
@@ -197,10 +197,16 @@
                             site/overwrite/auditranscribe/MainApplication.class
                         </exclude>
                         <exclude>
+                            site/overwrite/auditranscribe/**/exceptions/**
+                        </exclude>
+                        <exclude>
                             site/overwrite/auditranscribe/audio/Audio.class
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/exceptions/**
+                            site/overwrite/auditranscribe/generic/exceptions/**
+                        </exclude>
+                        <exclude>
+                            site/overwrite/auditranscribe/generic/ClassWithLogging.class
                         </exclude>
                         <exclude>
                             site/overwrite/auditranscribe/io/data_files/DataFiles.class
@@ -224,7 +230,7 @@
                             site/overwrite/auditranscribe/misc/CustomTask.class
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/misc/MouseHandler.class
+                            site/overwrite/auditranscribe/misc/IconHelpers.class
                         </exclude>
                         <exclude>
                             site/overwrite/auditranscribe/misc/MyLogger.class
@@ -236,7 +242,7 @@
                             site/overwrite/auditranscribe/misc/Theme.class
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/music/notes/*.class
+                            site/overwrite/auditranscribe/music/notes/**
                         </exclude>
                         <exclude>
                             site/overwrite/auditranscribe/plotting/Plotter.class

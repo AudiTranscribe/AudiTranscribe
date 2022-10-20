@@ -28,11 +28,10 @@ import org.apache.commons.compress.utils.FileNameUtils;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.audio.FFmpegHandler;
-import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
-import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
-import site.overwrite.auditranscribe.exceptions.io.audt_file.FailedToReadDataException;
-import site.overwrite.auditranscribe.exceptions.io.audt_file.IncorrectFileFormatException;
-import site.overwrite.auditranscribe.exceptions.io.audt_file.InvalidFileVersionException;
+import site.overwrite.auditranscribe.audio.exceptions.AudioTooLongException;
+import site.overwrite.auditranscribe.audio.exceptions.FFmpegNotFoundException;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
+import site.overwrite.auditranscribe.generic.tuples.Pair;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
@@ -40,13 +39,14 @@ import site.overwrite.auditranscribe.io.audt_file.ProjectData;
 import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileReader;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
-import site.overwrite.auditranscribe.misc.MyLogger;
-import site.overwrite.auditranscribe.misc.tuples.Pair;
-import site.overwrite.auditranscribe.system.OSMethods;
-import site.overwrite.auditranscribe.system.OSType;
-import site.overwrite.auditranscribe.misc.Popups;
+import site.overwrite.auditranscribe.io.exceptions.FailedToReadDataException;
+import site.overwrite.auditranscribe.io.exceptions.IncorrectFileFormatException;
+import site.overwrite.auditranscribe.io.exceptions.InvalidFileVersionException;
 import site.overwrite.auditranscribe.main_views.MainViewController;
 import site.overwrite.auditranscribe.main_views.TranscriptionViewController;
+import site.overwrite.auditranscribe.misc.Popups;
+import site.overwrite.auditranscribe.system.OSMethods;
+import site.overwrite.auditranscribe.system.OSType;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
@@ -57,7 +57,7 @@ import java.util.logging.Level;
 /**
  * Class that handles the switching between the main scene and the transcription scene.
  */
-public class SceneSwitcher {
+public class SceneSwitcher extends ClassWithLogging {
     // Attributes
     private final String currentVersion;
 
@@ -134,11 +134,11 @@ public class SceneSwitcher {
                         "An exception occurred during the execution of the program.",
                         e
                 );
-                MyLogger.logException(e);
+                logException(e);
             }
         }
 
-        MyLogger.log(Level.INFO, "Shutdown ordered", SceneSwitcher.class.getName());
+        log(Level.INFO, "Shutdown ordered");
         System.exit(0);  // Forces JVM to shut down
     }
 
@@ -179,7 +179,7 @@ public class SceneSwitcher {
                     controller.getSceneSwitchingData()
             );
         } catch (IOException e) {
-            MyLogger.logException(e);
+            logException(e);
         }
 
         return null;
@@ -206,11 +206,7 @@ public class SceneSwitcher {
 
             // Attempt creation of temporary folder if it doesn't exist
             IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
-            MyLogger.log(
-                    Level.FINE,
-                    "Temporary folder: " + IOConstants.TEMP_FOLDER_PATH,
-                    this.getClass().toString()
-            );
+            log(Level.FINE, "Temporary folder: " + IOConstants.TEMP_FOLDER_PATH);
 
             // Get the paths for the auxiliary files
             String baseName = IOMethods.joinPaths(
@@ -245,12 +241,9 @@ public class SceneSwitcher {
             successfullyDeleted = (successfullyDeleted && IOMethods.delete(slowedWAVFile));
 
             if (successfullyDeleted) {
-                MyLogger.log(Level.FINE, "Successfully deleted auxiliary WAV files.", this.getClass().toString());
+                log(Level.FINE, "Successfully deleted auxiliary WAV files.");
             } else {
-                MyLogger.log(
-                        Level.WARNING,
-                        "Failed to delete auxiliary WAV files now; will attempt delete after exit.",
-                        this.getClass().toString());
+                log(Level.WARNING, "Failed to delete auxiliary WAV files now; will attempt delete after exit.");
             }
 
             // Get the current scene and the spectrogram view controller
@@ -300,21 +293,21 @@ public class SceneSwitcher {
                             "still exist at the original location? Is the audio format supported?",
                     e
             );
-            MyLogger.logException(e);
+            logException(e);
         } catch (FFmpegNotFoundException e) {
             Popups.showExceptionAlert(
                     "Error finding FFmpeg.",
                     "FFmpeg was not found. Please install it and try again.",
                     e
             );
-            MyLogger.logException(e);
+            logException(e);
         } catch (AudioTooLongException e) {
             Popups.showExceptionAlert(
                     "Audio too long.",
                     "The audio file is too long. Please select a shorter audio file.",
                     e
             );
-            MyLogger.logException(e);
+            logException(e);
         }
 
         // If an exception occurred, return `null`
@@ -361,17 +354,9 @@ public class SceneSwitcher {
                             "Failed to make backup of '" + audtFileName + "'.",
                             "The program failed to make a backup of '" + audtFile.getName() + "'."
                     );
-                    MyLogger.log(
-                            Level.WARNING,
-                            "Failed to make backup of '" + audtFileName + "' to '" + backupPath + "'.",
-                            SceneSwitcher.class.getName()
-                    );
+                    log(Level.WARNING, "Failed to make backup of '" + audtFileName + "' to '" + backupPath + "'.");
                 } else {
-                    MyLogger.log(
-                            Level.INFO,
-                            "Made backup of '" + audtFileName + "' to '" + backupPath + "'.",
-                            SceneSwitcher.class.getName()
-                    );
+                    log(Level.INFO, "Made backup of '" + audtFileName + "' to '" + backupPath + "'.");
                 }
             }
 
@@ -445,7 +430,7 @@ public class SceneSwitcher {
                             "' at its designated location. Please check if it is still there.",
                     e
             );
-            MyLogger.logException(e);
+            logException(e);
         } catch (InvalidFileVersionException e) {
             Popups.showExceptionAlert(
                     "Invalid file version in '" + audtFile.getName() + "'.",
@@ -453,7 +438,7 @@ public class SceneSwitcher {
                             "check the version the file was saved in.",
                     e
             );
-            MyLogger.logException(e);
+            logException(e);
         } catch (IOException | IncorrectFileFormatException | FailedToReadDataException e) {
             Popups.showExceptionAlert(
                     "Failed to read '" + audtFile.getName() + "' as an AUDT ile.",
@@ -461,7 +446,7 @@ public class SceneSwitcher {
                             "' as an AUDT file. Is the file format correct?",
                     e
             );
-            MyLogger.logException(e);
+            logException(e);
         }
 
         // If an exception occurred, return `null`

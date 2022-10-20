@@ -19,10 +19,10 @@
 package site.overwrite.auditranscribe.utils;
 
 import org.junit.jupiter.api.Test;
-import site.overwrite.auditranscribe.exceptions.generic.LengthException;
-import site.overwrite.auditranscribe.exceptions.generic.ValueException;
+import site.overwrite.auditranscribe.generic.exceptions.LengthException;
+import site.overwrite.auditranscribe.generic.exceptions.ValueException;
 import site.overwrite.auditranscribe.misc.Complex;
-import site.overwrite.auditranscribe.misc.tuples.Pair;
+import site.overwrite.auditranscribe.generic.tuples.Pair;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

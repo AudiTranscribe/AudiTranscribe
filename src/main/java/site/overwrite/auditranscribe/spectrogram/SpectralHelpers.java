@@ -19,7 +19,7 @@
 package site.overwrite.auditranscribe.spectrogram;
 
 import site.overwrite.auditranscribe.audio.WindowFunction;
-import site.overwrite.auditranscribe.misc.tuples.Pair;
+import site.overwrite.auditranscribe.generic.tuples.Pair;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.FrequencyBins;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.STFT;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
@@ -249,7 +249,7 @@ public final class SpectralHelpers {
      * Perform parabolic interpolation on the STFT magnitudes.
      *
      * @param S STFT magnitudes matrix.
-     * @return A pair. First value is the 'average' matrix. The second value is the 'shuft' matrix.
+     * @return A pair. First value is the 'average' matrix. The second value is the 'shift' matrix.
      */
     private static Pair<Double[][], Double[][]> parabolicInterp(double[][] S) {
         // Perform parabolic interpolation

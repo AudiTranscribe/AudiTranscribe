@@ -19,13 +19,10 @@
 
 package site.overwrite.auditranscribe.io.audt_file.v0x00050002;
 
-import site.overwrite.auditranscribe.exceptions.io.audt_file.FailedToReadDataException;
-import site.overwrite.auditranscribe.exceptions.io.audt_file.IncorrectFileFormatException;
-import site.overwrite.auditranscribe.exceptions.io.audt_file.InvalidFileVersionException;
 import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileReader;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.*;
-import site.overwrite.auditranscribe.misc.MyLogger;
+import site.overwrite.auditranscribe.io.exceptions.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,7 +46,7 @@ public class AUDTFileReader0x00050002 extends AUDTFileReader {
             String filepath, InputStream inputStream
     ) throws IOException, IncorrectFileFormatException, InvalidFileVersionException {
         super(filepath, inputStream);
-        MyLogger.log(Level.INFO, "Using Version 0x00050002 AUDT file reader", AUDTFileReader.class.getName());
+        log(Level.INFO, "Using Version 0x00050002 AUDT file reader");
     }
 
     // Public methods

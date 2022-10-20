@@ -11,6 +11,7 @@
 | 0.5.x   | :x:                |
 | 0.6.x   | :x:                |
 | 0.7.x   | :white_check_mark: |
+| 0.8.x   | :white_check_mark: |
 
 The above table shows the supported versions of the security policy. A *supported version* for the
 security policy means that vulnerabilities in the source code will be accepted and would be

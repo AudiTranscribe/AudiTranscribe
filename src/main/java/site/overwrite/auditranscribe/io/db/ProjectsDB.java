@@ -18,9 +18,9 @@
 
 package site.overwrite.auditranscribe.io.db;
 
+import site.overwrite.auditranscribe.generic.tuples.Pair;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.misc.tuples.Pair;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

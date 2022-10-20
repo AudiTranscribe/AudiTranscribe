@@ -19,7 +19,7 @@
 package site.overwrite.auditranscribe.utils;
 
 import org.junit.jupiter.api.Test;
-import site.overwrite.auditranscribe.exceptions.generic.LengthException;
+import site.overwrite.auditranscribe.generic.exceptions.LengthException;
 
 import java.util.HexFormat;
 

@@ -22,21 +22,27 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import site.overwrite.auditranscribe.audio.FFmpegHandler;
 import site.overwrite.auditranscribe.audio.WindowFunction;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
+import site.overwrite.auditranscribe.main_views.helpers.ProjectIOHandlers;
 import site.overwrite.auditranscribe.misc.MyLogger;
+import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
 import site.overwrite.auditranscribe.misc.spinners.CustomIntegerSpinnerValueFactory;
+import site.overwrite.auditranscribe.music.notes.NoteQuantizationUnit;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
-import site.overwrite.auditranscribe.misc.Popups;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +50,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 
-public class PreferencesViewController implements Initializable {
+public class PreferencesViewController extends ClassWithLogging implements Initializable {
     // Attributes
     private String lastValidFFmpegPath;
 
@@ -57,6 +63,9 @@ public class PreferencesViewController implements Initializable {
 
     @FXML
     private ChoiceBox<WindowFunction> windowFunctionChoiceBox;
+
+    @FXML
+    private ChoiceBox<NoteQuantizationUnit> noteQuantizationChoiceBox;
 
     @FXML
     private ChoiceBox<Theme> themeChoiceBox;
@@ -80,11 +89,15 @@ public class PreferencesViewController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Set choice box selections
-        for (Theme theme : Theme.values()) themeChoiceBox.getItems().add(theme);
-
-        for (ColourScale colourScale : ColourScale.values()) colourScaleChoiceBox.getItems().add(colourScale);
+        for (ColourScale colourScale : ColourScale.values())
+            colourScaleChoiceBox.getItems().add(colourScale);
         for (WindowFunction windowFunction : WindowFunction.values())
             windowFunctionChoiceBox.getItems().add(windowFunction);
+        for (NoteQuantizationUnit noteQuantizationUnit : NoteQuantizationUnit.values())
+            noteQuantizationChoiceBox.getItems().add(noteQuantizationUnit);
+
+        for (Theme theme : Theme.values())
+            themeChoiceBox.getItems().add(theme);
 
         // Add methods to buttons
         selectFFmpegBinaryButton.setOnAction(event -> {
@@ -118,11 +131,7 @@ public class PreferencesViewController implements Initializable {
                 for (File file : files) {
                     if (!file.getName().equals(MyLogger.currentLogName) && !file.getName().endsWith(".lck")) {
                         IOMethods.delete(file);
-                        MyLogger.log(
-                                Level.FINE,
-                                "Deleted log '" + file.getName() + "'",
-                                PreferencesViewController.class.getName()
-                        );
+                        log(Level.FINE, "Deleted log '" + file.getName() + "'");
                         numDeleted++;
                     }
                 }
@@ -130,7 +139,7 @@ public class PreferencesViewController implements Initializable {
                 if (numDeleted != 0) {
                     Popups.showInformationAlert(
                             "Deleted Logs",
-                            "Deleted " + numDeleted + " " + (numDeleted == 1 ? "log" : "logs")+
+                            "Deleted " + numDeleted + " " + (numDeleted == 1 ? "log" : "logs") +
                                     " from the logs folder."
                     );
                 } else {
@@ -164,11 +173,7 @@ public class PreferencesViewController implements Initializable {
                     applyButton.setDisable(false);
 
                     // Report success
-                    MyLogger.log(
-                            Level.INFO,
-                            "FFmpeg binary path updated to: " + ffmpegBinaryPath,
-                            this.getClass().toString()
-                    );
+                    log(Level.INFO, "FFmpeg binary path updated to: " + ffmpegBinaryPath);
                 } else {
                     // Reset the value of the text field to the last valid FFmpeg path
                     ffmpegBinaryPathTextField.setText(lastValidFFmpegPath);
@@ -180,17 +185,13 @@ public class PreferencesViewController implements Initializable {
                     );
 
                     // Report failure
-                    MyLogger.log(
-                            Level.WARNING,
-                            "Selected FFmpeg binary path \"" + ffmpegBinaryPath + "\" invalid",
-                            this.getClass().toString()
-                    );
+                    log(Level.WARNING, "Selected FFmpeg binary path \"" + ffmpegBinaryPath + "\" invalid");
                 }
             }
         });
 
         // Report that the preferences view is ready to be shown
-        MyLogger.log(Level.INFO, "Preferences view ready to be shown", this.getClass().toString());
+        log(Level.INFO, "Preferences view ready to be shown");
     }
 
     // Public methods
@@ -222,19 +223,26 @@ public class PreferencesViewController implements Initializable {
      */
     public void setUpFields() {
         // Arrays that store the fields that just need to disable the apply button
-        ChoiceBox<?>[] choiceBoxes = new ChoiceBox[]{colourScaleChoiceBox, windowFunctionChoiceBox};
+        ChoiceBox<?>[] choiceBoxes = new ChoiceBox[]{
+                colourScaleChoiceBox, windowFunctionChoiceBox, noteQuantizationChoiceBox
+        };
         Spinner<?>[] spinners = new Spinner[]{
                 notePlayingDelayOffsetSpinner, autosaveIntervalSpinner, logFilePersistenceSpinner,
                 checkForUpdateIntervalSpinner
         };
 
         // Set choice box values
-        themeChoiceBox.setValue(Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal]);
-
-        colourScaleChoiceBox.setValue(ColourScale.values()[DataFiles.SETTINGS_DATA_FILE.data.colourScaleEnumOrdinal]);
+        colourScaleChoiceBox.setValue(
+                ColourScale.values()[DataFiles.SETTINGS_DATA_FILE.data.colourScaleEnumOrdinal]
+        );
         windowFunctionChoiceBox.setValue(
                 WindowFunction.values()[DataFiles.SETTINGS_DATA_FILE.data.windowFunctionEnumOrdinal]
         );
+        noteQuantizationChoiceBox.setValue(
+                NoteQuantizationUnit.values()[DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal]
+        );
+
+        themeChoiceBox.setValue(Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal]);
 
         // Add methods to choice boxes
         for (ChoiceBox<?> choiceBox : choiceBoxes) {
@@ -248,7 +256,8 @@ public class PreferencesViewController implements Initializable {
 
         // Set spinner factories and methods
         notePlayingDelayOffsetSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
-                -1, 1, DataFiles.SETTINGS_DATA_FILE.data.notePlayingDelayOffset, 0.01, 2
+                -1, 1, DataFiles.SETTINGS_DATA_FILE.data.notePlayingDelayOffset, 0.01,
+                2
         ));
         autosaveIntervalSpinner.setValueFactory(new CustomIntegerSpinnerValueFactory(
                 1, Integer.MAX_VALUE, DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval, 1
@@ -299,7 +308,7 @@ public class PreferencesViewController implements Initializable {
             // Show the stage
             preferencesStage.show();
         } catch (IOException e) {
-            MyLogger.logException(e);
+            logException(e);
             throw new RuntimeException(e);
         }
     }
@@ -326,6 +335,8 @@ public class PreferencesViewController implements Initializable {
 
         DataFiles.SETTINGS_DATA_FILE.data.colourScaleEnumOrdinal = colourScaleChoiceBox.getValue().ordinal();
         DataFiles.SETTINGS_DATA_FILE.data.windowFunctionEnumOrdinal = windowFunctionChoiceBox.getValue().ordinal();
+        DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal =
+                noteQuantizationChoiceBox.getValue().ordinal();
 
         DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal = themeChoiceBox.getValue().ordinal();
         DataFiles.SETTINGS_DATA_FILE.data.checkForUpdateInterval = checkForUpdateIntervalSpinner.getValue();

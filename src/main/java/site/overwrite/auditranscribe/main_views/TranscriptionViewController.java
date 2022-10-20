@@ -27,7 +27,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.*;
@@ -41,9 +40,11 @@ import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.audio.FFmpegHandler;
 import site.overwrite.auditranscribe.audio.WindowFunction;
-import site.overwrite.auditranscribe.exceptions.audio.AudioTooLongException;
-import site.overwrite.auditranscribe.exceptions.audio.FFmpegNotFoundException;
-import site.overwrite.auditranscribe.exceptions.notes.NoteRectangleCollisionException;
+import site.overwrite.auditranscribe.audio.exceptions.AudioTooLongException;
+import site.overwrite.auditranscribe.audio.exceptions.FFmpegNotFoundException;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
+import site.overwrite.auditranscribe.generic.tuples.Pair;
+import site.overwrite.auditranscribe.generic.tuples.Triple;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
@@ -53,15 +54,18 @@ import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.audt_file.v0x00080001.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
+import site.overwrite.auditranscribe.main_views.helpers.ProjectIOHandlers;
+import site.overwrite.auditranscribe.main_views.icon.IconHelpers;
 import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingData;
 import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingState;
-import site.overwrite.auditranscribe.misc.*;
+import site.overwrite.auditranscribe.misc.CustomTask;
+import site.overwrite.auditranscribe.misc.Popups;
+import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
-import site.overwrite.auditranscribe.misc.tuples.Pair;
-import site.overwrite.auditranscribe.misc.tuples.Triple;
 import site.overwrite.auditranscribe.music.MusicKey;
 import site.overwrite.auditranscribe.music.MusicKeyEstimator;
 import site.overwrite.auditranscribe.music.bpm_estimation.BPMEstimator;
+import site.overwrite.auditranscribe.music.exceptions.NoteRectangleCollisionException;
 import site.overwrite.auditranscribe.music.notes.MIDIInstrument;
 import site.overwrite.auditranscribe.music.notes.NotePlayerSequencer;
 import site.overwrite.auditranscribe.music.notes.NotePlayerSynth;
@@ -89,7 +93,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-public class TranscriptionViewController implements Initializable {
+public class TranscriptionViewController extends ClassWithLogging implements Initializable {
     // Constants
     public static final Pair<Integer, Integer> BPM_RANGE = new Pair<>(1, 512);  // In the format [min, max]
     private final Pair<Double, Double> OFFSET_RANGE = new Pair<>(-5., 5.);  // In the format [min, max]
@@ -102,6 +106,8 @@ public class TranscriptionViewController implements Initializable {
     private final double NUM_PX_PER_OCTAVE = 72;
     private final int MIN_NOTE_NUMBER = 0;  // C0
     private final int MAX_NOTE_NUMBER = 107;  // B8
+
+    private final double IMAGE_BUTTON_LENGTH = 50;  // In pixels
 
     private final long UPDATE_PLAYBACK_SCHEDULER_PERIOD = 50;  // In milliseconds
 
@@ -193,7 +199,7 @@ public class TranscriptionViewController implements Initializable {
 
     @FXML
     private MenuItem newProjectMenuItem, openProjectMenuItem, renameProjectMenuItem, saveProjectMenuItem,
-            saveAsMenuItem, exportMIDIMenuItem, preferencesMenuItem, aboutMenuItem;
+            saveAsMenuItem, exportMIDIMenuItem, preferencesMenuItem, quantizeNotesMenuItem, aboutMenuItem;
 
     // Main elements
     @FXML
@@ -205,9 +211,6 @@ public class TranscriptionViewController implements Initializable {
     // Top HBox
     @FXML
     private Button newProjectButton, openProjectButton, saveProjectButton;
-
-    @FXML
-    private ImageView newProjectButtonImage, openProjectButtonImage, saveProjectButtonImage;
 
     @FXML
     private ChoiceBox<String> musicKeyChoice, timeSignatureChoice;
@@ -244,12 +247,8 @@ public class TranscriptionViewController implements Initializable {
     private Label currTimeLabel, totalTimeLabel;
 
     @FXML
-    private Button audioVolumeButton, notesVolumeButton, playButton, stopButton, playSkipBackButton,
-            playSkipForwardButton, toggleSlowedAudioButton, scrollButton, editNotesButton;
-
-    @FXML
-    private ImageView audioVolumeButtonImage, notesVolumeButtonImage, playButtonImage, stopButtonImage,
-            playSkipBackButtonImage, playSkipForwardButtonImage, editNotesButtonImage, scrollButtonImage;
+    private Button scrollButton, editNotesButton, playButton, stopButton, playStepBackwardButton, playStepForwardButton,
+            toggleSlowedAudioButton, audioVolumeButton, notesVolumeButton;
 
     @FXML
     private Slider audioVolumeSlider, notesVolumeSlider;
@@ -283,7 +282,7 @@ public class TranscriptionViewController implements Initializable {
         } catch (MidiUnavailableException ignored) {  // We will notify the user that MIDI unavailable later
         }
 
-        notePlayerSequencer = new NotePlayerSequencer();
+        notePlayerSequencer = new NotePlayerSequencer(DataFiles.SETTINGS_DATA_FILE.data.notePlayingDelayOffset);
 
         // Update spinners' ranges
         bpmSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
@@ -326,11 +325,7 @@ public class TranscriptionViewController implements Initializable {
 
         timeSignatureChoice.getSelectionModel().selectedItemProperty()
                 .addListener((observable, oldValue, newValue) -> {
-                    MyLogger.log(
-                            Level.FINE,
-                            "Changed time signature from " + oldValue + " to " + newValue,
-                            this.getClass().toString()
-                    );
+                    log(Level.FINE, "Changed time signature from " + oldValue + " to " + newValue);
 
                     // Update the `hasUnsavedChanges` flag
                     hasUnsavedChanges = true;
@@ -373,7 +368,7 @@ public class TranscriptionViewController implements Initializable {
         playButton.setOnAction(event -> togglePlayButton());
 
         stopButton.setOnAction(event -> {
-            MyLogger.log(Level.FINE, "Pressed stop button", this.getClass().toString());
+            log(Level.FINE, "Pressed stop button");
 
             // Seek to beginning of the audio
             seekToTime(0);
@@ -382,31 +377,22 @@ public class TranscriptionViewController implements Initializable {
             isPaused = togglePaused(false);
         });
 
-        playSkipBackButton.setOnAction(event -> {
-            MyLogger.log(Level.FINE, "Pressed skip back button", this.getClass().toString());
+        playStepBackwardButton.setOnAction(event -> {
+            log(Level.FINE, "Pressed skip back button");
 
-            // Seek to the start of the audio
+            notePlayerSequencer.stop();
+            isPaused = togglePaused(false);  // Pause the audio
             seekToTime(0);
-
-            // Scroll to beginning
             updateScrollPosition(0, finalWidth);
-
-            // Pause the audio
-            isPaused = togglePaused(false);
         });
 
-        playSkipForwardButton.setOnAction(event -> {
-            MyLogger.log(Level.FINE, "Pressed skip forward button", this.getClass().toString());
+        playStepForwardButton.setOnAction(event -> {
+            log(Level.FINE, "Pressed skip forward button");
 
-            // Seek to the end of the audio
+            notePlayerSequencer.stop();
+            isPaused = togglePaused(true);  // Seeking to end later will toggle paused again
             seekToTime(audioDuration);
-
-            // Scroll to end
             updateScrollPosition(finalWidth, finalWidth);
-
-            // Force the audio to play at the end
-            // (This is to avoid a nasty seek to end issue where user needs to click on play button twice)
-            isPaused = togglePaused(true);
         });
 
         toggleSlowedAudioButton.setOnAction(event -> {
@@ -422,10 +408,9 @@ public class TranscriptionViewController implements Initializable {
             // Update the flag
             usingSlowedAudio = !usingSlowedAudio;
 
-            MyLogger.log(
+            log(
                     Level.FINE,
-                    "Toggled audio slowdown; audio playback speed is now " + (usingSlowedAudio ? "0.5x" : "1.0x"),
-                    this.getClass().toString()
+                    "Toggled audio slowdown; audio playback speed is now " + (usingSlowedAudio ? "0.5x" : "1.0x")
             );
         });
 
@@ -493,11 +478,11 @@ public class TranscriptionViewController implements Initializable {
 
                                         // Add the note rectangle to the spectrogram pane
                                         spectrogramPaneAnchor.getChildren().add(noteRect);
-                                        MyLogger.log(
+                                        log(
                                                 Level.FINE,
                                                 "Placed note " + estimatedNoteNum + " at " + estimatedTime +
-                                                        " seconds",
-                                                this.getClass().toString());
+                                                        " seconds"
+                                        );
 
                                         // Update the `hasUnsavedChanges` flag
                                         hasUnsavedChanges = true;
@@ -508,9 +493,12 @@ public class TranscriptionViewController implements Initializable {
 
                         } else {
                             // Play the note
-                            MyLogger.log(Level.FINE, "Playing " + UnitConversionUtils.noteNumberToNote(
-                                    estimatedNoteNum, musicKey, false
-                            ), this.getClass().toString());
+                            log(
+                                    Level.FINE,
+                                    "Playing " + UnitConversionUtils.noteNumberToNote(
+                                            estimatedNoteNum, musicKey, false
+                                    )
+                            );
                             notePlayerSynth.playNoteForDuration(
                                     estimatedNoteNum, NOTE_ON_VELOCITY, NOTE_OFF_VELOCITY,
                                     NOTE_ON_DURATION, NOTE_OFF_DURATION
@@ -547,8 +535,9 @@ public class TranscriptionViewController implements Initializable {
         saveProjectMenuItem.setOnAction(event -> handleSavingProject(false, false));
         saveAsMenuItem.setOnAction(event -> handleSavingProject(false, true));
         exportMIDIMenuItem.setOnAction(event -> handleExportMIDI());
-        preferencesMenuItem.setOnAction(actionEvent -> PreferencesViewController.showPreferencesWindow());
-        aboutMenuItem.setOnAction(actionEvent -> AboutViewController.showAboutWindow());
+        preferencesMenuItem.setOnAction(event -> PreferencesViewController.showPreferencesWindow());
+        quantizeNotesMenuItem.setOnAction(event -> handleQuantizeNotes());
+        aboutMenuItem.setOnAction(event -> AboutViewController.showAboutWindow());
 
         // Create scheduler to update memory available
         memoryAvailableScheduler = Executors.newScheduledThreadPool(0, runnable -> {
@@ -570,7 +559,7 @@ public class TranscriptionViewController implements Initializable {
         try {
             projectsDB = new ProjectsDB();
         } catch (SQLException e) {
-            MyLogger.logException(e);
+            logException(e);
             throw new RuntimeException(e);
         }
 
@@ -611,41 +600,46 @@ public class TranscriptionViewController implements Initializable {
         rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/" + theme.cssFile));
 
         // Set graphics
-        newProjectButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/create.png"
-        )));
-        openProjectButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/folder-open.png"
-        )));
-        saveProjectButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/save.png"
-        )));
+        IconHelpers.setSVGOnButton(
+                newProjectButton, 20, IMAGE_BUTTON_LENGTH, "plus-circle-solid", theme.shortName
+        );
+        IconHelpers.setSVGOnButton(
+                openProjectButton, 20, IMAGE_BUTTON_LENGTH, "folder-open-solid", theme.shortName
+        );
+        IconHelpers.setSVGOnButton(
+                saveProjectButton, 20, IMAGE_BUTTON_LENGTH, "floppy-solid", theme.shortName
+        );
 
-        playButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/play.png"
-        )));
-        stopButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/stop.png"
-        )));
-        playSkipBackButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/play-skip-back.png"
-        )));
-        playSkipForwardButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/play-skip-forward.png"
-        )));
-        scrollButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/footsteps-outline.png"
-        )));
-        editNotesButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/edit-notes-outline.png"
-        )));
+        IconHelpers.setSVGOnButton(
+                scrollButton, 15, 22.5, IMAGE_BUTTON_LENGTH, IMAGE_BUTTON_LENGTH,
+                "map-marker-line", theme.shortName
+        );
+        IconHelpers.setSVGOnButton(
+                editNotesButton, 20, IMAGE_BUTTON_LENGTH, "pencil-line", theme.shortName
+        );
 
-        audioVolumeButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/volume-high.png"
-        )));
-        notesVolumeButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/icons/PNGs/" + theme.shortName + "/musical-notes.png"
-        )));
+        IconHelpers.setSVGOnButton(
+                playButton, 20, IMAGE_BUTTON_LENGTH, "play-solid", theme.shortName
+        );
+        IconHelpers.setSVGOnButton(
+                stopButton, 20, IMAGE_BUTTON_LENGTH, "stop-solid", theme.shortName
+        );
+        IconHelpers.setSVGOnButton(
+                playStepBackwardButton, 20, IMAGE_BUTTON_LENGTH, "step-backward-solid",
+                theme.shortName
+        );
+        IconHelpers.setSVGOnButton(
+                playStepForwardButton, 20, IMAGE_BUTTON_LENGTH, "step-forward-solid",
+                theme.shortName
+        );
+
+        IconHelpers.setSVGOnButton(
+                audioVolumeButton, 20, IMAGE_BUTTON_LENGTH, "volume-up-solid", theme.shortName
+        );
+        IconHelpers.setSVGOnButton(
+                notesVolumeButton, 15, 20, IMAGE_BUTTON_LENGTH, IMAGE_BUTTON_LENGTH,
+                "music-note-solid", theme.shortName
+        );
     }
 
     /**
@@ -679,10 +673,9 @@ public class TranscriptionViewController implements Initializable {
 
             // Change the icon of the audio volume button from mute to non-mute
             if (isAudioMuted) {
-                audioVolumeButtonImage.setImage(
-                        new Image(IOMethods.getFileURLAsString(
-                                "images/icons/PNGs/" + theme.shortName + "/volume-high.png"
-                        ))
+                IconHelpers.setSVGOnButton(
+                        audioVolumeButton, 20, IMAGE_BUTTON_LENGTH, "volume-up-solid",
+                        theme.shortName
                 );
                 isAudioMuted = false;
             }
@@ -693,11 +686,7 @@ public class TranscriptionViewController implements Initializable {
             // Update CSS
             updateVolumeSliderCSS(audioVolumeSlider, audioVolume);
 
-            MyLogger.log(
-                    Level.FINE,
-                    "Changed audio volume from " + oldValue + " to " + newValue,
-                    this.getClass().toString()
-            );
+            log(Level.FINE, "Changed audio volume from " + oldValue + " to " + newValue);
         });
 
         notesVolumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -706,10 +695,9 @@ public class TranscriptionViewController implements Initializable {
 
             // Change the icon of the notes' volume button from off to on
             if (areNotesMuted) {
-                notesVolumeButtonImage.setImage(
-                        new Image(IOMethods.getFileURLAsString(
-                                "images/icons/PNGs/" + theme.shortName + "/musical-notes.png"
-                        ))
+                IconHelpers.setSVGOnButton(
+                        notesVolumeButton, 15, 20, IMAGE_BUTTON_LENGTH, IMAGE_BUTTON_LENGTH,
+                        "music-note-solid", theme.shortName
                 );
                 isAudioMuted = false;
             }
@@ -717,11 +705,7 @@ public class TranscriptionViewController implements Initializable {
             // Update CSS
             updateVolumeSliderCSS(notesVolumeSlider, (double) (notesVolume - 33) / 94);
 
-            MyLogger.log(
-                    Level.FINE,
-                    "Changed notes volume from " + oldValue + " to " + newValue,
-                    this.getClass().toString()
-            );
+            log(Level.FINE, "Changed notes volume from " + oldValue + " to " + newValue);
         });
 
         // Update labels
@@ -736,7 +720,7 @@ public class TranscriptionViewController implements Initializable {
         NoteRectangle.defineNoteRectanglesByNoteNumberLists(MAX_NOTE_NUMBER - MIN_NOTE_NUMBER + 1);
 
         // Report that the transcription view is ready to be shown
-        MyLogger.log(Level.INFO, "Transcription view ready to be shown", this.getClass().toString());
+        log(Level.INFO, "Transcription view ready to be shown");
     }
 
     /**
@@ -777,7 +761,7 @@ public class TranscriptionViewController implements Initializable {
                             "still exist at the original location?",
                     e
             );
-            MyLogger.logException(e);
+            logException(e);
             e.printStackTrace();
         } catch (FFmpegNotFoundException e) {
             Popups.showExceptionAlert(
@@ -785,7 +769,7 @@ public class TranscriptionViewController implements Initializable {
                     "FFmpeg was not found. Please install it and try again.",
                     e
             );
-            MyLogger.logException(e);
+            logException(e);
             e.printStackTrace();
         } catch (AudioTooLongException e) {
             Popups.showExceptionAlert(
@@ -793,7 +777,7 @@ public class TranscriptionViewController implements Initializable {
                     "The audio file is too long. Please select a shorter audio file.",
                     e
             );
-            MyLogger.logException(e);
+            logException(e);
             e.printStackTrace();
         }
 
@@ -808,7 +792,7 @@ public class TranscriptionViewController implements Initializable {
                 projectsDB.insertProjectRecord(audtFilePath, projectName);
             }
         } catch (SQLException e) {
-            MyLogger.logException(e);
+            logException(e);
             throw new RuntimeException(e);
         }
     }
@@ -965,11 +949,7 @@ public class TranscriptionViewController implements Initializable {
 
         // Ensure that the temporary directory exists
         IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
-        MyLogger.log(
-                Level.FINE,
-                "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH,
-                this.getClass().toString()
-        );
+        log(Level.FINE, "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH);
 
         // Define a FFmpeg handler
         FFmpegHandler ffmpegHandler = new FFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
@@ -987,11 +967,7 @@ public class TranscriptionViewController implements Initializable {
             rawSlowedMP3Bytes = TypeConversionUtils.toByteArray(returnedData.value0());
             auxSlowedWAVFile = returnedData.value1();
         } else {
-            MyLogger.log(
-                    Level.INFO,
-                    "Slowed audio not yet generated; generating now",
-                    this.getClass().getName()
-            );
+            log(Level.INFO, "Slowed audio not yet generated; generating now");
 
             // Slow down the original WAV file
             String auxSlowedMP3Path = ffmpegHandler.generateAltTempoAudio(
@@ -1011,11 +987,7 @@ public class TranscriptionViewController implements Initializable {
             // Delete unneeded files
             IOMethods.delete(auxSlowedMP3File);
 
-            MyLogger.log(
-                    Level.INFO,
-                    "Slowed audio generated",
-                    this.getClass().getName()
-            );
+            log(Level.INFO, "Slowed audio generated");
         }
 
         // Create the `Audio` object
@@ -1097,17 +1069,16 @@ public class TranscriptionViewController implements Initializable {
         // Stop the audio playing
         audio.stop();
 
+        // Close the note player sequencer
+        notePlayerSequencer.close();
+
         // Clear the note rectangles
         NoteRectangle.allNoteRectangles.clear();
 
-        // Shutdown the schedulers
+        // Shut down the schedulers
         if (scheduler != null) scheduler.shutdown();
         if (autosaveScheduler != null) autosaveScheduler.shutdown();
         if (memoryAvailableScheduler != null) memoryAvailableScheduler.shutdown();
-
-        // Stop and close the note player sequencer
-        notePlayerSequencer.stop();
-        notePlayerSequencer.close();
     }
 
     /**
@@ -1121,7 +1092,7 @@ public class TranscriptionViewController implements Initializable {
         if (saveProjectButton.isDisabled()) return false;
 
         // Now check if there are unsaved changes
-        if (hasUnsavedChanges) {
+        if (hasUnsavedChanges || NoteRectangle.getHasEditedNoteRectangles()) {
             // Prompt user to save work first
             ButtonType dontSaveButExit = new ButtonType("Don't Save");
             ButtonType dontSaveDontExit = new ButtonType("Cancel");
@@ -1153,7 +1124,7 @@ public class TranscriptionViewController implements Initializable {
                                     "AudiTranscribe failed to save the file.",
                                     e
                             );
-                            MyLogger.logException(e);
+                            logException(e);
                             return false;  // Cannot exit
                         }
                     } else {
@@ -1219,9 +1190,9 @@ public class TranscriptionViewController implements Initializable {
         // Update note sequencer current time
         if (!areNotesMuted && notePlayerSequencer.isSequencerAvailable()) {
             if (!notePlayerSequencer.getSequencer().isRunning() && !isPaused) {  // Not running but unpaused
-                notePlayerSequencer.play(seekTime + DataFiles.SETTINGS_DATA_FILE.data.notePlayingDelayOffset);
+                notePlayerSequencer.play(seekTime, usingSlowedAudio);
             } else {
-                notePlayerSequencer.setCurrTime(seekTime + DataFiles.SETTINGS_DATA_FILE.data.notePlayingDelayOffset);
+                notePlayerSequencer.setCurrTime(seekTime);
             }
         }
 
@@ -1232,7 +1203,7 @@ public class TranscriptionViewController implements Initializable {
         // Update the playhead X position
         playheadX.set(seekTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X);
 
-        MyLogger.log(Level.FINE, "Seeked to " + seekTime + " seconds", this.getClass().toString());
+        log(Level.FINE, "Seeked to " + seekTime + " seconds");
     }
 
     /**
@@ -1242,21 +1213,19 @@ public class TranscriptionViewController implements Initializable {
      * @return New paused state.
      */
     private boolean togglePaused(boolean isPaused) {
+        // Change the icon
+        String iconToUse;
         if (isPaused) {  // Is currently paused; want to make audio play
             // Change the icon of the play button from the play icon to the paused icon
             // (So that the user knows that the next interaction with button will pause audio)
-            playButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                    "images/icons/PNGs/" + theme.shortName + "/pause.png"
-            )));
+            iconToUse = "pause-solid";
 
             // Unpause the audio (i.e. play the audio)
             audio.play(usingSlowedAudio);
         } else {  // Is currently playing; want to make audio pause
             // Change the icon of the play button from the paused icon to the play icon
             // (So that the user knows that the next interaction with button will play audio)
-            playButtonImage.setImage(new Image(IOMethods.getFileURLAsString(
-                    "images/icons/PNGs/" + theme.shortName + "/play.png"
-            )));
+            iconToUse = "play-solid";
 
             // Pause the audio
             audio.pause();
@@ -1265,6 +1234,10 @@ public class TranscriptionViewController implements Initializable {
             notePlayerSequencer.stop();
         }
 
+        Platform.runLater(() -> IconHelpers.setSVGOnButton(
+                playButton, 20, IMAGE_BUTTON_LENGTH, iconToUse, theme.shortName
+        ));
+
         // Toggle paused state for note rectangles
         NoteRectangle.setIsPaused(!isPaused);
 
@@ -1272,10 +1245,7 @@ public class TranscriptionViewController implements Initializable {
         toggleSlowedAudioButton.setDisable(isPaused);  // If currently paused, will block
 
         // Return the toggled version of the `isPaused` flag
-        MyLogger.log(
-                Level.FINE,
-                "Toggled pause state; now is " + (!isPaused ? "paused" : "playing"),
-                this.getClass().toString());
+        log(Level.FINE, "Toggled pause state; now is " + (!isPaused ? "paused" : "playing"));
         return !isPaused;
     }
 
@@ -1303,8 +1273,8 @@ public class TranscriptionViewController implements Initializable {
         notePlayerSequencer.setBPM(bpm);
         notePlayerSequencer.setInstrument(NOTE_INSTRUMENT);
 
-        // Set notes
-        notePlayerSequencer.setNotesOnTrack(noteOnsetTimes, noteDurations, noteNums);  // Will clear existing notes
+        // Clear existing notes, and set new notes
+        notePlayerSequencer.setNotesOnTrack(noteOnsetTimes, noteDurations, noteNums, usingSlowedAudio);
     }
 
     // IO methods
@@ -1413,11 +1383,7 @@ public class TranscriptionViewController implements Initializable {
         ((Stage) rootPane.getScene().getWindow()).setTitle(newProjectName);
 
         // Update attributes
-        MyLogger.log(
-                Level.INFO,
-                "Changed project name from '" + projectName + "' to '" + newProjectName + "'",
-                this.getClass().toString()
-        );
+        log(Level.INFO, "Changed project name from '" + projectName + "' to '" + newProjectName + "'");
 
         projectName = newProjectName;
         changedProjectName = true;
@@ -1467,7 +1433,7 @@ public class TranscriptionViewController implements Initializable {
                     changedProjectName = false;  // Revert once complete
                 }
             } catch (SQLException e) {
-                MyLogger.logException(e);
+                logException(e);
                 throw new RuntimeException(e);
             }
 
@@ -1522,23 +1488,27 @@ public class TranscriptionViewController implements Initializable {
             notePlayerSequencer.exportToMIDI(
                     MusicUtils.TIME_SIGNATURES[timeSignatureIndex], musicKey, file.getAbsolutePath()
             );
-            MyLogger.log(
-                    Level.FINE,
-                    "Exported notes to '" + file.getAbsolutePath() + "'.",
-                    TranscriptionViewController.class.getName()
-            );
+            log(Level.FINE, "Exported notes to '" + file.getAbsolutePath() + "'.");
             Popups.showInformationAlert(
                     "Successfully exported to MIDI",
                     "Successfully exported to MIDI."
             );
         } catch (IOException e) {
-            MyLogger.logException(e);
+            logException(e);
             Popups.showExceptionAlert(
                     "Failed to export to MIDI file",
                     "An exception occurred when exporting the notes to MIDI file.",
                     e
             );
         }
+    }
+
+    /**
+     * Helper method that helps quantize the notes.
+     */
+    private void handleQuantizeNotes() {
+        NoteRectangle.quantizeNotes(bpm, offset, timeSignatureChoice.getValue());
+        log(Level.FINE, "Quantized notes");
     }
 
     /**
@@ -1569,7 +1539,8 @@ public class TranscriptionViewController implements Initializable {
 
         // Package project info data and music notes data for saving
         // (Note: current file version is 0x00080001, so all data objects used will be for that version)
-        MyLogger.log(Level.INFO, "Packaging data for saving", this.getClass().toString());
+        log(Level.INFO, "Packaging data for saving");
+
         ProjectInfoDataObject projectInfoData = new ProjectInfoDataObject0x00080001(
                 projectName, musicKeyIndex, timeSignatureIndex, bpm, offset, audioVolume,
                 (int) (currTime * 1000)
@@ -1588,7 +1559,7 @@ public class TranscriptionViewController implements Initializable {
                         task
                 );
             } catch (IOException e) {
-                MyLogger.logException(e);
+                logException(e);
                 throw new RuntimeException(e);
             }
 
@@ -1599,7 +1570,7 @@ public class TranscriptionViewController implements Initializable {
                         task
                 );
             } catch (IOException e) {
-                MyLogger.logException(e);
+                logException(e);
                 throw new RuntimeException(e);
             }
 
@@ -1634,10 +1605,11 @@ public class TranscriptionViewController implements Initializable {
             ProjectIOHandlers.saveProject(saveDest, numSkippableBytes, projectInfoData, musicNotesData);
         }
 
-        // Set the `hasUnsavedChanges` flag to false
+        // Set flags
         hasUnsavedChanges = false;
+        NoteRectangle.setHasEditedNoteRectangles(false);
 
-        MyLogger.log(Level.INFO, "File saved", this.getClass().toString());
+        log(Level.INFO, "File saved successfully");
     }
 
     // Updaters
@@ -1676,13 +1648,9 @@ public class TranscriptionViewController implements Initializable {
 
         // Update the BPM value
         if (!forceUpdate) {
-            MyLogger.log(
-                    Level.FINE,
-                    "Updated BPM value from " + bpm + " to " + newBPM,
-                    this.getClass().toString()
-            );
+            log(Level.FINE, "Updated BPM value from " + bpm + " to " + newBPM);
         } else {
-            MyLogger.log(Level.FINE, "Force update BPM value to " + newBPM, this.getClass().toString());
+            log(Level.FINE, "Force update BPM value to " + newBPM);
         }
 
         bpm = newBPM;
@@ -1722,13 +1690,9 @@ public class TranscriptionViewController implements Initializable {
 
         // Update the offset value
         if (!forceUpdate) {
-            MyLogger.log(
-                    Level.FINE,
-                    "Updated offset value from " + offset + " to " + newOffset,
-                    this.getClass().toString()
-            );
+            log(Level.FINE, "Updated offset value from " + offset + " to " + newOffset);
         } else {
-            MyLogger.log(Level.FINE, "Force update offset value to " + newOffset, this.getClass().toString());
+            log(Level.FINE, "Force update offset value to " + newOffset);
         }
 
         offset = newOffset;
@@ -1754,17 +1718,9 @@ public class TranscriptionViewController implements Initializable {
 
         // Update the music key value and music key index
         if (!forceUpdate) {
-            MyLogger.log(
-                    Level.FINE,
-                    "Changed music key from " + musicKey + " to " + newMusicKey,
-                    this.getClass().toString()
-            );
+            log(Level.FINE, "Changed music key from " + musicKey + " to " + newMusicKey);
         } else {
-            MyLogger.log(
-                    Level.FINE,
-                    "Forced changed music key from " + musicKey + " to " + newMusicKey,
-                    this.getClass().toString()
-            );
+            log(Level.FINE, "Forced changed music key from " + musicKey + " to " + newMusicKey);
         }
 
         musicKey = newMusicKey;
@@ -1857,11 +1813,7 @@ public class TranscriptionViewController implements Initializable {
 
                     // Check if the current time has exceeded and is not paused
                     if (currTime >= audioDuration) {
-                        MyLogger.log(
-                                Level.FINE,
-                                "Playback reached end of audio, will start from beginning upon play",
-                                this.getClass().toString()
-                        );
+                        log(Level.FINE, "Playback reached end of audio, will start from beginning upon play");
 
                         // Pause the audio
                         isPaused = togglePaused(false);
@@ -1892,13 +1844,9 @@ public class TranscriptionViewController implements Initializable {
                             () -> {
                                 if (audtFilePath != null) {
                                     handleSavingProject(true, false);
-                                    MyLogger.log(Level.INFO, "Project autosaved", this.getClass().toString());
+                                    log(Level.INFO, "Autosave project successful");
                                 } else {
-                                    MyLogger.log(
-                                            Level.INFO,
-                                            "Autosave skipped, no project loaded",
-                                            this.getClass().toString()
-                                    );
+                                    log(Level.INFO, "Autosave skipped, since project was not loaded from file");
                                 }
                             }),
                     DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval,
@@ -1969,11 +1917,7 @@ public class TranscriptionViewController implements Initializable {
 
             // Mark the task as completed and report that the transcription view is ready to be shown
             markTaskAsCompleted(task);
-            MyLogger.log(
-                    Level.INFO,
-                    "Spectrogram for '" + projectName + "' ready to be shown",
-                    this.getClass().toString()
-            );
+            log(Level.INFO, "Spectrogram for '" + projectName + "' ready to be shown");
         });
     }
 
@@ -2004,7 +1948,7 @@ public class TranscriptionViewController implements Initializable {
 
             // Mark the task as completed
             markTaskAsCompleted(task);
-            MyLogger.log(Level.INFO, "Estimation task complete", this.getClass().toString());
+            log(Level.INFO, "Estimation task complete");
         });
     }
 
@@ -2023,11 +1967,12 @@ public class TranscriptionViewController implements Initializable {
 
                 taskList.forEach(task -> task.setOnFailed(event -> {
                     // Log the error
-                    MyLogger.log(
-                            Level.SEVERE,
-                            "Task \"" + task.name + "\" failed: " + task.getException().getMessage(),
-                            this.getClass().toString());
-                    task.getException().printStackTrace();
+                    log(Level.SEVERE, "Task '" + task.name + "' failed.");
+                    if (task.getException() instanceof Exception) {
+                        logException((Exception) task.getException());
+                    } else {
+                        task.getException().printStackTrace();
+                    }
 
                     // Determine the header and content text to show
                     String headerText = "An Error Occurred";
@@ -2055,18 +2000,18 @@ public class TranscriptionViewController implements Initializable {
                     thread.setDaemon(true);
                     thread.start();
 
-                    MyLogger.log(Level.INFO, "Started task: '" + task.name + "'", this.getClass().toString());
+                    log(Level.INFO, "Started task: '" + task.name + "'");
 
                     // Await for completion
                     try {
                         thread.join();
                     } catch (InterruptedException e) {
-                        MyLogger.logException(e);
+                        logException(e);
                         throw new RuntimeException(e);
                     }
                 }
 
-                MyLogger.log(Level.INFO, "All tasks complete", this.getClass().toString());
+                log(Level.INFO, "All tasks complete");
                 return true;
             }
         };
@@ -2103,11 +2048,11 @@ public class TranscriptionViewController implements Initializable {
                             // Add the note rectangle to the spectrogram pane
                             spectrogramPaneAnchor.getChildren().add(noteRect);
 
-                            MyLogger.log(
+                            log(
                                     Level.FINE,
-                                    "Loaded note " + noteNum + " with " + noteDuration +
-                                            " seconds duration at " + timeToPlaceRectangle + " seconds",
-                                    this.getClass().toString());
+                                    "Loaded note " + noteNum + " with " + noteDuration + " seconds duration at " +
+                                            timeToPlaceRectangle + " seconds"
+                            );
                         } catch (NoteRectangleCollisionException ignored) {
                         }
                     }
@@ -2134,7 +2079,7 @@ public class TranscriptionViewController implements Initializable {
 
                         // Bottom Hbox
                         audioVolumeButton, audioVolumeSlider, notesVolumeButton, notesVolumeSlider,
-                        playButton, stopButton, playSkipBackButton, playSkipForwardButton,
+                        playButton, stopButton, playStepBackwardButton, playStepForwardButton,
                         toggleSlowedAudioButton, scrollButton, editNotesButton
                 };
 
@@ -2151,7 +2096,10 @@ public class TranscriptionViewController implements Initializable {
 
                 // If we are using existing data (i.e., AUDT file path was already set), then initially there are no
                 // unsaved changes
-                if (audtFilePath != null) hasUnsavedChanges = false;
+                if (audtFilePath != null) {
+                    hasUnsavedChanges = false;
+                    NoteRectangle.setHasEditedNoteRectangles(false);
+                }
             }
         });
 
@@ -2216,147 +2164,98 @@ public class TranscriptionViewController implements Initializable {
         // Play notes on note player sequencer
         // (We separate this method from above to ensure a more accurate note playing delay)
         if (!isPaused && !areNotesMuted) {  // We use `!isPaused` here because it was toggled already
-            notePlayerSequencer.play(currTime + DataFiles.SETTINGS_DATA_FILE.data.notePlayingDelayOffset);
+            notePlayerSequencer.play(currTime, usingSlowedAudio);
         }
 
         // Disable note volume slider and note muting button if playing
         notesVolumeButton.setDisable(!isPaused);
         notesVolumeSlider.setDisable(!isPaused);
 
-        MyLogger.log(
-                Level.FINE,
-                "Toggled play button; audio is now " + (!isPaused ? "paused" : "playing"),
-                this.getClass().toString()
-        );
+        log(Level.FINE, "Toggled play button; audio is now " + (!isPaused ? "paused" : "playing"));
     }
 
     /**
      * Helper method that toggles the scroll button.
      */
     private void toggleScrollButton() {
-        if (scrollToPlayhead) {
-            // Change the icon of the scroll button from filled to non-filled
-            scrollButtonImage.setImage(
-                    new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/footsteps-outline.png"
-                    ))
-            );
-        } else {
-            // Change the icon of the scroll button from non-filled to filled
-            scrollButtonImage.setImage(
-                    new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/footsteps-filled.png"
-                    ))
-            );
-        }
+        // Change the icon
+        String iconToUse = "map-marker-solid";
+        if (scrollToPlayhead) iconToUse = "map-marker-line";  // Want to change from filled to non-filled
+        IconHelpers.setSVGOnButton(
+                scrollButton, 15, 22.5, IMAGE_BUTTON_LENGTH, IMAGE_BUTTON_LENGTH, iconToUse,
+                theme.shortName
+        );
 
         // Toggle the `scrollToPlayhead` flag
         scrollToPlayhead = !scrollToPlayhead;
 
-        MyLogger.log(
-                Level.FINE,
-                "Toggled scroll (scroll is now " + scrollToPlayhead + ")",
-                this.getClass().toString()
-        );
+        log(Level.FINE, "Toggled scroll (scroll is now " + scrollToPlayhead + ")");
     }
 
     /**
      * Helper method that toggles the edit notes button.
      */
     private void toggleEditNotesButton() {
-        if (canEditNotes) {
-            // Change the icon of the edit notes button from filled to non-filled
-            editNotesButtonImage.setImage(
-                    new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/edit-notes-outline.png"
-                    ))
-            );
-
-        } else {
-            // Change the icon of the edit notes button from non-filled to filled
-            editNotesButtonImage.setImage(
-                    new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/edit-notes.png"
-                    ))
-            );
-        }
+        // Change the icon
+        String iconToUse = "pencil-solid";
+        if (canEditNotes) iconToUse = "pencil-line";  // Want to change from filled to non-filled
+        IconHelpers.setSVGOnButton(editNotesButton, 20, IMAGE_BUTTON_LENGTH, iconToUse, theme.shortName);
 
         // Toggle the `canEditNotes` flag
         canEditNotes = !canEditNotes;
         NoteRectangle.setCanEdit(canEditNotes);
 
-        MyLogger.log(
-                Level.FINE,
-                "Toggled editing notes (editing notes is now " + canEditNotes + ")",
-                this.getClass().toString()
-        );
+        log(Level.FINE, "Toggled editing notes (editing notes is now " + canEditNotes + ")");
     }
 
     /**
      * Helper method that toggles the audio mute button.
      */
     private void toggleAudioMuteButton() {
+        // Determine icon to use
+        String iconToUse;
+
         if (isAudioMuted) {
-            // Change the icon of the volume button from mute to non-mute
-            audioVolumeButtonImage.setImage(
-                    new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/volume-high.png"
-                    ))
-            );
+            // Want to change from mute to non-mute
+            iconToUse = "volume-up-solid";
 
             // Unmute the audio by setting the volume back to the value before the mute
             audio.setPlaybackVolume(audioVolume);
         } else {
-            // Change the icon of the volume button from non-mute to mute
-            audioVolumeButtonImage.setImage(
-                    new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/volume-mute.png"
-                    ))
-            );
+            // Want to change from non-mute to mute
+            iconToUse = "volume-mute-solid";
 
             // Mute the audio by setting the volume to zero
             audio.setPlaybackVolume(0);
         }
 
+        // Change the icon
+        IconHelpers.setSVGOnButton(
+                audioVolumeButton, 20, IMAGE_BUTTON_LENGTH, iconToUse, theme.shortName
+        );
+
         // Toggle the `isAudioMuted` flag
         isAudioMuted = !isAudioMuted;
 
-        MyLogger.log(
-                Level.FINE,
-                "Toggled audio mute button (audio muted is now " + isAudioMuted + ")",
-                this.getClass().toString()
-        );
+        log(Level.FINE, "Toggled audio mute button (audio muted is now " + isAudioMuted + ")");
     }
 
     /**
      * Helper method that toggles the note mute button.
      */
     private void toggleNoteMuteButton() {
-        if (areNotesMuted) {
-            // Change the icon of the notes button from off to on
-            notesVolumeButtonImage.setImage(
-                    new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/musical-notes.png"
-                    ))
-            );
-
-        } else {
-            // Change the icon of the notes button from on to off
-            notesVolumeButtonImage.setImage(
-                    new Image(IOMethods.getFileURLAsString(
-                            "images/icons/PNGs/" + theme.shortName + "/musical-notes-outline.png"
-                    ))
-            );
-        }
+        // Change the icon
+        String iconToUse = "music-note-line";
+        if (areNotesMuted) iconToUse = "music-note-solid";  // Want to change icon from off to on
+        IconHelpers.setSVGOnButton(
+                notesVolumeButton, 15, 20, IMAGE_BUTTON_LENGTH, IMAGE_BUTTON_LENGTH, iconToUse,
+                theme.shortName
+        );
 
         // Toggle the `areNotesMuted` flag
         areNotesMuted = !areNotesMuted;
 
-        MyLogger.log(
-                Level.FINE,
-                "Toggled notes mute button (notes muted is now " + areNotesMuted + ")",
-                this.getClass().toString()
-        );
+        log(Level.FINE, "Toggled notes mute button (notes muted is now " + areNotesMuted + ")");
     }
 
     // Keyboard event handlers
@@ -2407,11 +2306,7 @@ public class TranscriptionViewController implements Initializable {
             case MINUS -> {
                 notePlayerSynth.silenceChannel();  // Stop any notes from playing
                 if (octaveNum > 0) {
-                    MyLogger.log(
-                            Level.FINE,
-                            "Playback octave raised to " + octaveNum,
-                            this.getClass().toString()
-                    );
+                    log(Level.FINE, "Playback octave raised to " + octaveNum);
                     PlottingStuffHandler.updateCurrentOctaveRectangle(
                             currentOctaveRectangle, finalHeight, --octaveNum, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER
                     );
@@ -2420,11 +2315,7 @@ public class TranscriptionViewController implements Initializable {
             case EQUALS -> {
                 notePlayerSynth.silenceChannel();  // Stop any notes from playing
                 if (octaveNum < 9) {
-                    MyLogger.log(
-                            Level.FINE,
-                            "Playback octave lowered to " + octaveNum,
-                            this.getClass().toString()
-                    );
+                    log(Level.FINE, "Playback octave lowered to " + octaveNum);
                     PlottingStuffHandler.updateCurrentOctaveRectangle(
                             currentOctaveRectangle, finalHeight, ++octaveNum, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER
                     );
@@ -2509,11 +2400,7 @@ public class TranscriptionViewController implements Initializable {
 
         // Check if there already exist a place to save
         if (audtFilePath == null || forceChooseFile) {
-            MyLogger.log(
-                    Level.FINE,
-                    "AUDT file destination not yet set; asking now",
-                    this.getClass().toString()
-            );
+            log(Level.FINE, "AUDT file destination not yet set; asking now");
 
             // Get current window
             Window window = rootPane.getScene().getWindow();
@@ -2538,13 +2425,13 @@ public class TranscriptionViewController implements Initializable {
                 audtFileName = saveName;
             }
 
-            MyLogger.log(Level.FINE, "AUDT file destination set to " + saveDest, this.getClass().toString());
+            log(Level.FINE, "AUDT file destination set to: " + saveDest);
         } else {
             // Use the existing file path and file name
             saveDest = audtFilePath;
             saveName = audtFileName;
 
-            MyLogger.log(Level.FINE, "Saving " + saveName + " to " + saveDest, this.getClass().toString());
+            log(Level.FINE, "Saving '" + saveName + "' to: " + saveDest);
         }
 
         // Return the needed data

@@ -18,10 +18,12 @@
 
 package site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators;
 
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
+
 /**
  * Abstract AUDT data object class that stores the data needed.
  */
-public abstract class AbstractAUDTDataObject {
+public abstract class AbstractAUDTDataObject extends ClassWithLogging {
     // Abstract methods
 
     /**

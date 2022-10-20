@@ -24,13 +24,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.CustomTask;
-import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
-import site.overwrite.auditranscribe.setup_wizard.helpers.AudioResourceDownloadManager;
-import site.overwrite.auditranscribe.setup_wizard.helpers.FFmpegDownloadManager;
+import site.overwrite.auditranscribe.setup_wizard.download_managers.AudioResourceDownloadManager;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -39,7 +38,7 @@ import java.util.logging.Level;
 /**
  * View controller that handles the downloading of the audio resource to fix the note delay.
  */
-public class DownloadingAudioResourceViewController implements Initializable {
+public class DownloadingAudioResourceViewController extends ClassWithLogging implements Initializable {
     // Constants
     private final String DEST_FOLDER = IOMethods.joinPaths(IOConstants.OTHER_RESOURCES_DATA_FOLDER_PATH, "audio");
 
@@ -76,7 +75,7 @@ public class DownloadingAudioResourceViewController implements Initializable {
         CustomTask<String> downloadTask = new CustomTask<>() {
             @Override
             protected String call() throws Exception {
-                return downloadManager.downloadAudioResource(DEST_FOLDER, this);
+                return downloadManager.downloadResource(DEST_FOLDER, this);
             }
         };
         downloadTask.setOnFailed((event) -> {
@@ -85,11 +84,7 @@ public class DownloadingAudioResourceViewController implements Initializable {
         });
         downloadTask.setOnSucceeded((event) -> {
             audioResourcePath = downloadTask.getValue();
-            MyLogger.log(
-                    Level.INFO,
-                    "Audio resource downloaded to '" + audioResourcePath + "'.",
-                    this.getClass().getName()
-            );
+            log(Level.INFO, "Audio resource downloaded to '" + audioResourcePath + "'.");
             ((Stage) rootPane.getScene().getWindow()).close();
         });
 
@@ -101,7 +96,7 @@ public class DownloadingAudioResourceViewController implements Initializable {
         downloadThread.setDaemon(true);
         downloadThread.start();
 
-        MyLogger.log(Level.INFO, "Showing audio resource download view", this.getClass().getName());
+        log(Level.INFO, "Showing audio resource download view");
     }
 
     /**

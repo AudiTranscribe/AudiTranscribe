@@ -39,7 +39,7 @@ public enum Theme {
         this.cssFile = shortName + ".css";
     }
 
-    // Override methods
+    // Overridden methods
     @Override
     public String toString() {
         return name;

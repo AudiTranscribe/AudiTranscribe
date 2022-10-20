@@ -23,12 +23,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
+import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.CustomTask;
-import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.misc.Theme;
-import site.overwrite.auditranscribe.setup_wizard.helpers.FFmpegDownloadManager;
+import site.overwrite.auditranscribe.setup_wizard.download_managers.FFmpegDownloadManager;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -37,7 +37,7 @@ import java.util.logging.Level;
 /**
  * View controller that handles the downloading of FFmpeg.
  */
-public class DownloadingFFmpegViewController implements Initializable {
+public class DownloadingFFmpegViewController extends ClassWithLogging implements Initializable {
     // Constants
     private final String DEST_FOLDER = IOConstants.APP_DATA_FOLDER_PATH;
 
@@ -80,7 +80,10 @@ public class DownloadingFFmpegViewController implements Initializable {
         CustomTask<String> downloadTask = new CustomTask<>() {
             @Override
             protected String call() throws Exception {
-                return downloadManager.downloadFFmpeg(DEST_FOLDER, this);
+                String ffmpegZipPath = downloadManager.downloadResource(DEST_FOLDER, this);
+                downloadManager.processDownload(ffmpegZipPath);
+
+                return downloadManager.ffmpegBinPath;
             }
         };
         downloadTask.setOnFailed((event) -> {
@@ -89,11 +92,7 @@ public class DownloadingFFmpegViewController implements Initializable {
         });
         downloadTask.setOnSucceeded((event) -> {
             ffmpegPath = downloadTask.getValue();
-            MyLogger.log(
-                    Level.INFO,
-                    "FFmpeg downloaded; path set to '" + ffmpegPath + "'.",
-                    this.getClass().getName()
-            );
+            log(Level.INFO, "FFmpeg downloaded; path set to '" + ffmpegPath + "'.");
             ((Stage) rootPane.getScene().getWindow()).close();
         });
 
@@ -105,7 +104,7 @@ public class DownloadingFFmpegViewController implements Initializable {
         downloadThread.setDaemon(true);
         downloadThread.start();
 
-        MyLogger.log(Level.INFO, "Showing FFmpeg download view", this.getClass().getName());
+        log(Level.INFO, "Showing FFmpeg download view");
     }
 
     /**

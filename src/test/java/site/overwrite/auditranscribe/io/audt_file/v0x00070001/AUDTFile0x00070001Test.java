@@ -19,9 +19,9 @@
 package site.overwrite.auditranscribe.io.audt_file.v0x00070001;
 
 import org.junit.jupiter.api.*;
-import site.overwrite.auditranscribe.exceptions.io.audt_file.FailedToReadDataException;
-import site.overwrite.auditranscribe.exceptions.io.audt_file.IncorrectFileFormatException;
-import site.overwrite.auditranscribe.exceptions.io.audt_file.InvalidFileVersionException;
+import site.overwrite.auditranscribe.io.exceptions.FailedToReadDataException;
+import site.overwrite.auditranscribe.io.exceptions.IncorrectFileFormatException;
+import site.overwrite.auditranscribe.io.exceptions.InvalidFileVersionException;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
@@ -30,7 +30,7 @@ import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileReader;
 import site.overwrite.auditranscribe.io.audt_file.base.AUDTFileWriter;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.audt_file.v0x00070001.data_encapsulators.*;
-import site.overwrite.auditranscribe.misc.tuples.Triple;
+import site.overwrite.auditranscribe.generic.tuples.Triple;
 import site.overwrite.auditranscribe.utils.TypeConversionUtils;
 
 import java.io.IOException;

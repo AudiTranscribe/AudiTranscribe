@@ -1,6 +1,6 @@
 /*
  * module-info.java
- * Description: Module info class.
+ * Description: Module info file.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -36,34 +36,37 @@ module site.overwrite.auditranscribe {
 
     exports site.overwrite.auditranscribe;
     exports site.overwrite.auditranscribe.audio;
+    exports site.overwrite.auditranscribe.audio.exceptions;
     exports site.overwrite.auditranscribe.audio.filters;
     exports site.overwrite.auditranscribe.audio.window_functions;
-    exports site.overwrite.auditranscribe.exceptions.audio;
-    exports site.overwrite.auditranscribe.exceptions.generic;
-    exports site.overwrite.auditranscribe.exceptions.io;
-    exports site.overwrite.auditranscribe.exceptions.io.audt_file;
-    exports site.overwrite.auditranscribe.exceptions.network;
-    exports site.overwrite.auditranscribe.exceptions.notes;
+    exports site.overwrite.auditranscribe.generic.exceptions;
+    exports site.overwrite.auditranscribe.generic.tuples;
     exports site.overwrite.auditranscribe.io.audt_file;
     exports site.overwrite.auditranscribe.io.audt_file.base;
     exports site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators;
     exports site.overwrite.auditranscribe.io.data_files;
     exports site.overwrite.auditranscribe.io.data_files.data_encapsulators;
     exports site.overwrite.auditranscribe.io.data_files.file_classes;
+    exports site.overwrite.auditranscribe.io.exceptions;
     exports site.overwrite.auditranscribe.main_views;
+    exports site.overwrite.auditranscribe.main_views.helpers;
+    exports site.overwrite.auditranscribe.main_views.icon;
     exports site.overwrite.auditranscribe.main_views.scene_switching;
     exports site.overwrite.auditranscribe.misc;
-    exports site.overwrite.auditranscribe.misc.tuples;
+    exports site.overwrite.auditranscribe.music.exceptions;
     exports site.overwrite.auditranscribe.music.notes;
+    exports site.overwrite.auditranscribe.network.exceptions;
     exports site.overwrite.auditranscribe.setup_wizard;
-    exports site.overwrite.auditranscribe.setup_wizard.helpers;
-    exports site.overwrite.auditranscribe.setup_wizard.helpers.data_encapsulators;
+    exports site.overwrite.auditranscribe.setup_wizard.data_encapsulators;
+    exports site.overwrite.auditranscribe.setup_wizard.download_managers;
     exports site.overwrite.auditranscribe.setup_wizard.view_controllers;
     exports site.overwrite.auditranscribe.spectrogram;
     exports site.overwrite.auditranscribe.utils;
 
     opens site.overwrite.auditranscribe to javafx.fxml;
     opens site.overwrite.auditranscribe.main_views to javafx.fxml;
+    opens site.overwrite.auditranscribe.main_views.helpers to javafx.fxml;
+    opens site.overwrite.auditranscribe.main_views.icon to javafx.fxml;
     opens site.overwrite.auditranscribe.main_views.scene_switching to javafx.fxml;
     opens site.overwrite.auditranscribe.misc to javafx.fxml;
     opens site.overwrite.auditranscribe.setup_wizard to javafx.fxml;
