@@ -32,6 +32,19 @@ public abstract class DownloadTask<V> extends CustomTask<V> {
     private int downloadFileSize;
     private final IntegerProperty downloadedAmount = new SimpleIntegerProperty(0);
 
+    /**
+     * Initializes a new <code>DownloadTask</code> object.
+     */
+    public DownloadTask() {
+        super();
+
+        // Create a change listener for the progress property
+        progressProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal.equals(-1)) return;
+            downloadedAmount.setValue(newVal.doubleValue() * downloadFileSize);
+        });
+    }
+
     // Getter/Setter methods
 
     public int getDownloadFileSize() {
@@ -39,14 +52,14 @@ public abstract class DownloadTask<V> extends CustomTask<V> {
     }
 
     public void setDownloadFileSize(int downloadFileSize) {
-        // Update the file size attribute
         this.downloadFileSize = downloadFileSize;
+    }
 
-        // Bind the downloaded amount to this new file size
-        downloadedAmount.bind(progressProperty().multiply(downloadFileSize));
+    public IntegerProperty downloadedAmountProperty() {
+        return downloadedAmount;
     }
 
     public int getDownloadedAmount() {
-        return Math.max(0, downloadedAmount.get());
+        return downloadedAmount.get();
     }
 }
