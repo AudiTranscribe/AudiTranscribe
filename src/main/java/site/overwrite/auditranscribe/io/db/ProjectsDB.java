@@ -118,43 +118,6 @@ public class ProjectsDB {
             }
         }
 
-        // FOR VERSION 0.7.x ONLY: Update existing "Projects" table
-        // TODO: IMPORTANT: Remove once 0.7.x passes
-        try (ResultSet resultSet = dbManager.executeGetQuery(
-                "SELECT COUNT(*) AS X FROM pragma_table_info('Projects') WHERE name='filename';"
-        )) {
-            if (resultSet.next() && resultSet.getInt("X") == 1) {
-                dbManager.executeUpdate("""
-                        ALTER TABLE "Projects"
-                        RENAME COLUMN "filename" TO "project_name";
-                        """);
-            }
-        }
-        try (ResultSet resultSet = dbManager.executeGetQuery(
-                "SELECT \"id\", \"project_name\" FROM \"Projects\";"
-        )) {
-            while (resultSet.next()) {
-                // Get the ID
-                int id = resultSet.getInt("id");
-                String projectName = resultSet.getString("project_name");
-
-                // Update the project name
-                int length = projectName.length();
-                if (length >= 5 && projectName.substring(length - 5).equalsIgnoreCase(".audt")) {
-                    projectName = projectName.substring(0, projectName.length() - 5);  // Exclude the ".audt" at the end
-                }
-
-                try (PreparedStatement statement = dbManager.prepareStatement(
-                        "UPDATE \"Projects\" SET \"project_name\" = ? WHERE \"id\" = ?;"
-                )) {
-                    statement.setString(1, projectName);
-                    statement.setInt(2, id);
-
-                    dbManager.executeUpdate(statement);
-                }
-            }
-        }
-
         // Close connection with database
         dbManager.dbDisconnect();
     }

@@ -221,7 +221,6 @@ public class SceneSwitcher extends ClassWithLogging {
             FFmpegHandler FFmpegHandler = new FFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
 
             // Generate the WAV files
-            // Todo: perhaps find a way to save the slowed audio?
             File samplesWAVFile = new File(
                     FFmpegHandler.convertAudio(audioFile, samplesWAVPath)
             );
