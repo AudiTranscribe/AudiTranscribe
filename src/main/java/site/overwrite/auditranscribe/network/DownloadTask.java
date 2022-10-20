@@ -21,6 +21,9 @@ package site.overwrite.auditranscribe.network;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import site.overwrite.auditranscribe.misc.CustomTask;
+import site.overwrite.auditranscribe.misc.MyLogger;
+
+import java.util.logging.Level;
 
 /**
  * A task class that helps expose the download amount to other classes.
@@ -40,7 +43,10 @@ public abstract class DownloadTask<V> extends CustomTask<V> {
 
         // Create a change listener for the progress property
         progressProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal.equals(-1)) return;
+            if (newVal.doubleValue() == -1) {
+                MyLogger.log(Level.INFO, "New progress value is still -1", DownloadTask.class.getName());
+                return;
+            }
             downloadedAmount.setValue(newVal.doubleValue() * downloadFileSize);
         });
     }

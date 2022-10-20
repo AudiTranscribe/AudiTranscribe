@@ -182,7 +182,7 @@ class DownloadFileHandlerTest {
                     ),
                     outputFilePath,
                     task,
-                    16
+                    4
             );
 
             // Check the hash manually
@@ -193,6 +193,9 @@ class DownloadFileHandlerTest {
 
             // Check the value of the download file size
             assertEquals(248, task.getDownloadFileSize());
+
+            // Test the updating of the progress
+            task.updateProgress(-1, -1);
 
             // Test the method that downloads the file and checks the signature at the same time
             assertDoesNotThrow(() -> DownloadFileHandler.downloadFile(
