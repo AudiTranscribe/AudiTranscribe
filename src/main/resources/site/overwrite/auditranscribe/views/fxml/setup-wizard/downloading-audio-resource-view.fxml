@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -14,7 +15,7 @@
       <URL value="@../../css/light-mode.css" />
    </stylesheets>
    <children>
-      <VBox prefHeight="100.0" prefWidth="500.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="75.0">
+      <VBox prefHeight="125.0" prefWidth="500.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="62.5">
          <children>
             <Label alignment="CENTER" prefHeight="30.0" prefWidth="500.0" styleClass="download-ffmpeg-label" text="Downloading Audio Resource" />
             <ProgressBar fx:id="downloadProgressBar" prefHeight="35.0" prefWidth="400.0" progress="0.0">
@@ -22,6 +23,15 @@
                   <Insets bottom="5.0" left="50.0" right="50.0" top="5.0" />
                </padding>
             </ProgressBar>
+            <HBox alignment="TOP_CENTER" prefHeight="25.0" prefWidth="200.0" spacing="5.0">
+               <children>
+                  <Label fx:id="currDownloadAmountLabel" text="0.00" />
+                  <Label layoutX="10.0" layoutY="10.0" text="KB" />
+                  <Label text="/" />
+                  <Label fx:id="fileSizeLabel" text="0.00" />
+                  <Label text="KB" />
+               </children>
+            </HBox>
             <Label alignment="CENTER" prefWidth="400.0" text="Please wait while we download the audio resource needed to fix the note playback delay." textAlignment="CENTER" wrapText="true">
                <font>
                   <Font size="14.0" />

@@ -193,15 +193,7 @@ class DownloadFileHandlerTest {
 
             // Check the value of the download amount
             assertEquals(248, task.getDownloadFileSize());
-            if (task.progressProperty().get() > 0) {
-                assertEquals(248, task.getDownloadedAmount());
-            } else {
-                MyLogger.log(
-                        Level.WARNING,
-                        "Got indeterminate progress; skipping a check",
-                        DownloadFileHandlerTest.class.getName()
-                );
-            }
+            assertEquals(248, task.getDownloadedAmount());
 
             // Test the method that downloads the file and checks the signature at the same time
             assertDoesNotThrow(() -> DownloadFileHandler.downloadFile(
