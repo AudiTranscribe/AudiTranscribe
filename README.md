@@ -32,8 +32,10 @@ AudiTranscribe is meant to be an Open-Source and free alternative.
 The only dependency needed is [FFmpeg](https://ffmpeg.org/): a complete, cross-platform solution to record, convert and
 stream audio and video. AudiTranscribe uses it to help process different audio files.
 
-**Note**: AudiTranscribe will attempt to automatically install FFmpeg. You do **not** need to manually install FFmpeg
+**Note**:
+- For Windows and macOS, AudiTranscribe will attempt to automatically install FFmpeg. You do **not** need to manually install FFmpeg
 unless specified.
+- For Linux and others, **manual installation of FFmpeg is required**.
 
 ## For Developers
 
