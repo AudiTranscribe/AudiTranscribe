@@ -200,7 +200,7 @@ public class FixNoteDelayViewController extends ClassWithLogging implements Init
     public void setAudioResource(String audioResourcePath) {
         // Create the audio object for playback
         try {
-            audio = new Audio(new File(audioResourcePath), AudioProcessingMode.PLAYBACK);
+            audio = new Audio(new File(audioResourcePath), AudioProcessingMode.WITH_PLAYBACK);
         } catch (UnsupportedAudioFileException | IOException | AudioTooLongException e) {
             logException(e);
             throw new RuntimeException(e);

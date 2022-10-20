@@ -233,7 +233,8 @@ public class SceneSwitcher extends ClassWithLogging {
             // (Failure to read will throw exceptions)
             Audio audio = new Audio(
                     samplesWAVFile, slowedWAVFile,
-                    AudioProcessingMode.SAMPLES, AudioProcessingMode.PLAYBACK, AudioProcessingMode.WITH_SLOWDOWN
+                    AudioProcessingMode.WITH_SAMPLES, AudioProcessingMode.WITH_PLAYBACK,
+                    AudioProcessingMode.WITH_SLOWDOWN
             );
 
             // Delete auxiliary WAV files

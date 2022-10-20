@@ -992,7 +992,8 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
         // Create the `Audio` object
         audio = new Audio(
-                auxOriginalWAVFile, auxSlowedWAVFile, AudioProcessingMode.PLAYBACK, AudioProcessingMode.WITH_SLOWDOWN
+                auxOriginalWAVFile, auxSlowedWAVFile, AudioProcessingMode.WITH_PLAYBACK,
+                AudioProcessingMode.WITH_SLOWDOWN
         );
 
         // Update the raw MP3 bytes of the audio object
