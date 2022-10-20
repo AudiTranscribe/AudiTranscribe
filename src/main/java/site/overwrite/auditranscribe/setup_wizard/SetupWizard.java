@@ -132,6 +132,8 @@ public class SetupWizard extends ClassWithLogging {
             }
         }
 
+        log(Level.INFO, "FFmpeg path set to '" + ffmpegPath + "'");
+
         // Show view that confirms that FFmpeg was installed successfully
         showFinishFFmpegSetupView();
 
