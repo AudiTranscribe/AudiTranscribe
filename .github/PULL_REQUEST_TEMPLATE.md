@@ -8,9 +8,13 @@ Include any issues that are fixed in this pull request by using the octothorpe (
 
 Please delete options that are not relevant.
 
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality not to work as expected)
+- [ ] New Feature (change which adds new functionality to the application)
+- [ ] Minor Change (change which does not add functionality to the application)
+- [ ] Removals (change that removes functionality)
+- [ ] Bugfix (change which fixes an issue or a bug)
+
+Please specify any additional information:
+- [ ] This change is a breaking change
 - [ ] This change requires a documentation update
 
 ## Checklist
