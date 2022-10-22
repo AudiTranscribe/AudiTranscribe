@@ -70,6 +70,8 @@ public class FixNoteDelayViewController extends ClassWithLogging implements Init
     };
     private final MIDIInstrument INSTRUMENT = MIDIInstrument.PIANO;
 
+    public static final int NOTE_ON_VELOCITY = 64;
+    public static final int NOTE_OFF_VELOCITY = 54;
     public static final double OFFSET_OF_OFFSET = 0.1;
 
     public static final double LINE_MISALIGNMENT_OFFSET_CONSTANT = 2.5;  // To correct weird line misalignment
@@ -237,8 +239,8 @@ public class FixNoteDelayViewController extends ClassWithLogging implements Init
         // Check if the sequencer is available
         if (sequencer.isSequencerAvailable()) {
             // Set velocities
-            sequencer.setOnVelocity(94);
-            sequencer.setOffVelocity(64);
+            sequencer.setOnVelocity(NOTE_ON_VELOCITY);
+            sequencer.setOffVelocity(NOTE_OFF_VELOCITY);
 
             // Set BPM
             sequencer.setBPM(60);
@@ -275,7 +277,7 @@ public class FixNoteDelayViewController extends ClassWithLogging implements Init
         sequencer.setCurrTime(offsetTime);
 
         // Play the things
-        audio.setPlaybackVolume(0.5);
+        audio.setPlaybackVolume(1);
         audio.play();
         sequencer.play(offsetTime, false);
     }
