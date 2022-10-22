@@ -1,5 +1,5 @@
 coverage:
-  range: 80...100
+  range: 90...100
   status:
     project:
       default:
@@ -10,3 +10,6 @@ coverage:
       default:
         target: auto
         threshold: 5%
+
+comment:
+  layout: header, reach, sunburst, diff, flags, files, footer
