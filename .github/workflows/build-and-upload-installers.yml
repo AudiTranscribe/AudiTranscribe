@@ -15,13 +15,11 @@ jobs:
   # Build Installers
   build_installer_windows:
     name: Build Windows Installer
-    needs: [ run_tests ]
     uses: ./.github/workflows/build-installer-windows.yml
     with:
       branch: "staging"
   build_installer_mac:
     name: Build macOS Installer
-    needs: [ run_tests ]
     uses: ./.github/workflows/build-installer-mac.yml
     with:
       branch: "staging"
