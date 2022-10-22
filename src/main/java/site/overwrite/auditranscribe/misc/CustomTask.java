@@ -23,7 +23,7 @@ import javafx.concurrent.Task;
 /**
  * A custom task class where some protected methods are made public.
  *
- * @param <V> Value that is returned by the custom task.
+ * @param <V> Type of value that is returned by the custom task.
  */
 public abstract class CustomTask<V> extends Task<V> {
     // Attributes

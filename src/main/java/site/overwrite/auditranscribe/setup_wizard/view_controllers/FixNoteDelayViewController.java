@@ -26,7 +26,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Spinner;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import site.overwrite.auditranscribe.audio.Audio;
@@ -71,7 +70,11 @@ public class FixNoteDelayViewController extends ClassWithLogging implements Init
     };
     private final MIDIInstrument INSTRUMENT = MIDIInstrument.PIANO;
 
+    public static final int NOTE_ON_VELOCITY = 64;
+    public static final int NOTE_OFF_VELOCITY = 54;
     public static final double OFFSET_OF_OFFSET = 0.1;
+
+    public static final double LINE_MISALIGNMENT_OFFSET_CONSTANT = 2.5;  // To correct weird line misalignment
 
     // Attributes
     private final DoubleProperty playheadX = new SimpleDoubleProperty(0);
@@ -84,10 +87,7 @@ public class FixNoteDelayViewController extends ClassWithLogging implements Init
 
     // FXML elements
     @FXML
-    private AnchorPane rootPane;
-
-    @FXML
-    private Pane spectrogramPane;
+    private AnchorPane rootPane, spectrogramPane;
 
     @FXML
     private Spinner<Double> notePlayingDelayOffsetSpinner;
@@ -106,7 +106,9 @@ public class FixNoteDelayViewController extends ClassWithLogging implements Init
         setupNotePlayerSequencer();
 
         // Add playhead line to the spectrogram pane
-        Line playheadLine = PlottingStuffHandler.createPlayheadLine(height);
+        Line playheadLine = PlottingStuffHandler.createPlayheadLine(
+                LINE_MISALIGNMENT_OFFSET_CONSTANT, height - LINE_MISALIGNMENT_OFFSET_CONSTANT
+        );
         spectrogramPane.getChildren().add(playheadLine);
 
         // Bind properties
@@ -128,6 +130,9 @@ public class FixNoteDelayViewController extends ClassWithLogging implements Init
                 // By pressing the button we want to stop the audio
                 stopAudio();
 
+                // Reset playhead line position
+                playheadX.set(0);
+
                 // Update text on the button
                 togglePlaybackButton.setText("Play Test Audio");
             } else {
@@ -140,6 +145,9 @@ public class FixNoteDelayViewController extends ClassWithLogging implements Init
 
             // Toggle the `isPlaying` flag
             isPlaying = !isPlaying;
+
+            // Disable spinner if playing audio
+            notePlayingDelayOffsetSpinner.setDisable(isPlaying);
         });
 
         setNotePlaybackDelayButton.setOnAction(event -> ((Stage) rootPane.getScene().getWindow()).close());
@@ -194,7 +202,7 @@ public class FixNoteDelayViewController extends ClassWithLogging implements Init
     public void setAudioResource(String audioResourcePath) {
         // Create the audio object for playback
         try {
-            audio = new Audio(new File(audioResourcePath), AudioProcessingMode.PLAYBACK);
+            audio = new Audio(new File(audioResourcePath), AudioProcessingMode.WITH_PLAYBACK);
         } catch (UnsupportedAudioFileException | IOException | AudioTooLongException e) {
             logException(e);
             throw new RuntimeException(e);
@@ -231,8 +239,8 @@ public class FixNoteDelayViewController extends ClassWithLogging implements Init
         // Check if the sequencer is available
         if (sequencer.isSequencerAvailable()) {
             // Set velocities
-            sequencer.setOnVelocity(94);
-            sequencer.setOffVelocity(64);
+            sequencer.setOnVelocity(NOTE_ON_VELOCITY);
+            sequencer.setOffVelocity(NOTE_OFF_VELOCITY);
 
             // Set BPM
             sequencer.setBPM(60);
@@ -269,7 +277,7 @@ public class FixNoteDelayViewController extends ClassWithLogging implements Init
         sequencer.setCurrTime(offsetTime);
 
         // Play the things
-        audio.setPlaybackVolume(0.5);
+        audio.setPlaybackVolume(1);
         audio.play();
         sequencer.play(offsetTime, false);
     }

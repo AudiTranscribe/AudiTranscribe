@@ -39,7 +39,7 @@ class SpectralHelpersTest {
     // Load samples and sample rate for some tests
     Audio audio = new Audio(
             new File(IOMethods.getAbsoluteFilePath("testing-files/audio/Trumpet.wav")),
-            AudioProcessingMode.SAMPLES
+            AudioProcessingMode.WITH_SAMPLES
     );
 
     double[] samples = audio.getMonoSamples();

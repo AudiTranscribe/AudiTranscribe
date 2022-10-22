@@ -36,11 +36,11 @@ class OnsetTest {
         // Get the audio files
         Audio audio1 = new Audio(
                 new File(IOMethods.getAbsoluteFilePath("testing-files/audio/Choice.wav")),
-                AudioProcessingMode.SAMPLES
+                AudioProcessingMode.WITH_SAMPLES
         );
         Audio audio2 = new Audio(
                 new File(IOMethods.getAbsoluteFilePath("testing-files/audio/LevelsOfC.wav")),
-                AudioProcessingMode.SAMPLES
+                AudioProcessingMode.WITH_SAMPLES
         );
 
         // Extract samples and sample rate

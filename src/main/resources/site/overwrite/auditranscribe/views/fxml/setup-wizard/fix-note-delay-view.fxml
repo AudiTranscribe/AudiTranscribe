@@ -9,7 +9,6 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -27,15 +26,15 @@
             <Insets left="75.0" right="75.0" />
          </padding>
       </Label>
-      <Pane fx:id="spectrogramPane" prefHeight="110.0" prefWidth="450.0" AnchorPane.leftAnchor="75.0" AnchorPane.rightAnchor="75.0" AnchorPane.topAnchor="75.0">
+      <AnchorPane fx:id="spectrogramPane" prefHeight="115.0" prefWidth="450.0" AnchorPane.bottomAnchor="210.0" AnchorPane.leftAnchor="75.0" AnchorPane.rightAnchor="75.0" AnchorPane.topAnchor="75.0">
          <children>
-            <ImageView fitHeight="400.0" fitWidth="450.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="115.0" fitWidth="450.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <image>
                   <Image url="@../../../setup-wizard-files/images/breakfast-spectrogram.jpg" />
                </image>
             </ImageView>
          </children>
-      </Pane>
+      </AnchorPane>
       <Button fx:id="togglePlaybackButton" layoutX="220.0" layoutY="196.0" mnemonicParsing="false" prefWidth="150.0" text="Play Test Audio" AnchorPane.leftAnchor="225.0" AnchorPane.rightAnchor="225.0" AnchorPane.topAnchor="196.0">
          <font>
             <Font size="14.0" />

@@ -136,7 +136,7 @@ public class Audio extends ClassWithLogging {
         List<AudioProcessingMode> modes = List.of(processingModes);
 
         // Generate audio samples
-        if (modes.contains(AudioProcessingMode.SAMPLES)) {
+        if (modes.contains(AudioProcessingMode.WITH_SAMPLES)) {
             // Attempt to convert the input stream into an audio input stream
             InputStream bufferedIn = new BufferedInputStream(new FileInputStream(originalWAVFile));
             audioStream = AudioSystem.getAudioInputStream(bufferedIn);
@@ -168,7 +168,7 @@ public class Audio extends ClassWithLogging {
         }
 
         // Create the media player object if needed
-        if (modes.contains(AudioProcessingMode.PLAYBACK)) {
+        if (modes.contains(AudioProcessingMode.WITH_PLAYBACK)) {
             // Get the media player for the audio file
             MediaPlayer tempMediaPlayer;
 

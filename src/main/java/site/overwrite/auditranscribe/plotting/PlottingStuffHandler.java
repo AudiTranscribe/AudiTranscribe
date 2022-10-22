@@ -530,8 +530,19 @@ public final class PlottingStuffHandler {
      * @return A <code>Line</code> object, representing the playhead line.
      */
     public static Line createPlayheadLine(double height) {
+        return createPlayheadLine(0, height);
+    }
+
+    /**
+     * Method that creates a new playhead line.
+     *
+     * @param startY The vertical coordinate of the start point of the line segment
+     * @param endY   The vertical coordinate of the end point of the line segment
+     * @return A <code>Line</code> object, representing the playhead line.
+     */
+    public static Line createPlayheadLine(double startY, double endY) {
         // Create the playhead line object
-        Line playheadLine = new Line(0, 0, 0, height);
+        Line playheadLine = new Line(0, startY, 0, endY);
 
         // Add CSS style class
         playheadLine.getStyleClass().add("playhead-line");

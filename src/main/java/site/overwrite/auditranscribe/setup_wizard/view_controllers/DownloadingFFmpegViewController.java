@@ -20,15 +20,17 @@ package site.overwrite.auditranscribe.setup_wizard.view_controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.misc.Theme;
-import site.overwrite.auditranscribe.setup_wizard.download_managers.FFmpegDownloadManager;
+import site.overwrite.auditranscribe.network.DownloadTask;
+import site.overwrite.auditranscribe.setup_wizard.download_handlers.FFmpegDownloadManager;
+import site.overwrite.auditranscribe.utils.MathUtils;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -51,6 +53,9 @@ public class DownloadingFFmpegViewController extends ClassWithLogging implements
 
     @FXML
     private ProgressBar downloadProgressBar;
+
+    @FXML
+    private Label currDownloadAmountLabel, fileSizeLabel;
 
     // Initialization method
     @Override
@@ -77,7 +82,7 @@ public class DownloadingFFmpegViewController extends ClassWithLogging implements
      */
     public void startDownload() {
         // Define the task that handles the downloading of the FFmpeg binary
-        CustomTask<String> downloadTask = new CustomTask<>() {
+        DownloadTask<String> downloadTask = new DownloadTask<>() {
             @Override
             protected String call() throws Exception {
                 String ffmpegZipPath = downloadManager.downloadResource(DEST_FOLDER, this);
@@ -98,6 +103,17 @@ public class DownloadingFFmpegViewController extends ClassWithLogging implements
 
         // Set progress bar progress property
         downloadProgressBar.progressProperty().bind(downloadTask.progressProperty());
+
+        // Make the labels update once the downloaded amount changes
+        downloadTask.downloadedAmountProperty().addListener((obs, oldVal, newVal) -> {
+            // Convert the number of bytes to kilobytes
+            double downloadedAmtInKB = MathUtils.round(newVal.doubleValue() / 1e6, 2);
+            double fileSizeInKB = MathUtils.round(downloadTask.getDownloadFileSize() / 1e6, 2);
+
+            // Set text to display
+            currDownloadAmountLabel.setText(String.valueOf(downloadedAmtInKB));
+            fileSizeLabel.setText(String.valueOf(fileSizeInKB));
+        });
 
         // Define a thread to start the download on
         Thread downloadThread = new Thread(downloadTask);

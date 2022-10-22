@@ -50,11 +50,16 @@ public final class ApplicationDirectory {
             case MAC -> IOMethods.buildPath(
                     IOConstants.USER_HOME_PATH, "/Library/Application Support", appName, appVersion
             );
-            default -> IOMethods.buildPath(OSMethods.getOrDefault(
-                    "XDG_DATA_HOME", IOMethods.buildPath(
-                            IOConstants.USER_HOME_PATH, "/.local/share"
-                    )
-            ), appName, appVersion);
+            default -> IOMethods.buildPath(
+                    OSMethods.getOrDefault(
+                            "XDG_DATA_HOME",
+                            IOMethods.buildPath(
+                                    IOConstants.USER_HOME_PATH, "/.local/share"
+                            )
+                    ),
+                    appName,
+                    appVersion
+            );
         };
     }
 }

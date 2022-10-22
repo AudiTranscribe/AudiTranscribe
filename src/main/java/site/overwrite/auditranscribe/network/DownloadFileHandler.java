@@ -20,7 +20,6 @@ package site.overwrite.auditranscribe.network;
 
 import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.network.exceptions.FileSignatureMismatchException;
 import site.overwrite.auditranscribe.utils.HashingUtils;
 
@@ -65,18 +64,47 @@ public final class DownloadFileHandler extends ClassWithLogging {
      *
      * @param url            URL to download the file from.
      * @param outputFilePath <b>Absolute</b> file path to the output file.
-     * @param task           A <code>CustomTask</code> object to show the progress of the download.
      * @throws IOException If downloading the file fails.
      */
-    public static void downloadFile(URL url, String outputFilePath, CustomTask<?> task) throws IOException {
+    public static void downloadFile(URL url, String outputFilePath) throws IOException {
+        downloadFile(url, outputFilePath, null);
+    }
+
+    /**
+     * Method that downloads a file from a URL.
+     *
+     * @param url            URL to download the file from.
+     * @param outputFilePath <b>Absolute</b> file path to the output file.
+     * @param task           A <code>DownloadTask</code> object to show the progress of the download.
+     * @throws IOException If downloading the file fails.
+     */
+    public static void downloadFile(URL url, String outputFilePath, DownloadTask<?> task) throws IOException {
+        downloadFile(url, outputFilePath, task, DOWNLOAD_FILE_BUFFER_SIZE);
+    }
+
+    /**
+     * Method that downloads a file from a URL.
+     *
+     * @param url            URL to download the file from.
+     * @param outputFilePath <b>Absolute</b> file path to the output file.
+     * @param task           A <code>DownloadTask</code> object to show the progress of the download.
+     * @param buffSize       Buffer size for the download process.
+     * @throws IOException If downloading the file fails.
+     */
+    public static void downloadFile(
+            URL url, String outputFilePath, DownloadTask<?> task, int buffSize
+    ) throws IOException {
         // Get file size
         int fileSize = getFileSize(url);
 
+        // If a task is provided, update its download file size
+        if (task != null) task.setDownloadFileSize(fileSize);
+
         // Determine the number of passes needed to download the full data
-        int numPasses = (int) Math.ceil((double) fileSize / DOWNLOAD_FILE_BUFFER_SIZE);
+        int numPasses = (int) Math.ceil((double) fileSize / buffSize);
 
         // Define a buffer to handle the incoming bytes
-        byte[] buf = new byte[DOWNLOAD_FILE_BUFFER_SIZE];
+        byte[] buf = new byte[buffSize];
 
         // Download the file
         int len;
@@ -85,55 +113,10 @@ public final class DownloadFileHandler extends ClassWithLogging {
         try (InputStream in = url.openStream(); FileOutputStream fos = new FileOutputStream(outputFilePath)) {
             while ((len = in.read(buf)) > 0) {
                 fos.write(buf, 0, len);
-                if (task != null) task.updateProgress(++currPass, numPasses);
+                if (task != null) {
+                    task.updateProgress(++currPass, numPasses);
+                }
             }
-        }
-    }
-
-    /**
-     * Method that downloads a file from a URL.
-     *
-     * @param url            URL to download the file from.
-     * @param outputFilePath <b>Absolute</b> file path to the output file.
-     * @throws IOException If downloading the file fails.
-     */
-    public static void downloadFile(URL url, String outputFilePath) throws IOException {
-        downloadFile(url, outputFilePath, null);
-    }
-
-    /**
-     * Method that downloads a file from a URL, and then checks the downloaded file's signature with
-     * the correct signature.
-     *
-     * @param url            URL to download the file from.
-     * @param outputFilePath <b>Absolute</b> file path to the output file.
-     * @param task           A <code>CustomTask</code> object to show the progress of the download.
-     * @param algorithm      Hashing algorithm to generate the signature.
-     * @param correctHash    Correct signature.
-     * @throws IOException                    If downloading the file fails.
-     * @throws NoSuchAlgorithmException       If the specified algorithm for hashing could not be
-     *                                        found on the system.
-     * @throws FileSignatureMismatchException If the calculated file signature is not the same as
-     *                                        the correct file signature.
-     */
-    public static void downloadFile(
-            URL url, String outputFilePath, CustomTask<?> task, String algorithm, String correctHash
-    ) throws IOException, NoSuchAlgorithmException, FileSignatureMismatchException {
-        // Download the file first
-        downloadFile(url, outputFilePath, task);
-
-        // Calculate the hash of the file
-        String calculatedHash = HashingUtils.getHash(new File(outputFilePath), algorithm);
-
-        // Check if the hashes are equal
-        if (!Objects.equals(correctHash, calculatedHash)) {
-            // Delete the downloaded file
-            IOMethods.delete(outputFilePath);
-
-            // Throw an exception
-            throw new FileSignatureMismatchException(
-                    "Calculated hash (" + calculatedHash + ") does not match correct hash (" + correctHash + ")."
-            );
         }
     }
 
@@ -158,37 +141,39 @@ public final class DownloadFileHandler extends ClassWithLogging {
     }
 
     /**
-     * Method that attempts to download a file from a URL at most <code>maxRetryCount</code> times.
+     * Method that downloads a file from a URL, and then checks the downloaded file's signature with
+     * the correct signature.
      *
      * @param url            URL to download the file from.
      * @param outputFilePath <b>Absolute</b> file path to the output file.
-     * @param maxAttempts    Maximum number of times to try and download the file before giving up.
-     * @param task           A <code>CustomTask</code> object to show the progress of the download.
-     * @throws IOException If downloading the file fails.
+     * @param task           A <code>DownloadTask</code> object to show the progress of the download.
+     * @param algorithm      Hashing algorithm to generate the signature.
+     * @param correctHash    Correct signature.
+     * @throws IOException                    If downloading the file fails.
+     * @throws NoSuchAlgorithmException       If the specified algorithm for hashing could not be
+     *                                        found on the system.
+     * @throws FileSignatureMismatchException If the calculated file signature is not the same as
+     *                                        the correct file signature.
      */
-    public static void downloadFileWithRetry(
-            URL url, String outputFilePath, int maxAttempts, CustomTask<?> task
-    ) throws IOException {
-        for (int i = 0; i < maxAttempts; i++) {
-            // Try downloading the file
-            try {
-                downloadFile(url, outputFilePath, task);
-            } catch (IOException e) {
-                log(
-                        Level.WARNING, "Failed to download file, trying again (attempt " + (i + 1) + " of " + maxAttempts + ")", DownloadFileHandler.class.getName()
-                );
-                continue;  // Try again
-            }
+    public static void downloadFile(
+            URL url, String outputFilePath, DownloadTask<?> task, String algorithm, String correctHash
+    ) throws IOException, NoSuchAlgorithmException, FileSignatureMismatchException {
+        // Download the file first
+        downloadFile(url, outputFilePath, task);
 
-            // Download successful, return
-            return;
+        // Calculate the hash of the file
+        String calculatedHash = HashingUtils.getHash(new File(outputFilePath), algorithm);
+
+        // Check if the hashes are equal
+        if (!Objects.equals(correctHash, calculatedHash)) {
+            // Delete the downloaded file
+            IOMethods.delete(outputFilePath);
+
+            // Throw an exception
+            throw new FileSignatureMismatchException(
+                    "Calculated hash (" + calculatedHash + ") does not match correct hash (" + correctHash + ")."
+            );
         }
-
-        // If reached here, that means maximum number of tries was exceeded. Throw an IO exception
-        log(
-                Level.WARNING, "Failed to download file '" + url.toString() + "' after " + maxAttempts + " attempts", DownloadFileHandler.class.getName()
-        );
-        throw new IOException("File download from '" + url + "' failed after " + maxAttempts + " attempts");
     }
 
     /**
@@ -204,36 +189,28 @@ public final class DownloadFileHandler extends ClassWithLogging {
     }
 
     /**
-     * Method that downloads a file from a URL, and then checks the downloaded file's signature with
-     * the correct signature.
+     * Method that attempts to download a file from a URL at most <code>maxRetryCount</code> times.
      *
      * @param url            URL to download the file from.
      * @param outputFilePath <b>Absolute</b> file path to the output file.
-     * @param task           A <code>CustomTask</code> object to show the progress of the download.
-     * @param algorithm      Hashing algorithm to generate the signature.
-     * @param correctHash    Correct signature.
      * @param maxAttempts    Maximum number of times to try and download the file before giving up.
-     * @throws IOException              If downloading the file fails.
-     * @throws NoSuchAlgorithmException If the specified algorithm for hashing could not be found on
-     *                                  the system.
+     * @param task           A <code>DownloadTask</code> object to show the progress of the download.
+     * @throws IOException If downloading the file fails.
      */
     public static void downloadFileWithRetry(
-            URL url, String outputFilePath, CustomTask<?> task, String algorithm, String correctHash, int maxAttempts
-    ) throws IOException, NoSuchAlgorithmException {
+            URL url, String outputFilePath, int maxAttempts, DownloadTask<?> task
+    ) throws IOException {
         for (int i = 0; i < maxAttempts; i++) {
             // Try downloading the file
             try {
-                downloadFile(url, outputFilePath, task, algorithm, correctHash);
+                downloadFile(url, outputFilePath, task);
             } catch (IOException e) {
                 log(
-                        Level.WARNING, "File download failed, trying again (attempt " + (i + 1) + " of " + maxAttempts + ")", DownloadFileHandler.class.getName()
+                        Level.WARNING,
+                        "Failed to download file, trying again (attempt " + (i + 1) + " of " + maxAttempts + ")",
+                        DownloadFileHandler.class.getName()
                 );
                 continue;  // Try again
-            } catch (FileSignatureMismatchException e) {
-                log(
-                        Level.WARNING, e.getMessage() + " Trying again (attempt " + (i + 1) + " of " + maxAttempts + ")", DownloadFileHandler.class.getName()
-                );
-                continue;
             }
 
             // Download successful, return
@@ -242,7 +219,9 @@ public final class DownloadFileHandler extends ClassWithLogging {
 
         // If reached here, that means maximum number of tries was exceeded. Throw an IO exception
         log(
-                Level.WARNING, "Failed to download file '" + url.toString() + "' after " + maxAttempts + " attempts", DownloadFileHandler.class.getName()
+                Level.WARNING,
+                "Failed to download file '" + url.toString() + "' after " + maxAttempts + " attempts",
+                DownloadFileHandler.class.getName()
         );
         throw new IOException("File download from '" + url + "' failed after " + maxAttempts + " attempts");
     }
@@ -264,5 +243,55 @@ public final class DownloadFileHandler extends ClassWithLogging {
             URL url, String outputFilePath, String algorithm, String correctHash, int maxAttempts
     ) throws IOException, NoSuchAlgorithmException {
         downloadFileWithRetry(url, outputFilePath, null, algorithm, correctHash, maxAttempts);
+    }
+
+    /**
+     * Method that downloads a file from a URL, and then checks the downloaded file's signature with
+     * the correct signature.
+     *
+     * @param url            URL to download the file from.
+     * @param outputFilePath <b>Absolute</b> file path to the output file.
+     * @param task           A <code>DownloadTask</code> object to show the progress of the download.
+     * @param algorithm      Hashing algorithm to generate the signature.
+     * @param correctHash    Correct signature.
+     * @param maxAttempts    Maximum number of times to try and download the file before giving up.
+     * @throws IOException              If downloading the file fails.
+     * @throws NoSuchAlgorithmException If the specified algorithm for hashing could not be found on
+     *                                  the system.
+     */
+    public static void downloadFileWithRetry(
+            URL url, String outputFilePath, DownloadTask<?> task, String algorithm, String correctHash, int maxAttempts
+    ) throws IOException, NoSuchAlgorithmException {
+        for (int i = 0; i < maxAttempts; i++) {
+            // Try downloading the file
+            try {
+                downloadFile(url, outputFilePath, task, algorithm, correctHash);
+            } catch (IOException e) {
+                log(
+                        Level.WARNING,
+                        "File download failed, trying again (attempt " + (i + 1) + " of " + maxAttempts + ")",
+                        DownloadFileHandler.class.getName()
+                );
+                continue;  // Try again
+            } catch (FileSignatureMismatchException e) {
+                log(
+                        Level.WARNING,
+                        e.getMessage() + " Trying again (attempt " + (i + 1) + " of " + maxAttempts + ")",
+                        DownloadFileHandler.class.getName()
+                );
+                continue;
+            }
+
+            // Download successful, return
+            return;
+        }
+
+        // If reached here, that means maximum number of tries was exceeded. Throw an IO exception
+        log(
+                Level.WARNING,
+                "Failed to download file '" + url.toString() + "' after " + maxAttempts + " attempts",
+                DownloadFileHandler.class.getName()
+        );
+        throw new IOException("File download from '" + url + "' failed after " + maxAttempts + " attempts");
     }
 }
