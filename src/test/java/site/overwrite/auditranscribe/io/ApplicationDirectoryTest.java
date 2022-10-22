@@ -19,31 +19,39 @@
 package site.overwrite.auditranscribe.io;
 
 import org.junit.jupiter.api.Test;
-import site.overwrite.auditranscribe.system.OSMethods;
-import site.overwrite.auditranscribe.system.OSType;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class ApplicationDirectoryTest {
     @Test
-    void getUserDataDirectory() {
-        // Generate the path to the application directory
+    @EnabledOnOs({OS.WINDOWS})
+    void windowsDataDirectory() {
         String appDir = ApplicationDirectory.getUserDataDirectory("test", "123");
+        assertTrue(appDir.contains("AppData"));
+        assertTrue(appDir.contains("test\\123"));
+    }
 
-        // Get the OS
-        OSType osType = OSMethods.getOS();
+    @Test
+    @EnabledOnOs({OS.MAC})
+    void macOSDataDirectory() {
+        String appDir = ApplicationDirectory.getUserDataDirectory("test", "123");
+        assertTrue(appDir.contains("Application Support"));
+        assertTrue(appDir.contains("test/123"));
+    }
 
-        // Check the user data directory
-        if (osType == OSType.WINDOWS) {
-            assertTrue(appDir.contains("AppData"));
-            assertTrue(appDir.contains("test\\123"));
-        } else if (osType == OSType.MAC) {
-            assertTrue(appDir.contains("Application Support"));
-            assertTrue(appDir.contains("test/123"));
-        } else if (osType == OSType.LINUX) {
-            assertTrue(appDir.contains("test/123"));
-        } else {
-            assertNull(appDir);
-        }
+    @Test
+    @EnabledOnOs({OS.LINUX})
+    void linuxDataDirectory() {
+        String appDir = ApplicationDirectory.getUserDataDirectory("test", "123");
+        assertTrue(appDir.contains("test/123"));
+    }
+
+    @Test
+    @EnabledOnOs({OS.OTHER})
+    void othersDataDirectory() {
+        String appDir = ApplicationDirectory.getUserDataDirectory("test", "123");
+        assertNull(appDir);
     }
 }
