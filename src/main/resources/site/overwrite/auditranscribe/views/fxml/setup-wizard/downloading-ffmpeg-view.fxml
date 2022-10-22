@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -22,6 +23,15 @@
                   <Insets bottom="5.0" left="50.0" right="50.0" top="5.0" />
                </padding>
             </ProgressBar>
+            <HBox alignment="TOP_CENTER" prefHeight="25.0" prefWidth="200.0" spacing="5.0">
+               <children>
+                  <Label fx:id="currDownloadAmountLabel" text="0.00" />
+                  <Label layoutX="10.0" layoutY="10.0" text="MB" />
+                  <Label text="/" />
+                  <Label fx:id="fileSizeLabel" text="0.00" />
+                  <Label text="MB" />
+               </children>
+            </HBox>
             <Label alignment="CENTER" layoutX="10.0" layoutY="75.0" prefWidth="400.0" text="Please wait while we download and install FFmpeg.">
                <font>
                   <Font size="14.0" />

@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.setup_wizard.download_managers;
+package site.overwrite.auditranscribe.setup_wizard.download_handlers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;

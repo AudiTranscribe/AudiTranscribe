@@ -16,13 +16,13 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.setup_wizard.download_managers;
+package site.overwrite.auditranscribe.setup_wizard.download_handlers;
 
 import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.generic.exceptions.ValueException;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.network.DownloadFileHandler;
+import site.overwrite.auditranscribe.network.DownloadTask;
 
 import java.io.IOException;
 import java.net.URL;
@@ -55,13 +55,13 @@ public abstract class AbstractDownloadManager extends ClassWithLogging {
      * Method that downloads the resource.
      *
      * @param destFolder Folder that stores the resource.
-     * @param task       A <code>CustomTask</code> object to show the progress of the download.
+     * @param task       A <code>DownloadTask</code> object to show the progress of the download.
      * @return The <b>absolute</b> path to the downloaded resource.
      * @throws IOException    If the downloading of the resource fails.
      * @throws ValueException If not all required attributes (i.e., <code>downloadURL</code>,
      *                        <code>downloadFileName</code> and <code>signature</code>) are set.
      */
-    public String downloadResource(String destFolder, CustomTask<?> task) throws IOException {
+    public String downloadResource(String destFolder, DownloadTask<?> task) throws IOException {
         // Ensure all required attributes are set
         if (downloadURL == null || downloadFileName == null || signature == null) {
             throw new ValueException("Not all required attributes set");

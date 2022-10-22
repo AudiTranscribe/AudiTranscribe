@@ -26,7 +26,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import site.overwrite.auditranscribe.network.exceptions.FileSignatureMismatchException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.utils.HashingUtils;
 
 import java.io.File;
@@ -160,12 +159,16 @@ class DownloadFileHandlerTest {
         new JFXPanel();
 
         // Define the task
-        CustomTask<Void> task = new CustomTask<>() {
+        DownloadTask<Void> task = new DownloadTask<>() {
             @Override
             protected Void call() {
                 return null;
             }
         };
+
+        // Check that the downloaded amount is currently 0
+        assertEquals(0, task.getDownloadedAmount());
+        assertEquals(0, task.downloadedAmountProperty().get());
 
         // Specify the output file path
         String outputFilePath = IOMethods.joinPaths(IOConstants.ROOT_ABSOLUTE_PATH, "test-file-3.txt");
@@ -178,7 +181,8 @@ class DownloadFileHandlerTest {
                                     "90ba622e09c867250c24b3a2e437e888b2740027/Feature%20Plan.txt"
                     ),
                     outputFilePath,
-                    task
+                    task,
+                    4
             );
 
             // Check the hash manually
@@ -186,6 +190,12 @@ class DownloadFileHandlerTest {
                     "aa458767a7305cfb2ad50bd017c35e6e",
                     HashingUtils.getHash(new File(outputFilePath), "MD5")
             );
+
+            // Check the value of the download file size
+            assertEquals(248, task.getDownloadFileSize());
+
+            // Test the updating of the progress
+            task.updateProgress(-1, -1);
 
             // Test the method that downloads the file and checks the signature at the same time
             assertDoesNotThrow(() -> DownloadFileHandler.downloadFile(
@@ -211,7 +221,7 @@ class DownloadFileHandlerTest {
         new JFXPanel();
 
         // Define the task
-        CustomTask<Void> task = new CustomTask<>() {
+        DownloadTask<Void> task = new DownloadTask<>() {
             @Override
             protected Void call() {
                 return null;

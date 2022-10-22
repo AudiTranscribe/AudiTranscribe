@@ -46,7 +46,7 @@ class QTransformTests {
     // Get audio file and audio samples for the tests
     Audio audio = new Audio(
             new File(IOMethods.getAbsoluteFilePath("testing-files/audio/Choice.wav")),
-            AudioProcessingMode.SAMPLES
+            AudioProcessingMode.WITH_SAMPLES
     );
     double[] samples = audio.getMonoSamples();
 
