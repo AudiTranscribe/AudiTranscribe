@@ -43,6 +43,8 @@ jobs:
           java-version: "17"
           distribution: "adopt"
           cache: "maven"
+      - name: Install Custom Maven Dependencies
+        run: mvn validate
       - name: Download Installers
         uses: actions/download-artifact@v3
         id: download
