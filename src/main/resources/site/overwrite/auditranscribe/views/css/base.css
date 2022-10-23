@@ -20,11 +20,12 @@
     src: url("../fonts/Roboto-Italic.ttf");
 }
 
+/* GENERAL STYLING */
+/* Fonts Setup */
 * {
     -fx-font-family: "Roboto", "Arial", "Open Sans", sans-serif;
 }
 
-/* GENERAL STYLING */
 /* Buttons */
 .button {
     -fx-cursor: hand;
@@ -210,8 +211,4 @@
 .download-progress-label, .important-label {
     -fx-font-size: 16px;
     -fx-font-weight: bold;
-}
-
-.download-progress-label {
-    -fx-font-family: "Courier New", monospace;
 }
