@@ -1,9 +1,30 @@
-/* GENERAL STYLING */
-/* Labels */
-.label {
-    -fx-font-family: "Arial", sans-serif;
+/* IMPORT FONTS */
+@font-face {
+    font-family: "Roboto";
+    font-style: normal;
+    font-weight: 400;
+    src: url("../fonts/Roboto-Regular.ttf");
 }
 
+@font-face {
+    font-family: "Roboto";
+    font-style: bold;
+    font-weight: 700;
+    src: url("../fonts/Roboto-Bold.ttf");
+}
+
+@font-face {
+    font-family: "Roboto";
+    font-style: italic;
+    font-weight: 400;
+    src: url("../fonts/Roboto-Italic.ttf");
+}
+
+* {
+    -fx-font-family: "Roboto", "Arial", "Open Sans", sans-serif;
+}
+
+/* GENERAL STYLING */
 /* Buttons */
 .button {
     -fx-cursor: hand;
