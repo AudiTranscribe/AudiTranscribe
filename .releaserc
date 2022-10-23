@@ -1,6 +1,6 @@
 {
   "branches": "staging",
-  "repositoryUrl": "https://github.com/AudiTranscribe/AudiTranscribe",
+  "repositoryUrl": "https://github.com/AudiTranscribe/AudiTranscribe.git",
   "debug": "false",
   "plugins": [
     "@semantic-release/commit-analyzer",
@@ -15,8 +15,27 @@
     [
       "@semantic-release/git",
       {
-        "assets": ["CHANGELOG.md"]
+        "assets": [
+          "CHANGELOG.md"
+        ],
+        "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "assets": [
+          {
+            "path": "Windows-Installer.zip",
+            "label": "Windows Installer"
+          },
+          {
+            "path": "macOS-Installer.zip",
+            "label": "macOS Installer"
+          }
+        ]
       }
     ]
-  ]
+  ],
+  "dryRun": false
 }

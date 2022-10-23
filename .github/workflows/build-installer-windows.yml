@@ -22,10 +22,7 @@ jobs:
           tag: wix3112rtm
           file: wix311-binaries.zip
       - name: Decompress WiX
-        uses: DuckSoft/extract-7z-action@v1.0
-        with:
-          pathSource: wix311-binaries.zip
-          pathTarget: ./target/wix
+        run: 7z x wix311-binaries.zip -o/target wix
       - name: Add WiX to Path
         run: echo "$HOME/target/wix" >> $GITHUB_PATH
       - name: Checkout
@@ -39,7 +36,7 @@ jobs:
           distribution: "adopt"
           cache: "maven"
       - name: Setup FFmpeg
-        uses: FedericoCarboni/setup-ffmpeg@v1
+        uses: FedericoCarboni/setup-ffmpeg@v2
         with:
           token: ${{ github.token }}
       - name: Install Custom Maven Dependencies

@@ -39,7 +39,7 @@ jobs:
         with:
           ref: ${{ inputs.branch }}
       - name: Setup FFmpeg
-        uses: FedericoCarboni/setup-ffmpeg@v1
+        uses: FedericoCarboni/setup-ffmpeg@v2
         with:
           token: ${{ github.token }}
       - name: Set up JDK 17
