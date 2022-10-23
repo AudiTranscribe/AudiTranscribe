@@ -25,12 +25,14 @@ more stable for users to use.
 
 Unsure how to begin? There are a few places you can find issues for the project.
 
-- The [GitHub Issue Tracker](https://github.com/AudiTranscribe/AudiTranscribe/issues). This is the new (and main) way of
-  obtaining the issues that we need help with. If you're looking for something to contribute, try:
+- The [AudiTranscribe Bug Tracking Sheet](https://github.com/orgs/AudiTranscribe/projects/2). This neatly organizes all
+  the bugs that are found, and that need fixing.
+- The [Issue Tracker](https://github.com/AudiTranscribe/AudiTranscribe/issues). This is the main way of obtaining the
+  issues that we need help with. If you're looking for something to contribute, try:
     - Beginner issues: Issues that should only require a few lines of code, and a test or two
     - Help Wanted issues: Issues that are more involved
-- The [AudiTranscribe Bug Tracking Sheet](https://github.com/orgs/AudiTranscribe/projects/2) on GitHub. This neatly
-  organizes all the bugs that are found, and that need fixing.
+- The [AudiTranscribe Feature Plan](https://github.com/orgs/AudiTranscribe/projects/3). This contains all planned
+  features for future releases.
 
 ## Submitting Contributions
 
@@ -53,6 +55,10 @@ you could submit an issue instead of a pull request.
 - (Development) changes to *AudiTranscribe* should be pushed to the `main` branch**. The `staging`
   branch should be reserved for production builds. Never push any changes to the `staging` branch.
 - Make pull requests instead of directly editing files on the `main` branch.
+
+**Important:** Please follow
+the [Angular Commit Message Conventions](https://github.com/angular/angular/blob/main/CONTRIBUTING.md#commit) to make
+commits to AudiTranscribe.
 
 ## Reporting Bugs
 

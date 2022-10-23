@@ -1,0 +1,37 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  # Build Installers
+  build_installer_windows:
+    name: Build Windows Installer
+    uses: ./.github/workflows/build-installer-windows.yml
+    with:
+      branch: "staging"
+  build_installer_mac:
+    name: Build macOS Installer
+    uses: ./.github/workflows/build-installer-mac.yml
+    with:
+      branch: "staging"
+
+  # Release
+  release:
+    name: Release
+    needs: [ build_installer_windows, build_installer_mac ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Installers
+        uses: actions/download-artifact@v3
+        id: download
+      - name: Zip Installer Directories
+        run: |
+          zip -r Windows-Installer.zip Windows-Installer
+          zip -r macOS-Installer.zip macOS-Installer
+      - name: Setup Semantic Release
+        run: npm install -g semantic-release @semantic-release/git @semantic-release/changelog -D
+      - name: Release To GitHub
+        run: npx semantic-release

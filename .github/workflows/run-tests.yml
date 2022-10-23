@@ -8,11 +8,21 @@ on:
         default: "YES"
         required: true
         type: string
+      branch:
+        description: "Branch to test"
+        default: "main"
+        required: true
+        type: string
   workflow_dispatch:
     inputs:
       upload_to_codecov:
         description: "Upload to CodeCov?"
         default: "Enter either 'YES' or 'NO'"
+        required: true
+        type: string
+      branch:
+        description: "Branch to test"
+        default: "main"
         required: true
         type: string
 
@@ -26,6 +36,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.branch }}
       - name: Setup FFmpeg
         uses: FedericoCarboni/setup-ffmpeg@v1
         with:

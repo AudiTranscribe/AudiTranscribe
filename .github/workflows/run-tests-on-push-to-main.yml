@@ -15,3 +15,4 @@ jobs:
     uses: ./.github/workflows/run-tests.yml
     with:
       upload_to_codecov: "YES"
+      branch: "main"

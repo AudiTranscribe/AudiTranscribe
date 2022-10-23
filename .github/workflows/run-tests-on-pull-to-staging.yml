@@ -1,8 +1,6 @@
-name: Run Tests On Push To Staging
+name: Run Tests On Pull To Staging
 
 on:
-  push:
-    branches: [ "staging" ]
   pull_request:
     branches: [ "staging" ]
   workflow_dispatch:
@@ -13,3 +11,4 @@ jobs:
     uses: ./.github/workflows/run-tests.yml
     with:
       upload_to_codecov: "YES"
+      branch: "staging"

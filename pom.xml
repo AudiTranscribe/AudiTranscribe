@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>site.overwrite</groupId>
     <artifactId>AudiTranscribe</artifactId>
-    <version>0.8.2</version>
+    <version>0.8.3</version>
     <name>AudiTranscribe</name>
 
     <properties>
@@ -96,10 +97,6 @@
     </dependencies>
 
     <build>
-        <!--
-        Build configuration to be able to generate a minimal JAR (using modularization introduced in Java 9).
-        https://steveperkins.com/using-java-9-modularization-to-ship-zero-dependency-native-apps/
-        -->
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -153,11 +150,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <!--
-            The Compiler Plugin is used to compile the sources of your project.
-            https://maven.apache.org/plugins/maven-compiler-plugin/index.html
-            It provides two maven goals "compiler:compile" and "compiler:testCompile"
-            -->
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -179,11 +172,13 @@
                     <verbose>true</verbose>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M6</version>
             </plugin>
+
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -285,6 +280,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
@@ -306,12 +302,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <!--
-            The plugin helps to execute system and Java programs.
-            https://www.mojohaus.org/exec-maven-plugin/
-            It provides two maven goals "exec:exec" and "exec:java"
-            Allows us to run this test application from our IDE by first using "compiler:compile" and then "exec:java"
-            -->
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
