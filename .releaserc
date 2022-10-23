@@ -17,6 +17,15 @@
       {
         "assets": ["CHANGELOG.md"]
       }
+    ],
+    [
+      "@sematic-release/github",
+      {
+        "assets": [
+          {"path": "Windows-Installer.zip", "label": "Windows Installer"},
+          {"path": "macOS-Installer.zip", "label": "macOS Installer"}
+        ]
+      }
     ]
   ]
 }
