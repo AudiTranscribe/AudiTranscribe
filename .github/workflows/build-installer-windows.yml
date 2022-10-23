@@ -22,7 +22,7 @@ jobs:
           tag: wix3112rtm
           file: wix311-binaries.zip
       - name: Decompress WiX
-        run: 7z x wix311-binaries.zip -o./target wix
+        run: 7z x wix311-binaries.zip -o/target wix
       - name: Add WiX to Path
         run: echo "$HOME/target/wix" >> $GITHUB_PATH
       - name: Checkout
