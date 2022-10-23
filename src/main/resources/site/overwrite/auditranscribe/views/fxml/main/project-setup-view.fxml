@@ -64,7 +64,7 @@
                   <TextField fx:id="projectNameField" prefHeight="30.0" prefWidth="300.0" />
                   <HBox prefHeight="30.0" prefWidth="300.0" spacing="5.0">
                      <children>
-                        <Button fx:id="selectAudioFileButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="75.0" text="Select File" />
+                        <Button fx:id="selectAudioFileButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Select File" />
                         <Label fx:id="audioFileLabel" prefHeight="30.0" prefWidth="220.0" text="No file selected." />
                      </children>
                   </HBox>
