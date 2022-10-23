@@ -57,4 +57,4 @@ jobs:
       - name: Release To GitHub
         run: npx semantic-release
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ secrets.SEMVER_GITHUB_TOKEN }}
