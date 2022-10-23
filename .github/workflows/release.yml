@@ -24,6 +24,20 @@ jobs:
     needs: [ build_installer_windows, build_installer_mac ]
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.branch }}
+      - name: Setup FFmpeg
+        uses: FedericoCarboni/setup-ffmpeg@v2
+        with:
+          token: ${{ github.token }}
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17"
+          distribution: "adopt"
+          cache: "maven"
       - name: Download Installers
         uses: actions/download-artifact@v3
         id: download
@@ -35,3 +49,5 @@ jobs:
         run: npm install -g semantic-release @semantic-release/git @semantic-release/changelog -D
       - name: Release To GitHub
         run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

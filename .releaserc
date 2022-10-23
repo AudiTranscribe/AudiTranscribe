@@ -1,6 +1,6 @@
 {
   "branches": "staging",
-  "repositoryUrl": "https://github.com/AudiTranscribe/AudiTranscribe",
+  "repositoryUrl": "https://github.com/AudiTranscribe/AudiTranscribe.git",
   "debug": "false",
   "plugins": [
     "@semantic-release/commit-analyzer",
