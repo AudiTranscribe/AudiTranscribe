@@ -51,7 +51,7 @@ jobs:
           zip -r Windows-Installer.zip Windows-Installer
           zip -r macOS-Installer.zip macOS-Installer
       - name: Setup Semantic Release
-        run: npm install -g semantic-release @semantic-release/git @semantic-release/changelog -D
+        run: npm install -g semantic-release @semantic-release/git @semantic-release/changelog @semantic-release/github -D
       - name: Release To GitHub
         run: npx semantic-release
         env:
