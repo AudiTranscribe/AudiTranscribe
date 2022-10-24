@@ -50,6 +50,7 @@ import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
+import site.overwrite.auditranscribe.utils.GUIUtils;
 import site.overwrite.auditranscribe.utils.MiscUtils;
 
 import java.io.File;
@@ -79,7 +80,7 @@ public class MainViewController extends ClassWithLogging implements Initializabl
     private MenuBar menuBar;
 
     @FXML
-    private MenuItem newProjectMenuItem, openProjectMenuItem, preferencesMenuItem, aboutMenuItem;
+    private MenuItem newProjectMenuItem, openProjectMenuItem, preferencesMenuItem, docsMenuItem, aboutMenuItem;
 
     // Main elements
     @FXML
@@ -152,12 +153,10 @@ public class MainViewController extends ClassWithLogging implements Initializabl
 
         // Add methods to menu items
         newProjectMenuItem.setOnAction(this::handleNewProject);
-
         openProjectMenuItem.setOnAction(this::handleOpenProject);
-
-        preferencesMenuItem.setOnAction(actionEvent -> PreferencesViewController.showPreferencesWindow());
-
-        aboutMenuItem.setOnAction(actionEvent -> AboutViewController.showAboutWindow());
+        preferencesMenuItem.setOnAction(event -> PreferencesViewController.showPreferencesWindow());
+        docsMenuItem.setOnAction(event -> GUIUtils.openURLInBrowser("https://docs.auditranscribe.app/"));
+        aboutMenuItem.setOnAction(event -> AboutViewController.showAboutWindow());
 
         // Report that the main view is ready to be shown
         log(Level.INFO, "Main view ready to be shown");

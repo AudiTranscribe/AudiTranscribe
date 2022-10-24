@@ -199,7 +199,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
     @FXML
     private MenuItem newProjectMenuItem, openProjectMenuItem, renameProjectMenuItem, saveProjectMenuItem,
-            saveAsMenuItem, exportMIDIMenuItem, preferencesMenuItem, quantizeNotesMenuItem, aboutMenuItem;
+            saveAsMenuItem, exportMIDIMenuItem, preferencesMenuItem, quantizeNotesMenuItem, docsMenuItem, aboutMenuItem;
 
     // Main elements
     @FXML
@@ -537,6 +537,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         exportMIDIMenuItem.setOnAction(event -> handleExportMIDI());
         preferencesMenuItem.setOnAction(event -> PreferencesViewController.showPreferencesWindow());
         quantizeNotesMenuItem.setOnAction(event -> handleQuantizeNotes());
+        docsMenuItem.setOnAction(event -> GUIUtils.openURLInBrowser("https://docs.auditranscribe.app/"));
         aboutMenuItem.setOnAction(event -> AboutViewController.showAboutWindow());
 
         // Create scheduler to update memory available
