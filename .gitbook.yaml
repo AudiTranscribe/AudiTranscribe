@@ -1,0 +1,10 @@
+root: ./docs/
+
+structure:
+  readme: welcome.md
+  summary: README.md
+
+redirects:
+  quick-start: ./setup/0-introduction.md
+  setup: ./setup/1-installing-auditranscribe.md
+  tutorial: ./setup/0-overview.md
