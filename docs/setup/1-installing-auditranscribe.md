@@ -1,4 +1,4 @@
-# 1. Installing AudiTranscribe
+# Installing AudiTranscribe
 
 This page will guide you through the installation process for AudiTranscribe.
 

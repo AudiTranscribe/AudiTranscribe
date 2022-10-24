@@ -1,3 +1,3 @@
-# 2. Setup Wizard
+# Setup Wizard
 
 Todo: add more
