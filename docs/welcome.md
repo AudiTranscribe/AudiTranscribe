@@ -8,14 +8,14 @@ expensive professional transcription apps that many may not be able to afford.
 To the left you'll find all the different documentation sections. Below you'll find a high level overview of the docs,
 to help you get your bearings.
 
-To get started, we recommend checking out the [Setup Instructions](setup/1-installing-auditranscribe.md). Or, if
+To get started, we recommend checking out the [Setup Instructions](setup/installing-auditranscribe.md). Or, if
 you already have AudiTranscribe installed on your device, check out the [Tutorial](tutorial/1-first-project.md).
 
 Here's a rundown of the different sections (the section links point to the first page of each section):
 
 | Section                            | Description                                                 |
 |------------------------------------|-------------------------------------------------------------|
-| [Setup](setup/0-introduction.md)   | Follow these steps to set up AudiTranscribe on your device. |
+| [Setup](setup/introduction.md)     | Follow these steps to set up AudiTranscribe on your device. |
 | [Tutorial](tutorial/0-overview.md) | Learn the essentials on how to use AudiTranscribe.          |
 
 If there's something you can't find in the docs, we highly encourage you to file an issue on

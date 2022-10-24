@@ -43,7 +43,7 @@ unless specified.
 
 # Installation
 
-Please read the [Installation Guide](docs/setup/1-installing-auditranscribe.md).
+Please read the [Installation Guide](docs/setup/installing-auditranscribe.md).
 
 # Security Policy
 

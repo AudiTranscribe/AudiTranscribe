@@ -29,9 +29,9 @@ Currently, the only supported platforms for AudiTranscribe are Windows and macOS
    key. To fix this, open Terminal and run the following command. The command will remove all attributes from the `.dmg`
    file and makes it no longer quarantined. (**Note**: You may be prompted to enter your password.)
 
-```bash
-sudo xattr -cr path/to/the/dmg/file
-```
+   ```bash
+   sudo xattr -cr path/to/the/dmg/file
+   ```
 
 5. Once the command is run, open the `.dmg` file.
 6. Drag `AudiTranscribe.app` into the Applications folder.
