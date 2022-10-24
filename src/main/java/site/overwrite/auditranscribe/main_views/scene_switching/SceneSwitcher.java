@@ -267,7 +267,7 @@ public class SceneSwitcher extends ClassWithLogging {
             transcriptionStage.setTitle(data.projectName);
 
             // Set width and height of the new scene
-            Rectangle2D screenBounds = Screen.getPrimary().getBounds();
+            Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
             transcriptionStage.setMinWidth(screenBounds.getWidth());
             transcriptionStage.setMinHeight(screenBounds.getHeight());
 
@@ -396,7 +396,7 @@ public class SceneSwitcher extends ClassWithLogging {
             transcriptionStage.setTitle(projectData.projectInfoData.projectName);
 
             // Set width and height of the new scene
-            Rectangle2D screenBounds = Screen.getPrimary().getBounds();
+            Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
             transcriptionStage.setMinWidth(screenBounds.getWidth());
             transcriptionStage.setMinHeight(screenBounds.getHeight());
 
