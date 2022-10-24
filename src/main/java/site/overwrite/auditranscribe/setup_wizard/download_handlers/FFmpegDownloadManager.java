@@ -61,8 +61,8 @@ public class FFmpegDownloadManager extends AbstractDownloadManager {
         os = OSMethods.getOS();
         downloadFileName = "ffmpeg.zip";
 
-        // Linux is currently not supported
-        if (os == OSType.LINUX) {
+        // Linux and others do not have automatic FFmpeg installation
+        if (os == OSType.LINUX || os == OSType.OTHER) {
             downloadURL = null;
             signature = null;
             ffmpegFolder = null;
