@@ -4,9 +4,9 @@
 
 ## 🔨 Setup
 
-- [0. Introduction](setup/0-introduction.md)
-- [1. Downloading AudiTranscribe](setup/1-installing-auditranscribe.md)
-- [2. Setup Wizard](setup/2-setup-wizard.md)
+- [Introduction](setup/0-introduction.md)
+- [Downloading AudiTranscribe](setup/1-installing-auditranscribe.md)
+- [Setup Wizard](setup/2-setup-wizard.md)
 
 ## 📘 Tutorial
 
