@@ -42,6 +42,10 @@
 }
 
 /* Hyperlinks */
+.hyperlink {
+    -fx-font-size: 14px;
+}
+
 .hyperlink:hover {
     -fx-cursor: hand;
 }
