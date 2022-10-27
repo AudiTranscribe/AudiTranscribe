@@ -326,22 +326,38 @@
                 <configuration>
                     <name>AudiTranscribe</name>
                     <vendor>AudiTranscribe Team</vendor>
-                    <description>An open source music transcription application.</description>
-                    <copyright>© Copyright AudiTranscribe Team.</copyright>
+                    <description>An open-source music transcription application.</description>
+                    <copyright>© Copyright AudiTranscribe Team</copyright>
                     <destination>target/dist</destination>
                     <licenseFile>LICENSE</licenseFile>
                     <module>site.overwrite.auditranscribe/site.overwrite.auditranscribe.MainApplication</module>
                     <runtimeImage>target/AudiTranscribe</runtimeImage>
+                    <resourceDir>${project.basedir}/Production Assets</resourceDir>
                     <javaOptions>
                         <option>-Dfile.encoding=UTF-8</option>
                     </javaOptions>
                 </configuration>
                 <executions>
                     <execution>
+                        <id>linux-deb</id>
+                        <configuration>
+                            <appVersion>${project.version}</appVersion>
+                            <icon>${project.basedir}/Production Assets/AudiTranscribe.ico</icon>
+                            <type>DEB</type>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>linux-rpm</id>
+                        <configuration>
+                            <appVersion>${project.version}</appVersion>
+                            <icon>${project.basedir}/Production Assets/AudiTranscribe.ico</icon>
+                            <type>RPM</type>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>mac</id>
                         <configuration>
                             <appVersion>1.0.0</appVersion> <!-- For macOS, must make version at least 1.0.0 -->
-                            <resourceDir>${project.basedir}/Production Assets/mac</resourceDir>
                             <type>DMG</type>
                         </configuration>
                     </execution>
@@ -349,8 +365,7 @@
                         <id>win</id>
                         <configuration>
                             <appVersion>${project.version}</appVersion>
-                            <icon>${project.basedir}/Production Assets/win/AudiTranscribe.ico</icon>
-                            <resourceDir>${project.basedir}/Production Assets/win</resourceDir>
+                            <icon>${project.basedir}/Production Assets/AudiTranscribe.ico</icon>
                             <type>EXE</type>
                             <winMenu>true</winMenu>
                             <winPerUserInstall>true</winPerUserInstall>
