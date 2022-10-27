@@ -177,9 +177,14 @@ public class FFmpegHandler extends ClassWithLogging {
             try {
                 // Execute the command on the standard runtime
                 Runtime runtime = Runtime.getRuntime();
-                runtime.exec(new String[]{ffmpegPath, "-version"});  // If not found, will raise an IOException
-                return true;
-            } catch (IOException e) {
+                Process process = runtime.exec(new String[]{ffmpegPath, "-version"});
+
+                if (process.waitFor() == 0) {
+                    return true;  // Exited successfully
+                } else {
+                    throw new IOException("FFmpeg path not at '" + ffmpegPath + "'.");
+                }
+            } catch (IOException | InterruptedException e) {
                 return false;
             }
         }
