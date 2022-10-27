@@ -40,9 +40,27 @@ stream audio and video. AudiTranscribe uses it to help process different audio f
 
 ## For Developers
 
-- Java 17: The language used to write the application.
-- (**Windows Only**) [WiX Toolset 3](https://wixtoolset.org/): To generate the AudiTranscribe executable for Windows.
-- (**macOS Only**) Xcode Command Line Tools: Contains needed utilities to make AudiTranscribe run in development.
+If you are planning to develop for AudiTranscribe, please ensure that **Java 17** is installed on your machine.
+
+In addition, there are some additional dependencies to install for specific platforms:
+
+- **Windows**: The [**WiX Toolset 3**](https://wixtoolset.org/) is needed to generate the AudiTranscribe executable for
+  Windows.
+- **macOS**: On macOS, the **Xcode Command Line Tools** needs to be installed to make AudiTranscribe run in development.
+  You can install the XCode Command Line Tools by running:
+  ```
+  xcode-select --install
+  ```
+  in a terminal.
+- **Linux**: Please ensure that `jlink` is properly installed on your machine by running:
+  ```
+  jlink --version
+  ```
+  If an error appears, please install `jlink` by running:
+  ```
+  sudo apt install openjdk-17-jdk-headless
+  ```
+  or a similar command on your Linux machine.
 
 # Installation
 
