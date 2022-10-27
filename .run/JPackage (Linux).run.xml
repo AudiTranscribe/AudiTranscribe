@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Export for Production (Linux RPM)" type="MavenRunConfiguration" factoryName="Maven">
+  <configuration default="false" name="JPackage (Linux)" type="MavenRunConfiguration" factoryName="Maven">
     <MavenSettings>
       <option name="myGeneralSettings" />
       <option name="myRunnerSettings" />
@@ -10,10 +10,7 @@
           </option>
           <option name="goals">
             <list>
-              <option value="clean:clean" />
-              <option value="test" />
-              <option value="javafx:jlink" />
-              <option value="jpackage:jpackage@linux-rpm" />
+              <option value="jpackage:jpackage@linux" />
             </list>
           </option>
           <option name="pomFileName" />

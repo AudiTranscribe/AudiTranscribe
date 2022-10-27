@@ -339,19 +339,13 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>linux-deb</id>
+                        <id>linux</id>
                         <configuration>
                             <appVersion>${project.version}</appVersion>
                             <icon>${project.basedir}/Production Assets/AudiTranscribe.ico</icon>
                             <type>DEB</type>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>linux-rpm</id>
-                        <configuration>
-                            <appVersion>${project.version}</appVersion>
-                            <icon>${project.basedir}/Production Assets/AudiTranscribe.ico</icon>
-                            <type>RPM</type>
+                            <linuxPackageName>AudiTranscribe</linuxPackageName>
+                            <linuxShortcut>true</linuxShortcut>
                         </configuration>
                     </execution>
                     <execution>
