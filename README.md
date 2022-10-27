@@ -52,15 +52,25 @@ In addition, there are some additional dependencies to install for specific plat
   xcode-select --install
   ```
   in a terminal.
-- **Linux**: Please ensure that `jlink` is properly installed on your machine by running:
-  ```
-  jlink --version
-  ```
-  If an error appears, please install `jlink` by running:
-  ```
-  sudo apt install openjdk-17-jdk-headless
-  ```
-  or a similar command on your Linux machine.
+- **Linux**: The following instuctions are most relevant to **Ubuntu**. However, other Linux platforms may follow these requirements as well:
+    - The **`bin-utils`** package needs to be installed on your machine in order to access the `objcopy` command from
+      the shell. Install it by running:
+      ```
+      sudo apt-get install binutils
+      ```
+    - The **`fakeroot`** package needs to be installed in order to properly generate the Linux package. Install it by running:
+        ```
+      sudo apt-get install fakeroot
+      ```
+    - Please ensure that `jlink` is properly installed on your machine by running:
+      ```
+      jlink --version
+      ```
+      If an error appears, please install `jlink` by running:
+      ```
+      sudo apt install openjdk-17-jdk-headless
+      ```
+      or a similar command on your Linux machine.
 
 # Installation
 
