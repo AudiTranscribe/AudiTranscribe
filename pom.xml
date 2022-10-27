@@ -332,7 +332,6 @@
                     <licenseFile>LICENSE</licenseFile>
                     <module>site.overwrite.auditranscribe/site.overwrite.auditranscribe.MainApplication</module>
                     <runtimeImage>target/AudiTranscribe</runtimeImage>
-                    <resourceDir>${project.basedir}/Production Assets</resourceDir>
                     <javaOptions>
                         <option>-Dfile.encoding=UTF-8</option>
                     </javaOptions>
@@ -342,9 +341,10 @@
                         <id>linux</id>
                         <configuration>
                             <appVersion>${project.version}</appVersion>
-                            <icon>${project.basedir}/Production Assets/AudiTranscribe.ico</icon>
+                            <resourceDir>${project.basedir}/Production Assets/linux</resourceDir>
+                            <icon>${project.basedir}/Production Assets/linux/AudiTranscribe.ico</icon>
                             <type>DEB</type>
-                            <linuxPackageName>AudiTranscribe</linuxPackageName>
+                            <linuxAppCategory>Audio</linuxAppCategory>
                             <linuxShortcut>true</linuxShortcut>
                         </configuration>
                     </execution>
@@ -352,6 +352,7 @@
                         <id>mac</id>
                         <configuration>
                             <appVersion>1.0.0</appVersion> <!-- For macOS, must make version at least 1.0.0 -->
+                            <resourceDir>${project.basedir}/Production Assets/mac</resourceDir>
                             <type>DMG</type>
                         </configuration>
                     </execution>
@@ -359,7 +360,8 @@
                         <id>win</id>
                         <configuration>
                             <appVersion>${project.version}</appVersion>
-                            <icon>${project.basedir}/Production Assets/AudiTranscribe.ico</icon>
+                            <resourceDir>${project.basedir}/Production Assets/win</resourceDir>
+                            <icon>${project.basedir}/Production Assets/win/AudiTranscribe.ico</icon>
                             <type>EXE</type>
                             <winMenu>true</winMenu>
                             <winPerUserInstall>true</winPerUserInstall>
