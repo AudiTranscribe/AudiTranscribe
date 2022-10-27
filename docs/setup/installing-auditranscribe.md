@@ -1,3 +1,7 @@
+---
+description: Get AudiTranscribe up and running on your machine!
+---
+
 # Installing AudiTranscribe
 
 This page will guide you through the installation process for AudiTranscribe.
@@ -6,23 +10,26 @@ Currently, the only supported platforms for AudiTranscribe are Windows and macOS
 
 ## Using An Installer
 
-### Windows
+{% tabs %}
+{% tab title="Windows" %}
 
 1. Head to the latest releases section.
-    - If there are no current releases, you may want to choose a pre-release version instead.
-2. Under the downloads section, download the Windows installer.
-3. Unzip the installer package. The package should contain one `.exe` file.
-4. Run the application.
-    - It is highly likely that an alert like "Windows protected your PC" would pop up. This is normal, and is due to
+2. If there are no current releases, you may want to choose a pre-release version instead.
+3. Under the downloads section, download the Windows installer.
+4. Unzip the installer package. The package should contain one `.exe` file.
+5. Run the application.
+    * It is highly likely that an alert like "Windows protected your PC" would pop up. This is normal, and is due to
       AudiTranscribe not being a recognized app yet.
-    - If you see such an alert, click on "More Info", and then click on "Run Anyway" at the bottom of the screen.
-5. Follow the installation instructions.
-6. The application should be installed once completed.
+    * If you see such an alert, click on "More Info", and then click on "Run Anyway" at the bottom of the screen.
+6. Follow the installation instructions.
+7. The application should be installed once completed.
 
-### macOS
+{% endtab %}
+
+{% tab title="macOS" %}
 
 1. Head to the latest releases section.
-    - If there are no current releases, you may want to choose a pre-release version instead.
+    * If there are no current releases, you may want to choose a pre-release version instead.
 2. Under the downloads section, download the macOS file.
 3. Unzip the installer package. The package should contain one `.dmg` file. **Do not open the `.dmg` file yet**.
 4. If you were to open the `.dmg` file now, it would likely be quarantined by Apple due to it lacking a proper signing
@@ -32,10 +39,12 @@ Currently, the only supported platforms for AudiTranscribe are Windows and macOS
    ```bash
    sudo xattr -cr path/to/the/dmg/file
    ```
-
 5. Once the command is run, open the `.dmg` file.
 6. Drag `AudiTranscribe.app` into the Applications folder.
 7. Run the application!
+
+{% endtab %}
+{% endtabs %}
 
 ## From Source
 
