@@ -108,7 +108,7 @@ The spectrogram section refers to the following part of the user interface.
   note.
     * Changing the music key will change the _form_ of the notes shown. For example, $$C♯$$ in C Major may show up as
       $$D♭$$ in C♭ Major.
-    * The notes that are <u>underlined</u> are notes that are in the current music key.
+    * Underlined notes are **notes that are in the current scale**. Non-underlined notes are not in the current scale.
 * The right side shows a spectrogram, which shows which frequencies are the loudest. The most audible frequencies are
   displayed as the brightest on the spectrogram.
     * Note that harmonics (notes with frequencies that are multiples of the fundamental frequency) will show up as
