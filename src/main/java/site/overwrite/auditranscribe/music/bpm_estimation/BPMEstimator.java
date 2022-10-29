@@ -80,7 +80,7 @@ public final class BPMEstimator {
 
         for (int i = 0; i < bpms.length; i++) {
             double temp = (MathUtils.log2(bpms[i]) - MathUtils.log2(START_BPM)) / STD_BPM;
-            logPrior[i] = -0.5 * temp * temp;  // We do this because `Math.Pow` is slow
+            logPrior[i] = -0.5 * temp * temp;  // Multiply by `temp` twice because `Math.pow(temp, 2)` is slow
         }
 
         // Kill everything above the max tempo
