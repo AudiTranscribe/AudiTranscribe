@@ -258,7 +258,7 @@ public final class VQT extends ClassWithLogging {
             // Re-scale the filters to compensate for downsampling
             for (int i = 0; i < fftBasis.length; i++) {
                 for (int j = 0; j < fftBasis[0].length; j++) {
-                    fftBasis[i][j] = fftBasis[i][j].scale(Math.sqrt(sr / mySR));
+                    fftBasis[i][j] = fftBasis[i][j].times(Math.sqrt(sr / mySR));
                 }
             }
 
@@ -409,7 +409,7 @@ public final class VQT extends ClassWithLogging {
             double normalisationFactor = lengths[i] / numFFT;
 
             for (int j = 0; j < numFFT; j++) {
-                basis[i][j] = basis[i][j].scale(normalisationFactor);
+                basis[i][j] = basis[i][j].times(normalisationFactor);
             }
         }
 
