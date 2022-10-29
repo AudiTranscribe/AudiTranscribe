@@ -171,12 +171,12 @@ public class NoteRectangle extends StackPane {
         this.bordersRegion.setPrefHeight(this.rectangleHeight);
 
         // Update properties of the resizing regions
-        resizeLeftRegion.translateXProperty().bind(this.bordersRegion.widthProperty().divide(-2));
+        resizeLeftRegion.translateXProperty().bind(this.bordersRegion.widthProperty().multiply(-0.5));
         resizeLeftRegion.prefHeightProperty().bind(this.bordersRegion.prefHeightProperty());
         resizeLeftRegion.setPrefWidth(RESIZING_REGIONS_WIDTH);
         resizeLeftRegion.setMaxWidth(RESIZING_REGIONS_WIDTH);
 
-        resizeRightRegion.translateXProperty().bind(this.bordersRegion.widthProperty().divide(2));
+        resizeRightRegion.translateXProperty().bind(this.bordersRegion.widthProperty().multiply(0.5));
         resizeRightRegion.prefHeightProperty().bind(this.bordersRegion.prefHeightProperty());
         resizeRightRegion.setPrefWidth(RESIZING_REGIONS_WIDTH);
         resizeRightRegion.setMaxWidth(RESIZING_REGIONS_WIDTH);
