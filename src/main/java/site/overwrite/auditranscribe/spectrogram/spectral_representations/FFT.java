@@ -230,7 +230,7 @@ public final class FFT {
         for (int i = 0; i < length; i++) {
             exponentialTable[i] = Complex.exp(
                     Complex.IMAG_UNIT.times(
-                            new Complex((i * i) % (length * 2)).scale(exponentCoefficient)
+                            new Complex((i * i) % (length * 2)).times(exponentCoefficient)
                     )
             );
         }

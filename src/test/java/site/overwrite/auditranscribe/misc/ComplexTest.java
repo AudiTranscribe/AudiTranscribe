@@ -190,13 +190,10 @@ class ComplexTest {
     }
 
     @Test
-    void scale() {
-        assertEquals(new Complex(2.46, 3.69), (new Complex(2, 3)).scale(1.23).roundNicely(3));
-        assertEquals(new Complex(-2.46, -3.69), (new Complex(2, 3)).scale(-1.23).roundNicely(3));
-    }
-
-    @Test
     void times() {
+        assertEquals(new Complex(2.46, 3.69), (new Complex(2, 3)).times(1.23).roundNicely(3));
+        assertEquals(new Complex(-2.46, -3.69), (new Complex(2, 3)).times(-1.23).roundNicely(3));
+
         assertEquals(new Complex(2.46, 3.69), (new Complex(2, 3)).times(new Complex(1.23, 0)).roundNicely(3));
 
         assertEquals(new Complex(-5, 10), (new Complex(1, 2)).times(new Complex(3, 4)));
@@ -223,19 +220,19 @@ class ComplexTest {
 
     // Static method tests
     @Test
-    void testPlus() {
+    void staticPlus() {
         assertEquals(new Complex(2.23, 6.56), Complex.plus(new Complex(1, 2), new Complex(1.23, 4.56)).roundNicely(3));
         assertEquals(new Complex(2.23, 6.56), Complex.plus(new Complex(1.23, 4.56), new Complex(1, 2)).roundNicely(3));
     }
 
     @Test
-    void testMinus() {
+    void staticMinus() {
         assertEquals(new Complex(-0.23, -2.56), Complex.minus(new Complex(1, 2), new Complex(1.23, 4.56)).roundNicely(3));
         assertEquals(new Complex(0.23, 2.56), Complex.minus(new Complex(1.23, 4.56), new Complex(1, 2)).roundNicely(3));
     }
 
     @Test
-    void testTimes() {
+    void staticTimes() {
         assertEquals(new Complex(2.46, 3.69), Complex.times(new Complex(2, 3), new Complex(1.23, 0)).roundNicely(3));
 
         assertEquals(new Complex(-5, 10), Complex.times(new Complex(1, 2), new Complex(3, 4)));
@@ -243,13 +240,13 @@ class ComplexTest {
     }
 
     @Test
-    void testDivides() {
+    void staticDivides() {
         assertEquals(new Complex(1, 1), Complex.divides(new Complex(5, 5), new Complex(5, 0)).roundNicely(3));
         assertEquals(new Complex(0.44, 0.08), Complex.divides(new Complex(1, 2), new Complex(3, 4)).roundNicely(3));
     }
 
     @Test
-    void testExp() {
+    void exp() {
         assertEquals(new Complex(1, 0), Complex.exp(new Complex(0, 0)).roundNicely(3));
         assertEquals(new Complex(10, 0), Complex.exp(new Complex(Math.log(10), 0)).roundNicely(3));
         assertEquals(new Complex(1.23, 0), Complex.exp(new Complex(Math.log(1.23), 0)).roundNicely(3));

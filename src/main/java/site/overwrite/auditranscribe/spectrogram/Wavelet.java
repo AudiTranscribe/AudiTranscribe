@@ -190,7 +190,7 @@ public final class Wavelet {
             // Apply the windowing function
             double[] windowArray = windowFunction.window.generateWindow(signalLength, false);
             for (int j = 0; j < signalLength; j++) {
-                sig[j] = sig[j].scale(windowArray[j]);
+                sig[j] = sig[j].times(windowArray[j]);
             }
 
             // Normalise
