@@ -8,7 +8,7 @@
    sodipodi:version="0.32"
    inkscape:version="1.2 (dc2aeda, 2022-05-15)"
    version="1.0"
-   sodipodi:docname="KB_United_States.svg"
+   sodipodi:docname="play-notes-on-keyboard.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -167,8 +167,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.97111467"
-     inkscape:cx="431.97782"
-     inkscape:cy="292.44744"
+     inkscape:cx="443.30501"
+     inkscape:cy="157.03604"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      inkscape:grid-points="true"
@@ -176,9 +176,9 @@
      gridtolerance="15px"
      showborder="false"
      inkscape:window-width="1440"
-     inkscape:window-height="900"
+     inkscape:window-height="713"
      inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-y="25"
      showguides="true"
      inkscape:guide-bbox="true"
      inkscape:window-maximized="0"
@@ -258,11 +258,11 @@
        d="M 600,0 L 660,0 L 660,60 L 600,60 L 600,0 z "
        id="rect2242" />
     <path
-       style="fill:#ff0000;fill-opacity:0.4974094;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dashoffset:0;stroke-opacity:1"
+       style="fill:#ff8080;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dashoffset:0;stroke-opacity:1"
        d="M 660,0 L 720,0 L 720,60 L 660,60 L 660,0 z "
        id="rect2244" />
     <path
-       style="fill:#ff0000;fill-opacity:0.49740931;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dashoffset:0;stroke-opacity:1"
+       style="fill:#ff8080;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dashoffset:0;stroke-opacity:1"
        d="M 720,0 L 780,0 L 780,60 L 720,60 L 720,0 z "
        id="rect2246" />
     <path
@@ -831,7 +831,7 @@
        y="108.83304"
        id="text3504"><tspan
          sodipodi:role="line"
-         id="tspan3502"></tspan></text>
+         id="tspan3502" /></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:21.3333px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman,  Bold';fill:#ff0000;fill-opacity:1"

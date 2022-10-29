@@ -99,13 +99,10 @@ At this point, you should have an audio file with transcribed notes.
 
 </details>
 
-Congratulations! You have transcribed an audio file!
+Congratulations! You have transcribed an audio file! Don't forget to save the project before continuing on with
+the [exporting process](4-exporting.md).
 
 {% hint style="info" %}
-We'll cover more on [creating, editing](../reference/creating-and-editing-notes.md)
-and [playing](../reference/playing-notes.md) notes in later chapters of the tutorial.
-{% endhint %}
-
-{% hint style="warning" %}
-Don't forget to save the project before continuing on with the next chapter!
+Learn more about [creating, editing](../reference/creating-and-editing-notes.md)
+and [playing](../reference/playing-notes.md) notes in the reference.
 {% endhint %}

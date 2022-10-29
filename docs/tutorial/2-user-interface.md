@@ -6,8 +6,6 @@ description: Learn how to read the interface of AudiTranscribe.
 
 This page will guide you through the user interface of AudiTranscribe.
 
-After AudiTranscribe finishes setting up the project, you should see the following.
-
 <figure>
     <img src="img/2-user-interface/ui.jpg" alt="">
     <figcaption>
