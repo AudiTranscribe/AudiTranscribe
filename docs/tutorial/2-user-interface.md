@@ -121,7 +121,7 @@ played. This is useful in providing a quick reference to what the frequency soun
 
 * Note that this only works if you are not in edit mode (see below).
 
-Learn more about playing notes in the [Playing Notes](4-playing-notes.md) chapter of the tutorial.
+Learn more about playing notes in the [Playing Notes](IdeaProjects/AudiTranscribe/docs/reference/playing-notes.md) chapter of the tutorial.
 
 ## Bottom Section
 
@@ -158,7 +158,7 @@ by selecting the corresponding tab.
     * Playback mode is primarily for listening to the audio and seeing the spectrogram. **Note editing is disabled in
       this mode**.
     * Editing mode allows you to place and delete notes on the spectrogram. For more, see
-      the [Creating Notes](5-creating-notes.md) chapter of the tutorial.
+      the [Creating Notes](IdeaProjects/AudiTranscribe/docs/reference/creating-and-editing-notes.md) chapter of the tutorial.
         * You may still play the audio in edit mode, but you will not be able to click on the row of the note to play
           the corresponding note.
 

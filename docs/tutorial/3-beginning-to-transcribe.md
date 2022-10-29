@@ -102,8 +102,8 @@ At this point, you should have an audio file with transcribed notes.
 Congratulations! You have transcribed an audio file!
 
 {% hint style="info" %}
-We'll cover more on [creating](5-creating-notes.md) and [playing](4-playing-notes.md) notes in later chapters of the
-tutorial.
+We'll cover more on [creating, editing](../reference/creating-and-editing-notes.md)
+and [playing](../reference/playing-notes.md) notes in later chapters of the tutorial.
 {% endhint %}
 
 {% hint style="warning" %}

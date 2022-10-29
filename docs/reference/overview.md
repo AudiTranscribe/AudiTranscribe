@@ -7,4 +7,6 @@ We are working to adding all features into these references, but not all of them
 we are working on it!
 {% endhint %}
 
-- [Keyboard Shortcuts](keyboard-shortcuts.md)
+* [Keyboard Shortcuts](keyboard-shortcuts.md)
+* [Playing Notes](playing-notes.md)
+* [Creating and Editing Notes](creating-and-editing-notes.md)

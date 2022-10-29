@@ -14,11 +14,11 @@
 * [1. First Project](tutorial/1-first-project.md)
 * [2. User Interface](tutorial/2-user-interface.md)
 * [3. Beginning to Transcribe](tutorial/3-beginning-to-transcribe.md)
-* [4. Playing Notes](tutorial/4-playing-notes.md)
-* [5. Creating Notes](tutorial/5-creating-notes.md)
-* [6. Exporting](tutorial/6-exporting.md)
+* [4. Exporting](tutorial/4-exporting.md)
 
 ## 📚 Reference
 
 * [Overview](reference/overview.md)
 * [Keyboard Shortcuts](reference/keyboard-shortcuts.md)
+* [Playing Notes](reference/playing-notes.md)
+* [Creating and Editing Notes](reference/creating-and-editing-notes.md)

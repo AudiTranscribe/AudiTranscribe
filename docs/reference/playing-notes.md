@@ -1,4 +1,4 @@
-# 4. Playing Notes
+# Playing Notes
 
 AudiTranscribe supports the option of playing specific notes. There are two main ways of playing notes:
 
