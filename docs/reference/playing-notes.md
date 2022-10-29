@@ -45,7 +45,7 @@ To identify the current playback octave, look at the note bar on the side of the
 in **yellow** is in the current playback octave.
 
 <figure>
-    <img src="img/note-bar.jpg" alt="" height=300>
+    <img src="img/note-bar.jpg" alt="">
     <figcaption>
         <p>Note Bar</p>
     </figcaption>
