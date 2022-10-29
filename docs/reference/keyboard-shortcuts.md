@@ -1,7 +1,3 @@
----
-description: This page lists all the keyboard shortcuts that are present in AudiTranscribe.
----
-
 # Keyboard Shortcuts
 
 The following keyboard shortcuts only works whilst **in an AudiTranscribe project**.
