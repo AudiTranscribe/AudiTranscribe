@@ -690,7 +690,7 @@ public class Audio extends ClassWithLogging {
 
             // Calculate the number of samples needed for each window
             int numSamplesPerBuffer = SAMPLES_BUFFER_SIZE * audioFormat.getChannels();
-            int numBuffers = (int) Math.ceil((float) numSamples / numSamplesPerBuffer);
+            int numBuffers = MathUtils.intCeilDiv(numSamples, numSamplesPerBuffer);
 
             // Create a `finalSamples` array to store the samples
             float[] finalSamples = new float[numBuffers * numSamplesPerBuffer];
