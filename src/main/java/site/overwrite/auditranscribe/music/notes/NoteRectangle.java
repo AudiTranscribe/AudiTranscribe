@@ -36,6 +36,7 @@ import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.music.exceptions.NoteRectangleCollisionException;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
+import site.overwrite.auditranscribe.utils.MiscUtils;
 import site.overwrite.auditranscribe.utils.MusicUtils;
 
 import java.util.ArrayList;
@@ -67,6 +68,8 @@ public class NoteRectangle extends StackPane {
     private static boolean hasEditedNoteRectangles = false;
 
     // Instance attributes
+    private final String uuid;
+
     public int noteNum;
     private boolean isRemoved = false;
 
@@ -510,6 +513,9 @@ public class NoteRectangle extends StackPane {
 
         // Mark that the note rectangles were edited
         hasEditedNoteRectangles = true;
+
+        // Determine a UUID for the note rectangle
+        this.uuid = MiscUtils.generateUUID((long) (timeToPlaceRect + noteDuration + noteNum));
     }
 
     // Getter/Setter methods
@@ -830,10 +836,11 @@ public class NoteRectangle extends StackPane {
     @Override
     public String toString() {
         return "NoteRectangle(" +
-                "noteNum=" + noteNum +
+                "uuid=" + this.uuid +
+                ", noteNum=" + this.noteNum +
                 ", noteOnsetTime=" + getNoteOnsetTime() +
                 ", noteDuration=" + getNoteDuration() +
-                ')';
+                ")";
     }
 
     // Helper classes/enums
