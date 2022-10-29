@@ -64,6 +64,28 @@ public final class MathUtils {
         return Math.log(x) / Math.log(n);
     }
 
+    /**
+     * Method that returns the integer floor of <code>p / q</code>.<br>
+     * Assumes that both <code>p</code> and <code>q</code> are <b>positive integers</b>.
+     *
+     * @return Floor division of <code>p</code> by <code>q</code>.
+     */
+    public static int intFloorDiv(int p, int q) {
+        return p / q;
+    }
+
+    /**
+     * Method that returns the integer ceiling of <code>p / q</code>.<br>
+     * Assumes that both <code>p</code> and <code>q</code> are <b>positive integers</b>.
+     *
+     * @return Ceiling division of <code>p</code> by <code>q</code>.
+     * @implNote See <a href="https://stackoverflow.com/a/2745086">this StackOverflow answer</a> by
+     * Sparky.
+     */
+    public static int intCeilDiv(int p, int q) {
+        return 1 + ((p - 1) / q);
+    }
+
     // Data-related methods
 
     /**
