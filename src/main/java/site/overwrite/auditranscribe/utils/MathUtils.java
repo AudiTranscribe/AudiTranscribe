@@ -40,7 +40,7 @@ public final class MathUtils {
      * @return Log base 2 of <code>x</code>.
      */
     public static double log2(double x) {
-        return Math.log(x) * 1.442695040888963407359924681002;  // ln x * (1/ln 2), to 30 dp
+        return Math.log(x) * 1.4426950408889634;  // ln x * (1/ln 2), to 16 dp
     }
 
     /**

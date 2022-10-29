@@ -381,7 +381,7 @@ public final class UnitConversionUtils {
      * @return Octave number for the specified frequency.
      */
     public static double hzToOctaves(double hz) {
-        return MathUtils.log2(hz) - 4.781359713524659604069682476215;  // log2(16/440) to 30 dp
+        return MathUtils.log2(hz) - 4.7813597135246596;  // log2(16/440) to 16 dp
     }
 
     // Time unit conversion
