@@ -124,6 +124,10 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
     private final KeyCodeCombination SAVE_PROJECT_COMBINATION =
             new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN);
+    private final KeyCodeCombination UNDO_NOTE_EDIT_COMBINATION =
+            new KeyCodeCombination(KeyCode.Z, KeyCombination.SHORTCUT_DOWN);
+    private final KeyCodeCombination REDO_NOTE_EDIT_COMBINATION =
+            new KeyCodeCombination(KeyCode.Z, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
 
     // File-Savable Attributes
     private int numSkippableBytes;
@@ -197,6 +201,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
     @FXML
     private MenuBar menuBar;
 
+    // Todo: add undo/redo menu item
     @FXML
     private MenuItem newProjectMenuItem, openProjectMenuItem, renameProjectMenuItem, saveProjectMenuItem,
             saveAsMenuItem, exportMIDIMenuItem, preferencesMenuItem, quantizeNotesMenuItem, docsMenuItem, aboutMenuItem;
@@ -265,7 +270,8 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         NoteRectangle.allNoteRectangles.clear();
         NoteRectangle.noteRectanglesByNoteNumber.clear();
 
-        // Reset note rectangles settings
+        // Set note rectangles' static attribute
+        NoteRectangle.setSpectrogramPaneAnchor(spectrogramPaneAnchor);
         NoteRectangle.setIsPaused(isPaused);
         NoteRectangle.setCanEdit(canEditNotes);
 
@@ -2096,6 +2102,9 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
                     node.setDisable(false);
                 }
 
+                // Clear note rectangles' stacks
+                NoteRectangle.clearStacks();
+
                 // Handle attempt to close the window
                 rootPane.getScene().getWindow().setOnCloseRequest((windowEvent) -> {
                     // Deal with possible unsaved changes
@@ -2290,10 +2299,14 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             return;
         }
 
-        // Check if user wants to save the project
+        // Check if user is using any shortcuts
         if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {  // Save current project
             handleSavingProject(false, false);
             return;
+        } else if (UNDO_NOTE_EDIT_COMBINATION.match(keyEvent)) {  // Undo note edit
+            NoteRectangle.editAction(NoteRectangle.EditAction.UNDO);
+        } else if (REDO_NOTE_EDIT_COMBINATION.match(keyEvent)) {  // Redo note edit
+            NoteRectangle.editAction(NoteRectangle.EditAction.REDO);
         }
 
         // Otherwise, get the key event's key code

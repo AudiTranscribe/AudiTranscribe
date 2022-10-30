@@ -27,6 +27,7 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -54,9 +55,10 @@ public class NoteRectangle extends StackPane {
     public static List<ObservableList<NoteRectangle>> noteRectanglesByNoteNumber = new ArrayList<>();
     public static List<SortedList<NoteRectangle>> sortedNoteRectanglesByNoteNumber;
 
-    private static final Stack<Triple<String, EditAction, Double[]>> undoStack = new Stack<>();
-    private static final Stack<Triple<String, EditAction, Double[]>> redoStack = new Stack<>();
+    private static final Stack<Triple<String, UndoOrRedoAction, Double[]>> undoStack = new Stack<>();
+    private static final Stack<Triple<String, UndoOrRedoAction, Double[]>> redoStack = new Stack<>();
 
+    public static AnchorPane spectrogramPaneAnchor;
     public static double spectrogramWidth;
     public static double spectrogramHeight;
     public static int minNoteNum;
@@ -171,7 +173,9 @@ public class NoteRectangle extends StackPane {
                     "Note rectangle collision detected (" + colLoc + "); not placing note",
                     this.getClass().toString()
             );
-            throw new NoteRectangleCollisionException("Note rectangle collision detected; not placing note");
+            throw new NoteRectangleCollisionException(
+                    "Note rectangle collision detected (" + colLoc + "); not placing note"
+            );
         }
 
         // Set the borders' region's attributes
@@ -230,15 +234,15 @@ public class NoteRectangle extends StackPane {
                 noteRectanglesByNoteNumber.get(this.noteNum).remove(this);
 
                 // Determine if the secondary mouse button was pressed
-                if (event.isSecondaryButtonDown()) {  // TODO: HANDLE DELETION STATE SAVING
+                if (event.isSecondaryButtonDown()) {
                     // Remove the note rectangle from the parent pane
                     ((Pane) this.getParent()).getChildren().remove(this);
 
                     // Remove the note rectangle from the list of note rectangles
-                    allNoteRectangles.remove(this.uuid);
+                    allNoteRectangles.remove(this.uuid, this);
 
                     // Add create action to the undo
-                    addToUndoStack(this, EditAction.CREATE);  // When undoing, create rectangle
+                    addToStack(undoStack, this, UndoOrRedoAction.CREATE);  // When undoing, create rectangle
 
                     // Update flags
                     this.isRemoved = true;
@@ -256,7 +260,7 @@ public class NoteRectangle extends StackPane {
                     this.getParent().addEventHandler(ScrollEvent.ANY, cancelScroll);
 
                     // Add transform action to the `undo` stack
-                    addToUndoStack(this, EditAction.TRANSFORM);
+                    addToStack(undoStack, this, UndoOrRedoAction.TRANSFORM);
                 }
 
                 // Purge redo history
@@ -272,6 +276,8 @@ public class NoteRectangle extends StackPane {
         });
 
         mainRectangle.setOnMouseDragged(event -> {
+            // Todo: disable undo/redo whilst dragging
+
             // Check if editing is permitted
             if (canEdit && isPaused) {
                 // Set cursor
@@ -368,7 +374,7 @@ public class NoteRectangle extends StackPane {
             // Check if editing is permitted
             if (canEdit && isPaused) {
                 // Add current state to the undo stack and purge redo history
-                addToUndoStack(this, EditAction.TRANSFORM);
+                addToStack(undoStack, this, UndoOrRedoAction.TRANSFORM);
                 redoStack.clear();
 
                 // Remove rectangle from the note rectangle by number lists
@@ -451,7 +457,7 @@ public class NoteRectangle extends StackPane {
             // Check if editing is permitted
             if (canEdit && isPaused) {
                 // Add current state to the undo stack and purge redo history
-                addToUndoStack(this, EditAction.TRANSFORM);
+                addToStack(undoStack, this, UndoOrRedoAction.TRANSFORM);
                 redoStack.clear();
 
                 // Remove rectangle from the note rectangle by number lists
@@ -537,11 +543,16 @@ public class NoteRectangle extends StackPane {
         hasEditedNoteRectangles = true;
 
         // Add delete action to the undo stack and purge redi stack
-        addToUndoStack(this, EditAction.DELETE);  // When undoing, delete rectangle
+        addToStack(undoStack, this, UndoOrRedoAction.DELETE);  // When undoing, delete rectangle
         redoStack.clear();
     }
 
     // Getter/Setter methods
+
+    public static void setSpectrogramPaneAnchor(AnchorPane spectrogramPaneAnchor) {
+        NoteRectangle.spectrogramPaneAnchor = spectrogramPaneAnchor;
+    }
+
     public static void setSpectrogramWidth(double spectrogramWidth) {
         NoteRectangle.spectrogramWidth = spectrogramWidth;
     }
@@ -603,6 +614,14 @@ public class NoteRectangle extends StackPane {
     }
 
     // Public methods
+
+    /**
+     * Clears both the undo and redo stacks.
+     */
+    public static void clearStacks() {
+        undoStack.clear();
+        redoStack.clear();
+    }
 
     /**
      * Defines the note rectangles by note number lists.
@@ -672,44 +691,48 @@ public class NoteRectangle extends StackPane {
     }
 
     /**
-     * Undoes the latest action.
+     * Method that performs the specified <code>editAction</code>, such as undoing or redoing.
+     *
+     * @param editAction Action to perform.
      */
-    public static void undo() {
-        // Get the latest undo action from stack
-        Triple<String, EditAction, Double[]> latestAction = undoStack.pop();
+    public static void editAction(EditAction editAction) {
+        // If editing is disabled, do nothing
+        if (!canEdit) return;
+
+        // Determine the stacks to act upon
+        Stack<Triple<String, UndoOrRedoAction, Double[]>> primaryStack, secondaryStack;
+
+        if (editAction == EditAction.UNDO) {
+            primaryStack = undoStack;
+            secondaryStack = redoStack;
+        } else {
+            primaryStack = redoStack;
+            secondaryStack = undoStack;
+        }
+
+        // If the primary stack if empty
+        if (primaryStack.empty()) return;
+
+        // Get the latest undo action from primary stack
+        Triple<String, UndoOrRedoAction, Double[]> latestAction = primaryStack.pop();
         String uuid = latestAction.value0();
-        EditAction action = latestAction.value1();
+        UndoOrRedoAction action = latestAction.value1();
         Double[] data = latestAction.value2();
 
-        // Determine 'inverse' action to perform when redoing
-        EditAction invAction = EditAction.TRANSFORM;  // By default assume transform
-        if (action == EditAction.CREATE) invAction = EditAction.DELETE;
-        else if (action == EditAction.DELETE) invAction = EditAction.CREATE;
+        // Determine 'inverse' action to perform when doing the reverse operation
+        UndoOrRedoAction invAction = UndoOrRedoAction.TRANSFORM;  // By default assume transform
+        if (action == UndoOrRedoAction.CREATE) invAction = UndoOrRedoAction.DELETE;
+        else if (action == UndoOrRedoAction.DELETE) invAction = UndoOrRedoAction.CREATE;
 
-        // Add state the redo stack
-        addToRedoStack(allNoteRectangles.get(uuid), invAction);
+        // Get relevant rectangle
+        NoteRectangle relevantRect = allNoteRectangles.get(uuid);
 
-        // Perform the action
-        handleAction(uuid, action, data);
-    }
-
-    /**
-     * Redoes the latest action.
-     */
-    public static void redo() {
-        // Get the latest undo action from stack
-        Triple<String, EditAction, Double[]> latestAction = redoStack.pop();
-        String uuid = latestAction.value0();
-        EditAction action = latestAction.value1();
-        Double[] data = latestAction.value2();
-
-        // Determine 'inverse' action to perform when undoing
-        EditAction invAction = EditAction.TRANSFORM;  // By default assume transform
-        if (action == EditAction.CREATE) invAction = EditAction.DELETE;
-        else if (action == EditAction.DELETE) invAction = EditAction.CREATE;
-
-        // Add state the redo stack
-        addToUndoStack(allNoteRectangles.get(uuid), invAction);
+        // Add inverse action to secondary stack
+        if (relevantRect == null) {
+            addToStack(secondaryStack, uuid, invAction, data);
+        } else {
+            addToStack(secondaryStack, relevantRect, invAction);
+        }
 
         // Perform the action
         handleAction(uuid, action, data);
@@ -904,45 +927,30 @@ public class NoteRectangle extends StackPane {
     }
 
     /**
-     * Helper method that saves a rectangle's state to the undo stack.
+     * Helper method that saves a rectangle's state to the specified stack.
      *
-     * @param rect   Rectangle to act on.
-     * @param action Action to perform when undoing.
+     * @param stack  Stack to save the state to.
+     * @param rect   Rectangle to save the state of.
+     * @param action Action to take.
      */
-    private static void addToUndoStack(NoteRectangle rect, EditAction action) {
-        addToUndoStack(rect.uuid, action, getDataForStack(rect, action));
+    private static void addToStack(
+            Stack<Triple<String, UndoOrRedoAction, Double[]>> stack, NoteRectangle rect, UndoOrRedoAction action
+    ) {
+        addToStack(stack, rect.uuid, action, getDataForStack(rect, action));
     }
 
     /**
-     * Helper method that saves a rectangle's state to the undo stack.
+     * Helper method that saves a state to the specified stack.
      *
+     * @param stack  Stack to save the state to.
      * @param uuid   UUID of the rectangle.
-     * @param action Action to take when undoing.
-     * @param data   Data needed to perform the action.
+     * @param action Action to take.
+     * @param data   Data of the action.
      */
-    private static void addToUndoStack(String uuid, EditAction action, Double[] data) {
-        undoStack.add(new Triple<>(uuid, action, data));
-    }
-
-    /**
-     * Helper method that saves a rectangle's state to the redo stack.
-     *
-     * @param rect   Rectangle to act on.
-     * @param action Action to perform when redoing.
-     */
-    private static void addToRedoStack(NoteRectangle rect, EditAction action) {
-        addToRedoStack(rect.uuid, action, getDataForStack(rect, action));
-    }
-
-    /**
-     * Helper method that saves a rectangle's state to the redo stack.
-     *
-     * @param uuid   UUID of the rectangle.
-     * @param action Action to take when redoing.
-     * @param data   Data needed to perform the action.
-     */
-    private static void addToRedoStack(String uuid, EditAction action, Double[] data) {
-        redoStack.add(new Triple<>(uuid, action, data));
+    private static void addToStack(
+            Stack<Triple<String, UndoOrRedoAction, Double[]>> stack, String uuid, UndoOrRedoAction action, Double[] data
+    ) {
+        stack.add(new Triple<>(uuid, action, data));
     }
 
     /**
@@ -952,20 +960,12 @@ public class NoteRectangle extends StackPane {
      * @param action Action to perform.
      * @return Data needed to perform the action.
      */
-    private static Double[] getDataForStack(NoteRectangle rect, EditAction action) {
-        Double[] data;
-
-        if (action == EditAction.TRANSFORM || action == EditAction.CREATE) {
-            data = new Double[]{
-                    rect.getTranslateX(),
-                    rect.getTranslateY(),
-                    rect.getWidth()
-            };
-        } else {
-            data = new Double[0];
-        }
-
-        return data;
+    private static Double[] getDataForStack(NoteRectangle rect, UndoOrRedoAction action) {
+        return switch (action) {
+            case TRANSFORM -> new Double[]{rect.getTranslateX(), rect.getTranslateY(), rect.getWidth()};
+            case CREATE -> new Double[]{rect.getNoteOnsetTime(), rect.getNoteDuration(), (double) rect.noteNum};
+            case DELETE -> new Double[0];
+        };
     }
 
     /**
@@ -975,8 +975,8 @@ public class NoteRectangle extends StackPane {
      * @param action Action to take.
      * @param data   Data needed to perform the action.
      */
-    private static void handleAction(String uuid, EditAction action, Double[] data) {
-        if (action == EditAction.TRANSFORM) {
+    private static void handleAction(String uuid, UndoOrRedoAction action, Double[] data) {
+        if (action == UndoOrRedoAction.TRANSFORM) {
             // Get relevant rectangle
             NoteRectangle rect = allNoteRectangles.get(uuid);
 
@@ -984,28 +984,29 @@ public class NoteRectangle extends StackPane {
             rect.setTranslateX(data[0]);
             rect.setTranslateY(data[1]);
             rect.setWidth(data[2]);
-        } else if (action == EditAction.CREATE) {
+        } else if (action == UndoOrRedoAction.CREATE) {
             try {
                 // Create a new rectangle
-                NoteRectangle rect = new NoteRectangle(0, 0, 0);
-
-                // Update its attributes
+                NoteRectangle rect = new NoteRectangle(data[0], data[1], data[2].intValue());
+                spectrogramPaneAnchor.getChildren().add(rect);
                 rect.setUUID(uuid);
-                rect.setTranslateX(data[0]);
-                rect.setTranslateY(data[1]);
-                rect.setWidth(data[2]);
-            } catch (NoteRectangleCollisionException e) {
-                e.printStackTrace();
+
+                // Todo: set unsaved changes
+
+            } catch (NoteRectangleCollisionException ignored) {
             }
         } else {
             // Get the relevant rectangle
             NoteRectangle rect = allNoteRectangles.get(uuid);
 
+            // Remove rectangle from the note rectangle by number lists
+            noteRectanglesByNoteNumber.get(rect.noteNum).remove(rect);
+
             // Remove the note rectangle from the parent pane
             ((Pane) rect.getParent()).getChildren().remove(rect);
 
             // Remove the note rectangle from the list of note rectangles
-            allNoteRectangles.remove(rect.uuid);
+            allNoteRectangles.remove(uuid, rect);
 
             // Update flags
             rect.isRemoved = true;
@@ -1035,5 +1036,7 @@ public class NoteRectangle extends StackPane {
 
     enum VerticalMovement {UP, DOWN, NONE}
 
-    enum EditAction {TRANSFORM, CREATE, DELETE}
+    enum UndoOrRedoAction {TRANSFORM, CREATE, DELETE}
+
+    public enum EditAction {UNDO, REDO}
 }
