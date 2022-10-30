@@ -317,7 +317,7 @@ public final class VQT extends ClassWithLogging {
      * @return Number of octaves required to store <code>numBins</code>.
      */
     private static int getNumOctaves(int numBins, int binsPerOctave) {
-        return MathUtils.intCeilDiv(numBins, binsPerOctave);
+        return MathUtils.ceilDiv(numBins, binsPerOctave);
     }
 
     /**

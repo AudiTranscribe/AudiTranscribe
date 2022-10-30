@@ -158,7 +158,7 @@ public final class ChromaCQT {
         cqToChr = ArrayUtils.roll(cqToChr, -(numMerge / 2), 1);
 
         // How many octaves are we repeating?
-        int numOctaves = MathUtils.intCeilDiv(numInput, binsPerOctave);
+        int numOctaves = MathUtils.ceilDiv(numInput, binsPerOctave);
 
         // Repeat and trim
         double[][] temp = ArrayUtils.tile(cqToChr, numOctaves);

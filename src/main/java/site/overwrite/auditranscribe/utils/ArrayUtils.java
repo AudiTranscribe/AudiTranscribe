@@ -262,7 +262,7 @@ public final class ArrayUtils {
      */
     public static double[][] frame(double[] array, int frameLength, int hopLength, boolean verticalFraming) {
         // Calculate the length of the framed array
-        int finalArrayLength = MathUtils.intFloorDiv(array.length - frameLength, hopLength) + 1;
+        int finalArrayLength = Math.floorDiv(array.length - frameLength, hopLength) + 1;
 
         // Create the blank array to store the framed data in
         double[][] framed;

@@ -56,7 +56,7 @@ public final class Rhythm {
 
         // Center the autocorrelation windows
         int n = rawOnsetEnvelope.length;
-        int padAmount = MathUtils.intFloorDiv(winLength, 2);
+        int padAmount = Math.floorDiv(winLength, 2);
         double[] onsetEnvelope = new double[2 * padAmount + n];
 
         for (int i = 0; i < padAmount; i++) {

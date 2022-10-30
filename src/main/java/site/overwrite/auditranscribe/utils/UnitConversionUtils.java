@@ -423,12 +423,12 @@ public final class UnitConversionUtils {
      */
     public static int[] samplesToFrames(int[] samples, int hopLength, int numFFT) {
         // Compute offset value
-        int offset = (int) Math.floor(numFFT / 2.0);
+        int offset = Math.floorDiv(numFFT, 2);
 
         // Compute frame indices
         int[] frames = new int[samples.length];
         for (int i = 0; i < samples.length; i++) {
-            frames[i] = (int) Math.floor((double) (samples[i] - offset) / hopLength);
+            frames[i] = Math.floorDiv(samples[i] - offset, hopLength);
         }
         return frames;
     }

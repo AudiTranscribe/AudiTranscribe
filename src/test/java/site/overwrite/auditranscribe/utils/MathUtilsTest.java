@@ -48,29 +48,16 @@ class MathUtilsTest {
     }
 
     @Test
-    void intFloorDiv() {
-        assertEquals(2, MathUtils.intFloorDiv(8, 3));
-        assertEquals(3, MathUtils.intFloorDiv(9, 3));
-        assertEquals(3, MathUtils.intFloorDiv(10, 3));
-        assertEquals(3, MathUtils.intFloorDiv(11, 3));
-        assertEquals(4, MathUtils.intFloorDiv(12, 3));
+    void ceilDiv() {
+        assertEquals(3, MathUtils.ceilDiv(8, 3));
+        assertEquals(3, MathUtils.ceilDiv(9, 3));
+        assertEquals(4, MathUtils.ceilDiv(10, 3));
+        assertEquals(4, MathUtils.ceilDiv(11, 3));
+        assertEquals(4, MathUtils.ceilDiv(12, 3));
 
-        assertEquals(2, MathUtils.intFloorDiv(654, 321));
-        assertEquals(3, MathUtils.intFloorDiv(987, 321));
-        assertEquals(2, MathUtils.intFloorDiv(789, 321));
-    }
-
-    @Test
-    void intCeilDiv() {
-        assertEquals(3, MathUtils.intCeilDiv(8, 3));
-        assertEquals(3, MathUtils.intCeilDiv(9, 3));
-        assertEquals(4, MathUtils.intCeilDiv(10, 3));
-        assertEquals(4, MathUtils.intCeilDiv(11, 3));
-        assertEquals(4, MathUtils.intCeilDiv(12, 3));
-
-        assertEquals(3, MathUtils.intCeilDiv(654, 321));
-        assertEquals(4, MathUtils.intCeilDiv(987, 321));
-        assertEquals(3, MathUtils.intCeilDiv(789, 321));
+        assertEquals(3, MathUtils.ceilDiv(654, 321));
+        assertEquals(4, MathUtils.ceilDiv(987, 321));
+        assertEquals(3, MathUtils.ceilDiv(789, 321));
     }
 
     // Data-related methods
