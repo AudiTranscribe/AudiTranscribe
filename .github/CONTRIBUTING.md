@@ -11,8 +11,7 @@ you finalize your pull requests.
 
 ## What To Contribute
 
-There are many ways to contribute to AudiTranscribe. There are three **big** types of contributions we are looking our
-for:
+There are many ways to contribute to AudiTranscribe.
 
 - Improving the design of the application
 - Improving the efficiency of the program
