@@ -68,6 +68,7 @@ public class NoteRectangle extends StackPane {
     public static boolean isPaused = true;
     public static boolean canEdit = false;
     public static boolean isEditing = false;
+    public static boolean canUndoOrRedo = true;
 
     private static boolean hasEditedNoteRectangles = false;
 
@@ -268,6 +269,7 @@ public class NoteRectangle extends StackPane {
 
                 // Update flags
                 isEditing = true;
+                canUndoOrRedo = false;
                 hasEditedNoteRectangles = true;
 
                 // Prevent default action
@@ -276,9 +278,6 @@ public class NoteRectangle extends StackPane {
         });
 
         mainRectangle.setOnMouseDragged(event -> {
-            // Todo: disable undo/redo whilst dragging
-            // Fixme: bugs for translation
-
             // Check if editing is permitted
             if (canEdit && isPaused) {
                 // Set cursor
@@ -361,6 +360,7 @@ public class NoteRectangle extends StackPane {
 
                 // Update flags
                 isEditing = false;
+                canUndoOrRedo = true;
             }
 
             MyLogger.log(
@@ -696,9 +696,10 @@ public class NoteRectangle extends StackPane {
      *
      * @param editAction Action to perform.
      */
+    // Fixme: fix undo/redo bugs for all three actions
     public static void editAction(EditAction editAction) {
-        // If editing is disabled, do nothing
-        if (!canEdit) return;
+        // If editing is disabled or if undo or redo is disabled, do nothing
+        if (!canEdit || !canUndoOrRedo) return;
 
         // Determine the stacks to act upon
         Stack<Triple<String, UndoOrRedoAction, Double[]>> primaryStack, secondaryStack;
