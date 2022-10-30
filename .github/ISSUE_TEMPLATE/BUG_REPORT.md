@@ -43,7 +43,7 @@ Please complete the following information:
 
 Please complete the following information:
 
-- Application Version: [e.g. 1.2.3]
+- Application Version: [e.g. Version 1.2.3]
 
 ## Additional Context
 

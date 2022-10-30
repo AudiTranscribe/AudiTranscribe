@@ -14,8 +14,12 @@ Please delete options that are not relevant.
 - [ ] Bugfix (change which fixes an issue or a bug)
 
 Please specify any additional information:
+
 - [ ] This change is a breaking change
 - [ ] This change requires a documentation update
+    - [ ] A similar pull request on
+      the [documentation repository](https://github.com/AudiTranscribe/AudiTranscribe-Documentation) for the
+      documentation change was drafted/submitted
 
 ## Checklist
 
