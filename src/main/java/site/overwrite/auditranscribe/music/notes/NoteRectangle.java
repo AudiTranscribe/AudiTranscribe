@@ -277,6 +277,7 @@ public class NoteRectangle extends StackPane {
 
         mainRectangle.setOnMouseDragged(event -> {
             // Todo: disable undo/redo whilst dragging
+            // Fixme: bugs for translation
 
             // Check if editing is permitted
             if (canEdit && isPaused) {
@@ -934,7 +935,8 @@ public class NoteRectangle extends StackPane {
      * @param action Action to take.
      */
     private static void addToStack(
-            Stack<Triple<String, UndoOrRedoAction, Double[]>> stack, NoteRectangle rect, UndoOrRedoAction action
+            Stack<Triple<String, UndoOrRedoAction, Double[]>> stack, NoteRectangle rect,
+            UndoOrRedoAction action
     ) {
         addToStack(stack, rect.uuid, action, getDataForStack(rect, action));
     }
@@ -948,7 +950,8 @@ public class NoteRectangle extends StackPane {
      * @param data   Data of the action.
      */
     private static void addToStack(
-            Stack<Triple<String, UndoOrRedoAction, Double[]>> stack, String uuid, UndoOrRedoAction action, Double[] data
+            Stack<Triple<String, UndoOrRedoAction, Double[]>> stack, String uuid, UndoOrRedoAction action,
+            Double[] data
     ) {
         stack.add(new Triple<>(uuid, action, data));
     }
