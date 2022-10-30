@@ -993,9 +993,6 @@ public class NoteRectangle extends StackPane {
                 NoteRectangle rect = new NoteRectangle(data[0], data[1], data[2].intValue());
                 spectrogramPaneAnchor.getChildren().add(rect);
                 rect.setUUID(uuid);
-
-                // Todo: set unsaved changes
-
             } catch (NoteRectangleCollisionException ignored) {
             }
         } else {
@@ -1014,6 +1011,8 @@ public class NoteRectangle extends StackPane {
             // Update flags
             rect.isRemoved = true;
         }
+
+        hasEditedNoteRectangles = true;
     }
 
     // Overwritten methods
