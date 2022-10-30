@@ -39,9 +39,7 @@ import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 import site.overwrite.auditranscribe.utils.MiscUtils;
 import site.overwrite.auditranscribe.utils.MusicUtils;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 
 public class NoteRectangle extends StackPane {
@@ -50,7 +48,7 @@ public class NoteRectangle extends StackPane {
     private static final double RESIZING_REGIONS_WIDTH = 8;  // In pixels
 
     // Static attributes
-    public static List<NoteRectangle> allNoteRectangles = new ArrayList<>();
+    public static Map<String, NoteRectangle> allNoteRectangles = new HashMap<>();
 
     public static List<ObservableList<NoteRectangle>> noteRectanglesByNoteNumber = new ArrayList<>();
     public static List<SortedList<NoteRectangle>> sortedNoteRectanglesByNoteNumber;
@@ -111,6 +109,9 @@ public class NoteRectangle extends StackPane {
     public NoteRectangle(
             double timeToPlaceRect, double noteDuration, int noteNum
     ) throws NoteRectangleCollisionException {
+        // Determine a UUID for the note rectangle
+        this.uuid = MiscUtils.generateUUID((long) (timeToPlaceRect + noteDuration + noteNum));
+
         // Calculate the pixels per second for the spectrogram
         double pixelsPerSecond = spectrogramWidth / totalDuration;
         double secondsPerPixel = totalDuration / spectrogramWidth;
@@ -230,7 +231,7 @@ public class NoteRectangle extends StackPane {
                     ((Pane) this.getParent()).getChildren().remove(this);
 
                     // Remove the note rectangle from the list of note rectangles
-                    allNoteRectangles.remove(this);
+                    allNoteRectangles.remove(this.uuid);
 
                     // Update flags
                     this.isRemoved = true;
@@ -508,14 +509,11 @@ public class NoteRectangle extends StackPane {
         });
 
         // Add this new note rectangle into the note rectangles' lists
-        allNoteRectangles.add(this);
+        allNoteRectangles.put(this.uuid, this);
         noteRectanglesByNoteNumber.get(noteNum).add(this);
 
         // Mark that the note rectangles were edited
         hasEditedNoteRectangles = true;
-
-        // Determine a UUID for the note rectangle
-        this.uuid = MiscUtils.generateUUID((long) (timeToPlaceRect + noteDuration + noteNum));
     }
 
     // Getter/Setter methods
@@ -624,7 +622,7 @@ public class NoteRectangle extends StackPane {
             double resolution = spb / divisionFactor;
 
             // Process each note rectangle
-            for (NoteRectangle rectangle : allNoteRectangles) {
+            for (NoteRectangle rectangle : allNoteRectangles.values()) {
                 // Get the onset time and duration
                 double onsetTime = rectangle.getNoteOnsetTime();
                 double duration = rectangle.getNoteDuration();
