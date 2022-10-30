@@ -42,7 +42,6 @@ public final class BPMEstimationHelpers {
         binFreqs[0] = Double.POSITIVE_INFINITY;
 
         double scale =  60 * sampleRate / hopLength;
-
         for (int i = 1; i < numBins; i++) {
             binFreqs[i] = scale / i;
         }
