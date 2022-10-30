@@ -122,7 +122,7 @@ public final class UnitConversionUtils {
      * notes have been tuned to A440.
      */
     public static double noteNumberToFreq(int noteNumber) {
-        return 440 * Math.pow(2, (noteNumber - 57d) / 12);
+        return 440 * Math.pow(2, (noteNumber - 57.) / 12);
     }
 
     /**
@@ -329,16 +329,15 @@ public final class UnitConversionUtils {
      * @return Frequency in Mel.
      */
     public static double hzToMel(double freq) {
-        // Fill in the linear part
+        // Fill in the linear scale
         double fMin = 0;
-        double fSp = 200. / 3.;
-
+        double fSp = 66.66666666666667;  // Equals 200/3 to 16 sf
         double mel = (freq - fMin) / fSp;
 
-        // Fill in the log-scale part
-        double minLogHz = 1000.0;  // Beginning of log region (Hz)
+        // And now the log-scale
+        double minLogHz = 1000.;                     // Beginning of log region (Hz)
         double minLogMel = (minLogHz - fMin) / fSp;  // Same (Mels)
-        double logstep = Math.log(6.4) / 27.0;  // Step size for log region
+        double logstep = 0.06875177742094912;        // Step size for log region, equals `Math.log(6.4) / 27` to 16 sf
 
         if (freq >= minLogHz) {
             mel = minLogMel + Math.log(freq / minLogHz) / logstep;
@@ -356,17 +355,17 @@ public final class UnitConversionUtils {
      */
     public static double melToHz(double mel) {
         // Fill in the linear scale
-        double fMin = 0.0;
-        double fSp = 200.0 / 3.;
+        double fMin = 0;
+        double fSp = 66.66666666666667;  // Equals 200/3 to 16 sf
         double freq = fMin + fSp * mel;
 
-        // And now the nonlinear scale
-        double min_log_hz = 1000.0;  // Beginning of log region (Hz)
-        double min_log_mel = (min_log_hz - fMin) / fSp;  // Same (Mels)
-        double logstep = Math.log(6.4) / 27.0;  // Step size for log region
+        // And now the log-scale
+        double minLogHz = 1000.;                     // Beginning of log region (Hz)
+        double minLogMel = (minLogHz - fMin) / fSp;  // Same (Mels)
+        double logstep = 0.06875177742094912;        // Step size for log region, equals `Math.log(6.4) / 27` to 16 sf
 
-        if (mel >= min_log_mel) {
-            freq = min_log_hz * Math.exp(logstep * (mel - min_log_mel));
+        if (mel >= minLogMel) {
+            freq = minLogHz * Math.exp(logstep * (mel - minLogMel));
         }
 
         return freq;
@@ -475,7 +474,7 @@ public final class UnitConversionUtils {
         int truncSeconds = (int) Math.floor(numSeconds);
 
         // Compute the number of minutes and seconds
-        int minutes = truncSeconds / 60;  // Integer division
+        int minutes = truncSeconds / 60;
         int seconds = truncSeconds % 60;
 
         // Pad the minutes and seconds with needed zeros
