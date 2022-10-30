@@ -87,7 +87,7 @@ public class NoteRectangle extends StackPane {
     private double initXDiff;  // Initial difference between the mouse's x-coordinate and the note's x-coordinate
 
     private double initYTrans;  // Initial y-translation of the note
-    private double initYEvent;  // Initial difference between the mouse's y-coordinate and the note's y-coordinate
+    private double initYEvent;  // Initial y-coordinate of the event
 
     private double initWidth;  // Initial width of the note
     private int initNoteNum;  // Initial note number
