@@ -111,7 +111,6 @@ public class MainViewController extends ClassWithLogging implements Initializabl
 
         // Add methods to buttons
         newProjectButton.setOnAction(this::handleNewProject);
-
         openProjectButton.setOnAction(this::handleOpenProject);
 
         // Set the search field method
@@ -143,6 +142,8 @@ public class MainViewController extends ClassWithLogging implements Initializabl
                 // Set the scene switching state and data
                 sceneSwitchingState = SceneSwitchingState.OPEN_PROJECT;
                 sceneSwitchingData.file = file;
+
+                log(Level.INFO, "Opening project: '" + selectedItem.value1() + "'");  // Value 1 is project name
 
                 // Close this stage
                 ((Stage) rootPane.getScene().getWindow()).close();
