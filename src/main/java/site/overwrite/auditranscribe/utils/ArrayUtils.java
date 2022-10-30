@@ -174,16 +174,18 @@ public final class ArrayUtils {
      * @return Array of samples.
      */
     public static double[] linspace(double start, double end, int numElem) {
-        // Handle edge cases
+        // Handle weird cases
         if (numElem == 0) return new double[0];
         if (numElem == 1) return new double[]{start};
 
         // Handle standard cases
+        double scale = (end - start) / (numElem - 1.);
+
         double[] out = new double[numElem];
         out[0] = start;
         out[numElem - 1] = end;
         for (int i = 1; i < numElem - 1; i++) {
-            out[i] = ((double) i / (numElem - 1)) * (end - start) + start;
+            out[i] = i * scale + start;
         }
         return out;
     }
@@ -260,7 +262,7 @@ public final class ArrayUtils {
      */
     public static double[][] frame(double[] array, int frameLength, int hopLength, boolean verticalFraming) {
         // Calculate the length of the framed array
-        int finalArrayLength = (int) Math.floor((double) (array.length - frameLength) / hopLength) + 1;
+        int finalArrayLength = MathUtils.intFloorDiv(array.length - frameLength, hopLength) + 1;
 
         // Create the blank array to store the framed data in
         double[][] framed;
@@ -460,7 +462,7 @@ public final class ArrayUtils {
             for (double mag : magnitudes) {
                 lpNorm += Math.pow(mag, norm);
             }
-            lpNorm = Math.pow(lpNorm, 1.0 / norm);
+            lpNorm = Math.pow(lpNorm, 1. / norm);
 
         } else {  // `norm` is negative
             // Do not perform normalization
@@ -796,9 +798,7 @@ public final class ArrayUtils {
         // Convert `double` to `Double`
         Double[][] newArray = new Double[X][Y];
         for (int x = 0; x < X; x++) {
-            for (int y = 0; y < Y; y++) {
-                newArray[x][y] = array[x][y];
-            }
+            newArray[x] = TypeConversionUtils.toDoubleArray(array[x]);
         }
 
         // Create the new array
@@ -810,9 +810,7 @@ public final class ArrayUtils {
         // Convert `Double` to `double`
         double[][] transposedNew = new double[Y][X];
         for (int y = 0; y < Y; y++) {
-            for (int x = 0; x < X; x++) {
-                transposedNew[y][x] = transposed[y][x];
-            }
+            transposedNew[y] = TypeConversionUtils.toDoubleArray(transposed[y]);
         }
 
         // Return the transposed array
@@ -833,9 +831,7 @@ public final class ArrayUtils {
         // Convert `boolean` to `Boolean`
         Boolean[][] newArray = new Boolean[X][Y];
         for (int x = 0; x < X; x++) {
-            for (int y = 0; y < Y; y++) {
-                newArray[x][y] = array[x][y];
-            }
+            newArray[x] = TypeConversionUtils.toBooleanArray(array[x]);
         }
 
         // Create the new array
@@ -847,9 +843,7 @@ public final class ArrayUtils {
         // Convert `Boolean` to `boolean`
         boolean[][] transposedNew = new boolean[Y][X];
         for (int y = 0; y < Y; y++) {
-            for (int x = 0; x < X; x++) {
-                transposedNew[y][x] = transposed[y][x];
-            }
+            transposedNew[y] = TypeConversionUtils.toBooleanArray(transposed[y]);
         }
 
         // Return the transposed array
