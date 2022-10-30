@@ -91,7 +91,7 @@ public final class Wavelet {
         double[] gammas = new double[numFreqs];
 
         if (!isCQT && gammaValue == 0) {  // This means that gamma has not been calculated yet
-            double coefficient = 24.7 / 0.108;  // This special constant is from the paper
+            double coefficient = 228.7037037037037;  // Is `24.7 / 0.108` to 16 sf, which is from the paper
             for (int i = 0; i < numFreqs; i++) {
                 gammas[i] = coefficient * alphas[i];
             }
@@ -178,13 +178,14 @@ public final class Wavelet {
 
             // Build the filter
             Complex[] sig = new Complex[signalLength];
+            double scale = 2 * Math.PI * freq / sr;
 
             for (int j = 0; j < signalLength; j++) {
                 // Calculate current 'index' value
                 int indexVal = j + lowerBound;
 
                 // Compute current signal value
-                sig[j] = Complex.exp(new Complex(0, indexVal * (2 * Math.PI * freq / sr)));
+                sig[j] = Complex.exp(new Complex(0, indexVal * scale));
             }
 
             // Apply the windowing function
