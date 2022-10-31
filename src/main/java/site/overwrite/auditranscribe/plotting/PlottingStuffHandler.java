@@ -98,7 +98,7 @@ public final class PlottingStuffHandler {
             int maxNoteNumber, boolean fancyAccidentals
     ) {
         // Get the width of the note pane
-        double width = notePane.getWidth();
+        double width = notePane.getWidth() - 2;  // Minus 2 for the borders
 
         // Get the note offsets that are in the key
         HashSet<Integer> noteOffsets = MusicUtils.getNotesInKey(musicKey);
