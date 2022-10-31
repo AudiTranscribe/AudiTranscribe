@@ -98,7 +98,7 @@ public final class PlottingStuffHandler {
             int maxNoteNumber, boolean fancyAccidentals
     ) {
         // Get the width of the note pane
-        double width = notePane.getPrefWidth();
+        double width = notePane.getWidth();
 
         // Get the note offsets that are in the key
         HashSet<Integer> noteOffsets = MusicUtils.getNotesInKey(musicKey);
@@ -135,7 +135,7 @@ public final class PlottingStuffHandler {
 
             // Make the label centred
             noteLabel.setPrefWidth(width);
-            noteLabel.setAlignment(Pos.TOP_CENTER);
+            noteLabel.setAlignment(Pos.CENTER);
 
             // Add the label to the new note label array
             newNoteLabels[i - minNoteNumber] = noteLabel;

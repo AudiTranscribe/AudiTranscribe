@@ -140,12 +140,12 @@
                                             <content>
                                                 <AnchorPane fx:id="leftPaneAnchor" minHeight="0.0" minWidth="0.0" prefHeight="400.0" prefWidth="40.0">
                                                     <children>
-                                                        <Pane fx:id="notePane" layoutY="-94.0" minHeight="0.0" minWidth="0.0" prefHeight="400.0" prefWidth="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                        <Pane fx:id="notePane" layoutY="-94.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                                     </children>
                                                 </AnchorPane>
                                             </content>
                                         </ScrollPane>
-                                        <ScrollPane fx:id="spectrogramPane" hbarPolicy="NEVER" pannable="true" prefHeight="200.0" prefWidth="200.0" vbarPolicy="NEVER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                        <ScrollPane fx:id="spectrogramPane" hbarPolicy="NEVER" pannable="true" vbarPolicy="NEVER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <content>
                                                 <AnchorPane fx:id="spectrogramPaneAnchor" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0">
                                                     <children>
