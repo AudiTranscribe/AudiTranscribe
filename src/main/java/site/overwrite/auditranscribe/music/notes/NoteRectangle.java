@@ -73,7 +73,7 @@ public class NoteRectangle extends StackPane {
     private static boolean hasEditedNoteRectangles = false;
 
     // Instance attributes
-    private String uuid;
+    private final String uuid;
 
     public int noteNum;
     private boolean isRemoved = false;
@@ -116,8 +116,33 @@ public class NoteRectangle extends StackPane {
     public NoteRectangle(
             double timeToPlaceRect, double noteDuration, int noteNum
     ) throws NoteRectangleCollisionException {
-        // Determine a UUID for the note rectangle
-        this.uuid = MiscUtils.generateUUID((long) (MiscUtils.getUnixTimestamp() * 1e3));
+        this(
+                timeToPlaceRect,
+                noteDuration,
+                noteNum,
+                MiscUtils.generateUUID((long) (MiscUtils.getUnixTimestamp() * 1e3)),  // UUID
+                true
+        );
+    }
+
+    /**
+     * Initialization method for a <code>NoteRectangle</code> object.<br>
+     * Expects all required static values to be set.
+     *
+     * @param timeToPlaceRect The time (in seconds) at which the <b>start</b> of the note should be
+     *                        placed.
+     * @param noteDuration    The duration (in seconds) of the note.
+     * @param noteNum         The note number of the note.
+     * @param uuid            UUID of the rectangle.
+     * @param addToStacks     Whether to add an action to the undo stack.
+     * @throws NoteRectangleCollisionException If the creation of this note rectangle would cause a
+     *                                         collision with another note rectangle.
+     */
+    private NoteRectangle(
+            double timeToPlaceRect, double noteDuration, int noteNum, String uuid, boolean addToStacks
+    ) throws NoteRectangleCollisionException {
+        // Set the UUID of the rectangle
+        this.uuid = uuid;
 
         // Calculate the pixels per second for the spectrogram
         double pixelsPerSecond = spectrogramWidth / totalDuration;
@@ -543,9 +568,11 @@ public class NoteRectangle extends StackPane {
         // Mark that the note rectangles were edited
         hasEditedNoteRectangles = true;
 
-        // Add delete action to the undo stack and purge redi stack
-        addToStack(undoStack, this, UndoOrRedoAction.DELETE);  // When undoing, delete rectangle
-        redoStack.clear();
+        // Add delete action to the undo stack
+        if (addToStacks) {
+            addToStack(undoStack, this, UndoOrRedoAction.DELETE);  // When undoing, delete rectangle
+            redoStack.clear();
+        }
     }
 
     // Getter/Setter methods
@@ -588,10 +615,6 @@ public class NoteRectangle extends StackPane {
 
     public static void setHasEditedNoteRectangles(boolean hasEditedNoteRectangles) {
         NoteRectangle.hasEditedNoteRectangles = hasEditedNoteRectangles;
-    }
-
-    public void setUUID(String uuid) {
-        this.uuid = uuid;
     }
 
     public double getNoteOnsetTime() {
@@ -696,7 +719,6 @@ public class NoteRectangle extends StackPane {
      *
      * @param editAction Action to perform.
      */
-    // Fixme: fix undo/redo bugs for all three actions
     public static void editAction(EditAction editAction) {
         // If editing is disabled or if undo or redo is disabled, do nothing
         if (!canEdit || !canUndoOrRedo) return;
@@ -730,8 +752,8 @@ public class NoteRectangle extends StackPane {
         NoteRectangle relevantRect = allNoteRectangles.get(uuid);
 
         // Add inverse action to secondary stack
-        if (relevantRect == null) {
-            addToStack(secondaryStack, uuid, invAction, data);
+        if (invAction == UndoOrRedoAction.DELETE) {
+            addToStack(secondaryStack, uuid, invAction, new Double[0]);
         } else {
             addToStack(secondaryStack, relevantRect, invAction);
         }
@@ -991,9 +1013,8 @@ public class NoteRectangle extends StackPane {
         } else if (action == UndoOrRedoAction.CREATE) {
             try {
                 // Create a new rectangle
-                NoteRectangle rect = new NoteRectangle(data[0], data[1], data[2].intValue());
+                NoteRectangle rect = new NoteRectangle(data[0], data[1], data[2].intValue(), uuid, false);
                 spectrogramPaneAnchor.getChildren().add(rect);
-                rect.setUUID(uuid);
             } catch (NoteRectangleCollisionException ignored) {
             }
         } else {
