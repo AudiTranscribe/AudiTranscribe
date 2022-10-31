@@ -40,7 +40,7 @@ public final class MathUtils {
      * @return Log base 2 of <code>x</code>.
      */
     public static double log2(double x) {
-        return Math.log(x) * 1.442695040888963407359924681002;  // ln x * (1/ln 2), to 30 dp
+        return Math.log(x) * 1.4426950408889634;  // ln x * (1/ln 2), to 16 dp
     }
 
     /**
@@ -62,6 +62,18 @@ public final class MathUtils {
 
         // Return the logarithm
         return Math.log(x) / Math.log(n);
+    }
+
+    /**
+     * Method that returns the integer ceiling of <code>p / q</code>.<br>
+     * Assumes that both <code>p</code> and <code>q</code> are <b>positive integers</b>.
+     *
+     * @return Ceiling division of <code>p</code> by <code>q</code>.
+     * @implNote See <a href="https://stackoverflow.com/a/2745086">this StackOverflow answer</a> by
+     * Sparky.
+     */
+    public static int ceilDiv(int p, int q) {
+        return 1 + ((p - 1) / q);
     }
 
     // Data-related methods

@@ -258,7 +258,7 @@ public final class VQT extends ClassWithLogging {
             // Re-scale the filters to compensate for downsampling
             for (int i = 0; i < fftBasis.length; i++) {
                 for (int j = 0; j < fftBasis[0].length; j++) {
-                    fftBasis[i][j] = fftBasis[i][j].scale(Math.sqrt(sr / mySR));
+                    fftBasis[i][j] = fftBasis[i][j].times(Math.sqrt(sr / mySR));
                 }
             }
 
@@ -300,7 +300,9 @@ public final class VQT extends ClassWithLogging {
 
         // Return VQT matrix
         log(
-                Level.FINE, "VQT Matrix generated; has shape (" + V.length + ", " + V[0].length + ")", VQT.class.getName()
+                Level.FINE,
+                "VQT Matrix generated; has shape (" + V.length + ", " + V[0].length + ")",
+                VQT.class.getName()
         );
         return V;
     }
@@ -315,7 +317,7 @@ public final class VQT extends ClassWithLogging {
      * @return Number of octaves required to store <code>numBins</code>.
      */
     private static int getNumOctaves(int numBins, int binsPerOctave) {
-        return (int) Math.ceil((double) numBins / binsPerOctave);
+        return MathUtils.ceilDiv(numBins, binsPerOctave);
     }
 
     /**
@@ -409,7 +411,7 @@ public final class VQT extends ClassWithLogging {
             double normalisationFactor = lengths[i] / numFFT;
 
             for (int j = 0; j < numFFT; j++) {
-                basis[i][j] = basis[i][j].scale(normalisationFactor);
+                basis[i][j] = basis[i][j].times(normalisationFactor);
             }
         }
 

@@ -38,7 +38,7 @@ import java.util.logging.Level;
  */
 public class Spectrogram extends ClassWithLogging {
     // Constants
-    final double INTENSITY_PRECISION = 0.001;
+    final double INTENSITY_PRECISION = 1e-3;
     final double TOP_DB = 80;
 
     final boolean IS_CQT = false;
@@ -209,7 +209,8 @@ public class Spectrogram extends ClassWithLogging {
             );
         } else {
             QTMatrix = VQT.vqt(
-                    samples, sampleRate, hopLength, minFreq, numFreqBins, binsPerOctave, 0, GAMMA, windowFunction, task
+                    samples, sampleRate, hopLength, minFreq, numFreqBins, binsPerOctave, 0, GAMMA,
+                    windowFunction, task
             );
         }
 

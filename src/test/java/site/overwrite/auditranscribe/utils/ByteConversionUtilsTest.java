@@ -46,15 +46,6 @@ class ByteConversionUtilsTest {
     }
 
     @Test
-    void charToByte() {
-        assertEquals((byte) 0x41, ByteConversionUtils.charToByte('A'));
-        assertEquals((byte) 0x7a, ByteConversionUtils.charToByte('z'));
-        assertEquals((byte) 0x20, ByteConversionUtils.charToByte(' '));
-        assertEquals((byte) 0x3f, ByteConversionUtils.charToByte('?'));
-        assertEquals((byte) 0x35, ByteConversionUtils.charToByte('5'));
-    }
-
-    @Test
     void stringToBytes() {
         assertArrayEquals(new byte[]{(byte) 0x41, (byte) 0x7a, (byte) 0x20, (byte) 0x3f, (byte) 0x35}, ByteConversionUtils.stringToBytes("Az ?5"));
     }
@@ -97,28 +88,6 @@ class ByteConversionUtilsTest {
         assertArrayEquals(
                 HexFormat.of().parseHex(hexStr),
                 ByteConversionUtils.oneDimensionalDoubleArrayToBytes(array)
-        );
-    }
-
-    @Test
-    void twoDimensionalDoubleArrayToBytes() {
-        // Define the double array
-        double[][] array = {
-                {65.43, -123.45, 9876.54321, 3.14159265, -0.000082147128481},
-                {65.43, 9876.54321, 3.14159265, -0.000082147128481, -123.45},
-                {65.43, -123.45, 3.14159265, -0.000082147128481, 9876.54321}
-        };
-
-        // Define the correct hexadecimal string
-        String hexStr = "00000003" + "00000005"
-                + "40505b851eb851ec" + "c05edccccccccccd" + "40c34a4587e7c06e" + "400921fb53c8d4f1" + "bf1588ccebd0259f"
-                + "40505b851eb851ec" + "40c34a4587e7c06e" + "400921fb53c8d4f1" + "bf1588ccebd0259f" + "c05edccccccccccd"
-                + "40505b851eb851ec" + "c05edccccccccccd" + "400921fb53c8d4f1" + "bf1588ccebd0259f" + "40c34a4587e7c06e";
-
-        // Run test
-        assertArrayEquals(
-                HexFormat.of().parseHex(hexStr),
-                ByteConversionUtils.twoDimensionalDoubleArrayToBytes(array)
         );
     }
 
@@ -172,15 +141,6 @@ class ByteConversionUtilsTest {
     }
 
     @Test
-    void byteToChar() {
-        assertEquals('A', ByteConversionUtils.byteToChar((byte) 0x41));
-        assertEquals('z', ByteConversionUtils.byteToChar((byte) 0x7a));
-        assertEquals(' ', ByteConversionUtils.byteToChar((byte) 0x20));
-        assertEquals('?', ByteConversionUtils.byteToChar((byte) 0x3f));
-        assertEquals('5', ByteConversionUtils.byteToChar((byte) 0x35));
-    }
-
-    @Test
     void bytesToString() {
         assertEquals("Az ?5", ByteConversionUtils.bytesToString(new byte[]{(byte) 0x41, (byte) 0x7a, (byte) 0x20, (byte) 0x3f, (byte) 0x35}));
     }
@@ -223,28 +183,6 @@ class ByteConversionUtilsTest {
         assertArrayEquals(
                 array,
                 ByteConversionUtils.bytesToOneDimensionalDoubleArray(HexFormat.of().parseHex(hexStr))
-        );
-    }
-
-    @Test
-    void bytesToTwoDimensionalDoubleArray() {
-        // Define the hexadecimal string
-        String hexStr = "00000003" + "00000005"
-                + "40505b851eb851ec" + "c05edccccccccccd" + "40c34a4587e7c06e" + "400921fb53c8d4f1" + "bf1588ccebd0259f"
-                + "40505b851eb851ec" + "40c34a4587e7c06e" + "400921fb53c8d4f1" + "bf1588ccebd0259f" + "c05edccccccccccd"
-                + "40505b851eb851ec" + "c05edccccccccccd" + "400921fb53c8d4f1" + "bf1588ccebd0259f" + "40c34a4587e7c06e";
-
-        // Define the correct double array
-        double[][] array = {
-                {65.43, -123.45, 9876.54321, 3.14159265, -0.000082147128481},
-                {65.43, 9876.54321, 3.14159265, -0.000082147128481, -123.45},
-                {65.43, -123.45, 3.14159265, -0.000082147128481, 9876.54321}
-        };
-
-        // Run test
-        assertArrayEquals(
-                array,
-                ByteConversionUtils.bytesToTwoDimensionalDoubleArray(HexFormat.of().parseHex(hexStr))
         );
     }
 
