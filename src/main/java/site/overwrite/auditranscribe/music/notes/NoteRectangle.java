@@ -117,7 +117,7 @@ public class NoteRectangle extends StackPane {
             double timeToPlaceRect, double noteDuration, int noteNum
     ) throws NoteRectangleCollisionException {
         // Determine a UUID for the note rectangle
-        this.uuid = MiscUtils.generateUUID((long) MiscUtils.getUnixTimestamp());
+        this.uuid = MiscUtils.generateUUID((long) (MiscUtils.getUnixTimestamp() * 1e3));
 
         // Calculate the pixels per second for the spectrogram
         double pixelsPerSecond = spectrogramWidth / totalDuration;
