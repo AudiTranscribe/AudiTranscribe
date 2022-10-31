@@ -1987,6 +1987,11 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
                     // Show error dialog
                     Popups.showExceptionAlert(headerText, contentText, task.getException());
+
+                    // Clear progress bar area
+                    progressBarHBox.setVisible(false);
+                    progressBar.progressProperty().unbind();
+                    progressLabel.textProperty().unbind();
                 }));
 
                 // Add all tasks to the ongoing tasks queue
@@ -2133,7 +2138,6 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
                 // Update the progress section
                 progressBar.progressProperty().bind(currentTask.progressProperty());
                 progressLabel.textProperty().bind(currentTask.messageProperty());
-
             } else {
                 progressBarHBox.setVisible(false);
                 progressBar.progressProperty().unbind();
