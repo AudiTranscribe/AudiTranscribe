@@ -197,6 +197,19 @@ public abstract class AUDTFileWriter extends ClassWithLogging {
     // Protected methods
 
     /**
+     * Helper method that writes a short to the byte list.
+     *
+     * @param myShort Short to write.
+     */
+    protected void writeShort(short myShort) {
+        // Convert the short into its bytes
+        byte[] byteArray = ByteConversionUtils.shortToByte(myShort);
+
+        // Write to the byte list
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, byteArray);
+    }
+
+    /**
      * Helper method that writes an integer to the byte list.
      *
      * @param integer Integer to write.
