@@ -26,6 +26,7 @@ import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.audt_file.v0x00050002.AUDTFileWriter0x00050002;
 import site.overwrite.auditranscribe.io.audt_file.v0x00070001.AUDTFileWriter0x00070001;
 import site.overwrite.auditranscribe.io.audt_file.v0x00080001.AUDTFileWriter0x00080001;
+import site.overwrite.auditranscribe.io.audt_file.v0x00090002.AUDTFileWriter0x00090002;
 import site.overwrite.auditranscribe.io.exceptions.InvalidFileVersionException;
 import site.overwrite.auditranscribe.utils.ByteConversionUtils;
 
@@ -96,6 +97,7 @@ public abstract class AUDTFileWriter extends ClassWithLogging {
             case 0x00050002 -> new AUDTFileWriter0x00050002(filepath);
             case 0x00070001 -> new AUDTFileWriter0x00070001(filepath);
             case 0x00080001 -> new AUDTFileWriter0x00080001(filepath);
+            case 0x00090002 -> new AUDTFileWriter0x00090002(filepath);
             default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
         };
     }
@@ -115,6 +117,7 @@ public abstract class AUDTFileWriter extends ClassWithLogging {
             case 0x00050002 -> new AUDTFileWriter0x00050002(filepath, numBytesToSkip);
             case 0x00070001 -> new AUDTFileWriter0x00070001(filepath, numBytesToSkip);
             case 0x00080001 -> new AUDTFileWriter0x00080001(filepath, numBytesToSkip);
+            case 0x00090002 -> new AUDTFileWriter0x00090002(filepath, numBytesToSkip);
             default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
         };
     }

@@ -18,10 +18,11 @@ Copyright © AudiTranscribe Team
 """
 
 # IMPORTS
+import os
 import re
 
 # CONSTANTS
-ORIGINAL_AUDT_FILE = "test-AUDTFile0x00080001Test.audt"  # Original file to be edited
+ORIGINAL_AUDT_FILE = "test-AUDTFile0x00090002Test.audt"  # Original file to be edited
 TESTING_FILES_FOLDER = "../src/main/resources/site/overwrite/auditranscribe/testing-files/audt-test-files"
 
 NUM_SECTIONS = 5
@@ -36,6 +37,10 @@ print(f"Generating test files for version '{fileVersion}'.")
 input("Press any key to start.")
 
 # MAIN CODE
+# Make output folder if not exist
+if not os.path.exists(f"{TESTING_FILES_FOLDER}/{fileVersion}"):
+    os.makedirs(f"{TESTING_FILES_FOLDER}/{fileVersion}")
+
 # For each section, modify the ID and the EOS delimiter
 sectionIDBytePos = 32  # First 32 bytes are the AUDT file delimiter
 for sectionID in range(1, NUM_SECTIONS + 1):

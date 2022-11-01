@@ -25,6 +25,7 @@ import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.audt_file.v0x00050002.AUDTFileReader0x00050002;
 import site.overwrite.auditranscribe.io.audt_file.v0x00070001.AUDTFileReader0x00070001;
 import site.overwrite.auditranscribe.io.audt_file.v0x00080001.AUDTFileReader0x00080001;
+import site.overwrite.auditranscribe.io.audt_file.v0x00090002.AUDTFileReader0x00090002;
 import site.overwrite.auditranscribe.io.exceptions.*;
 import site.overwrite.auditranscribe.utils.ByteConversionUtils;
 
@@ -117,6 +118,7 @@ public abstract class AUDTFileReader extends ClassWithLogging {
                 case 0x00050002 -> new AUDTFileReader0x00050002(filepath, inputStream);
                 case 0x00070001 -> new AUDTFileReader0x00070001(filepath, inputStream);
                 case 0x00080001 -> new AUDTFileReader0x00080001(filepath, inputStream);
+                case 0x00090002 -> new AUDTFileReader0x00090002(filepath, inputStream);
                 default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
             };
         }
