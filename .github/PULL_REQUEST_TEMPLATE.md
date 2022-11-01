@@ -8,18 +8,20 @@ Include any issues that are fixed in this pull request by using the octothorpe (
 
 Please specify the type of change (delete when not applicable):
 
-- [ ] New Feature (change which adds new functionality to the application)
-- [ ] Minor Change (change which does not add functionality to the application)
-- [ ] Removals (change that removes functionality)
-- [ ] Bugfix (change which fixes an issue or a bug)
+- New Feature (a change which adds new functionality to the application)
+- Minor Change (a change which does not add functionality to the application)
+- Removals (a change that removes functionality)
+- Bugfix (a change which fixes an issue or a bug)
 
 Please specify any additional information (delete when not applicable):
 
-- [ ] This change is a breaking change
-- [ ] This change requires a documentation update
-    - [ ] A similar pull request on the [documentation repository](https://github.com/AudiTranscribe/AudiTranscribe-Documentation) for the documentation change was drafted/submitted
+- This change is a breaking change
+- This change requires a documentation update
+    - A similar pull request on
+      the [documentation repository](https://github.com/AudiTranscribe/AudiTranscribe-Documentation) for the
+      documentation change was drafted/submitted
 
-## Checklist
+## Pull Request Checklist
 
 - [ ] My code follows the style guidelines of this project
 - [ ] I have performed a self-review of my code
