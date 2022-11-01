@@ -27,6 +27,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ByteConversionUtilsTest {
     @Test
+    void shortToBytes() {
+        assertArrayEquals(HexFormat.of().parseHex("0000"), ByteConversionUtils.shortToByte((short) 0));
+        assertArrayEquals(HexFormat.of().parseHex("04d2"), ByteConversionUtils.shortToByte((short) 1234));
+        assertArrayEquals(HexFormat.of().parseHex("7fff"), ByteConversionUtils.shortToByte((short) 32767));
+        assertArrayEquals(HexFormat.of().parseHex("fb2e"), ByteConversionUtils.shortToByte((short) -1234));
+        assertArrayEquals(HexFormat.of().parseHex("8000"), ByteConversionUtils.shortToByte((short) -32768));
+    }
+
+    @Test
     void intToBytes() {
         assertArrayEquals(HexFormat.of().parseHex("00000000"), ByteConversionUtils.intToBytes(0));
         assertArrayEquals(HexFormat.of().parseHex("000004d2"), ByteConversionUtils.intToBytes(1234));
@@ -111,6 +120,19 @@ class ByteConversionUtilsTest {
                 HexFormat.of().parseHex(hexStr),
                 ByteConversionUtils.twoDimensionalIntegerArrayToBytes(array)
         );
+    }
+
+    @Test
+    void bytesToShort() {
+        // Test conversion
+        assertEquals((short) 0, ByteConversionUtils.bytesToShort(HexFormat.of().parseHex("0000")));
+        assertEquals((short) 1234, ByteConversionUtils.bytesToShort(HexFormat.of().parseHex("04d2")));
+        assertEquals((short) 32767, ByteConversionUtils.bytesToShort(HexFormat.of().parseHex("7fff")));
+        assertEquals((short) -1234, ByteConversionUtils.bytesToShort(HexFormat.of().parseHex("fb2e")));
+        assertEquals((short) -32768, ByteConversionUtils.bytesToShort(HexFormat.of().parseHex("8000")));
+
+        // Test exception
+        assertThrowsExactly(LengthException.class, () -> ByteConversionUtils.bytesToShort(new byte[]{(byte) 0x12}));
     }
 
     @Test

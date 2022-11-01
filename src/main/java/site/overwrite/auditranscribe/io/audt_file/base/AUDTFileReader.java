@@ -227,6 +227,20 @@ public abstract class AUDTFileReader extends ClassWithLogging {
     }
 
     /**
+     * Helper method that reads a short from the byte array.
+     *
+     * @return Short that was read in.
+     */
+    protected short readShort() {
+        // Read the next 2 bytes from the current `bytePos`
+        byte[] shortBytes = Arrays.copyOfRange(bytes, bytePos, bytePos + 2);
+        bytePos += 2;
+
+        // Convert these short bytes back into a short and return
+        return ByteConversionUtils.bytesToShort(shortBytes);
+    }
+
+    /**
      * Helper method that reads in an integer from the byte array.
      *
      * @return Integer that was read in.
