@@ -114,10 +114,10 @@ class AUDTFile0x00080001Test {
                 44100, 200);
 
         projectInfoDataObject1 = new ProjectInfoDataObject0x00080001(
-                "Test-1", 11, 9, 123.45, 0.01, 0.55, 12
+                "Test-1", 1, 0, 123.45, 0.01, 0.55, 12
         );
         projectInfoDataObject2 = new ProjectInfoDataObject0x00080001(
-                "Test-2", 15, 14, 67.89, -1.23, 0.124, 34
+                "Test-2", 8, 7, 67.89, -1.23, 0.124, 34
         );
 
         musicNotesDataObject1 = new MusicNotesDataObject0x00080001(
