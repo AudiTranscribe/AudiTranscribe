@@ -34,6 +34,7 @@ import javafx.scene.shape.Rectangle;
 import site.overwrite.auditranscribe.generic.tuples.Pair;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.misc.MyLogger;
+import site.overwrite.auditranscribe.music.NoteUnit;
 import site.overwrite.auditranscribe.music.exceptions.NoteRectangleCollisionException;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 import site.overwrite.auditranscribe.utils.MusicUtils;
@@ -608,8 +609,8 @@ public class NoteRectangle extends StackPane {
             double spb = 1. / bpm * 60.;  // spb = seconds per beat
 
             // Determine resolution of the quantization
-            NoteQuantizationUnit quantizationUnit =
-                    NoteQuantizationUnit.values()[DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal];
+            NoteUnit quantizationUnit =
+                    NoteUnit.values()[DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal];
             int divisionFactor = quantizationUnit.numericValue / noteUnit;
             double resolution = spb / divisionFactor;
 

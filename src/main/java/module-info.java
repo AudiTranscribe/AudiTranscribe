@@ -53,6 +53,7 @@ module site.overwrite.auditranscribe {
     exports site.overwrite.auditranscribe.main_views.icon;
     exports site.overwrite.auditranscribe.main_views.scene_switching;
     exports site.overwrite.auditranscribe.misc;
+    exports site.overwrite.auditranscribe.music;
     exports site.overwrite.auditranscribe.music.exceptions;
     exports site.overwrite.auditranscribe.music.notes;
     exports site.overwrite.auditranscribe.network;
