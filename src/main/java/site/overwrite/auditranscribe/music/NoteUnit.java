@@ -23,6 +23,7 @@ package site.overwrite.auditranscribe.music;
  */
 public enum NoteUnit {
     // Enum values
+    HALF_NOTE("Half Note", 2),
     QUARTER_NOTE("Quarter Note", 4),
     EIGHTH_NOTE("Eighth Note", 8),
     SIXTEENTH_NOTE("Sixteenth Note", 16),
