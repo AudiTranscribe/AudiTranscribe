@@ -342,9 +342,7 @@
                         <configuration>
                             <appVersion>${project.version}</appVersion>
                             <resourceDir>${project.basedir}/Production Assets/linux</resourceDir>
-                            <icon>${project.basedir}/Production Assets/linux/AudiTranscribe.png</icon>
                             <type>DEB</type>
-                            <linuxAppCategory>Audio</linuxAppCategory>
                             <linuxShortcut>true</linuxShortcut>
                         </configuration>
                     </execution>
