@@ -51,7 +51,7 @@ import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
 import site.overwrite.auditranscribe.io.audt_file.ProjectData;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import site.overwrite.auditranscribe.io.audt_file.v0x00080001.data_encapsulators.*;
+import site.overwrite.auditranscribe.io.audt_file.v0x00090002.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.main_views.helpers.ProjectIOHandlers;
@@ -1544,14 +1544,14 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         }
 
         // Package project info data and music notes data for saving
-        // (Note: current file version is 0x00080001, so all data objects used will be for that version)
+        // (Note: current file version is 0x00090002, so all data objects used will be for that version)
         log(Level.INFO, "Packaging data for saving");
 
-        ProjectInfoDataObject projectInfoData = new ProjectInfoDataObject0x00080001(
-                projectName, musicKeyIndex, timeSignature.ordinal(), bpm, offset, audioVolume,  // Todo: replace with just time signature
+        ProjectInfoDataObject projectInfoData = new ProjectInfoDataObject0x00090002(
+                projectName, musicKeyIndex, timeSignature, bpm, offset, audioVolume,
                 (int) (currTime * 1000)
         );
-        MusicNotesDataObject musicNotesData = new MusicNotesDataObject0x00080001(
+        MusicNotesDataObject musicNotesData = new MusicNotesDataObject0x00090002(
                 timesToPlaceRectangles, noteDurations, noteNums
         );
 
@@ -1581,10 +1581,10 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             }
 
             // Package Q-transform data and audio data for saving
-            QTransformDataObject qTransformData = new QTransformDataObject0x00080001(
+            QTransformDataObject qTransformData = new QTransformDataObject0x00090002(
                     qTransformBytes, minQTransformMagnitude, maxQTransformMagnitude
             );
-            AudioDataObject audioData = new AudioDataObject0x00080001(
+            AudioDataObject audioData = new AudioDataObject0x00090002(
                     compressedOriginalMP3Bytes, compressedSlowedMP3Bytes, sampleRate, (int) (audioDuration * 1000)
             );
 
@@ -1595,7 +1595,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
                     audioData.numBytesNeeded();
 
             // Update the unchanging data properties
-            UnchangingDataPropertiesObject unchangingDataProperties = new UnchangingDataPropertiesObject0x00080001(
+            UnchangingDataPropertiesObject unchangingDataProperties = new UnchangingDataPropertiesObject0x00090002(
                     numSkippableBytes
             );
 
