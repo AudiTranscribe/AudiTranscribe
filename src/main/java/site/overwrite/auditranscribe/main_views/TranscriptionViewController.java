@@ -64,6 +64,7 @@ import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
 import site.overwrite.auditranscribe.music.MusicKey;
 import site.overwrite.auditranscribe.music.MusicKeyEstimator;
+import site.overwrite.auditranscribe.music.TimeSignature;
 import site.overwrite.auditranscribe.music.bpm_estimation.BPMEstimator;
 import site.overwrite.auditranscribe.music.exceptions.NoteRectangleCollisionException;
 import site.overwrite.auditranscribe.music.notes.MIDIInstrument;
@@ -132,7 +133,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
     private String projectName;
     private int musicKeyIndex = 0;  // Index of the music key chosen, according to the `MUSIC_KEYS` array
-    private int timeSignatureIndex = 0;
+    private TimeSignature timeSignature = TimeSignature.FOUR_FOUR;
     private double bpm = 120;
     private double offset = 0.;
     private double audioVolume = 0.5;
@@ -213,7 +214,10 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
     private Button newProjectButton, openProjectButton, saveProjectButton;
 
     @FXML
-    private ChoiceBox<String> musicKeyChoice, timeSignatureChoice;
+    private ChoiceBox<String> musicKeyChoice;
+
+    @FXML
+    private ChoiceBox<TimeSignature> timeSignatureChoice;
 
     @FXML
     private Spinner<Double> bpmSpinner, offsetSpinner;
@@ -294,7 +298,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
         // Set the choice boxes' choices
         for (String musicKey : MusicUtils.MUSIC_KEYS) musicKeyChoice.getItems().add(musicKey);
-        for (String timeSignature : MusicUtils.TIME_SIGNATURES) timeSignatureChoice.getItems().add(timeSignature);
+        for (TimeSignature signature : TimeSignature.values()) timeSignatureChoice.getItems().add(signature);
 
         // Set methods on spinners
         bpmSpinner.valueProperty().addListener(
@@ -333,9 +337,9 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
                     // Get the old and new beats per bar
                     int oldBeatsPerBar = 0;
                     if (oldValue != null) {
-                        oldBeatsPerBar = MusicUtils.TIME_SIGNATURE_TO_BEATS_PER_BAR.get(oldValue);
+                        oldBeatsPerBar = oldValue.beatsPerBar;
                     }
-                    int newBeatsPerBar = MusicUtils.TIME_SIGNATURE_TO_BEATS_PER_BAR.get(newValue);
+                    int newBeatsPerBar = newValue.beatsPerBar;
 
                     // Update the beat lines and bar number ellipses, if the spectrogram is ready
                     if (isEverythingReady) {
@@ -352,7 +356,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
                     }
 
                     // Update the time signature index
-                    timeSignatureIndex = ArrayUtils.findIndex(MusicUtils.TIME_SIGNATURES, newValue);
+                    timeSignature = newValue;
 
                     // Update the beats per bar
                     beatsPerBar = newBeatsPerBar;
@@ -651,7 +655,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
     public void finishSetup() {
         // Set choices
         musicKeyChoice.setValue(MusicUtils.MUSIC_KEYS[musicKeyIndex]);
-        timeSignatureChoice.setValue(MusicUtils.TIME_SIGNATURES[timeSignatureIndex]);
+        timeSignatureChoice.setValue(timeSignature);
 
         // Update spinners' initial values
         updateBPMValue(bpm, true);
@@ -739,7 +743,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         // Set up project data
         projectName = projectData.projectInfoData.projectName;
         musicKeyIndex = projectData.projectInfoData.musicKeyIndex;
-        timeSignatureIndex = projectData.projectInfoData.timeSignatureIndex;
+        timeSignature = projectData.projectInfoData.timeSignature;
         bpm = projectData.projectInfoData.bpm;
         offset = projectData.projectInfoData.offsetSeconds;
         audioVolume = projectData.projectInfoData.playbackVolume;
@@ -784,7 +788,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
         // Update music key and beats per bar
         musicKey = MusicUtils.MUSIC_KEYS[musicKeyIndex];
-        beatsPerBar = MusicUtils.TIME_SIGNATURE_TO_BEATS_PER_BAR.get(MusicUtils.TIME_SIGNATURES[timeSignatureIndex]);
+        beatsPerBar = timeSignature.beatsPerBar;
 
         // Attempt to add this project to the projects' database
         try {
@@ -1488,7 +1492,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         // Now write the sequence to the MIDI file
         try {
             notePlayerSequencer.exportToMIDI(
-                    MusicUtils.TIME_SIGNATURES[timeSignatureIndex], musicKey, file.getAbsolutePath()
+                    timeSignature, musicKey, file.getAbsolutePath()
             );
             log(Level.FINE, "Exported notes to '" + file.getAbsolutePath() + "'.");
             Popups.showInformationAlert(
@@ -1509,7 +1513,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
      * Helper method that helps quantize the notes.
      */
     private void handleQuantizeNotes() {
-        NoteRectangle.quantizeNotes(bpm, offset, timeSignatureChoice.getValue());
+        NoteRectangle.quantizeNotes(bpm, offset, timeSignature);
         log(Level.FINE, "Quantized notes");
     }
 
@@ -1544,7 +1548,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         log(Level.INFO, "Packaging data for saving");
 
         ProjectInfoDataObject projectInfoData = new ProjectInfoDataObject0x00080001(
-                projectName, musicKeyIndex, timeSignatureIndex, bpm, offset, audioVolume,
+                projectName, musicKeyIndex, timeSignature.ordinal(), bpm, offset, audioVolume,  // Todo: replace with just time signature
                 (int) (currTime * 1000)
         );
         MusicNotesDataObject musicNotesData = new MusicNotesDataObject0x00080001(
