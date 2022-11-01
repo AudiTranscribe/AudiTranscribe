@@ -39,6 +39,20 @@ public enum NoteUnit {
         this.numericValue = numericValue;
     }
 
+    // Public methods
+
+    /**
+     * Method that retrieves the correct <code>NoteUnit</code> value given the numeric value of the note.
+     *
+     * @param numericValue Numeric value of the note.
+     * @return The <code>NoteUnit</code> value.<br>
+     * Returns <code>null</code> if not found.
+     */
+    public static NoteUnit numericValueToNoteUnit(int numericValue) {
+        for (NoteUnit noteUnit : NoteUnit.values()) if (numericValue == noteUnit.numericValue) return noteUnit;
+        return null;
+    }
+
     // Overridden methods
     @Override
     public String toString() {

@@ -66,4 +66,27 @@ public enum TimeSignature {
     public String displayText() {
         return beatsPerBar + "/" + denominator.numericValue;
     }
+
+    /**
+     * Method that obtains the correct <code>TimeSignature</code> value from the display text.
+     *
+     * @param displayText Display text of the time signature.
+     * @return The <code>TimeSignature</code> value.<br>
+     * Returns <code>null</code> if not found.
+     */
+    public static TimeSignature displayTextToTimeSignature(String displayText) {
+        // Get beats per bar and denominator value
+        String[] split = displayText.split("/");
+        int beatsPerBar = Integer.parseInt(split[0]);
+        NoteUnit denominator = NoteUnit.numericValueToNoteUnit(Integer.parseInt(split[1]));
+
+        // Get matching time signature
+        for (TimeSignature timeSignature : TimeSignature.values()) {
+            if (timeSignature.beatsPerBar == beatsPerBar && timeSignature.denominator == denominator) {
+                return timeSignature;
+            }
+        }
+
+        return null;
+    }
 }
