@@ -1537,8 +1537,22 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
      * Helper method that helps quantize the notes.
      */
     private void handleQuantizeNotes() {
-        NoteRectangle.quantizeNotes(bpm, offset, timeSignature);
-        log(Level.FINE, "Quantized notes");
+        if (canEditNotes) {
+            NoteRectangle.quantizeNotes(bpm, offset, timeSignature);
+            Popups.showInformationAlert(
+                    rootPane.getScene().getWindow(),
+                    "Quantized Notes",
+                    "Notes have been quantized."
+            );
+            log(Level.FINE, "Quantized notes");
+        } else {
+            Popups.showWarningAlert(
+                    rootPane.getScene().getWindow(),
+                    "Did Not Quantize Notes",
+                    "Please enter into editing mode before quantizing notes."
+            );
+        }
+
     }
 
     /**
