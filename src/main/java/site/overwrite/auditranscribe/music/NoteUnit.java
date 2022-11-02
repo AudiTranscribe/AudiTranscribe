@@ -1,5 +1,5 @@
 /*
- * NoteQuantizationUnit.java
+ * NoteUnit.java
  * Description: Enum that contains the possible note quantization units.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -16,13 +16,14 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.music.notes;
+package site.overwrite.auditranscribe.music;
 
 /**
  * Enum that contains the possible note quantization units.
  */
-public enum NoteQuantizationUnit {
+public enum NoteUnit {
     // Enum values
+    HALF_NOTE("Half Note", 2),
     QUARTER_NOTE("Quarter Note", 4),
     EIGHTH_NOTE("Eighth Note", 8),
     SIXTEENTH_NOTE("Sixteenth Note", 16),
@@ -33,9 +34,23 @@ public enum NoteQuantizationUnit {
     public final int numericValue;
 
     // Enum constructor
-    NoteQuantizationUnit(String name, int numericValue) {
+    NoteUnit(String name, int numericValue) {
         this.name = name;
         this.numericValue = numericValue;
+    }
+
+    // Public methods
+
+    /**
+     * Method that retrieves the correct <code>NoteUnit</code> value given the numeric value of the note.
+     *
+     * @param numericValue Numeric value of the note.
+     * @return The <code>NoteUnit</code> value.<br>
+     * Returns <code>null</code> if not found.
+     */
+    public static NoteUnit numericValueToNoteUnit(int numericValue) {
+        for (NoteUnit noteUnit : NoteUnit.values()) if (numericValue == noteUnit.numericValue) return noteUnit;
+        return null;
     }
 
     // Overridden methods

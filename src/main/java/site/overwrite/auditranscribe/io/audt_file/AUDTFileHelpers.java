@@ -19,6 +19,7 @@
 package site.overwrite.auditranscribe.io.audt_file;
 
 import site.overwrite.auditranscribe.generic.tuples.Triple;
+import site.overwrite.auditranscribe.music.TimeSignature;
 import site.overwrite.auditranscribe.utils.MathUtils;
 
 import java.util.List;
@@ -113,5 +114,20 @@ public final class AUDTFileHelpers {
 
         // Return the double array
         return doubleArray;
+    }
+
+    // Package-private methods
+
+    /**
+     * Helper method that converts the old time signature index into the new time signature enum value.
+     *
+     * @param timeSignatureIndex Old time signature index value.
+     * @return The <code>TimeSignature</code> enum value.
+     */
+    public static TimeSignature oldTimeSignatureIndexToTimeSignature(int timeSignatureIndex) {
+        String[] listOfOldTimeSignatures = new String[]{
+                "4/4", "2/2", "2/4", "3/4", "3/8", "6/8", "9/8", "12/8"
+        };
+        return TimeSignature.displayTextToTimeSignature(listOfOldTimeSignatures[timeSignatureIndex]);
     }
 }

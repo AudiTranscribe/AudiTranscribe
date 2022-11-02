@@ -35,6 +35,16 @@ public final class ByteConversionUtils {
     // Public methods
 
     /**
+     * Method that converts the short <code>x</code> into an array of 2 bytes.
+     *
+     * @param x Short to convert.
+     * @return Array of 2 bytes, representing the short.
+     */
+    public static byte[] shortToByte(short x) {
+        return ByteBuffer.allocate(2).order(ByteOrder.BIG_ENDIAN).putShort(x).array();
+    }
+
+    /**
      * Method that converts the integer <code>x</code> into an array of 4 bytes.
      *
      * @param x Integer to convert.
@@ -190,6 +200,21 @@ public final class ByteConversionUtils {
 
         // Return the byte array
         return bytes;
+    }
+
+    /**
+     * Method that converts an array of 2 bytes into a short.
+     *
+     * @param bytes Byte array to convert into a short.
+     * @return Short represented by the 2 bytes.
+     * @throws LengthException If the bytes array does <b>not</b> have exactly 2 bytes.
+     */
+    public static short bytesToShort(byte[] bytes) {
+        // Assert that there are exactly 2 bytes to convert
+        if (bytes.length != 2) throw new LengthException("There must be exactly 2 bytes in the bytes array.");
+
+        // Convert the bytes array to the short
+        return ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN).getShort();
     }
 
     /**
