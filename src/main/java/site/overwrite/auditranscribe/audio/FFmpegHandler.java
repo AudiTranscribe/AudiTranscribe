@@ -23,7 +23,7 @@ import site.overwrite.auditranscribe.audio.exceptions.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.generic.tuples.Pair;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.misc.IgnoredFromCoverage;
+import site.overwrite.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
 
@@ -71,7 +71,7 @@ public class FFmpegHandler extends ClassWithLogging {
      * @return A string, representing the FFmpeg installation path.
      * @throws FFmpegNotFoundException If the program fails to find the FFmpeg installation.
      */
-    @IgnoredFromCoverage
+    @ExcludeFromGeneratedCoverageReport
     public static String getPathToFFmpeg() throws FFmpegNotFoundException {
         // Get the operating system in question
         OSType os = OSMethods.getOS();

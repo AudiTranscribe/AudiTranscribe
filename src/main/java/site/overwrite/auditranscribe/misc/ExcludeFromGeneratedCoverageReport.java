@@ -1,5 +1,5 @@
 /*
- * IgnoredFromCoverage.java
+ * ExcludeFromGeneratedCoverageReport.java
  * Description: Custom annotation to ignore certain classes/methods from JaCoCo coverage.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -18,16 +18,9 @@
 
 package site.overwrite.auditranscribe.misc;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
-@Documented
-@Retention(RUNTIME)
-@Target({TYPE, METHOD})
-public @interface IgnoredFromCoverage {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface ExcludeFromGeneratedCoverageReport {
 }

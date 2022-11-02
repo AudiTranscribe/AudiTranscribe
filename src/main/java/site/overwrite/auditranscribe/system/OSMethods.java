@@ -18,6 +18,8 @@
 
 package site.overwrite.auditranscribe.system;
 
+import site.overwrite.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+
 import java.util.List;
 
 public final class OSMethods {
@@ -44,6 +46,7 @@ public final class OSMethods {
      *
      * @return Operating system enum value.
      */
+    @ExcludeFromGeneratedCoverageReport  // Todo: eventually we could consider a fourth OS for testing
     public static OSType getOS() {
         // Get the OS name
         String osName = System.getProperty("os.name").toUpperCase();
