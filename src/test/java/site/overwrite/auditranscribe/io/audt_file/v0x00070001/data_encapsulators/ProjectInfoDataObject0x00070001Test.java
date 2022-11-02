@@ -31,10 +31,10 @@ class ProjectInfoDataObject0x00070001Test {
     String projectName2 = "Second Project Name";
 
     int musicKeyIndex1 = 1;
-    int musicKeyIndex2 = 23;
+    int musicKeyIndex2 = 8;
 
-    int timeSignatureIndex1 = 12;
-    int timeSignatureIndex2 = 3;
+    int timeSignatureIndex1 = 0;
+    int timeSignatureIndex2 = 7;
 
     double bpm1 = 123.456;
     double bpm2 = 78.9;
@@ -136,7 +136,7 @@ class ProjectInfoDataObject0x00070001Test {
         );
 
         // Tests
-        assertEquals(1413278732, one.hashCode());
-        assertEquals(-954764613, two.hashCode());
+        assertEquals(1402196480, one.hashCode());
+        assertEquals(-1380507794, two.hashCode());
     }
 }

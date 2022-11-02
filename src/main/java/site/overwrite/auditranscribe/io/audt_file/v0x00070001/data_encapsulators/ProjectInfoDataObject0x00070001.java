@@ -18,6 +18,7 @@
 
 package site.overwrite.auditranscribe.io.audt_file.v0x00070001.data_encapsulators;
 
+import site.overwrite.auditranscribe.io.audt_file.AUDTFileHelpers;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.ProjectInfoDataObject;
 
 import java.util.Objects;
@@ -29,6 +30,9 @@ import java.util.Objects;
  * data encapsulators.
  */
 public class ProjectInfoDataObject0x00070001 extends ProjectInfoDataObject {
+    // Attributes
+    public int timeSignatureIndex;
+
     /**
      * Initialization method for the project info data object.
      *
@@ -52,6 +56,8 @@ public class ProjectInfoDataObject0x00070001 extends ProjectInfoDataObject {
         this.offsetSeconds = offsetSeconds;
         this.playbackVolume = playbackVolume;
         this.currTimeInMS = currTimeInMS;
+
+        this.timeSignature = AUDTFileHelpers.oldTimeSignatureIndexToTimeSignature(timeSignatureIndex);
     }
 
     // Overwritten methods
@@ -59,7 +65,7 @@ public class ProjectInfoDataObject0x00070001 extends ProjectInfoDataObject {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ProjectInfoDataObject that = (ProjectInfoDataObject) o;
+        ProjectInfoDataObject0x00070001 that = (ProjectInfoDataObject0x00070001) o;
         return (
                 Objects.equals(projectName, that.projectName) &&
                         musicKeyIndex == that.musicKeyIndex &&

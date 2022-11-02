@@ -41,8 +41,9 @@ public final class FrequencyBins {
         int numBins = numFFT / 2 + 1;
         double[] frequencies = new double[numBins];
 
+        double scaleFactor = sampleRate / numFFT;
         for (int i = 0; i < numBins; i++) {
-            frequencies[i] = i * (sampleRate / numFFT);
+            frequencies[i] = i * scaleFactor;
         }
         return frequencies;
     }
@@ -56,11 +57,12 @@ public final class FrequencyBins {
      * @return Array of center frequencies for each QT bin.
      */
     public static double[] getQTFreqBins(int numBins, int binsPerOctave, double fmin) {
-        double[] frequencies = new double[numBins];
+        double octavesPerBin = 1. / binsPerOctave;
 
+        double[] frequencies = new double[numBins];
         for (double i = 0; i < numBins; i++) {
             // Calculate the frequency of the current frequency bin
-            double freq = fmin * Math.pow(2, i / binsPerOctave);
+            double freq = fmin * Math.pow(2, i * octavesPerBin);
 
             // Append it to the list of frequencies
             frequencies[(int) i] = freq;
@@ -82,11 +84,14 @@ public final class FrequencyBins {
         double minMel = UnitConversionUtils.hzToMel(minFreq);
         double maxMel = UnitConversionUtils.hzToMel(maxFreq);
 
+        // Define normalization factor
+        double normFactor = (maxMel - minMel) / (numMels - 1);
+
         // Define the output mel matrix
         double[] melBins = new double[numMels];
         for (int i = 0; i < numMels; i++) {
             // Compute the current mel value
-            double mel = minMel + (maxMel - minMel) * i / (numMels - 1);
+            double mel = minMel + normFactor * i;
 
             // Convert that mel value into Hz and add to the array
             melBins[i] = UnitConversionUtils.melToHz(mel);

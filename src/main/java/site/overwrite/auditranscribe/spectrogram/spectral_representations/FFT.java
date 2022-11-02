@@ -39,66 +39,66 @@ public final class FFT {
     // Public methods
 
     /**
-     * Computes the Fast Fourier Transform (FFT) of the input array <code>x</code>.
+     * Computes the Fast Fourier Transform (FFT) of <code>array</code>.
      *
-     * @param x The complex array <code>x</code> representing the data source.
-     * @return An array of <code>Complex</code> objects representing the FFT of the data source.
+     * @param array The complex array to apply the FFT to.
+     * @return An array of <code>Complex</code> objects representing the FFT of <code>array</code>.
      */
-    public static Complex[] fft(Complex[] x) {
+    public static Complex[] fft(Complex[] array) {
         // Get length fo input array
-        int length = x.length;
+        int length = array.length;
 
         // Handle different cases of the length
         if (length == 0) {
             return new Complex[0];
         } else if (MathUtils.isPowerOf2(length)) {
-            return fftRadix2(x, length);
+            return fftRadix2(array, length);
         } else {  // Is not power of 2
-            return fftBluestein(x, length);
+            return fftBluestein(array, length);
         }
     }
 
     /**
-     * Computes the Real-Valued FFT (RFFT) of the input array <code>x</code>.
+     * Computes the Real-Valued FFT (RFFT) of <code>array</code>.
      *
-     * @param x The complex array <code>x</code> representing the data source.
-     * @return An array of <code>Complex</code> objects representing the RFFT of the data source.
+     * @param array The complex array to apply the RFFT to.
+     * @return An array of <code>Complex</code> objects representing the RFFT of <code>array</code>.
      * @implNote The array returned is so that only the non-negative frequencies are returned. This
      * means that the first <code>(N / 2) + 1</code> elements are returned if the length of the
      * array, <code>N</code>, is even and <code>(N + 1) / 2</code> if <code>N</code> is odd.
      */
-    public static Complex[] rfft(Complex[] x) {
+    public static Complex[] rfft(Complex[] array) {
         // Get length of the array
-        int length = x.length;
+        int length = array.length;
 
         // Compute FFT of the matrix
-        Complex[] tempMatrix = fft(x);
+        Complex[] tempMatrix = fft(array);
 
         // Determine number of elements to keep
-        int numElemToKeep = length % 2 == 0 ? length / 2 + 1 : (length + 1) / 2;
+        int numElemToKeep = length / 2 + 1;  // Above two length conditions equivilant to this
 
         // Keep only that number of elements
         return Arrays.copyOfRange(tempMatrix, 0, numElemToKeep);
     }
 
     /**
-     * Computes the Real-Valued FFT (RFFT) of the input array <code>x</code>.
+     * Computes the Real-Valued FFT (RFFT) of <code>array</code>.
      *
-     * @param x The complex array <code>x</code> representing the data source.
-     * @return An array of <code>Complex</code> objects representing the RFFT of the data source.
+     * @param array The real-valued array to apply the RFFT to.
+     * @return An array of <code>Complex</code> objects representing the RFFT of <code>array</code>.
      * @implNote The array returned is so that only the non-negative frequencies are returned. This
      * means that the first <code>(N / 2) + 1</code> elements are returned if the length of the
      * array, <code>N</code>, is even and <code>(N + 1) / 2</code> if <code>N</code> is odd.
      */
-    public static Complex[] rfft(double[] x) {
-        // Get the length of the array `x`
-        int n = x.length;
+    public static Complex[] rfft(double[] array) {
+        // Get the length of the array
+        int n = array.length;
 
-        // Convert `x` into a complex number array
+        // Convert to a complex number array
         Complex[] z = new Complex[n];
 
         for (int i = 0; i < n; i++) {
-            z[i] = new Complex(x[i]);
+            z[i] = new Complex(array[i]);
         }
 
         // Now run the FFT on this complex number array
@@ -106,20 +106,20 @@ public final class FFT {
     }
 
     /**
-     * Helper method that computes the Inverse FFT (IFFT) of the input array <code>x</code>.<br>
-     * This assumes that the length of the input array, say <code>N</code>, is a power of 2.
+     * Helper method that computes the Inverse FFT (IFFT) of <code>array</code>.<br>
+     * This assumes that the length of the input array is a power of 2.
      *
-     * @param x The complex array <code>x</code> representing the data source.
-     * @return An array of <code>Complex</code> objects representing the IFFT of the data source.
+     * @param array The complex array to apply the IFFT to.
+     * @return An array of <code>Complex</code> objects representing the IFFT of <code>array</code>.
      */
-    public static Complex[] ifft(Complex[] x) {
+    public static Complex[] ifft(Complex[] array) {
         // Get length of input array
-        int length = x.length;
+        int length = array.length;
 
-        // Compute conjugate of each element of `x`
+        // Compute conjugate of each element of the array
         Complex[] y = new Complex[length];  // We will reuse the array later
         for (int i = 0; i < length; i++) {
-            y[i] = x[i].conjugate();
+            y[i] = array[i].conjugate();
         }
 
         // Compute forward FFT
@@ -130,31 +130,31 @@ public final class FFT {
             y[i] = y[i].conjugate();
         }
 
-        // Divide by the length of `x`
+        // Divide by the length of the array
         for (int i = 0; i < length; i++) {
             y[i] = y[i].divides(length);
         }
 
-        // Return the inverse FFT array, `y`
+        // Return the inverse FFT array
         return y;
     }
 
     /**
-     * Computes the Inverse Real-Valued FFT (IRFFT) of the input array <code>x</code>.<br>
-     * This assumes that the length of the input array, say <code>N</code>, is of the form
-     * <code>K / 2 + 1</code> where <code>K</code> is a power of 2.
+     * Computes the Inverse Real-Valued FFT (IRFFT) of <code>array</code>.<br>
+     * This assumes that the length of the input array is of the form <code>2^k + 1</code> where
+     * <code>k</code> is a non-negative integer.
      *
-     * @param x The complex array <code>x</code> representing the data source.
-     * @param n Length of the transformed axis of the output.
+     * @param array The complex array <code>x</code> representing the data source.
+     * @param n     Length of the transformed axis of the output.
      * @return An array of <code>Complex</code> objects representing the IRFFT of the data source.
      */
-    public static Complex[] irfft(Complex[] x, int n) {
+    public static Complex[] irfft(Complex[] array, int n) {
         // Extend the input array to `n`
         Complex[] extended = new Complex[n];
-        System.arraycopy(x, 0, extended, 0, x.length);
+        System.arraycopy(array, 0, extended, 0, array.length);
 
-        for (int i = x.length; i < n; i++) {
-            extended[i] = x[n - i].conjugate();
+        for (int i = array.length; i < n; i++) {
+            extended[i] = array[n - i].conjugate();
         }
 
         // Compute IFFT and return
@@ -164,19 +164,20 @@ public final class FFT {
     // Private methods
 
     /**
-     * Helper method that computes the FFT of the input array <code>x</code> using the Radix-2
-     * Cooley-Tukey Algorithm.<br>
+     * Helper method that computes the FFT of the input array using the Radix-2 Cooley-Tukey
+     * Algorithm.<br>
      * This assumes that the length of the input array, say <code>N</code>, is a power of 2.
      *
-     * @param x      The complex array <code>x</code> representing the data source.
+     * @param array  The complex array to apply the algorithm to.
      * @param length Length of the input array.
      * @return An array of <code>Complex</code> objects representing the FFT of the data source.
      * @see <a href="https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm">Radix-2
      * Cooley-Tukey Algorithm</a>, which was the algorithm used to generate the FFT.
      */
-    private static Complex[] fftRadix2(Complex[] x, int length) {
+    private static Complex[] fftRadix2(Complex[] array, int length) {
         // Base case: length is 1
-        if (length == 1) return new Complex[]{x[0]};
+        // (Length 0 case is handled by wrapper function)
+        if (length == 1) return new Complex[]{array[0]};
 
         // Compute length of each of the two sub-arrays
         int halfLength = length / 2;
@@ -184,21 +185,22 @@ public final class FFT {
         // Compute FFT of even terms
         Complex[] terms = new Complex[halfLength];  // Will be used for both even and odd terms
         for (int k = 0; k < halfLength; k++) {
-            terms[k] = x[2 * k];
+            terms[k] = array[2 * k];
         }
         Complex[] p = fftRadix2(terms, halfLength);
 
         // Compute FFT of odd terms
         for (int k = 0; k < halfLength; k++) {
-            terms[k] = x[2 * k + 1];  // We reuse the above array
+            terms[k] = array[2 * k + 1];  // We reuse the above array
         }
         Complex[] q = fftRadix2(terms, halfLength);
 
         // Combine even and odd terms together
+        double scale = -2 * Math.PI / length;  // Will be used in loop below
         Complex[] y = new Complex[length];
         for (int k = 0; k < halfLength; k++) {
             // Compute w = exp(−2kπi/N)
-            Complex wk = Complex.exp(new Complex(0, -2 * k * Math.PI / length));
+            Complex wk = Complex.exp(new Complex(0, k * scale));
 
             // Set values for `y[k]` and `y[k + length/2]`
             y[k] = p[k].plus(wk.times(q[k]));
@@ -210,16 +212,15 @@ public final class FFT {
     }
 
     /**
-     * Helper method that computes the FFT of the input array <code>x</code> using Bluestein's
-     * algorithm (aka Chirp-Z Transform, or CZT for short).<br>
-     * This assumes that the length of the input array, say <code>N</code>, is a power of 2.
+     * Helper method that computes the FFT of the input array <code>array</code> using Bluestein's
+     * algorithm (also known as a Chirp-Z Transform, or CZT for short).
      *
-     * @param x The complex array <code>x</code> representing the data source.
+     * @param array The complex array to apply the algorithm to.
      * @return An array of <code>Complex</code> objects representing the FFT of the data source.
      * @see <a href="https://en.wikipedia.org/wiki/Chirp_Z-transform#Bluestein's_algorithm">
      * Bluestein's CZT Algorithm</a>, which was the algorithm used to generate the FFT.
      */
-    private static Complex[] fftBluestein(Complex[] x, int length) {
+    private static Complex[] fftBluestein(Complex[] array, int length) {
         // Find a power of 2 convolution length such that it is at least `length * 2 + 1`
         int convolutionLength = (int) Math.pow(2, MiscUtils.getNumSetBits(length * 2));
 
@@ -230,7 +231,7 @@ public final class FFT {
         for (int i = 0; i < length; i++) {
             exponentialTable[i] = Complex.exp(
                     Complex.IMAG_UNIT.times(
-                            new Complex((i * i) % (length * 2)).scale(exponentCoefficient)
+                            new Complex((i * i) % (length * 2)).times(exponentCoefficient)
                     )
             );
         }
@@ -238,7 +239,7 @@ public final class FFT {
         // Generate the first temporary vector
         Complex[] aVector = new Complex[convolutionLength];
         for (int i = 0; i < length; i++) {
-            aVector[i] = x[i].times(exponentialTable[i]);
+            aVector[i] = array[i].times(exponentialTable[i]);
         }
         for (int i = length; i < convolutionLength; i++) {
             aVector[i] = Complex.ZERO;
@@ -274,12 +275,14 @@ public final class FFT {
     }
 
     /**
-     * Helper method that computes the circular convolution of the two input vectors <code>aVector</code> and <code>bVector</code>.
+     * Helper method that computes the circular convolution of the two input vectors
+     * <code>aVector</code> and <code>bVector</code>.
      *
      * @param aVector The first vector.
      * @param bVector The second vector.
      * @return The circular convolution of the two input vectors.
-     * @throws LengthException If the lengths of <code>aVector</code> and <code>bVector</code> are not equal.
+     * @throws LengthException If the lengths of <code>aVector</code> and <code>bVector</code> are
+     *                         not equal.
      */
     private static Complex[] circularConvolution(Complex[] aVector, Complex[] bVector) {
         // Check that the lengths of the vectors are equal
@@ -291,7 +294,7 @@ public final class FFT {
 
         // Apply convolution theorem to obtain resultant convoluted vector
         // (See https://en.wikipedia.org/wiki/Convolution_theorem)
-        Complex[] AVector = fft(aVector);  // Convention: capital letter => fourier transformed vector
+        Complex[] AVector = fft(aVector);  // Convention: capital letter represents a fourier transformed vector
         Complex[] BVector = fft(bVector);
         Complex[] XVector = new Complex[length];
         for (int i = 0; i < length; i++) {

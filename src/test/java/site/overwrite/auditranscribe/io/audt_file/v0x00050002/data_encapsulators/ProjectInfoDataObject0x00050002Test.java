@@ -28,10 +28,10 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 class ProjectInfoDataObject0x00050002Test {
     // Attributes
     int musicKeyIndex1 = 1;
-    int musicKeyIndex2 = 23;
+    int musicKeyIndex2 = 8;
 
-    int timeSignatureIndex1 = 12;
-    int timeSignatureIndex2 = 3;
+    int timeSignatureIndex1 = 0;
+    int timeSignatureIndex2 = 7;
 
     double bpm1 = 123.456;
     double bpm2 = 78.9;
@@ -130,7 +130,7 @@ class ProjectInfoDataObject0x00050002Test {
         );
 
         // Tests
-        assertEquals(184433900, one.hashCode());
-        assertEquals(668235807, two.hashCode());
+        assertEquals(173351648, one.hashCode());
+        assertEquals(242492626, two.hashCode());
     }
 }

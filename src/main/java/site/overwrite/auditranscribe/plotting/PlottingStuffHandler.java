@@ -98,7 +98,7 @@ public final class PlottingStuffHandler {
             int maxNoteNumber, boolean fancyAccidentals
     ) {
         // Get the width of the note pane
-        double width = notePane.getPrefWidth();
+        double width = notePane.getWidth() - 2;  // Minus 2 for the borders
 
         // Get the note offsets that are in the key
         HashSet<Integer> noteOffsets = MusicUtils.getNotesInKey(musicKey);
@@ -135,7 +135,7 @@ public final class PlottingStuffHandler {
 
             // Make the label centred
             noteLabel.setPrefWidth(width);
-            noteLabel.setAlignment(Pos.TOP_CENTER);
+            noteLabel.setAlignment(Pos.CENTER);
 
             // Add the label to the new note label array
             newNoteLabels[i - minNoteNumber] = noteLabel;
@@ -385,7 +385,7 @@ public final class PlottingStuffHandler {
         double spb = secondsPerBeat(bpm);
 
         int numBeats = (int) Math.ceil(bpm / 60. * duration);
-        int numBars = (int) Math.floor((double) numBeats / beatsPerBar) + 1;
+        int numBars = Math.floorDiv(numBeats, beatsPerBar) + 1;
 
         // Generate lines for every beat
         StackPane[] stackPanes = new StackPane[numBars + 1];
@@ -560,7 +560,7 @@ public final class PlottingStuffHandler {
      * @return Seconds per beat.
      */
     private static double secondsPerBeat(double bpm) {
-        return 1. / (bpm / 60.);  // BPM / 60 = Beats per second, so 1 / Beats Per Second = Seconds per Beat
+        return 60. / bpm;
     }
 
     /**

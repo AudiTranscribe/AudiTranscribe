@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.music.TimeSignature;
 import site.overwrite.auditranscribe.utils.HashingUtils;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
@@ -103,7 +104,7 @@ class NotePlayerSequencerTest {
 
         try {
             if (notePlayerSequencer.isSequencerAvailable()) {
-                notePlayerSequencer.exportToMIDI("4/4", "C Major", filePath);
+                notePlayerSequencer.exportToMIDI(TimeSignature.FOUR_FOUR, "C Major", filePath);
             }
 
             assertEquals(

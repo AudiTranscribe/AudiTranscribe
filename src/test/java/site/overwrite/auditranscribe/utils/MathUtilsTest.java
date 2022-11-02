@@ -47,6 +47,19 @@ class MathUtilsTest {
         assertThrowsExactly(ValueException.class, () -> MathUtils.logN(123, -1.23));
     }
 
+    @Test
+    void ceilDiv() {
+        assertEquals(3, MathUtils.ceilDiv(8, 3));
+        assertEquals(3, MathUtils.ceilDiv(9, 3));
+        assertEquals(4, MathUtils.ceilDiv(10, 3));
+        assertEquals(4, MathUtils.ceilDiv(11, 3));
+        assertEquals(4, MathUtils.ceilDiv(12, 3));
+
+        assertEquals(3, MathUtils.ceilDiv(654, 321));
+        assertEquals(4, MathUtils.ceilDiv(987, 321));
+        assertEquals(3, MathUtils.ceilDiv(789, 321));
+    }
+
     // Data-related methods
     @Test
     void intLerp() {

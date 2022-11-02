@@ -36,6 +36,8 @@ import site.overwrite.auditranscribe.generic.tuples.Pair;
 import site.overwrite.auditranscribe.generic.tuples.Triple;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.misc.MyLogger;
+import site.overwrite.auditranscribe.music.NoteUnit;
+import site.overwrite.auditranscribe.music.TimeSignature;
 import site.overwrite.auditranscribe.music.exceptions.NoteRectangleCollisionException;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 import site.overwrite.auditranscribe.utils.MiscUtils;
@@ -674,22 +676,22 @@ public class NoteRectangle extends StackPane {
      *
      * @param bpm           Beats per minute.
      * @param offset        Offset value.
-     * @param timeSignature Time signature string.
+     * @param timeSignature Time signature of the audio.
      */
-    public static void quantizeNotes(double bpm, double offset, String timeSignature) {
+    public static void quantizeNotes(double bpm, double offset, TimeSignature timeSignature) {
         // Only allow quantization if the playback is paused
         if (isPaused) {
             double pixelsPerSecond = spectrogramWidth / totalDuration;
 
             // Determine the note 'unit' we are working with
-            int noteUnit = MusicUtils.parseTimeSignature(timeSignature).value1();  // What "one beat" represents
+            int noteUnit = timeSignature.denominator.numericValue;  // What one beat represents
 
             // Get the number of seconds per beat
             double spb = 1. / bpm * 60.;  // spb = seconds per beat
 
             // Determine resolution of the quantization
-            NoteQuantizationUnit quantizationUnit =
-                    NoteQuantizationUnit.values()[DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal];
+            NoteUnit quantizationUnit =
+                    NoteUnit.values()[DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal];
             int divisionFactor = quantizationUnit.numericValue / noteUnit;
             double resolution = spb / divisionFactor;
 

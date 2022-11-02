@@ -18,6 +18,7 @@
 
 package site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators;
 
+import site.overwrite.auditranscribe.io.audt_file.AUDTFileHelpers;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.ProjectInfoDataObject;
 
 import java.util.Objects;
@@ -29,6 +30,9 @@ import java.util.Objects;
  * data encapsulators.
  */
 public class ProjectInfoDataObject0x00050002 extends ProjectInfoDataObject {
+    // Attributes
+    public int timeSignatureIndex;
+
     /**
      * Initialization method for the project info data object.
      *
@@ -52,6 +56,7 @@ public class ProjectInfoDataObject0x00050002 extends ProjectInfoDataObject {
         this.currTimeInMS = currTimeInMS;
 
         this.projectName = null;  // We will need to update this later
+        this.timeSignature = AUDTFileHelpers.oldTimeSignatureIndexToTimeSignature(timeSignatureIndex);
     }
 
     // Public methods
@@ -60,6 +65,7 @@ public class ProjectInfoDataObject0x00050002 extends ProjectInfoDataObject {
      * Sets the project name.<br>
      * This helps bridge the gap between the old system (where we used <code>audioFileName</code> as
      * the project name) and the new system.
+     *
      * @param projectName The project name to set.
      */
     public void setProjectName(String projectName) {
