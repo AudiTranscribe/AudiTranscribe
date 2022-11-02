@@ -41,7 +41,6 @@ import site.overwrite.auditranscribe.music.TimeSignature;
 import site.overwrite.auditranscribe.music.exceptions.NoteRectangleCollisionException;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
 import site.overwrite.auditranscribe.utils.MiscUtils;
-import site.overwrite.auditranscribe.utils.MusicUtils;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -697,6 +696,10 @@ public class NoteRectangle extends StackPane {
 
             // Process each note rectangle
             for (NoteRectangle rectangle : allNoteRectangles.values()) {
+                // Save rectangle's current position to the undo stack
+                // Todo: make undoing more efficient by just using one quantize undo action?
+                addToStack(undoStack, rectangle, UndoOrRedoAction.TRANSFORM);
+
                 // Get the onset time and duration
                 double onsetTime = rectangle.getNoteOnsetTime();
                 double duration = rectangle.getNoteDuration();
