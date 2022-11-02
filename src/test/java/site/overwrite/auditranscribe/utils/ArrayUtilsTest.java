@@ -19,6 +19,8 @@
 package site.overwrite.auditranscribe.utils;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import site.overwrite.auditranscribe.generic.exceptions.LengthException;
 import site.overwrite.auditranscribe.generic.exceptions.ValueException;
 import site.overwrite.auditranscribe.misc.Complex;
@@ -679,6 +681,7 @@ class ArrayUtilsTest {
     }
 
     @Test
+    @EnabledOnOs({OS.LINUX})
     void matmulComplexStrassenCheck() {
         // Test constants
         final int matrixSize = 256;
@@ -710,6 +713,7 @@ class ArrayUtilsTest {
     }
 
     @Test
+    @EnabledOnOs({OS.LINUX})
     void matmulDoubleStrassenCheck() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         // Test constants
         final int matrixSize = 256;

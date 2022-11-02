@@ -120,10 +120,10 @@ class ProjectDataTest {
                 44100, 5000, "Choice.wav");
 
         projectInfoDataObject1 = new ProjectInfoDataObject0x00050002(
-                11, 9, 123.45, 0.01, 0.55, 9000
+                1, 0, 123.45, 0.01, 0.55, 9000
         );
         projectInfoDataObject2 = new ProjectInfoDataObject0x00050002(
-                15, 14, 67.89, -1.23, 0.124, 2048
+                8, 7, 67.89, -1.23, 0.124, 2048
         );
 
         musicNotesDataObject1 = new MusicNotesDataObject0x00050002(
@@ -224,7 +224,7 @@ class ProjectDataTest {
                 musicNotesDataObject2
         );
 
-        assertEquals(814949758, one.hashCode());
-        assertEquals(544922374, two.hashCode());
+        assertEquals(272185181, one.hashCode());
+        assertEquals(-1573040154, two.hashCode());
     }
 }

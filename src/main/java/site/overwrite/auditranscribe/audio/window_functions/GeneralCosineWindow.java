@@ -42,10 +42,11 @@ public abstract class GeneralCosineWindow extends AbstractWindow {
         int numACoefficients = aCoefficients.length;
 
         // Calculate the window value at index `n`
+        double scale = 2 * Math.PI * n / (length - 1);
         double winVal = 0;
         for (int k = 0; k < numACoefficients; k++) {
             // Determine the change in window value
-            double changeInValue = aCoefficients[k] * Math.cos(2 * Math.PI * k * n / (length - 1));
+            double changeInValue = aCoefficients[k] * Math.cos(k * scale);
 
             // Determine whether to add or subtract from the window value
             if (k % 2 == 0) {

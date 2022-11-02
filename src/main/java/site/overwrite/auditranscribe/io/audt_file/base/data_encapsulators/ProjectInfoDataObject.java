@@ -18,6 +18,8 @@
 
 package site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators;
 
+import site.overwrite.auditranscribe.music.TimeSignature;
+
 /**
  * Data object that stores the project's info.<br>
  * <b>Note</b>: This is different from the <code>ProjectData</code> class. This is a data object
@@ -31,7 +33,7 @@ public abstract class ProjectInfoDataObject extends AbstractAUDTDataObject {
     // Attributes
     public String projectName;
     public int musicKeyIndex;
-    public int timeSignatureIndex;
+    public TimeSignature timeSignature;
     public double bpm;
     public double offsetSeconds;
     public double playbackVolume;

@@ -23,6 +23,7 @@ import site.overwrite.auditranscribe.generic.exceptions.ValueException;
 import site.overwrite.auditranscribe.misc.Complex;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
+import site.overwrite.auditranscribe.utils.MathUtils;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
 /**
@@ -157,7 +158,7 @@ public final class ChromaCQT {
         cqToChr = ArrayUtils.roll(cqToChr, -(numMerge / 2), 1);
 
         // How many octaves are we repeating?
-        int numOctaves = (int) Math.ceil((double) numInput / binsPerOctave);
+        int numOctaves = MathUtils.ceilDiv(numInput, binsPerOctave);
 
         // Repeat and trim
         double[][] temp = ArrayUtils.tile(cqToChr, numOctaves);

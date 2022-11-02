@@ -41,7 +41,7 @@ import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
 import site.overwrite.auditranscribe.misc.spinners.CustomIntegerSpinnerValueFactory;
-import site.overwrite.auditranscribe.music.notes.NoteQuantizationUnit;
+import site.overwrite.auditranscribe.music.NoteUnit;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
 
 import java.io.File;
@@ -65,7 +65,7 @@ public class PreferencesViewController extends ClassWithLogging implements Initi
     private ChoiceBox<WindowFunction> windowFunctionChoiceBox;
 
     @FXML
-    private ChoiceBox<NoteQuantizationUnit> noteQuantizationChoiceBox;
+    private ChoiceBox<NoteUnit> noteQuantizationChoiceBox;
 
     @FXML
     private ChoiceBox<Theme> themeChoiceBox;
@@ -93,7 +93,7 @@ public class PreferencesViewController extends ClassWithLogging implements Initi
             colourScaleChoiceBox.getItems().add(colourScale);
         for (WindowFunction windowFunction : WindowFunction.values())
             windowFunctionChoiceBox.getItems().add(windowFunction);
-        for (NoteQuantizationUnit noteQuantizationUnit : NoteQuantizationUnit.values())
+        for (NoteUnit noteQuantizationUnit : NoteUnit.values())
             noteQuantizationChoiceBox.getItems().add(noteQuantizationUnit);
 
         for (Theme theme : Theme.values())
@@ -239,7 +239,7 @@ public class PreferencesViewController extends ClassWithLogging implements Initi
                 WindowFunction.values()[DataFiles.SETTINGS_DATA_FILE.data.windowFunctionEnumOrdinal]
         );
         noteQuantizationChoiceBox.setValue(
-                NoteQuantizationUnit.values()[DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal]
+                NoteUnit.values()[DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal]
         );
 
         themeChoiceBox.setValue(Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal]);

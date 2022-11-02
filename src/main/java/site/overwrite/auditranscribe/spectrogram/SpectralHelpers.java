@@ -199,8 +199,8 @@ public final class SpectralHelpers {
 
         for (int i = 0; i < S.length; i++) {
             for (int j = 0; j < S[0].length; j++) {
-                pitches[i][j] = 0d;
-                mags[i][j] = 0d;
+                pitches[i][j] = 0.;
+                mags[i][j] = 0.;
             }
         }
 
