@@ -117,7 +117,7 @@ public class PreferencesViewController extends ClassWithLogging implements Initi
                 // Update the value of the FFmpeg path text field
                 ffmpegBinaryPathTextField.setText(possibleFFmpegBinary.getAbsolutePath());
             } else {
-                Popups.showInformationAlert("Info", "No file selected.");
+                Popups.showInformationAlert(rootPane.getScene().getWindow(), "Info", "No file selected.");
             }
         });
 
@@ -136,15 +136,16 @@ public class PreferencesViewController extends ClassWithLogging implements Initi
                     }
                 }
 
+                String title = "";
+                String content = "No logs to delete.";
+
                 if (numDeleted != 0) {
-                    Popups.showInformationAlert(
-                            "Deleted Logs",
-                            "Deleted " + numDeleted + " " + (numDeleted == 1 ? "log" : "logs") +
-                                    " from the logs folder."
-                    );
-                } else {
-                    Popups.showInformationAlert("", "No logs to delete.");
+                    title = "Deleted Logs";
+                    content = "Deleted " + numDeleted + " " + (numDeleted == 1 ? "log" : "logs") +
+                            " from the logs folder.";
                 }
+
+                Popups.showInformationAlert(rootPane.getScene().getWindow(), title, content);
             }
         });
 
@@ -180,7 +181,7 @@ public class PreferencesViewController extends ClassWithLogging implements Initi
 
                     // Show a warning message
                     Popups.showWarningAlert(
-                            "Invalid FFmpeg Binary Path",
+                            null, "Invalid FFmpeg Binary Path",
                             "The provided path does not seem to point to a valid FFmpeg binary."
                     );
 

@@ -317,7 +317,7 @@ public class ProjectSetupViewController extends ClassWithLogging implements Init
 
         // Verify that the user actually chose a file
         if (file == null) {
-            Popups.showInformationAlert("Info", "No file selected.");
+            Popups.showInformationAlert(rootPane.getScene().getWindow(), "Info", "No file selected.");
         } else {
             audioFile = file;
             audioFileLabel.setText(file.getName());

@@ -257,6 +257,7 @@ public class FixNoteDelayViewController extends ClassWithLogging implements Init
 
         } else {
             Popups.showWarningAlert(
+                    rootPane.getScene().getWindow(),
                     "Sequencer not available",
                     "The note player sequencer is not available on your system. This part of the setup " +
                             "wizard will not function. Simply skip to the next part."
