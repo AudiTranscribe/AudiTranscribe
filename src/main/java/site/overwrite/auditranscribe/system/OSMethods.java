@@ -18,6 +18,10 @@
 
 package site.overwrite.auditranscribe.system;
 
+import site.overwrite.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+
+import java.util.List;
+
 public final class OSMethods {
     private OSMethods() {
         // Private constructor to signal this is a utility class
@@ -42,6 +46,7 @@ public final class OSMethods {
      *
      * @return Operating system enum value.
      */
+    @ExcludeFromGeneratedCoverageReport  // Todo: eventually we could consider a fourth OS for testing
     public static OSType getOS() {
         // Get the OS name
         String osName = System.getProperty("os.name").toUpperCase();
@@ -49,7 +54,15 @@ public final class OSMethods {
         // Split by spaces
         String[] split = osName.split(" ");
 
-        // Get the OS based on the first value
-        return OSType.valueOf(split[0]);
+        // Get the first value of the split
+        String proposedOSName = split[0];
+
+        // If the proposed OS name is one of the 3 standard ones we are OK
+        List<String> recognisedOS = List.of("WINDOWS", "MAC", "LINUX");
+        if (recognisedOS.contains(proposedOSName)) {
+            return OSType.valueOf(proposedOSName);
+        } else {
+            return OSType.OTHER;
+        }
     }
 }

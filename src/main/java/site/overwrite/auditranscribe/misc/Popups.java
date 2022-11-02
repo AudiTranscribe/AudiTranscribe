@@ -24,6 +24,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.stage.StageStyle;
+import javafx.stage.Window;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 
@@ -44,26 +45,29 @@ public final class Popups {
     /**
      * Method that shows an information alert.
      *
+     * @param owner   Stage that owns the alert. Provide <code>null</code> if there is no owner.
      * @param title   Title of the alert box.
      * @param content Content of the information alert.
      */
-    public static void showInformationAlert(String title, String content) {
-        showGenericAlert(title, content, Alert.AlertType.INFORMATION);
+    public static void showInformationAlert(Window owner, String title, String content) {
+        showGenericAlert(title, content, Alert.AlertType.INFORMATION, owner);
     }
 
     /**
      * Method that shows a warning alert.
      *
+     * @param owner   Stage that owns the alert. Provide <code>null</code> if there is no owner.
      * @param title   Title of the alert box.
      * @param content Content of the information alert.
      */
-    public static void showWarningAlert(String title, String content) {
-        showGenericAlert(title, content, Alert.AlertType.WARNING);
+    public static void showWarningAlert(Window owner, String title, String content) {
+        showGenericAlert(title, content, Alert.AlertType.WARNING, owner);
     }
 
     /**
      * Method that shows a confirmation alert.
      *
+     * @param owner       Stage that owns the alert. Provide <code>null</code> if there is no owner.
      * @param title       Title of the confirmation alert.
      * @param headerText  Header text for the confirmation alert.
      * @param contentText Content of the confirmation alert.
@@ -71,20 +75,15 @@ public final class Popups {
      * @return A <code>ButtonType</code> value.
      */
     public static Optional<ButtonType> showMultiButtonAlert(
-            String title, String headerText, String contentText, ButtonType... buttonTypes
+            Window owner, String title, String headerText, String contentText, ButtonType... buttonTypes
     ) {
         // Get active theme
         Theme currentTheme = Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal];
 
         // Create the alert
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.getDialogPane().getStylesheets().add(
-                IOMethods.getFileURL(IOMethods.joinPaths("views", "css", currentTheme.cssFile)).toExternalForm()
-        );
-        alert.initStyle(StageStyle.UTILITY);
-        alert.setTitle(title);
-        alert.setHeaderText(headerText);
-        alert.setContentText(contentText);
+        setupDialog(alert, owner, title, headerText, contentText, currentTheme);
+
         alert.getButtonTypes().setAll(buttonTypes);
 
         return alert.showAndWait();
@@ -93,29 +92,20 @@ public final class Popups {
     /**
      * Method that shows an exception alert.
      *
+     * @param owner       Stage that owns the alert. Provide <code>null</code> if there is no owner.
      * @param headerText  Header text for the exception alert.
      * @param contentText Content text for the exception alert.
      * @param throwable   <code>Throwable</code> object for the exception that occurred.
      */
-    public static void showExceptionAlert(String headerText, String contentText, Throwable throwable) {
+    public static void showExceptionAlert(
+            Window owner, String headerText, String contentText, Throwable throwable
+    ) {
         // Get active theme
         Theme currentTheme = Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal];
 
-        // Create a new error alert
+        // Create the alert
         Alert alert = new Alert(Alert.AlertType.ERROR);
-
-        // Set the theme on the alert
-        alert.getDialogPane().getStylesheets().add(
-                IOMethods.getFileURL(IOMethods.joinPaths("views", "css", currentTheme.cssFile)).toExternalForm()
-        );
-
-        // Set the alert style to `UTILITY` so that it can be shown during fullscreen
-        alert.initStyle(StageStyle.UTILITY);
-
-        // Set texts
-        alert.setTitle("Error");
-        alert.setHeaderText(headerText);
-        alert.setContentText(contentText);
+        setupDialog(alert, owner, "Error", headerText, contentText, currentTheme);
 
         // Set exception texts
         Label label = new Label("The exception stacktrace was:");
@@ -147,28 +137,21 @@ public final class Popups {
     /**
      * Method that shows a text input dialog with the specified header and content texts.
      *
+     * @param owner       Stage that owns the dialog. Provide <code>null</code> if there is no owner.
      * @param title       Title of the text input dialog.
      * @param headerText  Header text for the dialog.
      * @param contentText Content text for the dialog.
      * @return The value that was entered in the text input dialog.
      */
     public static Optional<String> showTextInputDialog(
-            String title, String headerText, String contentText, String defaultText
+            Window owner, String title, String headerText, String contentText, String defaultText
     ) {
         // Get active theme
         Theme currentTheme = Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal];
 
         // Set up text input dialog
         TextInputDialog dialog = new TextInputDialog();
-        dialog.initStyle(StageStyle.UTILITY);
-        dialog.setTitle(title);
-        dialog.setHeaderText(headerText);
-        dialog.setContentText(contentText);
-
-        // Add styling to the dialog
-        dialog.getDialogPane().getStylesheets().add(
-                IOMethods.getFileURL(IOMethods.joinPaths("views", "css", currentTheme.cssFile)).toExternalForm()
-        );
+        setupDialog(dialog, owner, title, headerText, contentText, currentTheme);
 
         // Get the nodes on the dialog
         Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
@@ -194,21 +177,41 @@ public final class Popups {
      * @param title   Title of the alert box.
      * @param content Content of the information alert.
      * @param type    Type of the alert box.
+     * @param owner   Stage that owns the alert. Provide <code>null</code> if there is no owner.
      */
-    private static void showGenericAlert(String title, String content, Alert.AlertType type) {
-        // Get active theme
+    private static void showGenericAlert(String title, String content, Alert.AlertType type, Window owner) {
         Theme currentTheme = Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal];
 
-        // Create the alert
         Alert alert = new Alert(type);
-        alert.getDialogPane().getStylesheets().add(
-                IOMethods.getFileURL(IOMethods.joinPaths("views", "css", currentTheme.cssFile)).toExternalForm()
-        );
-        alert.initStyle(StageStyle.UTILITY);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
+        setupDialog(alert, owner, title, null, content, currentTheme);
 
         alert.showAndWait();
+    }
+
+    /**
+     * Helper method that sets up a dialog.
+     *
+     * @param dialog       Dialog object to set up.
+     * @param owner        Stage that owns the dialog. Provide <code>null</code> if there is no
+     *                     owner.
+     * @param title        Title to be shown on the dialog.
+     * @param headerText   Header text of the dialog.
+     * @param contentText  Main text on the dialog.
+     * @param currentTheme Theme to apply to the dialog.
+     */
+    private static void setupDialog(
+            Dialog<?> dialog, Window owner, String title, String headerText, String contentText,
+            Theme currentTheme
+    ) {
+        dialog.getDialogPane().getStylesheets().add(
+                IOMethods.getFileURL(IOMethods.joinPaths("views", "css", currentTheme.cssFile)).toExternalForm()
+        );
+
+        dialog.initStyle(StageStyle.UTILITY);
+        if (owner != null) dialog.initOwner(owner);
+
+        dialog.setTitle(title);
+        dialog.setHeaderText(headerText);
+        dialog.setContentText(contentText);
     }
 }

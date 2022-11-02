@@ -310,7 +310,7 @@ public class MainViewController extends ClassWithLogging implements Initializabl
 
         // Verify that the user actually chose a file
         if (file == null) {
-            Popups.showInformationAlert("Info", "No file selected.");
+            Popups.showInformationAlert(rootPane.getScene().getWindow(), "Info", "No file selected.");
         } else {
             // Set the scene switching state and data
             sceneSwitchingState = SceneSwitchingState.OPEN_PROJECT;

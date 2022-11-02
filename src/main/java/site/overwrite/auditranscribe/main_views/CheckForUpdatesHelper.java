@@ -63,6 +63,7 @@ public class CheckForUpdatesHelper extends ClassWithLogging {
             ButtonType ignore = new ButtonType("Ignore For Now", ButtonBar.ButtonData.CANCEL_CLOSE);
 
             Optional<ButtonType> selectedButton = Popups.showMultiButtonAlert(
+                    null,
                     "New Version Available",
                     "New Version Available: " + semver,
                     "A new version for AudiTranscribe is available. Do you want to see it?",
@@ -105,7 +106,9 @@ public class CheckForUpdatesHelper extends ClassWithLogging {
         } catch (APIServerException e) {
             // Return a value that says that the current version is latest
             log(
-                    Level.WARNING, "Error for API request on checking new version: timed out or connection refused", CheckForUpdatesHelper.class.getName()
+                    Level.WARNING,
+                    "Error for API request on checking new version: timed out or connection refused",
+                    CheckForUpdatesHelper.class.getName()
             );
             return new Pair<>(true, null);
         } catch (IOException e) {

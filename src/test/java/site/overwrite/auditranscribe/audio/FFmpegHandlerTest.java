@@ -29,6 +29,8 @@ import site.overwrite.auditranscribe.io.data_files.DataFiles;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -178,5 +180,39 @@ class FFmpegHandlerTest {
         assertThrowsExactly(FFmpegCommandFailedException.class, () -> finalHandler.generateAltTempoAudio(
                 new File("non-existent-file.mp3"), "no-output.mp3", 1.234
         ));
+    }
+
+    @Test
+    @Order(6)
+    void handleInvalidFFmpegCommandExec()
+            throws NoSuchMethodException, FFmpegNotFoundException, InvocationTargetException, IllegalAccessException {
+        // Determine the FFmpeg path
+        FFmpegHandler handler;
+        try {
+            handler = new FFmpegHandler("ffmpeg");
+        } catch (FFmpegNotFoundException e) {
+            // Try to get the path from the settings file
+            handler = new FFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
+        }
+
+        // Open the method to the test
+        Method handleFFmpegCommandExec = FFmpegHandler.class.getDeclaredMethod(
+                "handleFFmpegCommandExec", String[].class
+        );
+        handleFFmpegCommandExec.setAccessible(true);
+
+        // Try and pass an empty command array
+        assertFalse((boolean) handleFFmpegCommandExec.invoke(handler, (Object) null));
+
+        // Create an invalid FFmpeg command
+        String[] command = {
+                handler.ffmpegPath,
+                "-y",
+                "-i", "fakefake",
+                "-vn",
+                "fakefake"
+        };
+
+        assertFalse((boolean) handleFFmpegCommandExec.invoke(handler, (Object) command));
     }
 }

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=AudiTranscribe
+GenericName=Music Transcription
+Comment=An open-source music transcription application.
+Icon=/opt/auditranscribe/lib/AudiTranscribe.png
+Exec=/opt/auditranscribe/bin/AudiTranscribe
+Terminal=false
+StartupWMClass=site.overwrite.auditranscribe.MainApplication
+StartupNotify=true
+MimeType=

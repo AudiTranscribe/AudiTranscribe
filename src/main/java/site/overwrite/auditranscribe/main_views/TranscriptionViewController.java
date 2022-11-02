@@ -761,6 +761,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             setAudioAndSpectrogramData(projectData.qTransformData, projectData.audioData);
         } catch (IOException | UnsupportedAudioFileException e) {
             Popups.showExceptionAlert(
+                    rootPane.getScene().getWindow(),
                     "Error loading audio data.",
                     "An error occurred when loading the audio data. Does the audio file " +
                             "still exist at the original location?",
@@ -770,6 +771,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             e.printStackTrace();
         } catch (FFmpegNotFoundException e) {
             Popups.showExceptionAlert(
+                    rootPane.getScene().getWindow(),
                     "Error loading audio data.",
                     "FFmpeg was not found. Please install it and try again.",
                     e
@@ -778,6 +780,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             e.printStackTrace();
         } catch (AudioTooLongException e) {
             Popups.showExceptionAlert(
+                    rootPane.getScene().getWindow(),
                     "Error loading audio data.",
                     "The audio file is too long. Please select a shorter audio file.",
                     e
@@ -898,6 +901,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
                         // Show alert
                         Platform.runLater(() -> Popups.showInformationAlert(
+                                rootPane.getScene().getWindow(),
                                 "Music Key Estimation Found Other Possible Keys",
                                 "Most likely music key, with decreasing correlation:\n" +
                                         mostLikelyKey.name + ": " + MathUtils.round(mostLikelyKeyCorr, 3) + "\n" +
@@ -1105,6 +1109,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             ButtonType saveAndExit = new ButtonType("Save");
 
             Optional<ButtonType> selectedButton = Popups.showMultiButtonAlert(
+                    rootPane.getScene().getWindow(),
                     "",
                     "",
                     "Save changes to project before leaving?",
@@ -1126,6 +1131,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
                         } catch (IOException | FFmpegNotFoundException e) {
                             // Show exception that was thrown
                             Popups.showExceptionAlert(
+                                    rootPane.getScene().getWindow(),
                                     "File Saving Failure",
                                     "AudiTranscribe failed to save the file.",
                                     e
@@ -1134,7 +1140,11 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
                             return false;  // Cannot exit
                         }
                     } else {
-                        Popups.showInformationAlert("Info", "No destination specified.");
+                        Popups.showInformationAlert(
+                                rootPane.getScene().getWindow(),
+                                "Info",
+                                "No destination specified."
+                        );
                         return false;  // No file selected; cannot exit
                     }
 
@@ -1353,7 +1363,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
             // Verify that the user actually chose a file
             if (file == null) {
-                Popups.showInformationAlert("Info", "No file selected.");
+                Popups.showInformationAlert(rootPane.getScene().getWindow(), "Info", "No file selected.");
             } else {
                 // Set the scene switching status and the selected file
                 sceneSwitchingState = SceneSwitchingState.OPEN_PROJECT;
@@ -1373,6 +1383,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
     private void handleRenameProject(Event event) {
         // Ask user for new project name
         Optional<String> newProjectNameResponse = Popups.showTextInputDialog(
+                rootPane.getScene().getWindow(),
                 "Rename Project",
                 "Enter New Project Name",
                 "New project name:",
@@ -1450,6 +1461,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             // Show popup upon saving completion, if it is not an autosave
             if (!isAutosave) {
                 Popups.showInformationAlert(
+                        rootPane.getScene().getWindow(),
                         "Saved Successfully",
                         "Project was saved successfully."
                 );
@@ -1480,6 +1492,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         // If operation was cancelled, show error
         if (file == null) {
             Popups.showInformationAlert(
+                    rootPane.getScene().getWindow(),
                     "No destination specified",
                     "No destination was specified. The MIDI file will not be created."
             );
@@ -1496,12 +1509,14 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             );
             log(Level.FINE, "Exported notes to '" + file.getAbsolutePath() + "'.");
             Popups.showInformationAlert(
+                    rootPane.getScene().getWindow(),
                     "Successfully exported to MIDI",
                     "Successfully exported to MIDI."
             );
         } catch (IOException e) {
             logException(e);
             Popups.showExceptionAlert(
+                    rootPane.getScene().getWindow(),
                     "Failed to export to MIDI file",
                     "An exception occurred when exporting the notes to MIDI file.",
                     e
@@ -1990,7 +2005,9 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
                     }
 
                     // Show error dialog
-                    Popups.showExceptionAlert(headerText, contentText, task.getException());
+                    Popups.showExceptionAlert(
+                            rootPane.getScene().getWindow(), headerText, contentText, task.getException()
+                    );
 
                     // Clear progress bar area
                     progressBarHBox.setVisible(false);
@@ -2073,6 +2090,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
                 if (!notePlayerSequencer.isSequencerAvailable()) {
                     // Show a warning message to the user
                     Popups.showWarningAlert(
+                            rootPane.getScene().getWindow(),
                             "MIDI Playback Unavailable",
                             "The MIDI playback is not available on your system. Playback of created " +
                                     "notes will not work."
