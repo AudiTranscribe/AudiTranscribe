@@ -195,6 +195,10 @@
 }
 
 /* PREFERENCES PAGE */
+.preference-page-button, .preference-page-button:hover {
+    -fx-font-size: 13px;
+}
+
 .setting-label {
     -fx-font-size: 13px;
     -fx-font-weight: bold;
