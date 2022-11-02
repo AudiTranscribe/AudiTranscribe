@@ -32,4 +32,10 @@ class NoteUnitTest {
 
         assertNull(NoteUnit.numericValueToNoteUnit(5));
     }
+
+    @Test
+    void testToString() {
+        assertEquals("Quarter Note", NoteUnit.QUARTER_NOTE.toString());
+        assertEquals("Thirty-Second Note", NoteUnit.THIRTY_SECOND_NOTE.toString());
+    }
 }
