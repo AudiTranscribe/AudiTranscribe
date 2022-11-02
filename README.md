@@ -52,13 +52,15 @@ In addition, there are some additional dependencies to install for specific plat
   xcode-select --install
   ```
   in a terminal.
-- **Linux**: The following instuctions are most relevant to **Ubuntu**. However, other Linux platforms may follow these requirements as well:
+- **Linux**: The following instructions are most relevant to **Ubuntu**. However, other Linux platforms may follow these
+  requirements as well:
     - The **`bin-utils`** package needs to be installed on your machine in order to access the `objcopy` command from
       the shell. Install it by running:
       ```
       sudo apt-get install binutils
       ```
-    - The **`fakeroot`** package needs to be installed in order to properly generate the Linux package. Install it by running:
+    - The **`fakeroot`** package needs to be installed in order to properly generate the Linux package. Install it by
+      running:
         ```
       sudo apt-get install fakeroot
       ```
@@ -105,6 +107,21 @@ This section will guide you through the installation of AudiTranscribe.
    ```
 5. Once the command is run, open the `.dmg` file.
 6. Drag `AudiTranscribe.app` into the Applications folder.
+7. Run the application!
+
+### Linux
+
+These instructions are most applicable to users on **Ubuntu**, or any Linux system that is running on `amd64`
+with `.deb` installation capabilities.
+
+1. Head to the latest releases section.
+    - If there are no current releases, you may want to choose a pre-release version instead.
+2. Under the downloads section, download the Linux file.
+3. Unzip the installer package. The package should contain one `.deb` file.
+4. Open the `.deb` file using the "Software Install" application.
+5. Click "Install" on the window that appears.
+6. Wait for the application to fully install. Then, close the installer window.
+    - Make sure you [read the licence information](https://auditranscribe.app/licences) for AudiTranscribe.
 7. Run the application!
 
 ## From Source
