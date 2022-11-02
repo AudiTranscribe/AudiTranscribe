@@ -18,6 +18,7 @@
 
 package site.overwrite.auditranscribe.io;
 
+import site.overwrite.auditranscribe.misc.IgnoredFromCoverage;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
 
@@ -38,6 +39,7 @@ public final class ApplicationDirectory {
      * @param appVersion The application's version.
      * @return The application data directory of the user.
      */
+    @IgnoredFromCoverage
     public static String getUserDataDirectory(String appName, String appVersion) {
         // Get the operating system
         OSType osType = OSMethods.getOS();
