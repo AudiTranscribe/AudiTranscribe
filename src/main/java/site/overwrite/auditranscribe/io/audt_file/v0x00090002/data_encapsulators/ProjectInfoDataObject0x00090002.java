@@ -75,7 +75,8 @@ public class ProjectInfoDataObject0x00090002 extends ProjectInfoDataObject {
     @Override
     public int hashCode() {
         return Objects.hash(
-                projectName, musicKeyIndex, timeSignature, bpm, offsetSeconds, playbackVolume, currTimeInMS
+                projectName, musicKeyIndex, timeSignature.displayText(), bpm, offsetSeconds, playbackVolume,
+                currTimeInMS
         );
     }
 
