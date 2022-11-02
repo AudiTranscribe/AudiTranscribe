@@ -23,7 +23,6 @@ import site.overwrite.auditranscribe.audio.exceptions.FFmpegNotFoundException;
 import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.generic.tuples.Pair;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.io.StreamGobbler;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
 
@@ -33,7 +32,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Executors;
 import java.util.logging.Level;
 
 /**
@@ -47,7 +45,6 @@ public class FFmpegHandler extends ClassWithLogging {
 
     // Attributes
     private final String ffmpegPath;
-    private final OSType os;
 
     /**
      * Initialization method for the audio converter.
@@ -56,8 +53,6 @@ public class FFmpegHandler extends ClassWithLogging {
      * @throws FFmpegNotFoundException If FFmpeg was not found at the specified path.
      */
     public FFmpegHandler(String ffmpegPath) throws FFmpegNotFoundException {
-        os = OSMethods.getOS();
-
         // Check FFmpeg path
         if (checkFFmpegPath(ffmpegPath)) {
             this.ffmpegPath = ffmpegPath;
@@ -80,58 +75,37 @@ public class FFmpegHandler extends ClassWithLogging {
         OSType os = OSMethods.getOS();
 
         // Generate the command to execute
-        String[] commands;
+        String[] command;
         if (os == OSType.WINDOWS) {
-            commands = new String[]{"cmd.exe", "/c", "where ffmpeg"};
+            command = new String[]{"cmd.exe", "/c", "where ffmpeg"};
         } else {
-            commands = new String[]{"sh", "-c", "which ffmpeg"};
+            command = new String[]{"sh", "-c", "which ffmpeg"};
         }
 
         // Define variables
         final String[] ffmpegPath = new String[1];
         try {
-            if (os == OSType.WINDOWS || os == OSType.MAC) {
-                // Build the process
-                ProcessBuilder builder = new ProcessBuilder();
-                builder.directory(new File(System.getProperty("user.home")));
-                builder.command(commands);
+            // Execute the command on the standard runtime
+            Runtime runtime = Runtime.getRuntime();
+            Process process = runtime.exec(command);
 
-                Process process = builder.start();
+            // Create a reader for the output
+            BufferedReader stdOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
-                // Define stream gobbler
-                StreamGobbler streamGobbler = new StreamGobbler(process.getInputStream(), s -> ffmpegPath[0] = s);
-
-                // Start the process
-                Executors.newSingleThreadExecutor().submit(streamGobbler);
-
-                // Check exit code of the command
-                int exitCode = process.waitFor();
-                if (exitCode != 0) {
-                    throw new FFmpegNotFoundException("FFmpeg binary cannot be located at '" + ffmpegPath[0] + "'");
-                }
-            } else {
-                // Execute the command on the standard runtime
-                Runtime runtime = Runtime.getRuntime();
-                Process process = runtime.exec(commands);
-
-                // Create a reader for the output
-                BufferedReader stdOutput = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-                // Read the output from the command
-                String temp;
-                StringBuilder sb = new StringBuilder();
-                while ((temp = stdOutput.readLine()) != null) {
-                    sb.append(temp);  // Add every line of the output
-                }
-
-                // Set the FFmpeg path
-                temp = sb.toString();
-                if (temp.equals("")) {
-                    throw new FFmpegNotFoundException("FFmpeg binary cannot be located at '" + ffmpegPath[0] + "'");
-                }
-                ffmpegPath[0] = temp;
+            // Read the output from the command
+            String temp;
+            StringBuilder sb = new StringBuilder();
+            while ((temp = stdOutput.readLine()) != null) {
+                sb.append(temp);  // Add every line of the output
             }
-        } catch (IOException | InterruptedException e) {
+
+            // Set the FFmpeg path
+            temp = sb.toString();
+            if (temp.equals("")) {
+                throw new FFmpegNotFoundException("FFmpeg binary cannot be located at '" + ffmpegPath[0] + "'");
+            }
+            ffmpegPath[0] = temp;
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
@@ -147,46 +121,18 @@ public class FFmpegHandler extends ClassWithLogging {
      * otherwise.
      */
     public static boolean checkFFmpegPath(String ffmpegPath) {
-        // Get the operating system in question
-        OSType os = OSMethods.getOS();
+        try {
+            // Execute the command on the standard runtime
+            Runtime runtime = Runtime.getRuntime();
+            Process process = runtime.exec(new String[]{ffmpegPath, "-version"});
 
-        if (os == OSType.WINDOWS || os == OSType.MAC) {
-            // Generate the command to execute
-            ProcessBuilder builder = new ProcessBuilder();
-            builder.command(ffmpegPath, "-version");
-
-            // Specify the working directory
-            builder.directory(new File(System.getProperty("user.home")));
-
-            // Check if the provided FFmpeg path works
-            try {
-                // Build the process
-                Process process = builder.start();
-
-                // Check exit code of the command
-                int exitCode = process.waitFor();
-                if (exitCode == 0) {
-                    return true;  // Exited successfully
-                } else {
-                    throw new IOException("FFmpeg path not at '" + ffmpegPath + "'.");
-                }
-            } catch (IOException | InterruptedException e) {
-                return false;
+            if (process.waitFor() == 0) {
+                return true;  // Exited successfully
+            } else {
+                throw new IOException("FFmpeg path not at '" + ffmpegPath + "'.");
             }
-        } else {
-            try {
-                // Execute the command on the standard runtime
-                Runtime runtime = Runtime.getRuntime();
-                Process process = runtime.exec(new String[]{ffmpegPath, "-version"});
-
-                if (process.waitFor() == 0) {
-                    return true;  // Exited successfully
-                } else {
-                    throw new IOException("FFmpeg path not at '" + ffmpegPath + "'.");
-                }
-            } catch (IOException | InterruptedException e) {
-                return false;
-            }
+        } catch (IOException | InterruptedException e) {
+            return false;
         }
     }
 
@@ -302,38 +248,13 @@ public class FFmpegHandler extends ClassWithLogging {
      * or not (<code>false</code>).
      */
     private boolean handleFFmpegCommandExec(String[] command) {
-        if (os == OSType.WINDOWS || os == OSType.MAC) {
-            // Build the process
-            ProcessBuilder builder = new ProcessBuilder();
-            builder.command(command);
-
-            // Specify the working directory
-            builder.directory(new File(System.getProperty("user.home")));
-
-            try {
-                // Start the process
-                Process process = builder.start();
-
-                // Check exit code of the command
-                int exitCode = process.waitFor();
-                if (exitCode == 0) {
-                    // Exit code 0 => exited successfully => can return
-                    return true;
-                } else {
-                    throw new IOException("Command execution failed");
-                }
-            } catch (IOException | InterruptedException e) {
-                return false;
-            }
-        } else {
-            try {
-                // Execute the command on the standard runtime
-                Runtime runtime = Runtime.getRuntime();
-                Process process = runtime.exec(command);
-                return process.waitFor() == 0;
-            } catch (IOException | InterruptedException e) {
-                return false;
-            }
+        try {
+            // Execute the command on the standard runtime
+            Runtime runtime = Runtime.getRuntime();
+            Process process = runtime.exec(command);
+            return process.waitFor() == 0;
+        } catch (IOException | InterruptedException e) {
+            return false;
         }
     }
 }
