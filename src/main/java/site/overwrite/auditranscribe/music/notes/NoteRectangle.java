@@ -697,7 +697,6 @@ public class NoteRectangle extends StackPane {
             // Process each note rectangle
             for (NoteRectangle rectangle : allNoteRectangles.values()) {
                 // Save rectangle's current position to the undo stack
-                // Todo: make undoing more efficient by just using one quantize undo action?
                 addToStack(undoStack, rectangle, UndoOrRedoAction.TRANSFORM);
 
                 // Get the onset time and duration
@@ -716,6 +715,14 @@ public class NoteRectangle extends StackPane {
                 rectangle.setTranslateX(onsetTime * pixelsPerSecond);
                 rectangle.bordersRegion.setPrefWidth(duration * pixelsPerSecond);
             }
+
+            // Add quantize action to the undo stack
+            addToStack(
+                    undoStack,
+                    null,
+                    UndoOrRedoAction.QUANTIZE,
+                    new Double[]{(double) allNoteRectangles.size(), 0.}
+            );
         }
     }
 
@@ -752,6 +759,7 @@ public class NoteRectangle extends StackPane {
         UndoOrRedoAction invAction = UndoOrRedoAction.TRANSFORM;  // By default assume transform
         if (action == UndoOrRedoAction.CREATE) invAction = UndoOrRedoAction.DELETE;
         else if (action == UndoOrRedoAction.DELETE) invAction = UndoOrRedoAction.CREATE;
+        else if (action == UndoOrRedoAction.QUANTIZE) invAction = UndoOrRedoAction.QUANTIZE;
 
         // Get relevant rectangle
         NoteRectangle relevantRect = allNoteRectangles.get(uuid);
@@ -759,12 +767,22 @@ public class NoteRectangle extends StackPane {
         // Add inverse action to secondary stack
         if (invAction == UndoOrRedoAction.DELETE) {
             addToStack(secondaryStack, uuid, invAction, new Double[0]);
-        } else {
+        } else if (invAction != UndoOrRedoAction.QUANTIZE) {
             addToStack(secondaryStack, relevantRect, invAction);
         }
 
         // Perform the action
         handleAction(uuid, action, data);
+
+        // Handle quantize case
+        if (invAction == UndoOrRedoAction.QUANTIZE) {
+            addToStack(
+                    secondaryStack,
+                    uuid,
+                    UndoOrRedoAction.QUANTIZE,
+                    new Double[]{data[0], 1 - data[1]}   // Makes 1 -> 0, 0 -> 1
+            );
+        }
     }
 
     // Private methods
@@ -966,7 +984,15 @@ public class NoteRectangle extends StackPane {
             Stack<Triple<String, UndoOrRedoAction, Double[]>> stack, NoteRectangle rect,
             UndoOrRedoAction action
     ) {
-        addToStack(stack, rect.uuid, action, getDataForStack(rect, action));
+        // Get the data for the stack
+        Double[] data = switch (action) {
+            case TRANSFORM -> new Double[]{rect.getTranslateX(), rect.getTranslateY(), rect.getWidth()};
+            case CREATE -> new Double[]{rect.getNoteOnsetTime(), rect.getNoteDuration(), (double) rect.noteNum};
+            default -> new Double[0];
+        };
+
+        // Add said data to the stack
+        addToStack(stack, rect.uuid, action, data);
     }
 
     /**
@@ -982,21 +1008,6 @@ public class NoteRectangle extends StackPane {
             Double[] data
     ) {
         stack.add(new Triple<>(uuid, action, data));
-    }
-
-    /**
-     * Helper method that retrieves the needed data to preform the action provided.
-     *
-     * @param rect   Rectangle to act on.
-     * @param action Action to perform.
-     * @return Data needed to perform the action.
-     */
-    private static Double[] getDataForStack(NoteRectangle rect, UndoOrRedoAction action) {
-        return switch (action) {
-            case TRANSFORM -> new Double[]{rect.getTranslateX(), rect.getTranslateY(), rect.getWidth()};
-            case CREATE -> new Double[]{rect.getNoteOnsetTime(), rect.getNoteDuration(), (double) rect.noteNum};
-            case DELETE -> new Double[0];
-        };
     }
 
     /**
@@ -1022,7 +1033,7 @@ public class NoteRectangle extends StackPane {
                 spectrogramPaneAnchor.getChildren().add(rect);
             } catch (NoteRectangleCollisionException ignored) {
             }
-        } else {
+        } else if (action == UndoOrRedoAction.DELETE) {
             // Get the relevant rectangle
             NoteRectangle rect = allNoteRectangles.get(uuid);
 
@@ -1037,6 +1048,18 @@ public class NoteRectangle extends StackPane {
 
             // Update flags
             rect.isRemoved = true;
+        } else {
+            // Get number of actions to perform
+            int numActions = data[0].intValue();
+
+            // Perform that number of preceding actions
+            for (int i = 0; i < numActions; i++) {
+                if (data[1].intValue() == 0) {
+                    editAction(EditAction.UNDO);
+                } else {
+                    editAction(EditAction.REDO);
+                }
+            }
         }
 
         hasEditedNoteRectangles = true;
@@ -1065,7 +1088,7 @@ public class NoteRectangle extends StackPane {
 
     enum VerticalMovement {UP, DOWN, NONE}
 
-    enum UndoOrRedoAction {TRANSFORM, CREATE, DELETE}
+    enum UndoOrRedoAction {TRANSFORM, CREATE, DELETE, QUANTIZE}
 
     public enum EditAction {UNDO, REDO}
 }
