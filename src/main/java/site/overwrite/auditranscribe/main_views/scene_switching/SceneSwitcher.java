@@ -64,6 +64,8 @@ public class SceneSwitcher extends ClassWithLogging {
     private final Stage mainStage = new Stage();
     private final Stage transcriptionStage = new Stage();
 
+    private final Rectangle2D screenBounds;
+
     private Pair<SceneSwitchingState, SceneSwitchingData> returnedPair = null;
 
     private SceneSwitchingState state = SceneSwitchingState.SHOW_MAIN_SCENE;
@@ -77,6 +79,8 @@ public class SceneSwitcher extends ClassWithLogging {
     public SceneSwitcher(String currentVersion) {
         // Update attributes
         this.currentVersion = currentVersion;
+
+        this.screenBounds = Screen.getPrimary().getVisualBounds();
 
         // Set icon for the main stage and transcription stage, if not on macOS
         if (OSMethods.getOS() != OSType.MAC) {
@@ -169,6 +173,8 @@ public class SceneSwitcher extends ClassWithLogging {
             mainStage.setTitle("Welcome to AudiTranscribe");
             mainStage.setScene(scene);
             mainStage.setResizable(false);
+
+            mainStage.centerOnScreen();
 
             // Show the main stage
             mainStage.showAndWait();
@@ -266,10 +272,11 @@ public class SceneSwitcher extends ClassWithLogging {
             transcriptionStage.setResizable(true);
             transcriptionStage.setTitle(data.projectName);
 
-            // Set width and height of the new scene
-            Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
             transcriptionStage.setMinWidth(screenBounds.getWidth());
             transcriptionStage.setMinHeight(screenBounds.getHeight());
+
+            transcriptionStage.setX(0);
+            transcriptionStage.setY(0);
 
             // Hide main stage (if it is still showing)
             if (mainStage.isShowing()) mainStage.hide();
@@ -395,10 +402,11 @@ public class SceneSwitcher extends ClassWithLogging {
             transcriptionStage.setResizable(true);
             transcriptionStage.setTitle(projectData.projectInfoData.projectName);
 
-            // Set width and height of the new scene
-            Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
             transcriptionStage.setMinWidth(screenBounds.getWidth());
             transcriptionStage.setMinHeight(screenBounds.getHeight());
+
+            transcriptionStage.setX(0);
+            transcriptionStage.setY(0);
 
             // Update scroll position
             controller.updateScrollPosition(
