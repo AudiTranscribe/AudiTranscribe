@@ -44,7 +44,7 @@ public class FFmpegHandler extends ClassWithLogging {
     });
 
     // Attributes
-    private final String ffmpegPath;
+    public final String ffmpegPath;
 
     /**
      * Initialization method for the audio converter.
@@ -102,7 +102,7 @@ public class FFmpegHandler extends ClassWithLogging {
             // Set the FFmpeg path
             temp = sb.toString();
             if (temp.equals("")) {
-                throw new FFmpegNotFoundException("FFmpeg binary cannot be located at '" + ffmpegPath[0] + "'");
+                throw new FFmpegNotFoundException("FFmpeg binary could not be found automatically.");
             }
             ffmpegPath[0] = temp;
         } catch (IOException e) {
@@ -253,7 +253,7 @@ public class FFmpegHandler extends ClassWithLogging {
             Runtime runtime = Runtime.getRuntime();
             Process process = runtime.exec(command);
             return process.waitFor() == 0;
-        } catch (IOException | InterruptedException e) {
+        } catch (Exception e) {
             return false;
         }
     }
