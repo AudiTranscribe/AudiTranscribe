@@ -40,12 +40,22 @@ stream audio and video. AudiTranscribe uses it to help process different audio f
 
 ## For Developers
 
-If you are planning to develop for AudiTranscribe, please ensure that **Java 17** is installed on your machine.
+If you are planning to develop for AudiTranscribe, please ensure that the following dependencies are installed on your
+machine:
+
+1. Java 17
+2. FFmpeg (Version 4 or later)
 
 In addition, there are some additional dependencies to install for specific platforms:
 
 - **Windows**: The [**WiX Toolset 3**](https://wixtoolset.org/) is needed to generate the AudiTranscribe executable for
   Windows.
+    - Make sure that the `.NET 3.5` feature is enabled on your Windows device. To enable it, follow these steps:
+        1. Go to the Control Panel.
+        2. Under "Programs", select "Programs and Features".
+        3. Choose "Turn Windows features on or off". You may be prompted to enter an administrator's password.
+        4. In the list of features, choose ".NET Framework 3.5 (includes .NET 2.0 and 3.0)" and then click "OK".
+        5. If a popup asks whether to download features, select "Let Windows Update download the files for you".
 - **macOS**: On macOS, the **Xcode Command Line Tools** needs to be installed to make AudiTranscribe run in development.
   You can install the XCode Command Line Tools by running:
   ```
