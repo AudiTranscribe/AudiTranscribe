@@ -1,4 +1,4 @@
-name: Release
+name: Create Release
 
 on:
   push:
@@ -17,11 +17,16 @@ jobs:
     uses: ./.github/workflows/build-installer-mac.yml
     with:
       branch: "staging"
+  build_installer_linux:
+    name: Build Linux Installer
+    uses: ./.github/workflows/build-installer-linux.yml
+    with:
+      branch: "staging"
 
   # Release
   release:
     name: Release
-    needs: [ build_installer_windows, build_installer_mac ]
+    needs: [ build_installer_windows, build_installer_mac, build_installer_linux ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
