@@ -27,22 +27,22 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Cursor;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import site.overwrite.auditranscribe.generic.tuples.Pair;
+import site.overwrite.auditranscribe.generic.tuples.Triple;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.misc.MyLogger;
 import site.overwrite.auditranscribe.music.NoteUnit;
 import site.overwrite.auditranscribe.music.TimeSignature;
 import site.overwrite.auditranscribe.music.exceptions.NoteRectangleCollisionException;
 import site.overwrite.auditranscribe.plotting.PlottingHelpers;
-import site.overwrite.auditranscribe.utils.MusicUtils;
+import site.overwrite.auditranscribe.utils.MiscUtils;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 
 public class NoteRectangle extends StackPane {
@@ -51,11 +51,15 @@ public class NoteRectangle extends StackPane {
     private static final double RESIZING_REGIONS_WIDTH = 8;  // In pixels
 
     // Static attributes
-    public static List<NoteRectangle> allNoteRectangles = new ArrayList<>();
+    public static Map<String, NoteRectangle> allNoteRectangles = new HashMap<>();
 
     public static List<ObservableList<NoteRectangle>> noteRectanglesByNoteNumber = new ArrayList<>();
     public static List<SortedList<NoteRectangle>> sortedNoteRectanglesByNoteNumber;
 
+    private static final Stack<Triple<String, UndoOrRedoAction, Double[]>> undoStack = new Stack<>();
+    private static final Stack<Triple<String, UndoOrRedoAction, Double[]>> redoStack = new Stack<>();
+
+    public static AnchorPane spectrogramPaneAnchor;
     public static double spectrogramWidth;
     public static double spectrogramHeight;
     public static int minNoteNum;
@@ -65,10 +69,13 @@ public class NoteRectangle extends StackPane {
     public static boolean isPaused = true;
     public static boolean canEdit = false;
     public static boolean isEditing = false;
+    public static boolean canUndoOrRedo = true;
 
     private static boolean hasEditedNoteRectangles = false;
 
     // Instance attributes
+    private final String uuid;
+
     public int noteNum;
     private boolean isRemoved = false;
 
@@ -86,7 +93,7 @@ public class NoteRectangle extends StackPane {
     private double initXDiff;  // Initial difference between the mouse's x-coordinate and the note's x-coordinate
 
     private double initYTrans;  // Initial y-translation of the note
-    private double initYEvent;  // Initial difference between the mouse's y-coordinate and the note's y-coordinate
+    private double initYEvent;  // Initial y-coordinate of the event
 
     private double initWidth;  // Initial width of the note
     private int initNoteNum;  // Initial note number
@@ -110,6 +117,34 @@ public class NoteRectangle extends StackPane {
     public NoteRectangle(
             double timeToPlaceRect, double noteDuration, int noteNum
     ) throws NoteRectangleCollisionException {
+        this(
+                timeToPlaceRect,
+                noteDuration,
+                noteNum,
+                MiscUtils.generateUUID((long) (MiscUtils.getUnixTimestamp() * 1e3)),
+                true
+        );
+    }
+
+    /**
+     * Initialization method for a <code>NoteRectangle</code> object.<br>
+     * Expects all required static values to be set.
+     *
+     * @param timeToPlaceRect The time (in seconds) at which the <b>start</b> of the note should be
+     *                        placed.
+     * @param noteDuration    The duration (in seconds) of the note.
+     * @param noteNum         The note number of the note.
+     * @param uuid            UUID of the rectangle.
+     * @param addToStacks     Whether to add an action to the undo stack.
+     * @throws NoteRectangleCollisionException If the creation of this note rectangle would cause a
+     *                                         collision with another note rectangle.
+     */
+    private NoteRectangle(
+            double timeToPlaceRect, double noteDuration, int noteNum, String uuid, boolean addToStacks
+    ) throws NoteRectangleCollisionException {
+        // Set the UUID of the rectangle
+        this.uuid = uuid;
+
         // Calculate the pixels per second for the spectrogram
         double pixelsPerSecond = spectrogramWidth / totalDuration;
         double secondsPerPixel = totalDuration / spectrogramWidth;
@@ -130,18 +165,20 @@ public class NoteRectangle extends StackPane {
         this.noteDuration.bind(this.widthProperty().multiply(secondsPerPixel));
         this.rectangleWidth.bind(this.widthProperty());
 
-        // Define the nodes
-        bordersRegion = new Region();
+        // Define nodes
+        this.bordersRegion = new Region();
+
         Rectangle mainRectangle = new Rectangle();  // Base rectangle to be used for the note
         Region resizeLeftRegion = new Region();  // Region that permits left-side resizing
         Region resizeRightRegion = new Region();  // Region that permits right-side resizing
 
         // Update properties of the main rectangle
-        mainRectangle.widthProperty().bind(bordersRegion.prefWidthProperty().subtract(BORDER_WIDTH));
-        mainRectangle.heightProperty().bind(bordersRegion.prefHeightProperty().subtract(BORDER_WIDTH));
+        mainRectangle.widthProperty().bind(this.bordersRegion.prefWidthProperty().subtract(BORDER_WIDTH));
+        mainRectangle.heightProperty().bind(this.bordersRegion.prefHeightProperty().subtract(BORDER_WIDTH));
 
         // Update the nodes' style classes
-        bordersRegion.getStyleClass().add("note-borders-region");
+        this.bordersRegion.getStyleClass().add("note-borders-region");
+
         mainRectangle.getStyleClass().add("note-main-rectangle");
 
         resizeLeftRegion.getStyleClass().add("note-resizing-region");
@@ -152,39 +189,39 @@ public class NoteRectangle extends StackPane {
 
         // Calculate the y-coordinate of the note rectangle
         double yCoord = PlottingHelpers.noteNumToHeight(noteNum, minNoteNum, maxNoteNum, spectrogramHeight) -
-                rectangleHeight / 2;
+                this.rectangleHeight / 2;
 
         // Check for collision
-        CollisionLocation collisionLocation = checkCollision(
-                xCoord, initialRectangleWidth, noteNum, VerticalMovement.NONE
-        );
+        CollisionLocation colLoc = checkCollision(xCoord, initialRectangleWidth, noteNum, VerticalMovement.NONE);
 
-        if (collisionLocation != CollisionLocation.NONE) {
+        if (colLoc != CollisionLocation.NONE) {
             MyLogger.log(
                     Level.FINE,
-                    "Note rectangle collision detected (" + collisionLocation + "); not placing note",
+                    "Note rectangle collision detected (" + colLoc + "); not placing note",
                     this.getClass().toString()
             );
-            throw new NoteRectangleCollisionException("Note rectangle collision detected; not placing note");
+            throw new NoteRectangleCollisionException(
+                    "Note rectangle collision detected (" + colLoc + "); not placing note"
+            );
         }
 
         // Set the borders' region's attributes
-        bordersRegion.setPrefWidth(initialRectangleWidth);
-        bordersRegion.setPrefHeight(rectangleHeight);
+        this.bordersRegion.setPrefWidth(initialRectangleWidth);
+        this.bordersRegion.setPrefHeight(this.rectangleHeight);
 
         // Update properties of the resizing regions
-        resizeLeftRegion.translateXProperty().bind(bordersRegion.widthProperty().divide(-2));
-        resizeLeftRegion.prefHeightProperty().bind(bordersRegion.prefHeightProperty());
+        resizeLeftRegion.translateXProperty().bind(this.bordersRegion.widthProperty().multiply(-0.5));
+        resizeLeftRegion.prefHeightProperty().bind(this.bordersRegion.prefHeightProperty());
         resizeLeftRegion.setPrefWidth(RESIZING_REGIONS_WIDTH);
         resizeLeftRegion.setMaxWidth(RESIZING_REGIONS_WIDTH);
 
-        resizeRightRegion.translateXProperty().bind(bordersRegion.widthProperty().divide(2));
-        resizeRightRegion.prefHeightProperty().bind(bordersRegion.prefHeightProperty());
+        resizeRightRegion.translateXProperty().bind(this.bordersRegion.widthProperty().multiply(0.5));
+        resizeRightRegion.prefHeightProperty().bind(this.bordersRegion.prefHeightProperty());
         resizeRightRegion.setPrefWidth(RESIZING_REGIONS_WIDTH);
         resizeRightRegion.setMaxWidth(RESIZING_REGIONS_WIDTH);
 
         // Update the stack pane
-        this.getChildren().addAll(bordersRegion, mainRectangle, resizeLeftRegion, resizeRightRegion);
+        this.getChildren().addAll(this.bordersRegion, mainRectangle, resizeLeftRegion, resizeRightRegion);
         this.setTranslateX(xCoord);
         this.setTranslateY(yCoord);
 
@@ -200,7 +237,7 @@ public class NoteRectangle extends StackPane {
         resizeLeftRegion.hoverProperty().addListener((observable, oldValue, newValue) -> {
             if (canEdit && isPaused && newValue) {
                 this.setCursor(Cursor.W_RESIZE);
-            } else if (!isDragging) {
+            } else if (!this.isDragging) {
                 this.setCursor(Cursor.DEFAULT);
             }
         });
@@ -208,7 +245,7 @@ public class NoteRectangle extends StackPane {
         resizeRightRegion.hoverProperty().addListener((observable, oldValue, newValue) -> {
             if (canEdit && isPaused && newValue) {
                 this.setCursor(Cursor.E_RESIZE);
-            } else if (!isDragging) {
+            } else if (!this.isDragging) {
                 this.setCursor(Cursor.DEFAULT);
             }
         });
@@ -229,30 +266,40 @@ public class NoteRectangle extends StackPane {
                     ((Pane) this.getParent()).getChildren().remove(this);
 
                     // Remove the note rectangle from the list of note rectangles
-                    allNoteRectangles.remove(this);
+                    allNoteRectangles.remove(this.uuid, this);
 
-                    // Update the `isRemoved` flag
-                    isRemoved = true;
+                    // Add create action to the undo
+                    addToStack(undoStack, this, UndoOrRedoAction.CREATE);  // When undoing, create rectangle
+
+                    // Update flags
+                    this.isRemoved = true;
                 } else {
                     // Set initial values
-                    initXTrans = this.getTranslateX();
-                    initXDiff = event.getSceneX() - initXTrans;
+                    this.initXTrans = this.getTranslateX();
+                    this.initXDiff = event.getSceneX() - this.initXTrans;
 
-                    initYTrans = this.getTranslateY();
-                    initYEvent = event.getSceneY();
+                    this.initYTrans = this.getTranslateY();
+                    this.initYEvent = event.getSceneY();
 
-                    initNoteNum = this.noteNum;
+                    this.initNoteNum = this.noteNum;
 
                     // Disable scrolling
                     this.getParent().addEventHandler(ScrollEvent.ANY, cancelScroll);
 
-                    // Prevent default action
-                    event.consume();
+                    // Add transform action to the `undo` stack
+                    addToStack(undoStack, this, UndoOrRedoAction.TRANSFORM);
                 }
+
+                // Purge redo history
+                redoStack.clear();
 
                 // Update flags
                 isEditing = true;
+                canUndoOrRedo = false;
                 hasEditedNoteRectangles = true;
+
+                // Prevent default action
+                event.consume();
             }
         });
 
@@ -263,14 +310,14 @@ public class NoteRectangle extends StackPane {
                 this.setCursor(Cursor.CLOSED_HAND);
 
                 // Calculate new X position
-                double newX = event.getSceneX() - initXDiff;
+                double newX = event.getSceneX() - this.initXDiff;
 
                 // Calculate number of rectangles' heights to shift the note and calculate new note number
-                double diffY = event.getSceneY() - initYEvent;
-                int numIncrements = (int) (diffY / rectangleHeight);
+                double diffY = event.getSceneY() - this.initYEvent;
+                int numIncrements = (int) (diffY / this.rectangleHeight);
                 int changeInNoteNumber = -numIncrements;  // Higher Y -> Lower on screen => need to negate
-                double newY = numIncrements * rectangleHeight + initYTrans;
-                int newNoteNum = initNoteNum + changeInNoteNumber;
+                double newY = numIncrements * this.rectangleHeight + this.initYTrans;
+                int newNoteNum = this.initNoteNum + changeInNoteNumber;
 
                 // Determine vertical movement from where the rectangle is CURRENTLY at
                 VerticalMovement verticalMovement;
@@ -289,13 +336,13 @@ public class NoteRectangle extends StackPane {
 
                 if (collisionLoc == CollisionLocation.LEFT) {  // Collided with left rectangle
                     // Move current rectangle to the right edge of the left rectangle
-                    if (leftBoundingRectangle != null) {
-                        this.setTranslateX(leftBoundingRectangle.getEndX());
+                    if (this.leftBoundingRectangle != null) {
+                        this.setTranslateX(this.leftBoundingRectangle.getEndX());
                     }
                 } else if (collisionLoc == CollisionLocation.RIGHT) {  // Collided with right rectangle
                     // Move current rectangle to the left edge of the right rectangle
-                    if (rightBoundingRectangle != null) {
-                        this.setTranslateX(rightBoundingRectangle.getStartX() - getRectangleWidth());
+                    if (this.rightBoundingRectangle != null) {
+                        this.setTranslateX(this.rightBoundingRectangle.getStartX() - getRectangleWidth());
                     }
                 } else {
                     // Permit horizontal movement if within range
@@ -306,7 +353,7 @@ public class NoteRectangle extends StackPane {
 
                 if (collisionLoc != CollisionLocation.UP && collisionLoc != CollisionLocation.DOWN) {
                     // Permit vertical movement if within range
-                    if (newY >= 0 && newY + rectangleHeight <= spectrogramHeight) {
+                    if (newY >= 0 && newY + this.rectangleHeight <= spectrogramHeight) {
                         this.setTranslateY(newY);
                         this.noteNum = newNoteNum;
                     }
@@ -329,7 +376,7 @@ public class NoteRectangle extends StackPane {
                 this.setCursor(Cursor.OPEN_HAND);
 
                 // Run only if the note rectangle was not removed
-                if (!isRemoved) {
+                if (!this.isRemoved) {
                     // Update the note rectangles' list
                     noteRectanglesByNoteNumber.get(this.noteNum).add(this);
 
@@ -339,6 +386,7 @@ public class NoteRectangle extends StackPane {
 
                 // Update flags
                 isEditing = false;
+                canUndoOrRedo = true;
             }
 
             MyLogger.log(
@@ -352,13 +400,17 @@ public class NoteRectangle extends StackPane {
         resizeLeftRegion.setOnMousePressed(event -> {
             // Check if editing is permitted
             if (canEdit && isPaused) {
+                // Add current state to the undo stack and purge redo history
+                addToStack(undoStack, this, UndoOrRedoAction.TRANSFORM);
+                redoStack.clear();
+
                 // Remove rectangle from the note rectangle by number lists
                 noteRectanglesByNoteNumber.get(this.noteNum).remove(this);
 
                 // Set initial values
-                initXTrans = this.getTranslateX();
-                initXDiff = event.getSceneX() - this.getTranslateX();
-                initWidth = bordersRegion.getPrefWidth();
+                this.initXTrans = this.getTranslateX();
+                this.initXDiff = event.getSceneX() - this.getTranslateX();
+                this.initWidth = this.bordersRegion.getPrefWidth();
 
                 // Disable scrolling
                 this.getParent().addEventHandler(ScrollEvent.ANY, cancelScroll);
@@ -367,9 +419,10 @@ public class NoteRectangle extends StackPane {
                 this.setCursor(Cursor.W_RESIZE);
 
                 // Update flags
-                isEditing = true;  // Static attribute
-                isDragging = true;  // Instance attribute
-                hasEditedNoteRectangles = true;  // Static attribute
+                isEditing = true;
+                hasEditedNoteRectangles = true;
+
+                this.isDragging = true;
 
                 // Prevent default action
                 event.consume();
@@ -380,10 +433,10 @@ public class NoteRectangle extends StackPane {
             // Check if editing is permitted
             if (canEdit && isPaused) {
                 // Get the new X position
-                double newX = event.getSceneX() - initXDiff;
+                double newX = event.getSceneX() - this.initXDiff;
 
                 // Calculate new width of the rectangle
-                double newWidth = initWidth + (initXTrans - newX);
+                double newWidth = this.initWidth + (this.initXTrans - newX);
 
                 // Check if collision will occur
                 CollisionLocation collisionLoc = checkCollision(newX, newWidth, this.noteNum, VerticalMovement.NONE);
@@ -391,7 +444,7 @@ public class NoteRectangle extends StackPane {
                     // If the new width is at least the resizing regions' width then resize
                     if (newWidth >= RESIZING_REGIONS_WIDTH) {
                         this.setTranslateX(newX);
-                        bordersRegion.setPrefWidth(newWidth);
+                        this.bordersRegion.setPrefWidth(newWidth);
                     }
                 }
 
@@ -409,7 +462,7 @@ public class NoteRectangle extends StackPane {
             // Check if editing is permitted
             if (canEdit && isPaused) {
                 // Run only if the note rectangle was not removed
-                if (!isRemoved) {
+                if (!this.isRemoved) {
                     // Add rectangle back into the note rectangle by number lists
                     noteRectanglesByNoteNumber.get(this.noteNum).add(this);
 
@@ -421,21 +474,26 @@ public class NoteRectangle extends StackPane {
                 if (!resizeLeftRegion.isHover()) this.setCursor(Cursor.DEFAULT);
 
                 // Update flags
-                isEditing = false;  // Static attribute
-                isDragging = false;  // Instance attribute
+                isEditing = false;
+
+                this.isDragging = false;
             }
         });
 
         resizeRightRegion.setOnMousePressed(event -> {
             // Check if editing is permitted
             if (canEdit && isPaused) {
+                // Add current state to the undo stack and purge redo history
+                addToStack(undoStack, this, UndoOrRedoAction.TRANSFORM);
+                redoStack.clear();
+
                 // Remove rectangle from the note rectangle by number lists
                 noteRectanglesByNoteNumber.get(this.noteNum).remove(this);
 
                 // Set initial values
-                initXTrans = this.getTranslateX();
-                initXDiff = event.getSceneX() - this.getTranslateX();
-                initWidth = bordersRegion.getPrefWidth();
+                this.initXTrans = this.getTranslateX();
+                this.initXDiff = event.getSceneX() - this.getTranslateX();
+                this.initWidth = this.bordersRegion.getPrefWidth();
 
                 // Disable scrolling
                 this.getParent().addEventHandler(ScrollEvent.ANY, cancelScroll);
@@ -444,9 +502,10 @@ public class NoteRectangle extends StackPane {
                 this.setCursor(Cursor.E_RESIZE);
 
                 // Update flags
-                isEditing = true;  // Static attribute
-                isDragging = true;  // Instance attribute
-                hasEditedNoteRectangles = true;  // Static attribute
+                isEditing = true;
+                hasEditedNoteRectangles = true;
+
+                this.isDragging = true;
 
                 // Prevent default action
                 event.consume();
@@ -457,17 +516,17 @@ public class NoteRectangle extends StackPane {
             // Check if editing is permitted
             if (canEdit && isPaused) {
                 // Get the new X position
-                double newX = event.getSceneX() - initXDiff;
+                double newX = event.getSceneX() - this.initXDiff;
 
                 // Update the width of the note rectangle
-                double newWidth = initWidth + (newX - initXTrans);
+                double newWidth = this.initWidth + (newX - this.initXTrans);
 
                 // Check if collision will occur
                 CollisionLocation collisionLoc = checkCollision(newX, newWidth, this.noteNum, VerticalMovement.NONE);
                 if (collisionLoc == CollisionLocation.NONE) {
                     // If the new width is at least the resizing regions' width then resize
                     if (newWidth >= RESIZING_REGIONS_WIDTH) {
-                        bordersRegion.setPrefWidth(newWidth);
+                        this.bordersRegion.setPrefWidth(newWidth);
                     }
                 }
 
@@ -485,7 +544,7 @@ public class NoteRectangle extends StackPane {
             // Check if editing is permitted
             if (canEdit && isPaused) {
                 // Run only if the note rectangle was not removed
-                if (!isRemoved) {
+                if (!this.isRemoved) {
                     // Add rectangle back into the note rectangle by number lists
                     noteRectanglesByNoteNumber.get(this.noteNum).add(this);
 
@@ -497,20 +556,32 @@ public class NoteRectangle extends StackPane {
                 if (!resizeRightRegion.isHover()) this.setCursor(Cursor.DEFAULT);
 
                 // Update flags
-                isEditing = false;  // Static attribute
-                isDragging = false;  // Instance attribute
+                isEditing = false;
+
+                this.isDragging = false;
             }
         });
 
         // Add this new note rectangle into the note rectangles' lists
-        allNoteRectangles.add(this);
+        allNoteRectangles.put(this.uuid, this);
         noteRectanglesByNoteNumber.get(noteNum).add(this);
 
         // Mark that the note rectangles were edited
         hasEditedNoteRectangles = true;
+
+        // Add delete action to the undo stack
+        if (addToStacks) {
+            addToStack(undoStack, this, UndoOrRedoAction.DELETE);  // When undoing, delete rectangle
+            redoStack.clear();
+        }
     }
 
     // Getter/Setter methods
+
+    public static void setSpectrogramPaneAnchor(AnchorPane spectrogramPaneAnchor) {
+        NoteRectangle.spectrogramPaneAnchor = spectrogramPaneAnchor;
+    }
+
     public static void setSpectrogramWidth(double spectrogramWidth) {
         NoteRectangle.spectrogramWidth = spectrogramWidth;
     }
@@ -548,15 +619,15 @@ public class NoteRectangle extends StackPane {
     }
 
     public double getNoteOnsetTime() {
-        return noteOnsetTime.get();
+        return this.noteOnsetTime.get();
     }
 
     public double getNoteDuration() {
-        return noteDuration.get();
+        return this.noteDuration.get();
     }
 
     public double getRectangleWidth() {
-        return rectangleWidth.get();
+        return this.rectangleWidth.get();
     }
 
     public double getStartX() {
@@ -568,6 +639,14 @@ public class NoteRectangle extends StackPane {
     }
 
     // Public methods
+
+    /**
+     * Clears both the undo and redo stacks.
+     */
+    public static void clearStacks() {
+        undoStack.clear();
+        redoStack.clear();
+    }
 
     /**
      * Defines the note rectangles by note number lists.
@@ -607,7 +686,7 @@ public class NoteRectangle extends StackPane {
             int noteUnit = timeSignature.denominator.numericValue;  // What one beat represents
 
             // Get the number of seconds per beat
-            double spb = 1. / bpm * 60.;  // spb = seconds per beat
+            double spb = 60. / bpm;  // spb = seconds per beat
 
             // Determine resolution of the quantization
             NoteUnit quantizationUnit =
@@ -616,7 +695,10 @@ public class NoteRectangle extends StackPane {
             double resolution = spb / divisionFactor;
 
             // Process each note rectangle
-            for (NoteRectangle rectangle : allNoteRectangles) {
+            for (NoteRectangle rectangle : allNoteRectangles.values()) {
+                // Save rectangle's current position to the undo stack
+                addToStack(undoStack, rectangle, UndoOrRedoAction.TRANSFORM);
+
                 // Get the onset time and duration
                 double onsetTime = rectangle.getNoteOnsetTime();
                 double duration = rectangle.getNoteDuration();
@@ -633,6 +715,72 @@ public class NoteRectangle extends StackPane {
                 rectangle.setTranslateX(onsetTime * pixelsPerSecond);
                 rectangle.bordersRegion.setPrefWidth(duration * pixelsPerSecond);
             }
+
+            addToStack(
+                    undoStack,
+                    null,
+                    UndoOrRedoAction.PERFORM_MULTIPLE,
+                    new Double[]{(double) allNoteRectangles.size(), 0.}
+            );
+        }
+    }
+
+    /**
+     * Method that performs the specified <code>editAction</code>, such as undoing or redoing.
+     *
+     * @param editAction Action to perform.
+     */
+    public static void editAction(EditAction editAction) {
+        // If editing is disabled or if undo or redo is disabled, do nothing
+        if (!canEdit || !canUndoOrRedo) return;
+
+        // Determine the stacks to act upon
+        Stack<Triple<String, UndoOrRedoAction, Double[]>> primaryStack, secondaryStack;
+
+        if (editAction == EditAction.UNDO) {
+            primaryStack = undoStack;
+            secondaryStack = redoStack;
+        } else {
+            primaryStack = redoStack;
+            secondaryStack = undoStack;
+        }
+
+        // If the primary stack if empty
+        if (primaryStack.empty()) return;
+
+        // Get the latest undo action from primary stack
+        Triple<String, UndoOrRedoAction, Double[]> latestAction = primaryStack.pop();
+        String uuid = latestAction.value0();
+        UndoOrRedoAction action = latestAction.value1();
+        Double[] data = latestAction.value2();
+
+        // Determine 'inverse' action to perform when doing the reverse operation
+        UndoOrRedoAction invAction = UndoOrRedoAction.TRANSFORM;  // By default assume transform
+        if (action == UndoOrRedoAction.CREATE) invAction = UndoOrRedoAction.DELETE;
+        else if (action == UndoOrRedoAction.DELETE) invAction = UndoOrRedoAction.CREATE;
+        else if (action == UndoOrRedoAction.PERFORM_MULTIPLE) invAction = UndoOrRedoAction.PERFORM_MULTIPLE;
+
+        // Get relevant rectangle
+        NoteRectangle relevantRect = allNoteRectangles.get(uuid);
+
+        // Add inverse action to secondary stack
+        if (invAction == UndoOrRedoAction.DELETE) {
+            addToStack(secondaryStack, uuid, invAction, new Double[0]);
+        } else if (invAction != UndoOrRedoAction.PERFORM_MULTIPLE) {
+            addToStack(secondaryStack, relevantRect, invAction);
+        }
+
+        // Perform the action
+        handleAction(uuid, action, data);
+
+        // Handle case where we need to perform multiple undo/redo actions
+        if (invAction == UndoOrRedoAction.PERFORM_MULTIPLE) {
+            addToStack(
+                    secondaryStack,
+                    uuid,
+                    UndoOrRedoAction.PERFORM_MULTIPLE,
+                    new Double[]{data[0], 1 - data[1]}   // Makes 1 -> 0, 0 -> 1
+            );
         }
     }
 
@@ -651,21 +799,21 @@ public class NoteRectangle extends StackPane {
      * collision with another note rectangle.
      *
      * @param xPos             X position.
-     * @param rectangleWidth   Width of the rectangle.
+     * @param rectWidth        Width of the rectangle.
      * @param noteNumber       Note number.
      * @param verticalMovement Vertical movement value.
      * @return A <code>CollisionLocation</code> value, describing the <em>direction</em> of the collision, or
      * <code>NONE</code> if there was no collision.
      */
     private CollisionLocation checkCollision(
-            double xPos, double rectangleWidth, int noteNumber, VerticalMovement verticalMovement
+            double xPos, double rectWidth, int noteNumber, VerticalMovement verticalMovement
     ) {
         // Determine bounding rectangles
         NoteRectangle leftBounder;
         NoteRectangle rightBounder;
-        if ((leftBoundingRectangle == null && rightBoundingRectangle == null) ||
-                (leftBoundingRectangle != null && xPos + rectangleWidth < leftBoundingRectangle.getStartX()) ||
-                (rightBoundingRectangle != null && xPos > rightBoundingRectangle.getEndX()) ||
+        if ((this.leftBoundingRectangle == null && this.rightBoundingRectangle == null) ||
+                (this.leftBoundingRectangle != null && xPos + rectWidth < this.leftBoundingRectangle.getStartX()) ||
+                (this.rightBoundingRectangle != null && xPos > this.rightBoundingRectangle.getEndX()) ||
                 verticalMovement != VerticalMovement.NONE) {
             // Recalculate the bounding rectangles and use the new ones
             Pair<NoteRectangle, NoteRectangle> rectangles = getLeftAndRightRectangles(xPos, noteNumber);
@@ -673,8 +821,8 @@ public class NoteRectangle extends StackPane {
             rightBounder = rectangles.value1();
         } else {
             // No changes made; use the old ones
-            leftBounder = leftBoundingRectangle;
-            rightBounder = rightBoundingRectangle;
+            leftBounder = this.leftBoundingRectangle;
+            rightBounder = this.rightBoundingRectangle;
         }
 
         // Handle edge cases
@@ -685,7 +833,7 @@ public class NoteRectangle extends StackPane {
 
         } else if (leftBounder == null) {  // No left rectangle
             // If the end of this rectangle is before the start of the right rectangle, then there is no collision
-            if (xPos + rectangleWidth >= rightBounder.getStartX()) {
+            if (xPos + rectWidth >= rightBounder.getStartX()) {
                 if (verticalMovement == VerticalMovement.NONE) {  // No vertical movement
                     return CollisionLocation.RIGHT;  // Collides with the rectangle on the right
                 } else {
@@ -718,7 +866,7 @@ public class NoteRectangle extends StackPane {
 
             if (leftBounder.getEndX() >= xPos) {
                 tempCollisionLoc = CollisionLocation.LEFT;
-            } else if (xPos + rectangleWidth >= rightBounder.getStartX()) {
+            } else if (xPos + rectWidth >= rightBounder.getStartX()) {
                 tempCollisionLoc = CollisionLocation.RIGHT;
             }
 
@@ -824,17 +972,110 @@ public class NoteRectangle extends StackPane {
         return left - 1;  // `left` is insertion point; we want *left* element's index
     }
 
+    /**
+     * Helper method that saves a rectangle's state to the specified stack.
+     *
+     * @param stack  Stack to save the state to.
+     * @param rect   Rectangle to save the state of.
+     * @param action Action to take.
+     */
+    private static void addToStack(
+            Stack<Triple<String, UndoOrRedoAction, Double[]>> stack, NoteRectangle rect,
+            UndoOrRedoAction action
+    ) {
+        // Get the data for the stack
+        Double[] data = switch (action) {
+            case TRANSFORM -> new Double[]{rect.getTranslateX(), rect.getTranslateY(), rect.getWidth()};
+            case CREATE -> new Double[]{rect.getNoteOnsetTime(), rect.getNoteDuration(), (double) rect.noteNum};
+            default -> new Double[0];
+        };
+
+        // Add said data to the stack
+        addToStack(stack, rect.uuid, action, data);
+    }
+
+    /**
+     * Helper method that saves a state to the specified stack.
+     *
+     * @param stack  Stack to save the state to.
+     * @param uuid   UUID of the rectangle.
+     * @param action Action to take.
+     * @param data   Data of the action.
+     */
+    private static void addToStack(
+            Stack<Triple<String, UndoOrRedoAction, Double[]>> stack, String uuid, UndoOrRedoAction action,
+            Double[] data
+    ) {
+        stack.add(new Triple<>(uuid, action, data));
+    }
+
+    /**
+     * Helper method that handles the action to be performed.
+     *
+     * @param uuid   UUID of the rectangle.
+     * @param action Action to take.
+     * @param data   Data needed to perform the action.
+     */
+    private static void handleAction(String uuid, UndoOrRedoAction action, Double[] data) {
+        if (action == UndoOrRedoAction.TRANSFORM) {
+            // Get relevant rectangle
+            NoteRectangle rect = allNoteRectangles.get(uuid);
+
+            // Update transform attributes
+            rect.setTranslateX(data[0]);
+            rect.setTranslateY(data[1]);
+            rect.setWidth(data[2]);
+        } else if (action == UndoOrRedoAction.CREATE) {
+            try {
+                // Create a new rectangle
+                NoteRectangle rect = new NoteRectangle(data[0], data[1], data[2].intValue(), uuid, false);
+                spectrogramPaneAnchor.getChildren().add(rect);
+            } catch (NoteRectangleCollisionException ignored) {
+            }
+        } else if (action == UndoOrRedoAction.DELETE) {
+            // Get the relevant rectangle
+            NoteRectangle rect = allNoteRectangles.get(uuid);
+
+            // Remove rectangle from the note rectangle by number lists
+            noteRectanglesByNoteNumber.get(rect.noteNum).remove(rect);
+
+            // Remove the note rectangle from the parent pane
+            ((Pane) rect.getParent()).getChildren().remove(rect);
+
+            // Remove the note rectangle from the list of note rectangles
+            allNoteRectangles.remove(uuid, rect);
+
+            // Update flags
+            rect.isRemoved = true;
+        } else {
+            // Get number of actions to perform
+            int numActions = data[0].intValue();
+
+            // Perform that number of preceding actions
+            for (int i = 0; i < numActions; i++) {
+                if (data[1].intValue() == 0) {
+                    editAction(EditAction.UNDO);
+                } else {
+                    editAction(EditAction.REDO);
+                }
+            }
+        }
+
+        hasEditedNoteRectangles = true;
+    }
+
     // Overwritten methods
     @Override
     public String toString() {
-        return "NoteRectangle{" +
-                "noteNum=" + noteNum +
+        return "NoteRectangle(" +
+                "uuid=" + this.uuid +
+                ", noteNum=" + this.noteNum +
                 ", noteOnsetTime=" + getNoteOnsetTime() +
                 ", noteDuration=" + getNoteDuration() +
-                '}';
+                ")";
     }
 
-    // Helper classes
+    // Helper classes/enums
     static class SortByTimeToPlace implements Comparator<NoteRectangle> {
         @Override
         public int compare(NoteRectangle o1, NoteRectangle o2) {
@@ -842,17 +1083,11 @@ public class NoteRectangle extends StackPane {
         }
     }
 
-    enum CollisionLocation {
-        LEFT,
-        RIGHT,
-        UP,
-        DOWN,
-        NONE
-    }
+    enum CollisionLocation {LEFT, RIGHT, UP, DOWN, NONE}
 
-    enum VerticalMovement {
-        UP,
-        DOWN,
-        NONE
-    }
+    enum VerticalMovement {UP, DOWN, NONE}
+
+    enum UndoOrRedoAction {TRANSFORM, CREATE, DELETE, PERFORM_MULTIPLE}
+
+    public enum EditAction {UNDO, REDO}
 }

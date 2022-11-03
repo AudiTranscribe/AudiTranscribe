@@ -125,6 +125,10 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
     private final KeyCodeCombination SAVE_PROJECT_COMBINATION =
             new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN);
+    private final KeyCodeCombination UNDO_NOTE_EDIT_COMBINATION =
+            new KeyCodeCombination(KeyCode.Z, KeyCombination.SHORTCUT_DOWN);
+    private final KeyCodeCombination REDO_NOTE_EDIT_COMBINATION =
+            new KeyCodeCombination(KeyCode.Z, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
 
     // File-Savable Attributes
     private int numSkippableBytes;
@@ -198,6 +202,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
     @FXML
     private MenuBar menuBar;
 
+    // Todo: add undo/redo menu item
     @FXML
     private MenuItem newProjectMenuItem, openProjectMenuItem, renameProjectMenuItem, saveProjectMenuItem,
             saveAsMenuItem, exportMIDIMenuItem, preferencesMenuItem, quantizeNotesMenuItem, docsMenuItem, aboutMenuItem;
@@ -269,7 +274,8 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         NoteRectangle.allNoteRectangles.clear();
         NoteRectangle.noteRectanglesByNoteNumber.clear();
 
-        // Reset note rectangles settings
+        // Set note rectangles' static attribute
+        NoteRectangle.setSpectrogramPaneAnchor(spectrogramPaneAnchor);
         NoteRectangle.setIsPaused(isPaused);
         NoteRectangle.setCanEdit(canEditNotes);
 
@@ -1269,8 +1275,9 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
      * Helper method that sets up the note player sequencer by setting the notes on it.
      */
     private void setupNotePlayerSequencer() {
-        // Get number of note rectangles
+        // Get note rectangles' data
         int numNoteRects = NoteRectangle.allNoteRectangles.size();
+        Object[] noteRectsKeys = NoteRectangle.allNoteRectangles.keySet().toArray();
 
         // Get the note onset times, note durations, and note numbers from the note rectangles
         double[] noteOnsetTimes = new double[numNoteRects];
@@ -1278,9 +1285,11 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         int[] noteNums = new int[numNoteRects];
 
         for (int i = 0; i < numNoteRects; i++) {
-            noteOnsetTimes[i] = NoteRectangle.allNoteRectangles.get(i).getNoteOnsetTime();
-            noteDurations[i] = NoteRectangle.allNoteRectangles.get(i).getNoteDuration();
-            noteNums[i] = NoteRectangle.allNoteRectangles.get(i).noteNum;
+            String key = (String) noteRectsKeys[i];
+
+            noteOnsetTimes[i] = NoteRectangle.allNoteRectangles.get(key).getNoteOnsetTime();
+            noteDurations[i] = NoteRectangle.allNoteRectangles.get(key).getNoteDuration();
+            noteNums[i] = NoteRectangle.allNoteRectangles.get(key).noteNum;
         }
 
         // Setup note player sequencer
@@ -1528,8 +1537,22 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
      * Helper method that helps quantize the notes.
      */
     private void handleQuantizeNotes() {
-        NoteRectangle.quantizeNotes(bpm, offset, timeSignature);
-        log(Level.FINE, "Quantized notes");
+        if (canEditNotes) {
+            NoteRectangle.quantizeNotes(bpm, offset, timeSignature);
+            Popups.showInformationAlert(
+                    rootPane.getScene().getWindow(),
+                    "Quantized Notes",
+                    "Notes have been quantized."
+            );
+            log(Level.FINE, "Quantized notes");
+        } else {
+            Popups.showWarningAlert(
+                    rootPane.getScene().getWindow(),
+                    "Did Not Quantize Notes",
+                    "Please enter into editing mode before quantizing notes."
+            );
+        }
+
     }
 
     /**
@@ -1545,14 +1568,18 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
     private void saveData(
             boolean forceChooseFile, String saveDest, CustomTask<?> task
     ) throws FFmpegNotFoundException, IOException {
-        // Get data from the note rectangles
+        // Get note rectangles' data
         int numRectangles = NoteRectangle.allNoteRectangles.size();
+        Object[] noteRectsKeys = NoteRectangle.allNoteRectangles.keySet().toArray();
+
         double[] timesToPlaceRectangles = new double[numRectangles];
         double[] noteDurations = new double[numRectangles];
         int[] noteNums = new int[numRectangles];
 
         for (int i = 0; i < numRectangles; i++) {
-            NoteRectangle noteRectangle = NoteRectangle.allNoteRectangles.get(i);
+            String key = (String) noteRectsKeys[i];
+            NoteRectangle noteRectangle = NoteRectangle.allNoteRectangles.get(key);
+
             timesToPlaceRectangles[i] = noteRectangle.getNoteOnsetTime();
             noteDurations[i] = noteRectangle.getNoteDuration();
             noteNums[i] = noteRectangle.noteNum;
@@ -2116,6 +2143,9 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
                     node.setDisable(false);
                 }
 
+                // Clear note rectangles' stacks
+                NoteRectangle.clearStacks();
+
                 // Handle attempt to close the window
                 rootPane.getScene().getWindow().setOnCloseRequest((windowEvent) -> {
                     // Deal with possible unsaved changes
@@ -2309,10 +2339,14 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             return;
         }
 
-        // Check if user wants to save the project
+        // Check if user is using any shortcuts
         if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {  // Save current project
             handleSavingProject(false, false);
             return;
+        } else if (UNDO_NOTE_EDIT_COMBINATION.match(keyEvent)) {  // Undo note edit
+            NoteRectangle.editAction(NoteRectangle.EditAction.UNDO);
+        } else if (REDO_NOTE_EDIT_COMBINATION.match(keyEvent)) {  // Redo note edit
+            NoteRectangle.editAction(NoteRectangle.EditAction.REDO);
         }
 
         // Otherwise, get the key event's key code
