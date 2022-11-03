@@ -121,7 +121,7 @@ public class NoteRectangle extends StackPane {
                 timeToPlaceRect,
                 noteDuration,
                 noteNum,
-                MiscUtils.generateUUID((long) (MiscUtils.getUnixTimestamp() * 1e3)),  // UUID
+                MiscUtils.generateUUID((long) (MiscUtils.getUnixTimestamp() * 1e3)),
                 true
         );
     }
@@ -716,11 +716,10 @@ public class NoteRectangle extends StackPane {
                 rectangle.bordersRegion.setPrefWidth(duration * pixelsPerSecond);
             }
 
-            // Add quantize action to the undo stack
             addToStack(
                     undoStack,
                     null,
-                    UndoOrRedoAction.QUANTIZE,
+                    UndoOrRedoAction.PERFORM_MULTIPLE,
                     new Double[]{(double) allNoteRectangles.size(), 0.}
             );
         }
@@ -759,7 +758,7 @@ public class NoteRectangle extends StackPane {
         UndoOrRedoAction invAction = UndoOrRedoAction.TRANSFORM;  // By default assume transform
         if (action == UndoOrRedoAction.CREATE) invAction = UndoOrRedoAction.DELETE;
         else if (action == UndoOrRedoAction.DELETE) invAction = UndoOrRedoAction.CREATE;
-        else if (action == UndoOrRedoAction.QUANTIZE) invAction = UndoOrRedoAction.QUANTIZE;
+        else if (action == UndoOrRedoAction.PERFORM_MULTIPLE) invAction = UndoOrRedoAction.PERFORM_MULTIPLE;
 
         // Get relevant rectangle
         NoteRectangle relevantRect = allNoteRectangles.get(uuid);
@@ -767,19 +766,19 @@ public class NoteRectangle extends StackPane {
         // Add inverse action to secondary stack
         if (invAction == UndoOrRedoAction.DELETE) {
             addToStack(secondaryStack, uuid, invAction, new Double[0]);
-        } else if (invAction != UndoOrRedoAction.QUANTIZE) {
+        } else if (invAction != UndoOrRedoAction.PERFORM_MULTIPLE) {
             addToStack(secondaryStack, relevantRect, invAction);
         }
 
         // Perform the action
         handleAction(uuid, action, data);
 
-        // Handle quantize case
-        if (invAction == UndoOrRedoAction.QUANTIZE) {
+        // Handle case where we need to perform multiple undo/redo actions
+        if (invAction == UndoOrRedoAction.PERFORM_MULTIPLE) {
             addToStack(
                     secondaryStack,
                     uuid,
-                    UndoOrRedoAction.QUANTIZE,
+                    UndoOrRedoAction.PERFORM_MULTIPLE,
                     new Double[]{data[0], 1 - data[1]}   // Makes 1 -> 0, 0 -> 1
             );
         }
@@ -1088,7 +1087,7 @@ public class NoteRectangle extends StackPane {
 
     enum VerticalMovement {UP, DOWN, NONE}
 
-    enum UndoOrRedoAction {TRANSFORM, CREATE, DELETE, QUANTIZE}
+    enum UndoOrRedoAction {TRANSFORM, CREATE, DELETE, PERFORM_MULTIPLE}
 
     public enum EditAction {UNDO, REDO}
 }
