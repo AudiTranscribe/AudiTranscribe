@@ -686,7 +686,7 @@ public class NoteRectangle extends StackPane {
             int noteUnit = timeSignature.denominator.numericValue;  // What one beat represents
 
             // Get the number of seconds per beat
-            double spb = 1. / bpm * 60.;  // spb = seconds per beat
+            double spb = 60. / bpm;  // spb = seconds per beat
 
             // Determine resolution of the quantization
             NoteUnit quantizationUnit =
