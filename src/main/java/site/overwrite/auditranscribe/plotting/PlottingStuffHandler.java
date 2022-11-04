@@ -58,8 +58,7 @@ public final class PlottingStuffHandler {
     public static void addNoteLines(
             Pane spectrogramPane, double height, int minNoteNumber, int maxNoteNumber
     ) {
-        // Get the width of the note pane
-        double width = spectrogramPane.getPrefWidth();
+        double width = spectrogramPane.getPrefWidth();  // Use pref width here b/c spectrogram may not be ready
 
         // Place the notes onto the pane
         for (int i = minNoteNumber; i <= maxNoteNumber; i++) {
@@ -161,8 +160,7 @@ public final class PlottingStuffHandler {
     public static Rectangle addCurrentOctaveRectangle(
             Pane notePane, double height, int octave, int minNoteNumber, int maxNoteNumber
     ) {
-        // Get the width of the note pane
-        double width = notePane.getPrefWidth();
+        double width = notePane.getWidth();
 
         // Get the lowest and highest note number within that octave
         int lowestNoteNum = octave * 12;  // Lowest note is C{octave}, e.g. C4 if octave is 4
