@@ -1431,6 +1431,13 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         // Get the save destination
         String saveDest = getSaveDestination(forceChooseFile);
 
+        if (saveDest == null) {
+            Popups.showInformationAlert(
+                    rootPane.getScene().getWindow(), "Info", "No destination specified."
+            );
+            return;
+        }
+
         // Set up task to run in alternate thread
         CustomTask<Void> task = new CustomTask<>("Save Project") {
             @Override
@@ -2456,7 +2463,8 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
      * Helper method that gets the save destination.
      *
      * @param forceChooseFile Whether the save destination must be forcibly chosen.
-     * @return String representing the save destination.
+     * @return String representing the save destination. Returns <code>null</code> if no destination
+     * was specified.
      */
     private String getSaveDestination(boolean forceChooseFile) {
         String saveDest, saveName;
