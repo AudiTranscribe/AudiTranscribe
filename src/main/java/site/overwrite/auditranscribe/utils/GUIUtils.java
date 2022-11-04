@@ -22,6 +22,7 @@ import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
 
 import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -69,6 +70,28 @@ public final class GUIUtils {
             // Run the command
             try {
                 Runtime.getRuntime().exec(new String[]{"sh", "-c", cmd.toString()});
+            } catch (Exception ignored) {
+            }
+        }
+    }
+
+    public static void openFolderInGUI(String folderPath) {
+        OSType os = OSMethods.getOS();
+
+        if (os == OSType.WINDOWS || os == OSType.MAC) {
+            // Get the desktop instance
+            Desktop desktop = Desktop.getDesktop();
+
+            // Try and browse to the URL
+            try {
+                desktop.open(new File(folderPath));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            // Run a command to open the file
+            try {
+                Runtime.getRuntime().exec(new String[]{"sh", "-c", "/usr/bin/xdg-open '" + folderPath + "'"});
             } catch (Exception ignored) {
             }
         }

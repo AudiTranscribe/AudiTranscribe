@@ -33,6 +33,7 @@ import javafx.stage.StageStyle;
 import site.overwrite.auditranscribe.audio.FFmpegHandler;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.generic.ClassWithLogging;
+import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.main_views.helpers.ProjectIOHandlers;
@@ -43,6 +44,7 @@ import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFacto
 import site.overwrite.auditranscribe.misc.spinners.CustomIntegerSpinnerValueFactory;
 import site.overwrite.auditranscribe.music.NoteUnit;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
+import site.overwrite.auditranscribe.utils.GUIUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -77,7 +79,7 @@ public class PreferencesViewController extends ClassWithLogging implements Initi
     private Spinner<Double> notePlayingDelayOffsetSpinner;
 
     @FXML
-    private Button selectFFmpegBinaryButton, deleteLogsButton;
+    private Button selectFFmpegBinaryButton, deleteLogsButton, openDataFolderButton;
 
     @FXML
     private TextField ffmpegBinaryPathTextField;
@@ -148,6 +150,8 @@ public class PreferencesViewController extends ClassWithLogging implements Initi
                 Popups.showInformationAlert(rootPane.getScene().getWindow(), title, content);
             }
         });
+
+        openDataFolderButton.setOnAction(event -> GUIUtils.openFolderInGUI(IOConstants.APP_DATA_FOLDER_PATH));
 
         cancelButton.setOnAction(event -> closePreferencesPane());
 
