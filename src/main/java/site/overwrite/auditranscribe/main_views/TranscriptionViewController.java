@@ -2384,7 +2384,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             }
             case EQUALS -> {
                 notePlayerSynth.silenceChannel();  // Stop any notes from playing
-                if (octaveNum < 9) {
+                if (octaveNum < 8) {
                     log(Level.FINE, "Playback octave lowered to " + octaveNum);
                     PlottingStuffHandler.updateCurrentOctaveRectangle(
                             currentOctaveRectangle, finalHeight, ++octaveNum, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER
