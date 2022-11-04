@@ -46,16 +46,19 @@ machine:
 1. Java 17
 2. FFmpeg (Version 4 or later)
 
-In addition, there are some additional dependencies to install for specific platforms:
+In addition, there are some additional dependencies to install and configurations to set up for specific platforms:
 
-- **Windows**: The [**WiX Toolset 3**](https://wixtoolset.org/) is needed to generate the AudiTranscribe executable for
-  Windows.
-    - Make sure that the `.NET 3.5` feature is enabled on your Windows device. To enable it, follow these steps:
-        1. Go to the Control Panel.
-        2. Under "Programs", select "Programs and Features".
-        3. Choose "Turn Windows features on or off". You may be prompted to enter an administrator's password.
-        4. In the list of features, choose ".NET Framework 3.5 (includes .NET 2.0 and 3.0)" and then click "OK".
-        5. If a popup asks whether to download features, select "Let Windows Update download the files for you".
+- **Windows**:
+    - The [**WiX Toolset 3**](https://wixtoolset.org/) is needed to generate the AudiTranscribe executable for
+      Windows.
+        - Make sure that the `.NET 3.5` feature is enabled on your Windows device. To enable it, follow these steps:
+            1. Go to the Control Panel.
+            2. Under "Programs", select "Programs and Features".
+            3. Choose "Turn Windows features on or off". You may be prompted to enter an administrator's password.
+            4. In the list of features, choose ".NET Framework 3.5 (includes .NET 2.0 and 3.0)" and then click "OK".
+            5. If a popup asks whether to download features, select "Let Windows Update download the files for you".
+    - The [Apache Maven](https://maven.apache.org/) project manager needs to be installed.
+        - Make sure the `JAVA_HOME` **system** environment variable is set to the JDK location.
 - **macOS**: On macOS, the **Xcode Command Line Tools** needs to be installed to make AudiTranscribe run in development.
   You can install the XCode Command Line Tools by running:
   ```
@@ -83,6 +86,8 @@ In addition, there are some additional dependencies to install for specific plat
       sudo apt install openjdk-17-jdk-headless
       ```
       or a similar command on your Linux machine.
+
+Once all dependencies have been installed and configurations are set, proceed to [Install From Source](#from-source).
 
 # Installation
 
@@ -138,10 +143,13 @@ with `.deb` installation capabilities.
 
 This guide will assume that [Apache Maven](https://maven.apache.org/) and [FFmpeg](https://ffmpeg.org/) are installed.
 
-Download the latest release/pre-release from the "releases" section of the GitHub page, or download the latest files
-under the `staging` branch.
+You will first need to obtain the source files. You can do this in multiple ways:
+- Download the latest release/pre-release from the "releases" section of the GitHub page;
+- Download the latest files on the `staging` branch;
+- Download the latest files on the `main` branch;
+- Download the files on any branch.
 
-To set up AudiTranscribe with maven, run the following commands:
+Once the files have been downloaded, you need to set up AudiTranscribe with maven. Run the following commands:
 
 ```bash
 # Install custom dependencies from the "lib" directory
@@ -153,6 +161,8 @@ mvn -B clean:clean compiler:compile javafx:jlink
 # Test installation
 mvn test
 ```
+
+That should complete the "from source" setup of AudiTranscribe.
 
 # Security Policy
 
