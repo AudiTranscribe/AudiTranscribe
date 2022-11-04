@@ -306,7 +306,7 @@ public class MainViewController extends ClassWithLogging implements Initializabl
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
                 "AudiTranscribe files (*.audt)", "*.audt"
         );
-        File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
+        File file = ProjectIOHandlers.openFileDialog(window, extFilter);
 
         // Verify that the user actually chose a file
         if (file == null) {

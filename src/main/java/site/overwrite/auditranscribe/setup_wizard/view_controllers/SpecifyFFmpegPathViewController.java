@@ -62,7 +62,7 @@ public class SpecifyFFmpegPathViewController extends ClassWithLogging implements
             );
 
             // Get the file
-            File possibleFFmpegBinary = ProjectIOHandlers.getFileFromFileDialog(
+            File possibleFFmpegBinary = ProjectIOHandlers.openFileDialog(
                     rootPane.getScene().getWindow(), extFilter
             );
 

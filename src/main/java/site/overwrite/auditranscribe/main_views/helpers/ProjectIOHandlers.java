@@ -92,13 +92,13 @@ public final class ProjectIOHandlers {
     }
 
     /**
-     * Method that helps show a file dialog for the user to select a file on.
+     * Method that helps show a file dialog for the user to select a file.
      *
-     * @param window  WindowFunction to show the file dialog on.
+     * @param window  Window to show the file dialog on.
      * @param filters Array of file filters to show in the file dialog.
      * @return A <code>File</code> object, representing the selected file.
      */
-    public static File getFileFromFileDialog(Window window, FileChooser.ExtensionFilter... filters) {
+    public static File openFileDialog(Window window, FileChooser.ExtensionFilter... filters) {
         FileChooser fileChooser = new FileChooser();
 
         for (FileChooser.ExtensionFilter filter : filters) {
@@ -106,5 +106,22 @@ public final class ProjectIOHandlers {
         }
 
         return fileChooser.showOpenDialog(window);
+    }
+
+    /**
+     * Method that helps show a dialog for the user to save a file.
+     *
+     * @param window  Window to show the file dialog on.
+     * @param filters Array of file filters to show in the file dialog.
+     * @return A <code>File</code> object, representing the location to save the file to.
+     */
+    public static File saveFileDialog(Window window, FileChooser.ExtensionFilter... filters) {
+        FileChooser fileChooser = new FileChooser();
+
+        for (FileChooser.ExtensionFilter filter : filters) {
+            fileChooser.getExtensionFilters().add(filter);
+        }
+
+        return fileChooser.showSaveDialog(window);
     }
 }

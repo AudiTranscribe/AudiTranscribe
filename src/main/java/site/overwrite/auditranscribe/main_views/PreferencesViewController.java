@@ -108,7 +108,7 @@ public class PreferencesViewController extends ClassWithLogging implements Initi
             );
 
             // Get the file
-            File possibleFFmpegBinary = ProjectIOHandlers.getFileFromFileDialog(
+            File possibleFFmpegBinary = ProjectIOHandlers.openFileDialog(
                     rootPane.getScene().getWindow(), extFilter
             );
 

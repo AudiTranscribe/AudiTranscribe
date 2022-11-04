@@ -1365,7 +1365,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
                     "AudiTranscribe files (*.audt)", "*.audt"
             );
-            File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
+            File file = ProjectIOHandlers.openFileDialog(window, extFilter);
 
             // If a file was selected, stop the audio completely
             if (file != null) {
@@ -1493,12 +1493,11 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         Window window = rootPane.getScene().getWindow();
 
         // Ask user to choose a file
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
                 "MIDI Files (*.mid, *.midi)",
                 "*.mid", "*.midi"
-        ));
-        File file = fileChooser.showSaveDialog(window);
+        );
+        File file = ProjectIOHandlers.saveFileDialog(window, extFilter);
 
         // If operation was cancelled, show error
         if (file == null) {
@@ -2470,8 +2469,10 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             Window window = rootPane.getScene().getWindow();
 
             // Ask user to choose a file
-            FileChooser fileChooser = new FileChooser();
-            File file = fileChooser.showSaveDialog(window);
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                    "AudiTranscribe File (*.audt)", "*.audt"
+            );
+            File file = ProjectIOHandlers.saveFileDialog(window, extFilter);
 
             // If operation was cancelled return
             if (file == null) return null;
