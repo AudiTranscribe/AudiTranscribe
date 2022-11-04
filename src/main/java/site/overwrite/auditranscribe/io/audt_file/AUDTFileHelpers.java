@@ -116,8 +116,6 @@ public final class AUDTFileHelpers {
         return doubleArray;
     }
 
-    // Package-private methods
-
     /**
      * Helper method that converts the old time signature index into the new time signature enum value.
      *
