@@ -44,6 +44,9 @@
                         </Menu>
                   <Menu mnemonicParsing="false" text="Edit">
                     <items>
+                        <MenuItem fx:id="undoMenuItem" mnemonicParsing="false" text="Undo" />
+                        <MenuItem fx:id="redoMenuItem" mnemonicParsing="false" text="Redo" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem fx:id="quantizeNotesMenuItem" mnemonicParsing="false" text="Quantize Notes" />
                     </items>
                   </Menu>
