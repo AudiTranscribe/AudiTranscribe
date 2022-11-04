@@ -56,21 +56,6 @@ public class Complex {
         im = 0;
     }
 
-    // Overwritten methods
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null) return false;
-        if (getClass() != o.getClass()) return false;
-        Complex that = (Complex) o;
-        return (this.re == that.re) && (this.im == that.im);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(re, im);
-    }
-
     // Standard methods
 
     /**
@@ -355,5 +340,19 @@ public class Complex {
         if (re == 0) return im + "j";
         if (im < 0) return re + " - " + (-im) + "j";
         return re + " + " + im + "j";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        if (getClass() != o.getClass()) return false;
+        Complex that = (Complex) o;
+        return (this.re == that.re) && (this.im == that.im);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(re, im);
     }
 }

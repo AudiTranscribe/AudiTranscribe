@@ -351,7 +351,7 @@ public abstract class AUDTFileWriter extends ClassWithLogging {
         AUDTFileHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_END_OF_FILE_DELIMITER);
     }
 
-    // Overwritten methods
+    // Overridden methods
     @Override
     public void log(Level level, String msg) {
         log(level, msg, AUDTFileWriter.class.getName());

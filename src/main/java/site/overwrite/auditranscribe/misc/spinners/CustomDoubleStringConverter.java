@@ -35,10 +35,10 @@ public class CustomDoubleStringConverter extends StringConverter<Double> {
      * Initialization method for a <code>CustomDoubleStringConverter</code>.
      */
     public CustomDoubleStringConverter(int decimalPlaces) {
-        // Create the decimal format
         this.df = new DecimalFormat("#." + String.join("", Collections.nCopies(decimalPlaces, "#")));
     }
 
+    // Overridden methods
     @Override
     public String toString(Double value) {
         // If the specified value is null, return a zero-length String

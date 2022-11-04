@@ -24,14 +24,13 @@ import javafx.util.StringConverter;
  * Custom converter that converts a string to an integer.
  */
 public class CustomIntegerStringConverter extends StringConverter<Integer> {
-
     /**
      * Initialization method for a <code>CustomIntegerStringConverter</code>.
      */
     public CustomIntegerStringConverter() {
     }
 
-    // Overwritten methods
+    // Overridden methods
     @Override
     public Integer fromString(String value) {
         // If the specified value is null or zero-length, return null

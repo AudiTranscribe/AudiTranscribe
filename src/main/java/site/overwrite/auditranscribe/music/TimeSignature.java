@@ -49,13 +49,6 @@ public enum TimeSignature {
         this.denominator = denominator;
     }
 
-    // Overriden methods
-
-    @Override
-    public String toString() {
-        return displayText();
-    }
-
     // Public methods
 
     /**
@@ -88,5 +81,12 @@ public enum TimeSignature {
         }
 
         return null;
+    }
+
+    // Overridden methods
+
+    @Override
+    public String toString() {
+        return displayText();
     }
 }

@@ -72,7 +72,7 @@ public class ProjectInfoDataObject0x00050002 extends ProjectInfoDataObject {
         this.projectName = projectName;  // We are setting the superclass' attribute
     }
 
-    // Overwritten methods
+    // Overridden methods
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -29,8 +29,6 @@ public abstract class CustomTask<V> extends Task<V> {
     // Attributes
     public String name;
 
-    // Constructors
-
     /**
      * Initializes a new instance of the <code>CustomTask</code> class.
      *
@@ -59,7 +57,7 @@ public abstract class CustomTask<V> extends Task<V> {
         updateMessage(s);
     }
 
-    // Overwritten methods
+    // Overridden methods
     @Override
     public void updateProgress(long current, long total) {
         super.updateProgress(current, total);

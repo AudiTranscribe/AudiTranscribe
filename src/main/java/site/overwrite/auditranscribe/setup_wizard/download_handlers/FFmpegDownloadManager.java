@@ -100,37 +100,6 @@ public class FFmpegDownloadManager extends AbstractDownloadManager {
         return super.downloadResource(destFolder, task);
     }
 
-    @Override
-    public void processDownload(String downloadedResourcePath) throws IOException {
-        // Unzip the downloaded file
-        log(Level.INFO, "Unzipping FFmpeg");
-        CompressionHandlers.zipDecompress(outputFolder, downloadedResourcePath);
-
-        // Define a variable to store the FFmpeg binary path
-        if (os == OSType.MAC) {
-            // Set executable status if needed
-            if (!new File(IOMethods.joinPaths(outputFolder, "ffmpeg")).setExecutable(true)) {
-                IOException e = new IOException(
-                        "Failed to set executable status for '" + IOMethods.joinPaths(outputFolder, "ffmpeg") + "'."
-                );
-                logException(e);
-                throw e;
-            } else {
-                log(Level.INFO, "Set executable status for FFmpeg");
-                ffmpegBinPath = IOMethods.joinPaths(outputFolder, "ffmpeg");
-            }
-        } else if (os == OSType.WINDOWS) {
-            ffmpegBinPath = IOMethods.joinPaths(outputFolder, "ffmpeg.exe");
-        } else {
-            throw new IOException("Unrecognised OS");
-        }
-
-        // Delete the downloaded zip file
-        IOMethods.delete(IOMethods.joinPaths(destFolder, "ffmpeg.zip"));
-
-        log(Level.INFO, "FFmpeg installation complete");
-    }
-
     // Private methods
 
     /**
@@ -176,5 +145,37 @@ public class FFmpegDownloadManager extends AbstractDownloadManager {
         } catch (JsonSyntaxException | APIServerException e) {
             throw new IOException(e);
         }
+    }
+
+    // Overridden methods
+    @Override
+    public void processDownload(String downloadedResourcePath) throws IOException {
+        // Unzip the downloaded file
+        log(Level.INFO, "Unzipping FFmpeg");
+        CompressionHandlers.zipDecompress(outputFolder, downloadedResourcePath);
+
+        // Define a variable to store the FFmpeg binary path
+        if (os == OSType.MAC) {
+            // Set executable status if needed
+            if (!new File(IOMethods.joinPaths(outputFolder, "ffmpeg")).setExecutable(true)) {
+                IOException e = new IOException(
+                        "Failed to set executable status for '" + IOMethods.joinPaths(outputFolder, "ffmpeg") + "'."
+                );
+                logException(e);
+                throw e;
+            } else {
+                log(Level.INFO, "Set executable status for FFmpeg");
+                ffmpegBinPath = IOMethods.joinPaths(outputFolder, "ffmpeg");
+            }
+        } else if (os == OSType.WINDOWS) {
+            ffmpegBinPath = IOMethods.joinPaths(outputFolder, "ffmpeg.exe");
+        } else {
+            throw new IOException("Unrecognised OS");
+        }
+
+        // Delete the downloaded zip file
+        IOMethods.delete(IOMethods.joinPaths(destFolder, "ffmpeg.zip"));
+
+        log(Level.INFO, "FFmpeg installation complete");
     }
 }

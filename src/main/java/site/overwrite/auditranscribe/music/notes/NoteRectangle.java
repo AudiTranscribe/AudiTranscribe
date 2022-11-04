@@ -1064,7 +1064,7 @@ public class NoteRectangle extends StackPane {
         hasEditedNoteRectangles = true;
     }
 
-    // Overwritten methods
+    // Overridden methods
     @Override
     public String toString() {
         return "NoteRectangle(" +

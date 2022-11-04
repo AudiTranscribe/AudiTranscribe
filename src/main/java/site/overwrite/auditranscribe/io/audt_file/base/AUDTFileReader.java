@@ -384,7 +384,7 @@ public abstract class AUDTFileReader extends ClassWithLogging {
         return checkBytesMatch(AUDTFileConstants.AUDT_END_OF_FILE_DELIMITER, eofBytes);
     }
 
-    // Overwritten methods
+    // Overridden methods
     @Override
     public void log(Level level, String msg) {
         log(level, msg, AUDTFileReader.class.getName());

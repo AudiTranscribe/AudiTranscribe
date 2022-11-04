@@ -60,7 +60,7 @@ public class ProjectInfoDataObject0x00070001 extends ProjectInfoDataObject {
         this.timeSignature = AUDTFileHelpers.oldTimeSignatureIndexToTimeSignature(timeSignatureIndex);
     }
 
-    // Overwritten methods
+    // Overridden methods
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

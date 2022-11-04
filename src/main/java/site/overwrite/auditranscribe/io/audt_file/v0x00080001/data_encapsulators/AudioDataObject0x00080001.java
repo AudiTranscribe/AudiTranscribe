@@ -44,7 +44,7 @@ public class AudioDataObject0x00080001 extends AudioDataObject {
         this.totalDurationInMS = totalDurationInMS;
     }
 
-    // Overwritten methods
+    // Overridden methods
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
