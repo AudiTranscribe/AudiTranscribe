@@ -29,7 +29,7 @@ for and the structure it must have.
 ```
 <type>(<scope>): <short summary>
   │       │             │
-  │       │             └─⫸ Summary in present tense. No period at the end.
+  │       │             └─⫸ Summary in present tense. No period at the end. Do not capitalise first letter of first word.
   │       │
   │       └─⫸ Commit Scope: Section of code that the change applies to.
   │
@@ -53,6 +53,7 @@ The `<type>` and `<short summary>` fields are mandatory. The `(<scope>)` field i
 - The summary field is used to provide a succinct description of the change.
     - Use the imperative, present tense: "change" not "changed" nor "changes"
     - No dot (`.`) at the end
+    - Do not capitalise first letter of first word
 
 ## Commit Message Body
 
