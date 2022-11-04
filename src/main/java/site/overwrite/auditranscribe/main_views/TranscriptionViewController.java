@@ -202,10 +202,10 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
     @FXML
     private MenuBar menuBar;
 
-    // Todo: add undo/redo menu item
     @FXML
     private MenuItem newProjectMenuItem, openProjectMenuItem, renameProjectMenuItem, saveProjectMenuItem,
-            saveAsMenuItem, exportMIDIMenuItem, preferencesMenuItem, quantizeNotesMenuItem, docsMenuItem, aboutMenuItem;
+            saveAsMenuItem, exportMIDIMenuItem, preferencesMenuItem, undoMenuItem, redoMenuItem, quantizeNotesMenuItem,
+            docsMenuItem, aboutMenuItem;
 
     // Main elements
     @FXML
@@ -546,6 +546,8 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         saveAsMenuItem.setOnAction(event -> handleSavingProject(false, true));
         exportMIDIMenuItem.setOnAction(event -> handleExportMIDI());
         preferencesMenuItem.setOnAction(event -> PreferencesViewController.showPreferencesWindow());
+        undoMenuItem.setOnAction(event -> NoteRectangle.editAction(NoteRectangle.EditAction.UNDO));
+        redoMenuItem.setOnAction(event -> NoteRectangle.editAction(NoteRectangle.EditAction.REDO));
         quantizeNotesMenuItem.setOnAction(event -> handleQuantizeNotes());
         docsMenuItem.setOnAction(event -> GUIUtils.openURLInBrowser("https://docs.auditranscribe.app/"));
         aboutMenuItem.setOnAction(event -> AboutViewController.showAboutWindow());
