@@ -28,6 +28,7 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import site.overwrite.auditranscribe.audio.FFmpegHandler;
@@ -306,6 +307,7 @@ public class PreferencesViewController extends ClassWithLogging implements Initi
             // Set stage properties
             Stage preferencesStage = new Stage();
             preferencesStage.initStyle(StageStyle.UTILITY);
+            preferencesStage.initModality(Modality.APPLICATION_MODAL);
             preferencesStage.setTitle("Settings and Preferences");
             preferencesStage.setScene(scene);
             preferencesStage.setResizable(false);
