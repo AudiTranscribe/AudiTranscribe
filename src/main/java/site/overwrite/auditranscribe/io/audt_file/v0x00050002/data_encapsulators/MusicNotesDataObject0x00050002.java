@@ -39,7 +39,7 @@ public class MusicNotesDataObject0x00050002 extends MusicNotesDataObject {
         this.noteNums = noteNums;
     }
 
-    // Overwritten methods
+    // Overridden methods
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -64,6 +64,8 @@ public class SceneSwitcher extends ClassWithLogging {
     private final Stage mainStage = new Stage();
     private final Stage transcriptionStage = new Stage();
 
+    private final Rectangle2D screenBounds;
+
     private Pair<SceneSwitchingState, SceneSwitchingData> returnedPair = null;
 
     private SceneSwitchingState state = SceneSwitchingState.SHOW_MAIN_SCENE;
@@ -77,6 +79,8 @@ public class SceneSwitcher extends ClassWithLogging {
     public SceneSwitcher(String currentVersion) {
         // Update attributes
         this.currentVersion = currentVersion;
+
+        this.screenBounds = Screen.getPrimary().getVisualBounds();
 
         // Set icon for the main stage and transcription stage, if not on macOS
         if (OSMethods.getOS() != OSType.MAC) {
@@ -130,7 +134,7 @@ public class SceneSwitcher extends ClassWithLogging {
                 }
             } catch (Exception e) {  // Catch any alert that was not handled correctly
                 Popups.showExceptionAlert(
-                        "An Exception Occurred",
+                        null, "An Exception Occurred",
                         "An exception occurred during the execution of the program.",
                         e
                 );
@@ -169,6 +173,8 @@ public class SceneSwitcher extends ClassWithLogging {
             mainStage.setTitle("Welcome to AudiTranscribe");
             mainStage.setScene(scene);
             mainStage.setResizable(false);
+
+            mainStage.centerOnScreen();
 
             // Show the main stage
             mainStage.showAndWait();
@@ -266,10 +272,11 @@ public class SceneSwitcher extends ClassWithLogging {
             transcriptionStage.setResizable(true);
             transcriptionStage.setTitle(data.projectName);
 
-            // Set width and height of the new scene
-            Rectangle2D screenBounds = Screen.getPrimary().getBounds();
             transcriptionStage.setMinWidth(screenBounds.getWidth());
             transcriptionStage.setMinHeight(screenBounds.getHeight());
+
+            transcriptionStage.setX(0);
+            transcriptionStage.setY(0);
 
             // Hide main stage (if it is still showing)
             if (mainStage.isShowing()) mainStage.hide();
@@ -288,7 +295,7 @@ public class SceneSwitcher extends ClassWithLogging {
 
         } catch (IOException | UnsupportedAudioFileException e) {
             Popups.showExceptionAlert(
-                    "Error loading audio data.",
+                    null, "Error loading audio data.",
                     "An error occurred when loading the audio data. Does the audio file " +
                             "still exist at the original location? Is the audio format supported?",
                     e
@@ -296,14 +303,14 @@ public class SceneSwitcher extends ClassWithLogging {
             logException(e);
         } catch (FFmpegNotFoundException e) {
             Popups.showExceptionAlert(
-                    "Error finding FFmpeg.",
+                    null, "Error finding FFmpeg.",
                     "FFmpeg was not found. Please install it and try again.",
                     e
             );
             logException(e);
         } catch (AudioTooLongException e) {
             Popups.showExceptionAlert(
-                    "Audio too long.",
+                    null, "Audio too long.",
                     "The audio file is too long. Please select a shorter audio file.",
                     e
             );
@@ -351,7 +358,7 @@ public class SceneSwitcher extends ClassWithLogging {
 
                 if (!success) {
                     Popups.showInformationAlert(
-                            "Failed to make backup of '" + audtFileName + "'.",
+                            null, "Failed to make backup of '" + audtFileName + "'.",
                             "The program failed to make a backup of '" + audtFile.getName() + "'."
                     );
                     log(Level.WARNING, "Failed to make backup of '" + audtFileName + "' to '" + backupPath + "'.");
@@ -395,10 +402,11 @@ public class SceneSwitcher extends ClassWithLogging {
             transcriptionStage.setResizable(true);
             transcriptionStage.setTitle(projectData.projectInfoData.projectName);
 
-            // Set width and height of the new scene
-            Rectangle2D screenBounds = Screen.getPrimary().getBounds();
             transcriptionStage.setMinWidth(screenBounds.getWidth());
             transcriptionStage.setMinHeight(screenBounds.getHeight());
+
+            transcriptionStage.setX(0);
+            transcriptionStage.setY(0);
 
             // Update scroll position
             controller.updateScrollPosition(
@@ -425,7 +433,7 @@ public class SceneSwitcher extends ClassWithLogging {
 
         } catch (FileNotFoundException e) {
             Popups.showExceptionAlert(
-                    "Failed to find '" + audtFile.getName() + "'.",
+                    null, "Failed to find '" + audtFile.getName() + "'.",
                     "The program failed to find'" + audtFile.getName() +
                             "' at its designated location. Please check if it is still there.",
                     e
@@ -433,7 +441,7 @@ public class SceneSwitcher extends ClassWithLogging {
             logException(e);
         } catch (InvalidFileVersionException e) {
             Popups.showExceptionAlert(
-                    "Invalid file version in '" + audtFile.getName() + "'.",
+                    null, "Invalid file version in '" + audtFile.getName() + "'.",
                     "The AUDT file '" + audtFile.getName() + "' has an invalid file version. Please " +
                             "check the version the file was saved in.",
                     e
@@ -441,7 +449,7 @@ public class SceneSwitcher extends ClassWithLogging {
             logException(e);
         } catch (IOException | IncorrectFileFormatException | FailedToReadDataException e) {
             Popups.showExceptionAlert(
-                    "Failed to read '" + audtFile.getName() + "' as an AUDT ile.",
+                    null, "Failed to read '" + audtFile.getName() + "' as an AUDT ile.",
                     "The program failed to read '" + audtFile.getName() +
                             "' as an AUDT file. Is the file format correct?",
                     e

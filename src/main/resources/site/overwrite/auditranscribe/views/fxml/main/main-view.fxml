@@ -34,7 +34,8 @@
                 </Menu>
                 <Menu mnemonicParsing="false" text="Help">
                   <items>
-                    <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" text="About AudiTranscribe" />
+                     <MenuItem fx:id="docsMenuItem" mnemonicParsing="false" text="AudiTranscribe Help and Docs" />
+                     <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" text="About AudiTranscribe" />
                   </items>
                 </Menu>
               </menus>

@@ -136,7 +136,7 @@ public class CustomIntegerSpinnerValueFactory extends SpinnerValueFactory<Intege
         return amountToStepBy.get();
     }
 
-    // Overwritten methods
+    // Overridden methods
     @Override
     public void decrement(int steps) {
         final int min = getMin();

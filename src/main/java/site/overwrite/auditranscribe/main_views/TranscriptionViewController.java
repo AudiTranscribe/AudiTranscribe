@@ -51,7 +51,7 @@ import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.audt_file.AUDTFileConstants;
 import site.overwrite.auditranscribe.io.audt_file.ProjectData;
 import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import site.overwrite.auditranscribe.io.audt_file.v0x00080001.data_encapsulators.*;
+import site.overwrite.auditranscribe.io.audt_file.v0x00090002.data_encapsulators.*;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.main_views.helpers.ProjectIOHandlers;
@@ -64,6 +64,7 @@ import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
 import site.overwrite.auditranscribe.music.MusicKey;
 import site.overwrite.auditranscribe.music.MusicKeyEstimator;
+import site.overwrite.auditranscribe.music.TimeSignature;
 import site.overwrite.auditranscribe.music.bpm_estimation.BPMEstimator;
 import site.overwrite.auditranscribe.music.exceptions.NoteRectangleCollisionException;
 import site.overwrite.auditranscribe.music.notes.MIDIInstrument;
@@ -124,6 +125,10 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
     private final KeyCodeCombination SAVE_PROJECT_COMBINATION =
             new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN);
+    private final KeyCodeCombination UNDO_NOTE_EDIT_COMBINATION =
+            new KeyCodeCombination(KeyCode.Z, KeyCombination.SHORTCUT_DOWN);
+    private final KeyCodeCombination REDO_NOTE_EDIT_COMBINATION =
+            new KeyCodeCombination(KeyCode.Z, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
 
     // File-Savable Attributes
     private int numSkippableBytes;
@@ -132,7 +137,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
     private String projectName;
     private int musicKeyIndex = 0;  // Index of the music key chosen, according to the `MUSIC_KEYS` array
-    private int timeSignatureIndex = 0;
+    private TimeSignature timeSignature = TimeSignature.FOUR_FOUR;
     private double bpm = 120;
     private double offset = 0.;
     private double audioVolume = 0.5;
@@ -199,7 +204,8 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
     @FXML
     private MenuItem newProjectMenuItem, openProjectMenuItem, renameProjectMenuItem, saveProjectMenuItem,
-            saveAsMenuItem, exportMIDIMenuItem, preferencesMenuItem, quantizeNotesMenuItem, aboutMenuItem;
+            saveAsMenuItem, exportMIDIMenuItem, preferencesMenuItem, undoMenuItem, redoMenuItem, quantizeNotesMenuItem,
+            docsMenuItem, aboutMenuItem;
 
     // Main elements
     @FXML
@@ -213,7 +219,10 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
     private Button newProjectButton, openProjectButton, saveProjectButton;
 
     @FXML
-    private ChoiceBox<String> musicKeyChoice, timeSignatureChoice;
+    private ChoiceBox<String> musicKeyChoice;
+
+    @FXML
+    private ChoiceBox<TimeSignature> timeSignatureChoice;
 
     @FXML
     private Spinner<Double> bpmSpinner, offsetSpinner;
@@ -265,7 +274,8 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         NoteRectangle.allNoteRectangles.clear();
         NoteRectangle.noteRectanglesByNoteNumber.clear();
 
-        // Reset note rectangles settings
+        // Set note rectangles' static attribute
+        NoteRectangle.setSpectrogramPaneAnchor(spectrogramPaneAnchor);
         NoteRectangle.setIsPaused(isPaused);
         NoteRectangle.setCanEdit(canEditNotes);
 
@@ -294,7 +304,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
         // Set the choice boxes' choices
         for (String musicKey : MusicUtils.MUSIC_KEYS) musicKeyChoice.getItems().add(musicKey);
-        for (String timeSignature : MusicUtils.TIME_SIGNATURES) timeSignatureChoice.getItems().add(timeSignature);
+        for (TimeSignature signature : TimeSignature.values()) timeSignatureChoice.getItems().add(signature);
 
         // Set methods on spinners
         bpmSpinner.valueProperty().addListener(
@@ -333,9 +343,9 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
                     // Get the old and new beats per bar
                     int oldBeatsPerBar = 0;
                     if (oldValue != null) {
-                        oldBeatsPerBar = MusicUtils.TIME_SIGNATURE_TO_BEATS_PER_BAR.get(oldValue);
+                        oldBeatsPerBar = oldValue.beatsPerBar;
                     }
-                    int newBeatsPerBar = MusicUtils.TIME_SIGNATURE_TO_BEATS_PER_BAR.get(newValue);
+                    int newBeatsPerBar = newValue.beatsPerBar;
 
                     // Update the beat lines and bar number ellipses, if the spectrogram is ready
                     if (isEverythingReady) {
@@ -352,7 +362,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
                     }
 
                     // Update the time signature index
-                    timeSignatureIndex = ArrayUtils.findIndex(MusicUtils.TIME_SIGNATURES, newValue);
+                    timeSignature = newValue;
 
                     // Update the beats per bar
                     beatsPerBar = newBeatsPerBar;
@@ -536,7 +546,10 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         saveAsMenuItem.setOnAction(event -> handleSavingProject(false, true));
         exportMIDIMenuItem.setOnAction(event -> handleExportMIDI());
         preferencesMenuItem.setOnAction(event -> PreferencesViewController.showPreferencesWindow());
+        undoMenuItem.setOnAction(event -> NoteRectangle.editAction(NoteRectangle.EditAction.UNDO));
+        redoMenuItem.setOnAction(event -> NoteRectangle.editAction(NoteRectangle.EditAction.REDO));
         quantizeNotesMenuItem.setOnAction(event -> handleQuantizeNotes());
+        docsMenuItem.setOnAction(event -> GUIUtils.openURLInBrowser("https://docs.auditranscribe.app/"));
         aboutMenuItem.setOnAction(event -> AboutViewController.showAboutWindow());
 
         // Create scheduler to update memory available
@@ -650,7 +663,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
     public void finishSetup() {
         // Set choices
         musicKeyChoice.setValue(MusicUtils.MUSIC_KEYS[musicKeyIndex]);
-        timeSignatureChoice.setValue(MusicUtils.TIME_SIGNATURES[timeSignatureIndex]);
+        timeSignatureChoice.setValue(timeSignature);
 
         // Update spinners' initial values
         updateBPMValue(bpm, true);
@@ -738,7 +751,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         // Set up project data
         projectName = projectData.projectInfoData.projectName;
         musicKeyIndex = projectData.projectInfoData.musicKeyIndex;
-        timeSignatureIndex = projectData.projectInfoData.timeSignatureIndex;
+        timeSignature = projectData.projectInfoData.timeSignature;
         bpm = projectData.projectInfoData.bpm;
         offset = projectData.projectInfoData.offsetSeconds;
         audioVolume = projectData.projectInfoData.playbackVolume;
@@ -756,6 +769,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             setAudioAndSpectrogramData(projectData.qTransformData, projectData.audioData);
         } catch (IOException | UnsupportedAudioFileException e) {
             Popups.showExceptionAlert(
+                    rootPane.getScene().getWindow(),
                     "Error loading audio data.",
                     "An error occurred when loading the audio data. Does the audio file " +
                             "still exist at the original location?",
@@ -765,6 +779,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             e.printStackTrace();
         } catch (FFmpegNotFoundException e) {
             Popups.showExceptionAlert(
+                    rootPane.getScene().getWindow(),
                     "Error loading audio data.",
                     "FFmpeg was not found. Please install it and try again.",
                     e
@@ -773,6 +788,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             e.printStackTrace();
         } catch (AudioTooLongException e) {
             Popups.showExceptionAlert(
+                    rootPane.getScene().getWindow(),
                     "Error loading audio data.",
                     "The audio file is too long. Please select a shorter audio file.",
                     e
@@ -783,7 +799,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
         // Update music key and beats per bar
         musicKey = MusicUtils.MUSIC_KEYS[musicKeyIndex];
-        beatsPerBar = MusicUtils.TIME_SIGNATURE_TO_BEATS_PER_BAR.get(MusicUtils.TIME_SIGNATURES[timeSignatureIndex]);
+        beatsPerBar = timeSignature.beatsPerBar;
 
         // Attempt to add this project to the projects' database
         try {
@@ -893,6 +909,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
                         // Show alert
                         Platform.runLater(() -> Popups.showInformationAlert(
+                                rootPane.getScene().getWindow(),
                                 "Music Key Estimation Found Other Possible Keys",
                                 "Most likely music key, with decreasing correlation:\n" +
                                         mostLikelyKey.name + ": " + MathUtils.round(mostLikelyKeyCorr, 3) + "\n" +
@@ -1100,6 +1117,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             ButtonType saveAndExit = new ButtonType("Save");
 
             Optional<ButtonType> selectedButton = Popups.showMultiButtonAlert(
+                    rootPane.getScene().getWindow(),
                     "",
                     "",
                     "Save changes to project before leaving?",
@@ -1121,6 +1139,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
                         } catch (IOException | FFmpegNotFoundException e) {
                             // Show exception that was thrown
                             Popups.showExceptionAlert(
+                                    rootPane.getScene().getWindow(),
                                     "File Saving Failure",
                                     "AudiTranscribe failed to save the file.",
                                     e
@@ -1129,7 +1148,11 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
                             return false;  // Cannot exit
                         }
                     } else {
-                        Popups.showInformationAlert("Info", "No destination specified.");
+                        Popups.showInformationAlert(
+                                rootPane.getScene().getWindow(),
+                                "Info",
+                                "No destination specified."
+                        );
                         return false;  // No file selected; cannot exit
                     }
 
@@ -1254,8 +1277,9 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
      * Helper method that sets up the note player sequencer by setting the notes on it.
      */
     private void setupNotePlayerSequencer() {
-        // Get number of note rectangles
+        // Get note rectangles' data
         int numNoteRects = NoteRectangle.allNoteRectangles.size();
+        Object[] noteRectsKeys = NoteRectangle.allNoteRectangles.keySet().toArray();
 
         // Get the note onset times, note durations, and note numbers from the note rectangles
         double[] noteOnsetTimes = new double[numNoteRects];
@@ -1263,9 +1287,11 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         int[] noteNums = new int[numNoteRects];
 
         for (int i = 0; i < numNoteRects; i++) {
-            noteOnsetTimes[i] = NoteRectangle.allNoteRectangles.get(i).getNoteOnsetTime();
-            noteDurations[i] = NoteRectangle.allNoteRectangles.get(i).getNoteDuration();
-            noteNums[i] = NoteRectangle.allNoteRectangles.get(i).noteNum;
+            String key = (String) noteRectsKeys[i];
+
+            noteOnsetTimes[i] = NoteRectangle.allNoteRectangles.get(key).getNoteOnsetTime();
+            noteDurations[i] = NoteRectangle.allNoteRectangles.get(key).getNoteDuration();
+            noteNums[i] = NoteRectangle.allNoteRectangles.get(key).noteNum;
         }
 
         // Setup note player sequencer
@@ -1339,7 +1365,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
                     "AudiTranscribe files (*.audt)", "*.audt"
             );
-            File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
+            File file = ProjectIOHandlers.openFileDialog(window, extFilter);
 
             // If a file was selected, stop the audio completely
             if (file != null) {
@@ -1348,7 +1374,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
             // Verify that the user actually chose a file
             if (file == null) {
-                Popups.showInformationAlert("Info", "No file selected.");
+                Popups.showInformationAlert(rootPane.getScene().getWindow(), "Info", "No file selected.");
             } else {
                 // Set the scene switching status and the selected file
                 sceneSwitchingState = SceneSwitchingState.OPEN_PROJECT;
@@ -1368,6 +1394,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
     private void handleRenameProject(Event event) {
         // Ask user for new project name
         Optional<String> newProjectNameResponse = Popups.showTextInputDialog(
+                rootPane.getScene().getWindow(),
                 "Rename Project",
                 "Enter New Project Name",
                 "New project name:",
@@ -1403,6 +1430,13 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
         // Get the save destination
         String saveDest = getSaveDestination(forceChooseFile);
+
+        if (saveDest == null) {
+            Popups.showInformationAlert(
+                    rootPane.getScene().getWindow(), "Info", "No destination specified."
+            );
+            return;
+        }
 
         // Set up task to run in alternate thread
         CustomTask<Void> task = new CustomTask<>("Save Project") {
@@ -1445,6 +1479,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             // Show popup upon saving completion, if it is not an autosave
             if (!isAutosave) {
                 Popups.showInformationAlert(
+                        rootPane.getScene().getWindow(),
                         "Saved Successfully",
                         "Project was saved successfully."
                 );
@@ -1465,16 +1500,16 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         Window window = rootPane.getScene().getWindow();
 
         // Ask user to choose a file
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
                 "MIDI Files (*.mid, *.midi)",
                 "*.mid", "*.midi"
-        ));
-        File file = fileChooser.showSaveDialog(window);
+        );
+        File file = ProjectIOHandlers.saveFileDialog(window, extFilter);
 
         // If operation was cancelled, show error
         if (file == null) {
             Popups.showInformationAlert(
+                    rootPane.getScene().getWindow(),
                     "No destination specified",
                     "No destination was specified. The MIDI file will not be created."
             );
@@ -1487,16 +1522,18 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         // Now write the sequence to the MIDI file
         try {
             notePlayerSequencer.exportToMIDI(
-                    MusicUtils.TIME_SIGNATURES[timeSignatureIndex], musicKey, file.getAbsolutePath()
+                    timeSignature, musicKey, file.getAbsolutePath()
             );
             log(Level.FINE, "Exported notes to '" + file.getAbsolutePath() + "'.");
             Popups.showInformationAlert(
+                    rootPane.getScene().getWindow(),
                     "Successfully exported to MIDI",
                     "Successfully exported to MIDI."
             );
         } catch (IOException e) {
             logException(e);
             Popups.showExceptionAlert(
+                    rootPane.getScene().getWindow(),
                     "Failed to export to MIDI file",
                     "An exception occurred when exporting the notes to MIDI file.",
                     e
@@ -1508,8 +1545,22 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
      * Helper method that helps quantize the notes.
      */
     private void handleQuantizeNotes() {
-        NoteRectangle.quantizeNotes(bpm, offset, timeSignatureChoice.getValue());
-        log(Level.FINE, "Quantized notes");
+        if (canEditNotes) {
+            NoteRectangle.quantizeNotes(bpm, offset, timeSignature);
+            Popups.showInformationAlert(
+                    rootPane.getScene().getWindow(),
+                    "Quantized Notes",
+                    "Notes have been quantized."
+            );
+            log(Level.FINE, "Quantized notes");
+        } else {
+            Popups.showWarningAlert(
+                    rootPane.getScene().getWindow(),
+                    "Did Not Quantize Notes",
+                    "Please enter into editing mode before quantizing notes."
+            );
+        }
+
     }
 
     /**
@@ -1525,28 +1576,32 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
     private void saveData(
             boolean forceChooseFile, String saveDest, CustomTask<?> task
     ) throws FFmpegNotFoundException, IOException {
-        // Get data from the note rectangles
+        // Get note rectangles' data
         int numRectangles = NoteRectangle.allNoteRectangles.size();
+        Object[] noteRectsKeys = NoteRectangle.allNoteRectangles.keySet().toArray();
+
         double[] timesToPlaceRectangles = new double[numRectangles];
         double[] noteDurations = new double[numRectangles];
         int[] noteNums = new int[numRectangles];
 
         for (int i = 0; i < numRectangles; i++) {
-            NoteRectangle noteRectangle = NoteRectangle.allNoteRectangles.get(i);
+            String key = (String) noteRectsKeys[i];
+            NoteRectangle noteRectangle = NoteRectangle.allNoteRectangles.get(key);
+
             timesToPlaceRectangles[i] = noteRectangle.getNoteOnsetTime();
             noteDurations[i] = noteRectangle.getNoteDuration();
             noteNums[i] = noteRectangle.noteNum;
         }
 
         // Package project info data and music notes data for saving
-        // (Note: current file version is 0x00080001, so all data objects used will be for that version)
+        // (Note: current file version is 0x00090002, so all data objects used will be for that version)
         log(Level.INFO, "Packaging data for saving");
 
-        ProjectInfoDataObject projectInfoData = new ProjectInfoDataObject0x00080001(
-                projectName, musicKeyIndex, timeSignatureIndex, bpm, offset, audioVolume,
+        ProjectInfoDataObject projectInfoData = new ProjectInfoDataObject0x00090002(
+                projectName, musicKeyIndex, timeSignature, bpm, offset, audioVolume,
                 (int) (currTime * 1000)
         );
-        MusicNotesDataObject musicNotesData = new MusicNotesDataObject0x00080001(
+        MusicNotesDataObject musicNotesData = new MusicNotesDataObject0x00090002(
                 timesToPlaceRectangles, noteDurations, noteNums
         );
 
@@ -1576,10 +1631,10 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             }
 
             // Package Q-transform data and audio data for saving
-            QTransformDataObject qTransformData = new QTransformDataObject0x00080001(
+            QTransformDataObject qTransformData = new QTransformDataObject0x00090002(
                     qTransformBytes, minQTransformMagnitude, maxQTransformMagnitude
             );
-            AudioDataObject audioData = new AudioDataObject0x00080001(
+            AudioDataObject audioData = new AudioDataObject0x00090002(
                     compressedOriginalMP3Bytes, compressedSlowedMP3Bytes, sampleRate, (int) (audioDuration * 1000)
             );
 
@@ -1590,7 +1645,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
                     audioData.numBytesNeeded();
 
             // Update the unchanging data properties
-            UnchangingDataPropertiesObject unchangingDataProperties = new UnchangingDataPropertiesObject0x00080001(
+            UnchangingDataPropertiesObject unchangingDataProperties = new UnchangingDataPropertiesObject0x00090002(
                     numSkippableBytes
             );
 
@@ -1985,7 +2040,14 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
                     }
 
                     // Show error dialog
-                    Popups.showExceptionAlert(headerText, contentText, task.getException());
+                    Popups.showExceptionAlert(
+                            rootPane.getScene().getWindow(), headerText, contentText, task.getException()
+                    );
+
+                    // Clear progress bar area
+                    progressBarHBox.setVisible(false);
+                    progressBar.progressProperty().unbind();
+                    progressLabel.textProperty().unbind();
                 }));
 
                 // Add all tasks to the ongoing tasks queue
@@ -2063,6 +2125,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
                 if (!notePlayerSequencer.isSequencerAvailable()) {
                     // Show a warning message to the user
                     Popups.showWarningAlert(
+                            rootPane.getScene().getWindow(),
                             "MIDI Playback Unavailable",
                             "The MIDI playback is not available on your system. Playback of created " +
                                     "notes will not work."
@@ -2087,6 +2150,9 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
                 for (Node node : disabledNodes) {
                     node.setDisable(false);
                 }
+
+                // Clear note rectangles' stacks
+                NoteRectangle.clearStacks();
 
                 // Handle attempt to close the window
                 rootPane.getScene().getWindow().setOnCloseRequest((windowEvent) -> {
@@ -2132,7 +2198,6 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
                 // Update the progress section
                 progressBar.progressProperty().bind(currentTask.progressProperty());
                 progressLabel.textProperty().bind(currentTask.messageProperty());
-
             } else {
                 progressBarHBox.setVisible(false);
                 progressBar.progressProperty().unbind();
@@ -2282,10 +2347,14 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             return;
         }
 
-        // Check if user wants to save the project
+        // Check if user is using any shortcuts
         if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {  // Save current project
             handleSavingProject(false, false);
             return;
+        } else if (UNDO_NOTE_EDIT_COMBINATION.match(keyEvent)) {  // Undo note edit
+            NoteRectangle.editAction(NoteRectangle.EditAction.UNDO);
+        } else if (REDO_NOTE_EDIT_COMBINATION.match(keyEvent)) {  // Redo note edit
+            NoteRectangle.editAction(NoteRectangle.EditAction.REDO);
         }
 
         // Otherwise, get the key event's key code
@@ -2315,7 +2384,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             }
             case EQUALS -> {
                 notePlayerSynth.silenceChannel();  // Stop any notes from playing
-                if (octaveNum < 9) {
+                if (octaveNum < 8) {
                     log(Level.FINE, "Playback octave lowered to " + octaveNum);
                     PlottingStuffHandler.updateCurrentOctaveRectangle(
                             currentOctaveRectangle, finalHeight, ++octaveNum, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER
@@ -2394,7 +2463,8 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
      * Helper method that gets the save destination.
      *
      * @param forceChooseFile Whether the save destination must be forcibly chosen.
-     * @return String representing the save destination.
+     * @return String representing the save destination. Returns <code>null</code> if no destination
+     * was specified.
      */
     private String getSaveDestination(boolean forceChooseFile) {
         String saveDest, saveName;
@@ -2407,8 +2477,10 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             Window window = rootPane.getScene().getWindow();
 
             // Ask user to choose a file
-            FileChooser fileChooser = new FileChooser();
-            File file = fileChooser.showSaveDialog(window);
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                    "AudiTranscribe File (*.audt)", "*.audt"
+            );
+            File file = ProjectIOHandlers.saveFileDialog(window, extFilter);
 
             // If operation was cancelled return
             if (file == null) return null;

@@ -46,10 +46,8 @@ public class Plotter extends ClassWithLogging {
 
     private BufferedImage bufferedImage;
 
-    // Constructor
-
     /**
-     * Creates a plotter object.
+     * Creates a <code>Plotter</code> object.
      *
      * @param colourScale        The colour scale to use for the spectrogram.
      * @param intensityPrecision The level of precision to be used when calculating relative

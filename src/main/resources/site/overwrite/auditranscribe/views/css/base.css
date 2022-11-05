@@ -27,7 +27,8 @@
 }
 
 /* Buttons */
-.button {
+.button, .button:hover {
+    -fx-font-size: 14px;
     -fx-cursor: hand;
 }
 
@@ -42,7 +43,8 @@
 }
 
 /* Hyperlinks */
-.hyperlink:hover {
+.hyperlink, .hyperlink:hover {
+    -fx-font-size: 14px;
     -fx-cursor: hand;
 }
 
@@ -87,7 +89,7 @@
 }
 
 /* Buttons */
-.main-menu-button {
+.main-menu-button, .main-menu-button:hover {
     -fx-font-size: 16px;
 }
 
@@ -193,6 +195,10 @@
 }
 
 /* PREFERENCES PAGE */
+.preference-page-button, .preference-page-button:hover {
+    -fx-font-size: 13px;
+}
+
 .setting-label {
     -fx-font-size: 13px;
     -fx-font-weight: bold;

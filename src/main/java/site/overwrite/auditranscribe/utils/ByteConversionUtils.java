@@ -35,6 +35,16 @@ public final class ByteConversionUtils {
     // Public methods
 
     /**
+     * Method that converts the short <code>x</code> into an array of 2 bytes.
+     *
+     * @param x Short to convert.
+     * @return Array of 2 bytes, representing the short.
+     */
+    public static byte[] shortToByte(short x) {
+        return ByteBuffer.allocate(2).order(ByteOrder.BIG_ENDIAN).putShort(x).array();
+    }
+
+    /**
      * Method that converts the integer <code>x</code> into an array of 4 bytes.
      *
      * @param x Integer to convert.
@@ -65,16 +75,6 @@ public final class ByteConversionUtils {
 
         // Return the finished array
         return bytes;
-    }
-
-    /**
-     * Method that converts a character into its byte representation.
-     *
-     * @param c Character.
-     * @return One byte representing the character <code>c</code>.
-     */
-    public static byte charToByte(char c) {
-        return (byte) c;
     }
 
     /**
@@ -154,55 +154,6 @@ public final class ByteConversionUtils {
     }
 
     /**
-     * Method that converts an 2D array of doubles into a byte array.
-     *
-     * @param array 2D array of doubles. <b>This assumes that each subarray has the same length.</b>
-     * @return Array of bytes, representing the 2D array of doubles.
-     */
-    public static byte[] twoDimensionalDoubleArrayToBytes(double[][] array) {
-        // Get the number of 1D arrays present in the main array
-        int numSubarrays = array.length;
-        int subarrayLength = array[0].length;  // Using assumption: each subarray has the same length
-
-        // Calculate the total number of doubles
-        int numDoubles = numSubarrays * subarrayLength;
-
-        // Calculate the total number of bytes needed
-        int numBytes = 8 * numDoubles  // Each double takes 8 bytes to store
-                + 4                    // Bytes to denote subarray length
-                + 4;                   // Bytes to denote number of subarrays
-
-        // Create the byte array
-        byte[] bytes = new byte[numBytes];
-
-        // Write the total number of subarrays and subarray length bytes into the bytes array
-        byte[] numSubarraysBytes = intToBytes(numSubarrays);
-        System.arraycopy(numSubarraysBytes, 0, bytes, 0, 4);
-
-        byte[] subarrayLengthBytes = intToBytes(subarrayLength);
-        System.arraycopy(subarrayLengthBytes, 0, bytes, 4, 4);
-
-        // Copy each double's bytes into the master byte aray
-        int numWrittenBytes = 8;  // We have already written 8 bytes in total
-
-        for (double[] doubles : array) {
-            for (double dbl : doubles) {
-                // Get the bytes that represent the double
-                byte[] doubleBytes = doubleToBytes(dbl);
-
-                // Update the byte array
-                System.arraycopy(doubleBytes, 0, bytes, numWrittenBytes, 8);
-
-                // Update the number of written bytes
-                numWrittenBytes += 8;
-            }
-        }
-
-        // Return the byte array
-        return bytes;
-    }
-
-    /**
      * Method that converts an 2D array of integers into a byte array.
      *
      * @param array 2D array of integers. <b>This assumes that each subarray has the same length.</b>
@@ -252,6 +203,21 @@ public final class ByteConversionUtils {
     }
 
     /**
+     * Method that converts an array of 2 bytes into a short.
+     *
+     * @param bytes Byte array to convert into a short.
+     * @return Short represented by the 2 bytes.
+     * @throws LengthException If the bytes array does <b>not</b> have exactly 2 bytes.
+     */
+    public static short bytesToShort(byte[] bytes) {
+        // Assert that there are exactly 2 bytes to convert
+        if (bytes.length != 2) throw new LengthException("There must be exactly 2 bytes in the bytes array.");
+
+        // Convert the bytes array to the short
+        return ByteBuffer.wrap(bytes).order(ByteOrder.BIG_ENDIAN).getShort();
+    }
+
+    /**
      * Method that converts an array of 4 bytes into an integer.
      *
      * @param bytes Byte array to convert into an integer.
@@ -282,16 +248,6 @@ public final class ByteConversionUtils {
     }
 
     /**
-     * Method that converts a byte into its character representation.
-     *
-     * @param b The byte to convert.
-     * @return Character representation of the byte <code>b</code>.
-     */
-    public static char byteToChar(byte b) {
-        return (char) b;
-    }
-
-    /**
      * Method that converts a byte array into a string.
      *
      * @param bytes Byte array.
@@ -301,7 +257,7 @@ public final class ByteConversionUtils {
         // Create the output string
         StringBuilder output = new StringBuilder();
         for (byte aByte : bytes) {
-            output.append(byteToChar(aByte));
+            output.append((char) aByte);
         }
 
         // Return the output string
@@ -356,43 +312,6 @@ public final class ByteConversionUtils {
 
             // Convert the bytes into a double and place into the array
             array[i] = bytesToDouble(currElemBytes);
-        }
-
-        // Return the double array
-        return array;
-    }
-
-    /**
-     * Method that converts a byte array into a 2D double array.
-     *
-     * @param bytes Byte array.
-     * @return 2D double array that was represented by the byte array.
-     */
-    public static double[][] bytesToTwoDimensionalDoubleArray(byte[] bytes) {
-        // First 4 bytes represent the number of subarrays in the resulting array
-        byte[] numSubarraysBytes = Arrays.copyOfRange(bytes, 0, 4);
-        int numSubarrays = bytesToInt(numSubarraysBytes);
-
-        // Next 4 bytes represent the number of doubles in each subarray (i.e. subarray length)
-        byte[] subarrayLengthBytes = Arrays.copyOfRange(bytes, 4, 8);
-        int subarrayLength = bytesToInt(subarrayLengthBytes);
-
-        // Create the double array
-        double[][] array = new double[numSubarrays][subarrayLength];
-
-        // Go through the remaining bytes and retrieve the doubles
-        for (int i = 0; i < numSubarrays; i++) {
-            for (int j = 0; j < subarrayLength; j++) {
-                // Get the bytes that represent the current element
-                byte[] currElemBytes = Arrays.copyOfRange(
-                        bytes,
-                        8 + 8 * i * subarrayLength + j * 8,
-                        8 + 8 * i * subarrayLength + (j + 1) * 8
-                );
-
-                // Convert the bytes into a double and place into the array
-                array[i][j] = bytesToDouble(currElemBytes);
-            }
         }
 
         // Return the double array

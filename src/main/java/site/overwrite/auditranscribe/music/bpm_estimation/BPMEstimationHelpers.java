@@ -40,8 +40,10 @@ public final class BPMEstimationHelpers {
     public static double[] tempoFrequencies(int numBins, double hopLength, double sampleRate) {
         double[] binFreqs = new double[numBins];
         binFreqs[0] = Double.POSITIVE_INFINITY;
+
+        double scale =  60 * sampleRate / hopLength;
         for (int i = 1; i < numBins; i++) {
-            binFreqs[i] = 60. * sampleRate / (i * hopLength);
+            binFreqs[i] = scale / i;
         }
         return binFreqs;
     }

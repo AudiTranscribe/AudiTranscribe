@@ -34,10 +34,7 @@ import java.util.Map;
  */
 public class IconsData extends ClassWithLogging {
     // Constants
-    final String ICON_DATA_FILE_PATH = IOMethods.joinPaths(
-            "images", "icons", "icons.json"
-    );
-
+    final String ICON_DATA_FILE_PATH = IOMethods.joinPaths("images", "icons", "icons.json");
     public static final IconsData ICONS_DATA = new IconsData();
 
     // Attributes
@@ -76,8 +73,8 @@ public class IconsData extends ClassWithLogging {
         }
     }
 
-    // Helper classes
-    public static class IconsDataEncapsulator {
+    // Helper class(es)
+    static class IconsDataEncapsulator {
         public Map<String, String> themeColours;
         public Map<String, String> svgPaths;
     }

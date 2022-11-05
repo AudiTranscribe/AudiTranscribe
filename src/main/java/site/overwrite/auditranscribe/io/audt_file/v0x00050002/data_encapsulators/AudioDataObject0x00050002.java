@@ -61,7 +61,7 @@ public class AudioDataObject0x00050002 extends AudioDataObject {
         return audioFileName;
     }
 
-    // Overwritten methods
+    // Overridden methods
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -40,7 +40,7 @@ public class QTransformDataObject0x00050002 extends QTransformDataObject {
         this.maxMagnitude = maxMagnitude;
     }
 
-    // Overwritten methods
+    // Overridden methods
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

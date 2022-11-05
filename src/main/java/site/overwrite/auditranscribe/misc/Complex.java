@@ -56,21 +56,6 @@ public class Complex {
         im = 0;
     }
 
-    // Overwritten methods
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null) return false;
-        if (getClass() != o.getClass()) return false;
-        Complex that = (Complex) o;
-        return (this.re == that.re) && (this.im == that.im);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(re, im);
-    }
-
     // Standard methods
 
     /**
@@ -89,22 +74,6 @@ public class Complex {
      */
     public double im() {
         return im;
-    }
-
-    // Standard `Object` methods
-
-    /**
-     * Generates a string representation of the complex number.<br>
-     * Note that we use "j" for the imaginary unit to follow Python's convention of the imaginary
-     * unit.
-     *
-     * @return String representation of the complex number.
-     */
-    public String toString() {
-        if (im == 0) return re + "";  // Concat "" to the end to make it a string
-        if (re == 0) return im + "j";
-        if (im < 0) return re + " - " + (-im) + "j";
-        return re + " + " + im + "j";
     }
 
     // Assertion methods
@@ -165,9 +134,8 @@ public class Complex {
      * @return A <code>Complex</code> object representing the resulting complex number.
      */
     public Complex plus(Complex other) {
-        Complex self = this;
-        double real = self.re + other.re;
-        double imag = self.im + other.im;
+        double real = this.re + other.re;
+        double imag = this.im + other.im;
         return new Complex(real, imag);
     }
 
@@ -179,21 +147,20 @@ public class Complex {
      * @return A <code>Complex</code> object representing the resulting complex number.
      */
     public Complex minus(Complex other) {
-        Complex a = this;
-        double real = a.re - other.re;
-        double imag = a.im - other.im;
+        double real = this.re - other.re;
+        double imag = this.im - other.im;
         return new Complex(real, imag);
     }
 
     /**
-     * Returns the scaled version of this complex number when scaled by the real number
-     * <code>alpha</code>.
+     * Returns the scaled version of this complex number when multiplied by the <b>real number</b>
+     * <code>other</code>.
      *
-     * @param alpha The scale factor.
+     * @param other The real number to multiply by.
      * @return A <code>Complex</code> object representing the resulting complex number.
      */
-    public Complex scale(double alpha) {
-        return new Complex(alpha * re, alpha * im);
+    public Complex times(double other) {
+        return new Complex(other * re, other * im);
     }
 
     /**
@@ -204,12 +171,11 @@ public class Complex {
      */
     public Complex times(Complex other) {
         // Check if the other complex number is purely real
-        if (other.isPurelyReal()) return this.scale(other.re);
+        if (other.isPurelyReal()) return new Complex(this.re * other.re, this.im * other.re);
 
         // Otherwise, perform complex number multiplication
-        Complex a = this;
-        double real = a.re * other.re - a.im * other.im;
-        double imag = a.re * other.im + a.im * other.re;
+        double real = this.re * other.re - this.im * other.im;
+        double imag = this.re * other.im + this.im * other.re;
         return new Complex(real, imag);
     }
 
@@ -219,8 +185,9 @@ public class Complex {
      * @return A <code>Complex</code> object representing the reciprocal of this complex number.
      */
     public Complex reciprocal() {
-        double scale = re * re + im * im;
-        return new Complex(re / scale, -im / scale);
+        double denominator = re * re + im * im;
+        double scale = 1 / denominator;  // This is to reduce computation later with multiplication
+        return new Complex(re * scale, -im * scale);
     }
 
     /**
@@ -231,7 +198,7 @@ public class Complex {
      * @return A <code>Complex</code> object representing the resulting complex number.
      */
     public Complex divides(double other) {
-        return this.scale(1.0 / other);
+        return this.times(1. / other);
     }
 
     /**
@@ -242,7 +209,7 @@ public class Complex {
      */
     public Complex divides(Complex other) {
         // Check if the other complex number is purely real
-        if (other.isPurelyReal()) return this.divides(other.re);
+        if (other.isPurelyReal()) return this.times(1 / other.re);
 
         // If not, do standard complex division
         return this.times(other.reciprocal());
@@ -305,11 +272,11 @@ public class Complex {
         double numeratorReal = a.re * b.re + a.im * b.im;
         double numeratorImag = b.re * a.im - a.re * b.im;
 
-        double denominator = 1 / (b.re * b.re + b.im * b.im);  // Note that denominator is purely real
+        double denominatorAsScale = 1 / (b.re * b.re + b.im * b.im);  // Do this to only invoke multiplication later
 
         // Combine numerator and denominator into the final real and imaginary parts
-        double real = numeratorReal * denominator;
-        double imag = numeratorImag * denominator;
+        double real = numeratorReal * denominatorAsScale;
+        double imag = numeratorImag * denominatorAsScale;
 
         // Return the new complex number
         return new Complex(real, imag);
@@ -323,14 +290,23 @@ public class Complex {
      * @return Value of e^<code>z</code>
      */
     public static Complex exp(Complex z) {
+        /*
+         * Recall that if z = u + vi where u and v are real numbers then:
+         *      e^z = e^(u + vi) = e^u * e^(vi).
+         * The e^u part can be found trivially; e^(vi) can be found by using Euler's identity:
+         *      e^(vi) = cos(v) + i sin(v).
+         * So,
+         *      e^z = e^(u + vi) = e^u * (cos(v) + i sin(v)).
+         */
+
         // Get the modulus of the final answer
-        double mod = Math.exp(z.re);
+        double modulus = Math.exp(z.re);
 
         // Get the 'complex' part of the final answer
         Complex complexPart = new Complex(Math.cos(z.im), Math.sin(z.im));
 
         // Return the final answer
-        return complexPart.scale(mod);
+        return complexPart.times(modulus);
     }
 
     // Misc Methods
@@ -347,5 +323,36 @@ public class Complex {
         im = MathUtils.round(im, dp);
 
         return this;
+    }
+
+    // Overridden methods
+
+    /**
+     * Generates a string representation of the complex number.<br>
+     * Note that we use "j" for the imaginary unit to follow Python's convention of the imaginary
+     * unit.
+     *
+     * @return String representation of the complex number.
+     */
+    @Override
+    public String toString() {
+        if (im == 0) return re + "";  // Concat "" to the end to make it a string
+        if (re == 0) return im + "j";
+        if (im < 0) return re + " - " + (-im) + "j";
+        return re + " + " + im + "j";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        if (getClass() != o.getClass()) return false;
+        Complex that = (Complex) o;
+        return (this.re == that.re) && (this.im == that.im);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(re, im);
     }
 }

@@ -61,8 +61,8 @@ public class FFmpegDownloadManager extends AbstractDownloadManager {
         os = OSMethods.getOS();
         downloadFileName = "ffmpeg.zip";
 
-        // Linux is currently not supported
-        if (os == OSType.LINUX) {
+        // Linux and others do not have automatic FFmpeg installation
+        if (os == OSType.LINUX || os == OSType.OTHER) {
             downloadURL = null;
             signature = null;
             ffmpegFolder = null;
@@ -98,37 +98,6 @@ public class FFmpegDownloadManager extends AbstractDownloadManager {
 
         // Handle download proper
         return super.downloadResource(destFolder, task);
-    }
-
-    @Override
-    public void processDownload(String downloadedResourcePath) throws IOException {
-        // Unzip the downloaded file
-        log(Level.INFO, "Unzipping FFmpeg");
-        CompressionHandlers.zipDecompress(outputFolder, downloadedResourcePath);
-
-        // Define a variable to store the FFmpeg binary path
-        if (os == OSType.MAC) {
-            // Set executable status if needed
-            if (!new File(IOMethods.joinPaths(outputFolder, "ffmpeg")).setExecutable(true)) {
-                IOException e = new IOException(
-                        "Failed to set executable status for '" + IOMethods.joinPaths(outputFolder, "ffmpeg") + "'."
-                );
-                logException(e);
-                throw e;
-            } else {
-                log(Level.INFO, "Set executable status for FFmpeg");
-                ffmpegBinPath = IOMethods.joinPaths(outputFolder, "ffmpeg");
-            }
-        } else if (os == OSType.WINDOWS) {
-            ffmpegBinPath = IOMethods.joinPaths(outputFolder, "ffmpeg.exe");
-        } else {
-            throw new IOException("Unrecognised OS");
-        }
-
-        // Delete the downloaded zip file
-        IOMethods.delete(IOMethods.joinPaths(destFolder, "ffmpeg.zip"));
-
-        log(Level.INFO, "FFmpeg installation complete");
     }
 
     // Private methods
@@ -176,5 +145,37 @@ public class FFmpegDownloadManager extends AbstractDownloadManager {
         } catch (JsonSyntaxException | APIServerException e) {
             throw new IOException(e);
         }
+    }
+
+    // Overridden methods
+    @Override
+    public void processDownload(String downloadedResourcePath) throws IOException {
+        // Unzip the downloaded file
+        log(Level.INFO, "Unzipping FFmpeg");
+        CompressionHandlers.zipDecompress(outputFolder, downloadedResourcePath);
+
+        // Define a variable to store the FFmpeg binary path
+        if (os == OSType.MAC) {
+            // Set executable status if needed
+            if (!new File(IOMethods.joinPaths(outputFolder, "ffmpeg")).setExecutable(true)) {
+                IOException e = new IOException(
+                        "Failed to set executable status for '" + IOMethods.joinPaths(outputFolder, "ffmpeg") + "'."
+                );
+                logException(e);
+                throw e;
+            } else {
+                log(Level.INFO, "Set executable status for FFmpeg");
+                ffmpegBinPath = IOMethods.joinPaths(outputFolder, "ffmpeg");
+            }
+        } else if (os == OSType.WINDOWS) {
+            ffmpegBinPath = IOMethods.joinPaths(outputFolder, "ffmpeg.exe");
+        } else {
+            throw new IOException("Unrecognised OS");
+        }
+
+        // Delete the downloaded zip file
+        IOMethods.delete(IOMethods.joinPaths(destFolder, "ffmpeg.zip"));
+
+        log(Level.INFO, "FFmpeg installation complete");
     }
 }

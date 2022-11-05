@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
@@ -17,7 +18,7 @@
 <AnchorPane fx:id="rootPane" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="site.overwrite.auditranscribe.main_views.PreferencesViewController">
    <children>
       <TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="350.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-        <tabs>
+         <tabs>
             <Tab text="Audio">
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
@@ -103,9 +104,9 @@
                   </AnchorPane>
                </content>
             </Tab>
-          <Tab text="Transcription">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+            <Tab text="Transcription">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
                         <HBox prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
@@ -148,11 +149,11 @@
                         </HBox>
                      </children>
                   </AnchorPane>
-            </content>
-          </Tab>
+               </content>
+            </Tab>
             <Tab text="Miscellaneous">
-              <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
                         <HBox prefHeight="100.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
@@ -191,6 +192,16 @@
                                           </Label>
                                        </children>
                                     </VBox>
+                                    <VBox alignment="TOP_RIGHT" layoutX="20.0" layoutY="100.0" prefHeight="30.0">
+                                       <children>
+                                          <Label styleClass="setting-label" text="Open AudiTranscribe Data Folder" />
+                                          <Label layoutX="10.0" layoutY="10.0" styleClass="setting-caption" text="Go to the data folder and see its contents">
+                                             <font>
+                                                <Font size="11.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </VBox>
                                  </children>
                               </VBox>
                               <VBox prefHeight="200.0" prefWidth="300.0" spacing="10.0" HBox.hgrow="ALWAYS">
@@ -201,14 +212,15 @@
                                     <ChoiceBox fx:id="themeChoiceBox" prefHeight="30.0" prefWidth="150.0" />
                                     <Spinner fx:id="checkForUpdateIntervalSpinner" editable="true" prefHeight="30.0" />
                                     <Button fx:id="deleteLogsButton" mnemonicParsing="false" prefHeight="30.0" text="Delete Logs" />
+                                    <Button fx:id="openDataFolderButton" layoutX="20.0" layoutY="100.0" mnemonicParsing="false" prefHeight="30.0" text="Open Data Folder" />
                                  </children>
                               </VBox>
                            </children>
                         </HBox>
                      </children></AnchorPane>
-              </content>
+               </content>
             </Tab>
-        </tabs>
+         </tabs>
       </TabPane>
       <HBox alignment="CENTER_RIGHT" prefHeight="50.0" prefWidth="200.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <children>
@@ -217,9 +229,13 @@
                   <Label styleClass="warning-label" text="⚠️ Changes may not take place until next restart." AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
             </AnchorPane>
-            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" prefWidth="60.0" text="Cancel" HBox.hgrow="NEVER" />
+            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" prefWidth="60.0" styleClass="preference-page-button" text="Cancel" HBox.hgrow="NEVER" />
             <Button fx:id="applyButton" disable="true" mnemonicParsing="false" prefWidth="60.0" text="Apply" HBox.hgrow="NEVER" />
-            <Button fx:id="okButton" mnemonicParsing="false" prefWidth="60.0" styleClass="ok-button" text="OK" HBox.hgrow="NEVER" />
+            <Button fx:id="okButton" mnemonicParsing="false" prefWidth="60.0" text="OK" HBox.hgrow="NEVER">
+               <styleClass>
+                  <String fx:value="preference-page-button" />
+                  <String fx:value="ok-button" />
+               </styleClass></Button>
          </children>
          <padding>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

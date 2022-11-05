@@ -23,6 +23,7 @@ import site.overwrite.auditranscribe.generic.exceptions.LengthException;
 import site.overwrite.auditranscribe.generic.exceptions.ValueException;
 import site.overwrite.auditranscribe.generic.tuples.Pair;
 import site.overwrite.auditranscribe.generic.tuples.Triple;
+import site.overwrite.auditranscribe.music.TimeSignature;
 import site.overwrite.auditranscribe.utils.MathUtils;
 import site.overwrite.auditranscribe.utils.MusicUtils;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
@@ -194,12 +195,12 @@ public class NotePlayerSequencer extends ClassWithLogging {
     /**
      * Method that writes the MIDI sequence to a MIDI file.
      *
-     * @param timeSignature  Time signature string (e.g. <code>6/8</code>, <code>3/4</code>).
+     * @param timeSignature  Time signature of the MIDI sequence.
      * @param key            Music key of the piece.
      * @param outputFilePath <b>Absolute</b> path to the output MIDI file.
      * @throws IOException If an IO exception occurs.
      */
-    public void exportToMIDI(String timeSignature, String key, String outputFilePath) throws IOException {
+    public void exportToMIDI(TimeSignature timeSignature, String key, String outputFilePath) throws IOException {
         setTimeSignatureOfNotePlayer(timeSignature);
         setKeySignatureOfNotePlayer(key);
         setTempoOfNotePlayer((float) bpm);
@@ -355,7 +356,7 @@ public class NotePlayerSequencer extends ClassWithLogging {
      * clocks, and that there are eight 32nd notes per beat.<br>
      * This method also assumes that the <code>denominator</code> is a perfect power of 2.
      *
-     * @param timeSignature Time signature string (e.g. <code>6/8</code>, <code>3/4</code>).
+     * @param timeSignature Time signature to set.
      * @throws ValueException If: <ul>
      *                        <li>
      *                        Either the <code>numerator</code> or <code>denominator</code> does not
@@ -366,23 +367,11 @@ public class NotePlayerSequencer extends ClassWithLogging {
      *                        </li>
      *                        </ul>
      */
-    private void setTimeSignatureOfNotePlayer(String timeSignature) {
-        // Parse the time signature
-        Pair<Integer, Integer> numeratorAndDenominator = MusicUtils.parseTimeSignature(timeSignature);
-        int numerator = numeratorAndDenominator.value0();
-        int denominator = numeratorAndDenominator.value1();
-
-        // Check if the numerator and denominator values are valid
-        if (!(numerator >= 0 && numerator <= 255 && denominator >= 0 && denominator <= 255))
-            throw new ValueException("Numerator and denominator must be in the interval [0, 255]");
-
-        // Check if the denominator is a power of 2
-        if (!MathUtils.isPowerOf2(denominator)) throw new ValueException("Denominator must be a power of 2");
-
+    private void setTimeSignatureOfNotePlayer(TimeSignature timeSignature) {
         // Create the time signature byte array
         byte[] timeSignatureByteArray = {
-                (byte) numerator,
-                (byte) ((int) MathUtils.log2(denominator)),
+                (byte) timeSignature.beatsPerBar,
+                (byte) ((int) MathUtils.log2(timeSignature.denominator.numericValue)),
                 0x18,  // Metronome click once every 24 = 0x18 MIDI clocks
                 0x08   // Eight 32nd notes per beat
         };

@@ -62,7 +62,7 @@ public class SpecifyFFmpegPathViewController extends ClassWithLogging implements
             );
 
             // Get the file
-            File possibleFFmpegBinary = ProjectIOHandlers.getFileFromFileDialog(
+            File possibleFFmpegBinary = ProjectIOHandlers.openFileDialog(
                     rootPane.getScene().getWindow(), extFilter
             );
 
@@ -72,7 +72,7 @@ public class SpecifyFFmpegPathViewController extends ClassWithLogging implements
                 ffmpegBinaryPathTextField.setText(possibleFFmpegBinary.getAbsolutePath());
                 log(Level.INFO, "FFmpeg path set to " + ffmpegBinaryPathTextField.getText());
             } else {
-                Popups.showInformationAlert("Info", "No file selected.");
+                Popups.showInformationAlert(rootPane.getScene().getWindow(), "Info", "No file selected.");
             }
         });
         checkFFmpegPathButton.setOnAction(event -> ((Stage) rootPane.getScene().getWindow()).close());

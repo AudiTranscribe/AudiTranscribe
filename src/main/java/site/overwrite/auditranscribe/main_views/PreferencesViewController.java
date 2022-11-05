@@ -28,11 +28,13 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import site.overwrite.auditranscribe.audio.FFmpegHandler;
 import site.overwrite.auditranscribe.audio.WindowFunction;
 import site.overwrite.auditranscribe.generic.ClassWithLogging;
+import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.main_views.helpers.ProjectIOHandlers;
@@ -41,8 +43,9 @@ import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
 import site.overwrite.auditranscribe.misc.spinners.CustomIntegerSpinnerValueFactory;
-import site.overwrite.auditranscribe.music.notes.NoteQuantizationUnit;
+import site.overwrite.auditranscribe.music.NoteUnit;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
+import site.overwrite.auditranscribe.utils.GUIUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,7 +68,7 @@ public class PreferencesViewController extends ClassWithLogging implements Initi
     private ChoiceBox<WindowFunction> windowFunctionChoiceBox;
 
     @FXML
-    private ChoiceBox<NoteQuantizationUnit> noteQuantizationChoiceBox;
+    private ChoiceBox<NoteUnit> noteQuantizationChoiceBox;
 
     @FXML
     private ChoiceBox<Theme> themeChoiceBox;
@@ -77,7 +80,7 @@ public class PreferencesViewController extends ClassWithLogging implements Initi
     private Spinner<Double> notePlayingDelayOffsetSpinner;
 
     @FXML
-    private Button selectFFmpegBinaryButton, deleteLogsButton;
+    private Button selectFFmpegBinaryButton, deleteLogsButton, openDataFolderButton;
 
     @FXML
     private TextField ffmpegBinaryPathTextField;
@@ -93,7 +96,7 @@ public class PreferencesViewController extends ClassWithLogging implements Initi
             colourScaleChoiceBox.getItems().add(colourScale);
         for (WindowFunction windowFunction : WindowFunction.values())
             windowFunctionChoiceBox.getItems().add(windowFunction);
-        for (NoteQuantizationUnit noteQuantizationUnit : NoteQuantizationUnit.values())
+        for (NoteUnit noteQuantizationUnit : NoteUnit.values())
             noteQuantizationChoiceBox.getItems().add(noteQuantizationUnit);
 
         for (Theme theme : Theme.values())
@@ -108,7 +111,7 @@ public class PreferencesViewController extends ClassWithLogging implements Initi
             );
 
             // Get the file
-            File possibleFFmpegBinary = ProjectIOHandlers.getFileFromFileDialog(
+            File possibleFFmpegBinary = ProjectIOHandlers.openFileDialog(
                     rootPane.getScene().getWindow(), extFilter
             );
 
@@ -117,7 +120,7 @@ public class PreferencesViewController extends ClassWithLogging implements Initi
                 // Update the value of the FFmpeg path text field
                 ffmpegBinaryPathTextField.setText(possibleFFmpegBinary.getAbsolutePath());
             } else {
-                Popups.showInformationAlert("Info", "No file selected.");
+                Popups.showInformationAlert(rootPane.getScene().getWindow(), "Info", "No file selected.");
             }
         });
 
@@ -136,17 +139,20 @@ public class PreferencesViewController extends ClassWithLogging implements Initi
                     }
                 }
 
+                String title = "";
+                String content = "No logs to delete.";
+
                 if (numDeleted != 0) {
-                    Popups.showInformationAlert(
-                            "Deleted Logs",
-                            "Deleted " + numDeleted + " " + (numDeleted == 1 ? "log" : "logs") +
-                                    " from the logs folder."
-                    );
-                } else {
-                    Popups.showInformationAlert("", "No logs to delete.");
+                    title = "Deleted Logs";
+                    content = "Deleted " + numDeleted + " " + (numDeleted == 1 ? "log" : "logs") +
+                            " from the logs folder.";
                 }
+
+                Popups.showInformationAlert(rootPane.getScene().getWindow(), title, content);
             }
         });
+
+        openDataFolderButton.setOnAction(event -> GUIUtils.openFolderInGUI(IOConstants.APP_DATA_FOLDER_PATH));
 
         cancelButton.setOnAction(event -> closePreferencesPane());
 
@@ -180,7 +186,7 @@ public class PreferencesViewController extends ClassWithLogging implements Initi
 
                     // Show a warning message
                     Popups.showWarningAlert(
-                            "Invalid FFmpeg Binary Path",
+                            null, "Invalid FFmpeg Binary Path",
                             "The provided path does not seem to point to a valid FFmpeg binary."
                     );
 
@@ -239,7 +245,7 @@ public class PreferencesViewController extends ClassWithLogging implements Initi
                 WindowFunction.values()[DataFiles.SETTINGS_DATA_FILE.data.windowFunctionEnumOrdinal]
         );
         noteQuantizationChoiceBox.setValue(
-                NoteQuantizationUnit.values()[DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal]
+                NoteUnit.values()[DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal]
         );
 
         themeChoiceBox.setValue(Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal]);
@@ -301,6 +307,7 @@ public class PreferencesViewController extends ClassWithLogging implements Initi
             // Set stage properties
             Stage preferencesStage = new Stage();
             preferencesStage.initStyle(StageStyle.UTILITY);
+            preferencesStage.initModality(Modality.APPLICATION_MODAL);
             preferencesStage.setTitle("Settings and Preferences");
             preferencesStage.setScene(scene);
             preferencesStage.setResizable(false);

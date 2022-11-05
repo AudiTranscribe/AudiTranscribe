@@ -313,11 +313,11 @@ public class ProjectSetupViewController extends ClassWithLogging implements Init
                 "Audio files (*.wav, *.mp3, *.flac, *.aif, *.aiff)",
                 "*.wav", "*.mp3", "*.flac", "*.aif", "*.aiff"
         );
-        File file = ProjectIOHandlers.getFileFromFileDialog(window, extFilter);
+        File file = ProjectIOHandlers.openFileDialog(window, extFilter);
 
         // Verify that the user actually chose a file
         if (file == null) {
-            Popups.showInformationAlert("Info", "No file selected.");
+            Popups.showInformationAlert(rootPane.getScene().getWindow(), "Info", "No file selected.");
         } else {
             audioFile = file;
             audioFileLabel.setText(file.getName());

@@ -11,12 +11,13 @@ you finalize your pull requests.
 
 ## What To Contribute
 
-There are many ways to contribute to AudiTranscribe. There are three **big** types of contributions we are looking our
-for:
+There are many ways to contribute to AudiTranscribe.
 
-- Improving the documentation
 - Improving the design of the application
-- Fixing bugs **OR** improving efficiency of the program
+- Improving the efficiency of the program
+- Fixing bugs
+- Improving the documentation
+- And much more...
 
 In addition, feature requests and bug reports are greatly appreciated. They help make AudiTranscribe a better tool and
 more stable for users to use.
@@ -38,27 +39,25 @@ Unsure how to begin? There are a few places you can find issues for the project.
 
 For something that is bigger than a one or two line fix:
 
-1. Create your own fork of the code
-2. Do the changes in your fork
+1. Create your own fork of the code.
+2. Do the changes in your fork.
 3. If you like the change and think the project could use it, send a pull request!
 
 However, for small issues such as
 
-- spelling / grammar fixes
-- typo correction, white space and formatting changes
-- comment clean up
+- spelling / grammar fixes,
+- typo correction, white space and formatting changes, or
+- comment clean up,
 
 you could submit an issue instead of a pull request.
 
-**Note:**
+**Important:**
 
-- (Development) changes to *AudiTranscribe* should be pushed to the `main` branch**. The `staging`
-  branch should be reserved for production builds. Never push any changes to the `staging` branch.
 - Make pull requests instead of directly editing files on the `main` branch.
-
-**Important:** Please follow
-the [Angular Commit Message Conventions](https://github.com/angular/angular/blob/main/CONTRIBUTING.md#commit) to make
-commits to AudiTranscribe.
+- Development changes to AudiTranscribe should be pushed to the `main` branch. The `staging` branch is reserved for
+  ready-to-release builds (i.e., production builds). **Never make pull requests of development changes to the `staging`
+  branch**.
+- Please follow the [Commit Message Format](commit_message_format.md) to make commits to AudiTranscribe.
 
 ## Reporting Bugs
 
