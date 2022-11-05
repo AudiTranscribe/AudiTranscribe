@@ -59,27 +59,3 @@ jobs:
         run: npx semantic-release --ci
         env:
           GITHUB_TOKEN: ${{ secrets.SEMVER_GITHUB_TOKEN }}
-
-  # Final touches
-  final_touches:
-    name: Final Touches
-    needs: [ release ]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get Latest Release
-        id: get_latest_release
-        uses: bruceadams/get-release@v1.2.2
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-      - name: Get Raw Release Version
-        id: raw_release_version
-        uses: mad9000/actions-find-and-replace-string@2
-        with:
-          source: ${{ steps.get_latest_release.outputs.tag_name }}
-          find: "v"
-          replace: ""
-      - name: Edit Release
-        uses: irongut/EditRelease@v1.2.0
-        with:
-          name: "Version ${{ steps.raw_release_version.outputs.value }}"
-          replacename: true
