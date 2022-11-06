@@ -1,6 +1,17 @@
 # AudiTranscribe Changelog
+<hr>
 
 # [0.9.0](https://github.com/AudiTranscribe/AudiTranscribe/compare/v0.8.3...v0.9.0) (2022-11-05)
+
+### Features
+
+* add button to visit app data folder ([e077490](https://github.com/AudiTranscribe/AudiTranscribe/commit/e0774907cff5a76eb670ebc0d47d292516c3dd1b))
+* add documentation ([a117b98](https://github.com/AudiTranscribe/AudiTranscribe/commit/a117b9897867349604ef581af51fc5c5e9caf121))
+* add Linux support ([8ccceb7](https://github.com/AudiTranscribe/AudiTranscribe/commit/8ccceb7a3426a213df73b6ffc69f58e92d3036fe))
+* add more time signature options ([3b933c7](https://github.com/AudiTranscribe/AudiTranscribe/commit/3b933c7f518a4569f1dd24292d6c480c90f04033))
+* add undo/redo for note rectangles ([91a92a0](https://github.com/AudiTranscribe/AudiTranscribe/commit/91a92a035a9c74aa9c1912619c93e7ba48603349))
+* be more generous with exceptions ([b13c633](https://github.com/AudiTranscribe/AudiTranscribe/commit/b13c633734af25913d324751a71c2aac76107f16))
+* increase time signature options ([a50c4f6](https://github.com/AudiTranscribe/AudiTranscribe/commit/a50c4f6cdaf541c8bb40f193f7e97d56b97f81ed))
 
 
 ### Bug Fixes
@@ -13,17 +24,6 @@
 * fix weird resizing of hyperlinks upon hover ([c673a5a](https://github.com/AudiTranscribe/AudiTranscribe/commit/c673a5adef003f3905b49e85adeb2d354d57334b))
 * incorrect positioning of transcription window ([946604d](https://github.com/AudiTranscribe/AudiTranscribe/commit/946604d1d7f85e9a11564021416c042378ff9d69))
 * weird window overflow was fixed ([22270df](https://github.com/AudiTranscribe/AudiTranscribe/commit/22270df7117d541cd4a84637f0faf2cfaf4b78b9))
-
-
-### Features
-
-* add button to visit app data folder ([e077490](https://github.com/AudiTranscribe/AudiTranscribe/commit/e0774907cff5a76eb670ebc0d47d292516c3dd1b))
-* add documentation ([a117b98](https://github.com/AudiTranscribe/AudiTranscribe/commit/a117b9897867349604ef581af51fc5c5e9caf121))
-* add Linux support ([8ccceb7](https://github.com/AudiTranscribe/AudiTranscribe/commit/8ccceb7a3426a213df73b6ffc69f58e92d3036fe))
-* add more time signature options ([3b933c7](https://github.com/AudiTranscribe/AudiTranscribe/commit/3b933c7f518a4569f1dd24292d6c480c90f04033))
-* add undo/redo for note rectangles ([91a92a0](https://github.com/AudiTranscribe/AudiTranscribe/commit/91a92a035a9c74aa9c1912619c93e7ba48603349))
-* be more generous with exceptions ([b13c633](https://github.com/AudiTranscribe/AudiTranscribe/commit/b13c633734af25913d324751a71c2aac76107f16))
-* increase time signature options ([a50c4f6](https://github.com/AudiTranscribe/AudiTranscribe/commit/a50c4f6cdaf541c8bb40f193f7e97d56b97f81ed))
 
 
 ### Performance Improvements
@@ -41,7 +41,7 @@
 * improve performance of `UnitConversionUtils` ([3321d5a](https://github.com/AudiTranscribe/AudiTranscribe/commit/3321d5a3780ae73f3683ca326bfe5803e965e4a4))
 * update use of ceiling/floor divisions ([cfe7331](https://github.com/AudiTranscribe/AudiTranscribe/commit/cfe7331d65125c901a7e39893d42db0be966a446))
 
-## [0.8.3](https://github.com/AudiTranscribe/AudiTranscribe/compare/v0.8.2...v0.8.3) (2022-10-23)
+# [0.8.3](https://github.com/AudiTranscribe/AudiTranscribe/compare/v0.8.2...v0.8.3) (2022-10-23)
 
 
 ### Bug Fixes
