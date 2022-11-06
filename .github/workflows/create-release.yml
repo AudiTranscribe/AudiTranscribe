@@ -51,9 +51,9 @@ jobs:
         id: download
       - name: Zip Installer Directories
         run: |
-          zip -r Windows-Installer.zip Windows-Installer.zip
-          zip -r macOS-Installer.zip macOS-Installer.zip
-          zip -r Linux-Installer.zip Linux-Installer.zip
+          zip -r Windows-Installer.zip Windows-Installer
+          zip -r macOS-Installer.zip macOS-Installer
+          zip -r Linux-Installer.zip Linux-Installer
       - name: Setup Semantic Release
         run: npm install -g semantic-release @semantic-release/git @semantic-release/changelog @semantic-release/github -D
       - name: Release To GitHub
