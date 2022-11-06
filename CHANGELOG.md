@@ -1,4 +1,12 @@
 # AudiTranscribe Changelog
+
+## [0.9.1](https://github.com/AudiTranscribe/AudiTranscribe/compare/v0.9.0...v0.9.1) (2022-11-06)
+
+
+### Bug Fixes
+
+* update API webserver URL ([fac7ff6](https://github.com/AudiTranscribe/AudiTranscribe/commit/fac7ff60a0617adc2f97cba868c9d3895f94a133))
+
 <hr>
 
 # [0.9.0](https://github.com/AudiTranscribe/AudiTranscribe/compare/v0.8.3...v0.9.0) (2022-11-05)
