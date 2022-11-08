@@ -28,7 +28,6 @@ import site.overwrite.auditranscribe.network.DownloadTask;
 import site.overwrite.auditranscribe.network.exceptions.APIServerException;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
-import site.overwrite.auditranscribe.views.setup_wizard.data_encapsulators.FFmpegDownloadData;
 
 import java.io.*;
 import java.net.URL;
@@ -177,5 +176,12 @@ public class FFmpegDownloadManager extends AbstractDownloadManager {
         IOMethods.delete(IOMethods.joinPaths(destFolder, "ffmpeg.zip"));
 
         log(Level.INFO, "FFmpeg installation complete");
+    }
+
+    // Helper classes
+    static class FFmpegDownloadData {
+        public String url;
+        public String signaturePage;
+        public String outputFolder;
     }
 }

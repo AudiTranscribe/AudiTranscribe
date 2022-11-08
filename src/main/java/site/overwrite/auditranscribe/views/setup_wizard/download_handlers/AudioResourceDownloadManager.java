@@ -24,7 +24,6 @@ import com.google.gson.JsonSyntaxException;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.network.APICallHandler;
 import site.overwrite.auditranscribe.network.exceptions.APIServerException;
-import site.overwrite.auditranscribe.views.setup_wizard.data_encapsulators.AudioResourceDownloadData;
 
 import java.io.*;
 import java.net.URL;
@@ -92,5 +91,11 @@ public class AudioResourceDownloadManager extends AbstractDownloadManager {
     @Override
     public void processDownload(String downloadedResourcePath) {
         // No processing needed
+    }
+
+    // Helper classes
+    static class AudioResourceDownloadData {
+        public String url;
+        public String signaturePage;
     }
 }
