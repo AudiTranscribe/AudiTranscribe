@@ -44,7 +44,7 @@ import site.overwrite.auditranscribe.io.data_files.data_encapsulators.SettingsDa
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.misc.Theme;
-import site.overwrite.auditranscribe.misc.icon.IconHelpers;
+import site.overwrite.auditranscribe.misc.icon.IconHelper;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
 import site.overwrite.auditranscribe.utils.GUIUtils;
@@ -189,7 +189,7 @@ public class MainViewController extends ClassWithLogging implements Initializabl
         rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/" + theme.cssFile));
 
         // Set graphics
-        IconHelpers.setSVGPath(searchImage, 20, "search-line", theme.shortName);
+        IconHelper.setSVGPath(searchImage, 20, "search-line", theme.shortName);
     }
 
     /**
@@ -378,7 +378,7 @@ public class MainViewController extends ClassWithLogging implements Initializabl
             removeButton.getStyleClass().add("image-button");
             removeButton.getStyleClass().add("remove-project-button");
 
-            IconHelpers.setSVGOnButton(
+            IconHelper.setSVGOnButton(
                     removeButton, 20, 50, "window-close-line",
                     Theme.values()[settingsData.themeEnumOrdinal].shortName
             );

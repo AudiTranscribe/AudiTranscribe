@@ -1,6 +1,6 @@
 /*
- * IconHelpers.java
- * Description: Helper methods for setting icons on SVG path objects.
+ * IconHelper.java
+ * Description: Class that helps to set icons on specific nodes.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -23,10 +23,10 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.SVGPath;
 
 /**
- * Helper methods for setting icons on SVG path objects.
+ * Class that helps to set icons on specific nodes.
  */
-public final class IconHelpers {
-    private IconHelpers() {
+public final class IconHelper {
+    private IconHelper() {
         // Private constructor to signal this is a utility class
     }
 

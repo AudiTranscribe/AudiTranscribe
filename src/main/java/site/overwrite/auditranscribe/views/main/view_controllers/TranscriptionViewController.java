@@ -57,7 +57,7 @@ import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.misc.Theme;
-import site.overwrite.auditranscribe.misc.icon.IconHelpers;
+import site.overwrite.auditranscribe.misc.icon.IconHelper;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
 import site.overwrite.auditranscribe.music.MusicKey;
 import site.overwrite.auditranscribe.music.MusicKeyEstimator;
@@ -613,43 +613,43 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/" + theme.cssFile));
 
         // Set graphics
-        IconHelpers.setSVGOnButton(
+        IconHelper.setSVGOnButton(
                 newProjectButton, 20, IMAGE_BUTTON_LENGTH, "plus-circle-solid", theme.shortName
         );
-        IconHelpers.setSVGOnButton(
+        IconHelper.setSVGOnButton(
                 openProjectButton, 20, IMAGE_BUTTON_LENGTH, "folder-open-solid", theme.shortName
         );
-        IconHelpers.setSVGOnButton(
+        IconHelper.setSVGOnButton(
                 saveProjectButton, 20, IMAGE_BUTTON_LENGTH, "floppy-solid", theme.shortName
         );
 
-        IconHelpers.setSVGOnButton(
+        IconHelper.setSVGOnButton(
                 scrollButton, 15, 22.5, IMAGE_BUTTON_LENGTH, IMAGE_BUTTON_LENGTH,
                 "map-marker-line", theme.shortName
         );
-        IconHelpers.setSVGOnButton(
+        IconHelper.setSVGOnButton(
                 editNotesButton, 20, IMAGE_BUTTON_LENGTH, "pencil-line", theme.shortName
         );
 
-        IconHelpers.setSVGOnButton(
+        IconHelper.setSVGOnButton(
                 playButton, 20, IMAGE_BUTTON_LENGTH, "play-solid", theme.shortName
         );
-        IconHelpers.setSVGOnButton(
+        IconHelper.setSVGOnButton(
                 stopButton, 20, IMAGE_BUTTON_LENGTH, "stop-solid", theme.shortName
         );
-        IconHelpers.setSVGOnButton(
+        IconHelper.setSVGOnButton(
                 playStepBackwardButton, 20, IMAGE_BUTTON_LENGTH, "step-backward-solid",
                 theme.shortName
         );
-        IconHelpers.setSVGOnButton(
+        IconHelper.setSVGOnButton(
                 playStepForwardButton, 20, IMAGE_BUTTON_LENGTH, "step-forward-solid",
                 theme.shortName
         );
 
-        IconHelpers.setSVGOnButton(
+        IconHelper.setSVGOnButton(
                 audioVolumeButton, 20, IMAGE_BUTTON_LENGTH, "volume-up-solid", theme.shortName
         );
-        IconHelpers.setSVGOnButton(
+        IconHelper.setSVGOnButton(
                 notesVolumeButton, 15, 20, IMAGE_BUTTON_LENGTH, IMAGE_BUTTON_LENGTH,
                 "music-note-solid", theme.shortName
         );
@@ -686,7 +686,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
             // Change the icon of the audio volume button from mute to non-mute
             if (isAudioMuted) {
-                IconHelpers.setSVGOnButton(
+                IconHelper.setSVGOnButton(
                         audioVolumeButton, 20, IMAGE_BUTTON_LENGTH, "volume-up-solid",
                         theme.shortName
                 );
@@ -708,7 +708,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
             // Change the icon of the notes' volume button from off to on
             if (areNotesMuted) {
-                IconHelpers.setSVGOnButton(
+                IconHelper.setSVGOnButton(
                         notesVolumeButton, 15, 20, IMAGE_BUTTON_LENGTH, IMAGE_BUTTON_LENGTH,
                         "music-note-solid", theme.shortName
                 );
@@ -1258,7 +1258,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             notePlayerSequencer.stop();
         }
 
-        Platform.runLater(() -> IconHelpers.setSVGOnButton(
+        Platform.runLater(() -> IconHelper.setSVGOnButton(
                 playButton, 20, IMAGE_BUTTON_LENGTH, iconToUse, theme.shortName
         ));
 
@@ -2247,7 +2247,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         // Change the icon
         String iconToUse = "map-marker-solid";
         if (scrollToPlayhead) iconToUse = "map-marker-line";  // Want to change from filled to non-filled
-        IconHelpers.setSVGOnButton(
+        IconHelper.setSVGOnButton(
                 scrollButton, 15, 22.5, IMAGE_BUTTON_LENGTH, IMAGE_BUTTON_LENGTH, iconToUse,
                 theme.shortName
         );
@@ -2265,7 +2265,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         // Change the icon
         String iconToUse = "pencil-solid";
         if (canEditNotes) iconToUse = "pencil-line";  // Want to change from filled to non-filled
-        IconHelpers.setSVGOnButton(editNotesButton, 20, IMAGE_BUTTON_LENGTH, iconToUse, theme.shortName);
+        IconHelper.setSVGOnButton(editNotesButton, 20, IMAGE_BUTTON_LENGTH, iconToUse, theme.shortName);
 
         // Toggle the `canEditNotes` flag
         canEditNotes = !canEditNotes;
@@ -2296,7 +2296,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         }
 
         // Change the icon
-        IconHelpers.setSVGOnButton(
+        IconHelper.setSVGOnButton(
                 audioVolumeButton, 20, IMAGE_BUTTON_LENGTH, iconToUse, theme.shortName
         );
 
@@ -2313,7 +2313,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         // Change the icon
         String iconToUse = "music-note-line";
         if (areNotesMuted) iconToUse = "music-note-solid";  // Want to change icon from off to on
-        IconHelpers.setSVGOnButton(
+        IconHelper.setSVGOnButton(
                 notesVolumeButton, 15, 20, IMAGE_BUTTON_LENGTH, IMAGE_BUTTON_LENGTH, iconToUse,
                 theme.shortName
         );
