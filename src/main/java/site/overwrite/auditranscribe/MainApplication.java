@@ -24,10 +24,10 @@ import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.PropertyFile;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
-import site.overwrite.auditranscribe.main_views.CheckForUpdatesHelper;
-import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitcher;
 import site.overwrite.auditranscribe.misc.MyLogger;
-import site.overwrite.auditranscribe.setup_wizard.SetupWizard;
+import site.overwrite.auditranscribe.views.main.CheckForUpdatesHelper;
+import site.overwrite.auditranscribe.views.main.scene_switching.SceneSwitcher;
+import site.overwrite.auditranscribe.views.setup_wizard.SetupWizard;
 
 import java.io.IOException;
 
