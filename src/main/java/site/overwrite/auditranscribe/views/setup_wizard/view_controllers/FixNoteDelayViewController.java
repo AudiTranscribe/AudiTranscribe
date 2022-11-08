@@ -22,7 +22,6 @@ import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Spinner;
 import javafx.scene.layout.AnchorPane;
@@ -31,10 +30,7 @@ import javafx.stage.Stage;
 import site.overwrite.auditranscribe.audio.Audio;
 import site.overwrite.auditranscribe.audio.AudioProcessingMode;
 import site.overwrite.auditranscribe.audio.exceptions.AudioTooLongException;
-import site.overwrite.auditranscribe.generic.ClassWithLogging;
-import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.Popups;
-import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
 import site.overwrite.auditranscribe.music.notes.MIDIInstrument;
 import site.overwrite.auditranscribe.music.notes.NotePlayerSequencer;
@@ -54,7 +50,7 @@ import java.util.logging.Level;
 /**
  * View controller that helps the user fix any note playback delays.
  */
-public class FixNoteDelayViewController extends ClassWithLogging implements Initializable {
+public class FixNoteDelayViewController extends AbstractSetupViewController {
     // Constants
     private final double[] NOTE_ONSET_TIMES = {
             0.5, 0.75, 1, 1.25, 1.5, 3,
@@ -181,18 +177,6 @@ public class FixNoteDelayViewController extends ClassWithLogging implements Init
     }
 
     // Public methods
-
-    /**
-     * Method that sets the scene's theme.
-     *
-     * @param theme Theme to set.
-     */
-    public void setThemeOnScene(Theme theme) {
-        rootPane.getStylesheets().clear();  // Reset the stylesheets first before adding new ones
-
-        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
-        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/" + theme.cssFile));
-    }
 
     /**
      * Method that sets the audio resource for the audio object.

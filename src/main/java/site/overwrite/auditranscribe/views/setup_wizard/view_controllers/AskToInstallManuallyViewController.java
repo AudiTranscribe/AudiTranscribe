@@ -20,13 +20,9 @@
 package site.overwrite.auditranscribe.views.setup_wizard.view_controllers;
 
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import site.overwrite.auditranscribe.generic.ClassWithLogging;
-import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.misc.Theme;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -36,7 +32,7 @@ import java.util.logging.Level;
  * View controller of the view that asks the user whether to install FFmpeg manually or
  * automatically.
  */
-public class AskToInstallManuallyViewController extends ClassWithLogging implements Initializable {
+public class AskToInstallManuallyViewController extends AbstractSetupViewController {
     // Attributes
     private boolean isManualInstallation;
 
@@ -71,19 +67,5 @@ public class AskToInstallManuallyViewController extends ClassWithLogging impleme
      */
     public boolean getIsManualInstallation() {
         return isManualInstallation;
-    }
-
-    // Public methods
-
-    /**
-     * Method that sets the scene's theme.
-     *
-     * @param theme Theme to set.
-     */
-    public void setThemeOnScene(Theme theme) {
-        rootPane.getStylesheets().clear();  // Reset the stylesheets first before adding new ones
-
-        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
-        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/" + theme.cssFile));
     }
 }

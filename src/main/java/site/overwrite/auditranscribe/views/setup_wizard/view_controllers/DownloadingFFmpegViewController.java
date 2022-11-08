@@ -19,15 +19,11 @@
 package site.overwrite.auditranscribe.views.setup_wizard.view_controllers;
 
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOConstants;
-import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.network.DownloadTask;
 import site.overwrite.auditranscribe.utils.MathUtils;
 import site.overwrite.auditranscribe.views.setup_wizard.download_handlers.FFmpegDownloadManager;
@@ -39,7 +35,7 @@ import java.util.logging.Level;
 /**
  * View controller that handles the downloading of FFmpeg.
  */
-public class DownloadingFFmpegViewController extends ClassWithLogging implements Initializable {
+public class DownloadingFFmpegViewController extends AbstractSetupViewController {
     // Constants
     private final String DEST_FOLDER = IOConstants.APP_DATA_FOLDER_PATH;
 
@@ -93,6 +89,7 @@ public class DownloadingFFmpegViewController extends ClassWithLogging implements
         };
         downloadTask.setOnFailed((event) -> {
             ffmpegPath = null;
+            logException((Exception) downloadTask.getException());
             ((Stage) rootPane.getScene().getWindow()).close();
         });
         downloadTask.setOnSucceeded((event) -> {
@@ -121,17 +118,5 @@ public class DownloadingFFmpegViewController extends ClassWithLogging implements
         downloadThread.start();
 
         log(Level.INFO, "Showing FFmpeg download view");
-    }
-
-    /**
-     * Method that sets the scene's theme.
-     *
-     * @param theme Theme to set.
-     */
-    public void setThemeOnScene(Theme theme) {
-        rootPane.getStylesheets().clear();  // Reset the stylesheets first before adding new ones
-
-        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
-        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/" + theme.cssFile));
     }
 }

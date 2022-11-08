@@ -19,13 +19,9 @@
 package site.overwrite.auditranscribe.views.setup_wizard.view_controllers;
 
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import site.overwrite.auditranscribe.generic.ClassWithLogging;
-import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.misc.Theme;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -34,7 +30,7 @@ import java.util.logging.Level;
 /**
  * View controller that handles the initial view for the setup wizard.
  */
-public class InitialViewController extends ClassWithLogging implements Initializable {
+public class InitialViewController extends AbstractSetupViewController {
     // Attributes
     private boolean hasFFmpegInstalled = false;
 
@@ -69,19 +65,5 @@ public class InitialViewController extends ClassWithLogging implements Initializ
      */
     public boolean getHasFFmpegInstalled() {
         return hasFFmpegInstalled;
-    }
-
-    // Public methods
-
-    /**
-     * Method that sets the scene's theme.
-     *
-     * @param theme Theme to set.
-     */
-    public void setThemeOnScene(Theme theme) {
-        rootPane.getStylesheets().clear();  // Reset the stylesheets first before adding new ones
-
-        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
-        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/" + theme.cssFile));
     }
 }

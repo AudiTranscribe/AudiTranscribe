@@ -1,6 +1,6 @@
 /*
- * FixNoteDelayViewController.java
- * Description: View controller that helps the user set up the update checking interval.
+ * AbstractSetupViewController.java
+ * Description: Abstract class that implements common methods for the setup view controllers.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -20,43 +20,17 @@ package site.overwrite.auditranscribe.views.setup_wizard.view_controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Spinner;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
 import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.Theme;
-import site.overwrite.auditranscribe.misc.spinners.CustomIntegerSpinnerValueFactory;
-
-import java.net.URL;
-import java.util.ResourceBundle;
-import java.util.logging.Level;
 
 /**
- * View controller that helps the user set up the update checking interval.
+ * Abstract class that implements common methods for the setup view controllers.
  */
-public class UpdateIntervalSetupViewController extends ClassWithLogging implements Initializable {
-    // FXML elements
+public abstract class AbstractSetupViewController extends ClassWithLogging implements Initializable {
     @FXML
-    private AnchorPane rootPane;
-
-    @FXML
-    private Spinner<Integer> updateCheckingIntervalSpinner;
-
-    @FXML
-    private Button confirmButton;
-
-    // Initialization method
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        updateCheckingIntervalSpinner.setValueFactory(new CustomIntegerSpinnerValueFactory(
-                1, 720, 24, 1
-        ));
-        confirmButton.setOnAction(event -> ((Stage) rootPane.getScene().getWindow()).close());
-
-        log(Level.INFO, "Showing update interval setup view");
-    }
+    AnchorPane rootPane;
 
     // Public methods
 
@@ -70,14 +44,5 @@ public class UpdateIntervalSetupViewController extends ClassWithLogging implemen
 
         rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
         rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/" + theme.cssFile));
-    }
-
-    /**
-     * Method that gets the update checking interval.
-     *
-     * @return An integer, representing the update checking interval.
-     */
-    public int getUpdateCheckingInterval() {
-        return updateCheckingIntervalSpinner.getValue();
     }
 }

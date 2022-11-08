@@ -79,6 +79,7 @@ public class ThemeSetupViewController extends ClassWithLogging implements Initia
 
     /**
      * Method that gets the theme ordinal.
+     *
      * @return An integer, representing the ordinal of the theme selected.
      */
     public int getSelectedThemeOrdinal() {

@@ -20,16 +20,12 @@
 package site.overwrite.auditranscribe.views.setup_wizard.view_controllers;
 
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import site.overwrite.auditranscribe.generic.ClassWithLogging;
-import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.Popups;
-import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.views.main.ProjectIOHandlers;
 
 import java.io.File;
@@ -40,7 +36,7 @@ import java.util.logging.Level;
 /**
  * View controller of the view that allows the user to manually specify the path to FFmpeg.
  */
-public class SpecifyFFmpegPathViewController extends ClassWithLogging implements Initializable {
+public class SpecifyFFmpegPathViewController extends AbstractSetupViewController {
     // FXML Elements
     @FXML
     private AnchorPane rootPane;
@@ -89,19 +85,5 @@ public class SpecifyFFmpegPathViewController extends ClassWithLogging implements
      */
     public String getCustomFFmpegPath() {
         return ffmpegBinaryPathTextField.getText();
-    }
-
-    // Public methods
-
-    /**
-     * Method that sets the scene's theme.
-     *
-     * @param theme Theme to set.
-     */
-    public void setThemeOnScene(Theme theme) {
-        rootPane.getStylesheets().clear();  // Reset the stylesheets first before adding new ones
-
-        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/base.css"));
-        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("views/css/" + theme.cssFile));
     }
 }
