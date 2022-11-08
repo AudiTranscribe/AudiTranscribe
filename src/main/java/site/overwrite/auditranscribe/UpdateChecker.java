@@ -1,5 +1,5 @@
 /*
- * CheckForUpdatesHelper.java
+ * UpdateChecker.java
  * Description: Class that assists with the checking of updates from the API server.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.views.main;
+package site.overwrite.auditranscribe;
 
 import com.google.gson.JsonObject;
 import javafx.scene.control.ButtonBar;
@@ -35,7 +35,10 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.logging.Level;
 
-public class CheckForUpdatesHelper extends ClassWithLogging {
+/**
+ * Class that assists with the checking of updates from the API server.
+ */
+public class UpdateChecker extends ClassWithLogging {
     // Public methods
     public static void checkForUpdates(String currentVersion) {
         // Determine if we need to check for updates
@@ -52,7 +55,7 @@ public class CheckForUpdatesHelper extends ClassWithLogging {
         String newVersionTag = response.value1();
 
         if (!isLatest) {
-            log(Level.INFO, "New version available: " + newVersionTag, CheckForUpdatesHelper.class.getName());
+            log(Level.INFO, "New version available: " + newVersionTag, UpdateChecker.class.getName());
 
             // Convert the new version tag into a semver
             String semver = newVersionTag.substring(1);
@@ -78,7 +81,7 @@ public class CheckForUpdatesHelper extends ClassWithLogging {
                 }
             }
         } else {
-            log(Level.INFO, "AudiTranscribe is up to date", CheckForUpdatesHelper.class.getName());
+            log(Level.INFO, "AudiTranscribe is up to date", UpdateChecker.class.getName());
         }
 
         // Supress alert for a set duration
@@ -108,7 +111,7 @@ public class CheckForUpdatesHelper extends ClassWithLogging {
             log(
                     Level.WARNING,
                     "Error for API request on checking new version: timed out or connection refused",
-                    CheckForUpdatesHelper.class.getName()
+                    UpdateChecker.class.getName()
             );
             return new Pair<>(true, null);
         } catch (IOException e) {
