@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.views.main;
+package site.overwrite.auditranscribe.views.main.view_controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -45,7 +45,7 @@ import site.overwrite.auditranscribe.misc.spinners.CustomIntegerSpinnerValueFact
 import site.overwrite.auditranscribe.music.NoteUnit;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
 import site.overwrite.auditranscribe.utils.GUIUtils;
-import site.overwrite.auditranscribe.views.main.helpers.ProjectIOHandlers;
+import site.overwrite.auditranscribe.views.main.ProjectIOHandlers;
 
 import java.io.File;
 import java.io.IOException;

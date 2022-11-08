@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.views.main;
+package site.overwrite.auditranscribe.views.main.view_controllers;
 
 import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
@@ -75,7 +75,7 @@ import site.overwrite.auditranscribe.spectrogram.Spectrogram;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
 import site.overwrite.auditranscribe.utils.*;
-import site.overwrite.auditranscribe.views.main.helpers.ProjectIOHandlers;
+import site.overwrite.auditranscribe.views.main.ProjectIOHandlers;
 import site.overwrite.auditranscribe.views.main.scene_switching.SceneSwitchingData;
 import site.overwrite.auditranscribe.views.main.scene_switching.SceneSwitchingState;
 

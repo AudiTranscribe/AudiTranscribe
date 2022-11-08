@@ -58,8 +58,8 @@ module site.overwrite.auditranscribe {
     exports site.overwrite.auditranscribe.spectrogram;
     exports site.overwrite.auditranscribe.utils;
     exports site.overwrite.auditranscribe.views.main;
-    exports site.overwrite.auditranscribe.views.main.helpers;
     exports site.overwrite.auditranscribe.views.main.scene_switching;
+    exports site.overwrite.auditranscribe.views.main.view_controllers;
     exports site.overwrite.auditranscribe.views.setup_wizard;
     exports site.overwrite.auditranscribe.views.setup_wizard.data_encapsulators;
     exports site.overwrite.auditranscribe.views.setup_wizard.download_handlers;
@@ -67,10 +67,10 @@ module site.overwrite.auditranscribe {
 
     opens site.overwrite.auditranscribe to javafx.fxml;
     opens site.overwrite.auditranscribe.misc to javafx.fxml;
-    opens site.overwrite.auditranscribe.misc.icon to javafx.fxml;
+    opens site.overwrite.auditranscribe.misc.icon to com.google.gson, javafx.fxml;
     opens site.overwrite.auditranscribe.views.main to javafx.fxml;
-    opens site.overwrite.auditranscribe.views.main.helpers to javafx.fxml;
     opens site.overwrite.auditranscribe.views.main.scene_switching to javafx.fxml;
+    opens site.overwrite.auditranscribe.views.main.view_controllers to javafx.fxml;
     opens site.overwrite.auditranscribe.views.setup_wizard to javafx.fxml;
     opens site.overwrite.auditranscribe.views.setup_wizard.view_controllers to javafx.fxml;
 }

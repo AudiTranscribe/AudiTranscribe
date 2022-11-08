@@ -45,8 +45,8 @@ import site.overwrite.auditranscribe.io.exceptions.InvalidFileVersionException;
 import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
-import site.overwrite.auditranscribe.views.main.MainViewController;
-import site.overwrite.auditranscribe.views.main.TranscriptionViewController;
+import site.overwrite.auditranscribe.views.main.view_controllers.MainViewController;
+import site.overwrite.auditranscribe.views.main.view_controllers.TranscriptionViewController;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;

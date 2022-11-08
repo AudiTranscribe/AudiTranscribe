@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.views.main;
+package site.overwrite.auditranscribe.views.main.view_controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

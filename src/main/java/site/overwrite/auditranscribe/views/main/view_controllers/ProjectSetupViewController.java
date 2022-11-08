@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.views.main;
+package site.overwrite.auditranscribe.views.main.view_controllers;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -33,7 +33,7 @@ import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.misc.Theme;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
 import site.overwrite.auditranscribe.utils.MusicUtils;
-import site.overwrite.auditranscribe.views.main.helpers.ProjectIOHandlers;
+import site.overwrite.auditranscribe.views.main.ProjectIOHandlers;
 import site.overwrite.auditranscribe.views.main.scene_switching.SceneSwitchingData;
 
 import java.io.File;

@@ -30,7 +30,7 @@ import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.misc.Theme;
-import site.overwrite.auditranscribe.views.main.helpers.ProjectIOHandlers;
+import site.overwrite.auditranscribe.views.main.ProjectIOHandlers;
 
 import java.io.File;
 import java.net.URL;
