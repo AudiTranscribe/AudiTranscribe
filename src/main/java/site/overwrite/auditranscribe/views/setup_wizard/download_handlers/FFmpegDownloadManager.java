@@ -134,7 +134,7 @@ public class FFmpegDownloadManager extends AbstractDownloadManager {
             FFmpegDownloadData data = gson.fromJson(reader, FFmpegDownloadData.class);
 
             // Set attributes
-            downloadURL = new URL(data.url);
+            downloadURL = new URL(APICallHandler.API_SERVER_URL + data.downloadPage);
             ffmpegFolder = data.outputFolder;
 
             // Get signature from signature page

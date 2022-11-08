@@ -29,7 +29,8 @@ for and the structure it must have.
 ```
 <type>(<scope>): <short summary>
   │       │             │
-  │       │             └─⫸ Summary in present tense. No period at the end. Do not capitalise first letter of first word.
+  │       │             └─⫸ Summary in present tense. No period at the end.
+  │       │                  Do not capitalise first letter of first word.
   │       │
   │       └─⫸ Commit Scope: Section of code that the change applies to.
   │

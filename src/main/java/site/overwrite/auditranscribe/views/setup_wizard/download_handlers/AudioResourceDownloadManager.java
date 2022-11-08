@@ -68,7 +68,7 @@ public class AudioResourceDownloadManager extends AbstractDownloadManager {
                 AudioResourceDownloadData data = gson.fromJson(reader, AudioResourceDownloadData.class);
 
                 // Set attributes
-                downloadURL = new URL(data.url);
+                downloadURL = new URL(APICallHandler.API_SERVER_URL + data.downloadPage);
 
                 // Get signature from signature page
                 JsonObject returnedData = APICallHandler.sendAPIGetRequest(data.signaturePage);

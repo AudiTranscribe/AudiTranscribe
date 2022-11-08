@@ -1,5 +1,12 @@
 # AudiTranscribe Changelog
 
+## [0.9.2](https://github.com/AudiTranscribe/AudiTranscribe/compare/v0.9.1...v0.9.2) (2022-11-08)
+
+
+### Bug Fixes
+
+* fix issue with downloading resources ([5aa5106](https://github.com/AudiTranscribe/AudiTranscribe/commit/5aa51068dc58971735ef1eef0db66b544bb88303))
+
 ## [0.9.1](https://github.com/AudiTranscribe/AudiTranscribe/compare/v0.9.0...v0.9.1) (2022-11-06)
 
 
