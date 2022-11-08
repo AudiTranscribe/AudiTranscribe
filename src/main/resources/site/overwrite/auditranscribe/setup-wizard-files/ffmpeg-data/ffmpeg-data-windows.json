@@ -1,5 +1,5 @@
 {
-  "url": "https://api.auditranscribe.app/download-ffmpeg?platform=windows",
+  "downloadPage": "download-ffmpeg?platform=windows",
   "signaturePage": "download-ffmpeg?platform=windows&signature_needed=true",
   "outputFolder": "ffmpeg/bin"
 }
