@@ -35,8 +35,7 @@ public final class APICallHandler {
     public static int CONNECTION_TIMEOUT = 1500;  // In milliseconds; duration to wait for connecting to server
     public static int READ_TIMEOUT = 2500;
     static final String[] API_SERVER_URLS = {
-            "http://auditranscribeapiwebserver-env.eba-98q82nkb.us-east-1.elasticbeanstalk.com/",  // Raw domain
-            "https://api.auditranscribe.app/",  // (Old) official site
+            "http://auditranscribeapiwebserver-env.eba-98q82nkb.us-east-1.elasticbeanstalk.com/",  // Official API site
             "http://127.0.0.1:5000/"  // For testing
     };
 
@@ -73,9 +72,9 @@ public final class APICallHandler {
     public static JsonObject sendAPIGetRequest(
             String page, Map<String, String> params, int timeout
     ) throws IOException, APIServerException {
-        for (int i = 0; i < 3; i++) {
+        for (String apiServerUrl : API_SERVER_URLS) {
             // Form the destination URL
-            String urlString = API_SERVER_URLS[i] + page;
+            String urlString = apiServerUrl + page;
             if (params != null) {
                 urlString += "?" + paramsMapToString(params);
             }
@@ -138,9 +137,9 @@ public final class APICallHandler {
     public static JsonObject sendAPIPostRequest(
             String page, Map<String, String> params, int timeout
     ) throws IOException, APIServerException {
-        for (int i = 0; i < 3; i++) {
+        for (String apiServerUrl : API_SERVER_URLS) {
             // Form the destination URL
-            String urlString = API_SERVER_URLS[i] + page;
+            String urlString = apiServerUrl + page;
             URL url = new URL(urlString);
 
             // Set up a connection to the URL
