@@ -179,8 +179,8 @@ public class FFmpegDownloadManager extends AbstractDownloadManager {
     }
 
     // Helper classes
-    static class FFmpegDownloadData {
-        public String url;
+    public static class FFmpegDownloadData {
+        public String downloadPage;
         public String signaturePage;
         public String outputFolder;
     }

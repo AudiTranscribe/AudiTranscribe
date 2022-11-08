@@ -94,8 +94,8 @@ public class AudioResourceDownloadManager extends AbstractDownloadManager {
     }
 
     // Helper classes
-    static class AudioResourceDownloadData {
-        public String url;
+    public static class AudioResourceDownloadData {
+        public String downloadPage;
         public String signaturePage;
     }
 }
