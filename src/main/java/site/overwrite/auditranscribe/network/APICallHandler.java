@@ -34,11 +34,8 @@ public final class APICallHandler {
     // Constants
     public static int CONNECTION_TIMEOUT = 1500;  // In milliseconds; duration to wait for connecting to server
     public static int READ_TIMEOUT = 2500;
-    static final String[] API_SERVER_URLS = {
-            "http://auditranscribeapiwebserver-env.eba-98q82nkb.us-east-1.elasticbeanstalk.com/",  // Raw domain
-            "https://api.auditranscribe.app/",  // (Old) official site
-            "http://127.0.0.1:5000/"  // For testing
-    };
+    public static final String API_SERVER_URL =
+            "http://auditranscribeapiwebserver-env.eba-98q82nkb.us-east-1.elasticbeanstalk.com/";
 
     private APICallHandler() {
         // Private constructor to signal this is a utility class
@@ -73,41 +70,36 @@ public final class APICallHandler {
     public static JsonObject sendAPIGetRequest(
             String page, Map<String, String> params, int timeout
     ) throws IOException, APIServerException {
-        for (int i = 0; i < 3; i++) {
-            // Form the destination URL
-            String urlString = API_SERVER_URLS[i] + page;
-            if (params != null) {
-                urlString += "?" + paramsMapToString(params);
-            }
-            URL url = new URL(urlString);
+        // Form the destination URL
+        String urlString = API_SERVER_URL + page;
+        if (params != null) {
+            urlString += "?" + paramsMapToString(params);
+        }
+        URL url = new URL(urlString);
 
-            // Set up a connection to the URL
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            String output;
+        // Set up a connection to the URL
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        String output;
 
-            try {
-                // Set the request method for the connection
-                con.setRequestMethod("GET");
+        try {
+            // Set the request method for the connection
+            con.setRequestMethod("GET");
 
-                // Set timeouts
-                con.setConnectTimeout(CONNECTION_TIMEOUT);
-                con.setReadTimeout(timeout);
+            // Set timeouts
+            con.setConnectTimeout(CONNECTION_TIMEOUT);
+            con.setReadTimeout(timeout);
 
-                // Get the output from the connection
-                output = getConnectionOutput(con);
-            } catch (IOException e) {
-                continue;
-            } finally {
-                // Must remember to disconnect
-                con.disconnect();
-            }
-
-            // Parse the content as JSON data
-            return JsonParser.parseString(output).getAsJsonObject();
+            // Get the output from the connection
+            output = getConnectionOutput(con);
+        } catch (IOException e) {
+            throw new APIServerException("Connection to API server failed");
+        } finally {
+            // Must remember to disconnect
+            con.disconnect();
         }
 
-        // If reached here all 3 URLs failed
-        throw new APIServerException("Connection to API server failed");
+        // Parse the content as JSON data
+        return JsonParser.parseString(output).getAsJsonObject();
     }
 
     /**
@@ -138,44 +130,40 @@ public final class APICallHandler {
     public static JsonObject sendAPIPostRequest(
             String page, Map<String, String> params, int timeout
     ) throws IOException, APIServerException {
-        for (int i = 0; i < 3; i++) {
-            // Form the destination URL
-            String urlString = API_SERVER_URLS[i] + page;
-            URL url = new URL(urlString);
+        // Form the destination URL
+        String urlString = API_SERVER_URL + page;
+        URL url = new URL(urlString);
 
-            // Set up a connection to the URL
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            String output;
+        // Set up a connection to the URL
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        String output;
 
-            try {
-                // Set the request method for the connection
-                con.setRequestMethod("POST");
+        try {
+            // Set the request method for the connection
+            con.setRequestMethod("POST");
 
-                // Set timeouts
-                con.setConnectTimeout(CONNECTION_TIMEOUT);
-                con.setReadTimeout(timeout);
+            // Set timeouts
+            con.setConnectTimeout(CONNECTION_TIMEOUT);
+            con.setReadTimeout(timeout);
 
-                // Add POST data
-                con.setDoOutput(true);
-                DataOutputStream out = new DataOutputStream(con.getOutputStream());
-                out.writeBytes(paramsMapToString(params));
-                out.flush();
-                out.close();
+            // Add POST data
+            con.setDoOutput(true);
+            DataOutputStream out = new DataOutputStream(con.getOutputStream());
+            out.writeBytes(paramsMapToString(params));
+            out.flush();
+            out.close();
 
-                // Get the output from the connection
-                output = getConnectionOutput(con);
-            } catch (IOException e) {
-                continue;
-            } finally {
-                // Must remember to disconnect
-                con.disconnect();
-            }
-
-            // Parse the content as JSON data
-            return JsonParser.parseString(output).getAsJsonObject();
+            // Get the output from the connection
+            output = getConnectionOutput(con);
+        } catch (IOException e) {
+            throw new APIServerException("Connection to API server failed");
+        } finally {
+            // Must remember to disconnect
+            con.disconnect();
         }
 
-        throw new APIServerException("Connection to API server failed");
+        // Parse the content as JSON data
+        return JsonParser.parseString(output).getAsJsonObject();
     }
 
     // Private methods

@@ -22,6 +22,6 @@ package site.overwrite.auditranscribe.setup_wizard.data_encapsulators;
  * Data object that stores the audio resource download data.
  */
 public class AudioResourceDownloadData {
-    public String url;
+    public String downloadPage;
     public String signaturePage;
 }

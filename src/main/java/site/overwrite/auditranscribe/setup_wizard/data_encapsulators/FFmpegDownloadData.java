@@ -22,7 +22,7 @@ package site.overwrite.auditranscribe.setup_wizard.data_encapsulators;
  * Data object that stores the FFmpeg download data.
  */
 public class FFmpegDownloadData {
-    public String url;
+    public String downloadPage;
     public String signaturePage;
     public String outputFolder;
 }
