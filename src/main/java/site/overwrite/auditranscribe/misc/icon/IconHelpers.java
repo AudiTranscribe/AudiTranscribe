@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package site.overwrite.auditranscribe.main_views.icon;
+package site.overwrite.auditranscribe.misc.icon;
 
 import javafx.scene.control.Button;
 import javafx.scene.paint.Paint;

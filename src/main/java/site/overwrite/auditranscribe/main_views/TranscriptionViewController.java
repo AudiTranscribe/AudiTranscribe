@@ -55,12 +55,12 @@ import site.overwrite.auditranscribe.io.audt_file.v0x00090002.data_encapsulators
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.io.db.ProjectsDB;
 import site.overwrite.auditranscribe.main_views.helpers.ProjectIOHandlers;
-import site.overwrite.auditranscribe.main_views.icon.IconHelpers;
 import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingData;
 import site.overwrite.auditranscribe.main_views.scene_switching.SceneSwitchingState;
 import site.overwrite.auditranscribe.misc.CustomTask;
 import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.misc.Theme;
+import site.overwrite.auditranscribe.misc.icon.IconHelpers;
 import site.overwrite.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
 import site.overwrite.auditranscribe.music.MusicKey;
 import site.overwrite.auditranscribe.music.MusicKeyEstimator;
