@@ -100,9 +100,9 @@ public class DebugViewController extends ClassWithLogging implements Initializab
     }
 
     /**
-     * Method that sets the content of the list.
+     * Method that sets the content of the list of variables.
      *
-     * @param listContent Variable-value mappings.
+     * @param listContent List of variable-value pairs.
      */
     public void setListContent(List<Pair<String, String>> listContent) {
         // Convert the map into strings to display
