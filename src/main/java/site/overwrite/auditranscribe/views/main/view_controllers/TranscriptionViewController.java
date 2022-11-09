@@ -147,6 +147,8 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
     // Other attributes
     private final DoubleProperty playheadX = new SimpleDoubleProperty(0);
 
+    private boolean debugMode = false;
+
     private boolean hasUnsavedChanges = true;
     private boolean changedProjectName = false;
     private int fileVersion;
@@ -584,6 +586,12 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
     }
 
     // Getter/Setter methods
+
+    public void setDebugMode(boolean debugMode) {
+        System.out.println(debugMode);
+        this.debugMode = debugMode;
+    }
+
     public SceneSwitchingState getSceneSwitchingState() {
         if (sceneSwitchingState == null) return SceneSwitchingState.SHOW_MAIN_SCENE;
         return sceneSwitchingState;
