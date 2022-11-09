@@ -1,5 +1,5 @@
 /*
- * DebugModeViewController.java
+ * DebugViewController.java
  * Description: View controller that shows the debug view.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-public class DebugModeViewController extends ClassWithLogging implements Initializable {
+public class DebugViewController extends ClassWithLogging implements Initializable {
     // FXML Elements
     @FXML
     private AnchorPane rootPane;
@@ -62,14 +62,14 @@ public class DebugModeViewController extends ClassWithLogging implements Initial
      * @param owner Owner of the debug view window.
      * @return The debug view controller.
      */
-    public static DebugModeViewController showDebugView(Window owner) {
+    public static DebugViewController showDebugView(Window owner) {
         try {
             // Load the FXML file into the scene
-            FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/main/debug-mode-view.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL("views/fxml/main/debug-view.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
 
             // Get the view controller
-            DebugModeViewController controller = fxmlLoader.getController();
+            DebugViewController controller = fxmlLoader.getController();
 
             // Set the theme of the scene
             controller.setThemeOnScene();

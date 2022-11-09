@@ -150,7 +150,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
     private final DoubleProperty playheadX = new SimpleDoubleProperty(0);
 
     private boolean debugMode = false;
-    private DebugModeViewController debugViewController = null;
+    private DebugViewController debugViewController = null;
 
     private boolean hasUnsavedChanges = true;
     private boolean changedProjectName = false;
@@ -2361,7 +2361,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             NoteRectangle.editAction(NoteRectangle.EditAction.REDO);
             return;
         } else if (DEBUG_COMBINATION.match(keyEvent)) {  // Show debug view
-            debugViewController = DebugModeViewController.showDebugView(rootPane.getScene().getWindow());
+            debugViewController = DebugViewController.showDebugView(rootPane.getScene().getWindow());
             return;
         }
 
