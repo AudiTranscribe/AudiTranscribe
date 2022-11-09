@@ -129,6 +129,8 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             new KeyCodeCombination(KeyCode.Z, KeyCombination.SHORTCUT_DOWN);
     private final KeyCodeCombination REDO_NOTE_EDIT_COMBINATION =
             new KeyCodeCombination(KeyCode.Z, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
+    private final KeyCodeCombination DEBUG_COMBINATION =
+            new KeyCodeCombination(KeyCode.D, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
 
     // File-Savable Attributes
     private int numSkippableBytes;
@@ -148,6 +150,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
     private final DoubleProperty playheadX = new SimpleDoubleProperty(0);
 
     private boolean debugMode = false;
+    private DebugModeViewController debugViewController = null;
 
     private boolean hasUnsavedChanges = true;
     private boolean changedProjectName = false;
@@ -587,8 +590,11 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
     // Getter/Setter methods
 
     public void setDebugMode(boolean debugMode) {
-        System.out.println(debugMode);
         this.debugMode = debugMode;
+
+        if (debugMode) {
+            log(Level.INFO, "Debug mode enabled");
+        }
     }
 
     public SceneSwitchingState getSceneSwitchingState() {
@@ -1883,6 +1889,15 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
                 }
             }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);
 
+            // Schedule debug view updating
+            if (debugMode) {
+                scheduler.scheduleAtFixedRate(() -> {
+                    if (debugViewController != null) {
+                        debugViewController.setListContent(getDebugInfo());
+                    }
+                }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);
+            }
+
             // Schedule autosave functionality
             scheduler.scheduleAtFixedRate(() -> Platform.runLater(
                             () -> {
@@ -2341,8 +2356,13 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             return;
         } else if (UNDO_NOTE_EDIT_COMBINATION.match(keyEvent)) {  // Undo note edit
             NoteRectangle.editAction(NoteRectangle.EditAction.UNDO);
+            return;
         } else if (REDO_NOTE_EDIT_COMBINATION.match(keyEvent)) {  // Redo note edit
             NoteRectangle.editAction(NoteRectangle.EditAction.REDO);
+            return;
+        } else if (DEBUG_COMBINATION.match(keyEvent)) {  // Show debug view
+            debugViewController = DebugModeViewController.showDebugView(rootPane.getScene().getWindow());
+            return;
         }
 
         // Otherwise, get the key event's key code
@@ -2541,5 +2561,17 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
         // Return needed information
         return new Pair<>(TypeConversionUtils.toByteArray(rawMP3Bytes), auxiliaryWAVFile);
+    }
+
+    /**
+     * Helper method that returns the debug information needed for the debug view's lists.
+     * @return Debug information as a map.
+     */
+    private Map<String, String> getDebugInfo() {
+        // Todo add more
+        return Map.of(
+                "playheadX", playheadX.toString(),
+                "currTime", Double.toString(currTime)
+        );
     }
 }

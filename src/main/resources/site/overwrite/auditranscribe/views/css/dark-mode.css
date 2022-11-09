@@ -249,3 +249,9 @@
 .ok-button:hover {
     -fx-background-color: #375880ff;
 }
+
+/* DEBUG VIEW */
+.debug-list .list-cell .text, .debug-list .list-cell:selected .text {
+    -fx-fill: -default-text-fill;
+    -fx-text-fill: -default-text-fill;
+}

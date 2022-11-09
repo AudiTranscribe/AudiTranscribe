@@ -253,3 +253,9 @@
     -fx-background-color: #ffffffff;
     -fx-text-fill: #000000ff;
 }
+
+/* DEBUG VIEW */
+.debug-list .list-cell .text, .debug-list .list-cell:selected .text {
+    -fx-fill: -default-text-fill;
+    -fx-text-fill: -default-text-fill;
+}
