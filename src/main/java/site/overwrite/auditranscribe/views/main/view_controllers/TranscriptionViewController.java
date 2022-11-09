@@ -197,7 +197,11 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
     private SceneSwitchingState sceneSwitchingState = SceneSwitchingState.SHOW_MAIN_SCENE;
     private SceneSwitchingData sceneSwitchingData = new SceneSwitchingData();
 
-    private ScheduledExecutorService scheduler, autosaveScheduler, memoryAvailableScheduler;
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(0, runnable -> {
+        Thread thread = Executors.defaultThreadFactory().newThread(runnable);
+        thread.setDaemon(true);  // Make it so that it can shut down gracefully by placing it in background
+        return thread;
+    });
 
     // FXML Elements
     // Menu bar
@@ -554,13 +558,8 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
         docsMenuItem.setOnAction(event -> GUIUtils.openURLInBrowser("https://docs.auditranscribe.app/"));
         aboutMenuItem.setOnAction(event -> AboutViewController.showAboutWindow());
 
-        // Create scheduler to update memory available
-        memoryAvailableScheduler = Executors.newScheduledThreadPool(0, runnable -> {
-            Thread thread = Executors.defaultThreadFactory().newThread(runnable);
-            thread.setDaemon(true);
-            return thread;
-        });
-        memoryAvailableScheduler.scheduleAtFixedRate(() -> Platform.runLater(() -> {
+        // Schedule available memory updating
+        scheduler.scheduleAtFixedRate(() -> Platform.runLater(() -> {
             // Get the presumed free memory available
             // (See https://stackoverflow.com/a/12807848)
             long allocatedMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
@@ -1092,19 +1091,10 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
      * Method that handles the things to do when the scene is to be closed.
      */
     public void handleSceneClosing() {
-        // Stop the audio playing
         audio.stop();
-
-        // Close the note player sequencer
         notePlayerSequencer.close();
-
-        // Clear the note rectangles
         NoteRectangle.allNoteRectangles.clear();
-
-        // Shut down the schedulers
-        if (scheduler != null) scheduler.shutdown();
-        if (autosaveScheduler != null) autosaveScheduler.shutdown();
-        if (memoryAvailableScheduler != null) memoryAvailableScheduler.shutdown();
+        scheduler.shutdown();
     }
 
     /**
@@ -1857,12 +1847,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
             playheadLine.startXProperty().bind(playheadX);
             playheadLine.endXProperty().bind(playheadX);
 
-            // Create a constantly-executing service for playback functionality
-            scheduler = Executors.newScheduledThreadPool(0, runnable -> {
-                Thread thread = Executors.defaultThreadFactory().newThread(runnable);
-                thread.setDaemon(true);  // Make it so that it can shut down gracefully by placing it in background
-                return thread;
-            });
+            // Schedule playback functionality
             scheduler.scheduleAtFixedRate(() -> {
                 // Nothing really changes if the audio is paused
                 if (!isPaused) {
@@ -1898,13 +1883,8 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
                 }
             }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);
 
-            // Create another constantly-executing service for autosaving
-            autosaveScheduler = Executors.newScheduledThreadPool(0, runnable -> {
-                Thread thread = Executors.defaultThreadFactory().newThread(runnable);
-                thread.setDaemon(true);
-                return thread;
-            });
-            autosaveScheduler.scheduleAtFixedRate(() -> Platform.runLater(
+            // Schedule autosave functionality
+            scheduler.scheduleAtFixedRate(() -> Platform.runLater(
                             () -> {
                                 if (audtFilePath != null) {
                                     handleSavingProject(true, false);
