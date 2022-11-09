@@ -2569,10 +2569,25 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
      * @return Debug information as a list of pairs.
      */
     private List<Pair<String, String>> getDebugInfo() {
-        // Todo add more variables
         return List.of(
+                new Pair<>("finalWidth", Double.toString(finalWidth)),
+                new Pair<>("finalHeight", Double.toString(finalHeight)),
+                new Pair<>("-----", "-----"),
+                new Pair<>("isPaused", Boolean.toString(isPaused)),
+                new Pair<>("usingSlowedAudio", Boolean.toString(usingSlowedAudio)),
                 new Pair<>("currTime", Double.toString(currTime)),
-                new Pair<>("playheadX", playheadX.toString())
+                new Pair<>("playheadX", playheadX.toString()),
+                new Pair<>("Playhead Line X-Coord", playheadLine.startXProperty().toString()),
+                new Pair<>("Coloured Progress Pane Position", colouredProgressPane.widthProperty().toString()),
+                new Pair<>("-----", "-----"),
+                new Pair<>("hasUnsavedChanges", Boolean.toString(hasUnsavedChanges)),
+                new Pair<>("audtFilePath", audtFilePath),
+                new Pair<>("audtFileName", audtFileName),
+                new Pair<>("-----", "-----"),
+                new Pair<>("isAudioMuted", Boolean.toString(isAudioMuted)),
+                new Pair<>("Audio Volume", Double.toString(audioVolumeSlider.getValue())),
+                new Pair<>("areNotesMuted", Boolean.toString(areNotesMuted)),
+                new Pair<>("Notes Volume", Double.toString(notesVolumeSlider.getValue()))
         );
     }
 }
