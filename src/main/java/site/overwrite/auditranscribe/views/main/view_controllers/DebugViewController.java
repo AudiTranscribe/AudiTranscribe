@@ -31,6 +31,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import site.overwrite.auditranscribe.generic.ClassWithLogging;
+import site.overwrite.auditranscribe.generic.tuples.Pair;
 import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.misc.Theme;
@@ -39,7 +40,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 public class DebugViewController extends ClassWithLogging implements Initializable {
@@ -88,6 +88,9 @@ public class DebugViewController extends ClassWithLogging implements Initializab
             // Show the stage
             debugStage.show();
 
+            // Return focus to owner
+            owner.requestFocus();
+
             // Return the controller for further processing
             return controller;
         } catch (IOException e) {
@@ -101,11 +104,11 @@ public class DebugViewController extends ClassWithLogging implements Initializab
      *
      * @param listContent Variable-value mappings.
      */
-    public void setListContent(Map<String, String> listContent) {
+    public void setListContent(List<Pair<String, String>> listContent) {
         // Convert the map into strings to display
         List<String> displayStrings = new ArrayList<>();
-        for (String key : listContent.keySet()) {
-            displayStrings.add(key + ": " + listContent.get(key));
+        for (Pair<String, String> entry : listContent) {
+            displayStrings.add(entry.value0() + ": " + entry.value1());
         }
 
         // Update the list view

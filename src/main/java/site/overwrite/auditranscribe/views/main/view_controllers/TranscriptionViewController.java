@@ -2565,13 +2565,14 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
 
     /**
      * Helper method that returns the debug information needed for the debug view's lists.
-     * @return Debug information as a map.
+     *
+     * @return Debug information as a list of pairs.
      */
-    private Map<String, String> getDebugInfo() {
-        // Todo add more
-        return Map.of(
-                "playheadX", playheadX.toString(),
-                "currTime", Double.toString(currTime)
+    private List<Pair<String, String>> getDebugInfo() {
+        // Todo add more variables
+        return List.of(
+                new Pair<>("currTime", Double.toString(currTime)),
+                new Pair<>("playheadX", playheadX.toString())
         );
     }
 }
