@@ -29,6 +29,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextBoundsType;
+import site.overwrite.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import site.overwrite.auditranscribe.utils.MusicUtils;
 import site.overwrite.auditranscribe.utils.UnitConversionUtils;
 
@@ -37,6 +38,7 @@ import java.util.HashSet;
 /**
  * Class that helps adds stuff to the spectrogram area.
  */
+@ExcludeFromGeneratedCoverageReport
 public final class PlottingStuffHandler {
     // Constants
     private static final double BAR_NUMBER_ELLIPSE_RADIUS_Y = 16;

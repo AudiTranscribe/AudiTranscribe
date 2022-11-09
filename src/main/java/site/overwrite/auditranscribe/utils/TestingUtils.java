@@ -18,9 +18,12 @@
 
 package site.overwrite.auditranscribe.utils;
 
+import site.overwrite.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+
 /**
  * Testing utility methods.
  */
+@ExcludeFromGeneratedCoverageReport
 public final class TestingUtils {
     // Attributes
     private static Boolean isRunningTest = null;

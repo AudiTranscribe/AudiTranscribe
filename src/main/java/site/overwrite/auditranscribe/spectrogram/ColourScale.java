@@ -18,11 +18,14 @@
 
 package site.overwrite.auditranscribe.spectrogram;
 
+import site.overwrite.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+
 /**
  * Enum that contains the possible colour scales for the spectrogram.<br>
  * Colour scale values are taken from Plotly and its
  * <a href="https://plotly.com/python/builtin-colorscales/">Built-In Colour Scales</a>.
  */
+@ExcludeFromGeneratedCoverageReport
 public enum ColourScale {
     // Enum values
     VIRIDIS(new int[]{

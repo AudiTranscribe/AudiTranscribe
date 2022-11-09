@@ -24,6 +24,7 @@ import javafx.scene.control.ButtonType;
 import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.generic.tuples.Pair;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
+import site.overwrite.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import site.overwrite.auditranscribe.misc.Popups;
 import site.overwrite.auditranscribe.network.APICallHandler;
 import site.overwrite.auditranscribe.network.exceptions.APIServerException;
@@ -38,6 +39,7 @@ import java.util.logging.Level;
 /**
  * Class that assists with the checking of updates from the API server.
  */
+@ExcludeFromGeneratedCoverageReport
 public class UpdateChecker extends ClassWithLogging {
     // Public methods
     public static void checkForUpdates(String currentVersion) {

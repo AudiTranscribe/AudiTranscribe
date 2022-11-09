@@ -35,6 +35,7 @@ import java.util.Optional;
 /**
  * Class that handles the showing of popups and dialogs to the user.
  */
+@ExcludeFromGeneratedCoverageReport
 public final class Popups {
     private Popups() {
         // Private constructor to signal this is a utility class

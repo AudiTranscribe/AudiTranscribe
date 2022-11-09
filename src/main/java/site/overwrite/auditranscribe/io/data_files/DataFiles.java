@@ -20,10 +20,12 @@ package site.overwrite.auditranscribe.io.data_files;
 
 import site.overwrite.auditranscribe.io.data_files.file_classes.PersistentDataFile;
 import site.overwrite.auditranscribe.io.data_files.file_classes.SettingsDataFile;
+import site.overwrite.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 
 /**
  * Enum that stores all the data files currently available.
  */
+@ExcludeFromGeneratedCoverageReport
 public final class DataFiles {
     // Constants
     public static final PersistentDataFile PERSISTENT_DATA_FILE = new PersistentDataFile();

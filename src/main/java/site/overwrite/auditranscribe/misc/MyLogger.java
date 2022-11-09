@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 /**
  * Class that handles the logging functionalities of AudiTranscribe.
  */
+@ExcludeFromGeneratedCoverageReport
 public final class MyLogger {
     // Constants
     private static final long MAX_LOG_FILE_SIZE = 5_000_000;  // In bytes
