@@ -82,6 +82,9 @@
 
 /* Buttons */
 .ok-button {
+    -fx-border-width: 1px;
+    -fx-border-color: #426ca8ff;
+    -fx-border-radius: 2px;
     -fx-background-color: #4c8acaff;
     -fx-text-fill: #ffffffff;
 }

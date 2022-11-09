@@ -229,9 +229,9 @@
                   <Label styleClass="warning-label" text="⚠️ Changes may not take place until next restart." AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
             </AnchorPane>
-            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" prefWidth="60.0" styleClass="preference-page-button" text="Cancel" HBox.hgrow="NEVER" />
-            <Button fx:id="applyButton" disable="true" mnemonicParsing="false" prefWidth="60.0" text="Apply" HBox.hgrow="NEVER" />
-            <Button fx:id="okButton" mnemonicParsing="false" prefWidth="60.0" text="OK" HBox.hgrow="NEVER">
+            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" prefHeight="25.0" prefWidth="60.0" styleClass="preference-page-button" text="Cancel" HBox.hgrow="NEVER" />
+            <Button fx:id="applyButton" disable="true" mnemonicParsing="false" prefHeight="25.0" prefWidth="60.0" styleClass="preference-page-button" text="Apply" HBox.hgrow="NEVER" />
+            <Button fx:id="okButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="60.0" text="OK" HBox.hgrow="NEVER">
                <styleClass>
                   <String fx:value="preference-page-button" />
                   <String fx:value="ok-button" />
