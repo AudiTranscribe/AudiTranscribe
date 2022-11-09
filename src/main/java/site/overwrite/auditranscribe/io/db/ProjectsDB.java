@@ -21,6 +21,7 @@ package site.overwrite.auditranscribe.io.db;
 import site.overwrite.auditranscribe.generic.tuples.Pair;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -31,6 +32,7 @@ import java.util.Map;
 /**
  * Class that interfaces with the projects' database.
  */
+@ExcludeFromGeneratedCoverageReport
 public class ProjectsDB {
     // Constants
     public static int SQL_DATABASE_VERSION = 0x00070001;  // Database version 0.7.0, revision 1 -> 00 07 00 01

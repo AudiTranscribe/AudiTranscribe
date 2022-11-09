@@ -18,6 +18,7 @@
 
 package site.overwrite.auditranscribe.utils;
 
+import site.overwrite.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
 
@@ -30,6 +31,7 @@ import java.net.URISyntaxException;
 /**
  * GUI utilities.
  */
+@ExcludeFromGeneratedCoverageReport
 public final class GUIUtils {
     private GUIUtils() {
         // Private constructor to signal this is a utility class

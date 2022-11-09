@@ -21,6 +21,7 @@ package site.overwrite.auditranscribe.plotting;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.WritableImage;
 import site.overwrite.auditranscribe.generic.ClassWithLogging;
+import site.overwrite.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import site.overwrite.auditranscribe.spectrogram.ColourScale;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
 import site.overwrite.auditranscribe.utils.MathUtils;
@@ -33,6 +34,7 @@ import java.util.logging.Level;
  * Class that contains plotting functions.<br>
  * This is a class that helps generate an image, given spectrogram magnitude data.
  */
+@ExcludeFromGeneratedCoverageReport
 public class Plotter extends ClassWithLogging {
     // Constants
     public final InterpolationMethod interpolationMethod = InterpolationMethod.BILINEAR;

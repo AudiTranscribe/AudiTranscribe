@@ -29,6 +29,7 @@ import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.generic.exceptions.ValueException;
 import site.overwrite.auditranscribe.io.IOConstants;
 import site.overwrite.auditranscribe.io.IOMethods;
+import site.overwrite.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import site.overwrite.auditranscribe.utils.ArrayUtils;
 import site.overwrite.auditranscribe.utils.MathUtils;
 
@@ -47,6 +48,7 @@ import java.util.logging.Level;
 /**
  * Audio class that handles audio processing and audio playback.
  */
+@ExcludeFromGeneratedCoverageReport
 public class Audio extends ClassWithLogging {
     // Constants
     public static final int SAMPLES_BUFFER_SIZE = 1024;  // In bits; 1024 = 2^10

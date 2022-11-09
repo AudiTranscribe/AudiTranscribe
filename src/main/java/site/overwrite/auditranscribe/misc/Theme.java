@@ -21,6 +21,7 @@ package site.overwrite.auditranscribe.misc;
 /**
  * Enum that contains the different possible themes that AudiTranscribe supports.
  */
+@ExcludeFromGeneratedCoverageReport
 public enum Theme {
     // Enum values
     LIGHT_MODE("Light Mode", "light-mode"),
