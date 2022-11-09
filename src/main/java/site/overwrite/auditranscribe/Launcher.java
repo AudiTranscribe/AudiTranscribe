@@ -18,6 +18,9 @@
 
 package site.overwrite.auditranscribe;
 
+import site.overwrite.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+
+@ExcludeFromGeneratedCoverageReport
 public class Launcher {
     public static void main(String[] args) {
         MainApplication.main(args);

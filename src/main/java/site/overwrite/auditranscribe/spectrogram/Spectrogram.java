@@ -25,6 +25,7 @@ import site.overwrite.auditranscribe.generic.ClassWithLogging;
 import site.overwrite.auditranscribe.generic.exceptions.ValueException;
 import site.overwrite.auditranscribe.misc.Complex;
 import site.overwrite.auditranscribe.misc.CustomTask;
+import site.overwrite.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import site.overwrite.auditranscribe.plotting.Plotter;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.CQT;
 import site.overwrite.auditranscribe.spectrogram.spectral_representations.FrequencyBins;
@@ -36,6 +37,7 @@ import java.util.logging.Level;
 /**
  * Class that handles the creation of the spectrogram image.
  */
+@ExcludeFromGeneratedCoverageReport
 public class Spectrogram extends ClassWithLogging {
     // Constants
     final double INTENSITY_PRECISION = 1e-3;

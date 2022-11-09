@@ -18,6 +18,7 @@
 
 package site.overwrite.auditranscribe.generic;
 
+import site.overwrite.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import site.overwrite.auditranscribe.misc.MyLogger;
 
 import java.util.logging.Level;
@@ -25,6 +26,7 @@ import java.util.logging.Level;
 /**
  * A generic AudiTranscribe class with logging capabilities.
  */
+@ExcludeFromGeneratedCoverageReport
 public abstract class ClassWithLogging {
     // Public methods
 

@@ -25,6 +25,7 @@ import javafx.concurrent.Task;
  *
  * @param <V> Type of value that is returned by the custom task.
  */
+@ExcludeFromGeneratedCoverageReport
 public abstract class CustomTask<V> extends Task<V> {
     // Attributes
     public String name;

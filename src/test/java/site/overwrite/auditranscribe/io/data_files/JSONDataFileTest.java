@@ -33,7 +33,6 @@ import java.nio.charset.StandardCharsets;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@EnabledOnOs({OS.LINUX})
 class JSONDataFileTest {
     // Attributes
     static String FILE_PATH = IOMethods.joinPaths(
