@@ -54,6 +54,11 @@ jobs:
           zip -r Windows-Installer.zip Windows-Installer
           zip -r macOS-Installer.zip macOS-Installer
           zip -r Linux-Installer.zip Linux-Installer
+      - name: Generate SHA256 Signatures
+        run: |
+          (sha256sum Windows-Installer.zip | cut -d " " -f1) > Windows-Installer.sha256
+          (sha256sum macOS-Installer.zip | cut -d " " -f1) > macOS-Installer.sha256
+          (sha256sum Linux-Installer.zip | cut -d " " -f1) > Linux-Installer.sha256
       - name: Setup Semantic Release
         run: npm install -g semantic-release @semantic-release/git @semantic-release/changelog @semantic-release/github -D
       - name: Release To GitHub
