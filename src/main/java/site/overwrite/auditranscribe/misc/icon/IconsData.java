@@ -73,8 +73,8 @@ public class IconsData extends ClassWithLogging {
         }
     }
 
-    // Helper class(es)
-    static class IconsDataEncapsulator {
+    // Helper classes
+    public static class IconsDataEncapsulator {
         public Map<String, String> themeColours;
         public Map<String, String> svgPaths;
     }

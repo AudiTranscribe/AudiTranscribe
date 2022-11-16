@@ -30,12 +30,24 @@
             "label": "Windows Installer"
           },
           {
+            "path": "Windows-Installer.sha256",
+            "label": "Windows Installer SHA256 Signature"
+          },
+          {
             "path": "macOS-Installer.zip",
             "label": "macOS Installer"
           },
           {
+            "path": "macOS-Installer.sha256",
+            "label": "macOS Installer SHA256 Signature"
+          },
+          {
             "path": "Linux-Installer.zip",
             "label": "Linux Installer"
+          },
+          {
+            "path": "Linux-Installer.sha256",
+            "label": "Linux Installer SHA256 Signature"
           }
         ]
       }

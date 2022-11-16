@@ -1,5 +1,12 @@
 # AudiTranscribe Changelog
 
+## [0.9.3](https://github.com/AudiTranscribe/AudiTranscribe/compare/v0.9.2...v0.9.3) (2022-11-16)
+
+
+### Bug Fixes
+
+* fix incorrect access modifier for the icons data ([aa4d07c](https://github.com/AudiTranscribe/AudiTranscribe/commit/aa4d07cbe36bdaa14bda910112355f6380f6b590))
+
 ## [0.9.2](https://github.com/AudiTranscribe/AudiTranscribe/compare/v0.9.1...v0.9.2) (2022-11-08)
 
 
