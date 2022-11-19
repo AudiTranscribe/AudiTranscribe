@@ -37,6 +37,10 @@ class VersionTest {
         assertEquals(0, new Version("1.0.0").compareTo(new Version("1.0.0")));
         assertEquals(-1, new Version("1.0.0").compareTo(new Version("2.0.0")));
 
+        assertEquals(1, new Version("1.0.1").compareTo(new Version("1")));
+        assertEquals(0, new Version("1.0.0").compareTo(new Version("1")));
+        assertEquals(-1, new Version("1.0.0").compareTo(new Version("2")));
+
         assertEquals(1, new Version("2").compareTo(new Version("1.0.0")));
         assertEquals(0, new Version("1").compareTo(new Version("1.0.0")));
         assertEquals(-1, new Version("1").compareTo(new Version("1.0.1")));
