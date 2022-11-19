@@ -19,14 +19,10 @@
 package site.overwrite.auditranscribe.views.setup_wizard.download_handlers;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.network.APICallHandler;
-import site.overwrite.auditranscribe.network.exceptions.APIServerException;
 
 import java.io.*;
-import java.net.URL;
 import java.util.logging.Level;
 
 /**
@@ -68,13 +64,10 @@ public class AudioResourceDownloadManager extends AbstractDownloadManager {
                 AudioResourceDownloadData data = gson.fromJson(reader, AudioResourceDownloadData.class);
 
                 // Set attributes
-                downloadURL = new URL(APICallHandler.API_SERVER_URL + data.downloadPage);
+                downloadDriveID = data.downloadDriveID;
+                signatureDriveID = data.signatureDriveID;
 
-                // Get signature from signature page
-                JsonObject returnedData = APICallHandler.sendAPIGetRequest(data.signaturePage);
-                signature = returnedData.get("signature").getAsString();
-
-            } catch (JsonSyntaxException | APIServerException e) {
+            } catch (JsonSyntaxException e) {
                 throw new IOException(e);
             }
         } catch (IOException e) {
@@ -82,8 +75,8 @@ public class AudioResourceDownloadManager extends AbstractDownloadManager {
             logException(e);
 
             // Make all the attributes `null`
-            downloadURL = null;
-            signature = null;
+            downloadDriveID = null;
+            signatureDriveID = null;
         }
     }
 
@@ -95,7 +88,7 @@ public class AudioResourceDownloadManager extends AbstractDownloadManager {
 
     // Helper classes
     public static class AudioResourceDownloadData {
-        public String downloadPage;
-        public String signaturePage;
+        public String downloadDriveID;
+        public String signatureDriveID;
     }
 }
