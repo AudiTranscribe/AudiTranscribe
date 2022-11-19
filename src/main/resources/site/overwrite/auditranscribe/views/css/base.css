@@ -218,3 +218,17 @@
     -fx-font-size: 16px;
     -fx-font-weight: bold;
 }
+
+/* DEBUG VIEW */
+.debug-view-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.debug-list .list-cell:hover {
+    -fx-cursor: none;
+}
+
+.debug-list .list-cell:hover {
+    -fx-background-color: transparent;
+}

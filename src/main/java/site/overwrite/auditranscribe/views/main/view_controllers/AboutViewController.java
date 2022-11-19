@@ -120,8 +120,6 @@ public class AboutViewController extends ClassWithLogging implements Initializab
         }
     }
 
-    // Private methods
-
     /**
      * Method that sets the theme for the scene.
      */

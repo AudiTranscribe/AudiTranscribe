@@ -59,6 +59,7 @@ import java.util.logging.Level;
  */
 public class SceneSwitcher extends ClassWithLogging {
     // Attributes
+    private final boolean debugMode;
     private final String currentVersion;
 
     private final Stage mainStage = new Stage();
@@ -79,8 +80,12 @@ public class SceneSwitcher extends ClassWithLogging {
     public SceneSwitcher(String currentVersion) {
         // Update attributes
         this.currentVersion = currentVersion;
-
         this.screenBounds = Screen.getPrimary().getVisualBounds();
+
+        // Check if debug mode is enabled
+        debugMode = IOMethods.isSomethingAt(
+                IOMethods.joinPaths(IOConstants.APP_DATA_FOLDER_PATH, "debug-mode.txt")
+        );
 
         // Set icon for the main stage and transcription stage, if not on macOS
         if (OSMethods.getOS() != OSType.MAC) {
@@ -482,6 +487,9 @@ public class SceneSwitcher extends ClassWithLogging {
 
         // Get the spectrogram view controller
         TranscriptionViewController controller = fxmlLoader.getController();
+
+        // Set debug mode attribute
+        controller.setDebugMode(debugMode);
 
         // Return the scene and controller
         return new Pair<>(scene, controller);
