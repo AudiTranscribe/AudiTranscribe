@@ -44,7 +44,7 @@ public final class IOConstants {
             IOConstants.APP_DATA_FOLDER_PATH, "other_resources"
     );
 
-    public static final String RESOURCES_FOLDER_PATH = IOMethods.joinPaths("site", "overwrite", "auditranscribe");
+    public static final String RESOURCES_FOLDER_PATH = IOMethods.joinPaths("app", "auditranscribe");
 
     private IOConstants() {
         // Private constructor to signal this is a utility class
