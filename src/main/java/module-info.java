@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-module site.overwrite.auditranscribe {
+module app.auditranscribe {
     requires java.desktop;
     requires java.sql;
 
