@@ -19,16 +19,13 @@
 package app.auditranscribe.audio;
 
 import app.auditranscribe.audio.exceptions.FilterNotFoundException;
-import app.auditranscribe.audio.filters.AbstractFilter;
-import app.auditranscribe.audio.filters.KaiserBest;
-import app.auditranscribe.audio.filters.KaiserFast;
+import app.auditranscribe.audio.filters.*;
 import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import site.overwrite.auditranscribe.audio.filters.*;
 
 import java.io.IOException;
 

@@ -18,6 +18,7 @@
 
 package app.auditranscribe.io.audt_file.v0x00090002;
 
+import app.auditranscribe.generic.tuples.Triple;
 import app.auditranscribe.io.CompressionHandlers;
 import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
@@ -26,15 +27,12 @@ import app.auditranscribe.io.audt_file.base.AUDTFileReader;
 import app.auditranscribe.io.audt_file.base.AUDTFileWriter;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import app.auditranscribe.io.audt_file.v0x00090002.data_encapsulators.*;
-import app.auditranscribe.music.TimeSignature;
-import app.auditranscribe.utils.TypeConversionUtils;
-import org.junit.jupiter.api.*;
-import app.auditranscribe.generic.tuples.Triple;
-import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import site.overwrite.auditranscribe.io.audt_file.v0x00090002.data_encapsulators.*;
 import app.auditranscribe.io.exceptions.FailedToReadDataException;
 import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
 import app.auditranscribe.io.exceptions.InvalidFileVersionException;
+import app.auditranscribe.music.TimeSignature;
+import app.auditranscribe.utils.TypeConversionUtils;
+import org.junit.jupiter.api.*;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;

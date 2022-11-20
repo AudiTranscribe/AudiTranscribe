@@ -18,18 +18,16 @@
 
 package app.auditranscribe.io.audt_file;
 
+import app.auditranscribe.generic.tuples.Triple;
+import app.auditranscribe.io.CompressionHandlers;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.*;
+import app.auditranscribe.utils.MathUtils;
+import app.auditranscribe.utils.TypeConversionUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
-import app.auditranscribe.io.CompressionHandlers;
-import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import site.overwrite.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.*;
-import app.auditranscribe.generic.tuples.Triple;
-import app.auditranscribe.utils.MathUtils;
-import app.auditranscribe.utils.TypeConversionUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;

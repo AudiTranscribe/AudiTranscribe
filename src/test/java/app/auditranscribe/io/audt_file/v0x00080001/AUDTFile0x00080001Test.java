@@ -32,8 +32,6 @@ import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
 import app.auditranscribe.io.exceptions.InvalidFileVersionException;
 import app.auditranscribe.utils.TypeConversionUtils;
 import org.junit.jupiter.api.*;
-import site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import site.overwrite.auditranscribe.io.audt_file.v0x00080001.data_encapsulators.*;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
