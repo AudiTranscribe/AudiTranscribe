@@ -24,7 +24,9 @@ import site.overwrite.auditranscribe.io.IOMethods;
 import site.overwrite.auditranscribe.network.DownloadFileHandler;
 import site.overwrite.auditranscribe.network.DownloadTask;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
@@ -36,9 +38,9 @@ public abstract class AbstractDownloadManager extends ClassWithLogging {
     // Attributes
     private final int maxAttempts;
 
-    protected URL downloadURL;
+    protected String downloadDriveID;
+    protected String signatureDriveID;
     protected String downloadFileName;
-    protected String signature;
 
     /**
      * Initialization method for an <code>AbstractDownloadManager</code>.
@@ -63,16 +65,29 @@ public abstract class AbstractDownloadManager extends ClassWithLogging {
      */
     public String downloadResource(String destFolder, DownloadTask<?> task) throws IOException {
         // Ensure all required attributes are set
-        if (downloadURL == null || downloadFileName == null || signature == null) {
+        if (downloadDriveID == null || signatureDriveID == null || downloadFileName == null) {
             throw new ValueException("Not all required attributes set");
         }
+
+        // Form the URLs
+        URL downloadURL = formDriveURL(downloadDriveID);
+        URL signatureURL = formDriveURL(signatureDriveID);
+
+        // Obtain signature from the file
+        log(Level.INFO, "Downloading signature from '" + signatureURL + "'.");
+        DownloadFileHandler.downloadFile(signatureURL, "temp.sha256");
+        String signature = IOMethods.inputStreamToString(
+                new FileInputStream("temp.sha256"), "UTF-8"
+        ).strip();  // Remove any trailing newline
+        IOMethods.delete("temp.sha256");
+        log(Level.INFO, "Obtained signature: " + signature);
 
         // Create all parent directories
         IOMethods.createFolder(destFolder);
 
         // Download the resource file
         try {
-            log(Level.INFO, "Downloading resource from '" + downloadURL.toString() + "'.");
+            log(Level.INFO, "Downloading resource from '" + downloadURL + "'.");
             DownloadFileHandler.downloadFileWithRetry(
                     downloadURL, IOMethods.joinPaths(destFolder, downloadFileName), task, "SHA256", signature,
                     maxAttempts
@@ -91,4 +106,17 @@ public abstract class AbstractDownloadManager extends ClassWithLogging {
      * @param downloadedResourcePath Path to the downloaded resource.
      */
     public abstract void processDownload(String downloadedResourcePath) throws IOException;
+
+    // Private methods
+
+    /**
+     * Helper method that generates the URL for downloading from Google Drive.
+     *
+     * @param driveID ID of the file on Google Drive.
+     * @return Formed URL of the file on Google Drive.
+     * @throws MalformedURLException If the URL is malformed.
+     */
+    private URL formDriveURL(String driveID) throws MalformedURLException {
+        return new URL("https://drive.google.com/uc?id=" + driveID + "&export=download");
+    }
 }

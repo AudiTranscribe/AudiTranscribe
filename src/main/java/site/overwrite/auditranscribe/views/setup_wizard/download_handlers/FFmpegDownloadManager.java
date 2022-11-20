@@ -19,18 +19,14 @@
 package site.overwrite.auditranscribe.views.setup_wizard.download_handlers;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import site.overwrite.auditranscribe.io.CompressionHandlers;
 import site.overwrite.auditranscribe.io.IOMethods;
-import site.overwrite.auditranscribe.network.APICallHandler;
 import site.overwrite.auditranscribe.network.DownloadTask;
-import site.overwrite.auditranscribe.network.exceptions.APIServerException;
 import site.overwrite.auditranscribe.system.OSMethods;
 import site.overwrite.auditranscribe.system.OSType;
 
 import java.io.*;
-import java.net.URL;
 import java.util.logging.Level;
 
 /**
@@ -62,8 +58,8 @@ public class FFmpegDownloadManager extends AbstractDownloadManager {
 
         // Linux and others do not have automatic FFmpeg installation
         if (os == OSType.LINUX || os == OSType.OTHER) {
-            downloadURL = null;
-            signature = null;
+            downloadDriveID = null;
+            signatureDriveID = null;
             ffmpegFolder = null;
         } else {
             try {
@@ -73,8 +69,8 @@ public class FFmpegDownloadManager extends AbstractDownloadManager {
                 logException(e);
 
                 // Make all the attributes `null`
-                downloadURL = null;
-                signature = null;
+                downloadDriveID = null;
+                signatureDriveID = null;
                 ffmpegFolder = null;
             }
         }
@@ -134,14 +130,11 @@ public class FFmpegDownloadManager extends AbstractDownloadManager {
             FFmpegDownloadData data = gson.fromJson(reader, FFmpegDownloadData.class);
 
             // Set attributes
-            downloadURL = new URL(APICallHandler.API_SERVER_URL + data.downloadPage);
+            downloadDriveID = data.downloadDriveID;
+            signatureDriveID = data.signatureDriveID;
             ffmpegFolder = data.outputFolder;
 
-            // Get signature from signature page
-            JsonObject returnedData = APICallHandler.sendAPIGetRequest(data.signaturePage);
-            signature = returnedData.get("signature").getAsString();
-
-        } catch (JsonSyntaxException | APIServerException e) {
+        } catch (JsonSyntaxException e) {
             throw new IOException(e);
         }
     }
@@ -180,8 +173,8 @@ public class FFmpegDownloadManager extends AbstractDownloadManager {
 
     // Helper classes
     public static class FFmpegDownloadData {
-        public String downloadPage;
-        public String signaturePage;
+        public String downloadDriveID;
+        public String signatureDriveID;
         public String outputFolder;
     }
 }

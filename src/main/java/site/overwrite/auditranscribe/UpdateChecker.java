@@ -18,7 +18,8 @@
 
 package site.overwrite.auditranscribe;
 
-import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import site.overwrite.auditranscribe.generic.ClassWithLogging;
@@ -26,13 +27,16 @@ import site.overwrite.auditranscribe.generic.tuples.Pair;
 import site.overwrite.auditranscribe.io.data_files.DataFiles;
 import site.overwrite.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import site.overwrite.auditranscribe.misc.Popups;
-import site.overwrite.auditranscribe.network.APICallHandler;
-import site.overwrite.auditranscribe.network.exceptions.APIServerException;
+import site.overwrite.auditranscribe.misc.Version;
 import site.overwrite.auditranscribe.utils.GUIUtils;
 import site.overwrite.auditranscribe.utils.MiscUtils;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.HashMap;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Optional;
 import java.util.logging.Level;
 
@@ -41,7 +45,20 @@ import java.util.logging.Level;
  */
 @ExcludeFromGeneratedCoverageReport
 public class UpdateChecker extends ClassWithLogging {
+    // Constants
+    public static int CONNECTION_TIMEOUT = 1500;  // In milliseconds; duration to wait for connecting to server
+    public static int READ_TIMEOUT = 2500;
+
+    public static String AUDITRANSCRIBE_REPO = "AudiTranscribe/AudiTranscribe";
+
     // Public methods
+
+    /**
+     * Method that checks if the current version of AudiTranscribe is the most recent version.
+     *
+     * @param currentVersion Current version of AudiTranscribe. Does <b>not</b> include a preceding
+     *                       <code>v</code> in front of the semantic version.
+     */
     public static void checkForUpdates(String currentVersion) {
         // Determine if we need to check for updates
         int currentTime = (int) MiscUtils.getUnixTimestamp();
@@ -90,43 +107,113 @@ public class UpdateChecker extends ClassWithLogging {
         DataFiles.PERSISTENT_DATA_FILE.data.lastCheckedForUpdates = currentTime;
         DataFiles.PERSISTENT_DATA_FILE.saveFile();
     }
+
     // Private methods
+
+    /**
+     * Helper method that retrieves the GitHub tag array.
+     *
+     * @return JSON array of the tags' data.
+     * @throws IOException If something went wrong when processing the URL or when opening a
+     *                     connection to the GitHub API server.
+     */
+    private static JsonArray getRawTagArray() throws IOException {
+        // Form the URL
+        URL url = new URL("https://api.github.com/repos/" + AUDITRANSCRIBE_REPO + "/tags");
+
+        // Send request to GitHub server for all the version tags
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        String output;
+
+        try {
+            // Set the request method for the connection
+            con.setRequestMethod("GET");
+
+            // Set timeouts
+            con.setConnectTimeout(CONNECTION_TIMEOUT);
+            con.setReadTimeout(READ_TIMEOUT);
+
+            // Get the output from the connection
+            StringBuilder content = new StringBuilder();
+            Reader streamReader;
+
+            if (con.getResponseCode() > 299) {
+                streamReader = new InputStreamReader(con.getErrorStream());
+            } else {
+                streamReader = new InputStreamReader(con.getInputStream());
+            }
+
+            BufferedReader in = new BufferedReader(streamReader);
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                content.append(inputLine);
+            }
+
+            in.close();
+
+            output = content.toString();
+        } finally {
+            // Must remember to disconnect
+            con.disconnect();
+        }
+
+        // Parse the content as JSON data
+        return JsonParser.parseString(output).getAsJsonArray();
+    }
+
+    /**
+     * Helper method that returns all the version tags.
+     *
+     * @return All the version tags.
+     */
+    private static Version[] getVersions() {
+        Version[] tags;
+        try {
+            JsonArray tagArray = getRawTagArray();
+
+            int numTags = tagArray.size();
+            tags = new Version[numTags];
+            for (int i = 0; i < numTags; i++) {
+                tags[i] = new Version(
+                        tagArray.get(i).getAsJsonObject().getAsJsonPrimitive("name")
+                                .getAsString().substring(1)
+                );
+            }
+        } catch (IOException e) {
+            logException(e);
+            tags = new Version[0];
+        }
+        return tags;
+    }
 
     /**
      * Helper method that checks if there are any new versions for AudiTranscribe.
      *
-     * @param currentVersion Current version of AudiTranscribe.
+     * @param currentVersionString Current version of AudiTranscribe.
      * @return A pair. First element is a boolean, describing whether the current version is latest.
      * Second element is the tag of a newer version, or <code>null</code> if current version is
      * already latest.
      */
-    private static Pair<Boolean, String> checkIfHaveNewVersion(String currentVersion) {
-        // Make a call to the API server checking if the current version is latest
-        HashMap<String, String> params = new HashMap<>();
-        params.put("current-version", "v" + currentVersion);
+    private static Pair<Boolean, String> checkIfHaveNewVersion(String currentVersionString) {
+        // Parse current version as a version object as well
+        Version currentVersion = new Version(currentVersionString);
 
-        JsonObject response;
-        try {
-            response = APICallHandler.sendAPIGetRequest("check-if-have-new-version", params, 5000);
-        } catch (APIServerException e) {
-            // Return a value that says that the current version is latest
-            log(
-                    Level.WARNING,
-                    "Error for API request on checking new version: timed out or connection refused",
-                    UpdateChecker.class.getName()
-            );
-            return new Pair<>(true, null);
-        } catch (IOException e) {
-            logException(e);
-            throw new RuntimeException(e);
+        // Get all version tags
+        Version[] versions = getVersions();
+
+        // Find the latest version among all the versions
+        Version latestVersion = currentVersion;
+        for (Version otherVersion : versions) {
+            if (latestVersion.compareTo(otherVersion) < 0) {
+                latestVersion = otherVersion;
+            }
         }
 
-        // Parse the response and return
-        boolean isLatest = response.get("is_latest").getAsBoolean();
-        if (isLatest) {
-            return new Pair<>(true, null);
+        // If current version is not latest, return newer version as well
+        if (currentVersion != latestVersion) {
+            return new Pair<>(false, "v" + latestVersion.version);
         } else {
-            return new Pair<>(false, response.get("newer_tag").getAsString());
+            return new Pair<>(true, null);  // Is latest, so do not return any version
         }
     }
 }

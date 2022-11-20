@@ -1,5 +1,5 @@
 {
-  "downloadPage": "download-ffmpeg?platform=macOS",
-  "signaturePage": "download-ffmpeg?platform=macOS&signature_needed=true",
+  "downloadDriveID": "1X3KlZRX_ZNKq_7ehtMrm5a9C81nRDYz2",
+  "signatureDriveID": "1L6eZ1iy1gYMD_XPhUj-3Cuqc9JG2INyT",
   "outputFolder": "ffmpeg/bin"
 }
