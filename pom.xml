@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>site.overwrite</groupId>
+    <groupId>app.auditranscribe</groupId>
     <artifactId>AudiTranscribe</artifactId>
     <version>0.10.0</version>
     <name>AudiTranscribe</name>
