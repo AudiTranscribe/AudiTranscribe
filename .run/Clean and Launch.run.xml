@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Clean and Launch" type="Application" factoryName="Application">
-    <option name="MAIN_CLASS_NAME" value="site.overwrite.auditranscribe.Launcher" />
+    <option name="MAIN_CLASS_NAME" value="app.auditranscribe.Launcher" />
     <module name="AudiTranscribe" />
     <option name="VM_PARAMETERS" value="-Djava.util.logging.config.file=src/main/resources/site/overwrite/auditranscribe/conf/logging.properties" />
     <method v="2">

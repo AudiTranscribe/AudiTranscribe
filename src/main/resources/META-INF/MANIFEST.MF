@@ -1,2 +1,2 @@
 Manifest-Version: 1.0
-Main-Class: site.overwrite.auditranscribe.MainApplication
+Main-Class: app.auditranscribe.MainApplication
