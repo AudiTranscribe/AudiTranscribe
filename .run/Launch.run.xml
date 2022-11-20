@@ -2,7 +2,7 @@
   <configuration default="false" name="Launch" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="app.auditranscribe.Launcher" />
     <module name="AudiTranscribe" />
-    <option name="VM_PARAMETERS" value="-Djava.util.logging.config.file=src/main/resources/site/overwrite/auditranscribe/conf/logging.properties" />
+    <option name="VM_PARAMETERS" value="-Djava.util.logging.config.file=src/main/resources/app/auditranscribe/conf/logging.properties" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

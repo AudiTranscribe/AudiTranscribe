@@ -7,8 +7,8 @@
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
-    <option name="PACKAGE_NAME" value="site.overwrite.auditranscribe.music.notes" />
-    <option name="MAIN_CLASS_NAME" value="notes.music.app.auditranscribe.NotePlayerSequencerTest" />
+    <option name="PACKAGE_NAME" value="app.auditranscribe.music.notes" />
+    <option name="MAIN_CLASS_NAME" value="app.auditranscribe.music.notes.NotePlayerSequencerTest" />
     <option name="METHOD_NAME" value="playbackNotes" />
     <option name="TEST_OBJECT" value="method" />
     <method v="2">
