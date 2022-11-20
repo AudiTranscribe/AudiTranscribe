@@ -22,12 +22,12 @@ import app.auditranscribe.generic.ClassWithLogging;
 import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.network.DownloadTask;
 import app.auditranscribe.utils.MathUtils;
+import app.auditranscribe.views.setup_wizard.download_handlers.FFmpegDownloadManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import app.auditranscribe.views.setup_wizard.download_handlers.FFmpegDownloadManager;
 
 import java.net.URL;
 import java.util.ResourceBundle;

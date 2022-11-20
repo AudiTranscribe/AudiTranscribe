@@ -18,12 +18,12 @@
 
 package app.auditranscribe.views.setup_wizard.view_controllers;
 
+import app.auditranscribe.generic.ClassWithLogging;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.misc.Theme;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.AnchorPane;
-import app.auditranscribe.generic.ClassWithLogging;
 
 /**
  * Abstract class that implements common methods for the setup view controllers.

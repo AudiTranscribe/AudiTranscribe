@@ -18,10 +18,10 @@
 
 package app.auditranscribe.spectrogram;
 
-import app.auditranscribe.utils.ArrayUtils;
 import app.auditranscribe.audio.WindowFunction;
 import app.auditranscribe.generic.tuples.Pair;
 import app.auditranscribe.misc.Complex;
+import app.auditranscribe.utils.ArrayUtils;
 import app.auditranscribe.utils.MathUtils;
 
 import java.util.ArrayList;

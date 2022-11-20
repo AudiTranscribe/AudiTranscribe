@@ -18,16 +18,23 @@
 
 package app.auditranscribe.views.main.view_controllers;
 
+import app.auditranscribe.generic.ClassWithLogging;
+import app.auditranscribe.generic.tuples.Pair;
+import app.auditranscribe.generic.tuples.Quadruple;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.data_files.DataFiles;
 import app.auditranscribe.io.data_files.data_encapsulators.SettingsData;
 import app.auditranscribe.io.db.ProjectsDB;
 import app.auditranscribe.misc.Popups;
 import app.auditranscribe.misc.Theme;
+import app.auditranscribe.misc.icon.IconHelper;
 import app.auditranscribe.system.OSMethods;
 import app.auditranscribe.system.OSType;
 import app.auditranscribe.utils.GUIUtils;
 import app.auditranscribe.utils.MiscUtils;
+import app.auditranscribe.views.main.ProjectIOHandlers;
+import app.auditranscribe.views.main.scene_switching.SceneSwitchingData;
+import app.auditranscribe.views.main.scene_switching.SceneSwitchingState;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -45,13 +52,6 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import app.auditranscribe.generic.ClassWithLogging;
-import app.auditranscribe.generic.tuples.Pair;
-import app.auditranscribe.generic.tuples.Quadruple;
-import app.auditranscribe.misc.icon.IconHelper;
-import app.auditranscribe.views.main.ProjectIOHandlers;
-import app.auditranscribe.views.main.scene_switching.SceneSwitchingData;
-import app.auditranscribe.views.main.scene_switching.SceneSwitchingState;
 
 import java.io.File;
 import java.io.IOException;

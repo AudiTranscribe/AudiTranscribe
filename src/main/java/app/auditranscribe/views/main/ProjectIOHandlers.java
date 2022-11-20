@@ -21,11 +21,11 @@ package app.auditranscribe.views.main;
 import app.auditranscribe.io.audt_file.AUDTFileConstants;
 import app.auditranscribe.io.audt_file.ProjectData;
 import app.auditranscribe.io.audt_file.base.AUDTFileWriter;
+import app.auditranscribe.io.audt_file.base.data_encapsulators.MusicNotesDataObject;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.ProjectInfoDataObject;
+import app.auditranscribe.io.exceptions.InvalidFileVersionException;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
-import app.auditranscribe.io.audt_file.base.data_encapsulators.MusicNotesDataObject;
-import app.auditranscribe.io.exceptions.InvalidFileVersionException;
 
 import java.io.File;
 import java.io.IOException;

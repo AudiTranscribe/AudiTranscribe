@@ -20,12 +20,15 @@ package app.auditranscribe.views.main.view_controllers;
 
 import app.auditranscribe.audio.FFmpegHandler;
 import app.auditranscribe.audio.WindowFunction;
+import app.auditranscribe.generic.ClassWithLogging;
 import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.data_files.DataFiles;
 import app.auditranscribe.misc.MyLogger;
 import app.auditranscribe.misc.Popups;
 import app.auditranscribe.misc.Theme;
+import app.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
+import app.auditranscribe.misc.spinners.CustomIntegerSpinnerValueFactory;
 import app.auditranscribe.music.NoteUnit;
 import app.auditranscribe.spectrogram.ColourScale;
 import app.auditranscribe.utils.GUIUtils;
@@ -43,9 +46,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import app.auditranscribe.generic.ClassWithLogging;
-import app.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
-import app.auditranscribe.misc.spinners.CustomIntegerSpinnerValueFactory;
 
 import java.io.File;
 import java.io.IOException;

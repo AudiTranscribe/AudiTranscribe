@@ -21,13 +21,13 @@ package app.auditranscribe;
 import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.PropertyFile;
+import app.auditranscribe.io.data_files.DataFiles;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.misc.MyLogger;
-import javafx.application.Application;
-import javafx.stage.Stage;
-import app.auditranscribe.io.data_files.DataFiles;
 import app.auditranscribe.views.main.scene_switching.SceneSwitcher;
 import app.auditranscribe.views.setup_wizard.SetupWizard;
+import javafx.application.Application;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 

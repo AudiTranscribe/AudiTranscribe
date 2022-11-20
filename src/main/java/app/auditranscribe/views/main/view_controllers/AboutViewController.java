@@ -18,6 +18,7 @@
 
 package app.auditranscribe.views.main.view_controllers;
 
+import app.auditranscribe.generic.ClassWithLogging;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.PropertyFile;
 import app.auditranscribe.io.data_files.DataFiles;
@@ -35,7 +36,6 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import app.auditranscribe.generic.ClassWithLogging;
 
 import java.io.IOException;
 import java.net.URL;

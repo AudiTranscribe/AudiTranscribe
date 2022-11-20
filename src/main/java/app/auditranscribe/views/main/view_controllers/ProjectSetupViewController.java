@@ -18,10 +18,14 @@
 
 package app.auditranscribe.views.main.view_controllers;
 
+import app.auditranscribe.generic.ClassWithLogging;
+import app.auditranscribe.generic.tuples.Pair;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.data_files.DataFiles;
 import app.auditranscribe.misc.Popups;
 import app.auditranscribe.misc.Theme;
+import app.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
+import app.auditranscribe.utils.MusicUtils;
 import app.auditranscribe.views.main.ProjectIOHandlers;
 import app.auditranscribe.views.main.scene_switching.SceneSwitchingData;
 import javafx.fxml.FXML;
@@ -31,10 +35,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.*;
-import app.auditranscribe.generic.ClassWithLogging;
-import app.auditranscribe.generic.tuples.Pair;
-import app.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
-import app.auditranscribe.utils.MusicUtils;
 
 import java.io.File;
 import java.io.IOException;

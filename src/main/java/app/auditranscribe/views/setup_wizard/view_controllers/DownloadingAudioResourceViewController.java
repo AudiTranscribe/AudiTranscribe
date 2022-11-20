@@ -23,12 +23,12 @@ import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.network.DownloadTask;
 import app.auditranscribe.utils.MathUtils;
+import app.auditranscribe.views.setup_wizard.download_handlers.AudioResourceDownloadManager;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import app.auditranscribe.views.setup_wizard.download_handlers.AudioResourceDownloadManager;
 
 import java.net.URL;
 import java.util.ResourceBundle;

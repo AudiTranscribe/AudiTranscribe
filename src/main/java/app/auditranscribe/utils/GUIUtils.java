@@ -18,9 +18,9 @@
 
 package app.auditranscribe.utils;
 
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.system.OSMethods;
 import app.auditranscribe.system.OSType;
-import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 
 import java.awt.Desktop;
 import java.io.File;

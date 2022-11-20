@@ -19,7 +19,6 @@
 package app.auditranscribe.spectrogram;
 
 import app.auditranscribe.audio.Audio;
-import javafx.scene.image.WritableImage;
 import app.auditranscribe.audio.WindowFunction;
 import app.auditranscribe.generic.ClassWithLogging;
 import app.auditranscribe.generic.exceptions.ValueException;
@@ -31,6 +30,7 @@ import app.auditranscribe.spectrogram.spectral_representations.CQT;
 import app.auditranscribe.spectrogram.spectral_representations.FrequencyBins;
 import app.auditranscribe.spectrogram.spectral_representations.VQT;
 import app.auditranscribe.utils.UnitConversionUtils;
+import javafx.scene.image.WritableImage;
 
 import java.util.logging.Level;
 
