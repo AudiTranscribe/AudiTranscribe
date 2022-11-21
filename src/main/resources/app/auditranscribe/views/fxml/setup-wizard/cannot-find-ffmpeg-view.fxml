@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="rootPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.auditranscribe.views.setup_wizard.view_controllers.CannotFindFFmpegViewController">
+   <stylesheets>
+      <URL value="@../../css/base.css" />
+      <URL value="@../../css/light-mode.css" />
+   </stylesheets>
+   <children>
+      <Label layoutX="20.0" layoutY="20.0" prefHeight="40.0" text="Unfortunately, AudiTranscribe was unable to download FFmpeg or find the local FFmpeg binary." textAlignment="JUSTIFY" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
+         <font>
+            <Font size="14.0" />
+         </font>
+         <padding>
+            <Insets left="75.0" right="75.0" />
+         </padding>
+      </Label>
+      <Label layoutX="30.0" layoutY="30.0" prefHeight="20.0" text="• If you have specified a manual path, the program was still unable to" textAlignment="JUSTIFY" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="70.0">
+         <font>
+            <Font size="14.0" />
+         </font>
+         <padding>
+            <Insets left="75.0" right="75.0" />
+         </padding>
+      </Label>
+      <Label layoutX="10.0" layoutY="85.0" prefHeight="2.0" text="  locate FFmpeg." textAlignment="JUSTIFY" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="90.0">
+         <font>
+            <Font size="14.0" />
+         </font>
+         <padding>
+            <Insets left="75.0" right="75.0" />
+         </padding>
+      </Label>
+      <Label layoutX="10.0" layoutY="105.0" prefHeight="20.0" text="• If this is the first time seeing this message, that means that the" textAlignment="JUSTIFY" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="110.0">
+         <font>
+            <Font size="14.0" />
+         </font>
+         <padding>
+            <Insets left="75.0" right="75.0" />
+         </padding>
+      </Label>
+      <Label layoutX="10.0" layoutY="125.0" prefHeight="2.0" text="  program failed to download or locate FFmpeg automatically." textAlignment="JUSTIFY" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="130.0">
+         <font>
+            <Font size="14.0" />
+         </font>
+         <padding>
+            <Insets left="75.0" right="75.0" />
+         </padding>
+      </Label>
+      <Label layoutX="10.0" layoutY="120.0" prefHeight="40.0" text="You may consider specifying the FFmpeg path manually, or read the instructions on how to install FFmpeg again." textAlignment="JUSTIFY" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="150.0">
+         <font>
+            <Font size="14.0" />
+         </font>
+         <padding>
+            <Insets left="75.0" right="75.0" />
+         </padding>
+      </Label>
+      <Label alignment="CENTER" layoutX="30.0" layoutY="30.0" prefHeight="20.0" text="What do you want to do?" textAlignment="CENTER" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="280.0">
+         <font>
+            <Font size="16.0" />
+         </font>
+         <padding>
+            <Insets left="75.0" right="75.0" />
+         </padding>
+      </Label>
+      <Button fx:id="specifyManuallyButton" layoutX="80.0" layoutY="339.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="210.0" text="Specify Manually" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="75.0">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Button>
+      <Button fx:id="readInstructionsAgainButton" layoutX="408.0" layoutY="340.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="210.0" text="Read Installation Instructions" AnchorPane.bottomAnchor="45.0" AnchorPane.rightAnchor="75.0">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Button>
+   </children>
+</AnchorPane>

@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>site.overwrite</groupId>
+    <groupId>app.auditranscribe</groupId>
     <artifactId>AudiTranscribe</artifactId>
     <version>0.10.0</version>
     <name>AudiTranscribe</name>
@@ -186,25 +186,25 @@
                 <configuration>
                     <excludes>
                         <exclude>
-                            site/overwrite/auditranscribe/**/exceptions/**
+                            app/auditranscribe/**/exceptions/**
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/io/data_files/data_encapsulators/**
+                            app/auditranscribe/io/data_files/data_encapsulators/**
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/io/data_files/file_classes/**
+                            app/auditranscribe/io/data_files/file_classes/**
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/misc/icon/**
+                            app/auditranscribe/misc/icon/**
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/misc/spinners/**
+                            app/auditranscribe/misc/spinners/**
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/music/notes/**
+                            app/auditranscribe/music/notes/**
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/views/**
+                            app/auditranscribe/views/**
                         </exclude>
                     </excludes>
                 </configuration>
@@ -242,7 +242,7 @@
                             <launcher>AudiTranscribe</launcher>
                             <jlinkImageName>AudiTranscribe</jlinkImageName>
                             <jlinkZipName>AudiTranscribe</jlinkZipName>
-                            <mainClass>site.overwrite.auditranscribe/site.overwrite.auditranscribe.MainApplication
+                            <mainClass>app.auditranscribe/app.auditranscribe.MainApplication
                             </mainClass>
                         </configuration>
                     </execution>
@@ -276,7 +276,7 @@
                     <copyright>© Copyright AudiTranscribe Team</copyright>
                     <destination>target/dist</destination>
                     <licenseFile>LICENSE</licenseFile>
-                    <module>site.overwrite.auditranscribe/site.overwrite.auditranscribe.MainApplication</module>
+                    <module>app.auditranscribe/app.auditranscribe.MainApplication</module>
                     <runtimeImage>target/AudiTranscribe</runtimeImage>
                     <javaOptions>
                         <option>-Dfile.encoding=UTF-8</option>
