@@ -39,7 +39,7 @@ class ComplexTest {
 
     @Test
     void testEquals() {
-        // Define three complex number objects to test equality
+        // Define five complex number objects to test equality
         Complex complex1 = new Complex(1.2, 3.4);
         Complex complex2 = new Complex(1.2, 3.4);
         Complex complex3 = new Complex(5.67, 8.9);
