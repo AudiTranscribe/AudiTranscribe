@@ -1,2 +1,0 @@
-This is a testing file to test the movement capabilities of the IO methods.
-Hello world!

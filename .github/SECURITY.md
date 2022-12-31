@@ -10,9 +10,9 @@
 | 0.4.x   | :x:                |
 | 0.5.x   | :x:                |
 | 0.6.x   | :x:                |
-| 0.7.x   | :white_check_mark: |
-| 0.8.x   | :white_check_mark: |
-| 0.9.x   | :white_check_mark: |
+| 0.7.x   | :x:                |
+| 0.8.x   | :x:                |
+| 0.9.x   | :x:                |
 | 0.10.x  | :white_check_mark: |
 
 The above table shows the supported versions of the security policy. A *supported version* for the
