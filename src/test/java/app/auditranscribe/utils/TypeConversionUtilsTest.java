@@ -8,6 +8,23 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TypeConversionUtilsTest {
     @Test
+    void toIntegerArray() {
+        // Define integer arrays to end up with
+        int[] array1 = {
+                1, 2, 3, 4, 5, 6, 7, 8, 9, 0,
+                0, 9, 8, 7, 6, 5, 4, 3, 2, 1
+        };
+        Integer[] array2 = {
+                0, 9, 8, 7, 6, 5, 4, 3, 2, 1,
+                1, 2, 3, 4, 5, 6, 7, 8, 9, 0
+        };
+
+        // Assertions
+        assertArrayEquals(array1, TypeConversionUtils.toIntegerArray(TypeConversionUtils.toIntegerArray(array1)));
+        assertArrayEquals(array2, TypeConversionUtils.toIntegerArray(TypeConversionUtils.toIntegerArray(array2)));
+    }
+
+    @Test
     void toDoubleArray() {
         // Define double arrays to end up with
         double[] array1 = {
@@ -27,5 +44,22 @@ class TypeConversionUtilsTest {
         assertArrayEquals(array1, TypeConversionUtils.toDoubleArray(TypeConversionUtils.toDoubleArray(array1)));
         assertArrayEquals(array2, TypeConversionUtils.toDoubleArray(TypeConversionUtils.toDoubleArray(array2)));
         assertArrayEquals(array1, TypeConversionUtils.toDoubleArray(list));
+    }
+
+    @Test
+    void toBooleanArray() {
+        // Define boolean arrays to end up with
+        boolean[] array1 = {
+                false, true, true, false, true, false, true, false, false, false,
+                true, false, true, false, false, false, true, false, true, false
+        };
+        Boolean[] array2 = {
+                true, false, false, true, false, false, false, false, true, false,
+                false, false, false, false, false, true, false, false, false, false
+        };
+
+        // Assertions
+        assertArrayEquals(array1, TypeConversionUtils.toBooleanArray(TypeConversionUtils.toBooleanArray(array1)));
+        assertArrayEquals(array2, TypeConversionUtils.toBooleanArray(TypeConversionUtils.toBooleanArray(array2)));
     }
 }

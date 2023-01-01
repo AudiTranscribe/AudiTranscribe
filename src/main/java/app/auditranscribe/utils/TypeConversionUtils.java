@@ -31,6 +31,34 @@ public final class TypeConversionUtils {
     // Public methods
 
     /**
+     * Method that converts a primitive integer array to a non-primitive integer array.
+     *
+     * @param ints The primitive integer array.
+     * @return The non-primitive integer array.
+     */
+    public static Integer[] toIntegerArray(int[] ints) {
+        Integer[] result = new Integer[ints.length];
+        for (int i = 0; i < ints.length; i++) {
+            result[i] = ints[i];
+        }
+        return result;
+    }
+
+    /**
+     * Method that converts a non-primitive integer array to a primitive integer array.
+     *
+     * @param ints The non-primitive integer array.
+     * @return The primitive integer array.
+     */
+    public static int[] toIntegerArray(Integer[] ints) {
+        int[] result = new int[ints.length];
+        for (int i = 0; i < ints.length; i++) {
+            result[i] = ints[i];
+        }
+        return result;
+    }
+
+    /**
      * Method that converts a primitive double array to a non-primitive double array.
      *
      * @param doubles The primitive double array.
@@ -69,6 +97,34 @@ public final class TypeConversionUtils {
         double[] result = new double[n];
         for (int i = 0; i < n; i++) {
             result[i] = doubles.get(i);
+        }
+        return result;
+    }
+
+    /**
+     * Method that converts a primitive boolean array to a non-primitive boolean array.
+     *
+     * @param booleans The primitive boolean array.
+     * @return The non-primitive boolean array.
+     */
+    public static Boolean[] toBooleanArray(boolean[] booleans) {
+        Boolean[] result = new Boolean[booleans.length];
+        for (int i = 0; i < booleans.length; i++) {
+            result[i] = booleans[i];
+        }
+        return result;
+    }
+
+    /**
+     * Method that converts a non-primitive boolean array to a primitive boolean array.
+     *
+     * @param booleans The non-primitive boolean array.
+     * @return The primitive boolean array.
+     */
+    public static boolean[] toBooleanArray(Boolean[] booleans) {
+        boolean[] result = new boolean[booleans.length];
+        for (int i = 0; i < booleans.length; i++) {
+            result[i] = booleans[i];
         }
         return result;
     }
