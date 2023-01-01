@@ -10,6 +10,7 @@ import java.time.ZoneOffset;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MiscUtilsTest {
+    // Time methods
     @Test
     void getUnixTimestamp() {
         // Define three clocks for testing
@@ -34,5 +35,17 @@ class MiscUtilsTest {
         assertEquals(1330837579, MiscUtils.getUnixTimestamp(Clock.offset(constantClock3, duration1)), 1e-5);
         assertEquals(1330839607, MiscUtils.getUnixTimestamp(Clock.offset(constantClock3, duration2)), 1e-5);
         assertEquals(1331269567, MiscUtils.getUnixTimestamp(Clock.offset(constantClock3, duration3)), 1e-5);
+    }
+
+    // Bit manipulation methods
+    @Test
+    void getNumSetBits() {
+        assertEquals(0, MiscUtils.getNumSetBits(0));
+        assertEquals(1, MiscUtils.getNumSetBits(1));
+        assertEquals(2, MiscUtils.getNumSetBits(2));
+        assertEquals(2, MiscUtils.getNumSetBits(3));
+        assertEquals(4, MiscUtils.getNumSetBits(13));
+        assertEquals(7, MiscUtils.getNumSetBits(127));
+        assertEquals(21, MiscUtils.getNumSetBits(1924282));
     }
 }

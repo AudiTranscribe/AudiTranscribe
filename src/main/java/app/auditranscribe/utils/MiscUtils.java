@@ -29,7 +29,7 @@ public final class MiscUtils {
         // Private constructor to signal this is a utility class
     }
 
-    // Time utils
+    // Time methods
 
     /**
      * Gets the number of seconds from the Java epoch of 1970-01-01T00:00:00Z.<br>
@@ -66,5 +66,19 @@ public final class MiscUtils {
      */
     public static double getUnixTimestamp() {
         return getUnixTimestamp(Clock.systemUTC());
+    }
+
+    // Bit manipulation methods
+
+    /**
+     * Method that gets the number of bits set in the given integer.<br>
+     * (i.e., the number of significant bits in the binary representation of the integer).
+     *
+     * @param value The integer to get the number of bits set in.
+     * @return The number of bits set in the given integer.
+     */
+    public static int getNumSetBits(int value) {
+        if (value == 0) return 0;
+        return MathUtils.binlog(Integer.highestOneBit(value)) + 1;
     }
 }

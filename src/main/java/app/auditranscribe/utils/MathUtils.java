@@ -34,6 +34,34 @@ public final class MathUtils {
     // Arithmetic-related methods
 
     /**
+     * Computes the log base 2 of an integer.
+     * @param x Integer to compute the log base 2 of.
+     * @return Log base 2 of the provided integer, rounded down.
+     * @implNote Adapted from <a href="https://stackoverflow.com/a/3305710">this StackOverflow
+     * answer</a>.
+     */
+    public static int binlog(int x) {
+        int log = 0;
+        if ((x & 0xffff0000) != 0) {
+            x >>>= 16;
+            log = 16;
+        }
+        if (x >= 256) {
+            x >>>= 8;
+            log += 8;
+        }
+        if (x >= 16) {
+            x >>>= 4;
+            log += 4;
+        }
+        if (x >= 4) {
+            x >>>= 2;
+            log += 2;
+        }
+        return log + (x >>> 1);
+    }
+
+    /**
      * Method to calculate the log base 2 of the number <code>x</code>.
      *
      * @param x Number to take the log base 2 of.

@@ -8,6 +8,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class MathUtilsTest {
     // Arithmetic-related methods
     @Test
+    void binlog() {
+        assertEquals(2, MathUtils.binlog(4));
+        assertEquals(2, MathUtils.binlog(5));
+        assertEquals(7, MathUtils.binlog(128));
+    }
+
+    @Test
     void log2() {
         assertEquals(2, MathUtils.log2(4), 1e-10);
         assertEquals(2.3219280949, MathUtils.log2(5), 1e-10);
