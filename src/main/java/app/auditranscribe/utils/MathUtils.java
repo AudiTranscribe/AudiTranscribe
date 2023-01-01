@@ -43,6 +43,29 @@ public final class MathUtils {
         return Math.log(x) * 1.442695040888963;  // ln x * (1/ln 2), to 16 sf
     }
 
+    // Checking-related methods
+
+    /**
+     * Method to check if the integer <code>x</code> is a power of 2.<br>
+     * This assumes that <code>x</code> is positive.
+     *
+     * @param x Integer to check.
+     * @return A boolean, <code>true</code> if the integer is a power of 2 and <code>false</code>
+     * otherwise.
+     */
+    public static boolean isPowerOf2(int x) {
+        if (x <= 0) throw new ValueException("The provided integer must be positive");
+
+        /*
+        The following check works because if `x` is a power of 2 (say 128) it would look like this:
+            10000000
+        Note that `x - 1` would then look like
+            01111111
+        and so computing the bitwise and (&) of `x` and `x-1` would yield 0.
+         */
+        return (x & (x - 1)) == 0;
+    }
+
     // Miscellaneous mathematical methods
 
     /**

@@ -14,6 +14,23 @@ class MathUtilsTest {
         assertEquals(7, MathUtils.log2(128), 1e-10);
     }
 
+    // Checking-related methods
+    @Test
+    void isPowerOf2() {
+        assertTrue(MathUtils.isPowerOf2(1));
+        assertTrue(MathUtils.isPowerOf2(4));
+        assertTrue(MathUtils.isPowerOf2(2048));
+        assertTrue(MathUtils.isPowerOf2(65536));
+
+        assertFalse(MathUtils.isPowerOf2(3));
+        assertFalse(MathUtils.isPowerOf2(5));
+        assertFalse(MathUtils.isPowerOf2(10012));
+        assertFalse(MathUtils.isPowerOf2(123456));
+
+        assertThrowsExactly(ValueException.class, () -> MathUtils.isPowerOf2(0));
+        assertThrowsExactly(ValueException.class, () -> MathUtils.isPowerOf2(-4));
+    }
+
     // Miscellaneous mathematical methods
     @Test
     void round() {
