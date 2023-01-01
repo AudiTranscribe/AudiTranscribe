@@ -18,6 +18,11 @@
 
 package app.auditranscribe.utils;
 
+import app.auditranscribe.generic.exceptions.ValueException;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 /**
  * Mathematical utilities.
  */
@@ -26,7 +31,7 @@ public final class MathUtils {
         // Private constructor to signal this is a utility class
     }
 
-    // Arithmetic-Related methods
+    // Arithmetic-related methods
 
     /**
      * Method to calculate the log base 2 of the number <code>x</code>.
@@ -36,5 +41,26 @@ public final class MathUtils {
      */
     public static double log2(double x) {
         return Math.log(x) * 1.442695040888963;  // ln x * (1/ln 2), to 16 sf
+    }
+
+    // Miscellaneous mathematical methods
+
+    /**
+     * Rounds the double <code>x</code> to <code>dp</code> decimal places.
+     *
+     * @param x  The double.
+     * @param dp Number of decimal places to round <code>x</code> to.
+     * @return Rounded double.
+     * @throws ValueException If the number of decimal places <code>dp</code> is less than 0.
+     * @implNote If <code>x</code> is <code>NaN</code> then the rounding will also return
+     * <code>NaN</code>.
+     */
+    public static double round(double x, int dp) {
+        if (Double.isNaN(x)) return Double.NaN;
+        if (dp < 0) throw new ValueException("Invalid number of decimal places: " + dp);
+
+        BigDecimal bd = new BigDecimal(Double.toString(x));
+        bd = bd.setScale(dp, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 }
