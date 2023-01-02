@@ -45,4 +45,27 @@ public final class FrequencyRangeGeneration {
         }
         return frequencies;
     }
+
+    /**
+     * Compute the center frequencies of Q-Transform bins.
+     *
+     * @param numBins       Number of Q-Transform bins.
+     * @param binsPerOctave Number of bins per octave.
+     * @param fmin          Minimum frequency.
+     * @return Array of center frequencies for each Q-Transform bin.
+     */
+    public static double[] qTransformFreqBins(int numBins, int binsPerOctave, double fmin) {
+        double octavesPerBin = 1. / binsPerOctave;
+
+        double[] frequencies = new double[numBins];
+        for (double i = 0; i < numBins; i++) {
+            // Calculate the frequency of the current frequency bin
+            double freq = fmin * Math.pow(2, i * octavesPerBin);
+
+            // Append it to the list of frequencies
+            frequencies[(int) i] = freq;
+        }
+
+        return frequencies;
+    }
 }
