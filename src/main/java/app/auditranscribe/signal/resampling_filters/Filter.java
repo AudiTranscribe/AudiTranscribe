@@ -1,6 +1,6 @@
 /*
- * module-info.java
- * Description: Module info file.
+ * Filter.java
+ * Description: Enum that contains resampling filters to be used during signal processing.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,23 +16,21 @@
  * Copyright © AudiTranscribe Team
  */
 
-module AudiTranscribe {
-    // Java dependencies
-    requires java.logging;
-    requires java.desktop;
+package app.auditranscribe.signal.resampling_filters;
 
-    // General dependencies
-    requires com.google.gson;
+/**
+ * Enum that contains resampling filters to be used during signal processing.
+ */
+public enum Filter {
+    // Enum values
+    KAISER_BEST(new KaiserBest()),
+    KAISER_FAST(new KaiserFast());
 
-    // JavaFX-related dependencies
-    requires javafx.controls;
-    requires javafx.fxml;
+    // Attributes
+    public final AbstractFilter filter;
 
-    // Exports
-    exports app.auditranscribe;
-    exports app.auditranscribe.signal;
-    exports app.auditranscribe.signal.resampling_filters;
-
-    // Opens
-    opens app.auditranscribe to javafx.fxml;
+    // Enum constructor
+    Filter(AbstractFilter filter) {
+        this.filter = filter;
+    }
 }

@@ -1,6 +1,6 @@
 /*
- * module-info.java
- * Description: Module info file.
+ * FilterData.java
+ * Description: Class that encapsulates certain information about a specific resampling filter.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,23 +16,13 @@
  * Copyright © AudiTranscribe Team
  */
 
-module AudiTranscribe {
-    // Java dependencies
-    requires java.logging;
-    requires java.desktop;
+package app.auditranscribe.signal.resampling_filters;
 
-    // General dependencies
-    requires com.google.gson;
-
-    // JavaFX-related dependencies
-    requires javafx.controls;
-    requires javafx.fxml;
-
-    // Exports
-    exports app.auditranscribe;
-    exports app.auditranscribe.signal;
-    exports app.auditranscribe.signal.resampling_filters;
-
-    // Opens
-    opens app.auditranscribe to javafx.fxml;
+/**
+ * Class that encapsulates certain information about a specific resampling filter.
+ */
+public class FilterData {
+    public double[] halfWindow;
+    public int precision;
+    public double rolloff;
 }

@@ -20,6 +20,13 @@
     </properties>
 
     <dependencies>
+        <!-- General dependencies -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10</version>
+        </dependency>
+
         <!-- JavaFX-related Dependencies -->
         <dependency>
             <groupId>org.openjfx</groupId>
