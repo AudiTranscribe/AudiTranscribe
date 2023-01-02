@@ -1,6 +1,6 @@
 /*
- * module-info.java
- * Description: Module info file.
+ * AudioProcessingMode.java
+ * Description: Enum that contains different audio processing modes.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,14 +16,12 @@
  * Copyright © AudiTranscribe Team
  */
 
-module AudiTranscribe {
-    requires java.logging;
+package app.auditranscribe.audio;
 
-    requires javafx.controls;
-    requires javafx.fxml;
-    requires java.desktop;
-
-    exports app.auditranscribe;
-
-    opens app.auditranscribe to javafx.fxml;
+/**
+ * Enum that contains different audio processing modes.
+ */
+public enum AudioProcessingMode {
+    WITH_SAMPLES,
+//    WITH_PLAYBACK  // Todo: enable
 }
