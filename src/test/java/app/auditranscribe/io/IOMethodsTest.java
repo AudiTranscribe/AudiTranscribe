@@ -51,9 +51,9 @@ class IOMethodsTest {
     @Test
     @Order(0)
     void getFileURLAsString() {
-        String urlString = IOMethods.getFileURLAsString("test-files/IOMethodsTest/EncodingTestFile.txt");
+        String urlString = IOMethods.getFileURLAsString("test-files/IOMethodsTest/MyFile.txt");
         assertTrue(urlString.contains("file:/"));
-        assertTrue(urlString.contains("test-files/IOMethodsTest/EncodingTestFile.txt"));
+        assertTrue(urlString.contains("test-files/IOMethodsTest/MyFile.txt"));
     }
 
     // Sequenced CRUD operation tests
@@ -182,6 +182,51 @@ class IOMethodsTest {
         );
         assertThrowsExactly(NullPointerException.class, () -> IOMethods.readAsString(
                 "not-a-file-that-exists", "UTF-8"
+        ));
+    }
+
+    // File location handling
+    @Test
+    @Order(0)
+    void isSomethingAt() {
+        assertFalse(IOMethods.isSomethingAt(null));
+        assertTrue(IOMethods.isSomethingAt(IOMethods.getAbsoluteFilePath("test-files/IOMethodsTest/MyFile.txt")));
+        assertTrue(IOMethods.isSomethingAt(IOMethods.getAbsoluteFilePath("conf/logging.properties")));
+        assertTrue(IOMethods.isSomethingAt(TESTING_FILES_PATH));
+        assertFalse(IOMethods.isSomethingAt("this-is-a-fake-file.fake"));
+    }
+
+    @Test
+    @Order(0)
+    void moveFile() throws IOException {
+        // Define paths
+        String originalFilePath = IOMethods.joinPaths(TESTING_FILES_PATH, "IOMethodsTest", "MyFile.txt");
+        String newFilePath = IOMethods.joinPaths(TESTING_FILES_PATH, "IOMethodsTest", "MyNewFile.txt");
+
+        // Check if the file that we want to move exists
+        assertTrue(IOMethods.isSomethingAt(originalFilePath));
+        assertFalse(IOMethods.isSomethingAt(newFilePath));
+
+        // Now move the file
+        IOMethods.moveFile(originalFilePath, newFilePath);
+
+        // Check if the file was moved
+        assertFalse(IOMethods.isSomethingAt(originalFilePath));
+        assertTrue(IOMethods.isSomethingAt(newFilePath));
+
+        // Now move back
+        IOMethods.moveFile(newFilePath, originalFilePath);
+
+        // Check if the file was moved back
+        assertTrue(IOMethods.isSomethingAt(originalFilePath));
+        assertFalse(IOMethods.isSomethingAt(newFilePath));
+
+        // Test if the move file operation will fail if the file does not exist
+        assertThrows(IOException.class, () -> IOMethods.moveFile(newFilePath, originalFilePath));
+
+        // Test if the move file operation will fail if the destination does not exist
+        assertThrows(IOException.class, () -> IOMethods.moveFile(
+                originalFilePath, "qwerty/not-a-folder/text.txt"
         ));
     }
 

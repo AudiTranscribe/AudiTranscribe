@@ -232,6 +232,43 @@ public final class IOMethods {
         }
     }
 
+    // File location handling
+
+    /**
+     * Method that checks if a file or folder is present at the specified absolute path.
+     *
+     * @param absolutePath <b>Absolute path</b> to determine if a file or folder exists there.
+     * @return Boolean. Returns <code>true</code> if the file or folder exists at the specified
+     * path, and <code>false</code> otherwise.
+     */
+    public static boolean isSomethingAt(String absolutePath) {
+        if (absolutePath == null) return false;
+        return (new File(absolutePath)).exists();
+    }
+
+    /**
+     * Method that moves the file to a new location.
+     *
+     * @param originalAbsolutePath Original <b>absolute</b> path of the file.
+     * @param newAbsolutePath      New <b>absolute</b> path of the file.
+     * @throws IOException If movement of the file fails.
+     */
+    public static void moveFile(String originalAbsolutePath, String newAbsolutePath) throws IOException {
+        // Check if the file exists first
+        File origFile = new File(originalAbsolutePath);
+
+        if (!origFile.exists()) {
+            throw new IOException("A file does not exist at '" + originalAbsolutePath + "'.");
+        }
+
+        // Rename file to the new absolute path
+        boolean success = origFile.renameTo(new File(newAbsolutePath));
+
+        if (!success) {
+            throw new IOException("Movement to the new location '" + newAbsolutePath + "' failed.");
+        }
+    }
+
     // Path handling
 
     /**
