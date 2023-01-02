@@ -17,13 +17,17 @@
  */
 
 module AudiTranscribe {
+    // Java dependencies
     requires java.logging;
-
-    requires javafx.controls;
-    requires javafx.fxml;
     requires java.desktop;
 
+    // JavaFX-related dependencies
+    requires javafx.controls;
+    requires javafx.fxml;
+
+    // Exports
     exports app.auditranscribe;
 
+    // Opens
     opens app.auditranscribe to javafx.fxml;
 }
