@@ -53,6 +53,19 @@ class MathUtilsTest {
 
     // Miscellaneous mathematical methods
     @Test
+    void numTwoFactors() {
+        assertEquals(6, MathUtils.numTwoFactors(1344));
+        assertEquals(4, MathUtils.numTwoFactors(80));
+        assertEquals(4, MathUtils.numTwoFactors(16));
+        assertEquals(0, MathUtils.numTwoFactors(1));
+        assertEquals(0, MathUtils.numTwoFactors(0));
+        assertEquals(0, MathUtils.numTwoFactors(-1));
+        assertEquals(4, MathUtils.numTwoFactors(-16));
+        assertEquals(4, MathUtils.numTwoFactors(-80));
+        assertEquals(6, MathUtils.numTwoFactors(-1344));
+    }
+
+    @Test
     void round() {
         assertEquals(1.23, MathUtils.round(1.23, 2));
         assertEquals(1.23, MathUtils.round(1.23456, 2));

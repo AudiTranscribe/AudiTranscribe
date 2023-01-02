@@ -35,6 +35,7 @@ public final class MathUtils {
 
     /**
      * Computes the log base 2 of an integer.
+     *
      * @param x Integer to compute the log base 2 of.
      * @return Log base 2 of the provided integer, rounded down.
      * @implNote Adapted from <a href="https://stackoverflow.com/a/3305710">this StackOverflow
@@ -106,6 +107,28 @@ public final class MathUtils {
     }
 
     // Miscellaneous mathematical methods
+
+    /**
+     * Return how many times the integer <code>x</code> can be evenly divided by 2.
+     *
+     * @param x The integer in question.
+     * @return Number of times <code>x</code> can be divided by 2.<br>
+     * Note that if <code>x</code> is 0, will return 0.
+     */
+    public static int numTwoFactors(int x) {
+        // If `x` is 0 return 0
+        if (x == 0) return 0;
+
+        // Compute the number of factors of two
+        int numTwos = 0;
+        while (x % 2 == 0) {
+            numTwos++;
+            x /= 2;
+        }
+
+        // Return the number of factors of two
+        return numTwos;
+    }
 
     /**
      * Rounds the double <code>x</code> to <code>dp</code> decimal places.
