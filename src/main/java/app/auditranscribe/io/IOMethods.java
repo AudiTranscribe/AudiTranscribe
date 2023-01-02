@@ -26,8 +26,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Input/Output handling methods.
@@ -70,6 +73,39 @@ public final class IOMethods {
                     "AudiTranscribe"
             );
         };
+    }
+
+    /**
+     * Gets a file's URL.
+     *
+     * @param filePath Path to the file, with respect to the <b>resource path</b>.
+     * @return A URL representing the absolute path to the file (which is in the target folder).
+     */
+    public static URL getFileURL(String filePath) {
+        return MainApplication.class.getResource(filePath);
+    }
+
+    /**
+     * Gets a file's URL as a string.
+     *
+     * @param filePath Path to the file, with respect to the <b>resource path</b>.
+     * @return A string, representing a URL to the file (which is in the target folder).
+     */
+    public static String getFileURLAsString(String filePath) {
+        return getFileURL(filePath).toString();
+    }
+
+    /**
+     * Gets the absolute path of a file.
+     *
+     * @param filePath Path to the file, with respect to the <b>resource path</b>.
+     * @return A string representing the <b>absolute path</b> to the file (which is in the target
+     * folder).
+     */
+    public static String getAbsoluteFilePath(String filePath) {
+        String path = getFileURL(filePath).getPath();
+        path = treatPath(path);
+        return path;
     }
 
     // CRUD operations
@@ -207,20 +243,6 @@ public final class IOMethods {
      * @return The joined path.
      */
     public static String joinPaths(boolean useOSSeparator, String... paths) {
-//        StringBuilder buffer = new StringBuilder();
-//        for (String path : paths) {
-//            if (path == null || path.equals("")) {
-//                continue;  // Empty paths can be skipped
-//            }
-//
-//            if (buffer.length() > 0) {  // If there is something in the buffer,
-//                buffer.append("/");     // append the separator first...
-//            }
-//            buffer.append(path);        // ...before appending the path
-//        }
-//
-//        return buffer.toString();
-
         // Determine the separator character to use
         String separator = "/";
         if (useOSSeparator) separator = IOConstants.SEPARATOR;
@@ -259,6 +281,40 @@ public final class IOMethods {
      */
     public static String joinPaths(String... paths) {
         return joinPaths(false, paths);
+    }
+
+    /**
+     * Method that treats a path so that it is correctly parsed by the operating system.
+     *
+     * @param path Path to treat.
+     * @return Treated path.
+     */
+    public static String treatPath(String path) {
+        // If the path starts with something like "/C:" or "\C:", we know we are on Windows
+        if (path.matches("[/\\\\][A-Z]:.*")) {
+            // Remove the first slash
+            path = path.substring(1);
+
+            // Now treat all the escaped characters with percentage signs
+            String finalPath = path;
+
+            Pattern pattern = Pattern.compile("%(?<seq>[\\da-fA-F]{2})");
+            Matcher matcher = pattern.matcher(finalPath);
+            while (matcher.find()) {
+                // Get the sequence to convert
+                String sequence = matcher.group("seq");
+
+                // Replace the sequence with the character
+                finalPath = matcher.replaceFirst(Character.toString((char) Integer.parseInt(sequence, 16)));
+
+                // Attempt to find next match
+                matcher = pattern.matcher(finalPath);
+            }
+
+            return finalPath;
+        } else {
+            return path;  // No treatment necessary on other systems
+        }
     }
 
     // Miscellaneous methods

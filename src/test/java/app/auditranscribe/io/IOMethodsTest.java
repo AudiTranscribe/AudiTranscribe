@@ -48,6 +48,14 @@ class IOMethodsTest {
         assertTrue(appDir.contains("AudiTranscribe"));
     }
 
+    @Test
+    @Order(0)
+    void getFileURLAsString() {
+        String urlString = IOMethods.getFileURLAsString("test-files/IOMethodsTest/EncodingTestFile.txt");
+        assertTrue(urlString.contains("file:/"));
+        assertTrue(urlString.contains("test-files/IOMethodsTest/EncodingTestFile.txt"));
+    }
+
     // Sequenced CRUD operation tests
     @Test
     @Order(1)
@@ -204,6 +212,25 @@ class IOMethodsTest {
                         true,
                         "a", null, "bc", null, null, null, IOConstants.SEPARATOR + "def"
                 )
+        );
+    }
+
+    @Test
+    @Order(0)
+    void treatPath() {
+        assertEquals("testing/file/1/hello.txt", IOMethods.treatPath("testing/file/1/hello.txt"));
+        assertEquals("testing\\file\\2\\hello.txt", IOMethods.treatPath("testing\\file\\2\\hello.txt"));
+        assertEquals("nothing/unusual/", IOMethods.treatPath("nothing/unusual/"));
+        assertEquals(
+                "there%20are%20n%6fw%20spaces/test.txt/",
+                IOMethods.treatPath("there%20are%20n%6fw%20spaces/test.txt/")
+        );
+
+        assertEquals("C:/testing/file/1/hello.txt", IOMethods.treatPath("/C:/testing/file/1/hello.txt"));
+        assertEquals("D:\\testing\\file\\2\\hello.txt", IOMethods.treatPath("\\D:\\testing\\file\\2\\hello.txt"));
+        assertEquals(
+                "E:/there are now spaces/test.txt/",
+                IOMethods.treatPath("/E:/there%20are%20n%6fw%20spaces/test.txt/")
         );
     }
 }
