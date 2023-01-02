@@ -141,6 +141,48 @@ class ArrayUtilsTest {
 
     // Array modification methods
     @Test
+    void lpNormalize() {
+        // Define the arrays
+        double[] array1 = {1, 2, 4, 8, 16};
+        double[] array2 = {1, 3, 9, 27, 81, 243};
+        double[] array3 = {0, 1, 0, -2, 0, 3, 0};
+        double[] array4 = {0.1, -0.02, 0.003, -0.0004, 0.05};
+        double[] array5 = {219, 0.24, 9.14};
+        double[] array6 = {0, 0, 0};
+        Complex[] array7 = {
+                new Complex(1), new Complex(0, 1), new Complex(-1),
+                new Complex(0, -1), new Complex(-1, 1)
+        };
+
+        // Define correct results
+        double[] array1Normalized = {0.0625, 0.125, 0.25, 0.5, 1.};
+        double[] array2Normalized = {0.00411183, 0.0123355, 0.0370065, 0.11101951, 0.33305853, 0.9991756};
+        double[] array3Normalized = {0., 0.33333333, 0., -0.66666667, 0., 1., 0.};
+        double[] array4Normalized = {250., -50., 7.5, -1., 125};
+        double[] array5Normalized = {219, 0.24, 9.14};
+        double[] array6Normalized = {Double.NaN, Double.NaN, Double.NaN};
+        Complex[] array7Normalized = {
+                new Complex(0.70710678), new Complex(0, 0.70710678),
+                new Complex(-0.70710678), new Complex(0, -0.70710678),
+                new Complex(-0.70710678, 0.70710678)
+        };
+
+        // Run tests
+        assertArrayEquals(array1Normalized, ArrayUtils.lpNormalize(array1, Double.POSITIVE_INFINITY), 1e-4);
+        assertArrayEquals(array2Normalized, ArrayUtils.lpNormalize(array2, 5), 1e-4);
+        assertArrayEquals(array3Normalized, ArrayUtils.lpNormalize(array3, 0), 1e-4);
+        assertArrayEquals(array4Normalized, ArrayUtils.lpNormalize(array4, Double.NEGATIVE_INFINITY), 1e-4);
+        assertArrayEquals(array5Normalized, ArrayUtils.lpNormalize(array5, -1337), 1e-4);  // No change
+        assertArrayEquals(array6Normalized, ArrayUtils.lpNormalize(array6, 0), 1e-4);
+
+        Complex[] array7Computed = ArrayUtils.lpNormalize(array7, Double.POSITIVE_INFINITY);
+        assertEquals(array7Computed.length, array7Normalized.length);
+        for (int i = 0; i < array7Normalized.length; i++) {
+            assertEquals(array7Normalized[i].roundNicely(4), array7Computed[i].roundNicely(4));
+        }
+    }
+
+    @Test
     void padCenter() {
         // Define the arrays
         double[] array1 = {1, 2, 3, 4};
@@ -148,19 +190,50 @@ class ArrayUtilsTest {
         double[] array3 = {5, 6};
         double[] array4 = {7};
 
+        Complex[] array5 = {new Complex(1), new Complex(2), new Complex(3), new Complex(4)};
+        Complex[] array6 = {new Complex(1), new Complex(2), new Complex(3)};
+        Complex[] array7 = {new Complex(5), new Complex(6)};
+        Complex[] array8 = {new Complex(7)};
+
         // Define the correct arrays
         double[] array1Correct = new double[]{0, 0, 1, 2, 3, 4, 0, 0};
         double[] array2Correct = new double[]{0, 0, 0, 1, 2, 3, 0, 0, 0};
         double[] array3Correct = new double[]{0, 0, 0, 0, 5, 6, 0, 0, 0, 0};
         double[] array4Correct = new double[]{0, 0, 0, 7, 0, 0, 0};
 
+        Complex[] array5Correct = new Complex[]{
+                Complex.ZERO, Complex.ZERO,
+                new Complex(1), new Complex(2), new Complex(3), new Complex(4),
+                Complex.ZERO, Complex.ZERO
+        };
+        Complex[] array6Correct = new Complex[]{
+                Complex.ZERO, Complex.ZERO, Complex.ZERO,
+                new Complex(1), new Complex(2), new Complex(3),
+                Complex.ZERO, Complex.ZERO, Complex.ZERO
+        };
+        Complex[] array7Correct = new Complex[]{
+                Complex.ZERO, Complex.ZERO, Complex.ZERO, Complex.ZERO,
+                new Complex(5), new Complex(6),
+                Complex.ZERO, Complex.ZERO, Complex.ZERO, Complex.ZERO
+        };
+        Complex[] array8Correct = new Complex[]{
+                Complex.ZERO, Complex.ZERO, Complex.ZERO,
+                new Complex(7),
+                Complex.ZERO, Complex.ZERO, Complex.ZERO
+        };
+
         // Run tests
         assertArrayEquals(array1Correct, ArrayUtils.padCenter(array1, 8));
         assertArrayEquals(array2Correct, ArrayUtils.padCenter(array2, 9));
         assertArrayEquals(array3Correct, ArrayUtils.padCenter(array3, 10));
         assertArrayEquals(array4Correct, ArrayUtils.padCenter(array4, 7));
+        assertArrayEquals(array5Correct, ArrayUtils.padCenter(array5, 8));
+        assertArrayEquals(array6Correct, ArrayUtils.padCenter(array6, 9));
+        assertArrayEquals(array7Correct, ArrayUtils.padCenter(array7, 10));
+        assertArrayEquals(array8Correct, ArrayUtils.padCenter(array8, 7));
 
         assertThrowsExactly(ValueException.class, () -> ArrayUtils.padCenter(array1, 3));
+        assertThrowsExactly(ValueException.class, () -> ArrayUtils.padCenter(array5, 3));
     }
 
     // Matrix methods

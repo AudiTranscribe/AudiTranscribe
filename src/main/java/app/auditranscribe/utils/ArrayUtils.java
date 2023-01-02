@@ -168,26 +168,177 @@ public final class ArrayUtils {
     // Array modification methods
 
     /**
+     * Normalizes the elements in the given array such that the L<sup>p</sup> norm is 1.
+     *
+     * @param array The array to normalize.
+     * @param norm  The norm parameter for the L<sup>p</sup> normalization. There are 5 cases to
+     *              consider for the value of <code>norm</code>.
+     *              <ul>
+     *                  <li>
+     *                      <code>norm = Double.NEGATIVE_INFINITY</code>: The L<sup>p</sup> norm is
+     *                      considered to be the <b>minimum</b> absolute value.
+     *                  </li>
+     *                  <li>
+     *                      <code>norm = Double.POSITIVE_INFINITY</code>: The L<sup>p</sup> norm is
+     *                      considered to be the <b>maximum</b> absolute value.
+     *                  </li>
+     *                  <li>
+     *                      <code>norm = 0</code>: The L<sup>p</sup> norm is considered to be the
+     *                      sum of all magnitudes.
+     *                  </li>
+     *                  <li>
+     *                      <code>norm > 0</code>: The <code>p</code> value is equal to
+     *                      <code>norm</code>, and L<sup>p</sup> norm will be calculated normally.
+     *                  </li>
+     *                  <li>
+     *                      <code>norm < 0</code>: No normalization will be performed.
+     *                  </li>
+     *              </ul>
+     * @return The normalized complex array such that the L<sup>p</sup> norm of the array is 1.
+     * @see <a href="https://bit.ly/3LVePPv">L<sup>p</sup>-Norm</a> on Wikipedia, and
+     * <a href="https://bit.ly/3GwhYUJ">Librosa's Implementation</a> of this method.
+     */
+    public static Complex[] lpNormalize(Complex[] array, double norm) {
+        // Get the number of elements in the array
+        int numElem = array.length;
+
+        // Set threshold to be the smallest (in absolute terms) non-zero number supported
+        double threshold = Double.MIN_VALUE;
+
+        // Get the magnitudes of the data in the array
+        double[] magnitudes = new double[numElem];
+
+        for (int i = 0; i < numElem; i++) {
+            magnitudes[i] = array[i].abs();
+        }
+
+        // Determine the `lpNorm` value
+        double lpNorm = 0;
+
+        if (norm == Double.NEGATIVE_INFINITY) {
+            // `p` value is the minimum absolute value of the values in the array
+            double minAbsVal = Double.MAX_VALUE;
+            for (double absVal : magnitudes) {
+                if (absVal < minAbsVal) {
+                    minAbsVal = absVal;
+                }
+            }
+            lpNorm = minAbsVal;
+        } else if (norm == Double.POSITIVE_INFINITY) {
+            // `p` value is the maximum absolute value of the values in the array
+            double maxAbsVal = Double.MIN_VALUE;
+            for (double absVal : magnitudes) {
+                if (absVal > maxAbsVal) {
+                    maxAbsVal = absVal;
+                }
+            }
+            lpNorm = maxAbsVal;
+        } else if (norm == 0) {
+            // The `lpNorm` is the number of positive values in the array
+            for (double mag : magnitudes) {
+                if (mag > 0) lpNorm++;
+            }
+        } else if (norm > 0) {
+            // Use the LP norm formula
+            for (double mag : magnitudes) {
+                lpNorm += Math.pow(mag, norm);
+            }
+            lpNorm = Math.pow(lpNorm, 1. / norm);
+
+        } else {  // `norm` is negative
+            // Do not perform normalization
+            return array;
+        }
+
+        // Ensure that the Lp-norm is at least the threshold
+        if (lpNorm < threshold) {
+            lpNorm = threshold;
+        }
+
+        // Normalize the array
+        Complex[] normalizedArray = new Complex[numElem];
+
+        for (int i = 0; i < numElem; i++) {
+            normalizedArray[i] = array[i].divides(lpNorm);
+        }
+
+        // Return the Lp-normalised array
+        return normalizedArray;
+    }
+
+
+    /**
+     * Normalizes the elements in the given array such that the L<sup>p</sup> norm is 1.
+     *
+     * @param array The array to normalize.
+     * @param norm  The norm parameter for the L<sup>p</sup> normalization. There are 5 cases to
+     *              consider for the value of <code>norm</code>.
+     *              <ul>
+     *                  <li>
+     *                      <code>norm = Double.NEGATIVE_INFINITY</code>: The L<sup>p</sup> norm is
+     *                      considered to be the <b>minimum</b> absolute value.
+     *                  </li>
+     *                  <li>
+     *                      <code>norm = Double.POSITIVE_INFINITY</code>: The L<sup>p</sup> norm is
+     *                      considered to be the <b>maximum</b> absolute value.
+     *                  </li>
+     *                  <li>
+     *                      <code>norm = 0</code>: The L<sup>p</sup> norm is considered to be the
+     *                      sum of all magnitudes.
+     *                  </li>
+     *                  <li>
+     *                      <code>norm > 0</code>: The <code>p</code> value is equal to
+     *                      <code>norm</code>, and L<sup>p</sup> norm will be calculated normally.
+     *                  </li>
+     *                  <li>
+     *                      <code>norm < 0</code>: No normalization will be performed.
+     *                  </li>
+     *              </ul>
+     * @return The normalized complex array such that the L<sup>p</sup> norm of the array is 1.
+     * @see <a href="https://bit.ly/3LVePPv">L<sup>p</sup>-Norm</a> on Wikipedia, and
+     * <a href="https://bit.ly/3GwhYUJ">Librosa's Implementation</a> of this method.
+     */
+    public static double[] lpNormalize(double[] array, double norm) {
+        // Convert all `double` values into `Complex` values
+        Complex[] complexArray = new Complex[array.length];
+        for (int i = 0; i < array.length; i++) {
+            complexArray[i] = new Complex(array[i]);
+        }
+
+        // Normalize the array
+        complexArray = lpNormalize(complexArray, norm);
+
+        // Convert all `Complex` values back into `double` values
+        double[] normalizedArray = new double[array.length];
+        for (int i = 0; i < array.length; i++) {
+            normalizedArray[i] = complexArray[i].re;
+        }
+
+        // Return the normalized array
+        return normalizedArray;
+    }
+
+    /**
      * Pad an array <code>array</code> to length <code>size</code> by centering the pre-existing
      * elements in <code>array</code>.
      *
      * @param array The array to pad.
      * @param size  The size to make the array.
      * @return Padded array where the length is now <code>size</code>.
-     * @throws ValueException If <code>size</code> is negative.
+     * @throws ValueException If <code>size</code> is smaller than the input array's length.
      */
     public static double[] padCenter(double[] array, int size) {
         // Get length of the array
         int n = array.length;
 
-        // Assert that the length of the data at least the desired size
-        if (size < n) {
-            throw new ValueException("Target size (" + size + ") must be at least input size (" + n + ")");
-        }
-
         // If `n` is `size` just return the array
         if (n == size) {
             return array;
+        }
+
+        // Assert that the length of the data at least the desired size
+        if (size < n) {
+            throw new ValueException("Target size (" + size + ") must be at least input size (" + n + ")");
         }
 
         // Calculate left padding
@@ -197,7 +348,42 @@ public final class ArrayUtils {
         double[] output = new double[size];
         System.arraycopy(array, 0, output, lpad, n);
 
-        // Return the output array
+        return output;
+    }
+
+    /**
+     * Pad an array <code>array</code> to length <code>size</code> by centering the pre-existing
+     * elements in <code>array</code>.
+     *
+     * @param array The array to pad.
+     * @param size  The size to make the array.
+     * @return Padded array where the length is now <code>size</code>.
+     * @throws ValueException If <code>size</code> is smaller than the input array's length.
+     */
+    public static Complex[] padCenter(Complex[] array, int size) {
+        // Get length of the array
+        int n = array.length;
+
+        // If `n` is `size` just return the array
+        if (n == size) {
+            return array;
+        }
+
+        // Assert that the length of the data at least the desired size
+        if (size < n) {
+            throw new ValueException("Target size (" + size + ") must be at least input size (" + n + ")");
+        }
+
+        // Calculate left padding
+        int lpad = (size - n) / 2;
+
+        // Fill in the output array
+        Complex[] output = new Complex[size];
+        for (int i = 0; i < size; i++) {
+            output[i] = Complex.ZERO;
+        }
+        System.arraycopy(array, 0, output, lpad, n);
+
         return output;
     }
 
