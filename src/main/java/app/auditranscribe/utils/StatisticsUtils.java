@@ -18,6 +18,8 @@
 
 package app.auditranscribe.utils;
 
+import app.auditranscribe.generic.tuples.Pair;
+
 import java.util.Arrays;
 
 /**
@@ -52,5 +54,52 @@ public final class StatisticsUtils {
         } else {
             return 0.5 * (array[n / 2] + array[n / 2 - 1]);
         }
+    }
+
+    /**
+     * Compute the histogram of a dataset.
+     *
+     * @param input   Input data.
+     * @param start   Starting value of the bins (inclusive).
+     * @param end     Ending value of the bins (inclusive).
+     * @param numBins Number of <b>uniformly distributed</b> bins.
+     * @return A pair of arrays.
+     * <ul>
+     *     <li>The first array is the count of items that appear in each of the bins.</li>
+     *     <li>
+     *         The second array is the bins. All but the right-hand-most bin is half-open. In other
+     *         words, if <code>bins = [1, 2, 3, 4]</code> then the first bin is [1, 2) (including
+     *         1, but excluding 2) and the second [2, 3). The last bin, however, is [3, 4], which
+     *         includes 4.
+     *     </li>
+     * </ul>
+     */
+    public static Pair<Integer[], Double[]> histogram(double[] input, double start, double end, int numBins) {
+        // Generate bins array
+        double[] bins = ArrayUtils.linspace(start, end, numBins + 1);
+
+        // Get leftmost edge of the bins
+        double[] binsLeftEdge = Arrays.copyOfRange(bins, 0, numBins);
+
+        // Generate counts
+        Integer[] counts = new Integer[numBins];
+        Arrays.fill(counts, 0);
+        for (double elem : input) {
+            // Check if element is within the range
+            if ((elem < start) || (elem > end)) {  // Note: end is *inclusive*
+                continue;
+            }
+
+            // Search for the position to insert the element into the `binsLeftEdge` array
+            int correctIndex = ArrayUtils.searchSorted(binsLeftEdge, elem);
+
+            // Determine the bin index
+            int binIndex = correctIndex == 0 ? 0 : correctIndex - 1;
+
+            // Add 1 to the bin index
+            counts[binIndex]++;
+        }
+
+        return new Pair<>(counts, TypeConversionUtils.toDoubleArray(bins));
     }
 }
