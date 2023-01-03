@@ -27,6 +27,7 @@ module AudiTranscribe {
     // JavaFX-related dependencies
     requires javafx.controls;
     requires javafx.fxml;
+    requires javafx.swing;
 
     // Exports
     exports app.auditranscribe;
