@@ -289,6 +289,41 @@ class MatrixUtilsTest {
 
     // Matrix modification methods
     @Test
+    void roll() {
+        // Define the matrix to roll
+        double[][] array = {
+                {1, 2, 3},
+                {4, 5, 6},
+                {7, 8, 9},
+                {10, 11, 12}
+        };
+
+        // Define correct output matrices
+        double[][] correct1 = {
+                {7, 8, 9},
+                {10, 11, 12},
+                {1, 2, 3},
+                {4, 5, 6},
+        };
+        double[][] correct2 = {
+                {3, 1, 2},
+                {6, 4, 5},
+                {9, 7, 8},
+                {12, 10, 11}
+        };
+
+        // Assertions
+        assertArrayEquals(correct1, MatrixUtils.roll(array, 2, 0));
+        assertArrayEquals(correct1, MatrixUtils.roll(array, 6, 0));
+        assertArrayEquals(correct1, MatrixUtils.roll(array, -2, 0));
+        assertArrayEquals(correct1, MatrixUtils.roll(array, -6, 0));
+        assertArrayEquals(correct2, MatrixUtils.roll(array, 1, 1));
+        assertArrayEquals(correct2, MatrixUtils.roll(array, 4, 1));
+        assertArrayEquals(correct2, MatrixUtils.roll(array, -2, 1));
+        assertArrayEquals(correct2, MatrixUtils.roll(array, -5, 1));
+    }
+
+    @Test
     void transpose() {
         // Define the matrices and their transposes
         double[][] A = new double[][]{
@@ -328,6 +363,24 @@ class MatrixUtilsTest {
         assertArrayEquals(At, MatrixUtils.transpose(A));
         assertArrayEquals(Bt, MatrixUtils.transpose(B));
         assertArrayEquals(Ct, MatrixUtils.transpose(C));
+    }
+
+    @Test
+    void tile() {
+        // Define the matrix to tile
+        double[][] array = new double[][]{
+                {1, 2, 3, 4},
+                {5, 6, 7, 8}
+        };
+
+        // Define the correct tiled matrix
+        double[][] correct = new double[][]{
+                {1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4},
+                {5, 6, 7, 8, 5, 6, 7, 8, 5, 6, 7, 8}
+        };
+
+        // Assertions
+        assertArrayEquals(correct, MatrixUtils.tile(array, 3));
     }
 
     // Helper functions

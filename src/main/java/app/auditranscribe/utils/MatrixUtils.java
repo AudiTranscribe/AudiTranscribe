@@ -210,6 +210,35 @@ public final class MatrixUtils {
     // Matrix modification methods
 
     /**
+     * Roll matrix elements along a given axis.<br>
+     * Elements that roll beyond the last position are re-introduced at the first.
+     *
+     * @param matrix The matrix to roll.
+     * @param shift  The number of places by which elements are shifted.
+     * @param axis   Axis along which elements are shifted.<br>
+     *               If <code>axis = 0</code>, elements are shifted <em>vertically</em> 'downwards'
+     *               by the specified shift.<br>
+     *               If <code>axis = 1</code>, elements are shifted <em>horizontally</em>
+     *               'rightwards' by the specified shift.
+     * @return The rolled matrix.
+     */
+    public static double[][] roll(double[][] matrix, int shift, int axis) {
+        double[][] output = new double[matrix.length][matrix[0].length];
+        if (axis == 0) {
+            for (int i = 0; i < matrix.length; i++) {
+                output[Math.floorMod(i + shift, matrix.length)] = matrix[i];
+            }
+        } else {
+            for (int i = 0; i < matrix.length; i++) {
+                for (int j = 0; j < matrix[0].length; j++) {
+                    output[i][Math.floorMod(j + shift, matrix[0].length)] = matrix[i][j];
+                }
+            }
+        }
+        return output;
+    }
+
+    /**
      * Transpose a 2D array of doubles.
      *
      * @param array Array of doubles to transpose.
@@ -294,6 +323,25 @@ public final class MatrixUtils {
 
         // Return the transposed array
         return transposed;
+    }
+
+    /**
+     * Construct a matrix by repeating <code>matrix</code> the number of times given by
+     * <code>reps</code>.<br>
+     * The repeating is done 'horizontally'.
+     *
+     * @param matrix The 2D matrix to repeat.
+     * @param reps   Number of times to repeat the matrix.
+     * @return The tiled output matrix.
+     */
+    public static double[][] tile(double[][] matrix, int reps) {
+        double[][] output = new double[matrix.length][matrix[0].length * reps];
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[0].length * reps; j++) {
+                output[i][j] = matrix[i][j % matrix[0].length];
+            }
+        }
+        return output;
     }
 
     // Private methods
