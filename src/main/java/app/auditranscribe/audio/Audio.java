@@ -20,7 +20,10 @@ package app.auditranscribe.audio;
 
 import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.generic.LoggableClass;
+import app.auditranscribe.generic.exceptions.ValueException;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+import app.auditranscribe.signal.resampling_filters.Filter;
+import app.auditranscribe.utils.ArrayUtils;
 import app.auditranscribe.utils.MathUtils;
 
 import javax.sound.sampled.AudioFormat;
@@ -28,6 +31,7 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.*;
+import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -123,7 +127,167 @@ public class Audio extends LoggableClass {
         return monoAudioSamples;
     }
 
+    // Public methods
+
+    /**
+     * Resample a signal from <code>srOld</code> to <code>srNew</code>.
+     *
+     * @param x      Original signal that needs to be resampled.
+     * @param srOld  Old sample rate of the signal.
+     * @param srNew  New sample rate of the signal.
+     * @param filter Resampling filter to apply to the signal.
+     * @param scale  Whether to scale the final sample array.
+     * @return Array representing the resampled signal.
+     * @throws ValueException If: <ul>
+     *                        <li>
+     *                        Either <code>srOld</code> or <code>srNew</code> is not positive.
+     *                        </li>
+     *                        <li>
+     *                        The input signal length is too short to be resampled to the desired
+     *                        sample rate.
+     *                        </li>
+     *                        </ul>
+     * @implNote See <a href="https://github.com/bmcfee/resampy/blob/1d1a08/resampy/core.py">
+     * Resampy's resampling source code</a>, where the main core of the code was taken from.
+     */
+    public static double[] resample(
+            double[] x, double srOld, double srNew, Filter filter, boolean scale
+    ) throws ValueException {
+        // Validate sample rates
+        if (srOld <= 0) throw new ValueException("Invalid old sample rate " + srOld);
+        if (srNew <= 0) throw new ValueException("Invalid new sample rate " + srNew);
+
+        // Calculate sample ratio
+        double ratio = srNew / srOld;
+
+        // Calculate final array length and check if it is okay
+        int finalLength = (int) (ratio * x.length);
+        if (finalLength < 1) {
+            throw new InvalidParameterException(
+                    "Input signal length of " + x.length + " too small to resample from " + srOld + " to " + srNew
+            );
+        }
+
+        // Generate output array in storage
+        double[] y = new double[finalLength];
+
+        // Get the interpolation window and precision of the specified resampling filter
+        double[] interpWin = filter.filter.getHalfWindow();
+        int precision = filter.filter.getPrecision();
+
+        int interpWinLength = interpWin.length;
+
+        // Treat the interpolation window
+        if (ratio < 1) {
+            for (int i = 0; i < interpWinLength; i++) {
+                interpWin[i] *= ratio;
+            }
+        }
+
+        // Calculate interpolation deltas
+        double[] interpDeltas = new double[interpWinLength];
+
+        for (int i = 0; i < interpWinLength - 1; i++) {
+            interpDeltas[i] = interpWin[i + 1] - interpWin[i];
+        }
+
+        // Run resampling
+        resamplingHelper(x, y, ratio, interpWin, interpDeltas, precision);
+
+        // Fix the length of the samples array
+        int correctedNumSamples = (int) Math.ceil(ratio * x.length);
+        double[] yHat = new double[correctedNumSamples];
+        System.arraycopy(y, 0, yHat, 0, Math.min(finalLength, correctedNumSamples));
+
+        // Handle rescaling
+        if (scale) {
+            for (int i = 0; i < correctedNumSamples; i++) {
+                yHat[i] /= Math.sqrt(ratio);
+            }
+        }
+
+        // Return the resampled array
+        return yHat;
+    }
+
     // Private methods
+
+    /**
+     * Helper method that resamples the audio samples array <code>x</code> and places it into the
+     * final array <code>y</code>.
+     *
+     * @param x            Initial array of audio samples.
+     * @param y            Final array to store resampled samples.
+     * @param sampleRatio  The ratio between the initial and final sample rates.
+     * @param interpWin    Interpolation window, based off the selected <code>resType</code>.
+     * @param interpDeltas Deltas between consecutive elements in <code>interpWin</code>.
+     * @param precision    Precision constant.
+     * @implNote See <a href="https://github.com/bmcfee/resampy/blob/1d1a08/resampy/interpn.py">
+     * Resampy's Source Code</a> for the original implementation of this function in Python.
+     */
+    private static void resamplingHelper(
+            double[] x, double[] y, double sampleRatio, double[] interpWin,
+            double[] interpDeltas, int precision
+    ) {
+        // Define constants that will be needed later
+        double scale = Math.min(sampleRatio, 1.);
+        double timeIncrement = 1. / sampleRatio;
+        int indexStep = (int) (scale * precision);
+
+        int nWin = interpWin.length;
+        int nOrig = x.length;
+        int nOut = y.length;
+
+        // Define 'loop variables'
+        int n, offset;
+        double timeRegister = 0;
+        double frac, indexFrac, eta, weight;
+
+        // Start resampling process
+        for (int t = 0; t < nOut; t++) {
+            // Grab the top bits as an index to the input buffer
+            n = (int) timeRegister;
+
+            // Grab the fractional component of the time index
+            frac = scale * (timeRegister - n);
+
+            // Offset into the filter
+            indexFrac = frac * precision;
+            offset = (int) indexFrac;
+
+            // Interpolation factor
+            eta = indexFrac - offset;
+
+            // Compute the left wing of the filter response
+            int iMax = Math.min(n + 1, (nWin - offset) / indexStep);
+
+            for (int i = 0; i < iMax; i++) {
+                weight = interpWin[offset + i * indexStep] + eta * interpDeltas[offset + i * indexStep];
+                y[t] += weight * x[n - i];
+            }
+
+            // Invert P
+            frac = scale - frac;
+
+            // Offset into the filter
+            indexFrac = frac * precision;
+            offset = (int) indexFrac;
+
+            // Interpolation factor
+            eta = indexFrac - offset;
+
+            // Compute the right wing of the filter response
+            int jMax = Math.min(nOrig - n - 1, (nWin - offset) / indexStep);
+
+            for (int j = 0; j < jMax; j++) {
+                weight = interpWin[offset + j * indexStep] + eta * interpDeltas[offset + j * indexStep];
+                y[t] += weight * x[n + j + 1];
+            }
+
+            // Increment the time register
+            timeRegister += timeIncrement;
+        }
+    }
 
     /**
      * Generates the audio sample data from the provided audio file.
