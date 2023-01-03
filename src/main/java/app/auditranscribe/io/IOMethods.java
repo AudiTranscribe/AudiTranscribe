@@ -103,7 +103,12 @@ public final class IOMethods {
      * folder).
      */
     public static String getAbsoluteFilePath(String filePath) {
-        String path = getFileURL(filePath).getPath();
+        String path;
+        try {
+            path = getFileURL(filePath).getPath();
+        } catch (NullPointerException e) {
+            throw new NullPointerException("Could not find file at '" + filePath + "'.");
+        }
         path = treatPath(path);
         return path;
     }
