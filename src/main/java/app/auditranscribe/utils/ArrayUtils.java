@@ -770,7 +770,6 @@ public final class ArrayUtils {
      * @see <a href="https://en.wikipedia.org/wiki/Strassen_algorithm">This Wikipedia article</a>
      * on Strassen algorithm for matrix multiplication.
      */
-    // Todo: use Winograd form for matrix multiplication
     private static double[][] matmulStrassen(double[][] A, double[][] B, int leafSize) {
         // Lengths
         int numRowsA = A.length;
@@ -821,19 +820,23 @@ public final class ArrayUtils {
             splitMatrix(Bnew, B21, numCommonNew / 2, numCommonNew, 0, numColsBNew / 2);
             splitMatrix(Bnew, B22, numCommonNew / 2, numCommonNew, numColsBNew / 2, numColsBNew);
 
-            // Apply Strassen Formulae
-            double[][] M1 = matmulStrassen(matadd(A11, A22), matadd(B11, B22), leafSize);
-            double[][] M2 = matmulStrassen(matadd(A21, A22), B11, leafSize);
-            double[][] M3 = matmulStrassen(A11, matsub(B12, B22), leafSize);
-            double[][] M4 = matmulStrassen(A22, matsub(B21, B11), leafSize);
-            double[][] M5 = matmulStrassen(matadd(A11, A12), B22, leafSize);
-            double[][] M6 = matmulStrassen(matsub(A21, A11), matadd(B11, B12), leafSize);
-            double[][] M7 = matmulStrassen(matsub(A12, A22), matadd(B21, B22), leafSize);
+            // Apply Strassen-Winograd Formulae
+            double[][] mulA11B11 = matmulStrassen(A11, B11, leafSize);
+            double[][] subA21A11 = matsub(A21, A11);
+            double[][] subB12B22 = matsub(B12, B22);
+            double[][] subB12B11 = matsub(B12, B11);
 
-            double[][] C11 = matadd(matsub(matadd(M1, M4), M5), M7);
-            double[][] C12 = matadd(M3, M5);
-            double[][] C21 = matadd(M2, M4);
-            double[][] C22 = matadd(matadd(matsub(M1, M2), M3), M6);
+            double[][] U = matmulStrassen(matsub(A21, A11), matsub(B12, B22), leafSize);
+            double[][] V = matmulStrassen(matadd(A21, A22), subB12B11, leafSize);
+            double[][] W = matadd(
+                    mulA11B11, matmulStrassen(matsub(matadd(A21, A22), A11), matsub(B22, subB12B11), leafSize)
+            );
+            double[][] addVW = matadd(V, W);
+
+            double[][] C11 = matadd(mulA11B11, matmulStrassen(A12, B21, leafSize));
+            double[][] C12 = matadd(addVW, matmulStrassen(matsub(matsub(A12, subA21A11), A22), B22, leafSize));
+            double[][] C21 = matadd(matadd(U, W), matmulStrassen(A22, matadd(matsub(B21, B11), subB12B22), leafSize));
+            double[][] C22 = matadd(U, addVW);
 
             // Join into one matrix
             double[][] CNew = new double[numRowsANew][numColsBNew];
