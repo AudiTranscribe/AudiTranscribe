@@ -124,6 +124,17 @@ public final class UnitConversionUtils {
         return 440 * Math.pow(2, (noteNumber - 57.) / 12);
     }
 
+    /**
+     * Converts the frequency to an estimated note number.
+     *
+     * @param freq Frequency of the note with that note number.<br>
+     *             The returned frequency assumes that the notes have been tuned to A440.
+     * @return The estimated note number as a decimal number.
+     */
+    public static double freqToNoteNumber(double freq) {
+        return 12 * MathUtils.log2(freq / 440) + 57;
+    }
+
     // Audio unit conversion
 
     /**

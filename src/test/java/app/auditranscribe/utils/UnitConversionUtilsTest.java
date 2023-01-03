@@ -67,6 +67,13 @@ class UnitConversionUtilsTest {
         assertEquals(15804.266, UnitConversionUtils.noteNumberToFreq(119), 0.001);  // B9
     }
 
+    @Test
+    void freqToNoteNumber() {
+        assertEquals(57, UnitConversionUtils.freqToNoteNumber(440), 0.001);  // A4
+        assertEquals(0, UnitConversionUtils.freqToNoteNumber(16.352), 0.001);  // C0
+        assertEquals(119, UnitConversionUtils.freqToNoteNumber(15804.266), 0.001);  // B9
+    }
+
     // Audio unit conversion
     @Test
     void hzToOctaves() {
