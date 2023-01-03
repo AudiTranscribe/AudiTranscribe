@@ -21,6 +21,7 @@ package app.auditranscribe.signal.representations;
 import app.auditranscribe.misc.Complex;
 import app.auditranscribe.signal.windowing.SignalWindow;
 import app.auditranscribe.utils.ArrayUtils;
+import app.auditranscribe.utils.MatrixUtils;
 
 /**
  * Class that implements the Short-Time Fourier Transform (STFT) algorithm.
@@ -68,7 +69,7 @@ public final class STFT {
         }
 
         // Transpose the windowed frames
-        Complex[][] windowedFramesTransposed = ArrayUtils.transpose(windowedFrames);
+        Complex[][] windowedFramesTransposed = MatrixUtils.transpose(windowedFrames);
 
         // Generate the transposed STFT matrix
         Complex[][] stftMatrixTransposed = new Complex[innerArrayLength][1 + numFFT / 2];
@@ -77,7 +78,7 @@ public final class STFT {
         }
 
         // Transpose the transposed matrix and return it
-        return ArrayUtils.transpose(stftMatrixTransposed);
+        return MatrixUtils.transpose(stftMatrixTransposed);
     }
 
     /**

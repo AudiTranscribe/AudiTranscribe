@@ -21,10 +21,7 @@ package app.auditranscribe.signal;
 import app.auditranscribe.generic.tuples.Pair;
 import app.auditranscribe.signal.representations.STFT;
 import app.auditranscribe.signal.windowing.SignalWindow;
-import app.auditranscribe.utils.ArrayUtils;
-import app.auditranscribe.utils.StatisticsUtils;
-import app.auditranscribe.utils.TypeConversionUtils;
-import app.auditranscribe.utils.UnitConversionUtils;
+import app.auditranscribe.utils.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -281,7 +278,7 @@ public final class TuningEstimator {
      * @return A boolean mask determining whether the element is a local maxima.
      */
     private static boolean[][] generateMaskedLocalMaxima(double[][] S, double[] refValues) {
-        double[][] transposedS = ArrayUtils.transpose(S);
+        double[][] transposedS = MatrixUtils.transpose(S);
         boolean[][] maskedLocalMaxTransposed = new boolean[S[0].length][S.length];
 
         for (int i = 0; i < S[0].length; i++) {
@@ -292,6 +289,6 @@ public final class TuningEstimator {
             maskedLocalMaxTransposed[i] = ArrayUtils.findLocalMaxima(relevantRow);
         }
 
-        return ArrayUtils.transpose(maskedLocalMaxTransposed);
+        return MatrixUtils.transpose(maskedLocalMaxTransposed);
     }
 }

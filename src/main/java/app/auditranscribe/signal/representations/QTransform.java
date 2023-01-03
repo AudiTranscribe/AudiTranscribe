@@ -31,8 +31,8 @@ import app.auditranscribe.signal.TuningEstimator;
 import app.auditranscribe.signal.Wavelet;
 import app.auditranscribe.signal.resampling_filters.Filter;
 import app.auditranscribe.signal.windowing.SignalWindow;
-import app.auditranscribe.utils.ArrayUtils;
 import app.auditranscribe.utils.MathUtils;
+import app.auditranscribe.utils.MatrixUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -493,7 +493,7 @@ public final class QTransform extends LoggableClass {
         Complex[][] D = STFT.stft(y, numFFT, hopLength, SignalWindow.ONES_WINDOW);
 
         // Matrix multiply `fftBasis` with `D` and return the result
-        return ArrayUtils.matmul(fftBasis, D);
+        return MatrixUtils.matmul(fftBasis, D);
     }
 
     /**
