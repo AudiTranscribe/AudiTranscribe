@@ -21,7 +21,7 @@ package app.auditranscribe.signal;
 /**
  * Helper methods used in the signal package.
  */
-public class SignalHelpers {
+public final class SignalHelpers {
     private SignalHelpers() {
         // Private constructor to signal this is a utility class
     }
