@@ -155,8 +155,9 @@ public class CustomLogger {
                 // Set up logger
                 logger = Logger.getLogger("AudiTranscribe");
 
-                // Create file handler if not running a test
+                // Determine which handler to add
                 if (!TestingUtils.isRunningTest()) {
+                    // Create file handler if not running a test
                     currentLogName = "Log-" + initTime + ".log";
                     FileHandler fileHandler = new FileHandler(
                             IOMethods.joinPaths(logsFolder, currentLogName),
@@ -171,6 +172,14 @@ public class CustomLogger {
 
                     // Add the file handler to the logger
                     logger.addHandler(fileHandler);
+                } else {
+                    // Use a console handler with level set to `FINE`
+                    ConsoleHandler consoleHandler = new ConsoleHandler();
+
+                    consoleHandler.setLevel(Level.FINE);
+                    consoleHandler.setFormatter(new SimpleFormatter());
+
+                    logger.addHandler(consoleHandler);
                 }
 
                 // Make logger use parent handlers
