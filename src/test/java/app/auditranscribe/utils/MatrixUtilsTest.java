@@ -291,7 +291,7 @@ class MatrixUtilsTest {
     @Test
     void roll() {
         // Define the matrix to roll
-        double[][] array = {
+        double[][] matrix = {
                 {1, 2, 3},
                 {4, 5, 6},
                 {7, 8, 9},
@@ -313,14 +313,14 @@ class MatrixUtilsTest {
         };
 
         // Assertions
-        assertArrayEquals(correct1, MatrixUtils.roll(array, 2, 0));
-        assertArrayEquals(correct1, MatrixUtils.roll(array, 6, 0));
-        assertArrayEquals(correct1, MatrixUtils.roll(array, -2, 0));
-        assertArrayEquals(correct1, MatrixUtils.roll(array, -6, 0));
-        assertArrayEquals(correct2, MatrixUtils.roll(array, 1, 1));
-        assertArrayEquals(correct2, MatrixUtils.roll(array, 4, 1));
-        assertArrayEquals(correct2, MatrixUtils.roll(array, -2, 1));
-        assertArrayEquals(correct2, MatrixUtils.roll(array, -5, 1));
+        assertArrayEquals(correct1, MatrixUtils.roll(matrix, 2, 0));
+        assertArrayEquals(correct1, MatrixUtils.roll(matrix, 6, 0));
+        assertArrayEquals(correct1, MatrixUtils.roll(matrix, -2, 0));
+        assertArrayEquals(correct1, MatrixUtils.roll(matrix, -6, 0));
+        assertArrayEquals(correct2, MatrixUtils.roll(matrix, 1, 1));
+        assertArrayEquals(correct2, MatrixUtils.roll(matrix, 4, 1));
+        assertArrayEquals(correct2, MatrixUtils.roll(matrix, -2, 1));
+        assertArrayEquals(correct2, MatrixUtils.roll(matrix, -5, 1));
     }
 
     @Test
@@ -368,7 +368,7 @@ class MatrixUtilsTest {
     @Test
     void tile() {
         // Define the matrix to tile
-        double[][] array = new double[][]{
+        double[][] matrix = new double[][]{
                 {1, 2, 3, 4},
                 {5, 6, 7, 8}
         };
@@ -380,7 +380,7 @@ class MatrixUtilsTest {
         };
 
         // Assertions
-        assertArrayEquals(correct, MatrixUtils.tile(array, 3));
+        assertArrayEquals(correct, MatrixUtils.tile(matrix, 3));
     }
 
     // Helper functions

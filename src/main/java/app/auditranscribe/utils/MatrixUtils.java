@@ -239,27 +239,27 @@ public final class MatrixUtils {
     }
 
     /**
-     * Transpose a 2D array of doubles.
+     * Transpose a 2D real-valued matrix.
      *
-     * @param array Array of doubles to transpose.
-     * @return Transposed array.
+     * @param matrix Matrix of doubles to transpose.
+     * @return Transposed matrix.
      */
-    public static double[][] transpose(double[][] array) {
-        // Get the dimensions of the original array
-        int X = array.length;
-        int Y = array[0].length;
+    public static double[][] transpose(double[][] matrix) {
+        // Get the dimensions of the original matrix
+        int X = matrix.length;
+        int Y = matrix[0].length;
 
         // Convert `double` to `Double`
-        Double[][] newArray = new Double[X][Y];
+        Double[][] newMatrix = new Double[X][Y];
         for (int x = 0; x < X; x++) {
-            newArray[x] = TypeConversionUtils.toDoubleArray(array[x]);
+            newMatrix[x] = TypeConversionUtils.toDoubleArray(matrix[x]);
         }
 
-        // Create the new array
+        // Create the new matrix
         Double[][] transposed = new Double[Y][X];
 
         // Run the transposition process
-        transpositionProcess(X, Y, newArray, transposed);
+        transpositionProcess(X, Y, newMatrix, transposed);
 
         // Convert `Double` to `double`
         double[][] transposedNew = new double[Y][X];
@@ -267,32 +267,31 @@ public final class MatrixUtils {
             transposedNew[y] = TypeConversionUtils.toDoubleArray(transposed[y]);
         }
 
-        // Return the transposed array
         return transposedNew;
     }
 
     /**
-     * Transpose a 2D array of booleans
+     * Transpose a 2D matrix of booleans.
      *
-     * @param array Array of booleans to transpose.
-     * @return Transposed array.
+     * @param matrix Matrix of booleans to transpose.
+     * @return Transposed matrix.
      */
-    public static boolean[][] transpose(boolean[][] array) {
-        // Get the dimensions of the original array
-        int X = array.length;
-        int Y = array[0].length;
+    public static boolean[][] transpose(boolean[][] matrix) {
+        // Get the dimensions of the original matrix
+        int X = matrix.length;
+        int Y = matrix[0].length;
 
         // Convert `boolean` to `Boolean`
-        Boolean[][] newArray = new Boolean[X][Y];
+        Boolean[][] newMatrix = new Boolean[X][Y];
         for (int x = 0; x < X; x++) {
-            newArray[x] = TypeConversionUtils.toBooleanArray(array[x]);
+            newMatrix[x] = TypeConversionUtils.toBooleanArray(matrix[x]);
         }
 
-        // Create the new array
+        // Create the new matrix
         Boolean[][] transposed = new Boolean[Y][X];
 
         // Run the transposition process
-        transpositionProcess(X, Y, newArray, transposed);
+        transpositionProcess(X, Y, newMatrix, transposed);
 
         // Convert `Boolean` to `boolean`
         boolean[][] transposedNew = new boolean[Y][X];
@@ -300,28 +299,27 @@ public final class MatrixUtils {
             transposedNew[y] = TypeConversionUtils.toBooleanArray(transposed[y]);
         }
 
-        // Return the transposed array
         return transposedNew;
     }
 
     /**
-     * Transpose a 2D <code>Complex</code> array.
+     * Transpose a 2D complex-valued matrix.
      *
-     * @param array Array of <code>Complex</code> objects to transpose.
-     * @return Transposed array.
+     * @param matrix Matrix of <code>Complex</code> objects to transpose.
+     * @return Transposed matrix.
      */
-    public static Complex[][] transpose(Complex[][] array) {
-        // Get the dimensions of the original array
-        int x = array.length;
-        int y = array[0].length;
+    public static Complex[][] transpose(Complex[][] matrix) {
+        // Get the dimensions of the original matrix
+        int x = matrix.length;
+        int y = matrix[0].length;
 
-        // Create the new array
+        // Create the new matrix
         Complex[][] transposed = new Complex[y][x];
 
         // Run the transposition process
-        transpositionProcess(x, y, array, transposed);
+        transpositionProcess(x, y, matrix, transposed);
 
-        // Return the transposed array
+        // Return the transposed matrix
         return transposed;
     }
 
@@ -509,19 +507,19 @@ public final class MatrixUtils {
     }
 
     /**
-     * Helper method that transposes the original array <code>originalArray</code> and places the
-     * result into <code>finalArray</code>. <b>This is an in-place method</b>.
+     * Helper method that transposes the original matrix <code>matrixOld</code> and places the
+     * result into <code>matrixNew</code>. <b>This is an in-place method</b>.
      *
-     * @param X             Number of subarrays in <code>originalArray</code>.
-     * @param Y             Length of each subarray in <code>originalArray</code>.
-     * @param originalArray The original, un-transposed, array.
-     * @param finalArray    Array to contain the transposed array.
-     * @param <T>           Type of the array.
+     * @param X         Number of rows in <code>matrixOld</code>.
+     * @param Y         Number of elements in each row in <code>matrixOld</code>.
+     * @param matrixOld The original, un-transposed, matrix.
+     * @param matrixNew Matrix to contain the new, transposed matrix.
+     * @param <T>       Type of the matrix.
      */
-    private static <T> void transpositionProcess(int X, int Y, T[][] originalArray, T[][] finalArray) {
+    private static <T> void transpositionProcess(int X, int Y, T[][] matrixOld, T[][] matrixNew) {
         for (int y = 0; y < Y; y++) {
             for (int x = 0; x < X; x++) {
-                finalArray[y][x] = originalArray[x][y];
+                matrixNew[y][x] = matrixOld[x][y];
             }
         }
     }
