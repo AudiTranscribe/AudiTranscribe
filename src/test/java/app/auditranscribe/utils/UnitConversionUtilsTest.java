@@ -76,6 +76,29 @@ class UnitConversionUtilsTest {
 
     // Audio unit conversion
     @Test
+    void powerToDecibel() {
+        assertEquals(3.010, UnitConversionUtils.powerToDecibel(2, 1), 0.001);
+        assertEquals(10, UnitConversionUtils.powerToDecibel(10, 1), 0.001);
+        assertEquals(10.915, UnitConversionUtils.powerToDecibel(12.345, 1), 0.001);
+        assertEquals(-7.782, UnitConversionUtils.powerToDecibel(2, 12), 0.001);
+        assertEquals(3.010, UnitConversionUtils.powerToDecibel(10, 5), 0.001);
+        assertEquals(2.597, UnitConversionUtils.powerToDecibel(12.345, 6.789), 0.001);
+    }
+
+    @Test
+    void amplitudeToDecibel() {
+        // With `refVal` equals to 1
+        assertEquals(6.021, UnitConversionUtils.amplitudeToDecibel(2, 1), 0.001);
+        assertEquals(20, UnitConversionUtils.amplitudeToDecibel(10, 1), 0.001);
+        assertEquals(21.830, UnitConversionUtils.amplitudeToDecibel(12.345, 1), 0.001);
+
+        // With variable `refVal`
+        assertEquals(-15.563, UnitConversionUtils.amplitudeToDecibel(2, 12), 0.001);
+        assertEquals(6.021, UnitConversionUtils.amplitudeToDecibel(10, 5), 0.001);
+        assertEquals(5.194, UnitConversionUtils.amplitudeToDecibel(12.345, 6.789), 0.001);
+    }
+
+    @Test
     void hzToOctaves() {
         assertEquals(4, UnitConversionUtils.hzToOctaves(440), 1e-10);
         assertEquals(6.2186402865, UnitConversionUtils.hzToOctaves(2048), 1e-10);

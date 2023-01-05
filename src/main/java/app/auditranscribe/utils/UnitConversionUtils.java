@@ -28,6 +28,9 @@ import java.util.regex.Pattern;
  * Unit conversion utilities.
  */
 public final class UnitConversionUtils {
+    // Constants
+    static final double POWER_TO_DB_MIN_AMPLITUDE = 1e-10;
+
     private UnitConversionUtils() {
         // Private constructor to signal this is a utility class
     }
@@ -136,6 +139,47 @@ public final class UnitConversionUtils {
     }
 
     // Audio unit conversion
+
+    /**
+     * Convert a power value (amplitude squared) to decibel (dB) units.
+     *
+     * @param power  Input power.
+     * @param refVal Value such that the amplitude <code>abs(power)</code> is scaled relative to
+     *               <code>refVal</code> using the formula <code>10 * log10(power / refVal)</code>.
+     * @return Decibel value for the given power.
+     * @implNote See
+     * <a href="https://librosa.org/doc/main/_modules/librosa/core/spectrum.html#power_to_db">
+     * Librosa's Implementation</a> of this function.
+     */
+    public static double powerToDecibel(double power, double refVal) {
+        // Treat the reference value
+        refVal = Math.abs(refVal);
+
+        // Calculate decibel
+        double logSpec = 10 * Math.log10(Math.max(POWER_TO_DB_MIN_AMPLITUDE, power));
+        logSpec -= 10 * Math.log10(Math.max(POWER_TO_DB_MIN_AMPLITUDE, refVal));
+
+        // Return it
+        return logSpec;
+    }
+
+    /**
+     * Convert an amplitude value to a dB-scaled value.<br>
+     * This is equivalent to <code>powerToDecibel(Math.pow(amplitude, 2))</code>, but is provided
+     * for convenience.
+     *
+     * @param amplitude Input amplitude.
+     * @param refVal    Value such that the amplitude <code>abs(power)</code> is scaled relative to
+     *                  <code>refVal</code> using the formula <code>20 * log10(power /
+     *                  refVal)</code>.
+     * @return Decibel value for the given amplitude.
+     * @implNote See
+     * <a href="https://librosa.org/doc/main/_modules/librosa/core/spectrum.html#amplitude_to_db">
+     * Librosa's Implementation</a> of this function.
+     */
+    public static double amplitudeToDecibel(double amplitude, double refVal) {
+        return powerToDecibel(amplitude * amplitude, refVal * refVal);
+    }
 
     /**
      * Method that converts a frequency in Hertz (Hz) into (fractional) octave numbers.<br>
