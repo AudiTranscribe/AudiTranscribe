@@ -83,6 +83,65 @@ public final class MathUtils {
         return 1 + ((p - 1) / q);
     }
 
+    // Data-related methods
+
+    /**
+     * Linearly interpolate the two values <code>a</code> and <code>b</code> by the scaling factor
+     * <code>x</code>.
+     *
+     * @param a First value.
+     * @param b Second value.
+     * @param x Scaling factor.
+     * @return An <b>integer</b> representing the linearly interpolated value.<br>
+     * If <code>x = 0</code> then this will return <code>a</code>.
+     * If <code>x = 1</code> then this will return <code>b</code>.
+     */
+    public static int intLerp(int a, int b, double x) {
+        return (int) lerp(a, b, x);
+    }
+
+    /**
+     * Linearly interpolate the two values <code>a</code> and <code>b</code> by the scaling factor
+     * <code>x</code>.
+     *
+     * @param a First value.
+     * @param b Second value.
+     * @param x Scaling factor.
+     * @return A <b>double</b> representing the linearly interpolated value.<br>
+     * If <code>x = 0</code> then this will return <code>a</code>.
+     * If <code>x = 1</code> then this will return <code>b</code>.
+     */
+    public static double lerp(double a, double b, double x) {
+        return (a + (b - a) * x);
+    }
+
+    /**
+     * Normalizes the value <code>x</code> to the range <code>zMin</code> to <code>zMax</code>
+     * inclusive.
+     *
+     * @param x    Value to normalize.
+     * @param xMin Minimum possible value of <code>x</code>.
+     * @param xMax Maximum possible value of <code>x</code>.
+     * @param zMin Minimum normalized value.
+     * @param zMax Maximum normalized value.
+     * @return Normalized value of <code>x</code>.
+     */
+    public static double normalize(double x, double xMin, double xMax, double zMin, double zMax) {
+        return ((x - xMin) / (xMax - xMin)) * (zMax - zMin) + zMin;
+    }
+
+    /**
+     * Normalizes the value <code>x</code> to the range 0 to 1 inclusive.
+     *
+     * @param x   Value to normalise.
+     * @param min Minimum possible value of <code>x</code>.
+     * @param max Maximum possible value of <code>x</code>.
+     * @return Normalized value of <code>x</code>.
+     */
+    public static double normalize(double x, double min, double max) {
+        return normalize(x, min, max, 0, 1);
+    }
+
     // Combinatorial methods
 
     /**

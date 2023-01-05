@@ -34,6 +34,45 @@ class MathUtilsTest {
         assertEquals(3, MathUtils.ceilDiv(789, 321));
     }
 
+    // Data-related methods
+    @Test
+    void intLerp() {
+        assertEquals(5, MathUtils.intLerp(0, 10, 0.567), 0.001);
+        assertEquals(1, MathUtils.intLerp(0, 10, 0.123), 0.001);
+        assertEquals(9, MathUtils.intLerp(0, 10, 0.901), 0.001);
+        assertEquals(2, MathUtils.intLerp(0, 10, 0.234), 0.001);
+    }
+
+    @Test
+    void lerp() {
+        assertEquals(5.67, MathUtils.lerp(0., 10., 0.567), 0.001);
+        assertEquals(1.23, MathUtils.lerp(0., 10., 0.123), 0.001);
+        assertEquals(9.01, MathUtils.lerp(0., 10., 0.901), 0.001);
+        assertEquals(2.34, MathUtils.lerp(0., 10., 0.234), 0.001);
+    }
+
+    @Test
+    void normalize() {
+        // Test extreme values
+        assertEquals(0, MathUtils.normalize(1, 1, 5));
+        assertEquals(1, MathUtils.normalize(5, 1, 5));
+
+        assertEquals(0, MathUtils.normalize(3, 3, 9));
+        assertEquals(1, MathUtils.normalize(9, 3, 9));
+
+        // Test in between
+        assertEquals(0.375, MathUtils.normalize(2.5, 1, 5), 0.0001);
+        assertEquals(0.535, MathUtils.normalize(3.14, 1, 5), 0.0001);
+
+        assertEquals(0.055, MathUtils.normalize(3.33, 3, 9), 0.0001);
+        assertEquals(0.333, MathUtils.normalize(5, 3, 9), 0.001);
+        assertEquals(0.667, MathUtils.normalize(7, 3, 9), 0.001);
+
+        // Test different endpoints
+        assertEquals(0.2345, MathUtils.normalize(2.345, -10, 10, -1, 1), 1e-4);
+        assertEquals(4.3571, MathUtils.normalize(4, -1, 13, 4, 5), 1e-4);
+    }
+
     // Combinatorial methods
     @Test
     void selfProduct() {
