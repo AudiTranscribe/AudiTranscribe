@@ -23,5 +23,5 @@ package app.auditranscribe.audio;
  */
 public enum AudioProcessingMode {
     WITH_SAMPLES,
-//    WITH_PLAYBACK  // Todo: enable
+    WITH_PLAYBACK
 }

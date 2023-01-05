@@ -18,18 +18,16 @@
 
 package app.auditranscribe.audio;
 
+import app.auditranscribe.audio.exceptions.AudioPlaybackNotSupported;
 import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.generic.exceptions.ValueException;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+import app.auditranscribe.misc.StoppableThread;
 import app.auditranscribe.signal.resampling_filters.Filter;
-import app.auditranscribe.utils.ArrayUtils;
 import app.auditranscribe.utils.MathUtils;
 
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.sound.sampled.*;
 import java.io.*;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
@@ -41,20 +39,25 @@ import java.util.List;
 @ExcludeFromGeneratedCoverageReport
 public class Audio extends LoggableClass {
     // Constants
-    public static final int SAMPLES_BUFFER_SIZE = 2048;  // In bits; 2048 = 2^11
+    public static final int SAMPLES_BUFFER_SIZE = 4096;  // In bits; 4096 = 2^12
+    public static final int PLAYBACK_BUFFER_SIZE = 4096;  // In bits
+
     final int MAX_AUDIO_DURATION = 5;  // In minutes
 
     // Attributes
     private final AudioInputStream audioStream;
     private final AudioFormat audioFormat;
-    private final double sampleRate;
 
-    private double duration = 0;  // In seconds
+    private final double sampleRate;
+    private final double duration;  // In seconds
+
+    private final SourceDataLine sourceDataLine;
+    private final StoppableThread audioPlaybackThread;
 
     private int numRawSamples;
     private int numMonoSamples;
-    private double[] rawAudioSamples;
-    private double[] monoAudioSamples;
+    private double[] rawSamples;
+    private double[] monoSamples;
 
     /**
      * Initializes an <code>Audio</code> object based on a file.
@@ -81,41 +84,66 @@ public class Audio extends LoggableClass {
         // Convert the given processing modes as a list
         List<AudioProcessingMode> modes = List.of(processingModes);
 
-        // Generate audio samples
+        // Attempt to convert the input stream into an audio input stream
+        InputStream bufferedIn = new BufferedInputStream(new FileInputStream(wavFile));
+        audioStream = AudioSystem.getAudioInputStream(bufferedIn);
+
+        // Get the audio file's audio format and audio file's sample rate
+        audioFormat = audioStream.getFormat();
+        sampleRate = audioFormat.getSampleRate();
+
+        // Compute the duration of the audio file
+        long frames = audioStream.getFrameLength();
+        duration = frames / audioFormat.getFrameRate();  // In seconds
+
+        // Check if duration is too long
+        double durationInMinutes = duration / 60;
+
+        if (durationInMinutes > MAX_AUDIO_DURATION) {
+            throw new AudioTooLongException(
+                    "Audio file is too long (audio was " + durationInMinutes + " minutes but maximum allowed " +
+                            "is " + MAX_AUDIO_DURATION + " minutes)"
+            );
+        }
+
+        // Generate audio samples if requested
         if (modes.contains(AudioProcessingMode.WITH_SAMPLES)) {
-            // Attempt to convert the input stream into an audio input stream
-            InputStream bufferedIn = new BufferedInputStream(new FileInputStream(wavFile));
-            audioStream = AudioSystem.getAudioInputStream(bufferedIn);
+            generateSamples();
+        }
 
-            // Get the audio file's audio format and audio file's sample rate
-            audioFormat = audioStream.getFormat();
-            sampleRate = audioFormat.getSampleRate();
-
-            // Compute the duration of the audio file
-            long frames = audioStream.getFrameLength();
-            duration = frames / audioFormat.getFrameRate();  // In seconds
-
-            // Check if duration is too long
-            double durationInMinutes = duration / 60;
-
-            if (durationInMinutes > MAX_AUDIO_DURATION) {
-                throw new AudioTooLongException(
-                        "Audio file is too long (audio was " + durationInMinutes + " minutes but maximum allowed " +
-                                "is " + MAX_AUDIO_DURATION + " minutes)"
-                );
+        // Allow audio playback if requested
+        if (modes.contains(AudioProcessingMode.WITH_PLAYBACK)) {
+            DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
+            try {
+                sourceDataLine = (SourceDataLine) AudioSystem.getLine(info);
+                sourceDataLine.open(audioFormat);
+            } catch (LineUnavailableException e) {
+                throw new RuntimeException(e);
             }
 
-            // Generate audio samples
-            generateSamples();
+            audioPlaybackThread = new StoppableThread() {
+                final byte[] bufferBytes = new byte[PLAYBACK_BUFFER_SIZE];
+                int readBytes;
 
+                @Override
+                public void runner() {
+                    while (running.get()) {
+                        try {
+                            readBytes = audioStream.read(bufferBytes);
+                            if (readBytes == -1) break;
+                        } catch (IOException e) {
+                            Thread.currentThread().interrupt();
+                            logException(e);
+                        }
+                        sourceDataLine.write(bufferBytes, 0, readBytes);
+                    }
+                }
+            };
         } else {
-            audioStream = null;
-            audioFormat = null;
-            sampleRate = Double.NaN;
+            sourceDataLine = null;
+            audioPlaybackThread = null;
         }
     }
-
-    // Todo: continue with playback support
 
     // Getter/Setter methods
 
@@ -123,11 +151,64 @@ public class Audio extends LoggableClass {
         return sampleRate;
     }
 
-    public double[] getMonoSamples() {
-        return monoAudioSamples;
+    public int getNumRawSamples() {
+        return numRawSamples;
     }
 
-    // Public methods
+    public double[] getRawSamples() {
+        return rawSamples;
+    }
+
+    public int getNumMonoSamples() {
+        return numMonoSamples;
+    }
+
+    public double[] getMonoSamples() {
+        return monoSamples;
+    }
+
+    public double getDuration() {
+        return duration;
+    }
+
+    // Audio playback methods
+
+    /**
+     * Starts playing the audio.
+     */
+    public void play() {
+        if (sourceDataLine == null || audioPlaybackThread == null) throw new AudioPlaybackNotSupported();
+        sourceDataLine.start();
+        audioPlaybackThread.start();
+    }
+
+    /**
+     * Pauses the audio.
+     */
+    public void pause() {
+        // Todo implement
+    }
+
+    /**
+     * Stops playing the audio.
+     */
+    public void stop() {
+        if (sourceDataLine == null || audioPlaybackThread == null) throw new AudioPlaybackNotSupported();
+        try {
+            audioPlaybackThread.interrupt();
+            sourceDataLine.drain();
+            sourceDataLine.close();
+            audioStream.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);  // Todo is this right?
+        }
+    }
+
+    public void seekToTime() {
+        // Todo: see https://stackoverflow.com/questions/52595473/java-start-audio-playback-at-x-position
+    }
+
+    // Audio sampling methods
 
     /**
      * Resample a signal from <code>srOld</code> to <code>srNew</code>.
@@ -333,10 +414,10 @@ public class Audio extends LoggableClass {
 
             // Convert everything to double and place it into the raw audio samples array
             // (We convert to double because most signal processing algorithms here use doubles)
-            rawAudioSamples = new double[numRawSamples];
+            rawSamples = new double[numRawSamples];
 
             for (int i = 0; i < numRawSamples; i++) {
-                rawAudioSamples[i] = finalSamples[i];
+                rawSamples[i] = finalSamples[i];
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -347,15 +428,15 @@ public class Audio extends LoggableClass {
                 numMonoSamples = numRawSamples / 2;
 
                 // Fill in the mono audio samples array
-                monoAudioSamples = new double[numMonoSamples];
+                monoSamples = new double[numMonoSamples];
 
                 for (int i = 0; i < numMonoSamples; i++) {
-                    monoAudioSamples[i] = (rawAudioSamples[i * 2] + rawAudioSamples[i * 2 + 1]) / 2;
+                    monoSamples[i] = (rawSamples[i * 2] + rawSamples[i * 2 + 1]) / 2;
                 }
             } else {  // Mono
                 // Fill in the mono audio samples array
-                monoAudioSamples = new double[numRawSamples];
-                System.arraycopy(rawAudioSamples, 0, monoAudioSamples, 0, numRawSamples);
+                monoSamples = new double[numRawSamples];
+                System.arraycopy(rawSamples, 0, monoSamples, 0, numRawSamples);
             }
 
             // Close the audio stream
