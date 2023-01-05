@@ -86,7 +86,7 @@ public final class MathUtils {
     // Data-related methods
 
     /**
-     * Linearly interpolate the two values <code>a</code> and <code>b</code> by the scaling factor
+     * Linearly interpolate the two integers <code>a</code> and <code>b</code> by the scaling factor
      * <code>x</code>.
      *
      * @param a First value.
@@ -109,10 +109,12 @@ public final class MathUtils {
      * @param x Scaling factor.
      * @return A <b>double</b> representing the linearly interpolated value.<br>
      * If <code>x = 0</code> then this will return <code>a</code>.
-     * If <code>x = 1</code> then this will return <code>b</code>.
+     * If <code>x = 1</code> then this will return <code>b</code> (approximately).
+     * @implNote Uses the form <code>a + (b - a) * x</code>, so may not return precise results when
+     * <code>x = 1</code>.
      */
     public static double lerp(double a, double b, double x) {
-        return (a + (b - a) * x);
+        return a + (b - a) * x;
     }
 
     /**
