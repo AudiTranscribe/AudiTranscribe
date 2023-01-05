@@ -36,4 +36,5 @@ module AudiTranscribe {
 
     // Opens
     opens app.auditranscribe to javafx.fxml;
+    opens app.auditranscribe.fxml.helpers to com.google.gson, javafx.fxml;
 }
