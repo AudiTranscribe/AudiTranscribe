@@ -31,6 +31,10 @@ module AudiTranscribe {
 
     // Exports
     exports app.auditranscribe;
+    exports app.auditranscribe.io.data_files;
+    exports app.auditranscribe.io.data_files.data_encapsulators;
+    exports app.auditranscribe.io.data_files.file_classes;
+    exports app.auditranscribe.io.exceptions;
     exports app.auditranscribe.signal;
     exports app.auditranscribe.signal.resampling_filters;
 
