@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package app.auditranscribe.fxml.helpers;
+package app.auditranscribe.fxml;
 
 import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.io.IOMethods;
