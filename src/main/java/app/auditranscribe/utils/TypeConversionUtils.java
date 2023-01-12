@@ -31,6 +31,34 @@ public final class TypeConversionUtils {
     // Public methods
 
     /**
+     * Method that converts primitive byte array to a non-primitive byte array.
+     *
+     * @param bytes The primitive byte array.
+     * @return The non-primitive byte array.
+     */
+    public static Byte[] toByteArray(byte[] bytes) {
+        Byte[] result = new Byte[bytes.length];
+        for (int i = 0; i < bytes.length; i++) {
+            result[i] = bytes[i];
+        }
+        return result;
+    }
+
+    /**
+     * Method that converts a non-primitive byte array to a primitive byte array.
+     *
+     * @param bytes The non-primitive byte array.
+     * @return The primitive byte array.
+     */
+    public static byte[] toByteArray(Byte[] bytes) {
+        byte[] result = new byte[bytes.length];
+        for (int i = 0; i < bytes.length; i++) {
+            result[i] = bytes[i];
+        }
+        return result;
+    }
+
+    /**
      * Method that converts a primitive integer array to a non-primitive integer array.
      *
      * @param ints The primitive integer array.

@@ -8,6 +8,29 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TypeConversionUtilsTest {
     @Test
+    void toByteArray() {
+        // Define byte arrays to end up with
+        byte[] array1 = new byte[] {
+                (byte) 0x41, (byte) 0x55, (byte) 0x44, (byte) 0x49,
+                (byte) 0x54, (byte) 0x52, (byte) 0x41, (byte) 0x4e,
+                (byte) 0x53, (byte) 0x43, (byte) 0x52, (byte) 0x49,
+                (byte) 0x42, (byte) 0x45, (byte) 0x0a, (byte) 0x0a,
+                (byte) 0xad, (byte) 0x75, (byte) 0xc1, (byte) 0xbe
+        };
+        Byte[] array2 = new Byte[] {
+                (byte) 0x53, (byte) 0x43, (byte) 0x52, (byte) 0x49,
+                (byte) 0x42, (byte) 0x45, (byte) 0x0a, (byte) 0x0a,
+                (byte) 0xad, (byte) 0x75, (byte) 0xc1, (byte) 0xbe,
+                (byte) 0x41, (byte) 0x55, (byte) 0x44, (byte) 0x49,
+                (byte) 0x54, (byte) 0x52, (byte) 0x41, (byte) 0x4e
+        };
+
+        // Assertions
+        assertArrayEquals(array1, TypeConversionUtils.toByteArray(TypeConversionUtils.toByteArray(array1)));
+        assertArrayEquals(array2, TypeConversionUtils.toByteArray(TypeConversionUtils.toByteArray(array2)));
+    }
+
+    @Test
     void toIntegerArray() {
         // Define integer arrays to end up with
         int[] array1 = {
