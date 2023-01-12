@@ -278,4 +278,28 @@ class IOMethodsTest {
                 IOMethods.treatPath("/E:/there%20are%20n%6fw%20spaces/test.txt/")
         );
     }
+
+    // Miscellaneous methods
+    @Test
+    @Order(0)
+    @EnabledOnOs({OS.MAC, OS.LINUX})
+    void numFilesInDir() {
+        // Define the testing directories
+        final String testDir1 = IOMethods.joinPaths(TESTING_FILES_PATH, "IOMethodsTest", "numFilesInDir", "dir1");
+        final String testDir2 = IOMethods.joinPaths(TESTING_FILES_PATH, "IOMethodsTest", "numFilesInDir", "dir2");
+
+        // Make sure the directories has the required testing files
+        if (IOMethods.isSomethingAt(IOMethods.joinPaths(testDir1, ".DS_Store"))) {
+            IOMethods.delete(IOMethods.joinPaths(testDir1, ".DS_Store"));
+        }
+
+        if (!IOMethods.isSomethingAt(IOMethods.joinPaths(testDir2, ".DS_Store"))) {
+            IOMethods.createFile(IOMethods.joinPaths(testDir2, ".DS_Store"));
+        }
+
+        // Run tests
+        assertEquals(3, IOMethods.numThingsInDir(testDir1));
+        assertEquals(4, IOMethods.numThingsInDir(IOMethods.joinPaths(testDir2)));
+        assertEquals(-1, IOMethods.numThingsInDir("not-a-dir"));
+    }
 }
