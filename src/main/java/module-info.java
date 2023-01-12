@@ -18,8 +18,9 @@
 
 module AudiTranscribe {
     // Java dependencies
-    requires java.logging;
     requires java.desktop;
+    requires java.logging;
+    requires java.sql;
 
     // General dependencies
     requires com.google.gson;
