@@ -18,6 +18,7 @@
 
 package app.auditranscribe;
 
+import app.auditranscribe.fxml.views.main.controllers.HomepageViewController;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import javafx.application.Application;
@@ -39,6 +40,9 @@ public class MainApplication extends Application {
                 "fxml/views/main/homepage-view.fxml"
         ));
         Scene scene = new Scene(fxmlLoader.load());
+
+        HomepageViewController controller = fxmlLoader.getController();
+        controller.setThemeOnScene();
 
         stage.setTitle("AudiTranscribe");
         stage.setScene(scene);

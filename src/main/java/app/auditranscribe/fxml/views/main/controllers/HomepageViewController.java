@@ -83,7 +83,7 @@ public class HomepageViewController extends LoggableClass implements Initializab
     private Label versionLabel;
 
     @FXML
-    private Button newProjectButton, openProjectButton;
+    private Button newProjectButton, openProjectButton, preferencesButton;
 
     // Projects list
     @FXML
@@ -177,6 +177,7 @@ public class HomepageViewController extends LoggableClass implements Initializab
 
         // Set graphics
         IconHelper.setSVGPath(searchImage, 20, "search-line", theme.shortName);
+        IconHelper.setSVGOnButton(preferencesButton, 20, 30, "cog-solid", theme.shortName);
     }
 
     /**

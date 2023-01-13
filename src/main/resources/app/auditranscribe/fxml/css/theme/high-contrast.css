@@ -1,0 +1,20 @@
+.root {
+    /* TODO UPDATE COLOUR PALETTE */
+
+    /* Colour palette definitions */
+    background-colour-primary: rgb(0, 0, 0);
+    background-colour-secondary: rgb(60, 60, 60);
+    background-colour-tertiary: rgb(120, 120, 120); /* Even lighter */
+
+    scrollbar-colour: rgb(255, 255, 255);
+    seperator-colour: rgb(255, 255, 255);
+    stroke-colour: rgb(255, 255, 255);
+
+    button-default-colour: background-colour-primary;
+    button-hover-colour: rgb(100, 100, 100);
+
+    text-colour-primary: rgb(255, 255, 255);
+    text-colour-secondary: rgb(255, 255, 255); /* Slightly darker */
+
+    focus-colour: rgb(30, 120, 210);
+}

@@ -22,10 +22,7 @@ import app.auditranscribe.MainApplication;
 import app.auditranscribe.system.OSMethods;
 import app.auditranscribe.system.OSType;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -93,7 +90,13 @@ public final class IOMethods {
      * @return A string, representing a URL to the file (which is in the target folder).
      */
     public static String getFileURLAsString(String filePath) {
-        return getFileURL(filePath).toString();
+        try {
+            return getFileURL(filePath).toString();
+        } catch (NullPointerException e) {
+            throw new RuntimeException(
+                    new FileNotFoundException("No file was found at the resource path '" + filePath + "'.")
+            );
+        }
     }
 
     /**

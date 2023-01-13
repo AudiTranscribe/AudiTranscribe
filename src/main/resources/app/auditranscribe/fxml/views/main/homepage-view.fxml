@@ -10,6 +10,7 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -67,6 +68,11 @@
                         </Button>
                      </children>
                   </VBox>
+                  <Button fx:id="preferencesButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" styleClass="image-button" text="P" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0">
+                     <tooltip>
+                        <Tooltip text="Preferences" />
+                     </tooltip>
+                  </Button>
                   <StackPane alignment="CENTER_LEFT" prefHeight="100.0" AnchorPane.leftAnchor="200.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
                         <TextField fx:id="searchTextField" prefHeight="40.0" promptText="Search projects..." styleClass="search-text-field">

@@ -102,7 +102,3 @@
     -fx-cursor: hand;
     -fx-background-color: background-colour-tertiary;
 }
-
-.scroll-bar:horizontal .thumb, .scroll-bar:vertical .thumb {
-    /*-fx-background-color: background-colour-primary;*/
-}
