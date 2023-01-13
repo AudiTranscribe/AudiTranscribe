@@ -24,24 +24,7 @@ import os
 import re
 import json
 
-# CONSTANTS
-THEME_COLOURS = {
-    "light": (22, 22, 22),
-    "dark": (235, 235, 235),
-    "high-contrast": (255, 255, 255)
-}
-
 # MAIN CODE
-# Convert theme colours into hex code
-themeColoursFinal = {}
-
-for theme, colourTuple in THEME_COLOURS.items():
-    hexString = "#"
-    for colour in colourTuple:
-        hexString += hex(colour)[2:]  # Remove the leading "0x"
-
-    themeColoursFinal[theme] = hexString
-
 # Read SVG files' contents
 svgContents = {}
 
@@ -60,8 +43,4 @@ for name, fileContents in svgContents.items():
 
 # Save the paths to a JSON file
 with open("icons.json", "w") as f:
-    finalData = {
-        "themeColours": themeColoursFinal,
-        "svgPaths": svgPathData
-    }
-    json.dump(finalData, f, indent=2)
+    json.dump({"svgPaths": svgPathData}, f, indent=2)

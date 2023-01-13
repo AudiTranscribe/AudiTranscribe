@@ -176,8 +176,8 @@ public class HomepageViewController extends LoggableClass implements Initializab
         rootPane.getStylesheets().add(IOMethods.getFileURLAsString("fxml/css/theme/" + theme.cssFile));
 
         // Set graphics
-        IconHelper.setSVGPath(searchImage, 20, "search-line", theme.shortName);
-        IconHelper.setSVGOnButton(preferencesButton, 20, 30, "cog-solid", theme.shortName);
+        IconHelper.setSVGPath(searchImage, 20, "search-line");
+        IconHelper.setSVGOnButton(preferencesButton, 20, 30, "cog-solid");
     }
 
     /**
@@ -373,8 +373,7 @@ public class HomepageViewController extends LoggableClass implements Initializab
             removeButton.getStyleClass().add("remove-project-button");
 
             IconHelper.setSVGOnButton(
-                    removeButton, 20, BUTTON_AND_RECTANGLE_SIDE_LENGTH, "window-close-line",
-                    Theme.values()[settingsData.themeEnumOrdinal].shortName
+                    removeButton, 20, BUTTON_AND_RECTANGLE_SIDE_LENGTH, "window-close-line"
             );
 
             removeButton.setOnAction(actionEvent -> {

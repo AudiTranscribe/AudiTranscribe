@@ -24,7 +24,6 @@ import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import javafx.scene.control.Button;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.SVGPath;
 
 import java.io.IOException;
@@ -47,32 +46,30 @@ public final class IconHelper {
     /**
      * Method that sets up the <code>SVGPath</code> FXML element.
      *
-     * @param svgPath   Object to set up.
-     * @param length    Length of the image.<br>
-     *                  Note that the width and the height will be exactly the same.
-     * @param iconName  Name of the icon to set.
-     * @param themeName Theme name, which determines the colour of the icon.
+     * @param svgPath  Object to set up.
+     * @param length   Length of the image.<br>
+     *                 Note that the width and the height will be exactly the same.
+     * @param iconName Name of the icon to set.
      */
-    public static void setSVGPath(SVGPath svgPath, double length, String iconName, String themeName) {
+    public static void setSVGPath(SVGPath svgPath, double length, String iconName) {
         svgPath.setContent(getIconSVGPath(iconName));
-        svgPath.setFill(getIconColour(themeName));
+        svgPath.getStyleClass().add("svg-path");
         resize(svgPath, length);
     }
 
     /**
      * Method that sets up the <code>SVGPath</code> FXML element.
      *
-     * @param svgPath   Object to set up.
-     * @param width     Width of the image.
-     * @param height    Height of the image.
-     * @param iconName  Name of the icon to set.
-     * @param themeName Theme name, which determines the colour of the icon.
+     * @param svgPath  Object to set up.
+     * @param width    Width of the image.
+     * @param height   Height of the image.
+     * @param iconName Name of the icon to set.
      */
     public static void setSVGPath(
-            SVGPath svgPath, double width, double height, String iconName, String themeName
+            SVGPath svgPath, double width, double height, String iconName
     ) {
         svgPath.setContent(getIconSVGPath(iconName));
-        svgPath.setFill(getIconColour(themeName));
+        svgPath.getStyleClass().add("svg-path");
         resize(svgPath, width, height);
     }
 
@@ -85,12 +82,11 @@ public final class IconHelper {
      * @param buttonLength The final length of the button.<br>
      *                     Note that both the width and the height will be the same.
      * @param iconName     Name of the icon to set.
-     * @param themeName    Theme name, which determines the colour of the icon.
      */
     public static void setSVGOnButton(
-            Button button, double svgLength, double buttonLength, String iconName, String themeName
+            Button button, double svgLength, double buttonLength, String iconName
     ) {
-        setSVGOnButton(button, svgLength, svgLength, buttonLength, buttonLength, iconName, themeName);
+        setSVGOnButton(button, svgLength, svgLength, buttonLength, buttonLength, iconName);
     }
 
     /**
@@ -102,15 +98,14 @@ public final class IconHelper {
      * @param buttonWidth  The final width of the button.
      * @param buttonHeight The final height of the button.
      * @param iconName     Name of the icon to set.
-     * @param themeName    Theme name, which determines the colour of the icon.
      */
     public static void setSVGOnButton(
             Button button, double svgWidth, double svgHeight, double buttonWidth, double buttonHeight,
-            String iconName, String themeName
+            String iconName
     ) {
         // Create the SVG path object first
         SVGPath svgPath = new SVGPath();
-        setSVGPath(svgPath, svgWidth, svgHeight, iconName, themeName);
+        setSVGPath(svgPath, svgWidth, svgHeight, iconName);
 
         // Set the SVG path on the button
         button.setGraphic(svgPath);
@@ -132,16 +127,6 @@ public final class IconHelper {
      */
     private static String getIconSVGPath(String iconName) {
         return IconsData.ICONS_DATA.svgPaths.get(iconName);
-    }
-
-    /**
-     * Helper method that retrieves the icon's colour based on the theme name.
-     *
-     * @param themeName Theme to obtain the colour for.
-     * @return A <code>Paint</code> object representing the colour of the icon.
-     */
-    private static Paint getIconColour(String themeName) {
-        return Paint.valueOf(IconsData.ICONS_DATA.themeColours.get(themeName));
     }
 
     /**
@@ -184,7 +169,6 @@ public final class IconHelper {
         public static final IconsData ICONS_DATA = new IconsData();
 
         // Attributes
-        public Map<String, String> themeColours;
         public Map<String, String> svgPaths;
 
         /**
@@ -203,18 +187,14 @@ public final class IconHelper {
                     throw new IOException("Cannot find the icons data file.");
                 }
 
+                // Try loading the SVG path data
                 try (Reader reader = new InputStreamReader(inputStream)) {
-                    // Try loading the filter data
                     IconsDataEncapsulator data = gson.fromJson(reader, IconsDataEncapsulator.class);
-
-                    // Set attributes
-                    themeColours = data.themeColours;
                     svgPaths = data.svgPaths;
                 } catch (JsonSyntaxException e) {
                     throw new IOException(e);
                 }
             } catch (IOException e) {
-                // Note that an exception has occurred
                 logException(e);
             }
         }
@@ -224,7 +204,6 @@ public final class IconHelper {
      * Class that encapsulates the <code>icons.json</code> data file's data.
      */
     static class IconsDataEncapsulator {
-        public Map<String, String> themeColours;
         public Map<String, String> svgPaths;
     }
 }

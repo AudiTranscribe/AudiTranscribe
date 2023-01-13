@@ -83,6 +83,12 @@
     -fx-cursor: hand;
 }
 
+/* SVG Classes */
+.svg-path {
+    -fx-stroke: stroke-colour;
+    -fx-fill: stroke-colour;
+}
+
 /* Other setup */
 .root {
     -fx-background-color: background-colour-primary;
