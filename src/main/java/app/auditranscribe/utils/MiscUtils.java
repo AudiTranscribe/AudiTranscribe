@@ -18,8 +18,13 @@
 
 package app.auditranscribe.utils;
 
+import java.text.SimpleDateFormat;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Miscellaneous utilities.
@@ -68,6 +73,18 @@ public final class MiscUtils {
         return getUnixTimestamp(Clock.systemUTC());
     }
 
+    /**
+     * Method that formats the given date according to the format.
+     *
+     * @param date   A <code>Date</code> object describing the date to format.
+     * @param format The format for the date.
+     * @return String representing the formatted date.
+     */
+    public static String formatDate(Date date, String format) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
+        return simpleDateFormat.format(date);
+    }
+
     // Bit manipulation methods
 
     /**
@@ -82,7 +99,85 @@ public final class MiscUtils {
         return MathUtils.binlog(Integer.highestOneBit(value)) + 1;
     }
 
-    // Other manipulation methods
+    // Other methods
+
+    /**
+     * Method that creates a shortened name based on the provided name.<br>
+     * The shortened name will follow the following rules.
+     * <ol>
+     *     <li>
+     *         Strip all whitespace before and after the name.
+     *     </li>
+     *     <li>
+     *         If there are <b>no characters</b> in the stripped name, the shortened name will be
+     *         <code>?</code>.
+     *     </li>
+     *     <li>
+     *         Get all the <b>uppercase</b> letters in <code>name</code>.
+     *     </li>
+     *     <li>
+     *         If there are no uppercase letters, take the <b>first alphabetical character</b> of
+     *         the <code>name</code> and use it as the shortened name.
+     *     </li>
+     *     <li>
+     *         If there are no alphabetical characters in the name, take the <b>first character</b>
+     *         of the <code>name</code> and use it as the shortened name.
+     *     </li>
+     *     <li>
+     *         If there are more than 2 uppercase letters, take the <b>first two uppercase
+     *         characters</b> and use it as the shortened name.
+     *     </li>
+     *     <li>
+     *         Otherwise, take all the <b>uppercase letters</b> and use it as the shortened name.
+     *     </li>
+     * </ol>
+     * Note that the shortened name will <b>always be capitalised</b>.
+     *
+     * @param name The long name to shorten.
+     * @return A string, representing the shortened name.
+     */
+    public static String getShortenedName(String name) {
+        name = name.strip();
+        if (Objects.equals(name, "")) return "?";
+
+        // Get the uppercase letters and alphabetical characters of the name
+        List<String> uppercaseLetters = new ArrayList<>();
+        List<String> alphabeticalCharacters = new ArrayList<>();
+
+        int length = name.length();
+        for (int i = 0; i < length; i++) {
+            char ch = name.charAt(i);
+            String charAsString = String.valueOf(ch);
+
+            if (Character.isLetter(ch)) {
+                alphabeticalCharacters.add(charAsString);
+
+                if (Character.isUpperCase(ch)) {
+                    uppercaseLetters.add(charAsString);
+                }
+            }
+        }
+
+        // Create a variable to store the final shortened name
+        StringBuilder shortNameBuffer = new StringBuilder();
+
+        // Check if there is at least one uppercase letter
+        int numUppercaseLetters = uppercaseLetters.size();
+        if (numUppercaseLetters >= 1) {
+            int numChars = Math.min(numUppercaseLetters, 2);
+            for (int i = 0; i < numChars; i++) shortNameBuffer.append(uppercaseLetters.get(i));
+        } else {
+            // No uppercase letters; check if there is at least one alphabetical character
+            if (alphabeticalCharacters.size() >= 1) {
+                shortNameBuffer.append(alphabeticalCharacters.get(0).toUpperCase());
+            } else {
+                // No alphabetical characters; take first character
+                shortNameBuffer.append(String.valueOf(name.charAt(0)).toUpperCase());
+            }
+        }
+
+        return shortNameBuffer.toString();
+    }
 
     /**
      * Converts the provided integer into a padded hexadecimal string.
