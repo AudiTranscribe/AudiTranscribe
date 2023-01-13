@@ -51,9 +51,9 @@ class IOMethodsTest {
     @Test
     @Order(0)
     void getFileURLAsString() {
-        String urlString = IOMethods.getFileURLAsString("test-files/IOMethodsTest/MyFile.txt");
+        String urlString = IOMethods.getFileURLAsString("test-files/io/IOMethodsTest/MyFile.txt");
         assertTrue(urlString.contains("file:/"));
-        assertTrue(urlString.contains("test-files/IOMethodsTest/MyFile.txt"));
+        assertTrue(urlString.contains("test-files/io/IOMethodsTest/MyFile.txt"));
     }
 
     // Sequenced CRUD operation tests
@@ -169,14 +169,14 @@ class IOMethodsTest {
         assertEquals(
                 "SOME TEXT Π",
                 IOMethods.readAsString(
-                        IOMethods.joinPaths("test-files", "IOMethodsTest", "EncodingTestFile.txt"),
+                        IOMethods.joinPaths("test-files", "io", "IOMethodsTest", "EncodingTestFile.txt"),
                         "UTF-8"
                 )
         );
         assertEquals(
                 "SOME TEXT ��",
                 IOMethods.readAsString(
-                        IOMethods.joinPaths("test-files", "IOMethodsTest", "EncodingTestFile.txt"),
+                        IOMethods.joinPaths("test-files", "io", "IOMethodsTest", "EncodingTestFile.txt"),
                         "ASCII"
                 )
         );
@@ -190,7 +190,7 @@ class IOMethodsTest {
     @Order(0)
     void isSomethingAt() {
         assertFalse(IOMethods.isSomethingAt(null));
-        assertTrue(IOMethods.isSomethingAt(IOMethods.getAbsoluteFilePath("test-files/IOMethodsTest/MyFile.txt")));
+        assertTrue(IOMethods.isSomethingAt(IOMethods.getAbsoluteFilePath("test-files/io/IOMethodsTest/MyFile.txt")));
         assertTrue(IOMethods.isSomethingAt(IOMethods.getAbsoluteFilePath("conf/logging.properties")));
         assertTrue(IOMethods.isSomethingAt(TESTING_FILES_PATH));
         assertFalse(IOMethods.isSomethingAt("this-is-a-fake-file.fake"));
@@ -200,8 +200,8 @@ class IOMethodsTest {
     @Order(0)
     void moveFile() throws IOException {
         // Define paths
-        String originalFilePath = IOMethods.joinPaths(TESTING_FILES_PATH, "IOMethodsTest", "MyFile.txt");
-        String newFilePath = IOMethods.joinPaths(TESTING_FILES_PATH, "IOMethodsTest", "MyNewFile.txt");
+        String originalFilePath = IOMethods.joinPaths(TESTING_FILES_PATH, "io", "IOMethodsTest", "MyFile.txt");
+        String newFilePath = IOMethods.joinPaths(TESTING_FILES_PATH, "io", "IOMethodsTest", "MyNewFile.txt");
 
         // Check if the file that we want to move exists
         assertTrue(IOMethods.isSomethingAt(originalFilePath));
@@ -272,7 +272,9 @@ class IOMethodsTest {
         );
 
         assertEquals("C:/testing/file/1/hello.txt", IOMethods.treatPath("/C:/testing/file/1/hello.txt"));
-        assertEquals("D:\\testing\\file\\2\\hello.txt", IOMethods.treatPath("\\D:\\testing\\file\\2\\hello.txt"));
+        assertEquals(
+                "D:\\testing\\file\\2\\hello.txt", IOMethods.treatPath("\\D:\\testing\\file\\2\\hello.txt")
+        );
         assertEquals(
                 "E:/there are now spaces/test.txt/",
                 IOMethods.treatPath("/E:/there%20are%20n%6fw%20spaces/test.txt/")
