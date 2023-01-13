@@ -30,7 +30,7 @@ class HashingUtilsTest {
                 "6292b31b6c5afb3c5bac1627f46fbb25",
                 HashingUtils.getHash(new File(IOMethods.joinPaths(
                         IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-                        "test-files", "HashingUtilsTest", "DummyFile.txt"
+                        "test-files", "utils", "HashingUtilsTest", "DummyFile.txt"
                 )), "MD5")
         );
         assertThrows(IOException.class, () -> HashingUtils.getHash(new File("not a file"), "MD5"));

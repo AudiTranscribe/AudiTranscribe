@@ -10,7 +10,8 @@ import static org.junit.jupiter.api.Assertions.*;
 class PropertyFileTest {
     // Constants
     static final String FILE_PATH = IOMethods.joinPaths(
-            IOConstants.RESOURCES_FOLDER_PATH, "test-files", "PropertyFileTest", "testing-properties-file.properties"
+            IOConstants.RESOURCES_FOLDER_PATH, "test-files", "io", "PropertyFileTest",
+            "testing-properties-file.properties"
     );
 
     // Attributes

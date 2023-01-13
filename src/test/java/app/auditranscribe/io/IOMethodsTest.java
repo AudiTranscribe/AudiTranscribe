@@ -285,8 +285,8 @@ class IOMethodsTest {
     @EnabledOnOs({OS.MAC, OS.LINUX})
     void numFilesInDir() {
         // Define the testing directories
-        final String testDir1 = IOMethods.joinPaths(TESTING_FILES_PATH, "IOMethodsTest", "numFilesInDir", "dir1");
-        final String testDir2 = IOMethods.joinPaths(TESTING_FILES_PATH, "IOMethodsTest", "numFilesInDir", "dir2");
+        final String testDir1 = IOMethods.joinPaths(TESTING_FILES_PATH, "io", "IOMethodsTest", "numFilesInDir", "dir1");
+        final String testDir2 = IOMethods.joinPaths(TESTING_FILES_PATH, "io", "IOMethodsTest", "numFilesInDir", "dir2");
 
         // Make sure the directories has the required testing files
         if (IOMethods.isSomethingAt(IOMethods.joinPaths(testDir1, ".DS_Store"))) {

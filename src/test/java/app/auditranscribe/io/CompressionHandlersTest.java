@@ -97,7 +97,7 @@ class CompressionHandlersTest {
         // Define base directory
         String baseDir = IOMethods.joinPaths(
                 IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH, "test-files",
-                "CompressionHandlersTest"
+                "io", "CompressionHandlersTest"
         );
 
         // Run file traversal test
@@ -182,7 +182,7 @@ class CompressionHandlersTest {
         IOMethods.delete(baseDir);
         IOMethods.delete(IOMethods.joinPaths(
                 IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH, "test-files",
-                "CompressionHandlersTest", "zip-test-base-dir"
+                "io", "CompressionHandlersTest", "zip-test-base-dir"
         ));
     }
 
@@ -192,7 +192,7 @@ class CompressionHandlersTest {
         // Define some file paths to compress
         String baseDir = IOMethods.joinPaths(
                 IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH, "test-files",
-                "CompressionHandlersTest"
+                "io", "CompressionHandlersTest"
         );
         String filepath1 = IOMethods.joinPaths(baseDir, "MyFile.txt");
         String filepath2 = IOMethods.joinPaths(baseDir, "AnotherFile.txt");
@@ -229,7 +229,7 @@ class CompressionHandlersTest {
         // Define base directory path
         String baseDir = IOMethods.joinPaths(
                 IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH, "test-files",
-                "CompressionHandlersTest"
+                "io", "CompressionHandlersTest"
         );
 
         // Tests

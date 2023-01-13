@@ -33,7 +33,7 @@ class QTransformTest {
     QTransformTest() throws UnsupportedAudioFileException, AudioTooLongException, IOException, NoSuchMethodException {
         // Get audio file and audio samples for the tests
         audio = new Audio(
-                new File(IOMethods.getAbsoluteFilePath("test-files/QTransformTest/Choice.wav")),
+                new File(IOMethods.getAbsoluteFilePath("test-files/signal/representations/QTransformTest/Choice.wav")),
                 AudioProcessingMode.WITH_SAMPLES
         );
         samples = audio.getMonoSamples();
