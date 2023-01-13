@@ -1,0 +1,108 @@
+/* SIDEBAR */
+.sidebar {
+    -fx-border-width: 0 1px 0 0;
+    -fx-border-color: seperator-colour;
+}
+
+/* Labels */
+.application-name-label {
+    -fx-font-size: 20pt;
+    -fx-font-weight: bold;
+    -fx-alignment: top-center;
+    -fx-text-fill: text-colour-primary;
+}
+
+.version-label {
+    -fx-font-size: 10pt;
+    -fx-alignment: center;
+    -fx-text-fill: text-colour-secondary;
+}
+
+/* Buttons */
+.sidebar-button {
+    -fx-font-size: 11pt;
+    -fx-border-width: 1px 0 1px 0;
+    -fx-border-color: seperator-colour;
+    -fx-background-radius: 0;
+    -fx-padding: 0 0 0 15px;
+    -fx-background-color: button-default-colour;
+    -fx-text-fill: text-colour-primary;
+}
+
+.sidebar-button:hover {
+    -fx-background-color: button-hover-colour;
+    -fx-cursor: hand;
+}
+
+/* PROJECTS SIDE */
+.no-projects-vbox, .projects-list-view {
+    -fx-background-color: background-colour-secondary;
+    -fx-border-width: 1px 0 0 1px;
+    -fx-border-color: seperator-colour;
+}
+
+.search-text-field {
+    -fx-background-color: background-colour-secondary;
+    -fx-font-size: 10pt;
+}
+
+/* PROJECT CELL */
+.project-name-label, .last-opened-date-label, .filepath-label, .short-name-label {
+    -fx-text-overrun: ellipsis;
+    -fx-text-fill: text-colour-primary;
+}
+
+.project-name-label {
+    -fx-pref-width: 330px;
+    -fx-text-alignment: left;
+    -fx-font-weight: bold;
+}
+
+.last-opened-date-label {
+    -fx-pref-width: 120px;
+    -fx-text-fill: text-colour-secondary;
+}
+
+.filepath-label {
+    -fx-pref-width: 520px;
+    -fx-max-width: 520px;
+    -fx-text-fill: text-colour-secondary;
+}
+
+.short-name-label {
+    -fx-font-size: 16pt;
+}
+
+.short-name-rectangle {
+    -fx-stroke: stroke-colour;
+    -fx-arc-width: 25px;
+    -fx-arc-height: 25px;
+}
+
+.remove-project-button {
+    -fx-max-width: 40px;
+    -fx-max-height: 40px;
+}
+
+.remove-project-button:hover {
+    -fx-background-color: background-colour-primary;
+}
+
+.list-cell {
+    -fx-pref-width: 570px;
+    -fx-max-width: 570px;
+    -fx-background-color: background-colour-secondary;
+}
+
+.list-cell:empty {
+    visibility: hidden;
+}
+
+.list-cell:hover {
+    -fx-cursor: hand;
+    -fx-background-color: background-colour-tertiary;
+}
+
+.scroll-bar:horizontal .thumb, .scroll-bar:vertical .thumb {
+    /*-fx-background-color: background-colour-primary;*/
+}

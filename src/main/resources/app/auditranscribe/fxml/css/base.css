@@ -25,3 +25,68 @@
 * {
     -fx-font-family: "Roboto", "Arial", "Open Sans", sans-serif;
 }
+
+/* Buttons */
+.image-button {
+    -fx-background-color: transparent;
+}
+
+.image-button:hover {
+    -fx-background-color: button-hover-colour;
+    -fx-background-insets: 0 0 -1 0, 0, 1, 2;
+    -fx-background-radius: 3px, 3px, 2px, 1px;
+}
+
+/* Text fields */
+.text-field {
+    -fx-background-color: background-colour-secondary;
+    -fx-font-size: 10pt;
+    -fx-text-fill: text-colour-primary;
+    -fx-prompt-text-fill: text-colour-secondary;
+}
+
+/* Scrollbar */
+.scroll-bar:horizontal {
+    -fx-pref-height: 12px;
+}
+
+.scroll-bar:vertical {
+    -fx-pref-width: 12px;
+}
+
+.scroll-bar:horizontal .track, .scroll-bar:vertical .track {
+    -fx-background-color: background-colour-primary;
+    -fx-border-color: transparent;
+    -fx-background-radius: 0;
+}
+
+.scroll-bar:horizontal .thumb, .scroll-bar:vertical .thumb {
+    -fx-background-color: scrollbar-colour;
+    -fx-border-color: transparent;
+    -fx-background-radius: 10px;
+}
+
+.scroll-bar:horizontal .increment-arrow, .scroll-bar:horizontal .decrement-arrow,
+.scroll-bar:vertical .increment-arrow, .scroll-bar:vertical .decrement-arrow {
+    -fx-padding: 0 0 0 0;
+}
+
+.scroll-bar:horizontal .increment-button, .scroll-bar:horizontal .decrement-button,
+.scroll-bar:vertical .increment-button, .scroll-bar:vertical .decrement-button {
+    -fx-padding: 0 0 0 0;
+    -fx-background-insets: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0 0;
+}
+
+.scroll-bar:horizontal .increment-button:hover, .scroll-bar:horizontal .decrement-button:hover,
+.scroll-bar:vertical .increment-button:hover, .scroll-bar:vertical .decrement-button:hover {
+    -fx-fill: button-hover-colour;
+    -fx-cursor: hand;
+}
+
+/* Other setup */
+.root {
+    -fx-background-color: background-colour-primary;
+
+    -fx-focus-color: focus-colour;
+    -fx-faint-focus-color: rgba(0, 0, 0, 0);
+}

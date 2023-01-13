@@ -18,16 +18,30 @@
 
 package app.auditranscribe;
 
+import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
+
+import java.io.IOException;
 
 @ExcludeFromGeneratedCoverageReport
 public class MainApplication extends Application {
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) throws IOException {
         // Todo: update
-        stage.setTitle("Main Application");
+//        stage.setTitle("Main Application");
+//        stage.show();
+
+        FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL(
+                "fxml/views/main/homepage-view.fxml"
+        ));
+        Scene scene = new Scene(fxmlLoader.load());
+
+        stage.setTitle("AudiTranscribe");
+        stage.setScene(scene);
         stage.show();
     }
 

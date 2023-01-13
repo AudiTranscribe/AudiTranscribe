@@ -18,6 +18,7 @@
 
 package app.auditranscribe.fxml;
 
+import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 
 /**
@@ -40,6 +41,24 @@ public enum Theme {
         this.name = name;
         this.shortName = shortName;
         this.cssFile = shortName + ".css";
+    }
+
+    // Public methods
+
+    /**
+     * Gets all the URLs to the theme CSS files.
+     *
+     * @return URLs to the theme CSS files.
+     */
+    public static String[] getThemeCSSURLs() {
+        int numThemes = Theme.values().length;
+        String[] urls = new String[numThemes];
+
+        for (int i = 0; i < numThemes; i++) {
+            urls[i] = IOMethods.getFileURLAsString( "fxml/css/theme/" + Theme.values()[i].cssFile);
+        }
+
+        return urls;
     }
 
     // Overridden methods
