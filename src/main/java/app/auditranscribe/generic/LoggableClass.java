@@ -54,6 +54,15 @@ public abstract class LoggableClass {
     }
 
     /**
+     * Logs a specific message at the <code>Level.INFO</code> level.
+     *
+     * @param msg The message to log.
+     */
+    public void log(String msg) {
+        CustomLogger.log(Level.INFO, msg, this.getClass().getName());
+    }
+
+    /**
      * Method that logs an exception.
      *
      * @param e Exception to log.
