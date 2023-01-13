@@ -33,6 +33,7 @@ module AudiTranscribe {
 
     // Exports
     exports app.auditranscribe;
+    exports app.auditranscribe.fxml.views;
     exports app.auditranscribe.fxml.views.main;
     exports app.auditranscribe.io.data_files;
     exports app.auditranscribe.io.data_files.data_encapsulators;

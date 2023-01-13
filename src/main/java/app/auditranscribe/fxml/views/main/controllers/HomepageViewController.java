@@ -19,11 +19,9 @@
 package app.auditranscribe.fxml.views.main.controllers;
 
 import app.auditranscribe.fxml.IconHelper;
-import app.auditranscribe.fxml.Theme;
-import app.auditranscribe.generic.LoggableClass;
+import app.auditranscribe.fxml.views.AbstractViewController;
 import app.auditranscribe.generic.tuples.Pair;
 import app.auditranscribe.generic.tuples.Quadruple;
-import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.data_files.DataFiles;
 import app.auditranscribe.io.data_files.data_encapsulators.SettingsData;
 import app.auditranscribe.io.db.ProjectsDB;
@@ -37,7 +35,6 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -61,7 +58,7 @@ import java.util.logging.Level;
 /**
  * Controller for the homepage.
  */
-public class HomepageViewController extends LoggableClass implements Initializable {
+public class HomepageViewController extends AbstractViewController {
     // Attributes
     private ProjectsDB projectsDB;
 
@@ -164,20 +161,11 @@ public class HomepageViewController extends LoggableClass implements Initializab
      * Method that sets the theme for the scene.
      */
     public void setThemeOnScene() {
-        // Get the new theme
-        Theme theme = Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal];
-
-        // Clear old themes
-        for (String url : Theme.getThemeCSSURLs()) {
-            rootPane.getStylesheets().remove(url);
-        }
-
-        // Set new theme
-        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("fxml/css/theme/" + theme.cssFile));
+        updateThemeCSS(rootPane);
 
         // Set graphics
         IconHelper.setSVGPath(searchImage, 20, "search-line");
-        IconHelper.setSVGOnButton(preferencesButton, 20, 30, "cog-solid");
+        IconHelper.setSVGOnButton(preferencesButton, 15, 30, "cog-solid");
     }
 
     /**
