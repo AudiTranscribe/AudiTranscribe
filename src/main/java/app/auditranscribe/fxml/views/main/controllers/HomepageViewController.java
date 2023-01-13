@@ -148,8 +148,7 @@ public class HomepageViewController extends AbstractViewController {
 //        preferencesMenuItem.setOnAction(event -> PreferencesViewController.showPreferencesWindow());
         preferencesMenuItem.setOnAction(event -> log("preferencesMenuItem"));  // todo remove
         docsMenuItem.setOnAction(event -> GUIUtils.openURLInBrowser("https://docs.auditranscribe.app/"));
-//        aboutMenuItem.setOnAction(event -> AboutViewController.showAboutWindow());
-        aboutMenuItem.setOnAction(event -> log("aboutMenuItem"));  // todo remove
+        aboutMenuItem.setOnAction(event -> AboutViewController.showAboutWindow());
 
         // Report that the homepage is ready to be shown
         log("Homepage ready to be shown");

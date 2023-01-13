@@ -37,6 +37,22 @@
     -fx-background-radius: 3px, 3px, 2px, 1px;
 }
 
+/* Hyperlinks */
+.hyperlink, .hyperlink:hover {
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-text-fill: text-colour-hyperlink;
+}
+
+.hyperlink:focused {
+    -fx-border-color: #00000000; /* Transparent */
+}
+
+/* Labels and texts */
+.label {
+    -fx-text-fill: text-colour-primary;
+}
+
 /* Text fields */
 .text-field {
     -fx-background-color: background-colour-secondary;

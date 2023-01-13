@@ -13,6 +13,7 @@
 
     text-colour-primary: rgb(50, 50, 50);
     text-colour-secondary: rgb(100, 100, 100); /* Slightly lighter */
+    text-colour-hyperlink: rgb(49, 114, 198);
 
     focus-colour: rgb(120, 180, 220);
 }
