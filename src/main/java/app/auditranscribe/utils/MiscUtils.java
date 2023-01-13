@@ -81,4 +81,22 @@ public final class MiscUtils {
         if (value == 0) return 0;
         return MathUtils.binlog(Integer.highestOneBit(value)) + 1;
     }
+
+    // Other manipulation methods
+
+    /**
+     * Converts the provided integer into a padded hexadecimal string.
+     *
+     * @param x Positive integer to convert.
+     * @return A 10-character hexadecimal string of the form <code>0xDDDDDDDD</code>.
+     */
+    public static String intAsPaddedHexStr(int x) {
+        // Use the built-in hexadecimal converter first
+        String initialHex = Integer.toHexString(x).toUpperCase();
+
+        // Add "0x" and remaining zeroes
+        return "0x" +
+                "0".repeat(8 - initialHex.length()) +
+                initialHex;
+    }
 }

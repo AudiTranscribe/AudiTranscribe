@@ -48,4 +48,13 @@ class MiscUtilsTest {
         assertEquals(7, MiscUtils.getNumSetBits(127));
         assertEquals(21, MiscUtils.getNumSetBits(1924282));
     }
+
+    // Other manipulation methods
+    @Test
+    void intAsPaddedHexStr() {
+        assertEquals("0x00000005", MiscUtils.intAsPaddedHexStr(5));
+        assertEquals("0x0000000D", MiscUtils.intAsPaddedHexStr(13));
+        assertEquals("0x0000ABCD", MiscUtils.intAsPaddedHexStr(43981));
+        assertEquals("0x1234ABCD", MiscUtils.intAsPaddedHexStr(305441741));
+    }
 }
