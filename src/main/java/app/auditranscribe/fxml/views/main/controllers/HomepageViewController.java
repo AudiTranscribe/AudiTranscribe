@@ -158,17 +158,6 @@ public class HomepageViewController extends AbstractViewController {
     // Public methods
 
     /**
-     * Method that sets the theme for the scene.
-     */
-    public void setThemeOnScene() {
-        updateThemeCSS(rootPane);
-
-        // Set graphics
-        IconHelper.setSVGPath(searchImage, 20, "search-line");
-        IconHelper.setSVGOnButton(preferencesButton, 15, 30, "cog-solid");
-    }
-
-    /**
      * Method that sets the version on the version label.
      *
      * @param version Current version of AudiTranscribe.
@@ -299,6 +288,17 @@ public class HomepageViewController extends AbstractViewController {
 //            // Close this stage
 //            ((Stage) window).close();
 //        }
+    }
+
+    // Overridden methods
+
+    @Override
+    public void setThemeOnScene() {
+        updateThemeCSS(rootPane);
+
+        // Set graphics
+        IconHelper.setSVGPath(searchImage, 20, "search-line");
+        IconHelper.setSVGOnButton(preferencesButton, 15, 30, "cog-solid");
     }
 
     // Helper classes

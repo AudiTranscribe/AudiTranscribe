@@ -19,13 +19,12 @@
 
 package app.auditranscribe.fxml.views;
 
-import app.auditranscribe.fxml.IconHelper;
 import app.auditranscribe.fxml.Theme;
 import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.data_files.DataFiles;
 import javafx.fxml.Initializable;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 
 /**
  * An abstract view controller that defines some useful methods for use in other view controllers.
@@ -42,8 +41,10 @@ public abstract class AbstractViewController extends LoggableClass implements In
 
     /**
      * Helps update the theme CSS loaded by resetting all theme CSS files before adding the new one.
+     *
+     * @return A <code>Theme</code> value, representing the theme that the scene was updated to.
      */
-    protected void updateThemeCSS(AnchorPane rootPane) {
+    protected Theme updateThemeCSS(Pane rootPane) {
         // Get the new theme
         Theme theme = Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal];
 
@@ -54,5 +55,8 @@ public abstract class AbstractViewController extends LoggableClass implements In
 
         // Set new theme
         rootPane.getStylesheets().add(IOMethods.getFileURLAsString("fxml/css/theme/" + theme.cssFile));
+
+        // Return the retrieved theme
+        return theme;
     }
 }
