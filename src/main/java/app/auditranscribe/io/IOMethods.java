@@ -19,6 +19,7 @@
 package app.auditranscribe.io;
 
 import app.auditranscribe.MainApplication;
+import app.auditranscribe.misc.CustomLogger;
 import app.auditranscribe.system.OSMethods;
 import app.auditranscribe.system.OSType;
 
@@ -27,6 +28,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Objects;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -80,7 +82,15 @@ public final class IOMethods {
      * @return A URL representing the absolute path to the file (which is in the target folder).
      */
     public static URL getFileURL(String filePath) {
-        return MainApplication.class.getResource(filePath);
+        URL url = MainApplication.class.getResource(filePath);
+        if (url == null) {
+            CustomLogger.log(
+                    Level.WARNING,
+                    "No file found at '" + filePath + "'; returning null URL",
+                    IOMethods.class.getName()
+            );
+        }
+        return url;
     }
 
     /**
