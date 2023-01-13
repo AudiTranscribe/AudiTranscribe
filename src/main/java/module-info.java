@@ -24,6 +24,7 @@ module AudiTranscribe {
 
     // General dependencies
     requires com.google.gson;
+    requires org.apache.commons.compress;
 
     // JavaFX-related dependencies
     requires javafx.controls;
