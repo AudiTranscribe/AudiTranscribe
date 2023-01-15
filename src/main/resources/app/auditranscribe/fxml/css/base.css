@@ -159,6 +159,9 @@
 
 .slider .thumb {
     -fx-background-color: slider-thumb-colour;
+    -fx-border-color: stroke-colour;
+    -fx-border-width: 1px;
+    -fx-border-radius: 50%;
 }
 
 /* SVG Classes */
