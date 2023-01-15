@@ -37,6 +37,14 @@ public abstract class AbstractViewController extends LoggableClass implements In
      */
     public abstract void setThemeOnScene();
 
+    /**
+     * Method that finishes the setting up of the view controller.<br>
+     * This method may be called after showing the stage.
+     */
+    public void finishSetup() {
+        // We assume that nothing needs to be done; can update in child classes
+    }
+
     // Protected methods
 
     /**
