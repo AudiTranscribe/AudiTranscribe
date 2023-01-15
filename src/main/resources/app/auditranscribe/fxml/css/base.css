@@ -27,14 +27,20 @@
 }
 
 /* Buttons */
-.image-button {
-    -fx-background-color: transparent;
-}
 
-.image-button:hover {
-    -fx-background-color: button-hover-colour;
+.button {
+    -fx-background-color: button-default-colour;
     -fx-background-insets: 0 0 -1 0, 0, 1, 2;
     -fx-background-radius: 3px, 3px, 2px, 1px;
+    -fx-text-fill: text-colour-primary;
+}
+
+.button:hover {
+    -fx-background-color: button-hover-colour;
+}
+
+.image-button {
+    -fx-background-color: transparent;
 }
 
 /* Hyperlinks */
@@ -46,6 +52,51 @@
 
 .hyperlink:focused {
     -fx-border-color: #00000000; /* Transparent */
+}
+
+/* Spinners/Choice Boxes */
+.choice-box, .spinner {
+    -fx-background-color: background-colour-secondary;
+    -fx-background-insets: 0, 1px;
+}
+
+.choice-box .menu-item {
+    -fx-background-color: background-colour-secondary;
+}
+
+.choice-box .menu-item > .label {
+    -fx-text-fill: text-colour-primary;
+}
+
+.choice-box .menu-item:focused {
+    -fx-background-color: background-colour-tertiary;
+}
+
+.spinner > .text-field {
+    -fx-text-fill: text-colour-primary;
+    -fx-background-color: transparent;
+}
+
+.arrow, .left-arrow, .right-arrow, .increment-arrow, .decrement-arrow {
+    -fx-background-color: text-colour-primary;
+    -fx-cursor: hand;
+}
+
+.spinner > .increment-arrow-button, .spinner > .decrement-arrow-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 1px;
+    -fx-cursor: hand;
+}
+
+.spinner > .increment-arrow-button:hover, .spinner > .decrement-arrow-button:hover {
+    -fx-background-color: background-colour-secondary;
+    -fx-border-width: 0;
+}
+
+/* Progress bars */
+.progress-bar > .bar {
+    -fx-background-color: progress-bar-filled-colour;
 }
 
 /* Labels and texts */
@@ -98,6 +149,16 @@
 .scroll-bar:vertical .increment-button:hover, .scroll-bar:vertical .decrement-button:hover {
     -fx-fill: button-hover-colour;
     -fx-cursor: hand;
+}
+
+/* Sliders */
+.slider:horizontal .track, .slider:vertical .track {
+    -slider-unfilled-colour: slider-track-unfilled-colour;
+    -slider-filled-colour: slider-track-filled-colour;
+}
+
+.slider .thumb {
+    -fx-background-color: slider-thumb-colour;
 }
 
 /* SVG Classes */

@@ -4,16 +4,22 @@
     background-colour-secondary: rgb(60, 60, 60); /* Slightly lighter */
     background-colour-tertiary: rgb(85, 85, 85); /* Even lighter */
 
-    scrollbar-colour: rgb(110, 110, 110);
-    seperator-colour: rgb(30, 30, 30);
-    stroke-colour: rgb(235, 235, 235);
-
-    button-default-colour: background-colour-primary;
-    button-hover-colour: rgb(67, 67, 69);
+    button-default-colour: rgb(79, 79, 79);
+    button-hover-colour: rgb(67, 67, 69); /* Slightly lighter */
 
     text-colour-primary: rgb(235, 235, 235);
     text-colour-secondary: rgb(175, 175, 175); /* Slightly darker */
     text-colour-hyperlink: rgb(148, 179, 242);
+
+    progress-bar-filled-colour: rgb(49, 87, 140);
+
+    slider-track-unfilled-colour: rgb(140, 140, 140);
+    slider-track-filled-colour: rgb(30, 150, 255);
+    slider-thumb-colour: rgb(35, 35, 35);
+
+    scrollbar-colour: rgb(110, 110, 110);
+    seperator-colour: rgb(30, 30, 30);
+    stroke-colour: rgb(235, 235, 235);
 
     focus-colour: rgb(30, 120, 210);
 }

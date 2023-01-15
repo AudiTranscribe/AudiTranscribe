@@ -25,7 +25,7 @@
     -fx-border-color: seperator-colour;
     -fx-background-radius: 0;
     -fx-padding: 0 0 0 15px;
-    -fx-background-color: button-default-colour;
+    -fx-background-color: background-colour-primary;
     -fx-text-fill: text-colour-primary;
 }
 
