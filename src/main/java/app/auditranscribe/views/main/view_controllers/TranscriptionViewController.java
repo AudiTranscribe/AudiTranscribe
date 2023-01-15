@@ -725,7 +725,7 @@ public class TranscriptionViewController extends ClassWithLogging implements Ini
                         notesVolumeButton, 15, 20, IMAGE_BUTTON_LENGTH, IMAGE_BUTTON_LENGTH,
                         "music-note-solid", theme.shortName
                 );
-                isAudioMuted = false;
+                areNotesMuted = false;
             }
 
             // Update CSS
