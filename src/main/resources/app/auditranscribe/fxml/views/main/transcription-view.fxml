@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane fx:id="rootPane" prefHeight="550.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.auditranscribe.fxml.views.main.controllers.TranscriptionViewController">
+   <stylesheets>
+      <URL value="@../../css/base.css" />
+      <URL value="@../../css/views/main/transcription.css" />
+      <URL value="@../../css/theme/dark.css" />
+   </stylesheets>
+   <children>
+      <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <MenuBar fx:id="menuBar" />
+            <VBox prefHeight="200.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
+               <children>
+                  <HBox prefHeight="60.0" spacing="20.0">
+                     <children>
+                        <HBox alignment="CENTER_RIGHT" prefWidth="200.0" spacing="15.0" HBox.hgrow="ALWAYS">
+                           <children>
+                              <HBox alignment="CENTER_RIGHT" spacing="5.0">
+                                 <children>
+                                    <Button fx:id="audioVolumeButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" styleClass="image-button" text="V">
+                                       <tooltip>
+                                          <Tooltip text="Mute audio volume" />
+                                       </tooltip>
+                                    </Button>
+                                    <Slider fx:id="audioVolumeSlider" max="1.0" value="0.5" />
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_RIGHT" spacing="5.0">
+                                 <children>
+                                    <Button fx:id="notesVolumeButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" styleClass="image-button" text="M">
+                                       <tooltip>
+                                          <Tooltip text="Mute music notes volume" />
+                                       </tooltip>
+                                    </Button>
+                                    <Slider fx:id="notesVolumeSlider" max="127.0" min="33.0" value="80.0" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </HBox>
+                        <Separator orientation="VERTICAL" HBox.hgrow="NEVER" />
+                        <HBox alignment="CENTER" spacing="15.0" HBox.hgrow="NEVER">
+                           <children>
+                              <ChoiceBox fx:id="musicKeyChoice" prefHeight="30.0">
+                                 <tooltip>
+                                    <Tooltip text="Music key" />
+                                 </tooltip>
+                              </ChoiceBox>
+                              <Spinner fx:id="bpmSpinner" prefHeight="30.0">
+                                 <tooltip>
+                                    <Tooltip text="Beats per minute" />
+                                 </tooltip>
+                              </Spinner>
+                              <ChoiceBox fx:id="timeSignatureChoice" prefHeight="30.0">
+                                 <tooltip>
+                                    <Tooltip text="Time signature" />
+                                 </tooltip>
+                              </ChoiceBox>
+                              <Spinner fx:id="offsetSpinner" prefHeight="30.0">
+                                 <tooltip>
+                                    <Tooltip text="Offset" />
+                                 </tooltip>
+                              </Spinner>
+                           </children></HBox>
+                        <Separator orientation="VERTICAL" HBox.hgrow="NEVER" />
+                        <HBox fx:id="progressBarHBox" alignment="CENTER_LEFT" prefWidth="200.0" spacing="15.0" HBox.hgrow="ALWAYS">
+                           <children>
+                              <ProgressBar fx:id="progressBar" prefHeight="20.0" progress="0.0" />
+                              <Label fx:id="progressLabel" prefHeight="20.0" styleClass="progress-bar-label" text="Doing task..." />
+                           </children></HBox>
+                     </children></HBox>
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                     <children>
+                        <AnchorPane AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <ScrollPane hbarPolicy="NEVER" prefWidth="40.0" vbarPolicy="NEVER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="40.0">
+                                       <children>
+                                          <Pane fx:id="notePane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </ScrollPane>
+                              <ScrollPane fx:id="spectrogramPane" hbarPolicy="NEVER" pannable="true" prefHeight="200.0" prefWidth="200.0" vbarPolicy="NEVER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <content>
+                                  <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0">
+                                       <children>
+                                          <ImageView fx:id="spectrogramImage" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </ScrollPane>
+                           </children></AnchorPane>
+                        <AnchorPane prefHeight="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                           <children>
+                              <Pane prefHeight="40.0" prefWidth="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+                              <ScrollPane hbarPolicy="NEVER" prefHeight="40.0" vbarPolicy="NEVER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="0.0">
+                                <content>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="40.0">
+                                       <children>
+                                          <Pane fx:id="barNumberPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                          <Pane fx:id="colouredProgressPane" prefWidth="0.0" styleClass="coloured-progress-pane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                          <Pane fx:id="clickableProgressPane" prefWidth="0.0" styleClass="clickable-progress-pane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                       </children>
+                                    </AnchorPane>
+                                </content>
+                              </ScrollPane>
+                           </children></AnchorPane>
+                     </children></AnchorPane>
+                  <HBox prefHeight="60.0" spacing="20.0">
+                     <children>
+                        <HBox alignment="CENTER_RIGHT" prefWidth="200.0" spacing="15.0" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Button fx:id="scrollButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" styleClass="image-button" text="S">
+                                 <tooltip>
+                                    <Tooltip text="Scroll to playhead" />
+                                 </tooltip></Button>
+                              <Button fx:id="editNotesButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" styleClass="image-button" text="E">
+                                 <tooltip>
+                                    <Tooltip text="Toggle edit mode" />
+                                 </tooltip></Button>
+                           </children></HBox>
+                        <Separator orientation="VERTICAL" prefHeight="200.0" />
+                        <HBox alignment="CENTER" spacing="15.0" HBox.hgrow="NEVER">
+                           <children>
+                              <Button fx:id="playButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" styleClass="image-button" text="P">
+                                 <tooltip>
+                                    <Tooltip text="Play/pause" />
+                                 </tooltip>
+                              </Button>
+                              <Button fx:id="playStepBackwardButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" styleClass="image-button" text="SB">
+                                 <tooltip>
+                                    <Tooltip text="Seek to start" />
+                                 </tooltip>
+                              </Button>
+                              <Button fx:id="toggleSlowedAudioButton" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" text="1.0x">
+                                 <tooltip>
+                                    <Tooltip text="Playback speed" />
+                                 </tooltip>
+                              </Button>
+                           </children></HBox>
+                        <Separator orientation="VERTICAL" prefHeight="200.0" />
+                        <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="5.0" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label fx:id="currTimeLabel" styleClass="time-label" text="00:00" />
+                              <Label styleClass="time-label" text="/" />
+                              <Label fx:id="totalTimeLabel" styleClass="time-label" text="MM:SS" />
+                           </children></HBox>
+                     </children></HBox>
+               </children>
+            </VBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

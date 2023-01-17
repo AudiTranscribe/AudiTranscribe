@@ -19,11 +19,10 @@
 package app.auditranscribe.fxml.views.main.controllers;
 
 import app.auditranscribe.fxml.IconHelper;
-import app.auditranscribe.fxml.views.AbstractViewController;
+import app.auditranscribe.fxml.Popups;
+import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitchingState;
 import app.auditranscribe.generic.tuples.Pair;
 import app.auditranscribe.generic.tuples.Quadruple;
-import app.auditranscribe.io.data_files.DataFiles;
-import app.auditranscribe.io.data_files.data_encapsulators.SettingsData;
 import app.auditranscribe.io.db.ProjectsDB;
 import app.auditranscribe.system.OSMethods;
 import app.auditranscribe.system.OSType;
@@ -41,7 +40,9 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.SVGPath;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,7 +59,7 @@ import java.util.logging.Level;
 /**
  * Controller for the homepage.
  */
-public class HomepageViewController extends AbstractViewController {
+public class HomepageViewController extends SwitchableViewController {
     // Attributes
     private ProjectsDB projectsDB;
 
@@ -129,9 +130,9 @@ public class HomepageViewController extends AbstractViewController {
                 String filepath = selectedItem.value2();
                 File file = new File(filepath);
 
-//                // Set the scene switching state and data
-//                sceneSwitchingState = SceneSwitchingState.OPEN_PROJECT;
-//                sceneSwitchingData.file = file;
+                // Set the scene switching state and data
+                sceneSwitchingState = SceneSwitchingState.OPEN_PROJECT;
+                sceneSwitchingData.file = file;
 
                 log("Opening project: '" + selectedItem.value1() + "'");  // Value 1 is project name
 
@@ -153,6 +154,15 @@ public class HomepageViewController extends AbstractViewController {
         // Report that the homepage is ready to be shown
         log("Homepage ready to be shown");
     }
+
+    // Getter/setter methods
+
+    @Override
+    public SceneSwitchingState getSceneSwitchingState() {
+        if (sceneSwitchingState == null) return SceneSwitchingState.CLOSE_SCENE;
+        return sceneSwitchingState;
+    }
+
 
     // Public methods
 
@@ -225,7 +235,7 @@ public class HomepageViewController extends AbstractViewController {
             projectsListView.setItems(new SortedList<>(filteredList));  // Use a sorted list for searching
             projectsListView.setCellFactory(
                     customListCellListView -> new CustomListCell(
-                            projectsDB, projectsListView, DataFiles.SETTINGS_DATA_FILE.data
+                            projectsDB, projectsListView
                     )
             );
         } else {
@@ -265,28 +275,26 @@ public class HomepageViewController extends AbstractViewController {
      * @param actionEvent Event that triggered this function.
      */
     private void handleOpenProject(ActionEvent actionEvent) {
-        // Todo add
-        log("handleOpenProject");
-//        // Get the current window
-//        Window window = rootPane.getScene().getWindow();
-//
-//        // Get user to select an AUDT file
-//        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
-//                "AudiTranscribe files (*.audt)", "*.audt"
-//        );
-//        File file = GUIUtils.openFileDialog(window, extFilter);
-//
-//        // Verify that the user actually chose a file
-//        if (file == null) {
-//            Popups.showInformationAlert(rootPane.getScene().getWindow(), "Info", "No file selected.");
-//        } else {
-//            // Set the scene switching state and data
-//            sceneSwitchingState = SceneSwitchingState.OPEN_PROJECT;
-//            sceneSwitchingData.file = file;
-//
-//            // Close this stage
-//            ((Stage) window).close();
-//        }
+        // Get the current window
+        Window window = rootPane.getScene().getWindow();
+
+        // Get user to select an AUDT file
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                "AudiTranscribe files (*.audt)", "*.audt"
+        );
+        File file = GUIUtils.openFileDialog(window, extFilter);
+
+        // Verify that the user actually chose a file
+        if (file == null) {
+            Popups.showInformationAlert(rootPane.getScene().getWindow(), "Info", "No file selected.");
+        } else {
+            // Set the scene switching state and data
+            sceneSwitchingState = SceneSwitchingState.OPEN_PROJECT;
+            sceneSwitchingData.file = file;
+
+            // Close this stage
+            ((Stage) window).close();
+        }
     }
 
     // Overridden methods
@@ -322,7 +330,7 @@ public class HomepageViewController extends AbstractViewController {
 
         Button removeButton;
 
-        public CustomListCell(ProjectsDB db, ListView<?> projectsListView, SettingsData settingsData) {
+        public CustomListCell(ProjectsDB db, ListView<?> projectsListView) {
             // Call superclass initialization method
             super();
 

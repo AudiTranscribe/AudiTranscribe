@@ -18,12 +18,14 @@
 
 package app.auditranscribe;
 
-import app.auditranscribe.fxml.views.main.controllers.HomepageViewController;
+import app.auditranscribe.fxml.views.AbstractViewController;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -33,20 +35,39 @@ public class MainApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         // Todo: update
-//        stage.setTitle("Main Application");
+//        FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL(
+//                "fxml/views/main/homepage-view.fxml"
+//        ));
+//        Scene scene = new Scene(fxmlLoader.load());
+//
+//        HomepageViewController controller = fxmlLoader.getController();
+//        controller.setThemeOnScene();
+//
+//        stage.setTitle("AudiTranscribe");
+//        stage.setScene(scene);
 //        stage.show();
 
         FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL(
-                "fxml/views/main/homepage-view.fxml"
+                "fxml/views/main/transcription-view.fxml"
         ));
         Scene scene = new Scene(fxmlLoader.load());
 
-        HomepageViewController controller = fxmlLoader.getController();
+        AbstractViewController controller = fxmlLoader.getController();
         controller.setThemeOnScene();
+
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
 
         stage.setTitle("AudiTranscribe");
         stage.setScene(scene);
+        stage.setMaximized(true);
+        stage.setResizable(true);
+        stage.setMinWidth(screenBounds.getWidth());
+        stage.setMinHeight(screenBounds.getHeight());
+        stage.setX(0);
+        stage.setY(0);
+
         stage.show();
+        controller.finishSetup();
     }
 
     public static void main(String[] args) {

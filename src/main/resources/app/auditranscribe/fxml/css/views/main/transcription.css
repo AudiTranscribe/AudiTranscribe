@@ -1,0 +1,18 @@
+/* TOP */
+.progress-bar-label {
+    -fx-font-size: 10pt;
+}
+
+/* MIDDLE */
+.clickable-progress-pane {
+    -fx-background-color: #00000000; /* Transparent */
+}
+
+.coloured-progress-pane {
+    -fx-background-color: derive(slider-track-filled-colour, 31.25%);
+}
+
+/* BOTTOM */
+.time-label {
+    -fx-font-size: 12pt;
+}
