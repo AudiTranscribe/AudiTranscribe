@@ -205,8 +205,10 @@ public final class Popups {
             Dialog<?> dialog, Window owner, String title, String headerText, String contentText,
             Theme currentTheme
     ) {
-        dialog.getDialogPane().getStylesheets().add(
-                IOMethods.getFileURL(IOMethods.joinPaths("views", "css", currentTheme.cssFile)).toExternalForm()
+        dialog.getDialogPane().getStylesheets().addAll(
+                IOMethods.getFileURL(IOMethods.joinPaths("fxml", "css", "base.css")).toExternalForm(),
+                IOMethods.getFileURL(IOMethods.joinPaths("fxml", "css", "views", "popups.css")).toExternalForm(),
+                IOMethods.getFileURL(IOMethods.joinPaths("fxml", "css", "theme", currentTheme.cssFile)).toExternalForm()
         );
 
         dialog.initStyle(StageStyle.UTILITY);

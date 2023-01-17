@@ -1,0 +1,12 @@
+.root {
+    -fx-base: background-colour-primary;
+    -fx-background: background-colour-primary;
+    -fx-accent: background-colour-primary;
+
+    -default-text-fill: text-colour-primary;
+}
+
+.dialog-pane > .button-bar > .container > .details-button.more,
+.dialog-pane > .button-bar > .container > .details-button.less {
+    -fx-text-fill: text-colour-primary;
+}
