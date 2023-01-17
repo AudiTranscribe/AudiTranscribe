@@ -35,41 +35,6 @@ import java.io.IOException;
 public class MainApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        // Todo: update
-//        FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL(
-//                "fxml/views/main/homepage-view.fxml"
-//        ));
-//        Scene scene = new Scene(fxmlLoader.load());
-//
-//        HomepageViewController controller = fxmlLoader.getController();
-//        controller.setThemeOnScene();
-//
-//        stage.setTitle("AudiTranscribe");
-//        stage.setScene(scene);
-//        stage.show();
-
-//        FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL(
-//                "fxml/views/main/transcription-view.fxml"
-//        ));
-//        Scene scene = new Scene(fxmlLoader.load());
-//
-//        AbstractViewController controller = fxmlLoader.getController();
-//        controller.setThemeOnScene();
-//
-//        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-//
-//        stage.setTitle("AudiTranscribe");
-//        stage.setScene(scene);
-//        stage.setMaximized(true);
-//        stage.setResizable(true);
-//        stage.setMinWidth(screenBounds.getWidth());
-//        stage.setMinHeight(screenBounds.getHeight());
-//        stage.setX(0);
-//        stage.setY(0);
-//
-//        stage.show();
-//        controller.finishSetup();
-
         // Ensure the needed application folders exists
         String[] neededFolders = new String[]{
                 IOConstants.APP_DATA_FOLDER_PATH,
@@ -100,8 +65,8 @@ public class MainApplication extends Application {
             throw new RuntimeException(e);
         }
 
-        // Todo: Check if there are any updates
-//        UpdateChecker.checkForUpdates(currentVersion);
+        // Check if there are any updates
+        UpdateChecker.checkForUpdates(currentVersion);
 
         // Start scene handler
         SceneSwitcher sceneHandler = new SceneSwitcher(currentVersion);
