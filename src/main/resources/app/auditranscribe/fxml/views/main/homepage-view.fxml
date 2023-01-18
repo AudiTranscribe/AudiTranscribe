@@ -30,7 +30,7 @@
                         <MenuItem fx:id="newProjectMenuItem" mnemonicParsing="false" text="New Project" />
                         <MenuItem fx:id="openProjectMenuItem" mnemonicParsing="false" text="Open..." />
                         <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem fx:id="preferencesMenuItem" mnemonicParsing="false" text="Preferences..." />
+                        <MenuItem fx:id="settingsMenuItem" mnemonicParsing="false" text="Settings..." />
                      </items>
                   </Menu>
                   <Menu mnemonicParsing="false" text="Help">

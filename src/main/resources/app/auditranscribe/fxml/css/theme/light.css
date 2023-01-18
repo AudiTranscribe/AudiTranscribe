@@ -6,6 +6,10 @@
 
     button-default-colour: rgb(218, 223, 229);
     button-hover-colour: rgb(226, 229, 233); /* Slightly lighter */
+    button-selected-colour: rgb(230, 240, 250);
+
+    ok-button-default-colour: rgb(120, 180, 235);
+    ok-button-hover-colour: rgb(180, 210, 240); /* Slightly lighter */
 
     text-colour-primary: rgb(50, 50, 50);
     text-colour-secondary: rgb(100, 100, 100); /* Slightly lighter */

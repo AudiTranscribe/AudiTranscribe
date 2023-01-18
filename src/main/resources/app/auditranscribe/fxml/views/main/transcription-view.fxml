@@ -18,11 +18,6 @@
 <?import javafx.scene.layout.VBox?>
 
 <AnchorPane fx:id="rootPane" prefHeight="550.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.auditranscribe.fxml.views.main.controllers.TranscriptionViewController">
-   <stylesheets>
-      <URL value="@../../css/base.css" />
-      <URL value="@../../css/views/main/transcription.css" />
-      <URL value="@../../css/theme/dark.css" />
-   </stylesheets>
    <children>
       <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -170,4 +165,9 @@
          </children>
       </VBox>
    </children>
+   <stylesheets>
+      <URL value="@../../css/base.css" />
+      <URL value="@../../css/views/main/transcription.css" />
+      <URL value="@../../css/theme/light.css" />
+   </stylesheets>
 </AnchorPane>

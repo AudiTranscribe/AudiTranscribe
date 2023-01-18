@@ -27,7 +27,6 @@
 }
 
 /* Buttons */
-
 .button {
     -fx-background-color: button-default-colour;
     -fx-background-insets: 0 0 -1 0, 0, 1, 2;
@@ -40,8 +39,21 @@
     -fx-cursor: hand;
 }
 
+.button:selected {
+    -fx-background-color: button-selected-colour;
+}
+
 .image-button {
     -fx-background-color: transparent;
+}
+
+.ok-button {
+    -fx-border-radius: 2px;
+    -fx-background-color: ok-button-default-colour;
+}
+
+.ok-button:hover {
+    -fx-background-color: ok-button-hover-colour;
 }
 
 /* Hyperlinks */

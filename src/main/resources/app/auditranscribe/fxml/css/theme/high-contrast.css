@@ -8,6 +8,10 @@
 
     button-default-colour: rgb(100, 100, 100);
     button-hover-colour: rgb(200, 200, 200);
+    button-selected-colour: rgb(150, 150, 150);
+
+    ok-button-default-colour: rgb(0, 255, 255);
+    ok-button-hover-colour: rgb(0, 128, 128); /* Slightly darker */
 
     text-colour-primary: rgb(255, 255, 255);
     text-colour-secondary: rgb(255, 255, 255); /* Slightly darker */

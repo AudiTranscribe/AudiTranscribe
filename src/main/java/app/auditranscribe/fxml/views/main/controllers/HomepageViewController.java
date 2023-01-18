@@ -74,7 +74,7 @@ public class HomepageViewController extends SwitchableViewController {
     private MenuBar menuBar;
 
     @FXML
-    private MenuItem newProjectMenuItem, openProjectMenuItem, preferencesMenuItem, docsMenuItem, aboutMenuItem;
+    private MenuItem newProjectMenuItem, openProjectMenuItem, settingsMenuItem, docsMenuItem, aboutMenuItem;
 
     // Sidebar
     @FXML
@@ -103,6 +103,7 @@ public class HomepageViewController extends SwitchableViewController {
         // Add methods to buttons
         newProjectButton.setOnAction(this::handleNewProject);
         openProjectButton.setOnAction(this::handleOpenProject);
+        preferencesButton.setOnAction(event -> SettingsViewController.showSettingsWindow());
 
         // Set the search field method
         searchTextField.textProperty().addListener((observable, oldValue, newValue) ->
@@ -146,8 +147,7 @@ public class HomepageViewController extends SwitchableViewController {
         // Add methods to menu items
         newProjectMenuItem.setOnAction(this::handleNewProject);
         openProjectMenuItem.setOnAction(this::handleOpenProject);
-//        preferencesMenuItem.setOnAction(event -> PreferencesViewController.showPreferencesWindow());
-        preferencesMenuItem.setOnAction(event -> log("preferencesMenuItem"));  // todo remove
+        settingsMenuItem.setOnAction(event -> SettingsViewController.showSettingsWindow());
         docsMenuItem.setOnAction(event -> GUIUtils.openURLInBrowser("https://docs.auditranscribe.app/"));
         aboutMenuItem.setOnAction(event -> AboutViewController.showAboutWindow());
 
