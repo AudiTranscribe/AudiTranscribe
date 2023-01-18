@@ -22,7 +22,7 @@ package app.auditranscribe.plotting.interpolation;
  * Class that handles the nearest neighbour interpolation method.
  */
 public class NearestNeighbourInterpolation extends AbstractInterpolation {
-    // Overridden methods
+    // Package-protected methods
 
     /**
      * Helper method to perform the nearest neighbour interpolation.

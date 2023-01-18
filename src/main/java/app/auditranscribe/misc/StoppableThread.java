@@ -122,7 +122,6 @@ public abstract class StoppableThread extends LoggableClass implements Runnable 
      */
     public abstract void runner();
 
-    // Overridden methods
     @Override
     public void run() {
         running.set(true);

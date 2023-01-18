@@ -37,7 +37,7 @@ public class MusicNotesDataObject0x00090002 extends MusicNotesDataObject {
         this.noteNums = noteNums;
     }
 
-    // Overridden methods
+    // Public methods
     @Override
     public int numBytesNeeded() {
         return 4 +  // Section ID

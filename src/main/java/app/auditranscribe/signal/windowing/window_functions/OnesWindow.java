@@ -26,7 +26,7 @@ public class OnesWindow extends AbstractWindow {
         bandwidth = 1.;  // Taken from http://librosa.org/doc/main/_modules/librosa/filters.html
     }
 
-    // Overridden methods
+    // Package-protected methods
     @Override
     double windowFunc(int k, int length) {
         return 1;

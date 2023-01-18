@@ -28,15 +28,8 @@ public abstract class GeneralCosineWindow extends AbstractWindow {
     // Attributes
     double[] aCoefficients;  // `a` coefficients as seen in the article linked above
 
-    // Protected methods
-
-    /**
-     * Method that generates the window value for a specific index <code>n</code>.
-     *
-     * @param n      Index of the window. <b>Note that this index is 1-indexed</b>.
-     * @param length Total length of the window.
-     * @return Double representing the window value at index <code>n</code>.
-     */
+    // Package-protected methods
+    @Override
     double windowFunc(int n, int length) {
         // Get the number of `a` coefficients
         int numACoefficients = aCoefficients.length;

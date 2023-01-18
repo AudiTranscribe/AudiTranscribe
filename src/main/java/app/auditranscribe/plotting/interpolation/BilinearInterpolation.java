@@ -25,7 +25,7 @@ import app.auditranscribe.utils.MathUtils;
  * Class that handles the bilinear interpolation method.
  */
 public class BilinearInterpolation extends AbstractInterpolation {
-    // Overridden methods
+    // Package-protected methods
 
     /**
      * Helper method to perform the bilinear interpolation.

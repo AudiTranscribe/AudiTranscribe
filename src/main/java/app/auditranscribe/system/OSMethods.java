@@ -30,7 +30,6 @@ public final class OSMethods {
 
     // Public methods
 
-
     /**
      * Method that returns the value of the requested environment variable, or the default value if
      * it is not found.

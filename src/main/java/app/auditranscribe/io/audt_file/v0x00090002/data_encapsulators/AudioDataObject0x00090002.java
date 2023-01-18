@@ -41,7 +41,7 @@ public class AudioDataObject0x00090002 extends AudioDataObject {
         this.totalDurationInMS = totalDurationInMS;
     }
 
-    // Overridden methods
+    // Public methods
     @Override
     public int numBytesNeeded() {
         return 4 +  // Section ID

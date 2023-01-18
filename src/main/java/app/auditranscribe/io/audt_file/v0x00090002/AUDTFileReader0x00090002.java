@@ -48,6 +48,7 @@ public class AUDTFileReader0x00090002 extends AUDTFileReader {
     }
 
     // Public methods
+    @Override
     public UnchangingDataPropertiesObject readUnchangingDataProperties() throws FailedToReadDataException {
         // Ensure that the unchanging data properties section ID is correct
         int sectionID = readSectionID();
@@ -73,6 +74,7 @@ public class AUDTFileReader0x00090002 extends AUDTFileReader {
         return new UnchangingDataPropertiesObject0x00090002(numSkippableBytes);
     }
 
+    @Override
     public QTransformDataObject readQTransformData() throws FailedToReadDataException {
         // Ensure that the Q-Transform data section ID is correct
         int sectionID = readSectionID();
@@ -97,6 +99,7 @@ public class AUDTFileReader0x00090002 extends AUDTFileReader {
         return new QTransformDataObject0x00090002(qTransformData, minMagnitude, maxMagnitude);
     }
 
+    @Override
     public AudioDataObject readAudioData() throws FailedToReadDataException {
         // Ensure that the audio data section ID is correct
         int sectionID = readSectionID();
@@ -124,6 +127,7 @@ public class AUDTFileReader0x00090002 extends AUDTFileReader {
         );
     }
 
+    @Override
     public ProjectInfoDataObject readProjectInfoData() throws FailedToReadDataException {
         // Ensure that the GUI data section ID is correct
         int sectionID = readSectionID();
@@ -159,6 +163,7 @@ public class AUDTFileReader0x00090002 extends AUDTFileReader {
         );
     }
 
+    @Override
     public MusicNotesDataObject readMusicNotesData() throws FailedToReadDataException, IOException {
         // Ensure that the GUI data section ID is correct
         int sectionID = readSectionID();

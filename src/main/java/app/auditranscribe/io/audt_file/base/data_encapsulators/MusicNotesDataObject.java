@@ -32,7 +32,7 @@ public abstract class MusicNotesDataObject extends AbstractAUDTDataObject {
     public double[] noteDurations;
     public int[] noteNums;
 
-    // Overridden methods
+    // Public methods
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

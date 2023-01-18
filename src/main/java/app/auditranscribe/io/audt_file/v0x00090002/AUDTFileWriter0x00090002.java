@@ -48,12 +48,7 @@ public class AUDTFileWriter0x00090002 extends AUDTFileWriter {
     }
 
     // Public methods
-
-    /**
-     * Method that writes the unchanging data properties to file.
-     *
-     * @param object Data object that contains the unchanging data's properties.
-     */
+    @Override
     public void writeUnchangingDataProperties(UnchangingDataPropertiesObject object) {
         // Cast to the correct version of the object
         UnchangingDataPropertiesObject0x00090002 obj = (UnchangingDataPropertiesObject0x00090002) object;
@@ -64,11 +59,7 @@ public class AUDTFileWriter0x00090002 extends AUDTFileWriter {
         writeEOSDelimiter();
     }
 
-    /**
-     * Method that writes the Q-Transform data to file.
-     *
-     * @param object Data object that holds all the Q-Transform data.
-     */
+    @Override
     public void writeQTransformData(QTransformDataObject object) {
         // Cast to the correct version of the object
         QTransformDataObject0x00090002 obj = (QTransformDataObject0x00090002) object;
@@ -81,11 +72,7 @@ public class AUDTFileWriter0x00090002 extends AUDTFileWriter {
         writeEOSDelimiter();
     }
 
-    /**
-     * Method that writes the audio data to file.
-     *
-     * @param object Data object that holds all the audio data.
-     */
+    @Override
     public void writeAudioData(AudioDataObject object) {
         // Cast to the correct version of the object
         AudioDataObject0x00090002 obj = (AudioDataObject0x00090002) object;
@@ -99,11 +86,7 @@ public class AUDTFileWriter0x00090002 extends AUDTFileWriter {
         writeEOSDelimiter();
     }
 
-    /**
-     * Method that writes the project info data to file.
-     *
-     * @param object Data object that holds all the project info data.
-     */
+    @Override
     public void writeProjectInfoData(ProjectInfoDataObject object) {
         // Cast to the correct version of the object
         ProjectInfoDataObject0x00090002 obj = (ProjectInfoDataObject0x00090002) object;
@@ -121,12 +104,7 @@ public class AUDTFileWriter0x00090002 extends AUDTFileWriter {
         writeEOSDelimiter();
     }
 
-    /**
-     * Method that writes the music notes data to file.
-     *
-     * @param object Data object that holds all the music notes data.
-     * @throws IOException If something went wrong when LZ4 compressing.
-     */
+    @Override
     public void writeMusicNotesData(MusicNotesDataObject object) throws IOException {
         // Cast to the correct version of the object
         MusicNotesDataObject0x00090002 obj = (MusicNotesDataObject0x00090002) object;

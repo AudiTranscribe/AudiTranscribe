@@ -53,7 +53,6 @@ public enum NoteUnit {
         return null;
     }
 
-    // Overridden methods
     @Override
     public String toString() {
         return name;

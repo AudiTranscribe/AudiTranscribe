@@ -166,6 +166,15 @@ public class HomepageViewController extends SwitchableViewController {
 
     // Public methods
 
+    @Override
+    public void setThemeOnScene() {
+        updateThemeCSS(rootPane);
+
+        // Set graphics
+        IconHelper.setSVGPath(searchImage, 20, "search-line");
+        IconHelper.setSVGOnButton(preferencesButton, 15, 30, "cog-solid");
+    }
+
     /**
      * Method that sets the version on the version label.
      *
@@ -295,17 +304,6 @@ public class HomepageViewController extends SwitchableViewController {
             // Close this stage
             ((Stage) window).close();
         }
-    }
-
-    // Overridden methods
-
-    @Override
-    public void setThemeOnScene() {
-        updateThemeCSS(rootPane);
-
-        // Set graphics
-        IconHelper.setSVGPath(searchImage, 20, "search-line");
-        IconHelper.setSVGOnButton(preferencesButton, 15, 30, "cog-solid");
     }
 
     // Helper classes

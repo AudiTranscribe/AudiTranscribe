@@ -39,7 +39,7 @@ public enum SignalWindow {
         this.name = name;
     }
 
-    // Override methods
+    // Public methods
     @Override
     public String toString() {
         return name;

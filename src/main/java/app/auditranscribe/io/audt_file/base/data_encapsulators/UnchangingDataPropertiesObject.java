@@ -35,7 +35,7 @@ public abstract class UnchangingDataPropertiesObject extends AbstractAUDTDataObj
     // Attributes
     public int numSkippableBytes;
 
-    // Overridden methods
+    // Public methods
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

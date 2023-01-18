@@ -70,7 +70,7 @@ public abstract class AbstractWindow {
         return truncate(window, truncateNeeded);
     }
 
-    // Protected methods
+    // Package-protected methods
 
     /**
      * Method that generates the signal window's value for a specific index <code>k</code>.

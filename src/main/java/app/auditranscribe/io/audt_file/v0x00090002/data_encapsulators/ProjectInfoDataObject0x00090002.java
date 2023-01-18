@@ -53,7 +53,7 @@ public class ProjectInfoDataObject0x00090002 extends ProjectInfoDataObject {
         this.currTimeInMS = currTimeInMS;
     }
 
-    // Overridden methods
+    // Public methods
     @Override
     public int numBytesNeeded() {
         return 4 +   // Section ID

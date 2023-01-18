@@ -34,7 +34,7 @@ public abstract class AudioDataObject extends AbstractAUDTDataObject {
     public double sampleRate;
     public int totalDurationInMS;
 
-    // Overridden methods
+    // Public methods
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -103,8 +103,6 @@ public abstract class QTransformDataObject extends AbstractAUDTDataObject {
         return AUDTFileHelpers.int2DtoDoubles2D(intData, minMagnitude, maxMagnitude);
     }
 
-    // Overridden methods
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

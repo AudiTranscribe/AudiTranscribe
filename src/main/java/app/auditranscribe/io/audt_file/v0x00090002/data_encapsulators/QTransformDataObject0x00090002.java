@@ -37,7 +37,7 @@ public class QTransformDataObject0x00090002 extends QTransformDataObject {
         this.maxMagnitude = maxMagnitude;
     }
 
-    // Overridden methods
+    // Public methods
     @Override
     public int numBytesNeeded() {
         return 4 +  // Section ID

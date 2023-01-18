@@ -68,6 +68,11 @@ public class SettingsViewController extends AbstractViewController {
 
     // Public methods
 
+    @Override
+    public void setThemeOnScene() {
+        updateThemeCSS(rootPane);
+    }
+
     /**
      * Method that shows the settings window.
      */
@@ -87,23 +92,18 @@ public class SettingsViewController extends AbstractViewController {
             controller.setUpFields();
 
             // Set stage properties
-            Stage preferencesStage = new Stage();
-            preferencesStage.initModality(Modality.APPLICATION_MODAL);
-            preferencesStage.setTitle("Settings");
-            preferencesStage.setScene(scene);
-            preferencesStage.setResizable(false);
+            Stage settingsStage = new Stage();
+            settingsStage.initModality(Modality.APPLICATION_MODAL);
+            settingsStage.setTitle("Settings");
+            settingsStage.setScene(scene);
+            settingsStage.setResizable(false);
 
             // Show the stage
-            preferencesStage.show();
+            settingsStage.show();
         } catch (IOException e) {
             logException(e);
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public void setThemeOnScene() {
-        updateThemeCSS(rootPane);
     }
 
     // Private methods

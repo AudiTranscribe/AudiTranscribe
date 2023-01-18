@@ -57,7 +57,7 @@ public class ProjectData {
         this.musicNotesData = musicNotesData;
     }
 
-    // Overridden methods
+    // Public methods
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

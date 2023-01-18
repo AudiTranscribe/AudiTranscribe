@@ -86,6 +86,16 @@ public class AboutViewController extends AbstractViewController {
 
     // Public methods
 
+    @Override
+    public void setThemeOnScene() {
+        Theme theme = updateThemeCSS(rootPane);
+
+        // Set graphics
+        bannerImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/logo-and-banner/banner-" + theme.shortName + ".png"
+        )));
+    }
+
     /**
      * Method that shows the "about" window.
      */
@@ -103,7 +113,6 @@ public class AboutViewController extends AbstractViewController {
 
             // Set stage properties
             Stage aboutStage = new Stage();
-            aboutStage.initStyle(StageStyle.UTILITY);
             aboutStage.initModality(Modality.APPLICATION_MODAL);
             aboutStage.setTitle("About AudiTranscribe");
             aboutStage.setScene(scene);
@@ -119,16 +128,5 @@ public class AboutViewController extends AbstractViewController {
             logException(e);
             throw new RuntimeException(e);
         }
-    }
-
-    // Overridden methods
-    @Override
-    public void setThemeOnScene() {
-        Theme theme = updateThemeCSS(rootPane);
-
-        // Set graphics
-        bannerImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/logo-and-banner/banner-" + theme.shortName + ".png"
-        )));
     }
 }

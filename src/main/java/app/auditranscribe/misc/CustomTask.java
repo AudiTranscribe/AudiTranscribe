@@ -47,7 +47,7 @@ public abstract class CustomTask<V> extends Task<V> {
         this.name = this.getMessage();
     }
 
-    // Overridden methods
+    // Public methods
     @Override
     public void updateProgress(long current, long total) {
         super.updateProgress(current, total);

@@ -33,7 +33,7 @@ public class UnchangingDataPropertiesObject0x00090002 extends UnchangingDataProp
         this.numSkippableBytes = numSkippableBytes;
     }
 
-    // Overridden methods
+    // Public methods
     @Override
     public int numBytesNeeded() {
         return NUM_BYTES_NEEDED;

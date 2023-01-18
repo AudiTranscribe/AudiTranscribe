@@ -41,7 +41,7 @@ public abstract class ProjectInfoDataObject extends AbstractAUDTDataObject {
     public double playbackVolume;
     public int currTimeInMS;
 
-    // Overridden methods
+    // Public methods
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
