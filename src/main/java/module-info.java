@@ -36,12 +36,16 @@ module AudiTranscribe {
     exports app.auditranscribe.fxml;
     exports app.auditranscribe.fxml.views;
     exports app.auditranscribe.fxml.views.main;
+    exports app.auditranscribe.generic;
+    exports app.auditranscribe.generic.tuples;
     exports app.auditranscribe.io.data_files;
     exports app.auditranscribe.io.data_files.data_encapsulators;
     exports app.auditranscribe.io.data_files.file_classes;
     exports app.auditranscribe.io.exceptions;
+    exports app.auditranscribe.misc;
     exports app.auditranscribe.signal;
     exports app.auditranscribe.signal.resampling_filters;
+    exports app.auditranscribe.signal.windowing;
 
     // Opens
     opens app.auditranscribe to javafx.fxml;
