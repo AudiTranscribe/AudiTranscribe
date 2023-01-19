@@ -19,22 +19,44 @@
 package app.auditranscribe.fxml.views.main.controllers;
 
 import app.auditranscribe.audio.Audio;
+import app.auditranscribe.audio.exceptions.AudioTooLongException;
+import app.auditranscribe.audio.exceptions.FFmpegNotFoundException;
 import app.auditranscribe.fxml.IconHelper;
+import app.auditranscribe.fxml.Popups;
 import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitchingData;
 import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitchingState;
 import app.auditranscribe.generic.tuples.Pair;
 import app.auditranscribe.io.audt_file.ProjectData;
+import app.auditranscribe.io.audt_file.base.data_encapsulators.AudioDataObject;
+import app.auditranscribe.io.audt_file.base.data_encapsulators.QTransformDataObject;
+import app.auditranscribe.io.data_files.DataFiles;
+import app.auditranscribe.misc.CustomTask;
+import app.auditranscribe.music.BPMEstimator;
+import app.auditranscribe.music.MusicKey;
+import app.auditranscribe.music.MusicKeyEstimator;
+import app.auditranscribe.music.TimeSignature;
+import app.auditranscribe.plotting.ColourScale;
+import app.auditranscribe.plotting.Spectrogram;
+import app.auditranscribe.signal.windowing.SignalWindow;
 import app.auditranscribe.system.OSMethods;
 import app.auditranscribe.system.OSType;
+import app.auditranscribe.utils.MathUtils;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Slider;
+import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.shape.SVGPath;
 
+import javax.sound.sampled.UnsupportedAudioFileException;
+import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 
@@ -58,6 +80,10 @@ public class TranscriptionViewController extends SwitchableViewController {
     private final double IMAGE_BUTTON_LENGTH = 50;  // In pixels
 
     // Attributes
+    private Audio audio;
+    private double audioDuration = 0;  // Will be updated upon scene initialization
+    private double sampleRate;
+
     private double audioVolume = 0.5;  // Percentage
     private int notesVolume = 80;  // MIDI velocity
     private boolean isAudioMuted = false;
@@ -68,6 +94,8 @@ public class TranscriptionViewController extends SwitchableViewController {
 
     private boolean debugMode = false;
 
+    private String projectName;
+
     // FXML elements
     @FXML
     private AnchorPane rootPane;
@@ -75,21 +103,53 @@ public class TranscriptionViewController extends SwitchableViewController {
     @FXML
     private MenuBar menuBar;
 
-    // Top bar
+    // Top
     @FXML
     private Button audioVolumeButton, notesVolumeButton;
 
     @FXML
     private Slider audioVolumeSlider, notesVolumeSlider;
-    // Todo add the rest
+
+    @FXML
+    private SVGPath bpmNoteSVG;
+
+    @FXML
+    private ChoiceBox<String> musicKeyChoice;
+
+    @FXML
+    private ChoiceBox<TimeSignature> timeSignatureChoice;
+
+    @FXML
+    private Spinner<Double> bpmSpinner, offsetSpinner;
+
+    @FXML
+    private HBox progressBarHBox;
+
+    @FXML
+    private ProgressBar progressBar;
+
+    @FXML
+    private Label progressLabel;
 
     // Middle
     @FXML
-    private ScrollPane spectrogramPane;
+    private ScrollPane leftScrollPane, spectrogramScrollPane, bottomScrollPane;
 
-    // Bottom bar
     @FXML
-    private Button scrollButton, editNotesButton, playButton, playStepBackwardButton;  // Todo rename
+    private AnchorPane leftAnchorPane, spectrogramAnchorPane, bottomAnchorPane;
+
+    @FXML
+    private Pane notePane, barNumberPane, clickableProgressPane, colouredProgressPane;
+
+    @FXML
+    private ImageView spectrogramImage;
+
+    // Bottom
+    @FXML
+    private Button scrollButton, editNotesButton, playButton, rewindToBeginningButton;
+
+    @FXML
+    private Label currTimeLabel, totalTimeLabel;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -181,12 +241,135 @@ public class TranscriptionViewController extends SwitchableViewController {
         IconHelper.setSVGOnButton(editNotesButton, 20, IMAGE_BUTTON_LENGTH, "pencil-line");
         IconHelper.setSVGOnButton(playButton, 20, IMAGE_BUTTON_LENGTH, "play-solid");
         IconHelper.setSVGOnButton(
-                playStepBackwardButton, 20, IMAGE_BUTTON_LENGTH, "step-backward-solid"
+                rewindToBeginningButton, 20, IMAGE_BUTTON_LENGTH, "step-backward-solid"
         );
     }
 
-    // Todo add doc
-    public void setAudioAndSpectrogramData(Audio audio, SceneSwitchingData data) {
+    /**
+     * Method that sets the audio and spectrogram data for the transcription view controller.<br>
+     * This method uses the actual audio file to do the setting of the data.
+     *
+     * @param anAudio An <code>Audio</code> object that contains audio data.
+     * @param data    Scene switching data that controls whether certain tasks will be executed (e.g.
+     *                BPM estimation task).
+     */
+    public void setAudioAndSpectrogramData(Audio anAudio, SceneSwitchingData data) {
+        // Set attributes
+        audio = anAudio;
+        audioDuration = anAudio.getDuration();
+        sampleRate = anAudio.getSampleRate();
+
+        projectName = data.projectName;
+
+        // Generate spectrogram image based on audio
+        CustomTask<WritableImage> spectrogramTask = new CustomTask<WritableImage>() {
+            @Override
+            protected WritableImage call() {
+                // Todo somehow implement saving of magnitudes
+                Spectrogram spectrogram = new Spectrogram(
+                        audio, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER, BINS_PER_OCTAVE, SPECTROGRAM_HOP_LENGTH,
+                        PX_PER_SECOND, NUM_PX_PER_OCTAVE, this
+                );
+                return spectrogram.generateSpectrogram(
+                        SignalWindow.values()[DataFiles.SETTINGS_DATA_FILE.data.windowFunctionEnumOrdinal],
+                        ColourScale.values()[DataFiles.SETTINGS_DATA_FILE.data.colourScaleEnumOrdinal]
+                );
+            }
+        };
+
+        // Create an estimation task to estimate both the BPM and the music key
+        CustomTask<Pair<Double, String>> estimationTask = new CustomTask<>("Estimation Task") {
+            @Override
+            protected Pair<Double, String> call() {
+                // First estimate BPM
+                this.setMessage("Estimating BPM...");
+                double bpm;
+                if (sceneSwitchingData.estimateBPM) {
+                    bpm = BPMEstimator.estimate(audio.getMonoSamples(), sampleRate).get(0);  // Take first element
+                } else {
+                    bpm = sceneSwitchingData.manualBPM;  // Use provided BPM
+                }
+
+                // Next estimate key
+                this.setMessage("Estimating key...");
+                String key;
+                if (sceneSwitchingData.estimateMusicKey) {
+                    // Get the top 4 most likely keys
+                    List<Pair<MusicKey, Double>> mostLikelyKeys = MusicKeyEstimator.getMostLikelyKeysWithCorrelation(
+                            audio.getMonoSamples(), sampleRate, 4, this
+                    );
+
+                    // Get most likely key and its correlation
+                    Pair<MusicKey, Double> mostLikelyKeyPair = mostLikelyKeys.get(0);
+                    MusicKey mostLikelyKey = mostLikelyKeyPair.value0();
+                    double mostLikelyKeyCorr = mostLikelyKeyPair.value1();
+
+                    // Get other likely keys
+                    List<Pair<MusicKey, Double>> otherLikelyKeys = new ArrayList<>();
+                    for (Pair<MusicKey, Double> pair : mostLikelyKeys.subList(1, 4)) {
+                        if (pair.value1() >= 0.9 * mostLikelyKeyCorr) {
+                            otherLikelyKeys.add(pair);
+                        }
+                    }
+
+                    // Inform user if there are other likely keys
+                    if (otherLikelyKeys.size() != 0) {
+                        // Form the string to show user
+                        StringBuilder sb = new StringBuilder();
+                        for (Pair<MusicKey, Double> pair : otherLikelyKeys) {
+                            sb.append(pair.value0().name).append(": ").append(MathUtils.round(pair.value1(), 3))
+                                    .append("\n");
+                        }
+
+                        // Show alert
+                        Platform.runLater(() -> Popups.showInformationAlert(
+                                rootPane.getScene().getWindow(),
+                                "Music Key Estimation Found Other Possible Keys",
+                                "Most likely music key, with decreasing correlation:\n" +
+                                        mostLikelyKey.name + ": " + MathUtils.round(mostLikelyKeyCorr, 3) + "\n" +
+                                        sb + "\n" +
+                                        "We will select " + mostLikelyKey.name + " as the key of the audio file."
+                        ));
+                    }
+
+                    // Return the most likely key
+                    key = mostLikelyKey.name;
+                } else {
+                    key = sceneSwitchingData.musicKeyString;
+                }
+
+                // Now return them both as a pair
+                return new Pair<>(bpm, key);
+            }
+        };
+
+        // Todo implement
+//        // Set up tasks
+//        setupSpectrogramTask(spectrogramTask, "Generating spectrogram...");
+//        setupEstimationTask(estimationTask);
+//
+//        // Start the tasks
+//        startTasks(spectrogramTask, estimationTask);
+    }
+
+    /**
+     * Method that sets the audio and spectrogram data for the transcription view controller.<br>
+     * This method uses existing data (provided in <code>qTransformData</code> and
+     * <code>audioData</code>) to do the setting of the data.
+     *
+     * @param qTransformData The Q-Transform data that will be used to set the spectrogram data.
+     * @param audioData      The audio data that will be used for audio playback.
+     * @throws IOException                   If the audio file path that was provided in
+     *                                       <code>audioData</code> points to a file that is invalid
+     *                                       (or does not exist).
+     * @throws FFmpegNotFoundException       If the FFmpeg binary could not be found.
+     * @throws UnsupportedAudioFileException If the audio file path that was provided in
+     *                                       <code>audioData</code> points to an invalid audio file.
+     * @throws AudioTooLongException         If the audio file is too long.
+     */
+    public void setAudioAndSpectrogramData(
+            QTransformDataObject qTransformData, AudioDataObject audioData
+    ) throws IOException, FFmpegNotFoundException, UnsupportedAudioFileException, AudioTooLongException {
         // Todo implement
     }
 
@@ -213,15 +396,15 @@ public class TranscriptionViewController extends SwitchableViewController {
         // Set the H-value of the spectrogram pane
         if (newPosX <= spectrogramAreaHalfWidth) {
             // If the `newPosX` is within the first 'half width' of the initial screen, do not scroll
-            spectrogramPane.setHvalue(0);
+            spectrogramScrollPane.setHvalue(0);
 
         } else if (newPosX >= finalWidth - spectrogramAreaHalfWidth) {
             // If the `newPosX` is within the last 'half width' of the entire spectrogram area, keep the scrolling to
             // the end
-            spectrogramPane.setHvalue(1);
+            spectrogramScrollPane.setHvalue(1);
         } else {
             // Otherwise, update the H-value accordingly so that the view is centered on the playhead
-            spectrogramPane.setHvalue(
+            spectrogramScrollPane.setHvalue(
                     (newPosX - spectrogramAreaHalfWidth) / (finalWidth - 2 * spectrogramAreaHalfWidth)
             );
         }

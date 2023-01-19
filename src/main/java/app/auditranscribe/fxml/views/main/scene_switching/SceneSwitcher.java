@@ -91,7 +91,7 @@ public class SceneSwitcher extends LoggableClass {
         if (OSMethods.getOS() != OSType.MAC) {
             Image icon = new Image(IOMethods.getInputStream("images/logo-and-banner/icon.png"));
             this.mainStage.getIcons().add(icon);
-//            this.transcriptionStage.getIcons().add(icon);
+            this.transcriptionStage.getIcons().add(icon);
         }
     }
 
@@ -159,7 +159,7 @@ public class SceneSwitcher extends LoggableClass {
      * @return Pair of values. First value is the scene switching state, and the second is the scene
      * switching data. Returns <code>null</code> if an unrecoverable exception occurs.
      */
-    private Pair<SceneSwitchingState, SceneSwitchingData> showHomepageScene() {  // Todo rename
+    private Pair<SceneSwitchingState, SceneSwitchingData> showHomepageScene() {
         try {
             // Load the FXML file into the scene
             FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL(
@@ -383,7 +383,7 @@ public class SceneSwitcher extends LoggableClass {
                     );
                     log(Level.WARNING, "Failed to make backup of '" + audtFileName + "' to '" + backupPath + "'.");
                 } else {
-                    log(Level.INFO, "Made backup of '" + audtFileName + "' to '" + backupPath + "'.");
+                    log("Made backup of '" + audtFileName + "' to '" + backupPath + "'.");
                 }
             }
 
