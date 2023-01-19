@@ -19,6 +19,7 @@
 package app.auditranscribe.utils;
 
 import app.auditranscribe.generic.exceptions.FormatException;
+import app.auditranscribe.generic.exceptions.ValueException;
 
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -161,6 +162,50 @@ public final class UnitConversionUtils {
 
         // Return it
         return logSpec;
+    }
+
+    /**
+     * Convert a power value (amplitude squared) to decibel (dB) units.
+     *
+     * @param S      Spectrogram of input powers.
+     * @param refVal Value such that the amplitude <code>abs(power)</code> is scaled relative to
+     *               <code>refVal</code> using the formula
+     *               <code>10 * log10(power / refVal)</code>.
+     * @param topDB  Threshold the output at <code>topDB</code> below the peak:<br>
+     *               <code>max(10 * log10(S / ref)) - topDB</code>.
+     * @return Spectrogram of decibel values for the given powers.
+     * @throws ValueException If the value of <code>topDB</code> is negative.
+     */
+    public static double[][] powerToDecibel(double[][] S, double refVal, double topDB) {
+        // Check that `topDB` is non-negative
+        if (topDB < 0) throw new ValueException("The threshold decibel (`topDB`) must be non-negative.");
+
+        // Compute decibel values for all powers
+        double maxDB = -Double.MAX_VALUE;
+
+        double[][] DB = new double[S.length][S[0].length];
+        for (int i = 0; i < S.length; i++) {
+            for (int j = 0; j < S[0].length; j++) {
+                // Compute the decibel value for the specific power
+                double dbVal = powerToDecibel(S[i][j], refVal);
+
+                // Update `maxDB` if necessary
+                if (dbVal > maxDB) maxDB = dbVal;
+
+                // Update decibel matrix
+                DB[i][j] = dbVal;
+            }
+        }
+
+        // Threshold the output at `topDB` below the peak
+        for (int i = 0; i < DB.length; i++) {
+            for (int j = 0; j < DB[0].length; j++) {
+                DB[i][j] = Math.max(DB[i][j], maxDB - topDB);
+            }
+        }
+
+        // Return the decibel matrix
+        return DB;
     }
 
     /**

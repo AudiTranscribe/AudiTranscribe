@@ -1,6 +1,7 @@
 package app.auditranscribe.utils;
 
 import app.auditranscribe.generic.exceptions.FormatException;
+import app.auditranscribe.generic.exceptions.ValueException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -77,12 +78,22 @@ class UnitConversionUtilsTest {
     // Audio unit conversion
     @Test
     void powerToDecibel() {
+        // With double
         assertEquals(3.010, UnitConversionUtils.powerToDecibel(2, 1), 0.001);
         assertEquals(10, UnitConversionUtils.powerToDecibel(10, 1), 0.001);
         assertEquals(10.915, UnitConversionUtils.powerToDecibel(12.345, 1), 0.001);
         assertEquals(-7.782, UnitConversionUtils.powerToDecibel(2, 12), 0.001);
         assertEquals(3.010, UnitConversionUtils.powerToDecibel(10, 5), 0.001);
         assertEquals(2.597, UnitConversionUtils.powerToDecibel(12.345, 6.789), 0.001);
+
+        // With matrix
+        assertArrayEquals(
+                new double[][]{{-60, 0}, {10, 20}, {20, 10}},
+                UnitConversionUtils.powerToDecibel(new double[][]{{0, 1}, {10, 100}, {100, 10}}, 1, 80)
+        );
+        assertThrowsExactly(ValueException.class, () -> UnitConversionUtils.powerToDecibel(
+                new double[][]{{0, 1}, {10, 100}, {100, 10}}, 1, -1
+        ));
     }
 
     @Test
