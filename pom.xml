@@ -95,16 +95,58 @@
                 </executions>
             </plugin>
 
-            <!-- Compilation plugins -->
+            <!-- Unit test plugins -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M8</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.8</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <formats>HTML,XML</formats>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Compilation & Packaging plugins -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.10.1</version>
                 <configuration>
+                    <excludes>
+                        <exclude>
+                            src/main/resources/app/auditranscribe/test-files/**
+                        </exclude>
+                        <exclude>
+                            *.svg
+                        </exclude>
+                        <exclude>
+                            *.pdf
+                        </exclude>
+                    </excludes>
                     <source>${compiler.source.version}</source>
                     <target>${compiler.target.version}</target>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
@@ -120,14 +162,65 @@
                             <launcher>AudiTranscribe</launcher>
                             <jlinkImageName>AudiTranscribe</jlinkImageName>
                             <jlinkZipName>AudiTranscribe</jlinkZipName>
-                            <mainClass>app.auditranscribe/app.auditranscribe.MainApplication
-                            </mainClass>
+                            <mainClass>AudiTranscribe/app.auditranscribe.MainApplication</mainClass>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.panteleyev</groupId>
+                <artifactId>jpackage-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <configuration>
+                    <name>AudiTranscribe</name>
+                    <vendor>AudiTranscribe Team</vendor>
+                    <description>An open-source music transcription application.</description>
+                    <copyright>© Copyright AudiTranscribe Team</copyright>
+                    <destination>target/dist</destination>
+                    <licenseFile>LICENSE</licenseFile>
+                    <module>AudiTranscribe/app.auditranscribe.MainApplication</module>
+                    <runtimeImage>target/AudiTranscribe</runtimeImage>
+                    <javaOptions>
+                        <option>-Dfile.encoding=UTF-8</option>
+                    </javaOptions>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>linux</id>
+                        <configuration>
+                            <appVersion>${project.version}</appVersion>
+                            <resourceDir>${project.basedir}/Production Assets/linux</resourceDir>
+                            <type>DEB</type>
+                            <linuxShortcut>true</linuxShortcut>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>mac</id>
+                        <configuration>
+                            <appVersion>1.0.0</appVersion> <!-- For macOS, must make version at least 1.0.0 -->
+                            <resourceDir>${project.basedir}/Production Assets/mac</resourceDir>
+                            <type>DMG</type>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>win</id>
+                        <configuration>
+                            <appVersion>${project.version}</appVersion>
+                            <resourceDir>${project.basedir}/Production Assets/win</resourceDir>
+                            <icon>${project.basedir}/Production Assets/win/AudiTranscribe.ico</icon>
+                            <type>EXE</type>
+                            <winMenu>true</winMenu>
+                            <winPerUserInstall>true</winPerUserInstall>
+                            <winShortcut>true</winShortcut>
+                            <winUpgradeUuid>AD75C1BE-77B3-4B8B-B55E-CB9C798819A2</winUpgradeUuid>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
 
+        <!-- Resources -->
         <resources>
             <resource>
                 <directory>src/main/resources</directory>

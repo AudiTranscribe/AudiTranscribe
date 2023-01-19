@@ -42,7 +42,6 @@ import app.auditranscribe.signal.windowing.SignalWindow;
 import app.auditranscribe.system.OSMethods;
 import app.auditranscribe.system.OSType;
 import app.auditranscribe.utils.MathUtils;
-import app.auditranscribe.utils.MusicUtils;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
