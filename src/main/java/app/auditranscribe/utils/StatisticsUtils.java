@@ -33,6 +33,30 @@ public final class StatisticsUtils {
     // Public methods
 
     /**
+     * Compute the sum of the array <code>x</code>.
+     *
+     * @param x Array to compute the sum of.
+     * @return The sum of the elements in the array.
+     */
+    public static double sum(double[] x) {
+        double sum = 0;
+        for (double v : x) {
+            sum += v;
+        }
+        return sum;
+    }
+
+    /**
+     * Compute the mean of an array <code>x</code>.
+     *
+     * @param x Array to compute the mean of.
+     * @return The mean of the array <code>x</code>.
+     */
+    public static double mean(double[] x) {
+        return sum(x) / x.length;
+    }
+
+    /**
      * Calculates the median of an array.
      *
      * @param array The array.

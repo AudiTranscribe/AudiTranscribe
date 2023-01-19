@@ -7,6 +7,24 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class StatisticsUtilsTest {
     @Test
+    void sum() {
+        double[] array1 = {1, 2, 3, 4, 5};
+        double[] array2 = {1, -2, 3, -4, 5, -6, 7, -8};
+
+        assertEquals(0, StatisticsUtils.sum(new double[0]));
+        assertEquals(15, StatisticsUtils.sum(array1));
+        assertEquals(-4, StatisticsUtils.sum(array2));
+    }
+
+    @Test
+    void mean() {
+        assertEquals(2.5, StatisticsUtils.mean(new double[]{1, 2, 3, 4}), 0.001);
+        assertEquals(3, StatisticsUtils.mean(new double[]{1, 2, 3, 4, 5}), 0.001);
+        assertEquals(9, StatisticsUtils.mean(new double[]{10, 8, 13, 9, 11, 14, 6, 4, 12, 7, 5}), 0.001);
+        assertEquals(7.50, StatisticsUtils.mean(new double[]{8.04, 6.95, 7.58, 8.81, 8.33, 9.96, 7.24, 4.26, 10.84, 4.82, 5.68}), 0.001);
+    }
+    
+    @Test
     void median() {
         // Define arrays
         double[] array1 = {
