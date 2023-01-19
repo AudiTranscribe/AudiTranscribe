@@ -187,6 +187,9 @@
 .root {
     -fx-background-color: background-colour-primary;
 
+    -fx-mark-color: text-colour-primary;
+    -fx-focused-mark-color: text-colour-primary;
+
     -fx-focus-color: focus-colour;
     -fx-faint-focus-color: rgba(0, 0, 0, 0);
 }

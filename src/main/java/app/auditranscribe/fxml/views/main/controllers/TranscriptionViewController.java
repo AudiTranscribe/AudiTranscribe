@@ -31,6 +31,7 @@ import app.auditranscribe.io.audt_file.base.data_encapsulators.AudioDataObject;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.QTransformDataObject;
 import app.auditranscribe.io.data_files.DataFiles;
 import app.auditranscribe.misc.CustomTask;
+import app.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
 import app.auditranscribe.music.BPMEstimator;
 import app.auditranscribe.music.MusicKey;
 import app.auditranscribe.music.MusicKeyEstimator;
@@ -41,6 +42,7 @@ import app.auditranscribe.signal.windowing.SignalWindow;
 import app.auditranscribe.system.OSMethods;
 import app.auditranscribe.system.OSType;
 import app.auditranscribe.utils.MathUtils;
+import app.auditranscribe.utils.MusicUtils;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -110,7 +112,7 @@ public class TranscriptionViewController extends SwitchableViewController {
     private Slider audioVolumeSlider, notesVolumeSlider;
 
     @FXML
-    private ChoiceBox<String> musicKeyChoice;
+    private ChoiceBox<MusicKey> musicKeyChoice;
 
     @FXML
     private ChoiceBox<TimeSignature> timeSignatureChoice;
@@ -153,6 +155,18 @@ public class TranscriptionViewController extends SwitchableViewController {
         if (OSMethods.getOS() == OSType.MAC) {
             menuBar.useSystemMenuBarProperty().set(true);
         }
+
+        // Set spinners' factories
+        bpmSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
+                BPM_RANGE.value0(), BPM_RANGE.value1(), 120, 0.1, 2
+        ));
+        offsetSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
+                OFFSET_RANGE.value0(), OFFSET_RANGE.value1(), 0, 0.01, 2
+        ));
+
+        // Set choice boxes' choices
+        for (MusicKey musicKey : MusicKey.values()) musicKeyChoice.getItems().add(musicKey);
+        for (TimeSignature signature : TimeSignature.values()) timeSignatureChoice.getItems().add(signature);
 
         // Set methods on the volume sliders
         audioVolumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {

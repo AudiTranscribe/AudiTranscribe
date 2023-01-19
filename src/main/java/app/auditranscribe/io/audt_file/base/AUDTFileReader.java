@@ -119,7 +119,9 @@ public abstract class AUDTFileReader extends LoggableClass {
             // Get the appropriate file reader objects
             return switch (fileVersion) {
                 case 0x00090002 -> new AUDTFileReader0x00090002(filepath, inputStream);
-                default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
+                default -> throw new InvalidFileVersionException(
+                        "Invalid file version '" + MiscUtils.intAsPaddedHexStr(fileVersion) + "'."
+                );
             };
         }
     }

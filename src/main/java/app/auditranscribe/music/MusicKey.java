@@ -100,22 +100,6 @@ public enum MusicKey {
     }
 
     /**
-     * Gets the names of all the music keys.
-     *
-     * @return An array of strings, containing the names of the music keys.
-     */
-    public static String[] getMusicKeyNames() {
-        int numKeys = MusicKey.values().length;
-        String[] names = new String[numKeys];
-
-        for (int i = 0; i < numKeys; i++) {
-            names[i] = MusicKey.values()[i].name;
-        }
-
-        return names;
-    }
-
-    /**
      * Obtains a list of possible keys given the offset (number of semitones from C) and whether the
      * key is minor.
      *

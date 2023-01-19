@@ -86,22 +86,22 @@
                         <Separator orientation="VERTICAL" HBox.hgrow="NEVER" />
                         <HBox alignment="CENTER" fillHeight="false" spacing="15.0" HBox.hgrow="NEVER">
                            <children>
-                              <ChoiceBox fx:id="musicKeyChoice" prefHeight="30.0">
+                              <ChoiceBox fx:id="musicKeyChoice" prefHeight="30.0" prefWidth="80.0">
                                  <tooltip>
                                     <Tooltip text="Music key" />
                                  </tooltip>
                               </ChoiceBox>
-                              <Spinner fx:id="bpmSpinner" prefHeight="30.0">
+                              <Spinner fx:id="bpmSpinner" prefHeight="30.0" prefWidth="80.0">
                                  <tooltip>
                                     <Tooltip text="Beats per minute" />
                                  </tooltip>
                               </Spinner>
-                              <ChoiceBox fx:id="timeSignatureChoice" prefHeight="30.0">
+                              <ChoiceBox fx:id="timeSignatureChoice" prefHeight="30.0" prefWidth="80.0">
                                  <tooltip>
                                     <Tooltip text="Time signature" />
                                  </tooltip>
                               </ChoiceBox>
-                              <Spinner fx:id="offsetSpinner" prefHeight="30.0">
+                              <Spinner fx:id="offsetSpinner" prefHeight="30.0" prefWidth="80.0">
                                  <tooltip>
                                     <Tooltip text="Offset" />
                                  </tooltip>
