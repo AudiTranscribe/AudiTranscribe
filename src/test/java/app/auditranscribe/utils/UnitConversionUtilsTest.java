@@ -99,6 +99,22 @@ class UnitConversionUtilsTest {
     }
 
     @Test
+    void hzToMel() {
+        assertEquals(0.9, UnitConversionUtils.hzToMel(60), 1e-5);
+        assertEquals(1.65, UnitConversionUtils.hzToMel(110), 1e-5);
+        assertEquals(3.3, UnitConversionUtils.hzToMel(220), 1e-5);
+        assertEquals(6.6, UnitConversionUtils.hzToMel(440), 1e-5);
+    }
+
+    @Test
+    void melToHz() {
+        assertEquals(60, UnitConversionUtils.melToHz(0.9), 1e-5);
+        assertEquals(110, UnitConversionUtils.melToHz(1.65), 1e-5);
+        assertEquals(220, UnitConversionUtils.melToHz(3.3), 1e-5);
+        assertEquals(440, UnitConversionUtils.melToHz(6.6), 1e-5);
+    }
+
+    @Test
     void hzToOctaves() {
         assertEquals(4, UnitConversionUtils.hzToOctaves(440), 1e-10);
         assertEquals(6.2186402865, UnitConversionUtils.hzToOctaves(2048), 1e-10);

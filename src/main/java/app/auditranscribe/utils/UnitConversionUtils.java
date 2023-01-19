@@ -182,6 +182,55 @@ public final class UnitConversionUtils {
     }
 
     /**
+     * Method that converts a frequency in Hertz (Hz) into mel frequency (mels).
+     *
+     * @param freq Frequency in Hertz.
+     * @return Frequency in mel.
+     */
+    public static double hzToMel(double freq) {
+        // Fill in the linear scale
+        double fMin = 0;
+        double fSp = 200. / 3;
+        double mel = (freq - fMin) / fSp;
+
+        // And now the log-scale
+        double minLogHz = 1000.;                     // Beginning of log region (Hz)
+        double minLogMel = (minLogHz - fMin) / fSp;
+        double logstep = 0.06875177742094912;        // Step size for log region, equals `Math.log(6.4) / 27` to 16 sf
+
+        if (freq >= minLogHz) {
+            mel = minLogMel + Math.log(freq / minLogHz) / logstep;
+        }
+
+        // Return the final mel value
+        return mel;
+    }
+
+    /**
+     * Method that converts a frequency in Mels into frequency in Hertz (Hz).
+     *
+     * @param mel Frequency in Mel.
+     * @return Frequency in Hertz.
+     */
+    public static double melToHz(double mel) {
+        // Fill in the linear scale
+        double fMin = 0;
+        double fSp = 200. / 3;
+        double freq = fMin + fSp * mel;
+
+        // And now the log-scale
+        double minLogHz = 1000.;                     // Beginning of log region (Hz)
+        double minLogMel = (minLogHz - fMin) / fSp;
+        double logstep = 0.06875177742094912;        // Step size for log region, equals `Math.log(6.4) / 27` to 16 sf
+
+        if (mel >= minLogMel) {
+            freq = minLogHz * Math.exp(logstep * (mel - minLogMel));
+        }
+
+        return freq;
+    }
+
+    /**
      * Method that converts a frequency in Hertz (Hz) into (fractional) octave numbers.<br>
      * This method assumes that there is no tuning deviation from A440 (i.e.
      * <code>tuning = 0</code>).

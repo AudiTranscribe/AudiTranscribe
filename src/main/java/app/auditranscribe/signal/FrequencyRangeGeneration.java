@@ -18,6 +18,8 @@
 
 package app.auditranscribe.signal;
 
+import app.auditranscribe.utils.UnitConversionUtils;
+
 /**
  * Handles the calculation of center frequencies of some signal algorithms.
  */
@@ -67,5 +69,35 @@ public final class FrequencyRangeGeneration {
         }
 
         return frequencies;
+    }
+
+    /**
+     * Compute an array of acoustic frequencies tuned to the mel scale.
+     *
+     * @param numMels Number of mel bins.
+     * @param minFreq Minimum frequency (in Hz).
+     * @param maxFreq Maximum frequency (in Hz).
+     * @return Array of acoustic frequencies tuned to the mel scale.
+     */
+    public static double[] melFreqBins(int numMels, double minFreq, double maxFreq) {
+        // Convert the min and max frequencies to mel
+        double minMel = UnitConversionUtils.hzToMel(minFreq);
+        double maxMel = UnitConversionUtils.hzToMel(maxFreq);
+
+        // Define normalization factor
+        double normFactor = (maxMel - minMel) / (numMels - 1);
+
+        // Define the output mel matrix
+        double[] melBins = new double[numMels];
+        for (int i = 0; i < numMels; i++) {
+            // Compute the current mel value
+            double mel = minMel + normFactor * i;
+
+            // Convert that mel value into Hz and add to the array
+            melBins[i] = UnitConversionUtils.melToHz(mel);
+        }
+
+        // Return the array of mel bins
+        return melBins;
     }
 }

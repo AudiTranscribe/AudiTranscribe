@@ -44,6 +44,8 @@ module AudiTranscribe {
     exports app.auditranscribe.io.exceptions;
     exports app.auditranscribe.misc;
     exports app.auditranscribe.signal;
+    exports app.auditranscribe.signal.feature_extraction;
+    exports app.auditranscribe.signal.representations;
     exports app.auditranscribe.signal.resampling_filters;
     exports app.auditranscribe.signal.windowing;
 

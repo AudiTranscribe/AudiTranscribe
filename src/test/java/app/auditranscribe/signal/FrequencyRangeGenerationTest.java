@@ -75,4 +75,34 @@ class FrequencyRangeGenerationTest {
         assertArrayEquals(correctFreqBins2, freqBins2, 1e-5);
         assertArrayEquals(correctFreqBins3, freqBins3, 1e-5);
     }
+
+    @Test
+    void melFreqBins() {
+        // Get the generated frequency bins
+        double[] freqBins1 = FrequencyRangeGeneration.melFreqBins(40, 0, 11025);
+        double[] freqBins2 = FrequencyRangeGeneration.melFreqBins(10, 512, 4096);
+
+        // Define correct frequency bins (using Librosa)
+        double[] correctFreqBins1 = {
+                0., 85.317, 170.635, 255.952,
+                341.269, 426.586, 511.904, 597.221,
+                682.538, 767.855, 853.173, 938.49,
+                1024.856, 1119.114, 1222.042, 1334.436,
+                1457.167, 1591.187, 1737.532, 1897.337,
+                2071.84, 2262.393, 2470.47, 2697.686,
+                2945.799, 3216.731, 3512.582, 3835.643,
+                4188.417, 4573.636, 4994.285, 5453.621,
+                5955.205, 6502.92, 7101.009, 7754.107,
+                8467.272, 9246.028, 10096.408, 11025.
+        };
+        double[] correctFreqBins2 = {
+                512., 718.13865968, 924.27731935, 1143.95888821,
+                1414.93125114, 1750.08950592, 2164.63752303, 2677.38055126,
+                3311.57828504, 4096.
+        };
+
+        // Assertions
+        assertArrayEquals(correctFreqBins1, freqBins1, 1e-3);
+        assertArrayEquals(correctFreqBins2, freqBins2, 1e-3);
+    }
 }
