@@ -1,5 +1,6 @@
 package app.auditranscribe.utils;
 
+import app.auditranscribe.generic.exceptions.LengthException;
 import app.auditranscribe.generic.tuples.Pair;
 import org.junit.jupiter.api.Test;
 
@@ -77,5 +78,67 @@ class StatisticsUtilsTest {
 
         assertArrayEquals(new double[]{1, 2, 3, 4, 5}, TypeConversionUtils.toDoubleArray(bins3), 1e-5);
         assertArrayEquals(new int[]{0, 0, 0, 0}, TypeConversionUtils.toIntegerArray(counts3));
+    }
+
+    @Test
+    void cov() {
+        // Test 1
+        double[] x1 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        double[] y1 = {5, 6, 7, 8, 9, 10, 11, 12, 13, 14};
+        double[][] cov1 = StatisticsUtils.cov(x1, y1);
+
+        assertArrayEquals(new double[]{9.16667, 9.16667}, cov1[0], 1e-5);
+        assertArrayEquals(new double[]{9.16667, 9.16667}, cov1[1], 1e-5);
+
+        // Test 2
+        double[] x2 = {1, -1, 2, -2, 0};
+        double[] y2 = {-1, 1, -2, 2, 0};
+        double[][] cov2 = StatisticsUtils.cov(x2, y2);
+
+        assertArrayEquals(new double[]{2.5, -2.5}, cov2[0], 1e-5);
+        assertArrayEquals(new double[]{-2.5, 2.5}, cov2[1], 1e-5);
+
+        // Test 3
+        double[] x3 = {-2, -1, 0, 1, 2};
+        double[] y3 = {4, 1, 0, 1, 4};
+        double[][] cov3 = StatisticsUtils.cov(x3, y3);
+
+        assertArrayEquals(new double[]{2.5, 0}, cov3[0], 1e-5);
+        assertArrayEquals(new double[]{0, 3.5}, cov3[1], 1e-5);
+
+        // Test exceptions
+        assertThrowsExactly(LengthException.class, () -> StatisticsUtils.cov(new double[0], y1));
+        assertThrowsExactly(LengthException.class, () -> StatisticsUtils.cov(x1, new double[0]));
+        assertThrowsExactly(LengthException.class, () -> StatisticsUtils.cov(new double[0], new double[0]));
+
+        assertThrowsExactly(LengthException.class, () -> StatisticsUtils.cov(x1, y2));
+        assertThrowsExactly(LengthException.class, () -> StatisticsUtils.cov(x2, y1));
+    }
+
+    @Test
+    void corrcoef() {
+        // Test 1
+        double[] x1 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        double[] y1 = {5, 6, 7, 8, 9, 10, 11, 12, 13, 14};
+        double[][] r1 = StatisticsUtils.corrcoef(x1, y1);
+
+        assertArrayEquals(new double[]{1, 1}, r1[0], 1e-5);
+        assertArrayEquals(new double[]{1, 1}, r1[1], 1e-5);
+
+        // Test 2
+        double[] x2 = {1, -1, 2, -2, 0};
+        double[] y2 = {-1, 1, -2, 2, 0};
+        double[][] r2 = StatisticsUtils.corrcoef(x2, y2);
+
+        assertArrayEquals(new double[]{1, -1}, r2[0], 1e-5);
+        assertArrayEquals(new double[]{-1, 1}, r2[1], 1e-5);
+
+        // Test 3
+        double[] x3 = {-2, -1, 0, 1, 2};
+        double[] y3 = {4, 1, 0, 1, 4};
+        double[][] r3 = StatisticsUtils.corrcoef(x3, y3);
+
+        assertArrayEquals(new double[]{1, 0}, r3[0], 1e-5);
+        assertArrayEquals(new double[]{0, 1}, r3[1], 1e-5);
     }
 }

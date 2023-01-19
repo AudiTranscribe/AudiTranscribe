@@ -18,6 +18,7 @@
 
 package app.auditranscribe.utils;
 
+import app.auditranscribe.generic.exceptions.LengthException;
 import app.auditranscribe.generic.tuples.Pair;
 
 import java.util.Arrays;
@@ -125,5 +126,86 @@ public final class StatisticsUtils {
         }
 
         return new Pair<>(counts, TypeConversionUtils.toDoubleArray(bins));
+    }
+
+    /**
+     * Estimate a covariance matrix, given data and weights.
+     *
+     * @param x First array, containing observations of the random variable <em>X</em>.
+     * @param y Second array, containing observations of the random variable <em>Y</em>.
+     * @return A 2x2 matrix, representing the covariance matrix of <em>X</em> and <em>Y</em>.
+     * @implNote See <a href="https://numpy.org/doc/stable/reference/generated/numpy.cov.html">
+     * Numpy's Implementation</a> of the <code>cov</code> method.
+     */
+    public static double[][] cov(double[] x, double[] y) {
+        // The delta degrees of freedom is 1
+        int ddof = 1;
+
+        // Ensure that `x` and `y` have elements
+        if (x.length == 0 || y.length == 0) {
+            throw new LengthException("The arrays must have elements inside them.");
+        }
+
+        // Ensure that both `x` and `y` have the same length
+        if (x.length != y.length) {
+            throw new LengthException("The arrays must have the same length.");
+        }
+
+        // Form the joined matrix for processing
+        int n = x.length;
+        double[][] M = new double[2][n];
+        for (int i = 0; i < n; i++) {
+            M[0][i] = x[i];
+            M[1][i] = y[i];
+        }
+
+        // Compute the mean and the weight sum
+        double[] avg = new double[2];
+        avg[0] = mean(x);
+        avg[1] = mean(y);
+
+        // Determine the normalization
+        double normalizationFactor = M[0].length - ddof;
+
+        // Adjust the matrix by the mean amount
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < x.length; j++) {
+                M[i][j] -= avg[i];
+            }
+        }
+
+        // Compute the covariance matrix
+        double[][] C = MatrixUtils.matmul(M, MatrixUtils.transpose(M));
+        for (int i = 0; i < C.length; i++) {
+            for (int j = 0; j < C[i].length; j++) {
+                C[i][j] /= normalizationFactor;
+            }
+        }
+
+        return C;
+    }
+
+    /**
+     * Return Pearson product-moment correlation coefficients.
+     *
+     * @param x First array, containing observations of the random variable <em>X</em>.
+     * @param y Second array, containing observations of the random variable <em>Y</em>.
+     * @return The correlation coefficient matrix of the variables.
+     * @implNote See <a href="https://numpy.org/doc/stable/reference/generated/numpy.corrcoef.html">
+     * Numpy's Implementation</a> of the <code>corrcoeff</code> method.
+     */
+    public static double[][] corrcoef(double[] x, double[] y) {
+        // Compute the covariance matrix first
+        double[][] C = cov(x, y);
+
+        // Compute the correlation coefficients
+        double[][] R = new double[C.length][C[0].length];
+        for (int i = 0; i < C.length; i++) {
+            for (int j = 0; j < C[0].length; j++) {
+                R[i][j] = (C[i][j]) / (Math.sqrt(C[i][i] * C[j][j]));
+            }
+        }
+
+        return R;
     }
 }
