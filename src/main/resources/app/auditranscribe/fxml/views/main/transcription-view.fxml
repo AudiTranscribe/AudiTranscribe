@@ -19,7 +19,6 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.shape.SVGPath?>
 
 <AnchorPane fx:id="rootPane" prefHeight="550.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.auditranscribe.fxml.views.main.controllers.TranscriptionViewController">
    <children>
@@ -92,17 +91,11 @@
                                     <Tooltip text="Music key" />
                                  </tooltip>
                               </ChoiceBox>
-                              <HBox spacing="3.0">
-                                 <children>
-                                    <SVGPath fx:id="bpmNoteSVG" content="M40,60 C42,48 44,30 25,32" />
-                                    <Label prefHeight="30.0" text="=" />
-                                    <Spinner fx:id="bpmSpinner" prefHeight="30.0">
-                                       <tooltip>
-                                          <Tooltip text="Beats per minute" />
-                                       </tooltip>
-                                    </Spinner>
-                                 </children>
-                              </HBox>
+                              <Spinner fx:id="bpmSpinner" prefHeight="30.0">
+                                 <tooltip>
+                                    <Tooltip text="Beats per minute" />
+                                 </tooltip>
+                              </Spinner>
                               <ChoiceBox fx:id="timeSignatureChoice" prefHeight="30.0">
                                  <tooltip>
                                     <Tooltip text="Time signature" />

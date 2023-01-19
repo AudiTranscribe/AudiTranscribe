@@ -50,7 +50,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.shape.SVGPath;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
@@ -109,9 +108,6 @@ public class TranscriptionViewController extends SwitchableViewController {
 
     @FXML
     private Slider audioVolumeSlider, notesVolumeSlider;
-
-    @FXML
-    private SVGPath bpmNoteSVG;
 
     @FXML
     private ChoiceBox<String> musicKeyChoice;
