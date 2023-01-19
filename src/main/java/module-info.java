@@ -45,6 +45,7 @@ module AudiTranscribe {
     exports app.auditranscribe.misc;
     exports app.auditranscribe.signal;
     exports app.auditranscribe.signal.feature_extraction;
+    exports app.auditranscribe.signal.onset_detection;
     exports app.auditranscribe.signal.representations;
     exports app.auditranscribe.signal.resampling_filters;
     exports app.auditranscribe.signal.time_domain_processing;

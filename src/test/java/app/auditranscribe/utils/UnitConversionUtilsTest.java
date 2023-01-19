@@ -131,4 +131,80 @@ class UnitConversionUtilsTest {
         assertEquals(6.2186402865, UnitConversionUtils.hzToOctaves(2048), 1e-10);
         assertEquals(8.8102795025, UnitConversionUtils.hzToOctaves(12345), 1e-10);
     }
+
+    // Time unit conversion
+    @Test
+    void timeToSamples() {
+        // Define times arrays
+        double[] times1 = {0., 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
+        double[] times2 = {1., 1.25, 1.5, 1.75, 2., 2.25, 2.5, 2.75, 3., 3.25, 3.5, 3.75};
+
+        // Define correct output arrays
+        int[] correctOutput1 = {0, 2205, 4410, 6615, 8820, 11025, 13230, 15435, 17640, 19845};
+        int[] correctOutput2 = {
+                44100, 55125, 66150, 77175, 88200, 99225, 110250, 121275, 132300, 143325, 154350, 165375
+        };
+
+        // Run tests
+        assertArrayEquals(correctOutput1, UnitConversionUtils.timeToSamples(times1, 22050));
+        assertArrayEquals(correctOutput2, UnitConversionUtils.timeToSamples(times2, 44100));
+    }
+
+    @Test
+    void samplesToFrames() {
+        // Define samples arrays
+        int[] samples1 = {
+                0, 256, 512, 768, 1024, 1280, 1536, 1792, 2048,
+                2304, 2560, 2816, 3072, 3328, 3584, 3840, 4096, 4352,
+                4608, 4864, 5120, 5376, 5632, 5888, 6144, 6400, 6656,
+                6912, 7168, 7424, 7680, 7936, 8192, 8448, 8704, 8960,
+                9216, 9472, 9728, 9984, 10240, 10496, 10752, 11008, 11264,
+                11520, 11776, 12032, 12288, 12544, 12800, 13056, 13312, 13568,
+                13824, 14080, 14336, 14592, 14848, 15104, 15360, 15616, 15872,
+                16128, 16384, 16640, 16896, 17152, 17408, 17664, 17920, 18176,
+                18432, 18688, 18944, 19200, 19456, 19712, 19968, 20224, 20480,
+                20736, 20992, 21248, 21504, 21760, 22016
+        };
+        int[] samples2 = {
+                22050, 23074, 24098, 25122, 26146, 27170, 28194, 29218, 30242,
+                31266, 32290, 33314, 34338, 35362, 36386, 37410, 38434, 39458,
+                40482, 41506, 42530, 43554
+        };
+
+        // Define correct output arrays
+        int[] correctOutput1 = {
+                0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6,
+                7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13,
+                14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 20, 20,
+                21, 21, 22, 22, 23, 23, 24, 24, 25, 25, 26, 26, 27, 27,
+                28, 28, 29, 29, 30, 30, 31, 31, 32, 32, 33, 33, 34, 34,
+                35, 35, 36, 36, 37, 37, 38, 38, 39, 39, 40, 40, 41, 41,
+                42, 42, 43
+        };
+        int[] correctOutput2 = {
+                84, 88, 92, 96, 100, 104, 108, 112, 116, 120, 124, 128, 132,
+                136, 140, 144, 148, 152, 156, 160, 164, 168
+        };
+
+        // Run tests
+        assertArrayEquals(correctOutput1, UnitConversionUtils.samplesToFrames(samples1, 512, 0));
+        assertArrayEquals(correctOutput2, UnitConversionUtils.samplesToFrames(samples2, 256, 1024));
+    }
+
+    @Test
+    void timeToFrames() {
+        // Define times arrays
+        double[] times1 = {0., 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
+        double[] times2 = {1., 1.25, 1.5, 1.75, 2., 2.25, 2.5, 2.75, 3., 3.25, 3.5, 3.75};
+
+        // Define correct output arrays
+        int[] correctOutput1 = {0, 4, 8, 12, 17, 21, 25, 30, 34, 38};
+        int[] correctOutput2 = {170, 213, 256, 299, 342, 385, 428, 471, 514, 557, 600, 643};
+
+        // Run tests
+        assertArrayEquals(correctOutput1, UnitConversionUtils.timeToFrames(times1, 22050, 512));
+        assertArrayEquals(correctOutput2, UnitConversionUtils.timeToFrames(
+                times2, 44100, 256, 1024
+        ));
+    }
 }

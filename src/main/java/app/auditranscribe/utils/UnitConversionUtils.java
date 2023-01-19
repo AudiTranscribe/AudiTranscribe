@@ -286,4 +286,71 @@ public final class UnitConversionUtils {
     public static double hzToOctaves(double hz) {
         return MathUtils.log2(hz) - 4.781359713524660;  // log2(hz) + log2(16/440), to 16 sf
     }
+
+    // Time unit conversion
+
+    /**
+     * Method that converts timestamps (in seconds) to sample indices.
+     *
+     * @param times      Timestamps (in seconds) to convert.
+     * @param sampleRate Sample rate of the audio.
+     * @return Sample indices corresponding to the given timestamps.
+     * @see <a href="https://bit.ly/3N4JoUe">Librosa's Implementation</a> of this method.
+     */
+    public static int[] timeToSamples(double[] times, double sampleRate) {
+        int[] samples = new int[times.length];
+        for (int i = 0; i < times.length; i++) {
+            samples[i] = (int) Math.round(times[i] * sampleRate);
+        }
+        return samples;
+    }
+
+    /**
+     * Method that converts sample indices into STFT frames.
+     *
+     * @param samples   Sample indices to convert.
+     * @param hopLength Hop length of the STFT.
+     * @param numFFT    Number of FFT bins.
+     * @return STFT frames corresponding to the given sample indices.
+     */
+    public static int[] samplesToFrames(int[] samples, int hopLength, int numFFT) {
+        // Compute offset value
+        int offset = Math.floorDiv(numFFT, 2);
+
+        // Compute frame indices
+        int[] frames = new int[samples.length];
+        for (int i = 0; i < samples.length; i++) {
+            frames[i] = Math.floorDiv(samples[i] - offset, hopLength);
+        }
+        return frames;
+    }
+
+    /**
+     * Method that converts time stamps into STFT frames.
+     *
+     * @param times      Timestamps to convert.
+     * @param sampleRate Sample rate of the audio.
+     * @param hopLength  Hop length of the STFT.
+     * @return STFT frames corresponding to the given timestamps.
+     */
+    public static int[] timeToFrames(double[] times, double sampleRate, int hopLength) {
+        return timeToFrames(times, sampleRate, hopLength, 0);
+    }
+
+    /**
+     * Method that converts time stamps into STFT frames.
+     *
+     * @param times      Timestamps to convert.
+     * @param sampleRate Sample rate of the audio.
+     * @param hopLength  Hop length of the STFT.
+     * @param numFFT     Number of FFT bins.
+     * @return STFT frames corresponding to the given timestamps.
+     */
+    public static int[] timeToFrames(double[] times, double sampleRate, int hopLength, int numFFT) {
+        // Convert time to samples
+        int[] samples = timeToSamples(times, sampleRate);
+
+        // Then convert the samples into frames
+        return samplesToFrames(samples, hopLength, numFFT);
+    }
 }
