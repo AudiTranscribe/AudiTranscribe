@@ -1,4 +1,4 @@
-name: Create Release
+name: Generate Release Artifacts
 
 on:
   push:
@@ -23,7 +23,7 @@ jobs:
     with:
       branch: "staging"
 
-  # Release
+  # Upload artifacts
   release:
     name: Release
     needs: [ build_installer_windows, build_installer_mac, build_installer_linux ]
@@ -59,9 +59,14 @@ jobs:
           (sha256sum Windows-Installer.zip | cut -d " " -f1) > Windows-Installer.sha256
           (sha256sum macOS-Installer.zip | cut -d " " -f1) > macOS-Installer.sha256
           (sha256sum Linux-Installer.zip | cut -d " " -f1) > Linux-Installer.sha256
-      - name: Setup Semantic Release
-        run: npm install -g semantic-release @semantic-release/git @semantic-release/changelog @semantic-release/github -D
-      - name: Release To GitHub
-        run: npx semantic-release --ci
-        env:
-          GITHUB_TOKEN: ${{ secrets.SEMVER_GITHUB_TOKEN }}
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: Release-Artifacts
+          path: |
+            Windows-Installer.zip
+            Windows-Installer.sha256
+            macOS-Installer.zip
+            macOS-Installer.sha256
+            Linux-Installer.zip
+            Linux-Installer.sha256
