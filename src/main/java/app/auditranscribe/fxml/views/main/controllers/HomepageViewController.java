@@ -20,6 +20,7 @@ package app.auditranscribe.fxml.views.main.controllers;
 
 import app.auditranscribe.fxml.IconHelper;
 import app.auditranscribe.fxml.Popups;
+import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitchingData;
 import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitchingState;
 import app.auditranscribe.generic.tuples.Pair;
 import app.auditranscribe.generic.tuples.Quadruple;
@@ -261,21 +262,19 @@ public class HomepageViewController extends SwitchableViewController {
      * @param actionEvent Event that triggered this function.
      */
     private void handleNewProject(ActionEvent actionEvent) {
-        // Todo add
-        log("handleNewProject");
-//        // Get the scene switching data
-//        Pair<Boolean, SceneSwitchingData> pair = ProjectSetupViewController.showProjectSetupView();
-//        boolean shouldProceed = pair.value0();
-//        sceneSwitchingData = pair.value1();
-//
-//        // Specify the scene switching state
-//        if (shouldProceed) {
-//            // Signal the creation of a new project
-//            sceneSwitchingState = SceneSwitchingState.NEW_PROJECT;
-//
-//            // Close this stage
-//            ((Stage) rootPane.getScene().getWindow()).close();
-//        }
+        // Get the scene switching data
+        Pair<Boolean, SceneSwitchingData> pair = ProjectSetupViewController.showProjectSetupView();
+        boolean shouldProceed = pair.value0();
+        sceneSwitchingData = pair.value1();
+
+        // Specify the scene switching state
+        if (shouldProceed) {
+            // Signal the creation of a new project
+            sceneSwitchingState = SceneSwitchingState.NEW_PROJECT;
+
+            // Close this stage
+            ((Stage) rootPane.getScene().getWindow()).close();
+        }
     }
 
     /**

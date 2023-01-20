@@ -25,5 +25,11 @@
     seperator-colour: rgb(30, 30, 30);
     stroke-colour: rgb(235, 235, 235);
 
+    radio-button-background-colour: slider-thumb-colour;
+    radio-button-border-colour: rgb(160, 160, 160);
+    radio-button-dot-colour: text-colour-primary;
+
+    error-border-colour: rgb(240, 85, 85);
+
     focus-colour: rgb(30, 120, 210);
 }

@@ -30,7 +30,8 @@
 .button {
     -fx-background-color: button-default-colour;
     -fx-background-insets: 0 0 -1 0, 0, 1, 2;
-    -fx-background-radius: 3px, 3px, 2px, 1px;
+    -fx-background-radius: 3px;
+    -fx-border-radius: 3px;
     -fx-text-fill: text-colour-primary;
 }
 
@@ -124,6 +125,7 @@
     -fx-font-size: 10pt;
     -fx-text-fill: text-colour-primary;
     -fx-prompt-text-fill: text-colour-secondary;
+    -fx-border-radius: 5px;
 }
 
 /* Scrollbar */
@@ -181,6 +183,29 @@
 .svg-path {
     -fx-stroke: stroke-colour;
     -fx-fill: stroke-colour;
+}
+
+/* Radio Buttons */
+.radio-button {
+    -fx-text-fill: text-colour-secondary;
+}
+
+.radio-button .radio {
+    -fx-background-color: radio-button-background-colour;
+    -fx-padding: 5px;
+    -fx-border-radius: 50%;
+    -fx-border-width: 1px;
+    -fx-border-color: radio-button-border-colour;
+}
+
+.radio-button .dot {
+    -fx-background-radius: 50%;
+    -fx-padding: 4px;
+}
+
+.radio-button:selected .dot {
+    -fx-translate-y: -1px; /* Weird correction factor but whatever */
+    -fx-background-color: radio-button-dot-colour;
 }
 
 /* Other setup */

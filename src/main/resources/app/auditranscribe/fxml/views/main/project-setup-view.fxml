@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane fx:id="rootPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.auditranscribe.fxml.views.main.controllers.ProjectSetupViewController">
+   <children>
+      <VBox spacing="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
+         <children>
+            <VBox>
+               <children>
+                  <Label alignment="CENTER_RIGHT" styleClass="subheading-label" text="Project Name" />
+                  <TextField fx:id="projectNameField" prefHeight="30.0" prefWidth="300.0" />
+               </children>
+            </VBox>
+            <VBox>
+               <children>
+                  <Label alignment="TOP_RIGHT" styleClass="subheading-label" text="Audio File" />
+                  <HBox prefHeight="30.0" prefWidth="300.0" spacing="5.0">
+                     <children>
+                        <Button fx:id="selectAudioFileButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Select File" />
+                        <Label fx:id="audioFileLabel" prefHeight="30.0" text="No file selected." />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <HBox spacing="5.0">
+               <children>
+                  <VBox spacing="10.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <VBox>
+                           <children>
+                              <Label alignment="TOP_CENTER" styleClass="subheading-label" text="Beats Per Minute (BPM)" textAlignment="RIGHT" textOverrun="WORD_ELLIPSIS" wrapText="true" />
+                              <VBox fillWidth="false">
+                                 <children>
+                                    <RadioButton fx:id="bpmEstimateAutomatically" mnemonicParsing="false" selected="true" text="Estimate BPM automatically" />
+                                    <HBox prefHeight="30.0" spacing="5.0">
+                                       <children>
+                                          <RadioButton fx:id="bpmSpecifyManually" mnemonicParsing="false" prefHeight="30.0" text="Specify manually:" />
+                                          <Spinner fx:id="bpmManualSpinner" editable="true" prefHeight="30.0" prefWidth="80.0" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </VBox>
+                     </children>
+                  </VBox>
+                  <VBox layoutX="10.0" layoutY="10.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <VBox>
+                           <children>
+                              <Label alignment="TOP_CENTER" styleClass="subheading-label" text="Music Key" textAlignment="RIGHT" textOverrun="WORD_ELLIPSIS" wrapText="true" />
+                              <VBox fillWidth="false" spacing="5.0">
+                                 <children>
+                                    <RadioButton fx:id="musicKeyEstimateAutomatically" mnemonicParsing="false" selected="true" text="Estimate music key automatically" />
+                                    <HBox prefHeight="30.0" spacing="5.0">
+                                       <children>
+                                          <RadioButton fx:id="musicKeySpecifyManually" mnemonicParsing="false" prefHeight="30.0" text="Specify manually:" />
+                                          <ChoiceBox fx:id="musicKeyChoiceBox" prefHeight="30.0" prefWidth="80.0" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </VBox>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      <HBox alignment="CENTER" prefHeight="30.0" prefWidth="200.0" spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0">
+         <children>
+            <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" prefHeight="30.0" prefWidth="150.0" text="Cancel" HBox.hgrow="ALWAYS" />
+            <Button fx:id="createButton" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="150.0" styleClass="ok-button" text="Create" HBox.hgrow="ALWAYS" />
+         </children>
+      </HBox>
+   </children>
+   <stylesheets>
+      <URL value="@../../css/base.css" />
+      <URL value="@../../css/views/main/project-setup.css" />
+      <URL value="@../../css/theme/light.css" />
+   </stylesheets>
+</AnchorPane>
