@@ -25,7 +25,7 @@ jobs:
 
   # Upload artifacts
   release:
-    name: Release
+    name: Upload Artifacts
     needs: [ build_installer_windows, build_installer_mac, build_installer_linux ]
     runs-on: ubuntu-latest
     steps:
