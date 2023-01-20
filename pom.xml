@@ -11,15 +11,15 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <junit.version>5.9.1</junit.version>
-        <javafx.version>19</javafx.version>
+        <junit.version>5.9.2</junit.version>
+        <javafx.version>19.0.2</javafx.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.10</version>
+            <version>2.10.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
