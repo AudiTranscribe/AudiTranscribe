@@ -1,5 +1,41 @@
 # AudiTranscribe Changelog
 
+## [0.10.0](https://github.com/AudiTranscribe/AudiTranscribe/compare/v0.9.3...v0.10.0) (2023-01-20)
+
+This release comes with some changes and a minor feature addition.
+
+### Additions
+
+- Added a debug mode for developers.
+
+### Changes
+
+- Deprecate the use of API for setup wizard (see below).
+
+### Removals
+
+- Removed API server dependence; now queries GitHub for the latest versions.
+- Removed unused packages and imports.
+- Remove unneeded schedulers in the transcription view.
+    - This should help reduce lag in that view.
+
+### Bugfixes
+
+- Fix download data attributes.
+- Fix weird sizing of preferences view buttons.
+- Fix run configurations.
+- Fix imports in some tests.
+- Fix incorrect resources folder path.
+
+### Technical Changes
+
+- Renamed the main package from `site.overwrite.auditranscribe` to `app.auditranscribe`.
+- Use an abstract setup wizard view class to reduce code complexity.
+- Merged the `main_views` and `setup_wizard` views into one package.
+    - This should help reduce clutter and make things easier to find.
+- Renamed `IconHelpers` to `IconHelper`.
+- Update the "stale" CI action.
+
 ## [0.9.3](https://github.com/AudiTranscribe/AudiTranscribe/compare/v0.9.2...v0.9.3) (2022-11-16)
 
 This release is a hotfix for a critical bug.
