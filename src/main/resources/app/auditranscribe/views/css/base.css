@@ -1,0 +1,234 @@
+/* IMPORT FONTS */
+@font-face {
+    font-family: "Roboto";
+    font-style: normal;
+    font-weight: 400;
+    src: url("../fonts/Roboto-Regular.ttf");
+}
+
+@font-face {
+    font-family: "Roboto";
+    font-style: bold;
+    font-weight: 700;
+    src: url("../fonts/Roboto-Bold.ttf");
+}
+
+@font-face {
+    font-family: "Roboto";
+    font-style: italic;
+    font-weight: 400;
+    src: url("../fonts/Roboto-Italic.ttf");
+}
+
+/* GENERAL STYLING */
+/* Fonts Setup */
+* {
+    -fx-font-family: "Roboto", "Arial", "Open Sans", sans-serif;
+}
+
+/* Buttons */
+.button, .button:hover {
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+
+.image-button {
+    -fx-background-color: transparent;
+}
+
+.image-button:hover {
+    -fx-background-color: -fx-shadow-highlight-color, -fx-outer-border, -fx-inner-border, -fx-body-color;
+    -fx-background-insets: 0 0 -1 0, 0, 1, 2;
+    -fx-background-radius: 3px, 3px, 2px, 1px;
+}
+
+/* Hyperlinks */
+.hyperlink, .hyperlink:hover {
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+
+.hyperlink:focused {
+    -fx-border-color: #00000000;
+}
+
+/* MAIN PAGE */
+/* Labels and Texts */
+.title-label {
+    -fx-font-size: 64px;
+    -fx-font-weight: bold;
+}
+
+.version-label {
+    -fx-font-size: 22px;
+}
+
+.project-name-label, .last-opened-date-label, .filepath-label, .short-name-text {
+    -fx-text-overrun: ellipsis;
+}
+
+.project-name-label {
+    -fx-pref-width: 370px;
+    -fx-max-width: 375px;
+    -fx-text-alignment: left;
+}
+
+.last-opened-date-label {
+    -fx-pref-width: 220px;
+    -fx-max-width: 225px;
+    -fx-text-alignment: right;
+}
+
+.filepath-label {
+    -fx-pref-width: 595px;
+    -fx-max-width: 600px;
+}
+
+.short-name-text {
+    -fx-font-size: 24pt;
+}
+
+/* Buttons */
+.main-menu-button, .main-menu-button:hover {
+    -fx-font-size: 16px;
+}
+
+.remove-project-button {
+    -fx-max-width: 40px;
+    -fx-max-height: 40px;
+}
+
+/* Others */
+.main-page-separator {
+    -fx-stroke-width: 5px;
+    -fx-stroke: #000000ff;
+}
+
+.no-projects-vbox {
+    -fx-border-width: 0;
+}
+
+.search-text-field {
+    -fx-font-size: 14px;
+}
+
+.short-name-rectangle {
+    -fx-arc-width: 25px;
+    -fx-arc-height: 25px;
+}
+
+.list-cell {
+    -fx-background-color: transparent;
+}
+
+.list-cell:empty {
+    visibility: hidden;
+}
+
+.list-cell:hover {
+    -fx-cursor: hand;
+}
+
+.project-list-cell {
+    -fx-pref-width: 765px;
+    -fx-max-width: 765px;
+}
+
+/* PROJECT SETUP PAGE */
+.requirement-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+/* TRANSCRIPTION PAGE */
+/* Labels */
+.display-label {
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+}
+
+.button-label {
+    -fx-font-size: 14px;
+}
+
+/* Spectrogram */
+.note-line {
+    -fx-stroke-width: 2px;
+    -fx-stroke-dash-array: 10 6;
+}
+
+.note-line-c {
+    -fx-stroke-dash-array: 1;
+}
+
+.beat-line, .bar-line {
+    -fx-stroke-width: 5px;
+}
+
+.bar-number-ellipse {
+    -fx-stroke-width: 1px;
+}
+
+/* Playback */
+.playhead-line {
+    -fx-stroke-width: 5px;
+}
+
+.volume-slider .track {
+    -fx-background-color: linear-gradient(to right, -slider-filled-colour 50%, -slider-unfilled-colour 50%);
+}
+
+/* Note rectangles */
+.note-rectangles-pane {
+    -fx-background-color: #00000000;
+}
+
+.note-borders-region {
+    -fx-border-width: 3px;
+    -fx-border-radius: 5px;
+    -fx-border-color: #ffa0ffff;
+}
+
+.note-main-rectangle {
+    -fx-border-radius: 5px;
+    -fx-fill: #ff80ffb0;
+}
+
+/* PREFERENCES PAGE */
+.preference-page-button, .preference-page-button:hover {
+    -fx-font-size: 13px;
+}
+
+.setting-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.setting-caption {
+    -fx-font-size: 11px;
+}
+
+/* SETUP WIZARD */
+.download-ffmpeg-label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.download-progress-label, .important-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+/* DEBUG VIEW */
+.debug-view-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.debug-list .list-cell:hover {
+    -fx-cursor: none;
+}
+
+.debug-list .list-cell:hover {
+    -fx-background-color: transparent;
+}

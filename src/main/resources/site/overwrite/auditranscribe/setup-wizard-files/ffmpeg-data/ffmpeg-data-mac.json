@@ -1,5 +1,0 @@
-{
-  "downloadPage": "download-ffmpeg?platform=macOS",
-  "signaturePage": "download-ffmpeg?platform=macOS&signature_needed=true",
-  "outputFolder": "ffmpeg/bin"
-}

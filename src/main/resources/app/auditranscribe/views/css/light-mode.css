@@ -1,0 +1,96 @@
+/* MAIN PAGE */
+/* Buttons */
+.button.error {
+    -fx-border-color: #b83434ff;
+}
+
+/* Hyperlinks */
+.hyperlink {
+    -fx-text-fill: #3172c6ff;
+}
+
+/* Text */
+.text-field.error {
+    -fx-border-color: #b83434ff;
+}
+
+/* Others */
+.no-projects-vbox {
+    -fx-background-color: #ffffffff;
+    -fx-border-color: #d3d3d3ff;
+}
+
+.short-name-rectangle {
+    -fx-stroke: #000000ff;
+}
+
+.list-cell:hover {
+    -fx-background-color: #e0e0e0ff;
+}
+
+.list-cell:selected .text {
+    -fx-fill: #000000ff;
+    -fx-text-fill: #000000ff;
+}
+
+/* TRANSCRIPTION PAGE */
+/* Labels */
+.display-label {
+    -fx-fill: #000000ff;
+}
+
+/* Spectrogram */
+.note-line, .beat-line {
+    -fx-stroke: #ffffff80;
+}
+
+.bar-line {
+    -fx-stroke: #00ff0080;
+}
+
+.bar-number-ellipse {
+    -fx-stroke: #000000ff;
+}
+
+.current-octave-rectangle {
+    -fx-fill: #ffbf0080;
+}
+
+/* Playback */
+.clickable-progress-pane {
+    -fx-background-color: #00000000;
+}
+
+.coloured-progress-pane {
+    -fx-background-color: #00bfff80;
+}
+
+.playhead-line {
+    -fx-stroke: #00bfffff;
+}
+
+.volume-slider .track {
+    -slider-unfilled-colour: #e0e0e0ff;
+    -slider-filled-colour: #6caad9ff;
+}
+
+/* PREFERENCES / PROJECT SETUP PAGE */
+/* Labels */
+.warning-label {
+    -fx-text-fill: #ff0000ff;
+}
+
+/* Buttons */
+.ok-button {
+    -fx-border-width: 1px;
+    -fx-border-color: #426ca8ff;
+    -fx-border-radius: 2px;
+    -fx-background-color: #4c8acaff;
+    -fx-text-fill: #ffffffff;
+}
+
+/* DEBUG VIEW */
+.debug-list .list-cell .text, .debug-list .list-cell:selected .text {
+    -fx-fill: #000000ff;
+    -fx-text-fill: #000000ff;
+}

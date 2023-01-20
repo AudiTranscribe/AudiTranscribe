@@ -4,22 +4,22 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>site.overwrite</groupId>
+    <groupId>app.auditranscribe</groupId>
     <artifactId>AudiTranscribe</artifactId>
-    <version>0.9.3</version>
+    <version>0.10.0</version>
     <name>AudiTranscribe</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <junit.version>5.9.1</junit.version>
-        <javafx.version>19</javafx.version>
+        <junit.version>5.9.2</junit.version>
+        <javafx.version>19.0.2</javafx.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.9.1</version>
+            <version>2.10.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -186,79 +186,25 @@
                 <configuration>
                     <excludes>
                         <exclude>
-                            site/overwrite/auditranscribe/Launcher.class
+                            app/auditranscribe/**/exceptions/**
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/MainApplication.class
+                            app/auditranscribe/io/data_files/data_encapsulators/**
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/**/exceptions/**
+                            app/auditranscribe/io/data_files/file_classes/**
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/audio/Audio.class
+                            app/auditranscribe/misc/icon/**
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/generic/exceptions/**
+                            app/auditranscribe/misc/spinners/**
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/generic/ClassWithLogging.class
+                            app/auditranscribe/music/notes/**
                         </exclude>
                         <exclude>
-                            site/overwrite/auditranscribe/io/data_files/DataFiles.class
-                        </exclude>
-                        <exclude>
-                            site/overwrite/auditranscribe/io/data_files/data_encapsulators/**
-                        </exclude>
-                        <exclude>
-                            site/overwrite/auditranscribe/io/data_files/file_classes/**
-                        </exclude>
-                        <exclude>
-                            site/overwrite/auditranscribe/io/db/ProjectsDB.class
-                        </exclude>
-                        <exclude>
-                            site/overwrite/auditranscribe/main_views/**
-                        </exclude>
-                        <exclude>
-                            site/overwrite/auditranscribe/misc/spinners/**
-                        </exclude>
-                        <exclude>
-                            site/overwrite/auditranscribe/misc/CustomTask.class
-                        </exclude>
-                        <exclude>
-                            site/overwrite/auditranscribe/misc/IconHelpers.class
-                        </exclude>
-                        <exclude>
-                            site/overwrite/auditranscribe/misc/MyLogger.class
-                        </exclude>
-                        <exclude>
-                            site/overwrite/auditranscribe/misc/Popups.class
-                        </exclude>
-                        <exclude>
-                            site/overwrite/auditranscribe/misc/Theme.class
-                        </exclude>
-                        <exclude>
-                            site/overwrite/auditranscribe/music/notes/**
-                        </exclude>
-                        <exclude>
-                            site/overwrite/auditranscribe/plotting/Plotter.class
-                        </exclude>
-                        <exclude>
-                            site/overwrite/auditranscribe/plotting/PlottingStuffHandler.class
-                        </exclude>
-                        <exclude>
-                            site/overwrite/auditranscribe/setup_wizard/**
-                        </exclude>
-                        <exclude>
-                            site/overwrite/auditranscribe/spectrogram/ColourScale.class
-                        </exclude>
-                        <exclude>
-                            site/overwrite/auditranscribe/spectrogram/Spectrogram.class
-                        </exclude>
-                        <exclude>
-                            site/overwrite/auditranscribe/utils/GUIUtils.class
-                        </exclude>
-                        <exclude>
-                            site/overwrite/auditranscribe/utils/TestingUtils.class
+                            app/auditranscribe/views/**
                         </exclude>
                     </excludes>
                 </configuration>
@@ -296,7 +242,7 @@
                             <launcher>AudiTranscribe</launcher>
                             <jlinkImageName>AudiTranscribe</jlinkImageName>
                             <jlinkZipName>AudiTranscribe</jlinkZipName>
-                            <mainClass>site.overwrite.auditranscribe/site.overwrite.auditranscribe.MainApplication
+                            <mainClass>app.auditranscribe/app.auditranscribe.MainApplication
                             </mainClass>
                         </configuration>
                     </execution>
@@ -330,7 +276,7 @@
                     <copyright>© Copyright AudiTranscribe Team</copyright>
                     <destination>target/dist</destination>
                     <licenseFile>LICENSE</licenseFile>
-                    <module>site.overwrite.auditranscribe/site.overwrite.auditranscribe.MainApplication</module>
+                    <module>app.auditranscribe/app.auditranscribe.MainApplication</module>
                     <runtimeImage>target/AudiTranscribe</runtimeImage>
                     <javaOptions>
                         <option>-Dfile.encoding=UTF-8</option>

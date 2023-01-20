@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-module site.overwrite.auditranscribe {
+module app.auditranscribe {
     requires java.desktop;
     requires java.sql;
 
@@ -34,43 +34,42 @@ module site.overwrite.auditranscribe {
     requires javafx.swing;
     requires javafx.web;
 
-    exports site.overwrite.auditranscribe;
-    exports site.overwrite.auditranscribe.audio;
-    exports site.overwrite.auditranscribe.audio.exceptions;
-    exports site.overwrite.auditranscribe.audio.filters;
-    exports site.overwrite.auditranscribe.audio.window_functions;
-    exports site.overwrite.auditranscribe.generic.exceptions;
-    exports site.overwrite.auditranscribe.generic.tuples;
-    exports site.overwrite.auditranscribe.io.audt_file;
-    exports site.overwrite.auditranscribe.io.audt_file.base;
-    exports site.overwrite.auditranscribe.io.audt_file.base.data_encapsulators;
-    exports site.overwrite.auditranscribe.io.data_files;
-    exports site.overwrite.auditranscribe.io.data_files.data_encapsulators;
-    exports site.overwrite.auditranscribe.io.data_files.file_classes;
-    exports site.overwrite.auditranscribe.io.exceptions;
-    exports site.overwrite.auditranscribe.main_views;
-    exports site.overwrite.auditranscribe.main_views.helpers;
-    exports site.overwrite.auditranscribe.main_views.icon;
-    exports site.overwrite.auditranscribe.main_views.scene_switching;
-    exports site.overwrite.auditranscribe.misc;
-    exports site.overwrite.auditranscribe.music;
-    exports site.overwrite.auditranscribe.music.exceptions;
-    exports site.overwrite.auditranscribe.music.notes;
-    exports site.overwrite.auditranscribe.network;
-    exports site.overwrite.auditranscribe.network.exceptions;
-    exports site.overwrite.auditranscribe.setup_wizard;
-    exports site.overwrite.auditranscribe.setup_wizard.data_encapsulators;
-    exports site.overwrite.auditranscribe.setup_wizard.download_handlers;
-    exports site.overwrite.auditranscribe.setup_wizard.view_controllers;
-    exports site.overwrite.auditranscribe.spectrogram;
-    exports site.overwrite.auditranscribe.utils;
+    exports app.auditranscribe;
+    exports app.auditranscribe.audio;
+    exports app.auditranscribe.audio.exceptions;
+    exports app.auditranscribe.audio.filters;
+    exports app.auditranscribe.audio.window_functions;
+    exports app.auditranscribe.generic.exceptions;
+    exports app.auditranscribe.generic.tuples;
+    exports app.auditranscribe.io.audt_file;
+    exports app.auditranscribe.io.audt_file.base;
+    exports app.auditranscribe.io.audt_file.base.data_encapsulators;
+    exports app.auditranscribe.io.data_files;
+    exports app.auditranscribe.io.data_files.data_encapsulators;
+    exports app.auditranscribe.io.data_files.file_classes;
+    exports app.auditranscribe.io.exceptions;
+    exports app.auditranscribe.misc;
+    exports app.auditranscribe.misc.icon;
+    exports app.auditranscribe.music;
+    exports app.auditranscribe.music.exceptions;
+    exports app.auditranscribe.music.notes;
+    exports app.auditranscribe.network;
+    exports app.auditranscribe.network.exceptions;
+    exports app.auditranscribe.spectrogram;
+    exports app.auditranscribe.utils;
+    exports app.auditranscribe.views.main;
+    exports app.auditranscribe.views.main.scene_switching;
+    exports app.auditranscribe.views.main.view_controllers;
+    exports app.auditranscribe.views.setup_wizard;
+    exports app.auditranscribe.views.setup_wizard.download_handlers;
+    exports app.auditranscribe.views.setup_wizard.view_controllers;
 
-    opens site.overwrite.auditranscribe to javafx.fxml;
-    opens site.overwrite.auditranscribe.main_views to javafx.fxml;
-    opens site.overwrite.auditranscribe.main_views.helpers to javafx.fxml;
-    opens site.overwrite.auditranscribe.main_views.icon to javafx.fxml;
-    opens site.overwrite.auditranscribe.main_views.scene_switching to javafx.fxml;
-    opens site.overwrite.auditranscribe.misc to javafx.fxml;
-    opens site.overwrite.auditranscribe.setup_wizard to javafx.fxml;
-    opens site.overwrite.auditranscribe.setup_wizard.view_controllers to javafx.fxml;
+    opens app.auditranscribe to javafx.fxml;
+    opens app.auditranscribe.misc to javafx.fxml;
+    opens app.auditranscribe.misc.icon to com.google.gson, javafx.fxml;
+    opens app.auditranscribe.views.main to javafx.fxml;
+    opens app.auditranscribe.views.main.scene_switching to javafx.fxml;
+    opens app.auditranscribe.views.main.view_controllers to javafx.fxml;
+    opens app.auditranscribe.views.setup_wizard to javafx.fxml;
+    opens app.auditranscribe.views.setup_wizard.view_controllers to javafx.fxml;
 }
