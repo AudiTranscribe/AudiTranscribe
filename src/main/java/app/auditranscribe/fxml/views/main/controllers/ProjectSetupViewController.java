@@ -23,7 +23,7 @@ import app.auditranscribe.fxml.views.AbstractViewController;
 import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitchingData;
 import app.auditranscribe.generic.tuples.Pair;
 import app.auditranscribe.io.IOMethods;
-import app.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
+import app.auditranscribe.fxml.spinners.CustomDoubleSpinnerValueFactory;
 import app.auditranscribe.music.MusicKey;
 import app.auditranscribe.utils.GUIUtils;
 import javafx.fxml.FXML;

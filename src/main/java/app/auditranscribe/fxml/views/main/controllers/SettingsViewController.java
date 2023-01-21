@@ -27,7 +27,7 @@ import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.data_files.DataFiles;
 import app.auditranscribe.io.data_files.data_encapsulators.SettingsData;
 import app.auditranscribe.misc.CustomLogger;
-import app.auditranscribe.misc.spinners.CustomIntegerSpinnerValueFactory;
+import app.auditranscribe.fxml.spinners.CustomIntegerSpinnerValueFactory;
 import app.auditranscribe.utils.GUIUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

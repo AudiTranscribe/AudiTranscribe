@@ -31,7 +31,7 @@ import app.auditranscribe.io.audt_file.base.data_encapsulators.AudioDataObject;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.QTransformDataObject;
 import app.auditranscribe.io.data_files.DataFiles;
 import app.auditranscribe.misc.CustomTask;
-import app.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
+import app.auditranscribe.fxml.spinners.CustomDoubleSpinnerValueFactory;
 import app.auditranscribe.music.BPMEstimator;
 import app.auditranscribe.music.MusicKey;
 import app.auditranscribe.music.MusicKeyEstimator;

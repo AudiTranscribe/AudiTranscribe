@@ -16,51 +16,44 @@
  * Copyright © AudiTranscribe Team
  */
 
-package app.auditranscribe.misc.spinners;
+package app.auditranscribe.fxml.spinners;
 
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
-import javafx.util.StringConverter;
 
 /**
  * Custom converter that converts a string to an integer.
  */
 @ExcludeFromGeneratedCoverageReport
-public class CustomIntegerStringConverter extends StringConverter<Integer> {
+public class CustomIntegerStringConverter extends CustomStringConverter<Integer> {
     /**
      * Initialization method for a <code>CustomIntegerStringConverter</code>.
      */
     public CustomIntegerStringConverter() {
     }
 
+    /**
+     * Initialization method for a <code>CustomIntegerStringConverter</code>.
+     *
+     * @param prefix Prefix to add before the number.
+     * @param suffix Suffix to add after the number.
+     */
+    public CustomIntegerStringConverter(String prefix, String suffix) {
+        this.prefix = prefix;
+        this.suffix = suffix;
+    }
+
     // Public methods
     @Override
-    public Integer fromString(String value) {
-        // If the specified value is null or zero-length, return null
-        if (value == null) {
-            return null;
-        }
+    public String convertValueToString(Integer value) {
+        return Integer.toString(value);
+    }
 
-        value = value.trim();
-
-        if (value.length() < 1) {
-            return null;
-        }
-
-        // Attempt to parse the specified value as an integer
+    @Override
+    public Integer convertStringToValue(String value) {
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
             return null;
-        }
-    }
-
-    @Override
-    public String toString(Integer value) {
-        // If the specified value is null, return a zero-length String
-        if (value == null) {
-            return "";
-        } else {
-            return Integer.toString(value);
         }
     }
 }

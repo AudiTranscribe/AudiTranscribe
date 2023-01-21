@@ -16,10 +16,9 @@
  * Copyright © AudiTranscribe Team
  */
 
-package app.auditranscribe.misc.spinners;
+package app.auditranscribe.fxml.spinners;
 
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
-import javafx.util.StringConverter;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -29,41 +28,40 @@ import java.util.Collections;
  * Custom converter that converts a string to a double.
  */
 @ExcludeFromGeneratedCoverageReport
-public class CustomDoubleStringConverter extends StringConverter<Double> {
+public class CustomDoubleStringConverter extends CustomStringConverter<Double> {
     // Attributes
     private final DecimalFormat df;
 
     /**
      * Initialization method for a <code>CustomDoubleStringConverter</code>.
+     *
+     * @param decimalPlaces Number of decimal places to show.
      */
     public CustomDoubleStringConverter(int decimalPlaces) {
         this.df = new DecimalFormat("#." + String.join("", Collections.nCopies(decimalPlaces, "#")));
     }
 
+    /**
+     * Initialization method for a <code>CustomDoubleStringConverter</code>.
+     *
+     * @param decimalPlaces Number of decimal places to show.
+     * @param prefix        Prefix to add before the number.
+     * @param suffix        Suffix to add after the number.
+     */
+    public CustomDoubleStringConverter(int decimalPlaces, String prefix, String suffix) {
+        this.df = new DecimalFormat("#." + String.join("", Collections.nCopies(decimalPlaces, "#")));
+        this.prefix = prefix;
+        this.suffix = suffix;
+    }
+
     // Public methods
     @Override
-    public String toString(Double value) {
-        // If the specified value is null, return a zero-length String
-        if (value == null) {
-            return "";
-        }
-
+    public String convertValueToString(Double value) {
         return df.format(value);
     }
 
     @Override
-    public Double fromString(String value) {
-        // If the specified value is null or zero-length, return null
-        if (value == null) {
-            return null;
-        }
-
-        value = value.trim();
-
-        if (value.length() < 1) {
-            return null;
-        }
-
+    public Double convertStringToValue(String value) {
         // Attempt to parse the specified value as a double
         try {
             Double.parseDouble(value);  // Do this first to catch any invalid strings

@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package app.auditranscribe.misc.spinners;
+package app.auditranscribe.fxml.spinners;
 
 import app.auditranscribe.generic.exceptions.ValueException;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
@@ -91,6 +91,59 @@ public class CustomIntegerSpinnerValueFactory extends SpinnerValueFactory<Intege
 
         // Set converter
         setConverter(new CustomIntegerStringConverter());
+
+        // Update the value property listener
+        valueProperty().addListener((o, oldValue, newValue) -> {
+            // Check if the new value is null
+            if (newValue == null) {
+                // Set the value to the last valid value
+                setValue(lastValidValue);
+            } else {
+                // When the value is set, we need to react to ensure it is a valid value (and if not, blow up
+                // appropriately)
+                int actualSetValue = newValue;
+                if (newValue < getMin()) {
+                    actualSetValue = getMin();
+                } else if (newValue > getMax()) {
+                    actualSetValue = getMax();
+                }
+                setValue(actualSetValue);
+
+                // Update the last valid value
+                lastValidValue = actualSetValue;
+            }
+        });
+
+        // Set initial value
+        initialValue = initialValue >= min && initialValue <= max ? initialValue : min;
+        setValue(initialValue);
+
+        // Set last valid value
+        lastValidValue = initialValue;
+    }
+
+    /**
+     * Initializes a new <code>CustomIntegerSpinnerValueFactory</code>.
+     *
+     * @param min            The minimum allowed double value for the spinner.
+     * @param max            The maximum allowed double value for the spinner.
+     * @param initialValue   The value of the spinner when first instantiated. Must be within the
+     *                       bounds of the <code>min</code> and <code>max</code> arguments, or else
+     *                       the minimum value will be used.
+     * @param amountToStepBy The amount to increment or decrement by, per step.
+     * @param prefix         Prefix to add before the number.
+     * @param suffix         Suffix to add after the number.
+     */
+    public CustomIntegerSpinnerValueFactory(
+            int min, int max, int initialValue, int amountToStepBy, String prefix, String suffix
+    ) {
+        // Set up values
+        setMin(min);
+        setMax(max);
+        setAmountToStepBy(amountToStepBy);
+
+        // Set converter
+        setConverter(new CustomIntegerStringConverter(prefix, suffix));
 
         // Update the value property listener
         valueProperty().addListener((o, oldValue, newValue) -> {
