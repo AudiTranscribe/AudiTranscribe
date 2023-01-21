@@ -1,3 +1,8 @@
+/* GENERAL */
+.separator *.line {
+    -fx-border-color: background-colour-tertiary;
+}
+
 /* TOP */
 .progress-bar-label {
     -fx-font-size: 10pt;
