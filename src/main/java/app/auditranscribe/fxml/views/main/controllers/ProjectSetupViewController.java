@@ -25,6 +25,7 @@ import app.auditranscribe.generic.tuples.Pair;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.misc.spinners.CustomDoubleSpinnerValueFactory;
 import app.auditranscribe.music.MusicKey;
+import app.auditranscribe.utils.GUIUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -301,7 +302,7 @@ public class ProjectSetupViewController extends AbstractViewController {
                 "Audio files (*.wav, *.mp3, *.flac, *.aif, *.aiff)",
                 "*.wav", "*.mp3", "*.flac", "*.aif", "*.aiff"
         );
-        File file = IOMethods.openFileDialog(window, extFilter);
+        File file = GUIUtils.openFileDialog(window, extFilter);
 
         // Verify that the user actually chose a file
         if (file == null) {

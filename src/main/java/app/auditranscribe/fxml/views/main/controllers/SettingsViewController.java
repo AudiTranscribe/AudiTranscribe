@@ -24,6 +24,7 @@ import app.auditranscribe.fxml.Popups;
 import app.auditranscribe.fxml.views.AbstractViewController;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.data_files.DataFiles;
+import app.auditranscribe.utils.GUIUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -110,7 +111,7 @@ public class SettingsViewController extends AbstractViewController {
             );
 
             // Get the file
-            File possibleFFmpegBinary = IOMethods.openFileDialog(
+            File possibleFFmpegBinary = GUIUtils.openFileDialog(
                     rootPane.getScene().getWindow(), extFilter
             );
 

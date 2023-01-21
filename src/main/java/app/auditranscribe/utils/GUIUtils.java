@@ -107,7 +107,7 @@ public final class GUIUtils {
      * @param filters Array of file filters to show in the file dialog.
      * @return A <code>File</code> object, representing the selected file.
      */
-    public static File openFileDialog(javafx.stage.Window window, FileChooser.ExtensionFilter... filters) {
+    public static File openFileDialog(Window window, FileChooser.ExtensionFilter... filters) {
         FileChooser fileChooser = new FileChooser();
 
         for (FileChooser.ExtensionFilter filter : filters) {
