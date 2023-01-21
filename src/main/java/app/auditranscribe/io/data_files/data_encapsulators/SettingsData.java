@@ -31,7 +31,7 @@ public class SettingsData {
     // Audio data
     public String ffmpegInstallationPath = null;  // Path to the ffmpeg installation
 
-    // I/O data
+    // Input/output data
     public int autosaveInterval = 5;  // In minutes
     public int logFilePersistence = 5;  // In days
 

@@ -77,13 +77,17 @@
     -fx-font-size: 13px;
 }
 
-.setting-label {
+.setting-subheading, .setting-label {
     -fx-font-size: 13px;
+}
+
+.setting-subheading{
     -fx-font-weight: bold;
 }
 
-.setting-caption {
-    -fx-font-size: 11px;
+/* FIELDS & INPUT AREAS */
+.text-field {
+    -fx-background-color: background-colour-primary;
 }
 
 /* BOTTOM */

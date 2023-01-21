@@ -18,29 +18,49 @@
 
 package app.auditranscribe.fxml.views.main.controllers;
 
+import app.auditranscribe.audio.FFmpegHandler;
+import app.auditranscribe.fxml.IconHelper;
+import app.auditranscribe.fxml.Popups;
 import app.auditranscribe.fxml.views.AbstractViewController;
 import app.auditranscribe.io.IOMethods;
+import app.auditranscribe.io.data_files.DataFiles;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 
 /**
  * Controller for the settings view.
  */
 public class SettingsViewController extends AbstractViewController {
+    // Attributes
+    private String lastValidFFmpegPath;
+
     // FXML elements
     @FXML
     private AnchorPane rootPane;
 
+    @FXML
+    private TabPane settingsTabPane;
+
     // "Audio" tab
+    @FXML
+    private TextField ffmpegPathTextField;
+
+    @FXML
+    private Button selectFFmpegBinaryButton;
 
     // "Input/Output" tab
 
@@ -54,6 +74,54 @@ public class SettingsViewController extends AbstractViewController {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        // Add methods to text fields
+        ffmpegPathTextField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            // Handle check for FFmpeg path only when unfocused
+            if (!newValue) {
+                // Get the absolute path to the FFmpeg binary
+                String ffmpegBinaryPath = ffmpegPathTextField.getText();
+
+                // Check if the FFmpeg binary is valid
+                if (FFmpegHandler.checkFFmpegPath(ffmpegBinaryPath)) {
+                    lastValidFFmpegPath = ffmpegBinaryPath;
+                    log(Level.INFO, "FFmpeg binary path updated to '" + ffmpegBinaryPath + "'");
+                } else {
+                    // Reset the value of the text field to the last valid FFmpeg path
+                    ffmpegPathTextField.setText(lastValidFFmpegPath);
+
+                    // Show a warning message
+                    Popups.showWarningAlert(
+                            null, "Invalid FFmpeg Binary Path",
+                            "The provided path does not seem to point to a valid FFmpeg binary."
+                    );
+
+                    // Report failure
+                    log(Level.WARNING, "Selected FFmpeg binary path '" + ffmpegBinaryPath + "' invalid");
+                }
+            }
+        });
+
+        // Set up tabs' buttons
+        selectFFmpegBinaryButton.setOnAction(event -> {
+            // Define file extension filter
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                    "FFmpeg binary",
+                    "*.exe", "*"
+            );
+
+            // Get the file
+            File possibleFFmpegBinary = IOMethods.openFileDialog(
+                    rootPane.getScene().getWindow(), extFilter
+            );
+
+            // Check if the FFmpeg binary is valid
+            if (possibleFFmpegBinary != null) {
+                ffmpegPathTextField.setText(possibleFFmpegBinary.getAbsolutePath());
+            } else {
+                Popups.showInformationAlert(rootPane.getScene().getWindow(), "Info", "No file selected.");
+            }
+        });
+
         // Set up bottom buttons
         resetToDefaultsButton.setOnAction(event -> resetSettingsToDefaults());
         cancelButton.setOnAction(event -> closeSettingsPage());
@@ -62,7 +130,7 @@ public class SettingsViewController extends AbstractViewController {
             closeSettingsPage();
         });
 
-        // Todo add
+        // Todo add more
         log("Settings view ready to be shown");
     }
 
@@ -71,6 +139,9 @@ public class SettingsViewController extends AbstractViewController {
     @Override
     public void setThemeOnScene() {
         updateThemeCSS(rootPane);
+
+        // Set graphics
+        IconHelper.setSVGOnButton(selectFFmpegBinaryButton, 15, 30, "folder-line");
     }
 
     /**
@@ -112,8 +183,11 @@ public class SettingsViewController extends AbstractViewController {
      * Helper method that sets up the fields for the settings view.
      */
     private void setUpFields() {
-        // Todo implement
-        log("setUpFields");
+        // Update the last valid FFmpeg path, and set up the FFmpeg binary path text field
+        lastValidFFmpegPath = DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath;
+        ffmpegPathTextField.setText(lastValidFFmpegPath);
+
+        // Todo add others
     }
 
     /**
@@ -128,15 +202,52 @@ public class SettingsViewController extends AbstractViewController {
      * Helper method that updates the settings file with the new settings.
      */
     private void applySettings() {
-        // Todo implement
-        log("applySettings");
+        // Update settings' values
+        DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath = ffmpegPathTextField.getText();
+
+//        DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval = autosaveIntervalSpinner.getValue();
+//        DataFiles.SETTINGS_DATA_FILE.data.logFilePersistence = logFilePersistenceSpinner.getValue();
+//
+//        DataFiles.SETTINGS_DATA_FILE.data.colourScaleEnumOrdinal = colourScaleChoiceBox.getValue().ordinal();
+//        DataFiles.SETTINGS_DATA_FILE.data.windowFunctionEnumOrdinal = windowFunctionChoiceBox.getValue().ordinal();
+//        DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal =
+//                noteQuantizationChoiceBox.getValue().ordinal();
+//
+//        DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal = themeChoiceBox.getValue().ordinal();
+//        DataFiles.SETTINGS_DATA_FILE.data.checkForUpdateInterval = checkForUpdateIntervalSpinner.getValue();
+
+        // Apply settings to the settings file
+        DataFiles.SETTINGS_DATA_FILE.saveFile();
     }
 
     /**
      * Helper method that sets the values of the current tab to defaults.
      */
     private void resetSettingsToDefaults() {
-        // Todo set values of current tab to defaults, but don't save yet
-        log("resetSettingsToDefaults");
+        // Get currently selected tab
+        int selectedTabIndex = settingsTabPane.getSelectionModel().getSelectedIndex();
+        String selectedTabName;
+
+        switch (selectedTabIndex) {
+            case 0 -> {  // "Audio" tab
+                selectedTabName = "Audio";
+
+                ffmpegPathTextField.setText(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
+            }
+            case 1 -> {  // "Input/Output" tab
+                selectedTabName = "Input/Output";
+            }
+            case 2 -> {  // "Transcription" tab
+                selectedTabName = "Transcription";
+            }
+            default -> {  // "Miscellaneous" tab
+                selectedTabName = "Miscellaneous";
+            }
+        }
+
+        // Report that reset to defaults was successful
+        String infoStr = "Reset '" + selectedTabName + "' tab settings to defaults";
+        Popups.showInformationAlert(rootPane.getScene().getWindow(), "Reset to Defaults", infoStr + ".");
+        log(infoStr);
     }
 }
