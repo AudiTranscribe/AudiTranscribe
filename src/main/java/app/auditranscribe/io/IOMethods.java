@@ -20,8 +20,11 @@ package app.auditranscribe.io;
 
 import app.auditranscribe.MainApplication;
 import app.auditranscribe.misc.CustomLogger;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.system.OSMethods;
 import app.auditranscribe.system.OSType;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
 
 import java.io.*;
 import java.net.URL;
@@ -395,6 +398,26 @@ public final class IOMethods {
         } else {
             return path;  // No treatment necessary on other systems
         }
+    }
+
+    // GUI methods
+
+    /**
+     * Method that helps show a file dialog for the user to select a file.
+     *
+     * @param window  Window to show the file dialog on.
+     * @param filters Array of file filters to show in the file dialog.
+     * @return The selected file as a <code>File</code> object.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static File openFileDialog(Window window, FileChooser.ExtensionFilter... filters) {
+        FileChooser fileChooser = new FileChooser();
+
+        for (FileChooser.ExtensionFilter filter : filters) {
+            fileChooser.getExtensionFilters().add(filter);
+        }
+
+        return fileChooser.showOpenDialog(window);
     }
 
     // Miscellaneous methods

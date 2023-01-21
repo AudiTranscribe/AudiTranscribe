@@ -19,10 +19,6 @@
 package app.auditranscribe.fxml.views.main;
 
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
-import javafx.stage.FileChooser;
-import javafx.stage.Window;
-
-import java.io.File;
 
 /**
  * Handles the interaction of AudiTranscribe projects.
@@ -31,24 +27,5 @@ import java.io.File;
 public final class ProjectHandler {
     private ProjectHandler() {
         // Private constructor to signal this is a utility class
-    }
-
-    // Public methods
-
-    /**
-     * Method that helps show a file dialog for the user to select a file.
-     *
-     * @param window  Window to show the file dialog on.
-     * @param filters Array of file filters to show in the file dialog.
-     * @return The selected file as a <code>File</code> object.
-     */
-    public static File openFileDialog(Window window, FileChooser.ExtensionFilter... filters) {
-        FileChooser fileChooser = new FileChooser();
-
-        for (FileChooser.ExtensionFilter filter : filters) {
-            fileChooser.getExtensionFilters().add(filter);
-        }
-
-        return fileChooser.showOpenDialog(window);
     }
 }

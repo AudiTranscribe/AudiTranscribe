@@ -20,7 +20,6 @@ package app.auditranscribe.fxml.views.main.controllers;
 
 import app.auditranscribe.fxml.Popups;
 import app.auditranscribe.fxml.views.AbstractViewController;
-import app.auditranscribe.fxml.views.main.ProjectHandler;
 import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitchingData;
 import app.auditranscribe.generic.tuples.Pair;
 import app.auditranscribe.io.IOMethods;
@@ -302,7 +301,7 @@ public class ProjectSetupViewController extends AbstractViewController {
                 "Audio files (*.wav, *.mp3, *.flac, *.aif, *.aiff)",
                 "*.wav", "*.mp3", "*.flac", "*.aif", "*.aiff"
         );
-        File file = ProjectHandler.openFileDialog(window, extFilter);
+        File file = IOMethods.openFileDialog(window, extFilter);
 
         // Verify that the user actually chose a file
         if (file == null) {
