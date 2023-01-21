@@ -1,6 +1,6 @@
-/* CONTROLS */
+/* FIELDS & INPUT AREAS */
 .choice-box, .spinner {
-    -fx-background-color: background-colour-tertiary;
+    -fx-background-color: background-colour-primary;
     -fx-background-insets: 0, 1px;
 }
 
@@ -14,6 +14,10 @@
 
 .spinner > .increment-arrow-button:hover, .spinner > .decrement-arrow-button:hover {
     -fx-background-color: background-colour-tertiary;
+}
+
+.text-field {
+    -fx-background-color: background-colour-primary;
 }
 
 /* TAB PANE */
@@ -51,10 +55,6 @@
     -fx-border-color: transparent;
 }
 
-.tab > .anchor-pane {
-    -fx-padding: 5px 0 0 0;
-}
-
 .tab-pane {
     -fx-background-color: background-colour-secondary;
 }
@@ -83,11 +83,6 @@
 
 .setting-subheading{
     -fx-font-weight: bold;
-}
-
-/* FIELDS & INPUT AREAS */
-.text-field {
-    -fx-background-color: background-colour-primary;
 }
 
 /* BOTTOM */

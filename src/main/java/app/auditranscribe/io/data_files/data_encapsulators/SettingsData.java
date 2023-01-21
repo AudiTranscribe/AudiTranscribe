@@ -28,17 +28,26 @@ import app.auditranscribe.signal.windowing.SignalWindow;
  */
 @ExcludeFromGeneratedCoverageReport
 public class SettingsData {
+    // Constants
+    public final static int AUTOSAVE_INTERVAL = 5;  // In minutes
+    public final static int LOG_FILE_PERSISTENCE = 5;  // In days
+
+    public final static int COLOUR_SCALE_ENUM_ORDINAL = ColourScale.VIRIDIS.ordinal();
+    public final static int WINDOW_FUNCTION_ENUM_ORDINAL = SignalWindow.HANN_WINDOW.ordinal();
+
+    public final static int THEME_ENUM_ORDINAL = Theme.DARK.ordinal();
+
     // Audio data
     public String ffmpegInstallationPath = null;  // Path to the ffmpeg installation
 
     // Input/output data
-    public int autosaveInterval = 5;  // In minutes
-    public int logFilePersistence = 5;  // In days
+    public int autosaveInterval = AUTOSAVE_INTERVAL;
+    public int logFilePersistence = LOG_FILE_PERSISTENCE;
 
     // Transcription data
-    public int colourScaleEnumOrdinal = ColourScale.VIRIDIS.ordinal();
-    public int windowFunctionEnumOrdinal = SignalWindow.HANN_WINDOW.ordinal();
+    public int colourScaleEnumOrdinal = COLOUR_SCALE_ENUM_ORDINAL;
+    public int windowFunctionEnumOrdinal = WINDOW_FUNCTION_ENUM_ORDINAL;
 
     // Miscellaneous data
-    public int themeEnumOrdinal = Theme.DARK.ordinal();
+    public int themeEnumOrdinal = THEME_ENUM_ORDINAL;
 }

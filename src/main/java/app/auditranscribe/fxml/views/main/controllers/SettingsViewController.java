@@ -22,13 +22,18 @@ import app.auditranscribe.audio.FFmpegHandler;
 import app.auditranscribe.fxml.IconHelper;
 import app.auditranscribe.fxml.Popups;
 import app.auditranscribe.fxml.views.AbstractViewController;
+import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.data_files.DataFiles;
+import app.auditranscribe.io.data_files.data_encapsulators.SettingsData;
+import app.auditranscribe.misc.CustomLogger;
+import app.auditranscribe.misc.spinners.CustomIntegerSpinnerValueFactory;
 import app.auditranscribe.utils.GUIUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Spinner;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
@@ -64,6 +69,11 @@ public class SettingsViewController extends AbstractViewController {
     private Button selectFFmpegBinaryButton;
 
     // "Input/Output" tab
+    @FXML
+    private Spinner<Integer> autosaveIntervalSpinner, logFilePersistenceSpinner;
+
+    @FXML
+    private Button deleteLogsButton, openDataFolderButton;
 
     // "Transcription" tab
 
@@ -122,6 +132,36 @@ public class SettingsViewController extends AbstractViewController {
                 Popups.showInformationAlert(rootPane.getScene().getWindow(), "Info", "No file selected.");
             }
         });
+
+        deleteLogsButton.setOnAction(event -> {
+            // Get the files in the logging folder
+            File[] files = new File(CustomLogger.logsFolder).listFiles();
+
+            // Exclude current log and its lock file
+            if (files != null) {
+                int numDeleted = 0;
+                for (File file : files) {
+                    if (!file.getName().equals(CustomLogger.currentLogName) && !file.getName().endsWith(".lck")) {
+                        IOMethods.delete(file);
+                        log(Level.FINE, "Deleted log '" + file.getName() + "'");
+                        numDeleted++;
+                    }
+                }
+
+                String title = "";
+                String content = "No logs to delete.";
+
+                if (numDeleted != 0) {
+                    title = "Deleted Logs";
+                    content = "Deleted " + numDeleted + " " + (numDeleted == 1 ? "log" : "logs") +
+                            " from the logs folder.";
+                }
+
+                Popups.showInformationAlert(rootPane.getScene().getWindow(), title, content);
+            }
+        });
+
+        openDataFolderButton.setOnAction(event -> GUIUtils.openFolderInGUI(IOConstants.APP_DATA_FOLDER_PATH));
 
         // Set up bottom buttons
         resetToDefaultsButton.setOnAction(event -> resetSettingsToDefaults());
@@ -188,6 +228,14 @@ public class SettingsViewController extends AbstractViewController {
         lastValidFFmpegPath = DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath;
         ffmpegPathTextField.setText(lastValidFFmpegPath);
 
+        // Set spinner factories and methods
+        autosaveIntervalSpinner.setValueFactory(new CustomIntegerSpinnerValueFactory(
+                1, Integer.MAX_VALUE, DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval, 1
+        ));
+        logFilePersistenceSpinner.setValueFactory(new CustomIntegerSpinnerValueFactory(
+                1, Integer.MAX_VALUE, DataFiles.SETTINGS_DATA_FILE.data.logFilePersistence, 1
+        ));
+
         // Todo add others
     }
 
@@ -206,9 +254,9 @@ public class SettingsViewController extends AbstractViewController {
         // Update settings' values
         DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath = ffmpegPathTextField.getText();
 
-//        DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval = autosaveIntervalSpinner.getValue();
-//        DataFiles.SETTINGS_DATA_FILE.data.logFilePersistence = logFilePersistenceSpinner.getValue();
-//
+        DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval = autosaveIntervalSpinner.getValue();
+        DataFiles.SETTINGS_DATA_FILE.data.logFilePersistence = logFilePersistenceSpinner.getValue();
+
 //        DataFiles.SETTINGS_DATA_FILE.data.colourScaleEnumOrdinal = colourScaleChoiceBox.getValue().ordinal();
 //        DataFiles.SETTINGS_DATA_FILE.data.windowFunctionEnumOrdinal = windowFunctionChoiceBox.getValue().ordinal();
 //        DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal =
@@ -233,10 +281,18 @@ public class SettingsViewController extends AbstractViewController {
             case 0 -> {  // "Audio" tab
                 selectedTabName = "Audio";
 
-                ffmpegPathTextField.setText(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
+                lastValidFFmpegPath = DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath;
+                ffmpegPathTextField.setText(lastValidFFmpegPath);
             }
             case 1 -> {  // "Input/Output" tab
                 selectedTabName = "Input/Output";
+
+                autosaveIntervalSpinner.setValueFactory(new CustomIntegerSpinnerValueFactory(
+                        1, Integer.MAX_VALUE, SettingsData.AUTOSAVE_INTERVAL, 1
+                ));
+                logFilePersistenceSpinner.setValueFactory(new CustomIntegerSpinnerValueFactory(
+                        1, Integer.MAX_VALUE, SettingsData.LOG_FILE_PERSISTENCE, 1
+                ));
             }
             case 2 -> {  // "Transcription" tab
                 selectedTabName = "Transcription";

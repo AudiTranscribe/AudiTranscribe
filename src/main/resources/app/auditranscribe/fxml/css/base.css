@@ -218,3 +218,9 @@
     -fx-focus-color: focus-colour;
     -fx-faint-focus-color: rgba(0, 0, 0, 0);
 }
+
+.separator *.line {
+    -fx-border-color: seperator-colour;
+    -fx-border-style: solid;
+    -fx-border-width: 0.5px;
+}
