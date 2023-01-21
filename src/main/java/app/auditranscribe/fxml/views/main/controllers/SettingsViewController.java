@@ -54,6 +54,8 @@ public class SettingsViewController extends AbstractViewController {
     // Attributes
     private String lastValidFFmpegPath;
 
+    private CustomIntegerSpinnerValueFactory autosaveIntervalSpinnerFactory, logFilePersistenceSpinnerFactory;
+
     // FXML elements
     @FXML
     private AnchorPane rootPane;
@@ -229,12 +231,17 @@ public class SettingsViewController extends AbstractViewController {
         ffmpegPathTextField.setText(lastValidFFmpegPath);
 
         // Set spinner factories and methods
-        autosaveIntervalSpinner.setValueFactory(new CustomIntegerSpinnerValueFactory(
-                1, Integer.MAX_VALUE, DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval, 1
-        ));
-        logFilePersistenceSpinner.setValueFactory(new CustomIntegerSpinnerValueFactory(
-                1, Integer.MAX_VALUE, DataFiles.SETTINGS_DATA_FILE.data.logFilePersistence, 1
-        ));
+        autosaveIntervalSpinnerFactory = new CustomIntegerSpinnerValueFactory(
+                1, Integer.MAX_VALUE, DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval, 1,
+                "", " min"
+        );
+        autosaveIntervalSpinner.setValueFactory(autosaveIntervalSpinnerFactory);
+
+        logFilePersistenceSpinnerFactory = new CustomIntegerSpinnerValueFactory(
+                1, Integer.MAX_VALUE, DataFiles.SETTINGS_DATA_FILE.data.logFilePersistence, 1,
+                "", " day(s)"
+        );
+        logFilePersistenceSpinner.setValueFactory(logFilePersistenceSpinnerFactory);
 
         // Todo add others
     }
@@ -287,12 +294,8 @@ public class SettingsViewController extends AbstractViewController {
             case 1 -> {  // "Input/Output" tab
                 selectedTabName = "Input/Output";
 
-                autosaveIntervalSpinner.setValueFactory(new CustomIntegerSpinnerValueFactory(
-                        1, Integer.MAX_VALUE, SettingsData.AUTOSAVE_INTERVAL, 1
-                ));
-                logFilePersistenceSpinner.setValueFactory(new CustomIntegerSpinnerValueFactory(
-                        1, Integer.MAX_VALUE, SettingsData.LOG_FILE_PERSISTENCE, 1
-                ));
+                autosaveIntervalSpinnerFactory.setValue(SettingsData.AUTOSAVE_INTERVAL);
+                logFilePersistenceSpinnerFactory.setValue(SettingsData.LOG_FILE_PERSISTENCE);
             }
             case 2 -> {  // "Transcription" tab
                 selectedTabName = "Transcription";

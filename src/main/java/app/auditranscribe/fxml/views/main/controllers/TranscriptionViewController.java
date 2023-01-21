@@ -96,6 +96,8 @@ public class TranscriptionViewController extends SwitchableViewController {
 
     private String projectName;
 
+    private CustomDoubleSpinnerValueFactory bpmSpinnerFactory, offsetSpinnerFactory;
+
     // FXML elements
     @FXML
     private AnchorPane rootPane;
@@ -156,12 +158,17 @@ public class TranscriptionViewController extends SwitchableViewController {
         }
 
         // Set spinners' factories
-        bpmSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
-                BPM_RANGE.value0(), BPM_RANGE.value1(), 120, 0.1, 2
-        ));
-        offsetSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
-                OFFSET_RANGE.value0(), OFFSET_RANGE.value1(), 0, 0.01, 2
-        ));
+        bpmSpinnerFactory = new CustomDoubleSpinnerValueFactory(
+                BPM_RANGE.value0(), BPM_RANGE.value1(), 120, 0.1, 2, "",
+                " bpm"
+        );
+        bpmSpinner.setValueFactory(bpmSpinnerFactory);
+
+        offsetSpinnerFactory = new CustomDoubleSpinnerValueFactory(
+                OFFSET_RANGE.value0(), OFFSET_RANGE.value1(), 0, 0.01, 2, "",
+                " s"
+        );
+        offsetSpinner.setValueFactory(offsetSpinnerFactory);
 
         // Set choice boxes' choices
         for (MusicKey musicKey : MusicKey.values()) musicKeyChoice.getItems().add(musicKey);
