@@ -31,12 +31,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * Class that helps set icons on specific nodes.
  */
 @ExcludeFromGeneratedCoverageReport
-public final class IconHelper {
+public final class IconHelper extends LoggableClass {
     private IconHelper() {
         // Private constructor to signal this is a utility class
     }
@@ -126,7 +127,14 @@ public final class IconHelper {
      * @return SVG path of the icon.
      */
     private static String getIconSVGPath(String iconName) {
-        return IconsData.ICONS_DATA.svgPaths.get(iconName);
+        String path = IconsData.ICONS_DATA.svgPaths.get(iconName);
+        if (path == null) {
+            log(
+                    Level.WARNING, "Cannot find icon with name '" + iconName + "'; returning null path",
+                    IconHelper.class.getName()
+            );
+        }
+        return path;
     }
 
     /**
