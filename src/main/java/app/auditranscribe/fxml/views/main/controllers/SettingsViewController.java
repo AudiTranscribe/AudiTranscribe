@@ -294,8 +294,14 @@ public class SettingsViewController extends AbstractViewController {
      * Helper method that closes the settings view.
      */
     private void closeSettingsPage() {
+        // Close the settings page
         ((Stage) rootPane.getScene().getWindow()).close();
         log("Closing settings page");
+
+        // Reset themes back to original
+        AbstractViewController.updateActiveViewsThemes(
+                Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal]
+        );
     }
 
     /**
