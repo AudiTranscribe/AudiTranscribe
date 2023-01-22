@@ -20,6 +20,7 @@ package app.auditranscribe.fxml.views.main.controllers;
 
 import app.auditranscribe.fxml.IconHelper;
 import app.auditranscribe.fxml.Popups;
+import app.auditranscribe.fxml.Theme;
 import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitchingData;
 import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitchingState;
 import app.auditranscribe.generic.tuples.Pair;
@@ -166,14 +167,10 @@ public class HomepageViewController extends SwitchableViewController {
 
 
     // Public methods
-
     @Override
-    public void setThemeOnScene() {
-        updateThemeCSS(rootPane);
-
-        // Set graphics
-        IconHelper.setSVGPath(searchImage, 20, "search-line");
-        IconHelper.setSVGOnButton(preferencesButton, 15, 30, "cog-solid");
+    public void setThemeOnScene(Theme theme) {
+        updateThemeCSS(rootPane, theme);
+        setGraphics(theme);
     }
 
     /**
@@ -253,6 +250,14 @@ public class HomepageViewController extends SwitchableViewController {
             projectsListView.opacityProperty().set(0);
         }
     }
+
+    // Protected methods
+    @Override
+    protected void setGraphics(Theme theme) {
+        IconHelper.setSVGPath(searchImage, 20, "search-line");
+        IconHelper.setSVGOnButton(preferencesButton, 15, 30, "cog-solid");
+    }
+
 
     // Private methods
 

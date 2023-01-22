@@ -23,6 +23,7 @@ import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.audio.exceptions.FFmpegNotFoundException;
 import app.auditranscribe.fxml.IconHelper;
 import app.auditranscribe.fxml.Popups;
+import app.auditranscribe.fxml.Theme;
 import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitchingData;
 import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitchingState;
 import app.auditranscribe.generic.tuples.Pair;
@@ -240,25 +241,9 @@ public class TranscriptionViewController extends SwitchableViewController {
     }
 
     @Override
-    public void setThemeOnScene() {
-        updateThemeCSS(rootPane);
-
-        // Set graphics
-        IconHelper.setSVGOnButton(audioVolumeButton, 20, IMAGE_BUTTON_LENGTH, "volume-up-solid");
-        IconHelper.setSVGOnButton(
-                notesVolumeButton, 15, 20, IMAGE_BUTTON_LENGTH, IMAGE_BUTTON_LENGTH,
-                "music-note-solid"
-        );
-
-        IconHelper.setSVGOnButton(
-                scrollButton, 15, 22.5, IMAGE_BUTTON_LENGTH, IMAGE_BUTTON_LENGTH,
-                "map-marker-line"
-        );
-        IconHelper.setSVGOnButton(editNotesButton, 20, IMAGE_BUTTON_LENGTH, "pencil-line");
-        IconHelper.setSVGOnButton(playButton, 20, IMAGE_BUTTON_LENGTH, "play-solid");
-        IconHelper.setSVGOnButton(
-                rewindToBeginningButton, 20, IMAGE_BUTTON_LENGTH, "step-backward-solid"
-        );
+    public void setThemeOnScene(Theme theme) {
+        updateThemeCSS(rootPane, theme);
+        setGraphics(theme);
     }
 
     /**
@@ -396,6 +381,7 @@ public class TranscriptionViewController extends SwitchableViewController {
 
     // Todo add doc
     public void handleSceneClosing() {
+        this.removeControllerFromActive();
         // Todo implement
     }
 
@@ -425,6 +411,27 @@ public class TranscriptionViewController extends SwitchableViewController {
             );
         }
     }
+
+    // Protected methods
+    @Override
+    protected void setGraphics(Theme theme) {
+        IconHelper.setSVGOnButton(audioVolumeButton, 20, IMAGE_BUTTON_LENGTH, "volume-up-solid");
+        IconHelper.setSVGOnButton(
+                notesVolumeButton, 15, 20, IMAGE_BUTTON_LENGTH, IMAGE_BUTTON_LENGTH,
+                "music-note-solid"
+        );
+
+        IconHelper.setSVGOnButton(
+                scrollButton, 15, 22.5, IMAGE_BUTTON_LENGTH, IMAGE_BUTTON_LENGTH,
+                "map-marker-line"
+        );
+        IconHelper.setSVGOnButton(editNotesButton, 20, IMAGE_BUTTON_LENGTH, "pencil-line");
+        IconHelper.setSVGOnButton(playButton, 20, IMAGE_BUTTON_LENGTH, "play-solid");
+        IconHelper.setSVGOnButton(
+                rewindToBeginningButton, 20, IMAGE_BUTTON_LENGTH, "step-backward-solid"
+        );
+    }
+
 
     // Private methods
 

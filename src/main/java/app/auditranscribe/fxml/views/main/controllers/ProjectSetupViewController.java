@@ -19,6 +19,7 @@
 package app.auditranscribe.fxml.views.main.controllers;
 
 import app.auditranscribe.fxml.Popups;
+import app.auditranscribe.fxml.Theme;
 import app.auditranscribe.fxml.views.AbstractViewController;
 import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitchingData;
 import app.auditranscribe.generic.tuples.Pair;
@@ -198,8 +199,9 @@ public class ProjectSetupViewController extends AbstractViewController {
 
     // Public methods
     @Override
-    public void setThemeOnScene() {
-        updateThemeCSS(rootPane);
+    public void setThemeOnScene(Theme theme) {
+        updateThemeCSS(rootPane, theme);
+        setGraphics(theme);
     }
 
     /**
@@ -231,6 +233,9 @@ public class ProjectSetupViewController extends AbstractViewController {
 
             // Show the stage
             projectSetupStage.showAndWait();
+
+            // Remove view from active
+            controller.removeControllerFromActive();
 
             // Set the scene switching data
             SceneSwitchingData data = new SceneSwitchingData();
@@ -267,6 +272,12 @@ public class ProjectSetupViewController extends AbstractViewController {
             throw new RuntimeException(e);
         }
     }
+
+    // Protected methods
+    @Override
+    protected void setGraphics(Theme theme) {
+    }
+
 
     // Private methods
 

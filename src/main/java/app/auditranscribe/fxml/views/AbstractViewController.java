@@ -26,16 +26,58 @@ import app.auditranscribe.io.data_files.DataFiles;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.Pane;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * An abstract view controller that defines some useful methods for use in other view controllers.
  */
 public abstract class AbstractViewController extends LoggableClass implements Initializable {
+    // Constants
+    public final static List<AbstractViewController> ACTIVE_VIEW_CONTROLLERS = new ArrayList<>();
+
+    /**
+     * Initialization method for a new <code>AbstractViewController</code>.
+     */
+    public AbstractViewController() {
+        ACTIVE_VIEW_CONTROLLERS.add(this);
+    }
+
     // Public methods
 
     /**
-     * Method that sets the theme for the scene.
+     * Method that sets the current theme on the scene.
      */
-    public abstract void setThemeOnScene();
+    public void setThemeOnScene() {
+        setThemeOnScene(getCurrentTheme());
+    }
+
+    /**
+     * Method that sets the theme for the scene.
+     *
+     * @param theme Theme to set on the scene.
+     * @implNote The general format of this method's implementation should look like this:
+     * <pre><code>
+     *     updateThemeCSS(rootPane, theme);
+     *     setGraphics(theme);
+     * </code></pre>
+     * This means that the implementation should utilize the {@link #updateThemeCSS(Pane, Theme)}
+     * and {@link #setGraphics(Theme)} methods.
+     */
+    public abstract void setThemeOnScene(Theme theme);
+
+    public Theme getCurrentTheme() {
+        return Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal];
+    }
+
+    /**
+     * Method that updates all the active views' themes at once.
+     *
+     * @param theme Theme to set on all active views.
+     */
+    public static void updateActiveViewsThemes(Theme theme) {
+        for (AbstractViewController controller : ACTIVE_VIEW_CONTROLLERS) controller.setThemeOnScene(theme);
+    }
 
     /**
      * Method that finishes the setting up of the view controller.<br>
@@ -43,6 +85,13 @@ public abstract class AbstractViewController extends LoggableClass implements In
      */
     public void finishSetup() {
         // We assume that nothing needs to be done; can update in child classes
+    }
+
+    /**
+     * Removes this controller from the list of active view controllers.
+     */
+    public void removeControllerFromActive() {
+        ACTIVE_VIEW_CONTROLLERS.remove(this);
     }
 
     // Protected methods
@@ -64,19 +113,9 @@ public abstract class AbstractViewController extends LoggableClass implements In
     }
 
     /**
-     * Helps update the theme CSS loaded by resetting all theme CSS files before adding the new one.
+     * Helps to set the specific graphics on the scene.
      *
-     * @param rootPane Root pane of the scene.
-     * @return A <code>Theme</code> value, representing the theme that the scene was updated to.
+     * @param theme The theme to use when setting the graphics.
      */
-    protected Theme updateThemeCSS(Pane rootPane) {
-        // Get the new theme
-        Theme theme = Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal];
-
-        // Update theme CSS
-        updateThemeCSS(rootPane, theme);
-
-        // Return the retrieved theme
-        return theme;
-    }
+    protected abstract void setGraphics(Theme theme);
 }

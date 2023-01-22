@@ -200,23 +200,10 @@ public class SettingsViewController extends AbstractViewController {
     }
 
     // Public methods
-
-    /**
-     * Method that sets a specific theme on the scene.
-     *
-     * @param theme The theme to apply to the scene.
-     */
+    @Override
     public void setThemeOnScene(Theme theme) {
         updateThemeCSS(rootPane, theme);
-
-        // Set graphics
-        IconHelper.setSVGOnButton(selectFFmpegBinaryButton, 15, 30, "folder-line");
-    }
-
-    @Override
-    public void setThemeOnScene() {
-        Theme theme = Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal];
-        setThemeOnScene(theme);
+        setGraphics(theme);
     }
 
     /**
@@ -245,12 +232,23 @@ public class SettingsViewController extends AbstractViewController {
             settingsStage.setResizable(false);
 
             // Show the stage
-            settingsStage.show();
+            settingsStage.showAndWait();
+
+            // Remove view from active
+            controller.removeControllerFromActive();
+
         } catch (IOException e) {
             logException(e);
             throw new RuntimeException(e);
         }
     }
+
+    // Protected methods
+    @Override
+    protected void setGraphics(Theme theme) {
+        IconHelper.setSVGOnButton(selectFFmpegBinaryButton, 15, 30, "folder-line");
+    }
+
 
     // Private methods
 
@@ -289,7 +287,7 @@ public class SettingsViewController extends AbstractViewController {
         logFilePersistenceSpinner.setValueFactory(logFilePersistenceSpinnerFactory);
 
         // Set choice box methods
-        themeChoiceBox.setOnAction(event -> setThemeOnScene(themeChoiceBox.getValue()));
+        themeChoiceBox.setOnAction(event -> AbstractViewController.updateActiveViewsThemes(themeChoiceBox.getValue()));
     }
 
     /**

@@ -85,15 +85,10 @@ public class AboutViewController extends AbstractViewController {
     }
 
     // Public methods
-
     @Override
-    public void setThemeOnScene() {
-        Theme theme = updateThemeCSS(rootPane);
-
-        // Set graphics
-        bannerImage.setImage(new Image(IOMethods.getFileURLAsString(
-                "images/logo-and-banner/banner-" + theme.shortName + ".png"
-        )));
+    public void setThemeOnScene(Theme theme) {
+        updateThemeCSS(rootPane, theme);
+        setGraphics(theme);
     }
 
     /**
@@ -119,14 +114,22 @@ public class AboutViewController extends AbstractViewController {
             aboutStage.setResizable(false);
 
             // Show the stage
-            aboutStage.show();
+            aboutStage.showAndWait();
 
-            // Stop highlighting the hyperlink
-            controller.rootPane.requestFocus();
+            // Remove view from active once complete
+            controller.removeControllerFromActive();
 
         } catch (IOException e) {
             logException(e);
             throw new RuntimeException(e);
         }
+    }
+
+    // Protected methods
+    @Override
+    protected void setGraphics(Theme theme) {
+        bannerImage.setImage(new Image(IOMethods.getFileURLAsString(
+                "images/logo-and-banner/banner-" + theme.shortName + ".png"
+        )));
     }
 }

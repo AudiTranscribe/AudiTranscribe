@@ -184,6 +184,9 @@ public class SceneSwitcher extends LoggableClass {
             // Show the main stage
             mainStage.showAndWait();
 
+            // Remove view from active
+            controller.removeControllerFromActive();
+
             // Obtain the scene switching state and the selected file and return
             return new Pair<>(
                     controller.getSceneSwitchingState(),
