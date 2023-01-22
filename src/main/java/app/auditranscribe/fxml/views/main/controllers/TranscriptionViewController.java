@@ -42,6 +42,7 @@ import app.auditranscribe.plotting.Spectrogram;
 import app.auditranscribe.signal.windowing.SignalWindow;
 import app.auditranscribe.system.OSMethods;
 import app.auditranscribe.system.OSType;
+import app.auditranscribe.utils.GUIUtils;
 import app.auditranscribe.utils.MathUtils;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -105,6 +106,11 @@ public class TranscriptionViewController extends SwitchableViewController {
 
     @FXML
     private MenuBar menuBar;
+
+    @FXML
+    private MenuItem newProjectMenuItem, openProjectMenuItem, renameProjectMenuItem, saveProjectMenuItem,
+            saveAsMenuItem, exportMIDIMenuItem, settingsMenuItem, undoMenuItem, redoMenuItem, quantizeNotesMenuItem,
+            docsMenuItem, aboutMenuItem;
 
     // Top
     @FXML
@@ -214,6 +220,21 @@ public class TranscriptionViewController extends SwitchableViewController {
 
             log(Level.FINE, "Changed notes volume from " + oldValue + " to " + newValue);
         });
+
+        // Add methods to menu items
+        // Todo: add the rest
+//        newProjectMenuItem.setOnAction(this::handleNewProject);
+//        openProjectMenuItem.setOnAction(this::handleOpenProject);
+//        renameProjectMenuItem.setOnAction(this::handleRenameProject);
+//        saveProjectMenuItem.setOnAction(event -> handleSavingProject(false, false));
+//        saveAsMenuItem.setOnAction(event -> handleSavingProject(false, true));
+//        exportMIDIMenuItem.setOnAction(event -> handleExportMIDI());
+        settingsMenuItem.setOnAction(event -> SettingsViewController.showSettingsWindow());
+//        undoMenuItem.setOnAction(event -> NoteRectangle.editAction(NoteRectangle.EditAction.UNDO));
+//        redoMenuItem.setOnAction(event -> NoteRectangle.editAction(NoteRectangle.EditAction.REDO));
+//        quantizeNotesMenuItem.setOnAction(event -> handleQuantizeNotes());
+        docsMenuItem.setOnAction(event -> GUIUtils.openURLInBrowser("https://docs.auditranscribe.app/"));
+        aboutMenuItem.setOnAction(event -> AboutViewController.showAboutWindow());
     }
 
     // Getter/setter methods
@@ -431,7 +452,6 @@ public class TranscriptionViewController extends SwitchableViewController {
                 rewindToBeginningButton, 20, IMAGE_BUTTON_LENGTH, "step-backward-solid"
         );
     }
-
 
     // Private methods
 

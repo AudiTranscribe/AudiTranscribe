@@ -37,7 +37,7 @@
                         <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem fx:id="exportMIDIMenuItem" mnemonicParsing="false" text="Export to MIDI..." />
                         <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem fx:id="preferencesMenuItem" mnemonicParsing="false" text="Preferences..." />
+                        <MenuItem fx:id="settingsMenuItem" mnemonicParsing="false" text="Settings..." />
                      </items>
                   </Menu>
                   <Menu mnemonicParsing="false" text="Edit">
