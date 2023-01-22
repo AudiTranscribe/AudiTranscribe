@@ -8,13 +8,18 @@
     -fx-font-size: 10pt;
 }
 
+.memory-use-hbox {
+    -fx-background-color: memory-hbox-colour;
+    -fx-background-radius: 0 0 10px 10px;
+}
+
 /* MIDDLE */
 .clickable-progress-pane {
     -fx-background-color: #00000000; /* Transparent */
 }
 
 .coloured-progress-pane {
-    -fx-background-color: derive(slider-track-filled-colour, 31.25%);
+    -fx-background-color: coloured-progress-pane-colour;
 }
 
 /* BOTTOM */

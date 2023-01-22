@@ -49,10 +49,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
@@ -60,6 +58,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 /**
@@ -100,6 +101,12 @@ public class TranscriptionViewController extends SwitchableViewController {
 
     private CustomDoubleSpinnerValueFactory bpmSpinnerFactory, offsetSpinnerFactory;
 
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(0, runnable -> {
+        Thread thread = Executors.defaultThreadFactory().newThread(runnable);
+        thread.setDaemon(true);  // Make it so that it can shut down gracefully by placing it in background
+        return thread;
+    });
+
     // FXML elements
     @FXML
     private AnchorPane rootPane;
@@ -129,13 +136,13 @@ public class TranscriptionViewController extends SwitchableViewController {
     private Spinner<Double> bpmSpinner, offsetSpinner;
 
     @FXML
-    private HBox progressBarHBox;
+    private HBox progressBarHBox, memoryUseHBox;
 
     @FXML
     private ProgressBar progressBar;
 
     @FXML
-    private Label progressLabel;
+    private Label progressLabel, freeMemoryLabel, maxMemoryLabel;
 
     // Middle
     @FXML
@@ -235,6 +242,23 @@ public class TranscriptionViewController extends SwitchableViewController {
 //        quantizeNotesMenuItem.setOnAction(event -> handleQuantizeNotes());
         docsMenuItem.setOnAction(event -> GUIUtils.openURLInBrowser("https://docs.auditranscribe.app/"));
         aboutMenuItem.setOnAction(event -> AboutViewController.showAboutWindow());
+
+        // Schedule available memory updating
+        scheduler.scheduleAtFixedRate(() -> Platform.runLater(() -> {
+            // Get the presumed free memory available
+            // (See https://stackoverflow.com/a/12807848)
+            long allocatedMemory = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+            long presumableFreeMemory = Runtime.getRuntime().maxMemory() - allocatedMemory;
+
+            // Update the free memory label
+            freeMemoryLabel.setText(MathUtils.round(presumableFreeMemory / 1e6, 2) + " MB");
+        }), 1, 1, TimeUnit.SECONDS);
+
+        // Set the maximum memory available
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        maxMemoryLabel.setText(
+                (maxMemory == Long.MAX_VALUE ? "∞" : MathUtils.round(maxMemory / 1e6, 2)) + " MB"
+        );
     }
 
     // Getter/setter methods
@@ -403,6 +427,7 @@ public class TranscriptionViewController extends SwitchableViewController {
     // Todo add doc
     public void handleSceneClosing() {
         this.removeControllerFromActive();
+        scheduler.shutdown();
         // Todo implement
     }
 
@@ -436,6 +461,7 @@ public class TranscriptionViewController extends SwitchableViewController {
     // Protected methods
     @Override
     protected void setGraphics(Theme theme) {
+        // Set icons
         IconHelper.setSVGOnButton(audioVolumeButton, 20, IMAGE_BUTTON_LENGTH, "volume-up-solid");
         IconHelper.setSVGOnButton(
                 notesVolumeButton, 15, 20, IMAGE_BUTTON_LENGTH, IMAGE_BUTTON_LENGTH,

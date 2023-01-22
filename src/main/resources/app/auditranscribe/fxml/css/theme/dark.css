@@ -1,5 +1,4 @@
 .root {
-    /* Colour palette definitions */
     background-colour-primary: rgb(45, 45, 45);
     background-colour-secondary: rgb(60, 60, 60); /* Slightly lighter */
     background-colour-tertiary: rgb(85, 85, 85); /* Even lighter */
@@ -21,6 +20,8 @@
     slider-track-filled-colour: rgb(30, 150, 255);
     slider-thumb-colour: rgb(35, 35, 35);
 
+    coloured-progress-pane-colour: rgba(30, 150, 255, 0.3125); /* `slider-track-filled-colour` with opacity */
+
     scrollbar-colour: rgb(110, 110, 110);
     seperator-colour: rgb(30, 30, 30);
     stroke-colour: rgb(235, 235, 235);
@@ -28,6 +29,8 @@
     radio-button-background-colour: slider-thumb-colour;
     radio-button-border-colour: rgb(160, 160, 160);
     radio-button-dot-colour: text-colour-primary;
+
+    memory-hbox-colour: rgba(60, 60, 60, 0.25); /* `background-colour-secondary` with opacity */
 
     error-border-colour: rgb(240, 85, 85);
 

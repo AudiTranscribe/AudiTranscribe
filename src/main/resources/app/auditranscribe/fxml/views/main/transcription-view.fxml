@@ -20,7 +20,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane fx:id="rootPane" prefHeight="550.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.auditranscribe.fxml.views.main.controllers.TranscriptionViewController">
+<AnchorPane fx:id="rootPane" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.auditranscribe.fxml.views.main.controllers.TranscriptionViewController">
    <children>
       <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -152,6 +152,13 @@
                                 </content>
                               </ScrollPane>
                            </children></AnchorPane>
+                        <HBox fx:id="memoryUseHBox" alignment="CENTER" prefWidth="200.0" spacing="3.0" styleClass="memory-use-hbox" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <Label fx:id="freeMemoryLabel" text="??????? MB" />
+                              <Label text="/" />
+                              <Label fx:id="maxMemoryLabel" text="??????? MB" />
+                           </children>
+                        </HBox>
                      </children></AnchorPane>
                   <HBox prefHeight="60.0" spacing="20.0">
                      <children>
