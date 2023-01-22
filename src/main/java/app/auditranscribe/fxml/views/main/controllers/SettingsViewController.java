@@ -21,6 +21,7 @@ package app.auditranscribe.fxml.views.main.controllers;
 import app.auditranscribe.audio.FFmpegHandler;
 import app.auditranscribe.fxml.IconHelper;
 import app.auditranscribe.fxml.Popups;
+import app.auditranscribe.fxml.Theme;
 import app.auditranscribe.fxml.views.AbstractViewController;
 import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
@@ -28,14 +29,14 @@ import app.auditranscribe.io.data_files.DataFiles;
 import app.auditranscribe.io.data_files.data_encapsulators.SettingsData;
 import app.auditranscribe.misc.CustomLogger;
 import app.auditranscribe.fxml.spinners.CustomIntegerSpinnerValueFactory;
+import app.auditranscribe.music.NoteUnit;
+import app.auditranscribe.plotting.ColourScale;
+import app.auditranscribe.signal.windowing.SignalWindow;
 import app.auditranscribe.utils.GUIUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -63,6 +64,10 @@ public class SettingsViewController extends AbstractViewController {
     @FXML
     private TabPane settingsTabPane;
 
+    // "General" tab
+    @FXML
+    private ChoiceBox<Theme> themeChoiceBox;
+
     // "Audio" tab
     @FXML
     private TextField ffmpegPathTextField;
@@ -78,8 +83,14 @@ public class SettingsViewController extends AbstractViewController {
     private Button deleteLogsButton, openDataFolderButton;
 
     // "Transcription" tab
+    @FXML
+    private ChoiceBox<ColourScale> colourScaleChoiceBox;
 
-    // "Miscellaneous" tab
+    @FXML
+    private ChoiceBox<SignalWindow> windowFunctionChoiceBox;
+
+    @FXML
+    private ChoiceBox<NoteUnit> noteQuantizationChoiceBox;
 
     // Bottom
     @FXML
@@ -87,6 +98,17 @@ public class SettingsViewController extends AbstractViewController {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        // Add choice box options
+        for (Theme theme : Theme.values())
+            themeChoiceBox.getItems().add(theme);
+
+        for (ColourScale colourScale : ColourScale.values())
+            colourScaleChoiceBox.getItems().add(colourScale);
+        for (SignalWindow windowFunction : SignalWindow.values())
+            windowFunctionChoiceBox.getItems().add(windowFunction);
+        for (NoteUnit noteQuantizationUnit : NoteUnit.values())
+            noteQuantizationChoiceBox.getItems().add(noteQuantizationUnit);
+
         // Add methods to text fields
         ffmpegPathTextField.focusedProperty().addListener((observable, oldValue, newValue) -> {
             // Handle check for FFmpeg path only when unfocused
@@ -179,12 +201,22 @@ public class SettingsViewController extends AbstractViewController {
 
     // Public methods
 
-    @Override
-    public void setThemeOnScene() {
-        updateThemeCSS(rootPane);
+    /**
+     * Method that sets a specific theme on the scene.
+     *
+     * @param theme The theme to apply to the scene.
+     */
+    public void setThemeOnScene(Theme theme) {
+        updateThemeCSS(rootPane, theme);
 
         // Set graphics
         IconHelper.setSVGOnButton(selectFFmpegBinaryButton, 15, 30, "folder-line");
+    }
+
+    @Override
+    public void setThemeOnScene() {
+        Theme theme = Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal];
+        setThemeOnScene(theme);
     }
 
     /**
@@ -230,6 +262,19 @@ public class SettingsViewController extends AbstractViewController {
         lastValidFFmpegPath = DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath;
         ffmpegPathTextField.setText(lastValidFFmpegPath);
 
+        // Set choice box values
+        themeChoiceBox.setValue(Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal]);
+
+        colourScaleChoiceBox.setValue(
+                ColourScale.values()[DataFiles.SETTINGS_DATA_FILE.data.colourScaleEnumOrdinal]
+        );
+        windowFunctionChoiceBox.setValue(
+                SignalWindow.values()[DataFiles.SETTINGS_DATA_FILE.data.windowFunctionEnumOrdinal]
+        );
+        noteQuantizationChoiceBox.setValue(
+                NoteUnit.values()[DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal]
+        );
+
         // Set spinner factories and methods
         autosaveIntervalSpinnerFactory = new CustomIntegerSpinnerValueFactory(
                 1, Integer.MAX_VALUE, DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval, 1,
@@ -243,7 +288,8 @@ public class SettingsViewController extends AbstractViewController {
         );
         logFilePersistenceSpinner.setValueFactory(logFilePersistenceSpinnerFactory);
 
-        // Todo add others
+        // Set choice box methods
+        themeChoiceBox.setOnAction(event -> setThemeOnScene(themeChoiceBox.getValue()));
     }
 
     /**
@@ -259,18 +305,17 @@ public class SettingsViewController extends AbstractViewController {
      */
     private void applySettings() {
         // Update settings' values
+        DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal = themeChoiceBox.getValue().ordinal();
+
         DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath = ffmpegPathTextField.getText();
 
         DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval = autosaveIntervalSpinner.getValue();
         DataFiles.SETTINGS_DATA_FILE.data.logFilePersistence = logFilePersistenceSpinner.getValue();
 
-//        DataFiles.SETTINGS_DATA_FILE.data.colourScaleEnumOrdinal = colourScaleChoiceBox.getValue().ordinal();
-//        DataFiles.SETTINGS_DATA_FILE.data.windowFunctionEnumOrdinal = windowFunctionChoiceBox.getValue().ordinal();
-//        DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal =
-//                noteQuantizationChoiceBox.getValue().ordinal();
-//
-//        DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal = themeChoiceBox.getValue().ordinal();
-//        DataFiles.SETTINGS_DATA_FILE.data.checkForUpdateInterval = checkForUpdateIntervalSpinner.getValue();
+        DataFiles.SETTINGS_DATA_FILE.data.colourScaleEnumOrdinal = colourScaleChoiceBox.getValue().ordinal();
+        DataFiles.SETTINGS_DATA_FILE.data.windowFunctionEnumOrdinal = windowFunctionChoiceBox.getValue().ordinal();
+        DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal =
+                noteQuantizationChoiceBox.getValue().ordinal();
 
         // Apply settings to the settings file
         DataFiles.SETTINGS_DATA_FILE.saveFile();
@@ -285,23 +330,29 @@ public class SettingsViewController extends AbstractViewController {
         String selectedTabName;
 
         switch (selectedTabIndex) {
-            case 0 -> {  // "Audio" tab
+            default -> {  // "General" tab
+                selectedTabName = "General";
+
+                themeChoiceBox.setValue(Theme.values()[SettingsData.THEME_ENUM_ORDINAL]);
+            }
+            case 1 -> {  // "Audio" tab
                 selectedTabName = "Audio";
 
                 lastValidFFmpegPath = DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath;
                 ffmpegPathTextField.setText(lastValidFFmpegPath);
             }
-            case 1 -> {  // "Input/Output" tab
+            case 2 -> {  // "Input/Output" tab
                 selectedTabName = "Input/Output";
 
                 autosaveIntervalSpinnerFactory.setValue(SettingsData.AUTOSAVE_INTERVAL);
                 logFilePersistenceSpinnerFactory.setValue(SettingsData.LOG_FILE_PERSISTENCE);
             }
-            case 2 -> {  // "Transcription" tab
+            case 3 -> {  // "Transcription" tab
                 selectedTabName = "Transcription";
-            }
-            default -> {  // "Miscellaneous" tab
-                selectedTabName = "Miscellaneous";
+
+                colourScaleChoiceBox.setValue(ColourScale.values()[SettingsData.COLOUR_SCALE_ENUM_ORDINAL]);
+                windowFunctionChoiceBox.setValue(SignalWindow.values()[SettingsData.WINDOW_FUNCTION_ENUM_ORDINAL]);
+                noteQuantizationChoiceBox.setValue(NoteUnit.values()[SettingsData.NOTE_QUANTIZATION_UNIT_ENUM_ORDINAL]);
             }
         }
 

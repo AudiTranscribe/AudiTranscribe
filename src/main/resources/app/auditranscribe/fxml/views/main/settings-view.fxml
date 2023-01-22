@@ -5,6 +5,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Spinner?>
@@ -24,6 +25,29 @@
     <children>
         <TabPane fx:id="settingsTabPane" rotateGraphic="true" side="LEFT" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <tabs>
+                <Tab>
+                    <graphic>
+                        <Group>
+                            <Label rotate="90" styleClass="tab-label" text="General" />
+                        </Group>
+                    </graphic>
+                    <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" styleClass="tab-anchor-pane">
+                     <children>
+                        <VBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="15.0">
+                           <children>
+                              <Label prefHeight="0.0" styleClass="setting-subheading" text="Theme" />
+                              <HBox spacing="10.0">
+                                 <children>
+                                    <Label prefHeight="30.0" prefWidth="150.0" styleClass="setting-label" text="Application theme:" />
+                                    <ChoiceBox fx:id="themeChoiceBox" prefHeight="30.0" prefWidth="150.0" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                     </children></AnchorPane>
+                    </content>
+                </Tab>
                 <Tab>
                     <graphic>
                         <Group>
@@ -68,7 +92,7 @@
                               <HBox spacing="10.0">
                                  <children>
                                     <Label prefHeight="30.0" prefWidth="150.0" styleClass="setting-label" text="Autosave interval:" />
-                                    <Spinner fx:id="autosaveIntervalSpinner" editable="true" prefHeight="30.0" prefWidth="100.0" />
+                                    <Spinner fx:id="autosaveIntervalSpinner" editable="true" prefHeight="30.0" prefWidth="150.0" />
                                  </children>
                               </HBox>
                               <Separator prefWidth="200.0" />
@@ -76,13 +100,13 @@
                               <HBox spacing="10.0">
                                  <children>
                                     <Label prefHeight="30.0" prefWidth="150.0" styleClass="setting-label" text="Log file persistence:" />
-                                    <Spinner fx:id="logFilePersistenceSpinner" editable="true" prefHeight="30.0" prefWidth="100.0" />
+                                    <Spinner fx:id="logFilePersistenceSpinner" editable="true" prefHeight="30.0" prefWidth="150.0" />
                                  </children>
                               </HBox>
                               <HBox layoutX="10.0" layoutY="113.0" spacing="10.0">
                                  <children>
                                     <Label prefHeight="30.0" prefWidth="150.0" styleClass="setting-label" text="Delete all logs:" />
-                                    <Button fx:id="deleteLogsButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Delete Logs" />
+                                    <Button fx:id="deleteLogsButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="150.0" text="Delete Logs" />
                                  </children>
                               </HBox>
                               <Separator prefWidth="200.0" />
@@ -90,7 +114,7 @@
                               <HBox spacing="10.0">
                                  <children>
                                     <Label prefHeight="30.0" prefWidth="150.0" styleClass="setting-label" text="Go to data folder:" />
-                                    <Button fx:id="openDataFolderButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Open Folder" />
+                                    <Button fx:id="openDataFolderButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="150.0" text="Open Folder" />
                                  </children>
                               </HBox>
                            </children>
@@ -105,17 +129,34 @@
                         </Group>
                     </graphic>
                     <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" styleClass="tab-anchor-pane" />
-                    </content>
-                </Tab>
-                <Tab>
-                    <graphic>
-                        <Group>
-                            <Label rotate="90" styleClass="tab-label" text="Miscellaneous" />
-                        </Group>
-                    </graphic>
-                    <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" styleClass="tab-anchor-pane" />
+                        <AnchorPane minHeight="0.0" minWidth="0.0" styleClass="tab-anchor-pane">
+                     <children>
+                        <VBox spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="15.0">
+                           <children>
+                              <Label prefHeight="0.0" styleClass="setting-subheading" text="Spectrogram" />
+                              <HBox spacing="10.0">
+                                 <children>
+                                    <Label prefHeight="30.0" prefWidth="150.0" styleClass="setting-label" text="Colour palette:" />
+                                    <ChoiceBox fx:id="colourScaleChoiceBox" prefHeight="30.0" prefWidth="150.0" />
+                                 </children>
+                              </HBox>
+                              <HBox spacing="10.0">
+                                 <children>
+                                    <Label prefHeight="30.0" prefWidth="150.0" styleClass="setting-label" text="Windowing function:" />
+                                    <ChoiceBox fx:id="windowFunctionChoiceBox" prefHeight="30.0" prefWidth="150.0" />
+                                 </children>
+                              </HBox>
+                              <Separator prefWidth="200.0" />
+                              <Label prefHeight="0.0" styleClass="setting-subheading" text="Notes" />
+                              <HBox spacing="10.0">
+                                 <children>
+                                    <Label prefHeight="30.0" prefWidth="150.0" styleClass="setting-label" text="Note quantization unit:" />
+                                    <ChoiceBox fx:id="noteQuantizationChoiceBox" prefHeight="30.0" prefWidth="150.0" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                     </children></AnchorPane>
                     </content>
                 </Tab>
             </tabs>

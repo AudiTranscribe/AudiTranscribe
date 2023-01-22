@@ -50,12 +50,10 @@ public abstract class AbstractViewController extends LoggableClass implements In
     /**
      * Helps update the theme CSS loaded by resetting all theme CSS files before adding the new one.
      *
-     * @return A <code>Theme</code> value, representing the theme that the scene was updated to.
+     * @param rootPane Root pane of the scene.
+     * @param theme    Theme to apply to the scene.
      */
-    protected Theme updateThemeCSS(Pane rootPane) {
-        // Get the new theme
-        Theme theme = Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal];
-
+    protected void updateThemeCSS(Pane rootPane, Theme theme) {
         // Clear old themes
         for (String url : Theme.getThemeCSSURLs()) {
             rootPane.getStylesheets().remove(url);
@@ -63,6 +61,20 @@ public abstract class AbstractViewController extends LoggableClass implements In
 
         // Set new theme
         rootPane.getStylesheets().add(IOMethods.getFileURLAsString("fxml/css/theme/" + theme.cssFile));
+    }
+
+    /**
+     * Helps update the theme CSS loaded by resetting all theme CSS files before adding the new one.
+     *
+     * @param rootPane Root pane of the scene.
+     * @return A <code>Theme</code> value, representing the theme that the scene was updated to.
+     */
+    protected Theme updateThemeCSS(Pane rootPane) {
+        // Get the new theme
+        Theme theme = Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal];
+
+        // Update theme CSS
+        updateThemeCSS(rootPane, theme);
 
         // Return the retrieved theme
         return theme;
