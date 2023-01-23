@@ -118,6 +118,73 @@ public final class UnitConversionUtils {
     }
 
     /**
+     * Converts a note number to its spelled note.<br>
+     * Note that the note number for C0 is 0 and subsequent note numbers are given by their offset
+     * from C0. For example, A4 has note number 57 as it is 57 notes away from C0.
+     *
+     * @param noteNumber       Note number for the given note.
+     * @param musicKey         Music key, with both the key and the mode.
+     * @param fancyAccidentals Whether <em>fancier accidentals</em> (i.e. ♯ instead of # and ♭
+     *                         instead of b) should be used.
+     * @return Note string.
+     */
+    public static String noteNumberToNote(int noteNumber, String musicKey, boolean fancyAccidentals) {
+        // Fancify music key
+        musicKey = MusicUtils.fancifyMusicString(musicKey);
+
+        // Compute the octave and the key value
+        int octave = Math.floorDiv(noteNumber, 12);  // Note that C0 has note number 0, C1 is 12, C2 is 24 etc.
+        int key = noteNumber % 12;  // 0 = C, 1 = C#/Db, 2 = D, 3 = D#/Eb etc.
+
+        // Determine which set of note strings to use
+        String[] noteStrings;
+        if (MusicUtils.doesKeyUseFlats(musicKey)) {
+            noteStrings = new String[]{"C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"};
+        } else {
+            noteStrings = new String[]{"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+        }
+
+        // Replace notes if the key demands it
+        if (musicKey.equals("G♭ Major") ||
+                musicKey.equals("C♭ Major") ||
+                musicKey.equals("E♭ Minor") ||
+                musicKey.equals("A♭ Minor")) {
+            noteStrings[11] = "Cb";  // Cb instead of B
+
+            if (key == 11) octave++;  // Need to increase octave number by 1
+        }
+
+        if (musicKey.equals("C♭ Major") || musicKey.equals("A♭ Minor")) {
+            noteStrings[4] = "Fb";  // Fb instead of E
+        }
+
+        if (musicKey.equals("F♯ Major") ||
+                musicKey.equals("C♯ Major") ||
+                musicKey.equals("D♯ Minor") ||
+                musicKey.equals("A♯ Minor")) {
+            noteStrings[5] = "E#";  // E# instead of F
+        }
+
+        if (musicKey.equals("C♯ Major") || musicKey.equals("A♯ Minor")) {
+            noteStrings[0] = "B#";  // B# instead of C
+            if (key == 0) octave--;  // Need to reduce octave number by 1
+        }
+
+        // Check if we want to use fancy accidentals
+        if (fancyAccidentals) {
+            for (int i = 0; i < noteStrings.length; i++) {
+                noteStrings[i] = MusicUtils.fancifyMusicString(noteStrings[i]);
+            }
+        }
+
+        // Get the pitch/offset string
+        String noteString = noteStrings[key];
+
+        // Return the full string
+        return noteString + octave;  // Example: C0, D#3, Eb5 etc.
+    }
+
+    /**
      * Converts the note number to a frequency.
      *
      * @param noteNumber The note number. Note that a note number of 0 means the key C0.

@@ -62,6 +62,166 @@ class UnitConversionUtilsTest {
     }
 
     @Test
+    void noteNumberToNote() {
+        assertEquals(
+                "C0",
+                UnitConversionUtils.noteNumberToNote(0, "C Major", false)
+        );
+        assertEquals(
+                "C4",
+                UnitConversionUtils.noteNumberToNote(48, "C Major", false)
+        );
+        assertEquals(
+                "F5",
+                UnitConversionUtils.noteNumberToNote(65, "C Major", false)
+        );
+        assertEquals(
+                "G#6",
+                UnitConversionUtils.noteNumberToNote(80, "C Major", false)
+        );
+        assertEquals(
+                "B9",
+                UnitConversionUtils.noteNumberToNote(119, "C Major", false)
+        );
+
+        assertEquals(
+                "C0",
+                UnitConversionUtils.noteNumberToNote(0, "Gb Major", false)
+        );
+        assertEquals(
+                "E5",
+                UnitConversionUtils.noteNumberToNote(64, "Gb Major", false)
+        );
+        assertEquals(
+                "F7",
+                UnitConversionUtils.noteNumberToNote(89, "Gb Major", false)
+        );
+        assertEquals(
+                "Cb9",
+                UnitConversionUtils.noteNumberToNote(107, "Gb Major", false)
+        );
+
+        assertEquals(
+                "C0",
+                UnitConversionUtils.noteNumberToNote(0, "Eb Minor", false)
+        );
+        assertEquals(
+                "E5",
+                UnitConversionUtils.noteNumberToNote(64, "Eb Minor", false)
+        );
+        assertEquals(
+                "F7",
+                UnitConversionUtils.noteNumberToNote(89, "Eb Minor", false)
+        );
+        assertEquals(
+                "Cb9",
+                UnitConversionUtils.noteNumberToNote(107, "Eb Minor", false)
+        );
+
+        assertEquals(
+                "C0",
+                UnitConversionUtils.noteNumberToNote(0, "Cb Major", false)
+        );
+        assertEquals(
+                "Fb5",
+                UnitConversionUtils.noteNumberToNote(64, "Cb Major", false)
+        );
+        assertEquals(
+                "F7",
+                UnitConversionUtils.noteNumberToNote(89, "Cb Major", false)
+        );
+        assertEquals(
+                "Cb9",
+                UnitConversionUtils.noteNumberToNote(107, "Cb Major", false)
+        );
+
+        assertEquals(
+                "C0",
+                UnitConversionUtils.noteNumberToNote(0, "A♭ Minor", true)
+        );
+        assertEquals(
+                "F♭5",
+                UnitConversionUtils.noteNumberToNote(64, "A♭ Minor", true)
+        );
+        assertEquals(
+                "F7",
+                UnitConversionUtils.noteNumberToNote(89, "A♭ Minor", true)
+        );
+        assertEquals(
+                "C♭9",
+                UnitConversionUtils.noteNumberToNote(107, "A♭ Minor", true)
+        );
+
+        assertEquals(
+                "C0",
+                UnitConversionUtils.noteNumberToNote(0, "F♯ Major", true)
+        );
+        assertEquals(
+                "E5",
+                UnitConversionUtils.noteNumberToNote(64, "F♯ Major", true)
+        );
+        assertEquals(
+                "E♯7",
+                UnitConversionUtils.noteNumberToNote(89, "F♯ Major", true)
+        );
+        assertEquals(
+                "B9",
+                UnitConversionUtils.noteNumberToNote(119, "F♯ Major", true)
+        );
+
+        assertEquals(
+                "C0",
+                UnitConversionUtils.noteNumberToNote(0, "D♯ Minor", true)
+        );
+        assertEquals(
+                "E5",
+                UnitConversionUtils.noteNumberToNote(64, "D♯ Minor", true)
+        );
+        assertEquals(
+                "E♯7",
+                UnitConversionUtils.noteNumberToNote(89, "D♯ Minor", true)
+        );
+        assertEquals(
+                "B9",
+                UnitConversionUtils.noteNumberToNote(119, "D♯ Minor", true)
+        );
+
+        assertEquals(
+                "B♯0",
+                UnitConversionUtils.noteNumberToNote(12, "C♯ Major", true)
+        );
+        assertEquals(
+                "E5",
+                UnitConversionUtils.noteNumberToNote(64, "C♯ Major", true)
+        );
+        assertEquals(
+                "E♯7",
+                UnitConversionUtils.noteNumberToNote(89, "C♯ Major", true)
+        );
+        assertEquals(
+                "B9",
+                UnitConversionUtils.noteNumberToNote(119, "C♯ Major", true)
+        );
+
+        assertEquals(
+                "B#0",
+                UnitConversionUtils.noteNumberToNote(12, "A# Minor", false)
+        );
+        assertEquals(
+                "E5",
+                UnitConversionUtils.noteNumberToNote(64, "A♯ Minor", true)
+        );
+        assertEquals(
+                "E♯7",
+                UnitConversionUtils.noteNumberToNote(89, "A♯ Minor", true)
+        );
+        assertEquals(
+                "B9",
+                UnitConversionUtils.noteNumberToNote(119, "A# Minor", false)
+        );
+    }
+
+    @Test
     void noteNumberToFreq() {
         assertEquals(440, UnitConversionUtils.noteNumberToFreq(57), 0.001);  // A4
         assertEquals(16.352, UnitConversionUtils.noteNumberToFreq(0), 0.001);  // C0
