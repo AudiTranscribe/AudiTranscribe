@@ -36,7 +36,7 @@ public final class AUDTFileHelpers {
         // Private constructor to signal this is a utility class
     }
 
-    // Public methods
+    // File processing helper methods
 
     /**
      * Method that helps to add bytes into a bytes list.
@@ -114,5 +114,20 @@ public final class AUDTFileHelpers {
 
         // Return the double array
         return doubleArray;
+    }
+
+    // Compatibility methods
+
+    /**
+     * Helper method that converts the old time signature index into the new time signature enum value.
+     *
+     * @param timeSignatureIndex Old time signature index value.
+     * @return The <code>TimeSignature</code> enum value.
+     */
+    public static TimeSignature oldTimeSignatureIndexToTimeSignature(int timeSignatureIndex) {
+        String[] listOfOldTimeSignatures = new String[]{
+                "4/4", "2/2", "2/4", "3/4", "3/8", "6/8", "9/8", "12/8"
+        };
+        return TimeSignature.displayTextToTimeSignature(listOfOldTimeSignatures[timeSignatureIndex]);
     }
 }

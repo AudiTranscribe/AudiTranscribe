@@ -1,4 +1,4 @@
-package app.auditranscribe.io.audt_file.v0x00090002;
+package app.auditranscribe.io.audt_file.v0x00050002;
 
 import app.auditranscribe.generic.tuples.Triple;
 import app.auditranscribe.io.CompressionHandlers;
@@ -8,11 +8,10 @@ import app.auditranscribe.io.audt_file.ProjectData;
 import app.auditranscribe.io.audt_file.base.AUDTFileReader;
 import app.auditranscribe.io.audt_file.base.AUDTFileWriter;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import app.auditranscribe.io.audt_file.v0x00090002.data_encapsulators.*;
+import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.*;
 import app.auditranscribe.io.exceptions.FailedToReadDataException;
 import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
 import app.auditranscribe.io.exceptions.InvalidFileVersionException;
-import app.auditranscribe.music.TimeSignature;
 import app.auditranscribe.utils.TypeConversionUtils;
 import org.junit.jupiter.api.*;
 
@@ -25,11 +24,11 @@ import java.nio.file.Paths;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class AUDTFile0x00090002Test {
+class AUDTFile0x00050002Test {
     // Define the file path
     static final String FILE_PATH = IOMethods.joinPaths(
             IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-            "test-files","io","audt_file", "v0x00090002", "test-AUDTFile0x00090002Test.audt"
+            "test-files","io","audt_file", "v0x00050002", "test-AUDTFile0x00050002Test.audt"
     );
 
     // Define helper attributes
@@ -59,7 +58,7 @@ class AUDTFile0x00090002Test {
     ProjectData projectData2;
 
     // Initialization method
-    AUDTFile0x00090002Test() throws IOException {
+    AUDTFile0x00050002Test() throws IOException {
         // Define sample array data
         // (These are example arrays, not actual data)
         qTransformMagnitudes = new double[][]{
@@ -84,36 +83,36 @@ class AUDTFile0x00090002Test {
         double maxMagnitude = conversionTuple.value2();
 
         // Define data to be used within the tests
-        qTransformDataObject = new QTransformDataObject0x00090002(
+        qTransformDataObject = new QTransformDataObject0x00050002(
                 qTransformBytes, minMagnitude, maxMagnitude
         );
-        audioDataObject = new AudioDataObject0x00090002(
+        audioDataObject = new AudioDataObject0x00050002(
                 CompressionHandlers.lz4Compress(Files.readAllBytes(Paths.get(
                         IOMethods.getAbsoluteFilePath("test-files/general/audio/VeryShortAudio.mp3")
                 ))),
-                CompressionHandlers.lz4Compress(Files.readAllBytes(Paths.get(
-                        IOMethods.getAbsoluteFilePath("test-files/general/audio/SlightlyShortAudio.mp3")
-                ))),
-                44100, 200
+                44100, 200, "VeryShortAudio.mp3"
         );
 
-        projectInfoDataObject1 = new ProjectInfoDataObject0x00090002(
-                "Test-1", 1, TimeSignature.TWO_TWO, 123.45, 0.01,
-                0.55, 12
+        ProjectInfoDataObject0x00050002 temp1 = new ProjectInfoDataObject0x00050002(
+                1, 0, 123.45, 0.01, 0.55, 12
         );
-        projectInfoDataObject2 = new ProjectInfoDataObject0x00090002(
-                "Test-2", 8, TimeSignature.SIX_FOUR, 67.89, -1.23,
-                0.124, 34
-        );
+        temp1.setProjectName("VeryShortAudio.mp3");
+        projectInfoDataObject1 = temp1;
 
-        musicNotesDataObject1 = new MusicNotesDataObject0x00090002(
+        ProjectInfoDataObject0x00050002 temp2 = new ProjectInfoDataObject0x00050002(
+                8, 7, 67.89, -1.23, 0.124, 34
+        );
+        temp2.setProjectName("VeryShortAudio.mp3");
+        projectInfoDataObject2 = temp2;
+
+        musicNotesDataObject1 = new MusicNotesDataObject0x00050002(
                 timesToPlaceRectangles1, noteDurations1, noteNums1
         );
-        musicNotesDataObject2 = new MusicNotesDataObject0x00090002(
+        musicNotesDataObject2 = new MusicNotesDataObject0x00050002(
                 timesToPlaceRectangles2, noteDurations2, noteNums2
         );
 
-        unchangingDataPropertiesObject = new UnchangingDataPropertiesObject0x00090002(
+        unchangingDataPropertiesObject = new UnchangingDataPropertiesObject0x00050002(
                 32 +  // Header section
                         UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
                         qTransformDataObject.numBytesNeeded() +
@@ -136,7 +135,7 @@ class AUDTFile0x00090002Test {
     @Order(1)
     void fileWriter_initialWrite() throws IOException, InvalidFileVersionException {
         // Create a file writer object
-        AUDTFileWriter fileWriter = AUDTFileWriter.getWriter(0x00090002, FILE_PATH);
+        AUDTFileWriter fileWriter = AUDTFileWriter.getWriter(0x00050002, FILE_PATH);
 
         // Test writing some data
         fileWriter.writeUnchangingDataProperties(unchangingDataPropertiesObject);
@@ -228,7 +227,7 @@ class AUDTFile0x00090002Test {
     @Order(3)
     void fileWriter_initialWriteAlt() throws IOException, InvalidFileVersionException {
         // Create a file writer object
-        AUDTFileWriter fileWriter = AUDTFileWriter.getWriter(0x00090002, FILE_PATH, 0);
+        AUDTFileWriter fileWriter = AUDTFileWriter.getWriter(0x00050002, FILE_PATH, 0);
 
         // Test writing some data
         fileWriter.writeUnchangingDataProperties(unchangingDataPropertiesObject);
@@ -287,7 +286,7 @@ class AUDTFile0x00090002Test {
     void fileWriter_2() throws IOException, InvalidFileVersionException {
         // Create a file writer object
         AUDTFileWriter fileWriter = AUDTFileWriter.getWriter(
-                0x00090002, FILE_PATH, unchangingDataPropertiesObject.numSkippableBytes
+                0x00050002, FILE_PATH, unchangingDataPropertiesObject.numSkippableBytes
         );
 
         // Test writing only the GUI and music notes data
@@ -344,7 +343,7 @@ class AUDTFile0x00090002Test {
         // Define files' folder
         String folder = IOMethods.joinPaths(
                 IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-                "test-files", "io", "audt_file", "v0x00090002", "AUDTFile0x00090002Test"
+                "test-files", "io", "audt_file", "v0x00050002", "AUDTFile0x00050002Test"
         );
 
         // Perform tests

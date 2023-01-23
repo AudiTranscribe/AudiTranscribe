@@ -24,6 +24,9 @@ import app.auditranscribe.io.CompressionHandlers;
 import app.auditranscribe.io.audt_file.AUDTFileConstants;
 import app.auditranscribe.io.audt_file.AUDTFileHelpers;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
+import app.auditranscribe.io.audt_file.v0x00050002.AUDTFileWriter0x00050002;
+import app.auditranscribe.io.audt_file.v0x00070001.AUDTFileWriter0x00070001;
+import app.auditranscribe.io.audt_file.v0x00080001.AUDTFileWriter0x00080001;
 import app.auditranscribe.io.audt_file.v0x00090002.AUDTFileWriter0x00090002;
 import app.auditranscribe.io.exceptions.InvalidFileVersionException;
 import app.auditranscribe.utils.MiscUtils;
@@ -98,6 +101,9 @@ public abstract class AUDTFileWriter extends LoggableClass {
     public static AUDTFileWriter getWriter(int fileVersion, String filepath) throws InvalidFileVersionException {
         // Get the appropriate file reader objects
         return switch (fileVersion) {
+            case 0x00050002 -> new AUDTFileWriter0x00050002(filepath);
+            case 0x00070001 -> new AUDTFileWriter0x00070001(filepath);
+            case 0x00080001 -> new AUDTFileWriter0x00080001(filepath);
             case 0x00090002 -> new AUDTFileWriter0x00090002(filepath);
             default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
         };
@@ -115,6 +121,9 @@ public abstract class AUDTFileWriter extends LoggableClass {
             throws InvalidFileVersionException {
         // Get the appropriate file reader objects
         return switch (fileVersion) {
+            case 0x00050002 -> new AUDTFileWriter0x00050002(filepath, numBytesToSkip);
+            case 0x00070001 -> new AUDTFileWriter0x00070001(filepath, numBytesToSkip);
+            case 0x00080001 -> new AUDTFileWriter0x00080001(filepath, numBytesToSkip);
             case 0x00090002 -> new AUDTFileWriter0x00090002(filepath, numBytesToSkip);
             default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
         };

@@ -1,5 +1,5 @@
 /*
- * QTransformDataObject0x00090002.java
+ * QTransformDataObject0x00080001.java
  * Description: Data object that stores the Q-Transform data.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -16,14 +16,14 @@
  * Copyright © AudiTranscribe Team
  */
 
-package app.auditranscribe.io.audt_file.v0x00090002.data_encapsulators;
+package app.auditranscribe.io.audt_file.v0x00080001.data_encapsulators;
 
-import app.auditranscribe.io.audt_file.v0x00080001.data_encapsulators.QTransformDataObject0x00080001;
+import app.auditranscribe.io.audt_file.v0x00070001.data_encapsulators.QTransformDataObject0x00070001;
 
 /**
  * Data object that stores the Q-Transform data.
  */
-public class QTransformDataObject0x00090002 extends QTransformDataObject0x00080001 {
+public class QTransformDataObject0x00080001 extends QTransformDataObject0x00070001 {
     /**
      * Initialization method for the Q-Transform data object.
      *
@@ -31,7 +31,7 @@ public class QTransformDataObject0x00090002 extends QTransformDataObject0x000800
      * @param minMagnitude    The minimum magnitude of the Q-Transform data.
      * @param maxMagnitude    The maximum magnitude of the Q-Transform data.
      */
-    public QTransformDataObject0x00090002(byte[] qTransformBytes, double minMagnitude, double maxMagnitude) {
+    public QTransformDataObject0x00080001(byte[] qTransformBytes, double minMagnitude, double maxMagnitude) {
         super(qTransformBytes, minMagnitude, maxMagnitude);
     }
 }

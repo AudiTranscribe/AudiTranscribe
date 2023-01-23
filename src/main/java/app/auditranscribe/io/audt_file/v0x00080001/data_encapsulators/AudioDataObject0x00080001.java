@@ -1,5 +1,5 @@
 /*
- * AudioDataObject0x00090002.java
+ * AudioDataObject0x00080001.java
  * Description: Data object that stores the audio data.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -16,14 +16,14 @@
  * Copyright © AudiTranscribe Team
  */
 
-package app.auditranscribe.io.audt_file.v0x00090002.data_encapsulators;
+package app.auditranscribe.io.audt_file.v0x00080001.data_encapsulators;
 
-import app.auditranscribe.io.audt_file.v0x00080001.data_encapsulators.AudioDataObject0x00080001;
+import app.auditranscribe.io.audt_file.base.data_encapsulators.AudioDataObject;
 
 /**
  * Data object that stores the audio data.
  */
-public class AudioDataObject0x00090002 extends AudioDataObject0x00080001 {
+public class AudioDataObject0x00080001 extends AudioDataObject {
     /**
      * Initialization method for the audio data object.
      *
@@ -32,9 +32,23 @@ public class AudioDataObject0x00090002 extends AudioDataObject0x00080001 {
      * @param sampleRate                 Sample rate of the audio file
      * @param totalDurationInMS          Total duration of the audio in <b>milliseconds</b>.
      */
-    public AudioDataObject0x00090002(
+    public AudioDataObject0x00080001(
             byte[] compressedOriginalMP3Bytes, byte[] compressedSlowedMP3Bytes, double sampleRate, int totalDurationInMS
     ) {
-        super(compressedOriginalMP3Bytes, compressedSlowedMP3Bytes, sampleRate, totalDurationInMS);
+        this.compressedOriginalMP3Bytes = compressedOriginalMP3Bytes;
+        this.compressedSlowedMP3Bytes = compressedSlowedMP3Bytes;
+        this.sampleRate = sampleRate;
+        this.totalDurationInMS = totalDurationInMS;
+    }
+
+    // Public methods
+    @Override
+    public int numBytesNeeded() {
+        return 4 +  // Section ID
+                (4 + compressedOriginalMP3Bytes.length) +  // +4 for the length of the original MP3 audio data
+                (4 + compressedSlowedMP3Bytes.length) +    // +4 for the length of the slowed MP3 audio data
+                8 +   // Sample rate
+                4 +   // Total duration in milliseconds
+                4;    // EOS delimiter
     }
 }

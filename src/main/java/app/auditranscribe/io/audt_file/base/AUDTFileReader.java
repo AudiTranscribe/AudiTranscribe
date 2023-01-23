@@ -23,6 +23,9 @@ import app.auditranscribe.io.ByteConversionHandler;
 import app.auditranscribe.io.CompressionHandlers;
 import app.auditranscribe.io.audt_file.AUDTFileConstants;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
+import app.auditranscribe.io.audt_file.v0x00050002.AUDTFileReader0x00050002;
+import app.auditranscribe.io.audt_file.v0x00070001.AUDTFileReader0x00070001;
+import app.auditranscribe.io.audt_file.v0x00080001.AUDTFileReader0x00080001;
 import app.auditranscribe.io.audt_file.v0x00090002.AUDTFileReader0x00090002;
 import app.auditranscribe.io.exceptions.FailedToReadDataException;
 import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
@@ -118,6 +121,9 @@ public abstract class AUDTFileReader extends LoggableClass {
         try (InputStream inputStream = new FileInputStream(filepath)) {  // Do this so that the read point is the start
             // Get the appropriate file reader objects
             return switch (fileVersion) {
+                case 0x00050002 -> new AUDTFileReader0x00050002(filepath, inputStream);
+                case 0x00070001 -> new AUDTFileReader0x00070001(filepath, inputStream);
+                case 0x00080001 -> new AUDTFileReader0x00080001(filepath, inputStream);
                 case 0x00090002 -> new AUDTFileReader0x00090002(filepath, inputStream);
                 default -> throw new InvalidFileVersionException(
                         "Invalid file version '" + MiscUtils.intAsPaddedHexStr(fileVersion) + "'."

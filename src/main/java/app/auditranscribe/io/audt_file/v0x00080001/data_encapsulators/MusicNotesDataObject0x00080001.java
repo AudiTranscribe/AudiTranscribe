@@ -1,5 +1,5 @@
 /*
- * MusicNotesDataObject0x00090002.java
+ * MusicNotesDataObject0x00080001.java
  * Description: Data object that stores the music notes' data.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -16,14 +16,14 @@
  * Copyright © AudiTranscribe Team
  */
 
-package app.auditranscribe.io.audt_file.v0x00090002.data_encapsulators;
+package app.auditranscribe.io.audt_file.v0x00080001.data_encapsulators;
 
-import app.auditranscribe.io.audt_file.v0x00080001.data_encapsulators.MusicNotesDataObject0x00080001;
+import app.auditranscribe.io.audt_file.v0x00070001.data_encapsulators.MusicNotesDataObject0x00070001;
 
 /**
  * Data object that stores the music notes' data.
  */
-public class MusicNotesDataObject0x00090002 extends MusicNotesDataObject0x00080001 {
+public class MusicNotesDataObject0x00080001 extends MusicNotesDataObject0x00070001 {
     /**
      * Initialization method for the music notes data object.
      *
@@ -31,7 +31,7 @@ public class MusicNotesDataObject0x00090002 extends MusicNotesDataObject0x000800
      * @param noteDurations          The duration of each note rectangle.
      * @param noteNums               The note number of each note rectangle.
      */
-    public MusicNotesDataObject0x00090002(double[] timesToPlaceRectangles, double[] noteDurations, int[] noteNums) {
+    public MusicNotesDataObject0x00080001(double[] timesToPlaceRectangles, double[] noteDurations, int[] noteNums) {
         super(timesToPlaceRectangles, noteDurations, noteNums);
     }
 }

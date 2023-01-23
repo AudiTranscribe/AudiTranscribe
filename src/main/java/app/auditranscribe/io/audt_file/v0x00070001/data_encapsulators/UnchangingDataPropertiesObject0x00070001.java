@@ -1,5 +1,5 @@
 /*
- * UnchangingDataPropertiesObject0x00090002.java
+ * UnchangingDataPropertiesObject0x00070001.java
  * Description: Data object that stores the unchanging data's properties.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -16,20 +16,20 @@
  * Copyright © AudiTranscribe Team
  */
 
-package app.auditranscribe.io.audt_file.v0x00090002.data_encapsulators;
+package app.auditranscribe.io.audt_file.v0x00070001.data_encapsulators;
 
-import app.auditranscribe.io.audt_file.v0x00080001.data_encapsulators.UnchangingDataPropertiesObject0x00080001;
+import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.UnchangingDataPropertiesObject0x00050002;
 
 /**
  * Data object that stores the unchanging data's properties.
  */
-public class UnchangingDataPropertiesObject0x00090002 extends UnchangingDataPropertiesObject0x00080001 {
+public class UnchangingDataPropertiesObject0x00070001 extends UnchangingDataPropertiesObject0x00050002 {
     /**
      * Initialization method for the unchanging data properties object.
      *
      * @param numSkippableBytes The number of skippable bytes.
      */
-    public UnchangingDataPropertiesObject0x00090002(int numSkippableBytes) {
+    public UnchangingDataPropertiesObject0x00070001(int numSkippableBytes) {
         super(numSkippableBytes);
     }
 }
