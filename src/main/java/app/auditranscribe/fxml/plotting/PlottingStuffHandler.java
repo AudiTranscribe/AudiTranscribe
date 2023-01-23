@@ -19,6 +19,7 @@
 package app.auditranscribe.fxml.plotting;
 
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+import app.auditranscribe.music.MusicKey;
 import app.auditranscribe.utils.MusicUtils;
 import app.auditranscribe.utils.UnitConversionUtils;
 import javafx.geometry.Pos;
@@ -96,14 +97,14 @@ public final class PlottingStuffHandler {
      *                         instead of b) should be used.
      */
     public static Label[] addNoteLabels(
-            Pane notePane, Label[] noteLabels, String musicKey, double height, int minNoteNumber,
+            Pane notePane, Label[] noteLabels, MusicKey musicKey, double height, int minNoteNumber,
             int maxNoteNumber, boolean fancyAccidentals
     ) {
         // Get the width of the note pane
         double width = notePane.getWidth() - 2;  // Minus 2 for the borders
 
         // Get the note offsets that are in the key
-        HashSet<Integer> noteOffsets = MusicUtils.getNotesInKey(musicKey);
+        HashSet<Integer> noteOffsets = musicKey.notesInKey;
 
         // Check if there are existing note labels
         if (noteLabels != null) {

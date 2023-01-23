@@ -20,6 +20,7 @@ package app.auditranscribe.utils;
 
 import app.auditranscribe.generic.exceptions.FormatException;
 import app.auditranscribe.generic.exceptions.ValueException;
+import app.auditranscribe.music.MusicKey;
 
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -128,44 +129,37 @@ public final class UnitConversionUtils {
      *                         instead of b) should be used.
      * @return Note string.
      */
-    public static String noteNumberToNote(int noteNumber, String musicKey, boolean fancyAccidentals) {
-        // Fancify music key
-        musicKey = MusicUtils.fancifyMusicString(musicKey);
-
+    public static String noteNumberToNote(int noteNumber, MusicKey musicKey, boolean fancyAccidentals) {
         // Compute the octave and the key value
         int octave = Math.floorDiv(noteNumber, 12);  // Note that C0 has note number 0, C1 is 12, C2 is 24 etc.
         int key = noteNumber % 12;  // 0 = C, 1 = C#/Db, 2 = D, 3 = D#/Eb etc.
 
         // Determine which set of note strings to use
         String[] noteStrings;
-        if (MusicUtils.doesKeyUseFlats(musicKey)) {
+        if (musicKey.usesFlats) {
             noteStrings = new String[]{"C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"};
         } else {
             noteStrings = new String[]{"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
         }
 
         // Replace notes if the key demands it
-        if (musicKey.equals("G♭ Major") ||
-                musicKey.equals("C♭ Major") ||
-                musicKey.equals("E♭ Minor") ||
-                musicKey.equals("A♭ Minor")) {
+        if (musicKey == MusicKey.G_FLAT_MAJOR || musicKey == MusicKey.C_FLAT_MAJOR ||
+                musicKey == MusicKey.E_FLAT_MINOR || musicKey == MusicKey.A_FLAT_MINOR) {
             noteStrings[11] = "Cb";  // Cb instead of B
 
             if (key == 11) octave++;  // Need to increase octave number by 1
         }
 
-        if (musicKey.equals("C♭ Major") || musicKey.equals("A♭ Minor")) {
+        if (musicKey == MusicKey.C_FLAT_MAJOR || musicKey == MusicKey.A_FLAT_MINOR) {
             noteStrings[4] = "Fb";  // Fb instead of E
         }
 
-        if (musicKey.equals("F♯ Major") ||
-                musicKey.equals("C♯ Major") ||
-                musicKey.equals("D♯ Minor") ||
-                musicKey.equals("A♯ Minor")) {
+        if (musicKey == MusicKey.F_SHARP_MAJOR || musicKey == MusicKey.C_SHARP_MAJOR ||
+                musicKey == MusicKey.D_SHARP_MINOR || musicKey == MusicKey.A_SHARP_MINOR) {
             noteStrings[5] = "E#";  // E# instead of F
         }
 
-        if (musicKey.equals("C♯ Major") || musicKey.equals("A♯ Minor")) {
+        if (musicKey == MusicKey.C_SHARP_MAJOR || musicKey == MusicKey.A_SHARP_MINOR) {
             noteStrings[0] = "B#";  // B# instead of C
             if (key == 0) octave--;  // Need to reduce octave number by 1
         }

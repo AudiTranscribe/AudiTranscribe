@@ -2,6 +2,7 @@ package app.auditranscribe.utils;
 
 import app.auditranscribe.generic.exceptions.FormatException;
 import app.auditranscribe.generic.exceptions.ValueException;
+import app.auditranscribe.music.MusicKey;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -65,159 +66,159 @@ class UnitConversionUtilsTest {
     void noteNumberToNote() {
         assertEquals(
                 "C0",
-                UnitConversionUtils.noteNumberToNote(0, "C Major", false)
+                UnitConversionUtils.noteNumberToNote(0, MusicKey.C_MAJOR, false)
         );
         assertEquals(
                 "C4",
-                UnitConversionUtils.noteNumberToNote(48, "C Major", false)
+                UnitConversionUtils.noteNumberToNote(48, MusicKey.C_MAJOR, false)
         );
         assertEquals(
                 "F5",
-                UnitConversionUtils.noteNumberToNote(65, "C Major", false)
+                UnitConversionUtils.noteNumberToNote(65, MusicKey.C_MAJOR, false)
         );
         assertEquals(
                 "G#6",
-                UnitConversionUtils.noteNumberToNote(80, "C Major", false)
+                UnitConversionUtils.noteNumberToNote(80, MusicKey.C_MAJOR, false)
         );
         assertEquals(
                 "B9",
-                UnitConversionUtils.noteNumberToNote(119, "C Major", false)
+                UnitConversionUtils.noteNumberToNote(119, MusicKey.C_MAJOR, false)
         );
 
         assertEquals(
                 "C0",
-                UnitConversionUtils.noteNumberToNote(0, "Gb Major", false)
+                UnitConversionUtils.noteNumberToNote(0, MusicKey.G_FLAT_MAJOR, false)
         );
         assertEquals(
                 "E5",
-                UnitConversionUtils.noteNumberToNote(64, "Gb Major", false)
+                UnitConversionUtils.noteNumberToNote(64, MusicKey.G_FLAT_MAJOR, false)
         );
         assertEquals(
                 "F7",
-                UnitConversionUtils.noteNumberToNote(89, "Gb Major", false)
+                UnitConversionUtils.noteNumberToNote(89, MusicKey.G_FLAT_MAJOR, false)
         );
         assertEquals(
                 "Cb9",
-                UnitConversionUtils.noteNumberToNote(107, "Gb Major", false)
+                UnitConversionUtils.noteNumberToNote(107, MusicKey.G_FLAT_MAJOR, false)
         );
 
         assertEquals(
                 "C0",
-                UnitConversionUtils.noteNumberToNote(0, "Eb Minor", false)
+                UnitConversionUtils.noteNumberToNote(0, MusicKey.E_FLAT_MINOR, false)
         );
         assertEquals(
                 "E5",
-                UnitConversionUtils.noteNumberToNote(64, "Eb Minor", false)
+                UnitConversionUtils.noteNumberToNote(64, MusicKey.E_FLAT_MINOR, false)
         );
         assertEquals(
                 "F7",
-                UnitConversionUtils.noteNumberToNote(89, "Eb Minor", false)
+                UnitConversionUtils.noteNumberToNote(89, MusicKey.E_FLAT_MINOR, false)
         );
         assertEquals(
                 "Cb9",
-                UnitConversionUtils.noteNumberToNote(107, "Eb Minor", false)
+                UnitConversionUtils.noteNumberToNote(107, MusicKey.E_FLAT_MINOR, false)
         );
 
         assertEquals(
                 "C0",
-                UnitConversionUtils.noteNumberToNote(0, "Cb Major", false)
+                UnitConversionUtils.noteNumberToNote(0, MusicKey.C_FLAT_MAJOR, false)
         );
         assertEquals(
                 "Fb5",
-                UnitConversionUtils.noteNumberToNote(64, "Cb Major", false)
+                UnitConversionUtils.noteNumberToNote(64, MusicKey.C_FLAT_MAJOR, false)
         );
         assertEquals(
                 "F7",
-                UnitConversionUtils.noteNumberToNote(89, "Cb Major", false)
+                UnitConversionUtils.noteNumberToNote(89, MusicKey.C_FLAT_MAJOR, false)
         );
         assertEquals(
                 "Cb9",
-                UnitConversionUtils.noteNumberToNote(107, "Cb Major", false)
+                UnitConversionUtils.noteNumberToNote(107, MusicKey.C_FLAT_MAJOR, false)
         );
 
         assertEquals(
                 "C0",
-                UnitConversionUtils.noteNumberToNote(0, "A♭ Minor", true)
+                UnitConversionUtils.noteNumberToNote(0, MusicKey.A_FLAT_MINOR, true)
         );
         assertEquals(
                 "F♭5",
-                UnitConversionUtils.noteNumberToNote(64, "A♭ Minor", true)
+                UnitConversionUtils.noteNumberToNote(64, MusicKey.A_FLAT_MINOR, true)
         );
         assertEquals(
                 "F7",
-                UnitConversionUtils.noteNumberToNote(89, "A♭ Minor", true)
+                UnitConversionUtils.noteNumberToNote(89, MusicKey.A_FLAT_MINOR, true)
         );
         assertEquals(
                 "C♭9",
-                UnitConversionUtils.noteNumberToNote(107, "A♭ Minor", true)
+                UnitConversionUtils.noteNumberToNote(107, MusicKey.A_FLAT_MINOR, true)
         );
 
         assertEquals(
                 "C0",
-                UnitConversionUtils.noteNumberToNote(0, "F♯ Major", true)
+                UnitConversionUtils.noteNumberToNote(0, MusicKey.F_SHARP_MAJOR, true)
         );
         assertEquals(
                 "E5",
-                UnitConversionUtils.noteNumberToNote(64, "F♯ Major", true)
+                UnitConversionUtils.noteNumberToNote(64, MusicKey.F_SHARP_MAJOR, true)
         );
         assertEquals(
                 "E♯7",
-                UnitConversionUtils.noteNumberToNote(89, "F♯ Major", true)
+                UnitConversionUtils.noteNumberToNote(89, MusicKey.F_SHARP_MAJOR, true)
         );
         assertEquals(
                 "B9",
-                UnitConversionUtils.noteNumberToNote(119, "F♯ Major", true)
+                UnitConversionUtils.noteNumberToNote(119, MusicKey.F_SHARP_MAJOR, true)
         );
 
         assertEquals(
                 "C0",
-                UnitConversionUtils.noteNumberToNote(0, "D♯ Minor", true)
+                UnitConversionUtils.noteNumberToNote(0, MusicKey.D_SHARP_MINOR, true)
         );
         assertEquals(
                 "E5",
-                UnitConversionUtils.noteNumberToNote(64, "D♯ Minor", true)
+                UnitConversionUtils.noteNumberToNote(64, MusicKey.D_SHARP_MINOR, true)
         );
         assertEquals(
                 "E♯7",
-                UnitConversionUtils.noteNumberToNote(89, "D♯ Minor", true)
+                UnitConversionUtils.noteNumberToNote(89, MusicKey.D_SHARP_MINOR, true)
         );
         assertEquals(
                 "B9",
-                UnitConversionUtils.noteNumberToNote(119, "D♯ Minor", true)
+                UnitConversionUtils.noteNumberToNote(119, MusicKey.D_SHARP_MINOR, true)
         );
 
         assertEquals(
                 "B♯0",
-                UnitConversionUtils.noteNumberToNote(12, "C♯ Major", true)
+                UnitConversionUtils.noteNumberToNote(12, MusicKey.C_SHARP_MAJOR, true)
         );
         assertEquals(
                 "E5",
-                UnitConversionUtils.noteNumberToNote(64, "C♯ Major", true)
+                UnitConversionUtils.noteNumberToNote(64, MusicKey.C_SHARP_MAJOR, true)
         );
         assertEquals(
                 "E♯7",
-                UnitConversionUtils.noteNumberToNote(89, "C♯ Major", true)
+                UnitConversionUtils.noteNumberToNote(89, MusicKey.C_SHARP_MAJOR, true)
         );
         assertEquals(
                 "B9",
-                UnitConversionUtils.noteNumberToNote(119, "C♯ Major", true)
+                UnitConversionUtils.noteNumberToNote(119, MusicKey.C_SHARP_MAJOR, true)
         );
 
         assertEquals(
                 "B#0",
-                UnitConversionUtils.noteNumberToNote(12, "A# Minor", false)
+                UnitConversionUtils.noteNumberToNote(12, MusicKey.A_SHARP_MINOR, false)
         );
         assertEquals(
                 "E5",
-                UnitConversionUtils.noteNumberToNote(64, "A♯ Minor", true)
+                UnitConversionUtils.noteNumberToNote(64, MusicKey.A_SHARP_MINOR, true)
         );
         assertEquals(
                 "E♯7",
-                UnitConversionUtils.noteNumberToNote(89, "A♯ Minor", true)
+                UnitConversionUtils.noteNumberToNote(89, MusicKey.A_SHARP_MINOR, true)
         );
         assertEquals(
                 "B9",
-                UnitConversionUtils.noteNumberToNote(119, "A# Minor", false)
+                UnitConversionUtils.noteNumberToNote(119, MusicKey.A_SHARP_MINOR, false)
         );
     }
 
