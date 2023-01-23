@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package app.auditranscribe.plotting.interpolation;
+package app.auditranscribe.fxml.plotting.interpolation;
 
 import app.auditranscribe.utils.ArrayUtils;
 import app.auditranscribe.utils.MathUtils;

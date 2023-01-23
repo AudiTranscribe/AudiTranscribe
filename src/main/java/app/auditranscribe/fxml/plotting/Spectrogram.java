@@ -16,15 +16,15 @@
  * Copyright © AudiTranscribe Team
  */
 
-package app.auditranscribe.plotting;
+package app.auditranscribe.fxml.plotting;
 
 import app.auditranscribe.audio.Audio;
+import app.auditranscribe.fxml.plotting.interpolation.AbstractInterpolation;
 import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.generic.exceptions.ValueException;
 import app.auditranscribe.misc.Complex;
 import app.auditranscribe.misc.CustomTask;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
-import app.auditranscribe.plotting.interpolation.AbstractInterpolation;
 import app.auditranscribe.signal.FrequencyRangeGeneration;
 import app.auditranscribe.signal.representations.QTransform;
 import app.auditranscribe.signal.windowing.SignalWindow;

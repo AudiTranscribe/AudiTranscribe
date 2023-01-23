@@ -1,4 +1,4 @@
-package app.auditranscribe.plotting;
+package app.auditranscribe.fxml.plotting;
 
 import app.auditranscribe.generic.exceptions.LengthException;
 import app.auditranscribe.utils.MatrixUtils;

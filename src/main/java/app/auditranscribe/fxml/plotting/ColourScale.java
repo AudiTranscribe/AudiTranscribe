@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package app.auditranscribe.plotting;
+package app.auditranscribe.fxml.plotting;
 
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 

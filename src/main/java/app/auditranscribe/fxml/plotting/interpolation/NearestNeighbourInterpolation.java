@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package app.auditranscribe.plotting.interpolation;
+package app.auditranscribe.fxml.plotting.interpolation;
 
 /**
  * Class that handles the nearest neighbour interpolation method.

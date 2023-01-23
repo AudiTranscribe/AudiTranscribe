@@ -19,9 +19,9 @@
 package app.auditranscribe.io.data_files.data_encapsulators;
 
 import app.auditranscribe.fxml.Theme;
+import app.auditranscribe.fxml.plotting.ColourScale;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.music.NoteUnit;
-import app.auditranscribe.plotting.ColourScale;
 import app.auditranscribe.signal.windowing.SignalWindow;
 
 /**

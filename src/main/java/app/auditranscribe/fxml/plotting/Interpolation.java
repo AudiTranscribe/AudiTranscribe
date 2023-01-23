@@ -17,11 +17,11 @@
  * Copyright © AudiTranscribe Team
  */
 
-package app.auditranscribe.plotting;
+package app.auditranscribe.fxml.plotting;
 
-import app.auditranscribe.plotting.interpolation.AbstractInterpolation;
-import app.auditranscribe.plotting.interpolation.BilinearInterpolation;
-import app.auditranscribe.plotting.interpolation.NearestNeighbourInterpolation;
+import app.auditranscribe.fxml.plotting.interpolation.AbstractInterpolation;
+import app.auditranscribe.fxml.plotting.interpolation.BilinearInterpolation;
+import app.auditranscribe.fxml.plotting.interpolation.NearestNeighbourInterpolation;
 
 /**
  * Enum that contains the different interpolation methods that can be used on a 2D array.

@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package app.auditranscribe.plotting.interpolation;
+package app.auditranscribe.fxml.plotting.interpolation;
 
 import app.auditranscribe.generic.exceptions.LengthException;
 
