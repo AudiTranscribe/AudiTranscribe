@@ -40,6 +40,7 @@ import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
 import app.auditranscribe.io.exceptions.InvalidFileVersionException;
 import app.auditranscribe.system.OSMethods;
 import app.auditranscribe.system.OSType;
+import app.auditranscribe.utils.MiscUtils;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -375,7 +376,7 @@ public class SceneSwitcher extends LoggableClass {
                 // Save to backups folder
                 String backupPath = IOMethods.joinPaths(
                         IOConstants.PROJECT_BACKUPS_FOLDER_PATH,
-                        noExtension + "-" + Integer.toHexString(fileVersion) + ".audt"
+                        noExtension + "-" + MiscUtils.intAsPaddedHexStr(fileVersion) + ".audt"
                 );
                 boolean success = IOMethods.copyFile(audtFile.getAbsolutePath(), backupPath);
 
@@ -384,9 +385,9 @@ public class SceneSwitcher extends LoggableClass {
                             null, "Failed to make backup of '" + audtFileName + "'.",
                             "The program failed to make a backup of '" + audtFile.getName() + "'."
                     );
-                    log(Level.WARNING, "Failed to make backup of '" + audtFileName + "' to '" + backupPath + "'.");
+                    log(Level.WARNING, "Failed to make backup of '" + audtFileName + "' to '" + backupPath + "'");
                 } else {
-                    log("Made backup of '" + audtFileName + "' to '" + backupPath + "'.");
+                    log("Made backup of '" + audtFileName + "' to '" + backupPath + "'");
                 }
             }
 
