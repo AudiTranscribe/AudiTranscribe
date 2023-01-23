@@ -32,6 +32,7 @@ import java.util.Objects;
 public class ProjectInfoDataObject0x00070001 extends ProjectInfoDataObject {
     // Attributes
     public int timeSignatureIndex;
+    public int musicKeyIndex;
 
     /**
      * Initialization method for the project info data object.
@@ -57,6 +58,7 @@ public class ProjectInfoDataObject0x00070001 extends ProjectInfoDataObject {
         this.playbackVolume = playbackVolume;
         this.currTimeInMS = currTimeInMS;
 
+        this.musicKey = AUDTFileHelpers.oldMusicKeyIndexToMusicKey(musicKeyIndex);
         this.timeSignature = AUDTFileHelpers.oldTimeSignatureIndexToTimeSignature(timeSignatureIndex);
     }
 

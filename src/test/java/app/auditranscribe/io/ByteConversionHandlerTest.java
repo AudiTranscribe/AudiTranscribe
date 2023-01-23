@@ -8,13 +8,20 @@ import java.util.HexFormat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ByteConversionHandlerTest {
+    // Conversion to bytes
+    @Test
+    void booleanToBytes() {
+        assertArrayEquals(new byte[]{0}, ByteConversionHandler.booleanToBytes(false));
+        assertArrayEquals(new byte[]{1}, ByteConversionHandler.booleanToBytes(true));
+    }
+
     @Test
     void shortToBytes() {
-        assertArrayEquals(HexFormat.of().parseHex("0000"), ByteConversionHandler.shortToByte((short) 0));
-        assertArrayEquals(HexFormat.of().parseHex("04d2"), ByteConversionHandler.shortToByte((short) 1234));
-        assertArrayEquals(HexFormat.of().parseHex("7fff"), ByteConversionHandler.shortToByte((short) 32767));
-        assertArrayEquals(HexFormat.of().parseHex("fb2e"), ByteConversionHandler.shortToByte((short) -1234));
-        assertArrayEquals(HexFormat.of().parseHex("8000"), ByteConversionHandler.shortToByte((short) -32768));
+        assertArrayEquals(HexFormat.of().parseHex("0000"), ByteConversionHandler.shortToBytes((short) 0));
+        assertArrayEquals(HexFormat.of().parseHex("04d2"), ByteConversionHandler.shortToBytes((short) 1234));
+        assertArrayEquals(HexFormat.of().parseHex("7fff"), ByteConversionHandler.shortToBytes((short) 32767));
+        assertArrayEquals(HexFormat.of().parseHex("fb2e"), ByteConversionHandler.shortToBytes((short) -1234));
+        assertArrayEquals(HexFormat.of().parseHex("8000"), ByteConversionHandler.shortToBytes((short) -32768));
     }
 
     @Test
@@ -120,6 +127,17 @@ class ByteConversionHandlerTest {
                 HexFormat.of().parseHex(hexStr),
                 ByteConversionHandler.twoDimensionalIntegerArrayToBytes(array)
         );
+    }
+
+    // Conversion from bytes
+    @Test
+    void bytesToBoolean() {
+        // Test conversion
+        assertFalse(ByteConversionHandler.bytesToBoolean(new byte[]{0}));
+        assertTrue(ByteConversionHandler.bytesToBoolean(new byte[]{1}));
+
+        // Test exception
+        assertThrowsExactly(LengthException.class, () -> ByteConversionHandler.bytesToBoolean(new byte[]{1, 2}));
     }
 
     @Test

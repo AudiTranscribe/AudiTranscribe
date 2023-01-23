@@ -21,8 +21,6 @@ package app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators;
 import app.auditranscribe.io.audt_file.AUDTFileHelpers;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.ProjectInfoDataObject;
 
-import java.util.Objects;
-
 /**
  * Data object that stores the project's info.<br>
  * <b>Note</b>: This is different from the <code>ProjectData</code> class. This is a data object
@@ -32,6 +30,7 @@ import java.util.Objects;
 public class ProjectInfoDataObject0x00050002 extends ProjectInfoDataObject {
     // Attributes
     public int timeSignatureIndex;
+    public int musicKeyIndex;
 
     /**
      * Initialization method for the project info data object.
@@ -56,6 +55,7 @@ public class ProjectInfoDataObject0x00050002 extends ProjectInfoDataObject {
         this.currTimeInMS = currTimeInMS;
 
         this.projectName = null;  // We will need to update this later
+        this.musicKey = AUDTFileHelpers.oldMusicKeyIndexToMusicKey(musicKeyIndex);
         this.timeSignature = AUDTFileHelpers.oldTimeSignatureIndexToTimeSignature(timeSignatureIndex);
     }
 
@@ -73,34 +73,6 @@ public class ProjectInfoDataObject0x00050002 extends ProjectInfoDataObject {
     }
 
     // Public methods
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        ProjectInfoDataObject0x00050002 that = (ProjectInfoDataObject0x00050002) o;
-        return timeSignatureIndex == that.timeSignatureIndex;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), timeSignatureIndex);
-    }
-
-    @Override
-    public String toString() {
-        return "ProjectInfoDataObject0x00050002{" +
-                "timeSignatureIndex=" + timeSignatureIndex +
-                ", projectName='" + projectName + '\'' +
-                ", musicKeyIndex=" + musicKeyIndex +
-                ", timeSignature=" + timeSignature +
-                ", bpm=" + bpm +
-                ", offsetSeconds=" + offsetSeconds +
-                ", playbackVolume=" + playbackVolume +
-                ", currTimeInMS=" + currTimeInMS +
-                '}';
-    }
-
     @Override
     public int numBytesNeeded() {
         return 4 +   // Section ID

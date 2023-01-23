@@ -22,24 +22,27 @@ import os
 import re
 
 # CONSTANTS
-ORIGINAL_AUDT_FILE = "test-AUDTFile0x00090002Test.audt"  # Original file to be edited
-TESTING_FILES_FOLDER = "../src/main/resources/site/overwrite/auditranscribe/testing-files/audt-test-files"
+VERSION = "0x000B0001"
+
+ORIGINAL_AUDT_FILE = f"test-AUDTFile{VERSION}Test.audt"  # Original file to be edited
+TESTING_FILES_FOLDER = "../src/main/resources/app/auditranscribe/test-files/io/audt_file/" + \
+                       f"v{VERSION}/AUDTFile{VERSION}Test"
 
 NUM_SECTIONS = 5
+print(TESTING_FILES_FOLDER)
 
-# READ FILE DATA
-with open(ORIGINAL_AUDT_FILE, "rb") as f:
-    fileData = f.read()
-
-# GET AUDT FILE VERSION
-fileVersion = "v" + re.match("test-AUDTFile(0x[0-9]{8})Test.audt", ORIGINAL_AUDT_FILE).group(1)
-print(f"Generating test files for version '{fileVersion}'.")
+print(f"Generating test files for version '{VERSION}'.")
 input("Press any key to start.")
 
 # MAIN CODE
+# Read original file
+with open(ORIGINAL_AUDT_FILE, "rb") as f:
+    fileData = f.read()
+
 # Make output folder if not exist
-if not os.path.exists(f"{TESTING_FILES_FOLDER}/{fileVersion}"):
-    os.makedirs(f"{TESTING_FILES_FOLDER}/{fileVersion}")
+if not os.path.exists(TESTING_FILES_FOLDER):
+    os.makedirs(TESTING_FILES_FOLDER)
+    print("Created testing files folder")
 
 # For each section, modify the ID and the EOS delimiter
 sectionIDBytePos = 32  # First 32 bytes are the AUDT file delimiter
@@ -71,7 +74,7 @@ for sectionID in range(1, NUM_SECTIONS + 1):
     for i in range(sectionIDBytePos, sectionIDBytePos + 4):
         idIncorrectBytes[i] = 255  # Byte FF
 
-    with open(f"{TESTING_FILES_FOLDER}/{fileVersion}/section{sectionID}-id-incorrect.audt", "wb") as f:
+    with open(f"{TESTING_FILES_FOLDER}/section{sectionID}-id-incorrect.audt", "wb") as f:
         f.write(idIncorrectBytes)
 
     # Replace the EOS for one of the files
@@ -80,7 +83,7 @@ for sectionID in range(1, NUM_SECTIONS + 1):
     for i in range(eosBytePos, eosBytePos + 4):
         idIncorrectBytes[i] = 255  # Byte FF
 
-    with open(f"{TESTING_FILES_FOLDER}/{fileVersion}/section{sectionID}-eos-incorrect.audt", "wb") as f:
+    with open(f"{TESTING_FILES_FOLDER}/section{sectionID}-eos-incorrect.audt", "wb") as f:
         f.write(idIncorrectBytes)
 
     print(f"Section {sectionID} files written")

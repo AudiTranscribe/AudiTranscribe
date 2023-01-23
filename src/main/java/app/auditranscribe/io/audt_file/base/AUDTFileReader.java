@@ -27,6 +27,7 @@ import app.auditranscribe.io.audt_file.v0x00050002.AUDTFileReader0x00050002;
 import app.auditranscribe.io.audt_file.v0x00070001.AUDTFileReader0x00070001;
 import app.auditranscribe.io.audt_file.v0x00080001.AUDTFileReader0x00080001;
 import app.auditranscribe.io.audt_file.v0x00090002.AUDTFileReader0x00090002;
+import app.auditranscribe.io.audt_file.v0x000B0001.AUDTFileReader0x000B0001;
 import app.auditranscribe.io.exceptions.FailedToReadDataException;
 import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
 import app.auditranscribe.io.exceptions.InvalidFileVersionException;
@@ -125,6 +126,7 @@ public abstract class AUDTFileReader extends LoggableClass {
                 case 0x00070001 -> new AUDTFileReader0x00070001(filepath, inputStream);
                 case 0x00080001 -> new AUDTFileReader0x00080001(filepath, inputStream);
                 case 0x00090002 -> new AUDTFileReader0x00090002(filepath, inputStream);
+                case 0x000B0001 -> new AUDTFileReader0x000B0001(filepath, inputStream);
                 default -> throw new InvalidFileVersionException(
                         "Invalid file version '" + MiscUtils.intAsPaddedHexStr(fileVersion) + "'."
                 );
@@ -234,6 +236,19 @@ public abstract class AUDTFileReader extends LoggableClass {
 
         // Verify that the header ends with an end-of-section delimiter
         return checkEOSDelimiter();
+    }
+
+    /**
+     * Helper method that reads a boolean from the byte array.
+     *
+     * @return Boolean that was read in.
+     */
+    protected boolean readBoolean() {
+        // Read the next byte from the current `bytePos`
+        byte[] booleanBytes = Arrays.copyOfRange(bytes, bytePos, ++bytePos);  // Increment then return
+
+        // Convert these boolean bytes back into a boolean and return
+        return ByteConversionHandler.bytesToBoolean(booleanBytes);
     }
 
     /**

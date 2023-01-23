@@ -111,7 +111,7 @@ class ProjectInfoDataObject0x00050002Test {
         );
 
         // Tests
-        assertEquals(-1787789942, one.hashCode());
-        assertEquals(-1586883211, two.hashCode());
+        assertEquals(1753316499, one.hashCode());
+        assertEquals(-2089141476, two.hashCode());
     }
 }

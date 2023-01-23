@@ -16,10 +16,10 @@
  * Copyright © AudiTranscribe Team
  */
 
-package app.auditranscribe.io.audt_file.v0x00090002.data_encapsulators;
+package app.auditranscribe.io.audt_file.v0x000B0001.data_encapsulators;
 
-import app.auditranscribe.io.audt_file.AUDTFileHelpers;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.ProjectInfoDataObject;
+import app.auditranscribe.music.MusicKey;
 import app.auditranscribe.music.TimeSignature;
 
 /**
@@ -28,35 +28,29 @@ import app.auditranscribe.music.TimeSignature;
  * storing the project's info, whereas the <code>ProjectData</code> object stores all the different
  * data encapsulators.
  */
-public class ProjectInfoDataObject0x00090002 extends ProjectInfoDataObject {
-    // Attributes
-    public int musicKeyIndex;
-
+public class ProjectInfoDataObject0x000B0001 extends ProjectInfoDataObject {
     /**
      * Initialization method for the project info data object.
      *
      * @param projectName    Name of the project.
-     * @param musicKeyIndex  The index of the music key in the dropdown menu shown in the
-     *                       application.
+     * @param musicKey       Music key of the project.
      * @param timeSignature  Time signature of the project.
      * @param bpm            Number of beats per minute.
      * @param offsetSeconds  Number of seconds offset from the start of the audio.
      * @param playbackVolume Volume to play back at.
      * @param currTimeInMS   Current playback time of the audio in <b>milliseconds</b>.
      */
-    public ProjectInfoDataObject0x00090002(
-            String projectName, int musicKeyIndex, TimeSignature timeSignature, double bpm, double offsetSeconds,
+    public ProjectInfoDataObject0x000B0001(
+            String projectName, MusicKey musicKey, TimeSignature timeSignature, double bpm, double offsetSeconds,
             double playbackVolume, int currTimeInMS
     ) {
         this.projectName = projectName;
-        this.musicKeyIndex = musicKeyIndex;
+        this.musicKey = musicKey;
         this.timeSignature = timeSignature;
         this.bpm = bpm;
         this.offsetSeconds = offsetSeconds;
         this.playbackVolume = playbackVolume;
         this.currTimeInMS = currTimeInMS;
-
-        this.musicKey = AUDTFileHelpers.oldMusicKeyIndexToMusicKey(musicKeyIndex);
     }
 
     // Public methods
@@ -64,7 +58,7 @@ public class ProjectInfoDataObject0x00090002 extends ProjectInfoDataObject {
     public int numBytesNeeded() {
         return 4 +   // Section ID
                 (4 + projectName.getBytes().length) +  // String length + string bytes of project name
-                4 +  // Music key index
+                2 +  // Music key UUID
                 2 + 2 +  // Time signature (numerator + denominator = 2 + 2)
                 8 +  // BPM
                 8 +  // Offset seconds

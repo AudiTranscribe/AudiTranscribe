@@ -28,6 +28,7 @@ import app.auditranscribe.io.audt_file.v0x00050002.AUDTFileWriter0x00050002;
 import app.auditranscribe.io.audt_file.v0x00070001.AUDTFileWriter0x00070001;
 import app.auditranscribe.io.audt_file.v0x00080001.AUDTFileWriter0x00080001;
 import app.auditranscribe.io.audt_file.v0x00090002.AUDTFileWriter0x00090002;
+import app.auditranscribe.io.audt_file.v0x000B0001.AUDTFileWriter0x000B0001;
 import app.auditranscribe.io.exceptions.InvalidFileVersionException;
 import app.auditranscribe.utils.MiscUtils;
 
@@ -105,6 +106,7 @@ public abstract class AUDTFileWriter extends LoggableClass {
             case 0x00070001 -> new AUDTFileWriter0x00070001(filepath);
             case 0x00080001 -> new AUDTFileWriter0x00080001(filepath);
             case 0x00090002 -> new AUDTFileWriter0x00090002(filepath);
+            case 0x000B0001 -> new AUDTFileWriter0x000B0001(filepath);
             default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
         };
     }
@@ -125,6 +127,7 @@ public abstract class AUDTFileWriter extends LoggableClass {
             case 0x00070001 -> new AUDTFileWriter0x00070001(filepath, numBytesToSkip);
             case 0x00080001 -> new AUDTFileWriter0x00080001(filepath, numBytesToSkip);
             case 0x00090002 -> new AUDTFileWriter0x00090002(filepath, numBytesToSkip);
+            case 0x000B0001 -> new AUDTFileWriter0x000B0001(filepath, numBytesToSkip);
             default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
         };
     }
@@ -207,13 +210,26 @@ public abstract class AUDTFileWriter extends LoggableClass {
     // Protected methods
 
     /**
+     * Helper method that writes a boolean to the byte list.
+     *
+     * @param myBoolean Boolean to write.
+     */
+    protected void writeBoolean(boolean myBoolean) {
+        // Convert the short into its bytes
+        byte[] byteArray = ByteConversionHandler.booleanToBytes(myBoolean);
+
+        // Write to the byte list
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, byteArray);
+    }
+
+    /**
      * Helper method that writes a short to the byte list.
      *
      * @param myShort Short to write.
      */
     protected void writeShort(short myShort) {
         // Convert the short into its bytes
-        byte[] byteArray = ByteConversionHandler.shortToByte(myShort);
+        byte[] byteArray = ByteConversionHandler.shortToBytes(myShort);
 
         // Write to the byte list
         AUDTFileHelpers.addBytesIntoBytesList(bytes, byteArray);

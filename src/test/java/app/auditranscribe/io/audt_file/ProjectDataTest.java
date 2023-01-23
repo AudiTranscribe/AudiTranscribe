@@ -204,7 +204,7 @@ class ProjectDataTest {
                 musicNotesDataObject2
         );
 
-        assertEquals(669315113, one.hashCode());
-        assertEquals(-2039234382, two.hashCode());
+        assertEquals(975342637, one.hashCode());
+        assertEquals(-791226519, two.hashCode());
     }
 }

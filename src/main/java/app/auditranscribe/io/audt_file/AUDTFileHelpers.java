@@ -19,6 +19,7 @@
 package app.auditranscribe.io.audt_file;
 
 import app.auditranscribe.generic.tuples.Triple;
+import app.auditranscribe.music.MusicKey;
 import app.auditranscribe.music.TimeSignature;
 import app.auditranscribe.utils.MathUtils;
 
@@ -129,5 +130,24 @@ public final class AUDTFileHelpers {
                 "4/4", "2/2", "2/4", "3/4", "3/8", "6/8", "9/8", "12/8"
         };
         return TimeSignature.displayTextToTimeSignature(listOfOldTimeSignatures[timeSignatureIndex]);
+    }
+
+    /**
+     * Helper method that converts the old music key index into the new music key enum value.
+     *
+     * @param musicKeyIndex Old music key index.
+     * @return The <code>MusicKey</code> enum value.
+     */
+    public static MusicKey oldMusicKeyIndexToMusicKey(int musicKeyIndex) {
+        String[] listOfOldMusicKeys = new String[]{
+                // Major keys
+                "C Major", "C♯ Major", "D♭ Major", "D Major", "E♭ Major", "E Major", "F Major", "F♯ Major", "G♭ Major",
+                "G Major", "A♭ Major", "A Major", "B♭ Major", "B Major", "C♭ Major",
+
+                // Minor keys
+                "C Minor", "C♯ Minor", "D Minor", "D♯ Minor", "E♭ Minor", "E Minor", "F Minor", "F♯ Minor", "G Minor",
+                "G♯ Minor", "A♭ Minor", "A Minor", "A♯ Minor", "B♭ Minor", "B Minor"
+        };
+        return MusicKey.getMusicKey(listOfOldMusicKeys[musicKeyIndex]);
     }
 }

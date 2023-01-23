@@ -32,7 +32,17 @@ public final class ByteConversionHandler {
         // Private constructor to signal this is a utility class
     }
 
-    // Public methods
+    // Conversion to bytes
+
+    /**
+     * Method that converts the boolean <code>x</code> into an array of 1 byte.
+     *
+     * @param x Boolean to convert.
+     * @return Array of 1 byte, representing the boolean.
+     */
+    public static byte[] booleanToBytes(boolean x) {
+        return new byte[]{(byte) (x ? 1 : 0)};
+    }
 
     /**
      * Method that converts the short <code>x</code> into an array of 2 bytes.
@@ -40,7 +50,7 @@ public final class ByteConversionHandler {
      * @param x Short to convert.
      * @return Array of 2 bytes, representing the short.
      */
-    public static byte[] shortToByte(short x) {
+    public static byte[] shortToBytes(short x) {
         return ByteBuffer.allocate(2).order(ByteOrder.BIG_ENDIAN).putShort(x).array();
     }
 
@@ -200,6 +210,23 @@ public final class ByteConversionHandler {
 
         // Return the byte array
         return bytes;
+    }
+
+    // Conversion from bytes
+
+    /**
+     * Method that converts an array of 1 byte into a boolean.
+     *
+     * @param bytes Byte array to convert into a boolean.
+     * @return Boolean represented by the single byte.
+     * @throws LengthException If the <code>bytes</code> array does <b>not</b> have exactly 1 byte.
+     */
+    public static boolean bytesToBoolean(byte[] bytes) {
+        // Assert that there are exactly 2 bytes to convert
+        if (bytes.length != 1) throw new LengthException("There must be exactly 1 byte in the bytes array.");
+
+        // Convert the bytes array to the boolean
+        return bytes[0] == (byte) 1;
     }
 
     /**

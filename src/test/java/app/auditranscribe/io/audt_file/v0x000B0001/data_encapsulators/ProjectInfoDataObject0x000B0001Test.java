@@ -1,21 +1,23 @@
-package app.auditranscribe.io.audt_file.v0x00070001.data_encapsulators;
+package app.auditranscribe.io.audt_file.v0x000B0001.data_encapsulators;
 
 import app.auditranscribe.io.audt_file.base.data_encapsulators.ProjectInfoDataObject;
+import app.auditranscribe.music.MusicKey;
+import app.auditranscribe.music.TimeSignature;
 import app.auditranscribe.utils.MathUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ProjectInfoDataObject0x00070001Test {
+class ProjectInfoDataObject0x000B0001Test {
     // Attributes
     String projectName1 = "First Project Name";
     String projectName2 = "Second Project Name";
 
-    int musicKeyIndex1 = 1;
-    int musicKeyIndex2 = 8;
+    MusicKey musicKey1 = MusicKey.C_SHARP_MAJOR;
+    MusicKey musicKey2 = MusicKey.G_FLAT_MAJOR;
 
-    int timeSignatureIndex1 = 0;
-    int timeSignatureIndex2 = 7;
+    TimeSignature timeSignature1 = TimeSignature.TWO_TWO;
+    TimeSignature timeSignature2 = TimeSignature.SIX_FOUR;
 
     double bpm1 = 123.456;
     double bpm2 = 78.9;
@@ -33,23 +35,23 @@ class ProjectInfoDataObject0x00070001Test {
     @Test
     void numBytesNeeded() {
         // Define the two data objects to test number of bytes needed
-        ProjectInfoDataObject one = new ProjectInfoDataObject0x00070001(
-                projectName1, musicKeyIndex1, timeSignatureIndex1, bpm1, offsetSeconds1, playbackVolume1, currTimeInMS1
+        ProjectInfoDataObject one = new ProjectInfoDataObject0x000B0001(
+                projectName1, musicKey1, timeSignature1, bpm1, offsetSeconds1, playbackVolume1, currTimeInMS1
         );
-        ProjectInfoDataObject two = new ProjectInfoDataObject0x00070001(
-                projectName2, musicKeyIndex2, timeSignatureIndex2, bpm2, offsetSeconds2, playbackVolume2, currTimeInMS2
+        ProjectInfoDataObject two = new ProjectInfoDataObject0x000B0001(
+                projectName2, musicKey2, timeSignature2, bpm2, offsetSeconds2, playbackVolume2, currTimeInMS2
         );
 
         // Tests
-        assertEquals(66, one.numBytesNeeded());
-        assertEquals(67, two.numBytesNeeded());
+        assertEquals(65, one.numBytesNeeded());
+        assertEquals(66, two.numBytesNeeded());
     }
 
     @Test
     void testEquals() {
         // Define temporary data object for testing the initial checks
-        ProjectInfoDataObject temp = new ProjectInfoDataObject0x00070001(
-                projectName1, musicKeyIndex1, timeSignatureIndex1, bpm1, offsetSeconds1, playbackVolume1, currTimeInMS1
+        ProjectInfoDataObject temp = new ProjectInfoDataObject0x000B0001(
+                projectName1, musicKey1, timeSignature1, bpm1, offsetSeconds1, playbackVolume1, currTimeInMS1
         );
 
         // Define other objects to test comparison
@@ -63,8 +65,8 @@ class ProjectInfoDataObject0x00070001Test {
 
         // Define arrays to pick the data attributes from
         String[] projectNames = {projectName1, projectName2};
-        int[] musicKeyIndices = {musicKeyIndex1, musicKeyIndex2};
-        int[] timeSignatureIndices = {timeSignatureIndex1, timeSignatureIndex2};
+        MusicKey[] musicKeys = {musicKey1, musicKey2};
+        TimeSignature[] timeSignatures = {timeSignature1, timeSignature2};
         double[] bpms = {bpm1, bpm2};
         double[] offsetSeconds = {offsetSeconds1, offsetSeconds2};
         double[] playbackVolumes = {playbackVolume1, playbackVolume2};
@@ -73,10 +75,10 @@ class ProjectInfoDataObject0x00070001Test {
         // Generate product of indices
         int[][] indexProduct = MathUtils.selfProduct(2, 7);  // 7 data attributes
         for (int[] indices1 : indexProduct) {
-            ProjectInfoDataObject one = new ProjectInfoDataObject0x00070001(
+            ProjectInfoDataObject one = new ProjectInfoDataObject0x000B0001(
                     projectNames[indices1[0]],
-                    musicKeyIndices[indices1[1]],
-                    timeSignatureIndices[indices1[2]],
+                    musicKeys[indices1[1]],
+                    timeSignatures[indices1[2]],
                     bpms[indices1[3]],
                     offsetSeconds[indices1[4]],
                     playbackVolumes[indices1[5]],
@@ -84,10 +86,10 @@ class ProjectInfoDataObject0x00070001Test {
             );
 
             for (int[] indices2 : indexProduct) {
-                ProjectInfoDataObject two = new ProjectInfoDataObject0x00070001(
+                ProjectInfoDataObject two = new ProjectInfoDataObject0x000B0001(
                         projectNames[indices2[0]],
-                        musicKeyIndices[indices2[1]],
-                        timeSignatureIndices[indices2[2]],
+                        musicKeys[indices2[1]],
+                        timeSignatures[indices2[2]],
                         bpms[indices2[3]],
                         offsetSeconds[indices2[4]],
                         playbackVolumes[indices2[5]],
@@ -109,15 +111,15 @@ class ProjectInfoDataObject0x00070001Test {
     @Test
     void testHashCode() {
         // Define the two data objects to test hash code
-        ProjectInfoDataObject one = new ProjectInfoDataObject0x00070001(
-                projectName1, musicKeyIndex1, timeSignatureIndex1, bpm1, offsetSeconds1, playbackVolume1, currTimeInMS1
+        ProjectInfoDataObject one = new ProjectInfoDataObject0x000B0001(
+                projectName1, musicKey1, timeSignature1, bpm1, offsetSeconds1, playbackVolume1, currTimeInMS1
         );
-        ProjectInfoDataObject two = new ProjectInfoDataObject0x00070001(
-                projectName2, musicKeyIndex2, timeSignatureIndex2, bpm2, offsetSeconds2, playbackVolume2, currTimeInMS2
+        ProjectInfoDataObject two = new ProjectInfoDataObject0x000B0001(
+                projectName2, musicKey2, timeSignature2, bpm2, offsetSeconds2, playbackVolume2, currTimeInMS2
         );
 
         // Tests
-        assertEquals(2126854677, one.hashCode());
-        assertEquals(-272481254, two.hashCode());
+        assertEquals(350000273, one.hashCode());
+        assertEquals(-519488405, two.hashCode());
     }
 }
