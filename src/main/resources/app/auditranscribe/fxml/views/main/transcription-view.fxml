@@ -55,7 +55,7 @@
                      </items>
                   </Menu>
                </menus></MenuBar>
-            <VBox prefHeight="200.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
+            <VBox fx:id="mainVBox" prefHeight="200.0" prefWidth="100.0" VBox.vgrow="ALWAYS">
                <children>
                   <HBox prefHeight="60.0" spacing="20.0">
                      <children>

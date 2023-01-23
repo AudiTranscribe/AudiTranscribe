@@ -18,6 +18,8 @@
 
 package app.auditranscribe.fxml.views.main.scene_switching;
 
+import app.auditranscribe.music.MusicKey;
+
 import java.io.File;
 
 /**
@@ -33,5 +35,5 @@ public class SceneSwitchingData {
     public double manualBPM;
 
     public boolean estimateMusicKey;
-    public String musicKeyString;
+    public MusicKey musicKey;
 }

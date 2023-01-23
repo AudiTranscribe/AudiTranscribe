@@ -188,11 +188,11 @@ public class ProjectSetupViewController extends AbstractViewController {
      * The first value specifies whether automatic music key estimation should be done.<br>
      * The second value is the manual music key that was specified.
      */
-    public Pair<Boolean, String> getMusicKeyPreference() {
+    public Pair<Boolean, MusicKey> getMusicKeyPreference() {
         if (musicKeyGroup.getSelectedToggle() == musicKeyEstimateAutomatically) {
             return new Pair<>(true, null);
         } else {
-            return new Pair<>(false, musicKeyChoiceBox.getValue().toString());
+            return new Pair<>(false, musicKeyChoiceBox.getValue());
         }
     }
 
@@ -247,9 +247,9 @@ public class ProjectSetupViewController extends AbstractViewController {
                 boolean shouldEstimateBPM = bpmPair.value0();
                 double manualBPM = bpmPair.value1();
 
-                Pair<Boolean, String> musicKeyPair = controller.getMusicKeyPreference();
+                Pair<Boolean, MusicKey> musicKeyPair = controller.getMusicKeyPreference();
                 boolean shouldEstimateMusicKey = musicKeyPair.value0();
-                String manualMusicKey = musicKeyPair.value1();
+                MusicKey manualMusicKey = musicKeyPair.value1();
 
                 // Then set on the scene switching data
                 data.projectName = controller.getProjectName();
@@ -261,7 +261,7 @@ public class ProjectSetupViewController extends AbstractViewController {
                 data.manualBPM = manualBPM;
 
                 data.estimateMusicKey = shouldEstimateMusicKey;
-                data.musicKeyString = manualMusicKey;
+                data.musicKey = manualMusicKey;
             }
 
             // Return the formed data

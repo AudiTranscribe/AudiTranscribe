@@ -25,6 +25,7 @@ import app.auditranscribe.fxml.IconHelper;
 import app.auditranscribe.fxml.Popups;
 import app.auditranscribe.fxml.Theme;
 import app.auditranscribe.fxml.plotting.ColourScale;
+import app.auditranscribe.fxml.plotting.PlottingStuffHandler;
 import app.auditranscribe.fxml.plotting.Spectrogram;
 import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitchingData;
 import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitchingState;
@@ -42,22 +43,21 @@ import app.auditranscribe.music.TimeSignature;
 import app.auditranscribe.signal.windowing.SignalWindow;
 import app.auditranscribe.system.OSMethods;
 import app.auditranscribe.system.OSType;
-import app.auditranscribe.utils.GUIUtils;
-import app.auditranscribe.utils.MathUtils;
+import app.auditranscribe.utils.*;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.sql.SQLException;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -80,6 +80,10 @@ public class TranscriptionViewController extends SwitchableViewController {
     private final int MIN_NOTE_NUMBER = 0;  // C0
     private final int MAX_NOTE_NUMBER = 107;  // B8
 
+    private final long UPDATE_PLAYBACK_SCHEDULER_PERIOD = 50;  // In milliseconds
+
+    private final boolean FANCY_NOTE_LABELS = true;  // Use fancy accidentals for note labels
+
     private final double IMAGE_BUTTON_LENGTH = 50;  // In pixels
 
     // Attributes
@@ -87,19 +91,39 @@ public class TranscriptionViewController extends SwitchableViewController {
     private double audioDuration = 0;  // Will be updated upon scene initialization
     private double sampleRate;
 
+    private double finalWidth;
+    private double finalHeight;
+
     private double audioVolume = 0.5;  // Percentage
     private int notesVolume = 80;  // MIDI velocity
     private boolean isAudioMuted = false;
     private boolean areNotesMuted = false;
 
-    private double finalWidth;
-    private double finalHeight;
+    private MusicKey musicKey = MusicKey.C_MAJOR;
+    private double bpm = 120;
+    private TimeSignature timeSignature = TimeSignature.FOUR_FOUR;
+    private int beatsPerBar = timeSignature.beatsPerBar;
+    private double offset = 0;
+
+    private boolean hasUnsavedChanges = true;
+    private boolean changedProjectName = false;
+
+    private boolean isPaused = true;
 
     private boolean debugMode = false;
+
+    private boolean isEverythingReady = false;
 
     private String projectName;
 
     private CustomDoubleSpinnerValueFactory bpmSpinnerFactory, offsetSpinnerFactory;
+
+    private Label[] noteLabels;
+    private Line[] beatLines;
+    private StackPane[] barNumberEllipses;
+    private Line playheadLine;
+
+    public Queue<CustomTask<?>> ongoingTasks = new LinkedList<>();
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(0, runnable -> {
         Thread thread = Executors.defaultThreadFactory().newThread(runnable);
@@ -118,6 +142,9 @@ public class TranscriptionViewController extends SwitchableViewController {
     private MenuItem newProjectMenuItem, openProjectMenuItem, renameProjectMenuItem, saveProjectMenuItem,
             saveAsMenuItem, exportMIDIMenuItem, settingsMenuItem, undoMenuItem, redoMenuItem, quantizeNotesMenuItem,
             docsMenuItem, aboutMenuItem;
+
+    @FXML
+    private VBox mainVBox;
 
     // Top
     @FXML
@@ -159,7 +186,7 @@ public class TranscriptionViewController extends SwitchableViewController {
 
     // Bottom
     @FXML
-    private Button scrollButton, editNotesButton, playButton, rewindToBeginningButton;
+    private Button scrollButton, editNotesButton, playButton, rewindToBeginningButton, toggleSlowedAudioButton;
 
     @FXML
     private Label currTimeLabel, totalTimeLabel;
@@ -308,7 +335,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         projectName = data.projectName;
 
         // Generate spectrogram image based on audio
-        CustomTask<WritableImage> spectrogramTask = new CustomTask<WritableImage>() {
+        CustomTask<WritableImage> spectrogramTask = new CustomTask<>() {
             @Override
             protected WritableImage call() {
                 // Todo somehow implement saving of magnitudes
@@ -324,9 +351,9 @@ public class TranscriptionViewController extends SwitchableViewController {
         };
 
         // Create an estimation task to estimate both the BPM and the music key
-        CustomTask<Pair<Double, String>> estimationTask = new CustomTask<>("Estimation Task") {
+        CustomTask<Pair<Double, MusicKey>> estimationTask = new CustomTask<>("Estimation Task") {
             @Override
-            protected Pair<Double, String> call() {
+            protected Pair<Double, MusicKey> call() {
                 // First estimate BPM
                 this.setMessage("Estimating BPM...");
                 double bpm;
@@ -338,7 +365,7 @@ public class TranscriptionViewController extends SwitchableViewController {
 
                 // Next estimate key
                 this.setMessage("Estimating key...");
-                String key;
+                MusicKey key;
                 if (sceneSwitchingData.estimateMusicKey) {
                     // Get the top 4 most likely keys
                     List<Pair<MusicKey, Double>> mostLikelyKeys = MusicKeyEstimator.getMostLikelyKeysWithCorrelation(
@@ -379,9 +406,9 @@ public class TranscriptionViewController extends SwitchableViewController {
                     }
 
                     // Return the most likely key
-                    key = mostLikelyKey.name;
+                    key = mostLikelyKey;
                 } else {
-                    key = sceneSwitchingData.musicKeyString;
+                    key = sceneSwitchingData.musicKey;
                 }
 
                 // Now return them both as a pair
@@ -389,13 +416,12 @@ public class TranscriptionViewController extends SwitchableViewController {
             }
         };
 
-        // Todo implement
-//        // Set up tasks
-//        setupSpectrogramTask(spectrogramTask, "Generating spectrogram...");
-//        setupEstimationTask(estimationTask);
-//
-//        // Start the tasks
-//        startTasks(spectrogramTask, estimationTask);
+        // Set up tasks
+        setupSpectrogramTask(spectrogramTask, "Generating spectrogram...");
+        setupEstimationTask(estimationTask);
+
+        // Start the tasks
+        startTasks(spectrogramTask, estimationTask);
     }
 
     /**
@@ -419,16 +445,89 @@ public class TranscriptionViewController extends SwitchableViewController {
         // Todo implement
     }
 
-    // Todo add doc
+    /**
+     * Method that makes the transcription view controller use the existing project data, that was
+     * supposedly read from a file.
+     *
+     * @param audtFilePath <b>Absolute</b> path to the file that contained the data.
+     * @param audtFileName The name of the AUDT file.
+     * @param projectData  The project data.
+     */
     public void useExistingData(String audtFilePath, String audtFileName, ProjectData projectData) {
         // Todo implement
+//        // Get number of skippable bytes
+////        numSkippableBytes = projectData.unchangingDataProperties.numSkippableBytes;
+//
+//        // Set up project data
+//        projectName = projectData.projectInfoData.projectName;
+////        musicKeyIndex = projectData.projectInfoData.musicKeyIndex;
+//        timeSignature = projectData.projectInfoData.timeSignature;
+//        bpm = projectData.projectInfoData.bpm;
+//        offset = projectData.projectInfoData.offsetSeconds;
+//        audioVolume = projectData.projectInfoData.playbackVolume;
+////        currTime = projectData.projectInfoData.currTimeInMS / 1000.;
+//
+////        // Set the music notes data attribute
+////        this.musicNotesData = projectData.musicNotesData;
+////
+////        // Set the AudiTranscribe file's file path and file name
+////        this.audtFilePath = audtFilePath;
+////        this.audtFileName = audtFileName;
+//
+//        // Set up Q-Transform data and audio data
+//        try {
+//            setAudioAndSpectrogramData(projectData.qTransformData, projectData.audioData);
+//        } catch (IOException | UnsupportedAudioFileException e) {
+//            Popups.showExceptionAlert(
+//                    rootPane.getScene().getWindow(),
+//                    "Error loading audio data.",
+//                    "An error occurred when loading the audio data. Does the audio file " +
+//                            "still exist at the original location?",
+//                    e
+//            );
+//            logException(e);
+//            e.printStackTrace();
+//        } catch (FFmpegNotFoundException e) {
+//            Popups.showExceptionAlert(
+//                    rootPane.getScene().getWindow(),
+//                    "Error loading audio data.",
+//                    "FFmpeg was not found. Please install it and try again.",
+//                    e
+//            );
+//            logException(e);
+//            e.printStackTrace();
+//        } catch (AudioTooLongException e) {
+//            Popups.showExceptionAlert(
+//                    rootPane.getScene().getWindow(),
+//                    "Error loading audio data.",
+//                    "The audio file is too long. Please select a shorter audio file.",
+//                    e
+//            );
+//            logException(e);
+//            e.printStackTrace();
+//        }
+//
+//        // Update music key and beats per bar
+//        musicKey = MusicUtils.MUSIC_KEYS[musicKeyIndex];
+//        beatsPerBar = timeSignature.beatsPerBar;
+//
+//        // Attempt to add this project to the projects' database
+//        try {
+//            if (projectsDB.checkIfProjectDoesNotExist(audtFilePath)) {
+//                // Insert the record into the database
+//                projectsDB.insertProjectRecord(audtFilePath, projectName);
+//            }
+//        } catch (SQLException e) {
+//            logException(e);
+//            throw new RuntimeException(e);
+//        }
     }
 
     // Todo add doc
     public void handleSceneClosing() {
         this.removeControllerFromActive();
         scheduler.shutdown();
-        // Todo implement
+        // Todo add
     }
 
     /**
@@ -479,7 +578,119 @@ public class TranscriptionViewController extends SwitchableViewController {
         );
     }
 
-    // Private methods
+    // Updaters
+
+    /**
+     * Helper method that helps update the needed things when the BPM value is to be updated.
+     *
+     * @param newBPM      New BPM value.
+     * @param forceUpdate Whether to force an update to the BPM value.
+     */
+    private void updateBPMValue(double newBPM, boolean forceUpdate) {
+        // Check if the BPM value is valid first
+        if (!(newBPM >= BPM_RANGE.value0() && newBPM <= BPM_RANGE.value1())) return;
+
+        // Update the `hasUnsavedChanges` flag
+        hasUnsavedChanges = true;
+
+        // Get the previous BPM value
+        double oldBPM = forceUpdate ? -1 : bpm;
+
+        // These can only be called when the spectrogram is ready to be shown
+        if (isEverythingReady) {
+            // Update the beat lines
+            beatLines = PlottingStuffHandler.updateBeatLines(
+                    spectrogramAnchorPane, beatLines, audioDuration, oldBPM, newBPM, offset, offset, finalHeight,
+                    beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+            );
+
+            // Update the bar number ellipses
+            barNumberEllipses = PlottingStuffHandler.updateBarNumberEllipses(
+                    barNumberPane, barNumberEllipses, audioDuration, oldBPM, newBPM, offset, offset,
+                    barNumberPane.getPrefHeight(), beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X,
+                    spectrogramScrollPane.getWidth()
+            );
+        }
+
+        // Update the BPM value
+        if (!forceUpdate) {
+            log(Level.FINE, "Updated BPM value from " + bpm + " to " + newBPM);
+        } else {
+            log(Level.FINE, "Force update BPM value to " + newBPM);
+        }
+
+        bpm = newBPM;
+    }
+
+    /**
+     * Helper method that helps update the needed things when the offset value is to be updated.
+     *
+     * @param newOffset   New offset value.
+     * @param forceUpdate Whether to force an update to the offset value.
+     */
+    private void updateOffsetValue(double newOffset, boolean forceUpdate) {
+        // Check if the new offset value is valid first
+        if (!(newOffset >= OFFSET_RANGE.value0() && newOffset <= OFFSET_RANGE.value1())) return;
+
+        // Update the `hasUnsavedChanges` flag
+        hasUnsavedChanges = true;
+
+        // Get the previous offset value
+        double oldOffset = forceUpdate ? OFFSET_RANGE.value0() - 1 : offset;  // Make it 1 less than permitted
+
+        // These can only be called when the spectrogram is ready to be shown
+        if (isEverythingReady) {
+            // Update the beat lines
+            beatLines = PlottingStuffHandler.updateBeatLines(
+                    spectrogramAnchorPane, beatLines, audioDuration, bpm, bpm, oldOffset, newOffset, finalHeight,
+                    beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+            );
+
+            // Update the bar number ellipses
+            barNumberEllipses = PlottingStuffHandler.updateBarNumberEllipses(
+                    barNumberPane, barNumberEllipses, audioDuration, bpm, bpm, oldOffset, newOffset,
+                    barNumberPane.getPrefHeight(), beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X,
+                    spectrogramScrollPane.getWidth()
+            );
+        }
+
+        // Update the offset value
+        if (!forceUpdate) {
+            log(Level.FINE, "Updated offset value from " + offset + " to " + newOffset);
+        } else {
+            log(Level.FINE, "Force update offset value to " + newOffset);
+        }
+
+        offset = newOffset;
+    }
+
+    /**
+     * Helper method that updates the needed things when the music key value changes.
+     *
+     * @param newMusicKey New music key value.
+     * @param forceUpdate Whether to force an update to the note labels.
+     */
+    private void updateMusicKeyValue(MusicKey newMusicKey, boolean forceUpdate) {
+        // Update the `hasUnsavedChanges` flag
+        hasUnsavedChanges = true;
+
+        // Update note pane and note labels
+        if (isEverythingReady || forceUpdate) {
+            noteLabels = PlottingStuffHandler.addNoteLabels(
+                    notePane, noteLabels, newMusicKey, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER,
+                    FANCY_NOTE_LABELS
+            );
+        }
+
+        // Update the music key value and music key index
+        if (!forceUpdate) {
+            log(Level.FINE, "Changed music key from " + musicKey + " to " + newMusicKey);
+        } else {
+            log(Level.FINE, "Forced changed music key from " + musicKey + " to " + newMusicKey);
+        }
+
+        musicKey = newMusicKey;
+    }
 
     /**
      * Method that sets the volume slider's CSS.
@@ -500,5 +711,405 @@ public class TranscriptionViewController extends SwitchableViewController {
         // Apply the style to the volume slider's track (if available)
         StackPane track = (StackPane) volumeSlider.lookup(".track");
         if (track != null) track.setStyle(style);
+    }
+
+    // Task handlers
+
+    /**
+     * Helper method that sets up the spectrogram generation task.
+     *
+     * @param task    The spectrogram task.
+     * @param message Message to display at the side of the progress bar.
+     */
+    private void setupSpectrogramTask(CustomTask<WritableImage> task, String message) {
+        // Set the task's message
+        task.setMessage(message);
+
+        // Set task completion listener
+        task.setOnSucceeded(event -> {
+            // Define a variable for the image
+            WritableImage image = task.getValue();
+
+            // Get the final width and height
+            finalWidth = image.getWidth() * SPECTROGRAM_ZOOM_SCALE_X;
+            finalHeight = image.getHeight() * SPECTROGRAM_ZOOM_SCALE_Y;
+
+            // Fix panes' properties
+            leftScrollPane.setFitToWidth(true);
+            leftAnchorPane.setPrefHeight(finalHeight);
+
+            spectrogramAnchorPane.setPrefWidth(finalWidth);
+            spectrogramAnchorPane.setPrefHeight(finalHeight);
+
+            bottomScrollPane.setFitToHeight(true);
+            bottomAnchorPane.setPrefWidth(finalWidth);
+
+            clickableProgressPane.setPrefWidth(finalWidth);
+
+            // Set scrolling for panes
+            leftScrollPane.vvalueProperty().bindBidirectional(spectrogramScrollPane.vvalueProperty());
+            bottomScrollPane.hvalueProperty().bindBidirectional(spectrogramScrollPane.hvalueProperty());
+
+//            // Add the playhead line
+//            playheadLine = PlottingStuffHandler.createPlayheadLine(finalHeight);
+//            spectrogramAnchorPane.getChildren().add(playheadLine);
+//
+//            // Bind properties
+//            colouredProgressPane.prefWidthProperty().bind(playheadX);
+//            playheadLine.startXProperty().bind(playheadX);
+//            playheadLine.endXProperty().bind(playheadX);
+//
+//            // Schedule playback functionality
+//            scheduler.scheduleAtFixedRate(() -> {
+//                // Nothing really changes if the audio is paused
+//                if (!isPaused) {
+//                    // Get the current audio time
+//                    currTime = audio.getCurrAudioTime(usingSlowedAudio);
+//
+//                    // Update the current time label
+//                    Platform.runLater(() -> currTimeLabel.setText(UnitConversionUtils.secondsToTimeString(currTime)));
+//
+//                    // Update the playhead X position
+//                    playheadX.set(currTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X);
+//
+//                    // Check if the current time has exceeded and is not paused
+//                    if (currTime >= audioDuration) {
+//                        log(Level.FINE, "Playback reached end of audio, will start from beginning upon play");
+//
+//                        // Pause the audio
+//                        isPaused = togglePaused(false);
+//
+//                        // Specially update the start time to 0
+//                        // (Because the `seekToTime` method would have set it to the end, which is not what we want)
+//                        audio.setAudioStartTime(0);
+//
+//                        // We need to do this so that the status is set to paused
+//                        audio.stop();
+//                        audio.pause();
+//                    }
+//
+//                    // Update scrolling
+//                    if (scrollToPlayhead) {
+//                        updateScrollPosition(playheadX.doubleValue(), spectrogramScrollPane.getWidth());
+//                    }
+//                }
+//            }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);
+//
+//            // Schedule debug view updating
+//            if (debugMode) {
+//                scheduler.scheduleAtFixedRate(() -> {
+//                    if (debugViewController != null) {
+//                        debugViewController.setListContent(getDebugInfo());
+//                    }
+//                }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);
+//            }
+//
+//            // Schedule autosave functionality
+//            scheduler.scheduleAtFixedRate(() -> Platform.runLater(
+//                            () -> {
+//                                if (audtFilePath != null) {
+//                                    handleSavingProject(true, false);
+//                                    log(Level.INFO, "Autosave project successful");
+//                                } else {
+//                                    log(Level.INFO, "Autosave skipped, since project was not loaded from file");
+//                                }
+//                            }),
+//                    DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval,
+//                    DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval,
+//                    TimeUnit.MINUTES
+//            );
+
+            // Set image on the spectrogram area
+            spectrogramImage.setFitHeight(finalWidth);
+            spectrogramImage.setFitWidth(finalHeight);
+            spectrogramImage.setImage(image);
+
+//            // Set the current octave rectangle
+//            currentOctaveRectangle = PlottingStuffHandler.addCurrentOctaveRectangle(
+//                    notePane, finalHeight, octaveNum, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER
+//            );
+//
+//            // Add note labels and note lines
+//            noteLabels = PlottingStuffHandler.addNoteLabels(
+//                    notePane, noteLabels, musicKey, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER,
+//                    FANCY_NOTE_LABELS
+//            );
+//            PlottingStuffHandler.addNoteLines(spectrogramAnchorPane, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER);
+//
+//            // Add the beat lines and bar number ellipses
+//            beatLines = PlottingStuffHandler.getBeatLines(
+//                    bpm, beatsPerBar, PX_PER_SECOND, finalHeight, audioDuration, offset, SPECTROGRAM_ZOOM_SCALE_X
+//            );
+//            PlottingStuffHandler.addBeatLines(spectrogramAnchorPane, beatLines);
+//
+//            barNumberEllipses = PlottingStuffHandler.getBarNumberEllipses(
+//                    bpm, beatsPerBar, PX_PER_SECOND, barNumberPane.getPrefHeight(), audioDuration, offset,
+//                    SPECTROGRAM_ZOOM_SCALE_X
+//            );
+//            PlottingStuffHandler.addBarNumberEllipses(barNumberPane, barNumberEllipses);
+
+            // Resize spectrogram image pane
+            // (We do this at the end to ensure that the image is properly placed)
+            spectrogramImage.setFitWidth(finalWidth);
+            spectrogramImage.setFitHeight(finalHeight);
+
+            // Resize spectrogram pane
+            spectrogramScrollPane.setPrefWidth(finalWidth);
+            spectrogramScrollPane.setPrefHeight(finalHeight);
+
+//            // Set `NoteRectangle` static attributes
+//            NoteRectangle.setSpectrogramWidth(finalWidth);
+//            NoteRectangle.setSpectrogramHeight(finalHeight);
+//            NoteRectangle.setMinNoteNum(MIN_NOTE_NUMBER);
+//            NoteRectangle.setMaxNoteNum(MAX_NOTE_NUMBER);
+//            NoteRectangle.setTotalDuration(audioDuration);
+
+            // Settle layout of the main pane
+            mainVBox.layout();
+
+            // Show the spectrogram from the middle
+            spectrogramScrollPane.setVvalue(0.5);
+
+            // Update volume sliders
+            audioVolumeSlider.setValue(audioVolume);
+            notesVolumeSlider.setValue(notesVolume);
+
+            updateVolumeSliderCSS(audioVolumeSlider, audioVolume);
+            updateVolumeSliderCSS(notesVolumeSlider, (double) (notesVolume - 33) / 94);
+
+            // Ensure main pane is in focus
+            rootPane.requestFocus();
+
+            // Mark the task as completed and report that the transcription view is ready to be shown
+            markTaskAsCompleted(task);
+            log("Spectrogram for '" + projectName + "' ready to be shown");
+        });
+    }
+
+    /**
+     * Helper method that sets up the estimation task.
+     *
+     * @param task The estimation task.
+     */
+    private void setupEstimationTask(CustomTask<Pair<Double, MusicKey>> task) {
+        // Set task completion listener
+        task.setOnSucceeded(event -> {
+            // Get the BPM and key values
+            Pair<Double, MusicKey> returnedPair = task.getValue();
+            double newBPM = returnedPair.value0();
+            MusicKey key = returnedPair.value1();
+
+            // Update the BPM value
+            updateBPMValue(MathUtils.round(newBPM, 1), false);
+
+            // Update BPM spinner initial value
+            bpmSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
+                    BPM_RANGE.value0(), BPM_RANGE.value1(), bpm, 0.1, 2
+            ));
+
+            // Update the music key choice
+            updateMusicKeyValue(key, sceneSwitchingData.estimateMusicKey);  // Will force update if estimating key
+            musicKeyChoice.setValue(key);
+
+            // Mark the task as completed
+            markTaskAsCompleted(task);
+            log("Estimation task complete");
+        });
+    }
+
+    /**
+     * Helper method that starts all the transcription view tasks.
+     *
+     * @param tasks The tasks to start.
+     */
+    private void startTasks(CustomTask<?>... tasks) {
+        // Create a task that starts the tasks
+        CustomTask<Boolean> masterTask = new CustomTask<>() {
+            @Override
+            protected Boolean call() {
+                // Convert the array of tasks into a list of tasks
+                Collection<CustomTask<?>> taskList = List.of(tasks);
+
+                taskList.forEach(task -> task.setOnFailed(event -> {
+                    // Log the error
+                    log(Level.SEVERE, "Task '" + task.name + "' failed.");
+                    if (task.getException() instanceof Exception) {
+                        logException((Exception) task.getException());
+                    } else {
+                        task.getException().printStackTrace();
+                    }
+
+                    // Determine the header and content text to show
+                    String headerText = "An Error Occurred";
+                    String contentText = "Task \"" + task.name + "\" failed.";
+
+                    if (task.getException() instanceof OutOfMemoryError) {
+                        headerText = "Out Of Memory";
+                        contentText = "Task \"" + task.name + "\" failed due to running out of memory.";
+                    }
+
+                    // Show error dialog
+                    Popups.showExceptionAlert(
+                            rootPane.getScene().getWindow(), headerText, contentText, task.getException()
+                    );
+
+                    // Clear progress bar area
+                    progressBarHBox.setVisible(false);
+                    progressBar.progressProperty().unbind();
+                    progressLabel.textProperty().unbind();
+                }));
+
+                // Add all tasks to the ongoing tasks queue
+                ongoingTasks.addAll(taskList);
+
+                // Update the progress bar section
+                markTaskAsCompleted(null);
+
+                // Execute tasks one-by-one
+                for (CustomTask<?> task : taskList) {
+                    // Create a new thread to start the task
+                    Thread thread = new Thread(task);
+                    thread.setDaemon(true);
+                    thread.start();
+
+                    log(Level.INFO, "Started task: '" + task.name + "'");
+
+                    // Await for completion
+                    try {
+                        thread.join();
+                    } catch (InterruptedException e) {
+                        logException(e);
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                log(Level.INFO, "All tasks complete");
+                return true;
+            }
+        };
+        masterTask.setOnSucceeded(event -> {
+            // Check if all tasks are completed
+            if (masterTask.getValue()) {
+                // Update the `isEverythingReady` flag
+                isEverythingReady = true;
+
+                // Update the BPM value
+                updateBPMValue(bpm, true);
+
+//                // Update playhead position
+//                seekToTime(currTime);
+//                updateScrollPosition(
+//                        currTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X,
+//                        spectrogramScrollPane.getWidth()
+//                );
+//
+//                // Set up note rectangles
+//                if (musicNotesData != null) {
+//                    int numNoteRectangles = musicNotesData.noteNums.length;
+//                    for (int i = 0; i < numNoteRectangles; i++) {
+//                        // Get the note rectangle data
+//                        double timeToPlaceRectangle = musicNotesData.timesToPlaceRectangles[i];
+//                        double noteDuration = musicNotesData.noteDurations[i];
+//                        int noteNum = musicNotesData.noteNums[i];
+//
+//                        // Attempt to create a new note rectangle
+//                        try {
+//                            // Create the note rectangle
+//                            NoteRectangle noteRect = new NoteRectangle(timeToPlaceRectangle, noteDuration, noteNum);
+//
+//                            // Add the note rectangle to the spectrogram pane
+//                            spectrogramAnchorPane.getChildren().add(noteRect);
+//
+//                            log(
+//                                    Level.FINE,
+//                                    "Loaded note " + noteNum + " with " + noteDuration + " seconds duration at " +
+//                                            timeToPlaceRectangle + " seconds"
+//                            );
+//                        } catch (NoteRectangleCollisionException ignored) {
+//                        }
+//                    }
+//                }
+//
+//                // Check if the sequencer is available
+//                if (!notePlayerSequencer.isSequencerAvailable()) {
+//                    // Show a warning message to the user
+//                    Popups.showWarningAlert(
+//                            rootPane.getScene().getWindow(),
+//                            "MIDI Playback Unavailable",
+//                            "The MIDI playback is not available on your system. Playback of created " +
+//                                    "notes will not work."
+//                    );
+//                }
+//
+//                // Reset the sequencer
+//                notePlayerSequencer.stop();
+
+                // Enable all disabled nodes
+                Node[] disabledNodes = new Node[]{
+                        // Top Hbox
+                        audioVolumeButton, audioVolumeSlider, notesVolumeButton, notesVolumeSlider, musicKeyChoice,
+                        bpmSpinner, timeSignatureChoice, offsetSpinner,
+
+                        // Bottom Hbox
+                        scrollButton, editNotesButton, playButton, rewindToBeginningButton, toggleSlowedAudioButton
+                };
+
+                for (Node node : disabledNodes) {
+                    node.setDisable(false);
+                }
+
+//                // Clear note rectangles' stacks
+//                NoteRectangle.clearStacks();
+//
+//                // Handle attempt to close the window
+//                rootPane.getScene().getWindow().setOnCloseRequest((windowEvent) -> {
+//                    // Deal with possible unsaved changes
+//                    boolean canCloseWindow = handleUnsavedChanges();
+//                    if (!canCloseWindow) windowEvent.consume();
+//                });
+//
+//                // If we are using existing data (i.e., AUDT file path was already set), then initially there are no
+//                // unsaved changes
+//                if (audtFilePath != null) {
+//                    hasUnsavedChanges = false;
+//                    NoteRectangle.setHasEditedNoteRectangles(false);
+//                }
+            }
+        });
+
+        // Start the thread
+        Thread masterThread = new Thread(masterTask);
+        masterThread.setDaemon(true);
+        masterThread.start();
+    }
+
+    /**
+     * Helper method that marks a task as completed and handles the ongoing tasks list.
+     *
+     * @param completedTask The completed task.
+     */
+    private void markTaskAsCompleted(CustomTask<?> completedTask) {
+        // Get the current task that is being processed
+        CustomTask<?> currentTask = ongoingTasks.peek();
+
+        // Remove the completed task from the ongoing tasks queue
+        if (completedTask != null) ongoingTasks.remove(completedTask);
+
+        // Update the progress bar section if the completed task is the current task or if the current task is `null`
+        if (completedTask == null || currentTask == completedTask) {
+            // Check if there are any tasks left in the queue
+            if (ongoingTasks.size() != 0) {
+                // Get the next task in the queue
+                currentTask = ongoingTasks.peek();
+
+                // Update the progress section
+                progressBar.progressProperty().bind(currentTask.progressProperty());
+                progressLabel.textProperty().bind(currentTask.messageProperty());
+            } else {
+                progressBarHBox.setVisible(false);
+                progressBar.progressProperty().unbind();
+                progressLabel.textProperty().unbind();
+            }
+        }
     }
 }
