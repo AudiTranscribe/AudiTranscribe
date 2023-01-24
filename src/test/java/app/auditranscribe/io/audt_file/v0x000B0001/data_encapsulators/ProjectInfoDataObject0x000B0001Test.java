@@ -43,8 +43,8 @@ class ProjectInfoDataObject0x000B0001Test {
         );
 
         // Tests
-        assertEquals(65, one.numBytesNeeded());
-        assertEquals(66, two.numBytesNeeded());
+        assertEquals(64, one.numBytesNeeded());
+        assertEquals(65, two.numBytesNeeded());
     }
 
     @Test
