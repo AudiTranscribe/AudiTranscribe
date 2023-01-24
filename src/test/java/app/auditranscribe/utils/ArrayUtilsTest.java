@@ -1,14 +1,8 @@
 package app.auditranscribe.utils;
 
-import app.auditranscribe.generic.exceptions.LengthException;
 import app.auditranscribe.generic.exceptions.ValueException;
 import app.auditranscribe.misc.Complex;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -175,7 +169,7 @@ class ArrayUtilsTest {
         Complex[] array7Computed = ArrayUtils.lpNormalize(array7, Double.POSITIVE_INFINITY);
         assertEquals(array7Computed.length, array7Normalized.length);
         for (int i = 0; i < array7Normalized.length; i++) {
-            assertEquals(array7Normalized[i].roundNicely(4), array7Computed[i].roundNicely(4));
+            assertEquals(array7Normalized[i].round(4), array7Computed[i].round(4));
         }
     }
 

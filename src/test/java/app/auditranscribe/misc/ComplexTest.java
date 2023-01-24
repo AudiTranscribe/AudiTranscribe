@@ -104,11 +104,11 @@ class ComplexTest {
     void plus() {
         assertEquals(
                 new Complex(2.23, 6.56),
-                (new Complex(1, 2)).plus(new Complex(1.23, 4.56)).roundNicely(3)
+                (new Complex(1, 2)).plus(new Complex(1.23, 4.56)).round(3)
         );
         assertEquals(
                 new Complex(2.23, 6.56),
-                (new Complex(1.23, 4.56)).plus(new Complex(1, 2)).roundNicely(3)
+                (new Complex(1.23, 4.56)).plus(new Complex(1, 2)).round(3)
         );
     }
 
@@ -116,11 +116,11 @@ class ComplexTest {
     void minus() {
         assertEquals(
                 new Complex(-0.23, -2.56),
-                (new Complex(1, 2)).minus(new Complex(1.23, 4.56)).roundNicely(3)
+                (new Complex(1, 2)).minus(new Complex(1.23, 4.56)).round(3)
         );
         assertEquals(
                 new Complex(0.23, 2.56),
-                (new Complex(1.23, 4.56)).minus(new Complex(1, 2)).roundNicely(3)
+                (new Complex(1.23, 4.56)).minus(new Complex(1, 2)).round(3)
         );
     }
 
@@ -128,16 +128,16 @@ class ComplexTest {
     void times() {
         assertEquals(
                 new Complex(2.46, 3.69),
-                (new Complex(2, 3)).times(1.23).roundNicely(3)
+                (new Complex(2, 3)).times(1.23).round(3)
         );
         assertEquals(
                 new Complex(-2.46, -3.69),
-                (new Complex(2, 3)).times(-1.23).roundNicely(3)
+                (new Complex(2, 3)).times(-1.23).round(3)
         );
 
         assertEquals(
                 new Complex(2.46, 3.69),
-                (new Complex(2, 3)).times(new Complex(1.23, 0)).roundNicely(3)
+                (new Complex(2, 3)).times(new Complex(1.23, 0)).round(3)
         );
 
         assertEquals(
@@ -163,11 +163,11 @@ class ComplexTest {
 
         assertEquals(
                 new Complex(0.5, -0.5),
-                (new Complex(1, 1)).reciprocal().roundNicely(3)
+                (new Complex(1, 1)).reciprocal().round(3)
         );
         assertEquals(
                 new Complex(0.12, -0.16),
-                (new Complex(3, 4)).reciprocal().roundNicely(3)
+                (new Complex(3, 4)).reciprocal().round(3)
         );
 
         assertEquals(
@@ -184,11 +184,11 @@ class ComplexTest {
     void divides() {
         assertEquals(
                 new Complex(1, 1),
-                (new Complex(5, 5)).divides(new Complex(5, 0)).roundNicely(3)
+                (new Complex(5, 5)).divides(new Complex(5, 0)).round(3)
         );
         assertEquals(
                 new Complex(0.44, 0.08),
-                (new Complex(1, 2)).divides(new Complex(3, 4)).roundNicely(3)
+                (new Complex(1, 2)).divides(new Complex(3, 4)).round(3)
         );
     }
 
@@ -197,45 +197,45 @@ class ComplexTest {
     void exp() {
         assertEquals(
                 new Complex(1, 0),
-                Complex.exp(new Complex(0, 0)).roundNicely(3)
+                Complex.exp(new Complex(0, 0)).round(3)
         );
         assertEquals(
                 new Complex(10, 0),
-                Complex.exp(new Complex(Math.log(10), 0)).roundNicely(3)
+                Complex.exp(new Complex(Math.log(10), 0)).round(3)
         );
         assertEquals(
                 new Complex(1.23, 0),
-                Complex.exp(new Complex(Math.log(1.23), 0)).roundNicely(3)
+                Complex.exp(new Complex(Math.log(1.23), 0)).round(3)
         );
 
         assertEquals(
                 new Complex(0, 1),
-                Complex.exp(new Complex(0, Math.PI / 2)).roundNicely(3)
+                Complex.exp(new Complex(0, Math.PI / 2)).round(3)
         );
         assertEquals(
                 new Complex(-1, 0),
-                Complex.exp(new Complex(0, Math.PI)).roundNicely(3)
+                Complex.exp(new Complex(0, Math.PI)).round(3)
         );
         assertEquals(
                 new Complex(0, -1),
-                Complex.exp(new Complex(0, 3 * Math.PI / 2)).roundNicely(3)
+                Complex.exp(new Complex(0, 3 * Math.PI / 2)).round(3)
         );
         assertEquals(
                 new Complex(1, 0),
-                Complex.exp(new Complex(0, 2 * Math.PI)).roundNicely(3)
+                Complex.exp(new Complex(0, 2 * Math.PI)).round(3)
         );
 
         assertEquals(
                 new Complex(0, 2),
-                Complex.exp(new Complex(Math.log(2), Math.PI / 2)).roundNicely(3)
+                Complex.exp(new Complex(Math.log(2), Math.PI / 2)).round(3)
         );
         assertEquals(
                 new Complex(0, -2),
-                Complex.exp(new Complex(Math.log(2), -Math.PI / 2)).roundNicely(3)
+                Complex.exp(new Complex(Math.log(2), -Math.PI / 2)).round(3)
         );
         assertEquals(
                 new Complex(-2, 0),
-                Complex.exp(new Complex(Math.log(2), Math.PI)).roundNicely(3)
+                Complex.exp(new Complex(Math.log(2), Math.PI)).round(3)
         );
     }
 

@@ -197,7 +197,6 @@ public class Complex {
 
     // Miscellaneous Methods
 
-
     /**
      * Compute the value of e<sup><code>z</code></sup> where e is Euler's number and <code>z</code> is the
      * complex number.
@@ -232,8 +231,7 @@ public class Complex {
      * @param dp Number of decimal places to round both the real and imaginary parts to.
      * @return This <code>Complex</code> object, after rounding.
      */
-    // Todo: rename to `round`
-    public Complex roundNicely(int dp) {
+    public Complex round(int dp) {
         re = MathUtils.round(re, dp);
         im = MathUtils.round(im, dp);
 

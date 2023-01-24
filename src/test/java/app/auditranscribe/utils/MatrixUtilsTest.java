@@ -249,7 +249,7 @@ class MatrixUtilsTest {
         // Check if equal
         for (int i = 0; i < matrixSize; i++) {
             for (int j = 0; j < matrixSize; j++) {
-                assertEquals(ijkResult[i][j].roundNicely(3), strassenResult[i][j].roundNicely(3));
+                assertEquals(ijkResult[i][j].round(3), strassenResult[i][j].round(3));
             }
         }
     }

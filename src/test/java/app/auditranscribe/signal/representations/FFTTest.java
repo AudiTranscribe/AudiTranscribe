@@ -33,38 +33,38 @@ class FFTTest {
         assertEquals(fftArray2.length, 6);
         assertEquals(fftArray3.length, 0);
 
-        assertEquals(new Complex(-4, -4), fftArray1[0].roundNicely(3));
-        assertEquals(new Complex(-4, -9.657), fftArray1[1].roundNicely(3));
-        assertEquals(new Complex(36), fftArray1[2].roundNicely(3));
-        assertEquals(new Complex(-4, 9.657), fftArray1[3].roundNicely(3));
-        assertEquals(new Complex(-4, 4), fftArray1[4].roundNicely(3));
-        assertEquals(new Complex(-4, 1.657), fftArray1[5].roundNicely(3));
-        assertEquals(new Complex(-4), fftArray1[6].roundNicely(3));
-        assertEquals(new Complex(-4, -1.657), fftArray1[7].roundNicely(3));
+        assertEquals(new Complex(-4, -4), fftArray1[0].round(3));
+        assertEquals(new Complex(-4, -9.657), fftArray1[1].round(3));
+        assertEquals(new Complex(36), fftArray1[2].round(3));
+        assertEquals(new Complex(-4, 9.657), fftArray1[3].round(3));
+        assertEquals(new Complex(-4, 4), fftArray1[4].round(3));
+        assertEquals(new Complex(-4, 1.657), fftArray1[5].round(3));
+        assertEquals(new Complex(-4), fftArray1[6].round(3));
+        assertEquals(new Complex(-4, -1.657), fftArray1[7].round(3));
 
         assertEquals(
-                new Complex(3, 4).roundNicely(5),
-                fftArray2[0].roundNicely(5)
+                new Complex(3, 4).round(5),
+                fftArray2[0].round(5)
         );
         assertEquals(
-                new Complex(-3.46410162, 14.92820323).roundNicely(5),
-                fftArray2[1].roundNicely(5)
+                new Complex(-3.46410162, 14.92820323).round(5),
+                fftArray2[1].round(5)
         );
         assertEquals(
-                new Complex(-3.46410162, -14.92820323).roundNicely(5),
-                fftArray2[2].roundNicely(5)
+                new Complex(-3.46410162, -14.92820323).round(5),
+                fftArray2[2].round(5)
         );
         assertEquals(
-                new Complex(3, -4).roundNicely(5),
-                fftArray2[3].roundNicely(5)
+                new Complex(3, -4).round(5),
+                fftArray2[3].round(5)
         );
         assertEquals(
-                new Complex(3.46410162, -1.07179677).roundNicely(5),
-                fftArray2[4].roundNicely(5)
+                new Complex(3.46410162, -1.07179677).round(5),
+                fftArray2[4].round(5)
         );
         assertEquals(
-                new Complex(3.46410162, 1.07179677).roundNicely(5),
-                fftArray2[5].roundNicely(5)
+                new Complex(3.46410162, 1.07179677).round(5),
+                fftArray2[5].round(5)
         );
     }
 
@@ -91,20 +91,20 @@ class FFTTest {
         assertEquals(rfftArray1.length, 4);
         assertEquals(rfftArray2.length, 9);
 
-        assertEquals(Complex.ZERO.roundNicely(5), rfftArray1[0].roundNicely(5));
-        assertEquals(new Complex(-3.68598068, 5.64282152).roundNicely(5), rfftArray1[1].roundNicely(5));
-        assertEquals(new Complex(0.03318787, -19.7157882).roundNicely(5), rfftArray1[2].roundNicely(5));
-        assertEquals(new Complex(7.15279281, -2.16708578).roundNicely(5), rfftArray1[3].roundNicely(5));
+        assertEquals(Complex.ZERO.round(5), rfftArray1[0].round(5));
+        assertEquals(new Complex(-3.68598068, 5.64282152).round(5), rfftArray1[1].round(5));
+        assertEquals(new Complex(0.03318787, -19.7157882).round(5), rfftArray1[2].round(5));
+        assertEquals(new Complex(7.15279281, -2.16708578).round(5), rfftArray1[3].round(5));
 
-        assertEquals(new Complex(719.8865527), rfftArray2[0].roundNicely(7));
-        assertEquals(new Complex(27.3594107, -15.5522762), rfftArray2[1].roundNicely(7));
-        assertEquals(new Complex(73.3602140, -63.9871918), rfftArray2[2].roundNicely(7));
-        assertEquals(new Complex(-102.5935467, 137.5257334), rfftArray2[3].roundNicely(7));
-        assertEquals(new Complex(76.5639314, -63.5043533), rfftArray2[4].roundNicely(7));
-        assertEquals(new Complex(-28.2492181, 37.7966577), rfftArray2[5].roundNicely(7));
-        assertEquals(new Complex(-37.9363571, -29.8598376), rfftArray2[6].roundNicely(7));
-        assertEquals(new Complex(-69.3873350, 78.5321617), rfftArray2[7].roundNicely(7));
-        assertEquals(new Complex(-191.0354334), rfftArray2[8].roundNicely(7));
+        assertEquals(new Complex(719.8865527), rfftArray2[0].round(7));
+        assertEquals(new Complex(27.3594107, -15.5522762), rfftArray2[1].round(7));
+        assertEquals(new Complex(73.3602140, -63.9871918), rfftArray2[2].round(7));
+        assertEquals(new Complex(-102.5935467, 137.5257334), rfftArray2[3].round(7));
+        assertEquals(new Complex(76.5639314, -63.5043533), rfftArray2[4].round(7));
+        assertEquals(new Complex(-28.2492181, 37.7966577), rfftArray2[5].round(7));
+        assertEquals(new Complex(-37.9363571, -29.8598376), rfftArray2[6].round(7));
+        assertEquals(new Complex(-69.3873350, 78.5321617), rfftArray2[7].round(7));
+        assertEquals(new Complex(-191.0354334), rfftArray2[8].round(7));
     }
 
     @Test
@@ -130,21 +130,21 @@ class FFTTest {
         assertEquals(complexNumberArray1.length, 8);
         assertEquals(complexNumberArray2.length, 6);
 
-        assertEquals(new Complex(1).roundNicely(5), complexNumberArray1[0].roundNicely(5));
-        assertEquals(new Complex(0, 2).roundNicely(5), complexNumberArray1[1].roundNicely(5));
-        assertEquals(new Complex(-3).roundNicely(5), complexNumberArray1[2].roundNicely(5));
-        assertEquals(new Complex(0, -4).roundNicely(5), complexNumberArray1[3].roundNicely(5));
-        assertEquals(new Complex(5).roundNicely(5), complexNumberArray1[4].roundNicely(5));
-        assertEquals(new Complex(0, 6).roundNicely(5), complexNumberArray1[5].roundNicely(5));
-        assertEquals(new Complex(-7).roundNicely(5), complexNumberArray1[6].roundNicely(5));
-        assertEquals(new Complex(0, -8).roundNicely(5), complexNumberArray1[7].roundNicely(5));
+        assertEquals(new Complex(1).round(5), complexNumberArray1[0].round(5));
+        assertEquals(new Complex(0, 2).round(5), complexNumberArray1[1].round(5));
+        assertEquals(new Complex(-3).round(5), complexNumberArray1[2].round(5));
+        assertEquals(new Complex(0, -4).round(5), complexNumberArray1[3].round(5));
+        assertEquals(new Complex(5).round(5), complexNumberArray1[4].round(5));
+        assertEquals(new Complex(0, 6).round(5), complexNumberArray1[5].round(5));
+        assertEquals(new Complex(-7).round(5), complexNumberArray1[6].round(5));
+        assertEquals(new Complex(0, -8).round(5), complexNumberArray1[7].round(5));
 
-        assertEquals(Complex.ONE.roundNicely(5), complexNumberArray2[0].roundNicely(5));
-        assertEquals(new Complex(0, 2).roundNicely(5), complexNumberArray2[1].roundNicely(5));
-        assertEquals(new Complex(-3).roundNicely(5), complexNumberArray2[2].roundNicely(5));
-        assertEquals(new Complex(0, -4).roundNicely(5), complexNumberArray2[3].roundNicely(5));
-        assertEquals(new Complex(5), complexNumberArray2[4].roundNicely(5));
-        assertEquals(new Complex(0, 6).roundNicely(5), complexNumberArray2[5].roundNicely(5));
+        assertEquals(Complex.ONE.round(5), complexNumberArray2[0].round(5));
+        assertEquals(new Complex(0, 2).round(5), complexNumberArray2[1].round(5));
+        assertEquals(new Complex(-3).round(5), complexNumberArray2[2].round(5));
+        assertEquals(new Complex(0, -4).round(5), complexNumberArray2[3].round(5));
+        assertEquals(new Complex(5), complexNumberArray2[4].round(5));
+        assertEquals(new Complex(0, 6).round(5), complexNumberArray2[5].round(5));
     }
 
     @Test
@@ -180,10 +180,10 @@ class FFTTest {
         assertEquals(correctConvCD.length, convCD.length);
 
         for (int i = 0; i < correctConvAB.length; i++) {
-            assertEquals(correctConvAB[i].roundNicely(5), convAB[i].roundNicely(5));
+            assertEquals(correctConvAB[i].round(5), convAB[i].round(5));
         }
         for (int i = 0; i < correctConvCD.length; i++) {
-            assertEquals(correctConvCD[i].roundNicely(5), convCD[i].roundNicely(5));
+            assertEquals(correctConvCD[i].round(5), convCD[i].round(5));
         }
 
         assertThrowsExactly(LengthException.class, () -> {

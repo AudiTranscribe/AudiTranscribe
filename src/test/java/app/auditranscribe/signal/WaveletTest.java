@@ -202,8 +202,8 @@ class WaveletTest {
         for (int i = 0; i < correctBasis1.length; i++) {
             for (int j = 0; j < correctBasis1[0].length; j++) {
                 assertEquals(
-                        correctBasis1[i][j].roundNicely(5),
-                        basis1[i][j].roundNicely(5),
+                        correctBasis1[i][j].round(5),
+                        basis1[i][j].round(5),
                         "Error at position (" + i + ", " + j + ")"
                 );
             }
@@ -215,8 +215,8 @@ class WaveletTest {
         for (int i = 0; i < correctBasis2.length; i++) {
             for (int j = 0; j < correctBasis2[0].length; j++) {
                 assertEquals(
-                        correctBasis2[i][j].roundNicely(5),
-                        basis2[i][j].roundNicely(5),
+                        correctBasis2[i][j].round(5),
+                        basis2[i][j].round(5),
                         "Error at position (" + i + ", " + j + ")"
                 );
             }
@@ -228,8 +228,8 @@ class WaveletTest {
         for (int i = 0; i < correctBasis3.length; i++) {
             for (int j = 0; j < correctBasis3[0].length; j++) {
                 assertEquals(
-                        correctBasis3[i][j].roundNicely(5),
-                        basis3[i][j].roundNicely(5),
+                        correctBasis3[i][j].round(5),
+                        basis3[i][j].round(5),
                         "Error at position (" + i + ", " + j + ")"
                 );
             }
