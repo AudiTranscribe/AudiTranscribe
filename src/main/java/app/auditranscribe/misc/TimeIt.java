@@ -29,6 +29,9 @@ public final class TimeIt {
     private static long startTime;
     private static long endTime;
 
+    private static long pauseStart;
+    private static long pauseDuration;
+
     private TimeIt() {
         // Private constructor to signal this is a utility class
     }
@@ -51,6 +54,21 @@ public final class TimeIt {
         countTime();
     }
 
+    /**
+     * Pause timing.
+     */
+    public static void pause() {
+        pauseStart = System.nanoTime();
+    }
+
+    /**
+     * Resume timing.
+     */
+    public static void resume() {
+        long pauseEnd = System.nanoTime();
+        pauseDuration += pauseEnd - pauseStart;
+    }
+
     // Private methods
 
     /**
@@ -58,7 +76,7 @@ public final class TimeIt {
      */
     private static void countTime() {
         // Calculate duration
-        long duration = endTime - startTime;
+        long duration = endTime - startTime - pauseDuration;
 
         // Determine unit to use for display
         String unit;
