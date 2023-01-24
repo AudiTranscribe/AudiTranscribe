@@ -158,7 +158,7 @@ class FFTTest {
         // Define vectors to test the circular convolution method
         Complex[] vectorA = {Complex.ZERO, Complex.ONE, Complex.IMAG_UNIT, Complex.ONE, Complex.ZERO};
         Complex[] vectorB = {
-                new Complex(10), new Complex(11), new Complex(0, 11),new Complex(11),
+                new Complex(10), new Complex(11), new Complex(0, 11), new Complex(11),
                 new Complex(10)
         };
         Complex[] vectorC = {new Complex(-1, -2), new Complex(-3, -4)};

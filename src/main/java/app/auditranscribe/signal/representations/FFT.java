@@ -125,6 +125,10 @@ public final class FFT {
      * @param array  The complex array to apply the algorithm to.
      * @param length Length of the input array.
      * @return An array of <code>Complex</code> objects representing the FFT of the data source.
+     * @implNote Adapted from Orlando Selenu's code of the FFT, which can be found
+     * <a href="https://github.com/hedoluna/fft/blob/6f116b1/FFTbase.java">here</a>. See also
+     * Brigham, E. O. (1988). FFT Computation Flowchart. In The fast fourier transform and its
+     * applications (pp. 143–145)., Prentice-Hall.
      * @see <a href="https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm">Radix-2
      * Cooley-Tukey Algorithm</a>, which was the algorithm used to generate the FFT.
      */
@@ -133,36 +137,85 @@ public final class FFT {
         // (Length 0 case is handled by wrapper function)
         if (length == 1) return new Complex[]{array[0]};
 
-        // Compute length of each of the two sub-arrays
+        // Split into real and imaginary parts
+        double[] realParts = new double[length];
+        double[] imagParts = new double[length];
+
+        for (int i = 0; i < length; i++) {
+            realParts[i] = array[i].re;
+            imagParts[i] = array[i].im;
+        }
+
+        // Declare needed variables
         int halfLength = length / 2;
+        int nu = MathUtils.binlog(length);  // Dimension of the problem
+        int nu1 = nu - 1;
 
-        // Compute FFT of even terms
-        Complex[] terms = new Complex[halfLength];  // Will be used for both even and odd terms
-        for (int k = 0; k < halfLength; k++) {
-            terms[k] = array[2 * k];
+        double tReal;  // Real term
+        double tImag;  // Imaginary term
+
+        double arg;  // Argument for the cosine and sine parts
+        double cosinePart;  // Real (cosine) part of the complex exponent
+        double sinePart;  // Imaginary (sine) part of the complex exponent
+
+        // Part 1 - Calculation
+        int k = 0;
+        double factor;
+
+        for (int l = 1; l <= nu; l++) {
+            while (k < length) {
+                for (int i = 1; i <= halfLength; i++) {
+                    factor = bitReverse(k >> nu1, nu);  // ???
+
+                    // Compute complex exponent
+                    arg = 2 * Math.PI * factor / length;  // We omit "-" sign because we are doing signal processing
+                    cosinePart = Math.cos(arg);
+                    sinePart = Math.sin(arg);
+
+                    // Form real and imaginary terms
+                    tReal = realParts[k + halfLength] * cosinePart + imagParts[k + halfLength] * sinePart;
+                    tImag = imagParts[k + halfLength] * cosinePart - realParts[k + halfLength] * sinePart;
+
+                    // Update FFT arrays
+                    realParts[k + halfLength] = realParts[k] - tReal;
+                    imagParts[k + halfLength] = imagParts[k] - tImag;
+                    realParts[k] += tReal;
+                    imagParts[k] += tImag;
+
+                    k++;
+                }
+                k += halfLength;
+            }
+
+            // Update loop variables
+            k = 0;
+            nu1--;
+            halfLength /= 2;
         }
-        Complex[] p = fftRadix2(terms, halfLength);
 
-        // Compute FFT of odd terms
-        for (int k = 0; k < halfLength; k++) {
-            terms[k] = array[2 * k + 1];  // We reuse the above array
-        }
-        Complex[] q = fftRadix2(terms, halfLength);
-
-        // Combine even and odd terms together
-        double scale = -2 * Math.PI / length;  // Will be used in loop below
-        Complex[] y = new Complex[length];
-        for (int k = 0; k < halfLength; k++) {
-            // Compute w = exp(−2kπi/N)
-            Complex wk = Complex.exp(new Complex(0, k * scale));
-
-            // Set values for `y[k]` and `y[k + length/2]`
-            y[k] = p[k].plus(wk.times(q[k]));
-            y[k + length / 2] = p[k].minus(wk.times(q[k]));
+        // Part 2 - Unscrambling and recombination
+        int r;
+        while (k < length) {
+            // Determine the possible place to swap
+            r = bitReverse(k, nu);
+            if (r > k) {
+                // Swap elements at index `k` and `r`
+                tReal = realParts[k];
+                tImag = imagParts[k];
+                realParts[k] = realParts[r];
+                imagParts[k] = imagParts[r];
+                realParts[r] = tReal;
+                imagParts[r] = tImag;
+            }
+            k++;
         }
 
-        // Return FFT array
-        return y;
+        // Part 3 - Form final `Complex` array
+        Complex[] output = new Complex[length];
+        for (int i = 0; i < length; i++) {
+            output[i] = new Complex(realParts[i], imagParts[i]);
+        }
+        return output;
     }
 
     /**
@@ -257,5 +310,27 @@ public final class FFT {
         }
 
         return ifft(XVector);
+    }
+
+    /**
+     * Pads and then reverses the bits in the index <code>j</code>.<br>
+     * This method first pads the binary form of <code>j</code> until its length is <code>nu</code>,
+     * then reverses the binary form of the new number and returns its integer.
+     *
+     * @param j  The index.
+     * @param nu Number of bits of the padded number.
+     * @return Processed and reversed binary number.
+     */
+    private static int bitReverse(int j, int nu) {
+        // Todo document
+        int j2;
+        int j1 = j;
+        int k = 0;
+        for (int i = 1; i <= nu; i++) {
+            j2 = j1 / 2;
+            k = 2 * k + j1 - 2 * j2;
+            j1 = j2;
+        }
+        return k;
     }
 }
