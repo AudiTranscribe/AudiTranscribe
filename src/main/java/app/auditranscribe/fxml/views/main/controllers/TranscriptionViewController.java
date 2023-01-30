@@ -56,6 +56,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
@@ -336,10 +337,74 @@ public class TranscriptionViewController extends SwitchableViewController {
     // Public methods
     @Override
     public void finishSetup() {
-        // Update sliders' initial CSS
-        // todo: move this to after spectrogram setup finishes
-        updateVolumeSliderCSS(audioVolumeSlider, audioVolume);
-        updateVolumeSliderCSS(notesVolumeSlider, (double) (notesVolume - 33) / 94);
+        // Set choices
+        musicKeyChoice.setValue(musicKey);
+        timeSignatureChoice.setValue(timeSignature);
+
+        // Update spinners' initial values
+        updateBPMValue(bpm, true);
+        updateOffsetValue(offset, true);
+
+        bpmSpinnerFactory.setValue(bpm);
+        offsetSpinnerFactory.setValue(offset);
+
+        // Set methods on the volume sliders
+        audioVolumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            // Update the `hasUnsavedChanges` flag
+            hasUnsavedChanges = true;
+
+            // Update the audio volume value
+            audioVolume = newValue.doubleValue();
+
+            // Change the icon of the audio volume button from mute to non-mute
+            if (isAudioMuted) {
+                IconHelper.setSVGOnButton(
+                        audioVolumeButton, 20, IMAGE_BUTTON_LENGTH, "volume-up-solid"
+                );
+                isAudioMuted = false;
+            }
+
+            // Update audio volume
+//            audio.setPlaybackVolume(audioVolume);
+
+            // Update CSS
+            updateVolumeSliderCSS(audioVolumeSlider, audioVolume);
+
+            log(Level.FINE, "Changed audio volume from " + oldValue + " to " + newValue);
+        });
+
+        notesVolumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            // Update the notes volume value
+            notesVolume = newValue.intValue();
+
+            // Change the icon of the notes' volume button from off to on
+            if (areNotesMuted) {
+                IconHelper.setSVGOnButton(
+                        notesVolumeButton, 15, 20, IMAGE_BUTTON_LENGTH, IMAGE_BUTTON_LENGTH,
+                        "music-note-solid"
+                );
+                areNotesMuted = false;
+            }
+
+            // Update CSS
+            updateVolumeSliderCSS(notesVolumeSlider, (double) (notesVolume - 33) / 94);
+
+            log(Level.FINE, "Changed notes volume from " + oldValue + " to " + newValue);
+        });
+
+        // Update labels
+        totalTimeLabel.setText(UnitConversionUtils.secondsToTimeString(audioDuration));
+//        currTimeLabel.setText(UnitConversionUtils.secondsToTimeString(currTime));
+
+        // Set keyboard button press/release methods
+//        mainPane.getScene().addEventFilter(KeyEvent.KEY_PRESSED, this::keyPressEventHandler);
+//        mainPane.getScene().addEventFilter(KeyEvent.KEY_RELEASED, this::keyReleasedEventHandler);
+
+        // Define the lists note rectangles by note number
+//        NoteRectangle.defineNoteRectanglesByNoteNumberLists(MAX_NOTE_NUMBER - MIN_NOTE_NUMBER + 1);
+
+        // Report that the transcription view is ready to be shown
+        log(Level.INFO, "Transcription view ready to be shown");
     }
 
     @Override
