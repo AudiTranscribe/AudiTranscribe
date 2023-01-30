@@ -73,7 +73,13 @@ class AudioTest {
                 Thread.sleep(1000);
                 System.out.println("SEEK");
                 audio.seekToTime(1);
-                Thread.sleep(3000);
+                Thread.sleep(500);
+                audio.pause();
+                System.out.println("PAUSED");
+                Thread.sleep(2000);
+                audio.play();
+                System.out.println("RESUMED");
+                Thread.sleep(2500);
                 System.out.println("DONE");
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);

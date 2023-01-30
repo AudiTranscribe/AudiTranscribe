@@ -27,6 +27,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public abstract class StoppableThread extends LoggableClass implements Runnable {
     // Attributes
+    private boolean started;
+
     private Thread worker;  // Thread that actually runs the code we want
     protected AtomicBoolean running = new AtomicBoolean(false);  // Whether the code is running
     protected AtomicBoolean stopped = new AtomicBoolean(true);  // Whether the thread has stopped
@@ -41,6 +43,10 @@ public abstract class StoppableThread extends LoggableClass implements Runnable 
         return stopped.get();
     }
 
+    public boolean isStarted() {
+        return started;
+    }
+
     // Public methods
 
     /**
@@ -49,6 +55,7 @@ public abstract class StoppableThread extends LoggableClass implements Runnable 
     public void start() {
         worker = new Thread(this);
         worker.start();
+        started = true;
     }
 
     /**

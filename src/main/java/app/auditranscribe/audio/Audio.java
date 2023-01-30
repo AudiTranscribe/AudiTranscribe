@@ -57,6 +57,7 @@ public class Audio extends LoggableClass {
     private final double duration;  // In seconds
 
     private long totalNumBytesProcessed;
+    private boolean paused = false;
 
     private final SourceDataLine sourceDataLine;
     private final StoppableThread audioPlaybackThread;
@@ -139,18 +140,20 @@ public class Audio extends LoggableClass {
                 @Override
                 public void runner() {
                     while (running.get()) {
-                        // Attempt to read bytes from audio stream
-                        try {
-                            numBytesRead = audioStream.read(bufferBytes);
-                            if (numBytesRead == -1) break;
-                            totalNumBytesProcessed += numBytesRead;
-                        } catch (IOException e) {
-                            Thread.currentThread().interrupt();
-                            logException(e);
-                        }
+                        // Attempt to read bytes from audio stream if not paused
+                        if (!paused) {
+                            try {
+                                numBytesRead = audioStream.read(bufferBytes);
+                                if (numBytesRead == -1) break;
+                                totalNumBytesProcessed += numBytesRead;
+                            } catch (IOException e) {
+                                Thread.currentThread().interrupt();
+                                logException(e);
+                            }
 
-                        // Write audio bytes for playback
-                        sourceDataLine.write(bufferBytes, 0, numBytesRead);
+                            // Write audio bytes for playback
+                            sourceDataLine.write(bufferBytes, 0, numBytesRead);
+                        }
                     }
                 }
             };
@@ -197,15 +200,20 @@ public class Audio extends LoggableClass {
      */
     public void play() {
         if (sourceDataLine == null || audioPlaybackThread == null) throw new AudioPlaybackNotSupported();
-        sourceDataLine.start();
-        audioPlaybackThread.start();
+
+        if (audioPlaybackThread.isStarted()) {
+            paused = false;
+        } else {
+            sourceDataLine.start();
+            audioPlaybackThread.start();
+        }
     }
 
     /**
      * Pauses the audio.
      */
     public void pause() {
-        // Todo implement
+        paused = true;
     }
 
     /**
@@ -218,6 +226,7 @@ public class Audio extends LoggableClass {
             sourceDataLine.drain();
             sourceDataLine.close();
             audioStream.close();
+            paused = false;
         } catch (IOException e) {
             throw new RuntimeException(e);  // Todo is this right?
         }
