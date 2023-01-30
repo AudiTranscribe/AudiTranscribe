@@ -19,12 +19,8 @@
 
 package app.auditranscribe.io.audt_file.v0x00090002;
 
-import app.auditranscribe.io.audt_file.base.AUDTFileReader;
-import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.MusicNotesDataObject0x00050002;
-import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.QTransformDataObject0x00050002;
-import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.UnchangingDataPropertiesObject0x00050002;
-import app.auditranscribe.io.audt_file.v0x00080001.data_encapsulators.AudioDataObject0x00080001;
+import app.auditranscribe.io.audt_file.base.data_encapsulators.ProjectInfoDataObject;
+import app.auditranscribe.io.audt_file.v0x00080001.AUDTFileReader0x00080001;
 import app.auditranscribe.io.audt_file.v0x00090002.data_encapsulators.ProjectInfoDataObject0x00090002;
 import app.auditranscribe.io.exceptions.FailedToReadDataException;
 import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
@@ -34,7 +30,7 @@ import app.auditranscribe.music.TimeSignature;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class AUDTFileReader0x00090002 extends AUDTFileReader {
+public class AUDTFileReader0x00090002 extends AUDTFileReader0x00080001 {
     /**
      * Initialization method to make an <code>AUDTFileReader0x00090002</code> object.
      *
@@ -48,92 +44,13 @@ public class AUDTFileReader0x00090002 extends AUDTFileReader {
     public AUDTFileReader0x00090002(
             String filepath, InputStream inputStream
     ) throws IOException, IncorrectFileFormatException, InvalidFileVersionException {
-        super(0x00090002, filepath, inputStream);
+        super(filepath, inputStream);
     }
 
     // Public methods
     @Override
-    public UnchangingDataPropertiesObject readUnchangingDataProperties() throws FailedToReadDataException {
-        // Ensure that the unchanging data properties section ID is correct
-        int sectionID = readSectionID();
-        if (sectionID != UnchangingDataPropertiesObject.SECTION_ID) {
-            throw new FailedToReadDataException(
-                    "Failed to read the unchanging data properties section; the unchanging data properties section " +
-                            "has the incorrect section ID of " + sectionID + " (expected: " +
-                            UnchangingDataPropertiesObject.SECTION_ID + ")"
-            );
-        }
-
-        // Read in the rest of the data
-        int numSkippableBytes = readInteger();
-
-        // Check if there is an EOS
-        if (!checkEOSDelimiter()) {
-            throw new FailedToReadDataException(
-                    "Failed to read unchanging data properties; end of section delimiter missing"
-            );
-        }
-
-        // Create and return a `UnchangingDataPropertiesObject`
-        return new UnchangingDataPropertiesObject0x00050002(numSkippableBytes);
-    }
-
-    @Override
-    public QTransformDataObject readQTransformData() throws FailedToReadDataException {
-        // Ensure that the Q-Transform data section ID is correct
-        int sectionID = readSectionID();
-        if (sectionID != QTransformDataObject.SECTION_ID) {
-            throw new FailedToReadDataException(
-                    "Failed to read Q-Transform data; the Q-Transform data section has the incorrect " +
-                            "section ID of " + sectionID + " (expected: " + QTransformDataObject.SECTION_ID + ")"
-            );
-        }
-
-        // Read in the rest of the data
-        double minMagnitude = readDouble();
-        double maxMagnitude = readDouble();
-        byte[] qTransformData = readByteArray();
-
-        // Check if there is an EOS
-        if (!checkEOSDelimiter()) {
-            throw new FailedToReadDataException("Failed to read Q-Transform data; end of section delimiter missing");
-        }
-
-        // Create and return a `QTransformDataObject`
-        return new QTransformDataObject0x00050002(qTransformData, minMagnitude, maxMagnitude);
-    }
-
-    @Override
-    public AudioDataObject readAudioData() throws FailedToReadDataException {
-        // Ensure that the audio data section ID is correct
-        int sectionID = readSectionID();
-        if (sectionID != AudioDataObject.SECTION_ID) {
-            throw new FailedToReadDataException(
-                    "Failed to read audio data; the audio data section has the incorrect section ID of " + sectionID +
-                            " (expected: " + AudioDataObject.SECTION_ID + ")"
-            );
-        }
-
-        // Read in the rest of the data
-        byte[] compressedOriginalMP3Bytes = readByteArray();
-        byte[] compressedSlowedMP3Bytes = readByteArray();
-        double sampleRate = readDouble();
-        int totalDurationInMS = readInteger();
-
-        // Check if there is an EOS
-        if (!checkEOSDelimiter()) {
-            throw new FailedToReadDataException("Failed to read audio data; end of section delimiter missing");
-        }
-
-        // Create and return an `AudioDataObject`
-        return new AudioDataObject0x00080001(
-                compressedOriginalMP3Bytes, compressedSlowedMP3Bytes, sampleRate, totalDurationInMS
-        );
-    }
-
-    @Override
     public ProjectInfoDataObject readProjectInfoData() throws FailedToReadDataException {
-        // Ensure that the GUI data section ID is correct
+        // Ensure that the project info data section ID is correct
         int sectionID = readSectionID();
         if (sectionID != ProjectInfoDataObject.SECTION_ID) {
             throw new FailedToReadDataException(
@@ -165,30 +82,5 @@ public class AUDTFileReader0x00090002 extends AUDTFileReader {
         return new ProjectInfoDataObject0x00090002(
                 projectName, musicKeyIndex, timeSignature, bpm, offsetSeconds, playbackVolume, currTimeInMS
         );
-    }
-
-    @Override
-    public MusicNotesDataObject readMusicNotesData() throws FailedToReadDataException, IOException {
-        // Ensure that the GUI data section ID is correct
-        int sectionID = readSectionID();
-        if (sectionID != MusicNotesDataObject.SECTION_ID) {
-            throw new FailedToReadDataException(
-                    "Failed to read music notes data; the music notes data section has the incorrect section ID of " +
-                            sectionID + " (expected: " + MusicNotesDataObject.SECTION_ID + ")"
-            );
-        }
-
-        // Read in the rest of the data first
-        double[] timesToPlaceRectangles = read1DDoubleArray();
-        double[] noteDurations = read1DDoubleArray();
-        int[] noteNums = read1DIntegerArray();
-
-        // Check if there is an EOS
-        if (!checkEOSDelimiter()) {
-            throw new FailedToReadDataException("Failed to read music notes data; end of section delimiter missing");
-        }
-
-        // Create and return a `MusicNotesDataObject`
-        return new MusicNotesDataObject0x00050002(timesToPlaceRectangles, noteDurations, noteNums);
     }
 }

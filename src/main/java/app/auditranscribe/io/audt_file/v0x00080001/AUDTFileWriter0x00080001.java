@@ -19,17 +19,11 @@
 
 package app.auditranscribe.io.audt_file.v0x00080001;
 
-import app.auditranscribe.io.audt_file.base.AUDTFileWriter;
-import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.MusicNotesDataObject0x00050002;
-import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.QTransformDataObject0x00050002;
-import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.UnchangingDataPropertiesObject0x00050002;
-import app.auditranscribe.io.audt_file.v0x00070001.data_encapsulators.ProjectInfoDataObject0x00070001;
+import app.auditranscribe.io.audt_file.base.data_encapsulators.AudioDataObject;
+import app.auditranscribe.io.audt_file.v0x00070001.AUDTFileWriter0x00070001;
 import app.auditranscribe.io.audt_file.v0x00080001.data_encapsulators.AudioDataObject0x00080001;
 
-import java.io.IOException;
-
-public class AUDTFileWriter0x00080001 extends AUDTFileWriter {
+public class AUDTFileWriter0x00080001 extends AUDTFileWriter0x00070001 {
     /**
      * Initialization method to make an <code>AUDTFileWriter0x00080001</code> object.
      *
@@ -38,7 +32,7 @@ public class AUDTFileWriter0x00080001 extends AUDTFileWriter {
      * @param numBytesToSkip Number of bytes to skip at the beginning of the file.
      */
     public AUDTFileWriter0x00080001(String filepath, int numBytesToSkip) {
-        super(0x00080001, filepath, numBytesToSkip);
+        super(filepath, numBytesToSkip);
     }
 
     /**
@@ -48,48 +42,11 @@ public class AUDTFileWriter0x00080001 extends AUDTFileWriter {
      *                 <b>include</b> the extension of the AUDT file.
      */
     public AUDTFileWriter0x00080001(String filepath) {
-        super(0x00080001, filepath);
+        super(filepath);
     }
 
     // Public methods
-
-    /**
-     * Method that writes the unchanging data properties to file.
-     *
-     * @param object Data object that contains the unchanging data's properties.
-     */
-    public void writeUnchangingDataProperties(UnchangingDataPropertiesObject object) {
-        // Cast to the correct version of the object
-        UnchangingDataPropertiesObject0x00050002 obj = (UnchangingDataPropertiesObject0x00050002) object;
-
-        // Write to file
-        writeSectionID(UnchangingDataPropertiesObject0x00050002.SECTION_ID);
-        writeInteger(obj.numSkippableBytes);
-        writeEOSDelimiter();
-    }
-
-    /**
-     * Method that writes the Q-Transform data to file.
-     *
-     * @param object Data object that holds all the Q-Transform data.
-     */
-    public void writeQTransformData(QTransformDataObject object) {
-        // Cast to the correct version of the object
-        QTransformDataObject0x00050002 obj = (QTransformDataObject0x00050002) object;
-
-        // Write to file
-        writeSectionID(QTransformDataObject0x00050002.SECTION_ID);
-        writeDouble(obj.minMagnitude);
-        writeDouble(obj.maxMagnitude);
-        writeByteArray(obj.qTransformBytes);
-        writeEOSDelimiter();
-    }
-
-    /**
-     * Method that writes the audio data to file.
-     *
-     * @param object Data object that holds all the audio data.
-     */
+    @Override
     public void writeAudioData(AudioDataObject object) {
         // Cast to the correct version of the object
         AudioDataObject0x00080001 obj = (AudioDataObject0x00080001) object;
@@ -100,45 +57,6 @@ public class AUDTFileWriter0x00080001 extends AUDTFileWriter {
         writeByteArray(obj.compressedSlowedMP3Bytes);
         writeDouble(obj.sampleRate);
         writeInteger(obj.totalDurationInMS);
-        writeEOSDelimiter();
-    }
-
-    /**
-     * Method that writes the project info data to file.
-     *
-     * @param object Data object that holds all the project info data.
-     */
-    public void writeProjectInfoData(ProjectInfoDataObject object) {
-        // Cast to the correct version of the object
-        ProjectInfoDataObject0x00070001 obj = (ProjectInfoDataObject0x00070001) object;
-
-        // Write to file
-        writeSectionID(ProjectInfoDataObject0x00070001.SECTION_ID);
-        writeString(obj.projectName);
-        writeInteger(obj.musicKeyIndex);
-        writeInteger(obj.timeSignatureIndex);
-        writeDouble(obj.bpm);
-        writeDouble(obj.offsetSeconds);
-        writeDouble(obj.playbackVolume);
-        writeInteger(obj.currTimeInMS);
-        writeEOSDelimiter();
-    }
-
-    /**
-     * Method that writes the music notes data to file.
-     *
-     * @param object Data object that holds all the music notes data.
-     * @throws IOException If something went wrong when LZ4 compressing.
-     */
-    public void writeMusicNotesData(MusicNotesDataObject object) throws IOException {
-        // Cast to the correct version of the object
-        MusicNotesDataObject0x00050002 obj = (MusicNotesDataObject0x00050002) object;
-
-        // Write to file
-        writeSectionID(MusicNotesDataObject0x00050002.SECTION_ID);
-        write1DDoubleArray(obj.timesToPlaceRectangles);
-        write1DDoubleArray(obj.noteDurations);
-        write1DIntegerArray(obj.noteNums);
         writeEOSDelimiter();
     }
 }

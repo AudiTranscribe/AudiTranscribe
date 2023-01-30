@@ -31,6 +31,7 @@ import app.auditranscribe.io.audt_file.v0x000B0001.AUDTFileReader0x000B0001;
 import app.auditranscribe.io.exceptions.FailedToReadDataException;
 import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
 import app.auditranscribe.io.exceptions.InvalidFileVersionException;
+import app.auditranscribe.misc.CustomLogger;
 import app.auditranscribe.utils.MiscUtils;
 
 import java.io.FileInputStream;
@@ -62,7 +63,7 @@ public abstract class AUDTFileReader extends LoggableClass {
      * @throws InvalidFileVersionException  If the LZ4 version is outdated.
      */
     public AUDTFileReader(
-            int fileVersion, String filepath, InputStream inputStream
+            String filepath, InputStream inputStream
     ) throws IOException, IncorrectFileFormatException, InvalidFileVersionException {
         // Update attributes
         this.filepath = filepath;
@@ -81,9 +82,6 @@ public abstract class AUDTFileReader extends LoggableClass {
                     "The file is not an AUDT file. Is the end-of-file delimiter correct?"
             );
         }
-
-        // Log version
-        log(Level.INFO, "Using version " + MiscUtils.intAsPaddedHexStr(fileVersion) + " AUDT file reader");
     }
 
     // Public methods
@@ -120,8 +118,7 @@ public abstract class AUDTFileReader extends LoggableClass {
         }
 
         try (InputStream inputStream = new FileInputStream(filepath)) {  // Do this so that the read point is the start
-            // Get the appropriate file reader objects
-            return switch (fileVersion) {
+            AUDTFileReader reader = switch (fileVersion) {
                 case 0x00050002 -> new AUDTFileReader0x00050002(filepath, inputStream);
                 case 0x00070001 -> new AUDTFileReader0x00070001(filepath, inputStream);
                 case 0x00080001 -> new AUDTFileReader0x00080001(filepath, inputStream);
@@ -131,6 +128,14 @@ public abstract class AUDTFileReader extends LoggableClass {
                         "Invalid file version '" + MiscUtils.intAsPaddedHexStr(fileVersion) + "'."
                 );
             };
+
+            CustomLogger.log(
+                    Level.INFO,
+                    "Using version " + MiscUtils.intAsPaddedHexStr(fileVersion) + " AUDT file reader",
+                    AUDTFileReader.class.getName()
+            );
+
+            return reader;
         }
     }
 

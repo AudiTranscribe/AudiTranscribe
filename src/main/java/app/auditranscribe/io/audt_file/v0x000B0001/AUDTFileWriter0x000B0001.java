@@ -19,17 +19,11 @@
 
 package app.auditranscribe.io.audt_file.v0x000B0001;
 
-import app.auditranscribe.io.audt_file.base.AUDTFileWriter;
-import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.MusicNotesDataObject0x00050002;
-import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.QTransformDataObject0x00050002;
-import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.UnchangingDataPropertiesObject0x00050002;
-import app.auditranscribe.io.audt_file.v0x00080001.data_encapsulators.AudioDataObject0x00080001;
+import app.auditranscribe.io.audt_file.base.data_encapsulators.ProjectInfoDataObject;
+import app.auditranscribe.io.audt_file.v0x00090002.AUDTFileWriter0x00090002;
 import app.auditranscribe.io.audt_file.v0x000B0001.data_encapsulators.ProjectInfoDataObject0x000B0001;
 
-import java.io.IOException;
-
-public class AUDTFileWriter0x000B0001 extends AUDTFileWriter {
+public class AUDTFileWriter0x000B0001 extends AUDTFileWriter0x00090002 {
     /**
      * Initialization method to make an <code>AUDTFileWriter0x000B0001</code> object.
      *
@@ -38,7 +32,7 @@ public class AUDTFileWriter0x000B0001 extends AUDTFileWriter {
      * @param numBytesToSkip Number of bytes to skip at the beginning of the file.
      */
     public AUDTFileWriter0x000B0001(String filepath, int numBytesToSkip) {
-        super(0x000B0001, filepath, numBytesToSkip);
+        super(filepath, numBytesToSkip);
     }
 
     /**
@@ -48,48 +42,10 @@ public class AUDTFileWriter0x000B0001 extends AUDTFileWriter {
      *                 <b>include</b> the extension of the AUDT file.
      */
     public AUDTFileWriter0x000B0001(String filepath) {
-        super(0x000B0001, filepath);
+        super(filepath);
     }
 
     // Public methods
-    @Override
-    public void writeUnchangingDataProperties(UnchangingDataPropertiesObject object) {
-        // Cast to the correct version of the object
-        UnchangingDataPropertiesObject0x00050002 obj = (UnchangingDataPropertiesObject0x00050002) object;
-
-        // Write to file
-        writeSectionID(UnchangingDataPropertiesObject0x00050002.SECTION_ID);
-        writeInteger(obj.numSkippableBytes);
-        writeEOSDelimiter();
-    }
-
-    @Override
-    public void writeQTransformData(QTransformDataObject object) {
-        // Cast to the correct version of the object
-        QTransformDataObject0x00050002 obj = (QTransformDataObject0x00050002) object;
-
-        // Write to file
-        writeSectionID(QTransformDataObject0x00050002.SECTION_ID);
-        writeDouble(obj.minMagnitude);
-        writeDouble(obj.maxMagnitude);
-        writeByteArray(obj.qTransformBytes);
-        writeEOSDelimiter();
-    }
-
-    @Override
-    public void writeAudioData(AudioDataObject object) {
-        // Cast to the correct version of the object
-        AudioDataObject0x00080001 obj = (AudioDataObject0x00080001) object;
-
-        // Write to file
-        writeSectionID(AudioDataObject0x00080001.SECTION_ID);
-        writeByteArray(obj.compressedOriginalMP3Bytes);
-        writeByteArray(obj.compressedSlowedMP3Bytes);
-        writeDouble(obj.sampleRate);
-        writeInteger(obj.totalDurationInMS);
-        writeEOSDelimiter();
-    }
-
     @Override
     public void writeProjectInfoData(ProjectInfoDataObject object) {
         // Cast to the correct version of the object
@@ -105,19 +61,6 @@ public class AUDTFileWriter0x000B0001 extends AUDTFileWriter {
         writeDouble(obj.offsetSeconds);
         writeDouble(obj.playbackVolume);
         writeInteger(obj.currTimeInMS);
-        writeEOSDelimiter();
-    }
-
-    @Override
-    public void writeMusicNotesData(MusicNotesDataObject object) throws IOException {
-        // Cast to the correct version of the object
-        MusicNotesDataObject0x00050002 obj = (MusicNotesDataObject0x00050002) object;
-
-        // Write to file
-        writeSectionID(MusicNotesDataObject0x00050002.SECTION_ID);
-        write1DDoubleArray(obj.timesToPlaceRectangles);
-        write1DDoubleArray(obj.noteDurations);
-        write1DIntegerArray(obj.noteNums);
         writeEOSDelimiter();
     }
 }

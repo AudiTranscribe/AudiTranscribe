@@ -34,7 +34,7 @@ public class AUDTFileWriter0x00050002 extends AUDTFileWriter {
      * @param numBytesToSkip Number of bytes to skip at the beginning of the file.
      */
     public AUDTFileWriter0x00050002(String filepath, int numBytesToSkip) {
-        super(0x00050002, filepath, numBytesToSkip);
+        super(filepath, numBytesToSkip);
     }
 
     /**
@@ -44,10 +44,11 @@ public class AUDTFileWriter0x00050002 extends AUDTFileWriter {
      *                 <b>include</b> the extension of the AUDT file.
      */
     public AUDTFileWriter0x00050002(String filepath) {
-        super(0x00050002, filepath);
+        super(filepath);
     }
 
     // Public methods
+    @Override
     public void writeUnchangingDataProperties(UnchangingDataPropertiesObject object) {
         // Cast to the correct version of the object
         UnchangingDataPropertiesObject0x00050002 obj = (UnchangingDataPropertiesObject0x00050002) object;
@@ -58,6 +59,7 @@ public class AUDTFileWriter0x00050002 extends AUDTFileWriter {
         writeEOSDelimiter();
     }
 
+    @Override
     public void writeQTransformData(QTransformDataObject object) {
         // Cast to the correct version of the object
         QTransformDataObject0x00050002 obj = (QTransformDataObject0x00050002) object;
@@ -70,6 +72,7 @@ public class AUDTFileWriter0x00050002 extends AUDTFileWriter {
         writeEOSDelimiter();
     }
 
+    @Override
     public void writeAudioData(AudioDataObject object) {
         // Cast to the correct version of the object
         AudioDataObject0x00050002 obj = (AudioDataObject0x00050002) object;
@@ -83,6 +86,7 @@ public class AUDTFileWriter0x00050002 extends AUDTFileWriter {
         writeEOSDelimiter();
     }
 
+    @Override
     public void writeProjectInfoData(ProjectInfoDataObject object) {
         // Cast to the correct version of the object
         ProjectInfoDataObject0x00050002 obj = (ProjectInfoDataObject0x00050002) object;
@@ -98,6 +102,7 @@ public class AUDTFileWriter0x00050002 extends AUDTFileWriter {
         writeEOSDelimiter();
     }
 
+    @Override
     public void writeMusicNotesData(MusicNotesDataObject object) throws IOException {
         // Cast to the correct version of the object
         MusicNotesDataObject0x00050002 obj = (MusicNotesDataObject0x00050002) object;

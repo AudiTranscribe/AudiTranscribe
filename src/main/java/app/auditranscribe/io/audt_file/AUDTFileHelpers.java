@@ -19,6 +19,7 @@
 package app.auditranscribe.io.audt_file;
 
 import app.auditranscribe.generic.tuples.Triple;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.music.MusicKey;
 import app.auditranscribe.music.TimeSignature;
 import app.auditranscribe.utils.MathUtils;
@@ -28,6 +29,7 @@ import java.util.List;
 /**
  * Helper methods for IO operations with AUDT files.
  */
+@ExcludeFromGeneratedCoverageReport
 public final class AUDTFileHelpers {
     // Constants
     static final int INT_CONVERSION_MINIMUM = Integer.MIN_VALUE;

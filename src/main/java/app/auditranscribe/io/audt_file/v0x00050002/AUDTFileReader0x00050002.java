@@ -28,7 +28,6 @@ import app.auditranscribe.io.exceptions.InvalidFileVersionException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Level;
 
 public class AUDTFileReader0x00050002 extends AUDTFileReader {
     // Attributes
@@ -47,10 +46,11 @@ public class AUDTFileReader0x00050002 extends AUDTFileReader {
     public AUDTFileReader0x00050002(
             String filepath, InputStream inputStream
     ) throws IOException, IncorrectFileFormatException, InvalidFileVersionException {
-        super(0x00050002, filepath, inputStream);
+        super(filepath, inputStream);
     }
 
     // Public methods
+    @Override
     public UnchangingDataPropertiesObject readUnchangingDataProperties() throws FailedToReadDataException {
         // Ensure that the unchanging data properties section ID is correct
         int sectionID = readSectionID();
@@ -76,6 +76,7 @@ public class AUDTFileReader0x00050002 extends AUDTFileReader {
         return new UnchangingDataPropertiesObject0x00050002(numSkippableBytes);
     }
 
+    @Override
     public QTransformDataObject readQTransformData() throws FailedToReadDataException {
         // Ensure that the Q-Transform data section ID is correct
         int sectionID = readSectionID();
@@ -100,6 +101,7 @@ public class AUDTFileReader0x00050002 extends AUDTFileReader {
         return new QTransformDataObject0x00050002(qTransformData, minMagnitude, maxMagnitude);
     }
 
+    @Override
     public AudioDataObject readAudioData() throws FailedToReadDataException {
         // Ensure that the audio data section ID is correct
         int sectionID = readSectionID();
@@ -125,8 +127,9 @@ public class AUDTFileReader0x00050002 extends AUDTFileReader {
         return new AudioDataObject0x00050002(compressedMP3Bytes, sampleRate, totalDurationInMS, originalFileName);
     }
 
+    @Override
     public ProjectInfoDataObject readProjectInfoData() throws FailedToReadDataException {
-        // Ensure that the GUI data section ID is correct
+        // Ensure that the project info data section ID is correct
         int sectionID = readSectionID();
         if (sectionID != ProjectInfoDataObject.SECTION_ID) {
             throw new FailedToReadDataException(
@@ -156,8 +159,9 @@ public class AUDTFileReader0x00050002 extends AUDTFileReader {
         return obj;
     }
 
+    @Override
     public MusicNotesDataObject readMusicNotesData() throws FailedToReadDataException, IOException {
-        // Ensure that the GUI data section ID is correct
+        // Ensure that the music notes data section ID is correct
         int sectionID = readSectionID();
         if (sectionID != MusicNotesDataObject.SECTION_ID) {
             throw new FailedToReadDataException(

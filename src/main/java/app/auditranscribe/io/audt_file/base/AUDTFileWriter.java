@@ -30,6 +30,7 @@ import app.auditranscribe.io.audt_file.v0x00080001.AUDTFileWriter0x00080001;
 import app.auditranscribe.io.audt_file.v0x00090002.AUDTFileWriter0x00090002;
 import app.auditranscribe.io.audt_file.v0x000B0001.AUDTFileWriter0x000B0001;
 import app.auditranscribe.io.exceptions.InvalidFileVersionException;
+import app.auditranscribe.misc.CustomLogger;
 import app.auditranscribe.utils.MiscUtils;
 
 import java.io.File;
@@ -46,6 +47,7 @@ import java.util.logging.Level;
 public abstract class AUDTFileWriter extends LoggableClass {
     // Attributes
     public final String filepath;
+    public int fileVersion;
 
     protected final List<Byte> bytes = new ArrayList<>();
     protected final int numBytesToSkip;
@@ -53,40 +55,24 @@ public abstract class AUDTFileWriter extends LoggableClass {
     /**
      * Initialization method to make an <code>AUDTFileWriter</code> object.
      *
-     * @param fileVersion    AUDT file version.
      * @param filepath       Path to the AUDT file. The file name at the end of the file path should
      *                       <b>include</b> the extension of the AUDT file.
      * @param numBytesToSkip Number of bytes to skip at the beginning of the file.
      */
-    public AUDTFileWriter(int fileVersion, String filepath, int numBytesToSkip) {
-        // Update attributes
+    public AUDTFileWriter(String filepath, int numBytesToSkip) {
         this.filepath = filepath;
         this.numBytesToSkip = numBytesToSkip;
-
-        // Write the header section if no bytes are to be skipped
-        if (numBytesToSkip == 0) writeHeaderSection(fileVersion);
-
-        // Log version
-        log(Level.INFO, "Using version " + MiscUtils.intAsPaddedHexStr(fileVersion) + " AUDT file writer");
     }
 
     /**
      * Initialization method to make an <code>AUDTFileWriter</code> object.
      *
-     * @param fileVersion AUDT file version.
-     * @param filepath    Path to the AUDT file. The file name at the end of the file path should
-     *                    <b>include</b> the extension of the AUDT file.
+     * @param filepath Path to the AUDT file. The file name at the end of the file path should
+     *                 <b>include</b> the extension of the AUDT file.
      */
-    public AUDTFileWriter(int fileVersion, String filepath) {
-        // Update attributes
+    public AUDTFileWriter(String filepath) {
         this.filepath = filepath;
         this.numBytesToSkip = 0;
-
-        // Write the header section
-        writeHeaderSection(fileVersion);
-
-        // Log version
-        log(Level.INFO, "Using version " + MiscUtils.intAsPaddedHexStr(fileVersion) + " AUDT file writer");
     }
 
     // Public methods
@@ -100,8 +86,7 @@ public abstract class AUDTFileWriter extends LoggableClass {
      * @throws InvalidFileVersionException If the specified file version is not supported.
      */
     public static AUDTFileWriter getWriter(int fileVersion, String filepath) throws InvalidFileVersionException {
-        // Get the appropriate file reader objects
-        return switch (fileVersion) {
+        AUDTFileWriter writer = switch (fileVersion) {
             case 0x00050002 -> new AUDTFileWriter0x00050002(filepath);
             case 0x00070001 -> new AUDTFileWriter0x00070001(filepath);
             case 0x00080001 -> new AUDTFileWriter0x00080001(filepath);
@@ -109,6 +94,16 @@ public abstract class AUDTFileWriter extends LoggableClass {
             case 0x000B0001 -> new AUDTFileWriter0x000B0001(filepath);
             default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
         };
+
+        CustomLogger.log(
+                Level.INFO,
+                "Using version " + MiscUtils.intAsPaddedHexStr(fileVersion) + " AUDT file writer",
+                AUDTFileWriter.class.getName()
+        );
+
+        writer.fileVersion = fileVersion;
+        writer.writeHeaderSection(fileVersion);
+        return writer;
     }
 
     /**
@@ -121,8 +116,7 @@ public abstract class AUDTFileWriter extends LoggableClass {
      */
     public static AUDTFileWriter getWriter(int fileVersion, String filepath, int numBytesToSkip)
             throws InvalidFileVersionException {
-        // Get the appropriate file reader objects
-        return switch (fileVersion) {
+        AUDTFileWriter writer = switch (fileVersion) {
             case 0x00050002 -> new AUDTFileWriter0x00050002(filepath, numBytesToSkip);
             case 0x00070001 -> new AUDTFileWriter0x00070001(filepath, numBytesToSkip);
             case 0x00080001 -> new AUDTFileWriter0x00080001(filepath, numBytesToSkip);
@@ -130,6 +124,9 @@ public abstract class AUDTFileWriter extends LoggableClass {
             case 0x000B0001 -> new AUDTFileWriter0x000B0001(filepath, numBytesToSkip);
             default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
         };
+
+        if (numBytesToSkip == 0) writer.writeHeaderSection(fileVersion);
+        return writer;
     }
 
     /**
