@@ -69,7 +69,7 @@
                                           <Tooltip text="Mute audio volume" />
                                        </tooltip>
                                     </Button>
-                                    <Slider fx:id="audioVolumeSlider" max="1.0" value="0.5" />
+                                    <Slider fx:id="audioVolumeSlider" blockIncrement="0.1" max="2.0" value="1.0" />
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER_RIGHT" spacing="5.0">

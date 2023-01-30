@@ -114,7 +114,7 @@ public class TranscriptionViewController extends SwitchableViewController {
     private double finalWidth;
     private double finalHeight;
 
-    private double audioVolume = 0.5;  // Percentage
+    private double audioVolume = 1;  // Percentage from 0 to 200%
     private int notesVolume = 80;  // MIDI velocity
     private int octaveNum = 4;  // Currently highlighted octave number
     private boolean isAudioMuted = false;
@@ -243,15 +243,20 @@ public class TranscriptionViewController extends SwitchableViewController {
             // Update the audio volume value
             audioVolume = newValue.doubleValue();
 
-            // Change the icon of the audio volume button from mute to non-mute
-            if (isAudioMuted) {
+            // Change the icon of the audio volume button if needed
+            if (audioVolume == audioVolumeSlider.getMin()) {
+                // Hacky way to set the mute icon
+                isAudioMuted = false;
+                toggleAudioMuteButton();
+            } else if (isAudioMuted) {
                 IconHelper.setSVGOnButton(
                         audioVolumeButton, 20, IMAGE_BUTTON_LENGTH, "volume-up-solid"
                 );
                 isAudioMuted = false;
             }
 
-            // Todo: update audio volume
+            // Update audio volume
+            audio.setPlaybackVolume(audioVolume);
 
             // Update CSS
             updateVolumeSliderCSS(audioVolumeSlider, audioVolume);
@@ -263,8 +268,12 @@ public class TranscriptionViewController extends SwitchableViewController {
             // Update the notes volume value
             notesVolume = newValue.intValue();
 
-            // Change the icon of the notes' volume button from off to on
-            if (areNotesMuted) {
+            // Change the icon of the notes' volume button if needed
+            if (notesVolume == notesVolumeSlider.getMin()) {
+                // Hacky way to set the mute icon
+                areNotesMuted = false;
+                toggleNoteMuteButton();
+            } else if (areNotesMuted) {
                 IconHelper.setSVGOnButton(
                         notesVolumeButton, 15, 20, IMAGE_BUTTON_LENGTH, IMAGE_BUTTON_LENGTH,
                         "music-note-solid"
@@ -273,10 +282,15 @@ public class TranscriptionViewController extends SwitchableViewController {
             }
 
             // Update CSS
-            updateVolumeSliderCSS(notesVolumeSlider, (double) (notesVolume - 33) / 94);
+            updateVolumeSliderCSS(notesVolumeSlider, notesVolume);
 
             log(Level.FINE, "Changed notes volume from " + oldValue + " to " + newValue);
         });
+
+        // Add methods to buttons
+        // Todo add the rest
+        audioVolumeButton.setOnAction(event -> toggleAudioMuteButton());
+        notesVolumeButton.setOnAction(event -> toggleNoteMuteButton());
 
         // Add methods to menu items
         // Todo: add the rest
@@ -347,50 +361,6 @@ public class TranscriptionViewController extends SwitchableViewController {
 
         bpmSpinnerFactory.setValue(bpm);
         offsetSpinnerFactory.setValue(offset);
-
-        // Set methods on the volume sliders
-        audioVolumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            // Update the `hasUnsavedChanges` flag
-            hasUnsavedChanges = true;
-
-            // Update the audio volume value
-            audioVolume = newValue.doubleValue();
-
-            // Change the icon of the audio volume button from mute to non-mute
-            if (isAudioMuted) {
-                IconHelper.setSVGOnButton(
-                        audioVolumeButton, 20, IMAGE_BUTTON_LENGTH, "volume-up-solid"
-                );
-                isAudioMuted = false;
-            }
-
-            // Update audio volume
-//            audio.setPlaybackVolume(audioVolume);
-
-            // Update CSS
-            updateVolumeSliderCSS(audioVolumeSlider, audioVolume);
-
-            log(Level.FINE, "Changed audio volume from " + oldValue + " to " + newValue);
-        });
-
-        notesVolumeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            // Update the notes volume value
-            notesVolume = newValue.intValue();
-
-            // Change the icon of the notes' volume button from off to on
-            if (areNotesMuted) {
-                IconHelper.setSVGOnButton(
-                        notesVolumeButton, 15, 20, IMAGE_BUTTON_LENGTH, IMAGE_BUTTON_LENGTH,
-                        "music-note-solid"
-                );
-                areNotesMuted = false;
-            }
-
-            // Update CSS
-            updateVolumeSliderCSS(notesVolumeSlider, (double) (notesVolume - 33) / 94);
-
-            log(Level.FINE, "Changed notes volume from " + oldValue + " to " + newValue);
-        });
 
         // Update labels
         totalTimeLabel.setText(UnitConversionUtils.secondsToTimeString(audioDuration));
@@ -885,10 +855,12 @@ public class TranscriptionViewController extends SwitchableViewController {
      * Method that sets the volume slider's CSS.
      *
      * @param volumeSlider Volume slider that needs updating.
-     * @param fillAmount   The amount of the volume slider that is filled. Must be a double between
-     *                     0 and 1 inclusive.
+     * @param value        Value of the slider.
      */
-    private void updateVolumeSliderCSS(Slider volumeSlider, double fillAmount) {
+    private void updateVolumeSliderCSS(Slider volumeSlider, double value) {
+        // Compute fill amount
+        double fillAmount = (value - volumeSlider.getMin()) / (volumeSlider.getMax() - volumeSlider.getMin());
+
         // Generate the style of the volume slider for the current volume value
         String style = String.format(
                 "-fx-background-color: linear-gradient(" +
@@ -1064,7 +1036,7 @@ public class TranscriptionViewController extends SwitchableViewController {
             notesVolumeSlider.setValue(notesVolume);
 
             updateVolumeSliderCSS(audioVolumeSlider, audioVolume);
-            updateVolumeSliderCSS(notesVolumeSlider, (double) (notesVolume - 33) / 94);
+            updateVolumeSliderCSS(notesVolumeSlider, notesVolume);
 
             // Ensure main pane is in focus
             rootPane.requestFocus();
@@ -1300,6 +1272,55 @@ public class TranscriptionViewController extends SwitchableViewController {
                 progressLabel.textProperty().unbind();
             }
         }
+    }
+
+    // Button handlers
+
+    /**
+     * Helper method that toggles the audio mute button.
+     */
+    private void toggleAudioMuteButton() {
+        // Determine icon to use
+        String iconToUse;
+
+        if (isAudioMuted) {
+            // Want to change from mute to non-mute
+            iconToUse = "volume-up-solid";
+
+            // Unmute the audio by setting the volume back to the value before the mute
+            audio.setPlaybackVolume(audioVolume);
+        } else {
+            // Want to change from non-mute to mute
+            iconToUse = "volume-mute-solid";
+
+            // Mute the audio by setting the volume to zero
+            audio.setPlaybackVolume(0);
+        }
+
+        // Change the icon
+        IconHelper.setSVGOnButton(audioVolumeButton, 20, IMAGE_BUTTON_LENGTH, iconToUse);
+
+        // Toggle the `isAudioMuted` flag
+        isAudioMuted = !isAudioMuted;
+
+        log(Level.FINE, "Toggled audio mute button (audio muted is now " + isAudioMuted + ")");
+    }
+
+    /**
+     * Helper method that toggles the note mute button.
+     */
+    private void toggleNoteMuteButton() {
+        // Change the icon
+        String iconToUse = "music-note-line";
+        if (areNotesMuted) iconToUse = "music-note-solid";  // Want to change icon from off to on
+        IconHelper.setSVGOnButton(
+                notesVolumeButton, 15, 20, IMAGE_BUTTON_LENGTH, IMAGE_BUTTON_LENGTH, iconToUse
+        );
+
+        // Toggle the `areNotesMuted` flag
+        areNotesMuted = !areNotesMuted;
+
+        log(Level.FINE, "Toggled notes mute button (notes muted is now " + areNotesMuted + ")");
     }
 
     // Miscellaneous handlers
