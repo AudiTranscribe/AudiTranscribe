@@ -9,8 +9,12 @@
 }
 
 .memory-use-hbox {
-    -fx-background-color: memory-hbox-colour;
-    -fx-background-radius: 0 0 10px 10px;
+    -fx-background-color: memory-hbox-background-colour;
+    -fx-background-radius: 0 0 0 10px;
+}
+
+.memory-use-hbox > .label {
+    -fx-text-fill: memory-hbox-text-colour;
 }
 
 /* MIDDLE */

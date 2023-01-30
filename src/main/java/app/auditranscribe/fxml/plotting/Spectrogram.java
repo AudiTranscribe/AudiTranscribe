@@ -210,6 +210,17 @@ public class Spectrogram extends LoggableClass {
         return plot(generateMagnitudes(windowFunction), generateColourMap(colourScale));
     }
 
+    /**
+     * Generates the spectrogram image for the given Q-Transform magnitude data.
+     *
+     * @param magnitudes  Existing magnitudes to use on the spectrogram.
+     * @param colourScale The colour scale to use for the spectrogram.
+     * @return The spectrogram image.
+     */
+    public WritableImage generateSpectrogram(double[][] magnitudes, ColourScale colourScale) {
+        return plot(magnitudes, generateColourMap(colourScale));
+    }
+
     // Private methods
 
     /**
