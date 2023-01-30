@@ -1,7 +1,7 @@
 /* SIDEBAR */
 .sidebar {
     -fx-border-width: 0 1px 0 0;
-    -fx-border-color: seperator-colour;
+    -fx-border-color: separator-colour;
 }
 
 /* Labels */
@@ -22,7 +22,7 @@
 .sidebar-button {
     -fx-font-size: 11pt;
     -fx-border-width: 1px 0 1px 0;
-    -fx-border-color: seperator-colour;
+    -fx-border-color: separator-colour;
     -fx-background-radius: 0;
     -fx-padding: 0 0 0 15px;
     -fx-background-color: background-colour-primary;
@@ -38,7 +38,7 @@
 .no-projects-vbox, .projects-list-view {
     -fx-background-color: background-colour-secondary;
     -fx-border-width: 1px 0 0 1px;
-    -fx-border-color: seperator-colour;
+    -fx-border-color: separator-colour;
 }
 
 .search-text-field {
