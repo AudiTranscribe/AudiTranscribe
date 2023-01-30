@@ -368,4 +368,18 @@ class UnitConversionUtilsTest {
                 times2, 44100, 256, 1024
         ));
     }
+
+    // Other unit conversions
+    @Test
+    void secondsToTimeString() {
+        assertEquals("00:00", UnitConversionUtils.secondsToTimeString(0));
+        assertEquals("00:01", UnitConversionUtils.secondsToTimeString(1));
+        assertEquals("01:00", UnitConversionUtils.secondsToTimeString(60));
+        assertEquals("01:02", UnitConversionUtils.secondsToTimeString(62));
+        assertEquals("00:12", UnitConversionUtils.secondsToTimeString(12));
+        assertEquals("12:00", UnitConversionUtils.secondsToTimeString(720));
+        assertEquals("12:34", UnitConversionUtils.secondsToTimeString(754));
+
+        assertEquals("12345:40", UnitConversionUtils.secondsToTimeString(740740));  // Weird
+    }
 }

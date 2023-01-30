@@ -414,4 +414,39 @@ public final class UnitConversionUtils {
         // Then convert the samples into frames
         return samplesToFrames(samples, hopLength, numFFT);
     }
+
+    // Other unit conversions
+
+    /**
+     * Converts the number of seconds into a properly formatted time string.
+     *
+     * @param numSeconds Number of seconds.
+     * @return A string of the form "MM:SS".
+     */
+    public static String secondsToTimeString(double numSeconds) {
+        // Truncate any decimal places
+        int truncSeconds = (int) Math.floor(numSeconds);
+
+        // Compute the number of minutes and seconds
+        int minutes = truncSeconds / 60;
+        int seconds = truncSeconds % 60;
+
+        // Pad the minutes and seconds with needed zeros
+        String minuteStr;
+        if (minutes < 10) {
+            minuteStr = "0" + minutes;
+        } else {
+            minuteStr = "" + minutes;
+        }
+
+        String secondsStr;
+        if (seconds < 10) {
+            secondsStr = "0" + seconds;
+        } else {
+            secondsStr = "" + seconds;
+        }
+
+        // Return the final string
+        return minuteStr + ":" + secondsStr;
+    }
 }
