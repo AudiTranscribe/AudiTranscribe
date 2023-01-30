@@ -17,7 +17,7 @@ class AudioTest {
     Audio audio;
 
     AudioTest() throws UnsupportedAudioFileException, AudioTooLongException, IOException {
-        File file = new File(IOMethods.getAbsoluteFilePath("test-files/general/audio/Trumpet.wav"));
+        File file = new File(IOMethods.getAbsoluteFilePath("test-files/general/audio/Choice.wav"));
 
         if (TEST_PLAYBACK) {
             audio = new Audio(
@@ -32,17 +32,22 @@ class AudioTest {
 
     @Test
     void getDuration() {
-        assertEquals(5.333, audio.getDuration(), 1e-3);  // 5.333 seconds was obtained from Audacity
+        assertEquals(5.000, audio.getDuration(), 1e-3);  // 5.000 seconds was obtained from Audacity
+    }
+
+    @Test
+    void getSampleRate() {
+        assertEquals(44100, audio.getSampleRate());
     }
 
     @Test
     void getNumRawSamples() {
-        assertEquals(235202, audio.getNumRawSamples());
+        assertEquals(441000, audio.getNumRawSamples());
     }
 
     @Test
     void getNumMonoSamples() {
-        assertEquals(117601, audio.getNumMonoSamples());
+        assertEquals(220500, audio.getNumMonoSamples());
     }
 
     @Test
@@ -55,16 +60,29 @@ class AudioTest {
         System.out.println("SLEEPING");
         Thread t = new Thread(() -> {
             try {
-                Thread.sleep(2000);
+                Thread.sleep(1000);
+                System.out.println("SEEK");
+                audio.seekToTime(2.75);
+                Thread.sleep(1000);
+                System.out.println("CHECK TIME: " + audio.getCurrentTime());
+                Thread.sleep(1000);
+                System.out.println("SEEK");
+                audio.seekToTime(0.25);
+                Thread.sleep(1000);
+                System.out.println("CHECK TIME: " + audio.getCurrentTime());
+                Thread.sleep(1000);
+                System.out.println("SEEK");
+                audio.seekToTime(1);
+                Thread.sleep(3000);
+                System.out.println("DONE");
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         });
         t.start();
         t.join();
-        System.out.println("DONE");
         audio.stop();
-        System.out.println("STOPPED?");
+        System.out.println("STOPPED");
     }
 
     // Helper methods

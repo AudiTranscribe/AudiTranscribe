@@ -45,11 +45,18 @@ public class Audio extends LoggableClass {
     final int MAX_AUDIO_DURATION = 5;  // In minutes
 
     // Attributes
-    private final AudioInputStream audioStream;
+    private final File wavFile;
+
+    private AudioInputStream audioStream;
     private final AudioFormat audioFormat;
 
+    private final int frameSize;
+    private final double frameRate;
+    private final double bytesPerSecond;
     private final double sampleRate;
     private final double duration;  // In seconds
+
+    private long totalNumBytesProcessed;
 
     private final SourceDataLine sourceDataLine;
     private final StoppableThread audioPlaybackThread;
@@ -85,16 +92,20 @@ public class Audio extends LoggableClass {
         List<AudioProcessingMode> modes = List.of(processingModes);
 
         // Attempt to convert the input stream into an audio input stream
-        InputStream bufferedIn = new BufferedInputStream(new FileInputStream(wavFile));
-        audioStream = AudioSystem.getAudioInputStream(bufferedIn);
+        this.wavFile = wavFile;
+        audioStream = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream(wavFile)));
 
-        // Get the audio file's audio format and audio file's sample rate
+        // Get the audio file's audio format, and get the format's properties
         audioFormat = audioStream.getFormat();
+
+        frameSize = audioFormat.getFrameSize();
+        frameRate = audioFormat.getFrameRate();
+        bytesPerSecond = frameSize * frameRate;
         sampleRate = audioFormat.getSampleRate();
 
         // Compute the duration of the audio file
         long frames = audioStream.getFrameLength();
-        duration = frames / audioFormat.getFrameRate();  // In seconds
+        duration = frames / frameRate;  // In seconds
 
         // Check if duration is too long
         double durationInMinutes = duration / 60;
@@ -123,19 +134,23 @@ public class Audio extends LoggableClass {
 
             audioPlaybackThread = new StoppableThread() {
                 final byte[] bufferBytes = new byte[PLAYBACK_BUFFER_SIZE];
-                int readBytes;
+                int numBytesRead;
 
                 @Override
                 public void runner() {
                     while (running.get()) {
+                        // Attempt to read bytes from audio stream
                         try {
-                            readBytes = audioStream.read(bufferBytes);
-                            if (readBytes == -1) break;
+                            numBytesRead = audioStream.read(bufferBytes);
+                            if (numBytesRead == -1) break;
+                            totalNumBytesProcessed += numBytesRead;
                         } catch (IOException e) {
                             Thread.currentThread().interrupt();
                             logException(e);
                         }
-                        sourceDataLine.write(bufferBytes, 0, readBytes);
+
+                        // Write audio bytes for playback
+                        sourceDataLine.write(bufferBytes, 0, numBytesRead);
                     }
                 }
             };
@@ -171,6 +186,10 @@ public class Audio extends LoggableClass {
         return duration;
     }
 
+    public double getCurrentTime() {
+        return totalNumBytesProcessed / bytesPerSecond;
+    }
+
     // Audio playback methods
 
     /**
@@ -204,8 +223,19 @@ public class Audio extends LoggableClass {
         }
     }
 
-    public void seekToTime() {
-        // Todo: see https://stackoverflow.com/questions/52595473/java-start-audio-playback-at-x-position
+    /**
+     * Method that seeks the audio to the new time.
+     *
+     * @param seekTime Time to seek the audio to.
+     */
+    public void seekToTime(double seekTime) {
+        // If the current time is earlier than the seek time, we want to seek forwards
+        double currTime = getCurrentTime();
+        if (currTime < seekTime) {
+            seekForwards(seekTime - currTime);
+        } else {  // Want to seek to earlier part of audio; seek backwards
+            seekBackwards(seekTime);
+        }
     }
 
     // Audio sampling methods
@@ -292,6 +322,22 @@ public class Audio extends LoggableClass {
     }
 
     // Private methods
+
+    /**
+     * Helper method that resets the audio stream to the beginning.
+     */
+    private void resetAudioStream() {
+        if (audioStream != null) {
+            try {
+                audioStream.close();
+                audioStream = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream(wavFile)));
+
+                totalNumBytesProcessed = 0;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     /**
      * Helper method that resamples the audio samples array <code>x</code> and places it into the
@@ -439,14 +485,7 @@ public class Audio extends LoggableClass {
                 System.arraycopy(rawSamples, 0, monoSamples, 0, numRawSamples);
             }
 
-            // Close the audio stream
-            if (audioStream != null) {
-                try {
-                    audioStream.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+            resetAudioStream();
         }
     }
 
@@ -568,5 +607,38 @@ public class Audio extends LoggableClass {
         for (int i = 0; i < transfer.length; i++) {
             samples[i] = (float) transfer[i] / (float) fullScale;
         }
+    }
+
+    /**
+     * Helper method that assists with skipping forwards in the audio.
+     *
+     * @param secondsToSkip Number of seconds to skip forwards from the current position.
+     * @implNote Adapted from <a href="https://stackoverflow.com/a/52596824">this StackOverflow
+     * answer</a>.
+     */
+    private void seekForwards(double secondsToSkip) {
+        // Compute the number of bytes to skip
+        long bytesToSkip = (long) (frameSize * frameRate * secondsToSkip);
+        totalNumBytesProcessed += bytesToSkip;
+
+        // Now skip until the correct number of bytes have been skipped
+        try {
+            long justSkipped;
+            while (bytesToSkip > 0 && (justSkipped = audioStream.skip(bytesToSkip)) > 0) {
+                bytesToSkip -= justSkipped;
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);  // Todo is this right?
+        }
+    }
+
+    /**
+     * Helper method that assists with seeking backwards in the audio.
+     *
+     * @param timeToSeekTo Time to seek to in the audio.
+     */
+    private void seekBackwards(double timeToSeekTo) {
+        resetAudioStream();
+        seekForwards(timeToSeekTo);
     }
 }
