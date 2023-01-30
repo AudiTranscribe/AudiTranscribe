@@ -21,10 +21,7 @@ package app.auditranscribe.utils;
 import java.text.SimpleDateFormat;
 import java.time.Clock;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Miscellaneous utilities.
@@ -193,5 +190,27 @@ public final class MiscUtils {
         return "0x" +
                 "0".repeat(8 - initialHex.length()) +
                 initialHex;
+    }
+
+    // Randomisation utils
+
+    /**
+     * Method that generates a UUID string based on a given seed.
+     *
+     * @param seed Seed to generate the UUID on.
+     * @return Generated UUID string.
+     */
+    public static String generateUUID(long seed) {
+        // Declare random generator
+        Random random = new Random(seed);
+
+        // Generate UUID seed
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 16; i++) {
+            sb.append(random.nextInt());
+        }
+
+        // Generate UUID from bytes
+        return UUID.nameUUIDFromBytes(sb.toString().getBytes()).toString();
     }
 }
