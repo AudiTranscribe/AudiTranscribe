@@ -116,6 +116,7 @@
    <stylesheets>
       <URL value="@../../css/base.css" />
       <URL value="@../../css/views/main/about.css" />
+      <URL value="@../../css/theme/shared-colours.css" />
       <URL value="@../../css/theme/light.css" />
    </stylesheets>
 </AnchorPane>
