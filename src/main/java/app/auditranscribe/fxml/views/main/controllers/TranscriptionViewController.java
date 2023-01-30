@@ -58,6 +58,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
@@ -114,6 +115,7 @@ public class TranscriptionViewController extends SwitchableViewController {
 
     private double audioVolume = 0.5;  // Percentage
     private int notesVolume = 80;  // MIDI velocity
+    private int octaveNum = 4;  // Currently highlighted octave number
     private boolean isAudioMuted = false;
     private boolean areNotesMuted = false;
 
@@ -201,6 +203,8 @@ public class TranscriptionViewController extends SwitchableViewController {
 
     @FXML
     private ImageView spectrogramImage;
+
+    private Rectangle currentOctaveRectangle;
 
     // Bottom
     @FXML
@@ -727,7 +731,7 @@ public class TranscriptionViewController extends SwitchableViewController {
             // Update the bar number ellipses
             barNumberEllipses = PlottingStuffHandler.updateBarNumberEllipses(
                     barNumberPane, barNumberEllipses, audioDuration, oldBPM, newBPM, offset, offset,
-                    barNumberPane.getPrefHeight(), beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X,
+                    bottomAnchorPane.getPrefHeight(), beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X,
                     spectrogramScrollPane.getWidth()
             );
         }
@@ -769,7 +773,7 @@ public class TranscriptionViewController extends SwitchableViewController {
             // Update the bar number ellipses
             barNumberEllipses = PlottingStuffHandler.updateBarNumberEllipses(
                     barNumberPane, barNumberEllipses, audioDuration, bpm, bpm, oldOffset, newOffset,
-                    barNumberPane.getPrefHeight(), beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X,
+                    bottomAnchorPane.getPrefHeight(), beatsPerBar, beatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X,
                     spectrogramScrollPane.getWidth()
             );
         }
@@ -870,10 +874,10 @@ public class TranscriptionViewController extends SwitchableViewController {
             leftScrollPane.vvalueProperty().bindBidirectional(spectrogramScrollPane.vvalueProperty());
             bottomScrollPane.hvalueProperty().bindBidirectional(spectrogramScrollPane.hvalueProperty());
 
-//            // Add the playhead line
-//            playheadLine = PlottingStuffHandler.createPlayheadLine(finalHeight);
-//            spectrogramAnchorPane.getChildren().add(playheadLine);
-//
+            // Add the playhead line
+            playheadLine = PlottingStuffHandler.createPlayheadLine(finalHeight);
+            spectrogramAnchorPane.getChildren().add(playheadLine);
+
 //            // Bind properties
 //            colouredProgressPane.prefWidthProperty().bind(playheadX);
 //            playheadLine.startXProperty().bind(playheadX);
@@ -944,29 +948,29 @@ public class TranscriptionViewController extends SwitchableViewController {
             spectrogramImage.setFitWidth(finalHeight);
             spectrogramImage.setImage(image);
 
-//            // Set the current octave rectangle
-//            currentOctaveRectangle = PlottingStuffHandler.addCurrentOctaveRectangle(
-//                    notePane, finalHeight, octaveNum, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER
-//            );
-//
-//            // Add note labels and note lines
-//            noteLabels = PlottingStuffHandler.addNoteLabels(
-//                    notePane, noteLabels, musicKey, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER,
-//                    FANCY_NOTE_LABELS
-//            );
-//            PlottingStuffHandler.addNoteLines(spectrogramAnchorPane, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER);
-//
-//            // Add the beat lines and bar number ellipses
-//            beatLines = PlottingStuffHandler.getBeatLines(
-//                    bpm, beatsPerBar, PX_PER_SECOND, finalHeight, audioDuration, offset, SPECTROGRAM_ZOOM_SCALE_X
-//            );
-//            PlottingStuffHandler.addBeatLines(spectrogramAnchorPane, beatLines);
-//
-//            barNumberEllipses = PlottingStuffHandler.getBarNumberEllipses(
-//                    bpm, beatsPerBar, PX_PER_SECOND, barNumberPane.getPrefHeight(), audioDuration, offset,
-//                    SPECTROGRAM_ZOOM_SCALE_X
-//            );
-//            PlottingStuffHandler.addBarNumberEllipses(barNumberPane, barNumberEllipses);
+            // Set the current octave rectangle
+            currentOctaveRectangle = PlottingStuffHandler.addCurrentOctaveRectangle(
+                    notePane, finalHeight, octaveNum, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER
+            );
+
+            // Add note labels and note lines
+            noteLabels = PlottingStuffHandler.addNoteLabels(
+                    notePane, noteLabels, musicKey, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER,
+                    FANCY_NOTE_LABELS
+            );
+            PlottingStuffHandler.addNoteLines(spectrogramAnchorPane, finalHeight, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER);
+
+            // Add the beat lines and bar number ellipses
+            beatLines = PlottingStuffHandler.getBeatLines(
+                    bpm, beatsPerBar, PX_PER_SECOND, finalHeight, audioDuration, offset, SPECTROGRAM_ZOOM_SCALE_X
+            );
+            PlottingStuffHandler.addBeatLines(spectrogramAnchorPane, beatLines);
+
+            barNumberEllipses = PlottingStuffHandler.getBarNumberEllipses(
+                    bpm, beatsPerBar, PX_PER_SECOND, bottomAnchorPane.getPrefHeight(), audioDuration, offset,
+                    SPECTROGRAM_ZOOM_SCALE_X
+            );
+            PlottingStuffHandler.addBarNumberEllipses(barNumberPane, barNumberEllipses);
 
             // Resize spectrogram image pane
             // (We do this at the end to ensure that the image is properly placed)

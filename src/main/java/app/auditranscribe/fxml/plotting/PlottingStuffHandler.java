@@ -126,7 +126,7 @@ public final class PlottingStuffHandler {
             Label noteLabel = new Label(note);
 
             // Add CSS style class
-            noteLabel.getStyleClass().add("display-label");
+            noteLabel.getStyleClass().add("edge-label");
 
             // Check if this note is one of the notes in the key
             if (noteOffsets.contains(i % 12)) {
@@ -624,11 +624,10 @@ public final class PlottingStuffHandler {
         ellipse.setStrokeType(StrokeType.CENTERED);
 
         // Create the bar number text that will go inside the ellipse
-        Text barNumText = new Text(Integer.toString(barNum));
-        barNumText.setBoundsType(TextBoundsType.VISUAL);
+        Label barNumText = new Label(Integer.toString(barNum));
 
         // Add CSS style class to the bar number text
-        barNumText.getStyleClass().add("display-label");
+        barNumText.getStyleClass().add("edge-label");
 
         // Create the `StackPane` that will contain both these things
         StackPane stackPane = new StackPane();
@@ -636,7 +635,7 @@ public final class PlottingStuffHandler {
 
         // Move the `StackPane` correctly
         stackPane.setTranslateX(pos - BAR_NUMBER_ELLIPSE_RADIUS_Y * zoomScaleX);
-        stackPane.setTranslateY(height / 2 - BAR_NUMBER_ELLIPSE_RADIUS_Y);
+        stackPane.setTranslateY(height / 2 - BAR_NUMBER_ELLIPSE_RADIUS_Y - 2);  // Magical constant
 
         // Return the generated ellipse
         return stackPane;
