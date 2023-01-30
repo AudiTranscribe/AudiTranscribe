@@ -17,6 +17,6 @@ class NoteUnitTest {
     @Test
     void testToString() {
         assertEquals("Quarter Note", NoteUnit.QUARTER_NOTE.toString());
-        assertEquals("Thirty-Second Note", NoteUnit.THIRTY_SECOND_NOTE.toString());
+        assertEquals("Thirty-second Note", NoteUnit.THIRTY_SECOND_NOTE.toString());
     }
 }
