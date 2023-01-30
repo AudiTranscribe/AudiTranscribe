@@ -247,6 +247,23 @@ public class Audio extends LoggableClass {
         }
     }
 
+    /**
+     * Method that sets the volume to the volume provided.<br>
+     * Also sets the slowed audio's media player's volume if it is provided.
+     *
+     * @param volume Volume value. This value should be in the interval [0, 2] where 0 means
+     *               silent and 2 means <b>twice</b> full volume.
+     */
+    public void setPlaybackVolume(double volume) {
+        FloatControl volumeControl = (FloatControl) sourceDataLine.getControl(FloatControl.Type.MASTER_GAIN);
+        if (volume == 0) {
+            volumeControl.setValue(Float.NEGATIVE_INFINITY);  // 'Gain' of -infinity dB
+        } else {
+            volumeControl.setValue(20f * (float) Math.log10(volume));  // Gain of this amount of dB
+        }
+    }
+
+
     // Audio sampling methods
 
     /**

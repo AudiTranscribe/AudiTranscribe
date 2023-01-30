@@ -12,8 +12,6 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AudioTest {
-    final boolean TEST_PLAYBACK = false;
-
     Audio audio;
 
     AudioTest() throws UnsupportedAudioFileException, AudioTooLongException, IOException {
@@ -50,6 +48,7 @@ class AudioTest {
         assertEquals(220500, audio.getNumMonoSamples());
     }
 
+    final boolean TEST_PLAYBACK = false;
     @Test
     @DisabledIf("isPlaybackTestDisabled")
     void playback() throws InterruptedException {
@@ -60,26 +59,36 @@ class AudioTest {
         System.out.println("SLEEPING");
         Thread t = new Thread(() -> {
             try {
+                audio.setPlaybackVolume(1);
                 Thread.sleep(1000);
-                System.out.println("SEEK");
+                System.out.println("SEEK 2.75");
                 audio.seekToTime(2.75);
                 Thread.sleep(1000);
                 System.out.println("CHECK TIME: " + audio.getCurrentTime());
                 Thread.sleep(1000);
-                System.out.println("SEEK");
+                System.out.println("SEEK 0.25");
                 audio.seekToTime(0.25);
                 Thread.sleep(1000);
                 System.out.println("CHECK TIME: " + audio.getCurrentTime());
                 Thread.sleep(1000);
-                System.out.println("SEEK");
+                System.out.println("VOLUME 50%");
+                audio.setPlaybackVolume(0.5);
+                Thread.sleep(1000);
+                System.out.println("SEEK 1");
                 audio.seekToTime(1);
-                Thread.sleep(500);
+                Thread.sleep(1000);
                 audio.pause();
                 System.out.println("PAUSED");
-                Thread.sleep(2000);
+                Thread.sleep(1000);
                 audio.play();
                 System.out.println("RESUMED");
-                Thread.sleep(2500);
+                Thread.sleep(1000);
+                System.out.println("SEEK 0");
+                audio.seekToTime(0);
+                Thread.sleep(1000);
+                System.out.println("VOLUME 150%");
+                audio.setPlaybackVolume(1.5);
+                Thread.sleep(3000);
                 System.out.println("DONE");
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
