@@ -21,7 +21,11 @@ package app.auditranscribe.io.audt_file.v0x00090002;
 
 import app.auditranscribe.io.audt_file.base.AUDTFileReader;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import app.auditranscribe.io.audt_file.v0x00090002.data_encapsulators.*;
+import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.MusicNotesDataObject0x00050002;
+import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.QTransformDataObject0x00050002;
+import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.UnchangingDataPropertiesObject0x00050002;
+import app.auditranscribe.io.audt_file.v0x00080001.data_encapsulators.AudioDataObject0x00080001;
+import app.auditranscribe.io.audt_file.v0x00090002.data_encapsulators.ProjectInfoDataObject0x00090002;
 import app.auditranscribe.io.exceptions.FailedToReadDataException;
 import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
 import app.auditranscribe.io.exceptions.InvalidFileVersionException;
@@ -71,7 +75,7 @@ public class AUDTFileReader0x00090002 extends AUDTFileReader {
         }
 
         // Create and return a `UnchangingDataPropertiesObject`
-        return new UnchangingDataPropertiesObject0x00090002(numSkippableBytes);
+        return new UnchangingDataPropertiesObject0x00050002(numSkippableBytes);
     }
 
     @Override
@@ -96,7 +100,7 @@ public class AUDTFileReader0x00090002 extends AUDTFileReader {
         }
 
         // Create and return a `QTransformDataObject`
-        return new QTransformDataObject0x00090002(qTransformData, minMagnitude, maxMagnitude);
+        return new QTransformDataObject0x00050002(qTransformData, minMagnitude, maxMagnitude);
     }
 
     @Override
@@ -122,7 +126,7 @@ public class AUDTFileReader0x00090002 extends AUDTFileReader {
         }
 
         // Create and return an `AudioDataObject`
-        return new AudioDataObject0x00090002(
+        return new AudioDataObject0x00080001(
                 compressedOriginalMP3Bytes, compressedSlowedMP3Bytes, sampleRate, totalDurationInMS
         );
     }
@@ -185,6 +189,6 @@ public class AUDTFileReader0x00090002 extends AUDTFileReader {
         }
 
         // Create and return a `MusicNotesDataObject`
-        return new MusicNotesDataObject0x00090002(timesToPlaceRectangles, noteDurations, noteNums);
+        return new MusicNotesDataObject0x00050002(timesToPlaceRectangles, noteDurations, noteNums);
     }
 }

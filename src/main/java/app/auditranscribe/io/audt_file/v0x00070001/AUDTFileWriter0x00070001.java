@@ -21,10 +21,12 @@ package app.auditranscribe.io.audt_file.v0x00070001;
 
 import app.auditranscribe.io.audt_file.base.AUDTFileWriter;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
+import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.MusicNotesDataObject0x00050002;
+import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.QTransformDataObject0x00050002;
+import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.UnchangingDataPropertiesObject0x00050002;
 import app.auditranscribe.io.audt_file.v0x00070001.data_encapsulators.*;
 
 import java.io.IOException;
-import java.util.logging.Level;
 
 public class AUDTFileWriter0x00070001 extends AUDTFileWriter {
     /**
@@ -51,20 +53,20 @@ public class AUDTFileWriter0x00070001 extends AUDTFileWriter {
     // Public methods
     public void writeUnchangingDataProperties(UnchangingDataPropertiesObject object) {
         // Cast to the correct version of the object
-        UnchangingDataPropertiesObject0x00070001 obj = (UnchangingDataPropertiesObject0x00070001) object;
+        UnchangingDataPropertiesObject0x00050002 obj = (UnchangingDataPropertiesObject0x00050002) object;
 
         // Write to file
-        writeSectionID(UnchangingDataPropertiesObject0x00070001.SECTION_ID);
+        writeSectionID(UnchangingDataPropertiesObject0x00050002.SECTION_ID);
         writeInteger(obj.numSkippableBytes);
         writeEOSDelimiter();
     }
 
     public void writeQTransformData(QTransformDataObject object) {
         // Cast to the correct version of the object
-        QTransformDataObject0x00070001 obj = (QTransformDataObject0x00070001) object;
+        QTransformDataObject0x00050002 obj = (QTransformDataObject0x00050002) object;
 
         // Write to file
-        writeSectionID(QTransformDataObject0x00070001.SECTION_ID);
+        writeSectionID(QTransformDataObject0x00050002.SECTION_ID);
         writeDouble(obj.minMagnitude);
         writeDouble(obj.maxMagnitude);
         writeByteArray(obj.qTransformBytes);
@@ -101,10 +103,10 @@ public class AUDTFileWriter0x00070001 extends AUDTFileWriter {
 
     public void writeMusicNotesData(MusicNotesDataObject object) throws IOException {
         // Cast to the correct version of the object
-        MusicNotesDataObject0x00070001 obj = (MusicNotesDataObject0x00070001) object;
+        MusicNotesDataObject0x00050002 obj = (MusicNotesDataObject0x00050002) object;
 
         // Write to file
-        writeSectionID(MusicNotesDataObject0x00070001.SECTION_ID);
+        writeSectionID(MusicNotesDataObject0x00050002.SECTION_ID);
         write1DDoubleArray(obj.timesToPlaceRectangles);
         write1DDoubleArray(obj.noteDurations);
         write1DIntegerArray(obj.noteNums);

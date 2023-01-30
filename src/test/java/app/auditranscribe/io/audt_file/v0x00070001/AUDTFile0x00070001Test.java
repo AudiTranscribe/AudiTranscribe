@@ -26,7 +26,11 @@ import app.auditranscribe.io.audt_file.ProjectData;
 import app.auditranscribe.io.audt_file.base.AUDTFileReader;
 import app.auditranscribe.io.audt_file.base.AUDTFileWriter;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import app.auditranscribe.io.audt_file.v0x00070001.data_encapsulators.*;
+import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.MusicNotesDataObject0x00050002;
+import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.QTransformDataObject0x00050002;
+import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.UnchangingDataPropertiesObject0x00050002;
+import app.auditranscribe.io.audt_file.v0x00070001.data_encapsulators.AudioDataObject0x00070001;
+import app.auditranscribe.io.audt_file.v0x00070001.data_encapsulators.ProjectInfoDataObject0x00070001;
 import app.auditranscribe.io.exceptions.FailedToReadDataException;
 import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
 import app.auditranscribe.io.exceptions.InvalidFileVersionException;
@@ -101,7 +105,7 @@ class AUDTFile0x00070001Test {
         double maxMagnitude = conversionTuple.value2();
 
         // Define data to be used within the tests
-        qTransformDataObject = new QTransformDataObject0x00070001(
+        qTransformDataObject = new QTransformDataObject0x00050002(
                 qTransformBytes, minMagnitude, maxMagnitude
         );
         audioDataObject = new AudioDataObject0x00070001(
@@ -120,14 +124,14 @@ class AUDTFile0x00070001Test {
                 0.124, 34
         );
 
-        musicNotesDataObject1 = new MusicNotesDataObject0x00070001(
+        musicNotesDataObject1 = new MusicNotesDataObject0x00050002(
                 timesToPlaceRectangles1, noteDurations1, noteNums1
         );
-        musicNotesDataObject2 = new MusicNotesDataObject0x00070001(
+        musicNotesDataObject2 = new MusicNotesDataObject0x00050002(
                 timesToPlaceRectangles2, noteDurations2, noteNums2
         );
 
-        unchangingDataPropertiesObject = new UnchangingDataPropertiesObject0x00070001(
+        unchangingDataPropertiesObject = new UnchangingDataPropertiesObject0x00050002(
                 32 +  // Header section
                         UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
                         qTransformDataObject.numBytesNeeded() +

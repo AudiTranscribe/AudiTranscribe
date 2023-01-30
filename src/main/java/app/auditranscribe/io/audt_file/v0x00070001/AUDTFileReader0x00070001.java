@@ -21,14 +21,17 @@ package app.auditranscribe.io.audt_file.v0x00070001;
 
 import app.auditranscribe.io.audt_file.base.AUDTFileReader;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import app.auditranscribe.io.audt_file.v0x00070001.data_encapsulators.*;
+import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.MusicNotesDataObject0x00050002;
+import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.QTransformDataObject0x00050002;
+import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.UnchangingDataPropertiesObject0x00050002;
+import app.auditranscribe.io.audt_file.v0x00070001.data_encapsulators.AudioDataObject0x00070001;
+import app.auditranscribe.io.audt_file.v0x00070001.data_encapsulators.ProjectInfoDataObject0x00070001;
 import app.auditranscribe.io.exceptions.FailedToReadDataException;
 import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
 import app.auditranscribe.io.exceptions.InvalidFileVersionException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Level;
 
 public class AUDTFileReader0x00070001 extends AUDTFileReader {
     /**
@@ -70,7 +73,7 @@ public class AUDTFileReader0x00070001 extends AUDTFileReader {
         }
 
         // Create and return a `UnchangingDataPropertiesObject`
-        return new UnchangingDataPropertiesObject0x00070001(numSkippableBytes);
+        return new UnchangingDataPropertiesObject0x00050002(numSkippableBytes);
     }
 
     public QTransformDataObject readQTransformData() throws FailedToReadDataException {
@@ -94,7 +97,7 @@ public class AUDTFileReader0x00070001 extends AUDTFileReader {
         }
 
         // Create and return a `QTransformDataObject`
-        return new QTransformDataObject0x00070001(qTransformData, minMagnitude, maxMagnitude);
+        return new QTransformDataObject0x00050002(qTransformData, minMagnitude, maxMagnitude);
     }
 
     public AudioDataObject readAudioData() throws FailedToReadDataException {
@@ -172,6 +175,6 @@ public class AUDTFileReader0x00070001 extends AUDTFileReader {
         }
 
         // Create and return a `MusicNotesDataObject`
-        return new MusicNotesDataObject0x00070001(timesToPlaceRectangles, noteDurations, noteNums);
+        return new MusicNotesDataObject0x00050002(timesToPlaceRectangles, noteDurations, noteNums);
     }
 }

@@ -2,8 +2,7 @@ package app.auditranscribe.io.audt_file;
 
 import app.auditranscribe.generic.tuples.Triple;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import app.auditranscribe.io.audt_file.v0x00090002.data_encapsulators.*;
-import app.auditranscribe.music.TimeSignature;
+import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.*;
 import app.auditranscribe.utils.MathUtils;
 import app.auditranscribe.utils.TypeConversionUtils;
 import org.junit.jupiter.api.Test;
@@ -77,49 +76,41 @@ class ProjectDataTest {
         double maxMagnitude2 = conversionTuple2.value2();
 
         // Define data to be used within the tests
-        qTransformDataObject1 = new QTransformDataObject0x00090002(
+        qTransformDataObject1 = new QTransformDataObject0x00050002(
                 qTransformBytes1, minMagnitude1, maxMagnitude1
         );
-        qTransformDataObject2 = new QTransformDataObject0x00090002(
+        qTransformDataObject2 = new QTransformDataObject0x00050002(
                 qTransformBytes2, minMagnitude2, maxMagnitude2
         );
 
-        audioDataObject1 = new AudioDataObject0x00090002(
+        audioDataObject1 = new AudioDataObject0x00050002(
                 new byte[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
-                new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-                44100,
-                8000
-        );
-        audioDataObject2 = new AudioDataObject0x00090002(
+                44100, 8000, "A440.wav");
+        audioDataObject2 = new AudioDataObject0x00050002(
                 new byte[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19},
-                new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20},
-                44100,
-                5000
+                44100, 5000, "Choice.wav");
+
+        projectInfoDataObject1 = new ProjectInfoDataObject0x00050002(
+                1, 0, 123.45, 0.01, 0.55, 9000
+        );
+        projectInfoDataObject2 = new ProjectInfoDataObject0x00050002(
+                8, 7, 67.89, -1.23, 0.124, 2048
         );
 
-        projectInfoDataObject1 = new ProjectInfoDataObject0x00090002(
-                "A440", 1, TimeSignature.FOUR_FOUR, 123.45, 0.01,
-                0.55, 9000
-        );
-        projectInfoDataObject2 = new ProjectInfoDataObject0x00090002(
-                "Choice", 8, TimeSignature.TWELVE_EIGHT, 67.89, -1.23,
-                0.124, 2048
-        );
-
-        musicNotesDataObject1 = new MusicNotesDataObject0x00090002(
+        musicNotesDataObject1 = new MusicNotesDataObject0x00050002(
                 timesToPlaceRectangles1, noteDurations1, noteNums1
         );
-        musicNotesDataObject2 = new MusicNotesDataObject0x00090002(
+        musicNotesDataObject2 = new MusicNotesDataObject0x00050002(
                 timesToPlaceRectangles2, noteDurations2, noteNums2
         );
 
-        unchangingDataPropertiesObject1 = new UnchangingDataPropertiesObject0x00090002(
+        unchangingDataPropertiesObject1 = new UnchangingDataPropertiesObject0x00050002(
                 32 +  // Header section
                         UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
                         qTransformDataObject1.numBytesNeeded() +
                         audioDataObject1.numBytesNeeded()
         );
-        unchangingDataPropertiesObject2 = new UnchangingDataPropertiesObject0x00090002(
+        unchangingDataPropertiesObject2 = new UnchangingDataPropertiesObject0x00050002(
                 32 +  // Header section
                         UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
                         qTransformDataObject2.numBytesNeeded() +
@@ -204,7 +195,7 @@ class ProjectDataTest {
                 musicNotesDataObject2
         );
 
-        assertEquals(975342637, one.hashCode());
-        assertEquals(-791226519, two.hashCode());
+        assertEquals(-1664917780, one.hashCode());
+        assertEquals(-1398708167, two.hashCode());
     }
 }

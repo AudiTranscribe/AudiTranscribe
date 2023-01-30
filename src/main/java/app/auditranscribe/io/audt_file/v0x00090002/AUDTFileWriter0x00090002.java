@@ -21,7 +21,11 @@ package app.auditranscribe.io.audt_file.v0x00090002;
 
 import app.auditranscribe.io.audt_file.base.AUDTFileWriter;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import app.auditranscribe.io.audt_file.v0x00090002.data_encapsulators.*;
+import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.MusicNotesDataObject0x00050002;
+import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.QTransformDataObject0x00050002;
+import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.UnchangingDataPropertiesObject0x00050002;
+import app.auditranscribe.io.audt_file.v0x00080001.data_encapsulators.AudioDataObject0x00080001;
+import app.auditranscribe.io.audt_file.v0x00090002.data_encapsulators.ProjectInfoDataObject0x00090002;
 
 import java.io.IOException;
 
@@ -51,10 +55,10 @@ public class AUDTFileWriter0x00090002 extends AUDTFileWriter {
     @Override
     public void writeUnchangingDataProperties(UnchangingDataPropertiesObject object) {
         // Cast to the correct version of the object
-        UnchangingDataPropertiesObject0x00090002 obj = (UnchangingDataPropertiesObject0x00090002) object;
+        UnchangingDataPropertiesObject0x00050002 obj = (UnchangingDataPropertiesObject0x00050002) object;
 
         // Write to file
-        writeSectionID(UnchangingDataPropertiesObject0x00090002.SECTION_ID);
+        writeSectionID(UnchangingDataPropertiesObject0x00050002.SECTION_ID);
         writeInteger(obj.numSkippableBytes);
         writeEOSDelimiter();
     }
@@ -62,10 +66,10 @@ public class AUDTFileWriter0x00090002 extends AUDTFileWriter {
     @Override
     public void writeQTransformData(QTransformDataObject object) {
         // Cast to the correct version of the object
-        QTransformDataObject0x00090002 obj = (QTransformDataObject0x00090002) object;
+        QTransformDataObject0x00050002 obj = (QTransformDataObject0x00050002) object;
 
         // Write to file
-        writeSectionID(QTransformDataObject0x00090002.SECTION_ID);
+        writeSectionID(QTransformDataObject0x00050002.SECTION_ID);
         writeDouble(obj.minMagnitude);
         writeDouble(obj.maxMagnitude);
         writeByteArray(obj.qTransformBytes);
@@ -75,10 +79,10 @@ public class AUDTFileWriter0x00090002 extends AUDTFileWriter {
     @Override
     public void writeAudioData(AudioDataObject object) {
         // Cast to the correct version of the object
-        AudioDataObject0x00090002 obj = (AudioDataObject0x00090002) object;
+        AudioDataObject0x00080001 obj = (AudioDataObject0x00080001) object;
 
         // Write to file
-        writeSectionID(AudioDataObject0x00090002.SECTION_ID);
+        writeSectionID(AudioDataObject0x00080001.SECTION_ID);
         writeByteArray(obj.compressedOriginalMP3Bytes);
         writeByteArray(obj.compressedSlowedMP3Bytes);
         writeDouble(obj.sampleRate);
@@ -107,10 +111,10 @@ public class AUDTFileWriter0x00090002 extends AUDTFileWriter {
     @Override
     public void writeMusicNotesData(MusicNotesDataObject object) throws IOException {
         // Cast to the correct version of the object
-        MusicNotesDataObject0x00090002 obj = (MusicNotesDataObject0x00090002) object;
+        MusicNotesDataObject0x00050002 obj = (MusicNotesDataObject0x00050002) object;
 
         // Write to file
-        writeSectionID(MusicNotesDataObject0x00090002.SECTION_ID);
+        writeSectionID(MusicNotesDataObject0x00050002.SECTION_ID);
         write1DDoubleArray(obj.timesToPlaceRectangles);
         write1DDoubleArray(obj.noteDurations);
         write1DIntegerArray(obj.noteNums);
