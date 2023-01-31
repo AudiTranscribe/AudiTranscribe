@@ -39,7 +39,7 @@ import java.util.*;
 @ExcludeFromGeneratedCoverageReport
 public class Audio extends LoggableClass {
     // Constants
-    public static final int SAMPLES_BUFFER_SIZE = 4096;  // In bits; 4096 = 2^12
+    public static final int SAMPLES_BUFFER_SIZE = 1024;  // In number of samples; 1024 = 2^10
     public static final int[] VALID_PLAYBACK_BUFFER_SIZES = {1024, 2048, 4096};  // In bytes
 
     final int MAX_AUDIO_DURATION = 5;  // In minutes
