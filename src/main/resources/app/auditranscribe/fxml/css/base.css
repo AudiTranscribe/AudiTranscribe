@@ -220,7 +220,7 @@
 }
 
 .separator *.line {
-    -fx-border-color: seperator-colour;
+    -fx-border-color: separator-colour;
     -fx-border-style: solid;
     -fx-border-width: 0.5px;
 }
