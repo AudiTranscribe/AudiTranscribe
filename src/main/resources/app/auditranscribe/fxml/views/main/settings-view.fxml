@@ -72,6 +72,20 @@
                                     </HBox>
                                  </children>
                               </HBox>
+                              <Separator prefWidth="200.0" />
+                              <Label layoutX="10.0" layoutY="10.0" prefHeight="0.0" styleClass="setting-subheading" text="Playback" />
+                              <HBox layoutX="10.0" layoutY="35.0" spacing="10.0">
+                                 <children>
+                                    <Label prefHeight="30.0" prefWidth="150.0" styleClass="setting-label" text="Audio device:" />
+                                    <ChoiceBox fx:id="audioDeviceChoiceBox" prefHeight="30.0" prefWidth="150.0" />
+                                 </children>
+                              </HBox>
+                              <HBox layoutX="10.0" layoutY="111.0" spacing="10.0">
+                                 <children>
+                                    <Label prefHeight="30.0" prefWidth="150.0" styleClass="setting-label" text="Buffer size:" />
+                                    <ChoiceBox fx:id="playbackBufferSizeChoiceBox" prefHeight="30.0" prefWidth="150.0" />
+                                 </children>
+                              </HBox>
                            </children>
                         </VBox>
                      </children>

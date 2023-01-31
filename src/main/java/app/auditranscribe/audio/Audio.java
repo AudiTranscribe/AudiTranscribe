@@ -22,6 +22,7 @@ import app.auditranscribe.audio.exceptions.AudioPlaybackNotSupported;
 import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.generic.exceptions.ValueException;
+import app.auditranscribe.io.data_files.DataFiles;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.misc.StoppableThread;
 import app.auditranscribe.signal.resampling_filters.Filter;
@@ -40,7 +41,7 @@ import java.util.List;
 public class Audio extends LoggableClass {
     // Constants
     public static final int SAMPLES_BUFFER_SIZE = 4096;  // In bits; 4096 = 2^12
-    public static final int PLAYBACK_BUFFER_SIZE = 4096;  // In bits
+    public static final int[] VALID_PLAYBACK_BUFFER_SIZES = {1024, 2048, 4096};  // In bytes
 
     final int MAX_AUDIO_DURATION = 5;  // In minutes
 
@@ -134,7 +135,9 @@ public class Audio extends LoggableClass {
             }
 
             audioPlaybackThread = new StoppableThread() {
-                final byte[] bufferBytes = new byte[PLAYBACK_BUFFER_SIZE];
+                // Get playback buffer size
+                final int playbackBufferSize = DataFiles.SETTINGS_DATA_FILE.data.playbackBufferSize;
+                final byte[] bufferBytes = new byte[playbackBufferSize];
                 int numBytesRead;
 
                 @Override

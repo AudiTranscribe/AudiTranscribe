@@ -30,6 +30,8 @@ import app.auditranscribe.signal.windowing.SignalWindow;
 @ExcludeFromGeneratedCoverageReport
 public class SettingsData {
     // Constants
+    public final static int PLAYBACK_BUFFER_SIZE = 1024;  // In bytes
+
     public final static int AUTOSAVE_INTERVAL = 5;  // In minutes
     public final static int LOG_FILE_PERSISTENCE = 5;  // In days
 
@@ -41,6 +43,7 @@ public class SettingsData {
 
     // Audio data
     public String ffmpegInstallationPath = null;  // Path to the ffmpeg installation
+    public int playbackBufferSize = PLAYBACK_BUFFER_SIZE;
 
     // Input/output data
     public int autosaveInterval = AUTOSAVE_INTERVAL;

@@ -18,6 +18,7 @@
 
 package app.auditranscribe.fxml.views.main.controllers;
 
+import app.auditranscribe.audio.Audio;
 import app.auditranscribe.audio.FFmpegHandler;
 import app.auditranscribe.fxml.IconHelper;
 import app.auditranscribe.fxml.Popups;
@@ -75,6 +76,12 @@ public class SettingsViewController extends AbstractViewController {
     @FXML
     private Button selectFFmpegBinaryButton;
 
+//    @FXML
+//    private ChoiceBox<?> audioDeviceChoiceBox;  // Todo find out what type to use
+
+    @FXML
+    private ChoiceBox<Integer> playbackBufferSizeChoiceBox;
+
     // "Input/Output" tab
     @FXML
     private Spinner<Integer> autosaveIntervalSpinner, logFilePersistenceSpinner;
@@ -101,6 +108,9 @@ public class SettingsViewController extends AbstractViewController {
         // Add choice box options
         for (Theme theme : Theme.values())
             themeChoiceBox.getItems().add(theme);
+
+        for (Integer bufferSize : Audio.VALID_PLAYBACK_BUFFER_SIZES)
+            playbackBufferSizeChoiceBox.getItems().add(bufferSize);
 
         for (ColourScale colourScale : ColourScale.values())
             colourScaleChoiceBox.getItems().add(colourScale);
@@ -263,6 +273,8 @@ public class SettingsViewController extends AbstractViewController {
         // Set choice box values
         themeChoiceBox.setValue(Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal]);
 
+        playbackBufferSizeChoiceBox.setValue(DataFiles.SETTINGS_DATA_FILE.data.playbackBufferSize);
+
         colourScaleChoiceBox.setValue(
                 ColourScale.values()[DataFiles.SETTINGS_DATA_FILE.data.colourScaleEnumOrdinal]
         );
@@ -312,6 +324,7 @@ public class SettingsViewController extends AbstractViewController {
         DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal = themeChoiceBox.getValue().ordinal();
 
         DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath = ffmpegPathTextField.getText();
+        DataFiles.SETTINGS_DATA_FILE.data.playbackBufferSize = playbackBufferSizeChoiceBox.getValue();
 
         DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval = autosaveIntervalSpinner.getValue();
         DataFiles.SETTINGS_DATA_FILE.data.logFilePersistence = logFilePersistenceSpinner.getValue();
@@ -344,6 +357,8 @@ public class SettingsViewController extends AbstractViewController {
 
                 lastValidFFmpegPath = DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath;
                 ffmpegPathTextField.setText(lastValidFFmpegPath);
+
+                playbackBufferSizeChoiceBox.setValue(SettingsData.PLAYBACK_BUFFER_SIZE);
             }
             case 2 -> {  // "Input/Output" tab
                 selectedTabName = "Input/Output";
