@@ -31,8 +31,7 @@ import app.auditranscribe.utils.MathUtils;
 import javax.sound.sampled.*;
 import java.io.*;
 import java.security.InvalidParameterException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Class that handles audio processing and audio playback.
@@ -60,7 +59,8 @@ public class Audio extends LoggableClass {
     private long totalNumBytesProcessed;
     private boolean paused = false;
 
-    private final SourceDataLine sourceDataLine;
+    private boolean withPlayback = false;
+    private SourceDataLine sourceDataLine;
     private final StoppableThread audioPlaybackThread;
 
     private int numRawSamples;
@@ -126,14 +126,7 @@ public class Audio extends LoggableClass {
 
         // Allow audio playback if requested
         if (modes.contains(AudioProcessingMode.WITH_PLAYBACK)) {
-            DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
-            try {
-                sourceDataLine = (SourceDataLine) AudioSystem.getLine(info);
-                sourceDataLine.open(audioFormat);
-            } catch (LineUnavailableException e) {
-                throw new RuntimeException(e);
-            }
-
+            withPlayback = true;
             audioPlaybackThread = new StoppableThread() {
                 // Get playback buffer size
                 final int playbackBufferSize = DataFiles.SETTINGS_DATA_FILE.data.playbackBufferSize;
@@ -202,7 +195,8 @@ public class Audio extends LoggableClass {
      * Starts playing the audio.
      */
     public void play() {
-        if (sourceDataLine == null || audioPlaybackThread == null) throw new AudioPlaybackNotSupported();
+        if (!withPlayback) throw new AudioPlaybackNotSupported();
+        if (sourceDataLine == null) setupSourceDataLine();
 
         if (audioPlaybackThread.isStarted()) {
             paused = false;
@@ -223,7 +217,7 @@ public class Audio extends LoggableClass {
      * Stops playing the audio.
      */
     public void stop() {
-        if (sourceDataLine == null || audioPlaybackThread == null) throw new AudioPlaybackNotSupported();
+        if (!withPlayback) throw new AudioPlaybackNotSupported();
         try {
             audioPlaybackThread.interrupt();
             sourceDataLine.drain();
@@ -266,6 +260,66 @@ public class Audio extends LoggableClass {
         }
     }
 
+    // Audio device methods
+
+    /**
+     * Method that filters audio devices based on the desired line.
+     *
+     * @param supportedLine Line to filter devices for.
+     * @return List of <code>Mixer.Info</code> objects, representing supported devices.
+     */
+    public static List<Mixer.Info> filterDevices(Line.Info supportedLine) {
+        List<Mixer.Info> result = new ArrayList<>();
+        Mixer.Info[] infos = AudioSystem.getMixerInfo();
+
+        for (Mixer.Info info : infos) {
+            Mixer mixer = AudioSystem.getMixer(info);
+            if (mixer.isLineSupported(supportedLine)) {
+                result.add(info);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Method that lists output audio devices for the system.
+     *
+     * @return List of <code>Mixer.Info</code> objects, representing supported output devices.
+     */
+    public static List<Mixer.Info> listOutputAudioDevices() {
+        return filterDevices(new Line.Info(SourceDataLine.class));
+    }
+
+    /**
+     * Gets the specified output audio device within a list.
+     *
+     * @param audioDevices Devices to search the audio device within.
+     * @param infoMap      Map of the info of the desired audio device.
+     * @return A <code>Mixer.Info</code> object, representing the info for the audio device.<br>
+     * If not found, returns the default audio device.
+     */
+    public static Mixer.Info getOutputAudioDevice(List<Mixer.Info> audioDevices, Map<String, String> infoMap) {
+        for (Mixer.Info device : audioDevices) {
+            if (Objects.equals(device.getName(), infoMap.get("name")) &&
+                    Objects.equals(device.getVendor(), infoMap.get("vendor")) &&
+                    Objects.equals(device.getVersion(), infoMap.get("version"))) {
+                return device;
+            }
+        }
+        return audioDevices.get(0);
+    }
+
+    /**
+     * Gets the specified output audio device from the list of all audio devices.
+     *
+     * @param infoMap Map of the info of the desired audio device.
+     * @return A <code>Mixer.Info</code> object, representing the info for the audio device.<br>
+     * If not found, returns the default audio device.
+     */
+    public static Mixer.Info getOutputAudioDevice(Map<String, String> infoMap) {
+        return getOutputAudioDevice(listOutputAudioDevices(), infoMap);
+    }
 
     // Audio sampling methods
 
@@ -351,6 +405,23 @@ public class Audio extends LoggableClass {
     }
 
     // Private methods
+
+    /**
+     * Helper method that sets up the source data line for writing to.
+     */
+    private void setupSourceDataLine() {
+        DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
+        Mixer audioDevice = AudioSystem.getMixer(getOutputAudioDevice(
+                DataFiles.SETTINGS_DATA_FILE.data.audioDeviceInfo
+        ));
+
+        try {
+            sourceDataLine = (SourceDataLine) audioDevice.getLine(info);
+            sourceDataLine.open(audioFormat);
+        } catch (LineUnavailableException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * Helper method that resets the audio stream to the beginning.

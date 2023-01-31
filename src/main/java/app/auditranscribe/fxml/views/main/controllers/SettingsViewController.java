@@ -43,9 +43,12 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import javax.sound.sampled.Mixer;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 
@@ -55,6 +58,8 @@ import java.util.logging.Level;
 public class SettingsViewController extends AbstractViewController {
     // Attributes
     private String lastValidFFmpegPath;
+
+    private List<Mixer.Info> audioDevices;
 
     private CustomIntegerSpinnerValueFactory autosaveIntervalSpinnerFactory, logFilePersistenceSpinnerFactory;
 
@@ -76,8 +81,8 @@ public class SettingsViewController extends AbstractViewController {
     @FXML
     private Button selectFFmpegBinaryButton;
 
-//    @FXML
-//    private ChoiceBox<?> audioDeviceChoiceBox;  // Todo find out what type to use
+    @FXML
+    private ChoiceBox<MixerInfoDisplay> audioDeviceChoiceBox;
 
     @FXML
     private ChoiceBox<Integer> playbackBufferSizeChoiceBox;
@@ -105,10 +110,15 @@ public class SettingsViewController extends AbstractViewController {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        // Get available audio devices
+        audioDevices = Audio.listOutputAudioDevices();
+
         // Add choice box options
         for (Theme theme : Theme.values())
             themeChoiceBox.getItems().add(theme);
 
+        for (Mixer.Info info : audioDevices)
+            audioDeviceChoiceBox.getItems().add(new MixerInfoDisplay(info));
         for (Integer bufferSize : Audio.VALID_PLAYBACK_BUFFER_SIZES)
             playbackBufferSizeChoiceBox.getItems().add(bufferSize);
 
@@ -205,7 +215,6 @@ public class SettingsViewController extends AbstractViewController {
             closeSettingsPage();
         });
 
-        // Todo add more
         log("Settings view ready to be shown");
     }
 
@@ -259,7 +268,6 @@ public class SettingsViewController extends AbstractViewController {
         IconHelper.setSVGOnButton(selectFFmpegBinaryButton, 15, 30, "folder-line");
     }
 
-
     // Private methods
 
     /**
@@ -273,6 +281,10 @@ public class SettingsViewController extends AbstractViewController {
         // Set choice box values
         themeChoiceBox.setValue(Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal]);
 
+        audioDeviceChoiceBox.setValue(new MixerInfoDisplay(Audio.getOutputAudioDevice(
+                audioDevices,
+                DataFiles.SETTINGS_DATA_FILE.data.audioDeviceInfo
+        )));
         playbackBufferSizeChoiceBox.setValue(DataFiles.SETTINGS_DATA_FILE.data.playbackBufferSize);
 
         colourScaleChoiceBox.setValue(
@@ -324,6 +336,7 @@ public class SettingsViewController extends AbstractViewController {
         DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal = themeChoiceBox.getValue().ordinal();
 
         DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath = ffmpegPathTextField.getText();
+        DataFiles.SETTINGS_DATA_FILE.data.audioDeviceInfo = audioDeviceChoiceBox.getValue().getMixerInfoAsMap();
         DataFiles.SETTINGS_DATA_FILE.data.playbackBufferSize = playbackBufferSizeChoiceBox.getValue();
 
         DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval = autosaveIntervalSpinner.getValue();
@@ -358,6 +371,9 @@ public class SettingsViewController extends AbstractViewController {
                 lastValidFFmpegPath = DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath;
                 ffmpegPathTextField.setText(lastValidFFmpegPath);
 
+                audioDeviceChoiceBox.setValue(new MixerInfoDisplay(Audio.getOutputAudioDevice(
+                        audioDevices, SettingsData.AUDIO_DEVICE_INFO
+                )));
                 playbackBufferSizeChoiceBox.setValue(SettingsData.PLAYBACK_BUFFER_SIZE);
             }
             case 2 -> {  // "Input/Output" tab
@@ -379,5 +395,39 @@ public class SettingsViewController extends AbstractViewController {
         String infoStr = "Reset '" + selectedTabName + "' tab settings to defaults";
         Popups.showInformationAlert(rootPane.getScene().getWindow(), "Reset to Defaults", infoStr + ".");
         log(infoStr);
+    }
+
+    // Helper classes
+    static class MixerInfoDisplay {
+        private final Mixer.Info info;
+
+        /**
+         * Initializes a new <code>MixerInfoDisplay</code> instance.
+         *
+         * @param info Mixer info object.
+         */
+        public MixerInfoDisplay(Mixer.Info info) {
+            this.info = info;
+        }
+
+        // Public methods
+
+        /**
+         * Method that gets the mixer info as a map for saving.
+         *
+         * @return A <code>Map</code>, with both key and value being strings.
+         */
+        public Map<String, String> getMixerInfoAsMap() {
+            return Map.of(
+                    "name", info.getName(),
+                    "vendor", info.getVendor(),
+                    "version", info.getVersion()
+            );
+        }
+
+        @Override
+        public String toString() {
+            return info.getName();
+        }
     }
 }

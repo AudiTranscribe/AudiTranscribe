@@ -24,6 +24,8 @@ import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.music.NoteUnit;
 import app.auditranscribe.signal.windowing.SignalWindow;
 
+import java.util.Map;
+
 /**
  * Class that contains the settings data.
  */
@@ -31,6 +33,11 @@ import app.auditranscribe.signal.windowing.SignalWindow;
 public class SettingsData {
     // Constants
     public final static int PLAYBACK_BUFFER_SIZE = 1024;  // In bytes
+    public final static Map<String, String> AUDIO_DEVICE_INFO = Map.of(
+            "name", "Default Audio Device",
+            "vendor", "Unknown Vendor",
+            "version", "Unknown Version"
+    );  // Todo: find out if this is the same on other platforms
 
     public final static int AUTOSAVE_INTERVAL = 5;  // In minutes
     public final static int LOG_FILE_PERSISTENCE = 5;  // In days
@@ -43,6 +50,7 @@ public class SettingsData {
 
     // Audio data
     public String ffmpegInstallationPath = null;  // Path to the ffmpeg installation
+    public Map<String, String> audioDeviceInfo = AUDIO_DEVICE_INFO;
     public int playbackBufferSize = PLAYBACK_BUFFER_SIZE;
 
     // Input/output data

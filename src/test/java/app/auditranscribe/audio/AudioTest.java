@@ -49,6 +49,7 @@ class AudioTest {
     }
 
     final boolean TEST_PLAYBACK = false;
+
     @Test
     @DisabledIf("isPlaybackTestDisabled")
     void playback() throws InterruptedException {
