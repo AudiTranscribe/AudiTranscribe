@@ -179,6 +179,36 @@ public final class UnitConversionUtils {
     }
 
     /**
+     * Converts a note number (as defined by AudiTranscribe) to its corresponding MIDI number.
+     *
+     * @param noteNumber Note number.
+     * @return Corresponding MIDI number. Note that this will return <code>-1</code> is there is no
+     * corresponding MIDI number (say above G9).
+     */
+    public static int noteNumberToMIDINumber(int noteNumber) {
+        // If the note number is above 116 (i.e. above G9) there is no MIDI number equivalent
+        if (noteNumber > 116) return -1;
+
+        // Otherwise, add 12 to the note number to get the MIDI number
+        return noteNumber + 12;
+    }
+
+    /**
+     * Converts a MIDI number to its corresponding note number (as defined by AudiTranscribe).
+     *
+     * @param midiNumber MIDI number.
+     * @return Corresponding note number. Note that this will return <code>-1</code> is there is no
+     * corresponding note number (say below C0).
+     */
+    public static int midiNumberToNoteNumber(int midiNumber) {
+        // If the note number is less than 12 (i.e. below C0) there is no note number equivalent
+        if (midiNumber < 12) return -1;
+
+        // Otherwise, subtract 12 from the MIDI number to get the note number
+        return midiNumber - 12;
+    }
+
+    /**
      * Converts the note number to a frequency.
      *
      * @param noteNumber The note number. Note that a note number of 0 means the key C0.

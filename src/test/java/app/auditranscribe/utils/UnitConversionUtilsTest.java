@@ -223,6 +223,26 @@ class UnitConversionUtilsTest {
     }
 
     @Test
+    void noteNumberToMIDINumber() {
+        assertEquals(12, UnitConversionUtils.noteNumberToMIDINumber(0));     // C0
+        assertEquals(127, UnitConversionUtils.noteNumberToMIDINumber(115));  // G9
+        assertEquals(60, UnitConversionUtils.noteNumberToMIDINumber(48));    // C4
+        assertEquals(113, UnitConversionUtils.noteNumberToMIDINumber(101));  // F8
+        assertEquals(68, UnitConversionUtils.noteNumberToMIDINumber(56));    // G#4
+        assertEquals(-1, UnitConversionUtils.noteNumberToMIDINumber(119));   // B9
+    }
+
+    @Test
+    void midiNumberToNoteNumber() {
+        assertEquals(0, UnitConversionUtils.midiNumberToNoteNumber(12));     // C0
+        assertEquals(115, UnitConversionUtils.midiNumberToNoteNumber(127));  // G9
+        assertEquals(48, UnitConversionUtils.midiNumberToNoteNumber(60));    // C4
+        assertEquals(101, UnitConversionUtils.midiNumberToNoteNumber(113));  // F8
+        assertEquals(56, UnitConversionUtils.midiNumberToNoteNumber(68));    // G#4
+        assertEquals(-1, UnitConversionUtils.midiNumberToNoteNumber(-12));   // C-1
+    }
+
+    @Test
     void noteNumberToFreq() {
         assertEquals(440, UnitConversionUtils.noteNumberToFreq(57), 0.001);  // A4
         assertEquals(16.352, UnitConversionUtils.noteNumberToFreq(0), 0.001);  // C0
