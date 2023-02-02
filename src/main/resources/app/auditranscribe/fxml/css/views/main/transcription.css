@@ -21,6 +21,10 @@
     -fx-text-fill: memory-hbox-text-colour;
 }
 
+.slider:horizontal .track, .slider:vertical .track {
+    -fx-background-color: linear-gradient(to right, -slider-filled-colour 50%, -slider-unfilled-colour 50%);
+}
+
 /* MIDDLE */
 .corner-pane, .edge-anchor-pane, .left-edge-pane, .bottom-edge-pane, .middle-pane {
     -fx-background-color: background-colour-secondary;

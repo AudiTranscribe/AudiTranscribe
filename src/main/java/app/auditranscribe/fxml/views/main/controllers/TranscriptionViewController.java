@@ -56,7 +56,6 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
@@ -66,8 +65,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -259,7 +256,7 @@ public class TranscriptionViewController extends SwitchableViewController {
             audio.setPlaybackVolume(audioVolume);
 
             // Update CSS
-            updateVolumeSliderCSS(audioVolumeSlider, audioVolume);
+            updateSliderCSS(audioVolumeSlider, audioVolume);
 
             log(Level.FINE, "Changed audio volume from " + oldValue + " to " + newValue);
         });
@@ -282,7 +279,7 @@ public class TranscriptionViewController extends SwitchableViewController {
             }
 
             // Update CSS
-            updateVolumeSliderCSS(notesVolumeSlider, notesVolume);
+            updateSliderCSS(notesVolumeSlider, notesVolume);
 
             log(Level.FINE, "Changed notes volume from " + oldValue + " to " + newValue);
         });
@@ -852,16 +849,16 @@ public class TranscriptionViewController extends SwitchableViewController {
     }
 
     /**
-     * Method that sets the volume slider's CSS.
+     * Method that sets the slider's CSS style.
      *
-     * @param volumeSlider Volume slider that needs updating.
-     * @param value        Value of the slider.
+     * @param slider Slider that needs updating.
+     * @param value  Value of the slider.
      */
-    private void updateVolumeSliderCSS(Slider volumeSlider, double value) {
+    private void updateSliderCSS(Slider slider, double value) {
         // Compute fill amount
-        double fillAmount = (value - volumeSlider.getMin()) / (volumeSlider.getMax() - volumeSlider.getMin());
+        double fillAmount = (value - slider.getMin()) / (slider.getMax() - slider.getMin());
 
-        // Generate the style of the volume slider for the current volume value
+        // Generate the style of the slider for the current value
         String style = String.format(
                 "-fx-background-color: linear-gradient(" +
                         "to right, -slider-filled-colour %f%%, -slider-unfilled-colour %f%%" +
@@ -869,8 +866,8 @@ public class TranscriptionViewController extends SwitchableViewController {
                 fillAmount * 100, fillAmount * 100
         );
 
-        // Apply the style to the volume slider's track (if available)
-        StackPane track = (StackPane) volumeSlider.lookup(".track");
+        // Apply the style to the slider's track (if available)
+        StackPane track = (StackPane) slider.lookup(".track");
         if (track != null) track.setStyle(style);
     }
 
@@ -1035,8 +1032,8 @@ public class TranscriptionViewController extends SwitchableViewController {
             audioVolumeSlider.setValue(audioVolume);
             notesVolumeSlider.setValue(notesVolume);
 
-            updateVolumeSliderCSS(audioVolumeSlider, audioVolume);
-            updateVolumeSliderCSS(notesVolumeSlider, notesVolume);
+            updateSliderCSS(audioVolumeSlider, audioVolume);
+            updateSliderCSS(notesVolumeSlider, notesVolume);
 
             // Ensure main pane is in focus
             rootPane.requestFocus();
