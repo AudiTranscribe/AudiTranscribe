@@ -460,24 +460,23 @@ public class TranscriptionViewController extends SwitchableViewController {
         });
 
         // Set clickable progress pane method
-        // Todo implement
-//        clickableProgressPane.setOnMouseClicked(event -> {
-//            // Ensure that the click is within the pane
-//            double clickX = event.getX();
-//            double clickY = event.getY();
-//
-//            if (clickX >= clickableProgressPane.getBoundsInParent().getMinX() &&
-//                    clickX <= clickableProgressPane.getBoundsInParent().getMaxX() &&
-//                    clickY >= clickableProgressPane.getBoundsInParent().getMinY() &&
-//                    clickY <= clickableProgressPane.getBoundsInParent().getMaxY()
-//            ) {
-//                // Convert the click position to seek time
-//                double seekTime = clickX / SPECTROGRAM_ZOOM_SCALE_X / PX_PER_SECOND;
-//
-//                // Seek to that time
-//                seekToTime(seekTime);
-//            }
-//        });
+        clickableProgressPane.setOnMouseClicked(event -> {
+            // Ensure that the click is within the pane
+            double clickX = event.getX();
+            double clickY = event.getY();
+
+            if (clickX >= clickableProgressPane.getBoundsInParent().getMinX() &&
+                    clickX <= clickableProgressPane.getBoundsInParent().getMaxX() &&
+                    clickY >= clickableProgressPane.getBoundsInParent().getMinY() &&
+                    clickY <= clickableProgressPane.getBoundsInParent().getMaxY()
+            ) {
+                // Convert the click position to seek time
+                double seekTime = clickX / SPECTROGRAM_ZOOM_SCALE_X / PX_PER_SECOND;
+
+                // Seek to that time
+                seekToTime(seekTime);
+            }
+        });
 
         // Schedule available memory updating
         scheduler.scheduleAtFixedRate(() -> Platform.runLater(() -> {
@@ -1488,6 +1487,10 @@ public class TranscriptionViewController extends SwitchableViewController {
                 for (Node node : disabledNodes) {
                     node.setDisable(false);
                 }
+
+                // Initialize the source data line for the audio
+                audio.play();
+                audio.pause();
 
 //                // Clear note rectangles' stacks
 //                NoteRectangle.clearStacks();
