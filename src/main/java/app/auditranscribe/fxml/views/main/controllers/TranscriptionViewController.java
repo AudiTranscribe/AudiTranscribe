@@ -27,6 +27,7 @@ import app.auditranscribe.fxml.IconHelper;
 import app.auditranscribe.fxml.Popups;
 import app.auditranscribe.fxml.Theme;
 import app.auditranscribe.fxml.plotting.ColourScale;
+import app.auditranscribe.fxml.plotting.PlottingHelpers;
 import app.auditranscribe.fxml.plotting.PlottingStuffHandler;
 import app.auditranscribe.fxml.plotting.Spectrogram;
 import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitchingData;
@@ -51,15 +52,13 @@ import app.auditranscribe.system.OSMethods;
 import app.auditranscribe.system.OSType;
 import app.auditranscribe.utils.*;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
@@ -151,7 +150,7 @@ public class TranscriptionViewController extends SwitchableViewController {
     private boolean isPaused = true;
 
     private NotePlayerSynth notePlayerSynth;
-//    private NotePlayerSequencer notePlayerSequencer;
+    //    private NotePlayerSequencer notePlayerSequencer;
     private MusicNotesDataObject musicNotesData;
 
     private boolean debugMode = false;
@@ -335,6 +334,113 @@ public class TranscriptionViewController extends SwitchableViewController {
 //        quantizeNotesMenuItem.setOnAction(event -> handleQuantizeNotes());
         docsMenuItem.setOnAction(event -> GUIUtils.openURLInBrowser("https://docs.auditranscribe.app/"));
         aboutMenuItem.setOnAction(event -> AboutViewController.showAboutWindow());
+
+        // Set spectrogram pane mouse event handler
+        spectrogramAnchorPane.addEventHandler(MouseEvent.ANY, new EventHandler<>() {
+            private boolean dragging = false;  // Whether the action is a drag action or not
+
+            @Override
+            public void handle(MouseEvent event) {
+                if (event.getEventType() == MouseEvent.MOUSE_PRESSED) {
+                    dragging = false;
+                } else if (event.getEventType() == MouseEvent.DRAG_DETECTED) {
+                    dragging = true;
+                } else if (event.getEventType() == MouseEvent.MOUSE_CLICKED && !dragging && isEverythingReady) {
+                    // Ensure that the click is within the pane
+                    double clickX = event.getX();
+                    double clickY = event.getY();
+
+                    if (clickX >= spectrogramAnchorPane.getBoundsInParent().getMinX() &&
+                            clickX <= spectrogramAnchorPane.getBoundsInParent().getMaxX() &&
+                            clickY >= spectrogramAnchorPane.getBoundsInParent().getMinY() &&
+                            clickY <= spectrogramAnchorPane.getBoundsInParent().getMaxY()
+                    ) {
+                        // Compute the frequency that the mouse click would correspond to
+                        double estimatedFreq = PlottingHelpers.heightToFreq(
+                                clickY,
+                                UnitConversionUtils.noteNumberToFreq(MIN_NOTE_NUMBER),
+                                UnitConversionUtils.noteNumberToFreq(MAX_NOTE_NUMBER),
+                                spectrogramAnchorPane.getHeight()
+                        );
+
+                        // Now estimate the note number
+                        int estimatedNoteNum = (int) Math.round(UnitConversionUtils.freqToNoteNumber(estimatedFreq));
+
+//                        if (canEditNotes) {
+//                            if (isPaused) {  // Permit note placement only when paused
+//                                // Compute the time that the mouse click would correspond to
+//                                double estimatedTime = clickX / finalWidth * audioDuration;
+//
+//                                // Determine if it is a left click or a right click
+//                                if (event.getButton() == MouseButton.PRIMARY) {
+//                                    // Compute the duration of one beat
+//                                    double beatDuration = 60 / bpm;
+//
+//                                    // Ignore any clicks that are too close to the boundary
+//                                    if (estimatedTime > audioDuration - beatDuration ||
+//                                            estimatedNoteNum < MIN_NOTE_NUMBER + 1 ||
+//                                            estimatedNoteNum > MAX_NOTE_NUMBER - 1
+//                                    ) return;
+//
+//                                    // Attempt to create a new note rectangle
+//                                    try {
+//                                        // Create note rectangle
+//                                        NoteRectangle noteRect = new NoteRectangle(
+//                                                estimatedTime, beatDuration, estimatedNoteNum
+//                                        );
+//
+//                                        // Add the note rectangle to the spectrogram pane
+//                                        spectrogramAnchorPane.getChildren().add(noteRect);
+//                                        log(
+//                                                Level.FINE,
+//                                                "Placed note " + estimatedNoteNum + " at " + estimatedTime +
+//                                                        " seconds"
+//                                        );
+//
+//                                        // Update the `hasUnsavedChanges` flag
+//                                        hasUnsavedChanges = true;
+//                                    } catch (NoteRectangleCollisionException ignored) {
+//                                    }
+//                                }
+//                            }
+//
+//                        } else {
+                        // Play the note
+                        log(
+                                Level.FINE,
+                                "Playing " + UnitConversionUtils.noteNumberToNote(
+                                        estimatedNoteNum, musicKey, false
+                                )
+                        );
+                        notePlayerSynth.playNoteForDuration(
+                                estimatedNoteNum, NOTE_ON_VELOCITY, NOTE_OFF_VELOCITY, NOTE_ON_DURATION,
+                                NOTE_OFF_DURATION
+                        );
+//                        }
+                    }
+                }
+            }
+        });
+
+        // Set clickable progress pane method
+        // Todo implement
+//        clickableProgressPane.setOnMouseClicked(event -> {
+//            // Ensure that the click is within the pane
+//            double clickX = event.getX();
+//            double clickY = event.getY();
+//
+//            if (clickX >= clickableProgressPane.getBoundsInParent().getMinX() &&
+//                    clickX <= clickableProgressPane.getBoundsInParent().getMaxX() &&
+//                    clickY >= clickableProgressPane.getBoundsInParent().getMinY() &&
+//                    clickY <= clickableProgressPane.getBoundsInParent().getMaxY()
+//            ) {
+//                // Convert the click position to seek time
+//                double seekTime = clickX / SPECTROGRAM_ZOOM_SCALE_X / PX_PER_SECOND;
+//
+//                // Seek to that time
+//                seekToTime(seekTime);
+//            }
+//        });
 
         // Schedule available memory updating
         scheduler.scheduleAtFixedRate(() -> Platform.runLater(() -> {
