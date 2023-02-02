@@ -22,6 +22,7 @@ import app.auditranscribe.audio.exceptions.AudioPlaybackNotSupported;
 import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.generic.exceptions.ValueException;
+import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.data_files.DataFiles;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.misc.StoppableThread;
@@ -32,6 +33,7 @@ import javax.sound.sampled.*;
 import java.io.*;
 import java.security.InvalidParameterException;
 import java.util.*;
+import java.util.logging.Level;
 
 /**
  * Class that handles audio processing and audio playback.
@@ -402,6 +404,22 @@ public class Audio extends LoggableClass {
 
         // Return the resampled array
         return yHat;
+    }
+
+    // Miscellaneous public methods
+
+    /**
+     * Deletes the WAV file used for the audio processing.<br>
+     * <b>Warning</b>: Attempting playback after deletion will result in <em>a lot</em> of errors.
+     */
+    public void deleteWAVFile() {
+        boolean successfullyDeleted = IOMethods.delete(wavFile);
+
+        if (successfullyDeleted) {
+            log(Level.FINE, "Successfully deleted '" + wavFile + "'");
+        } else {
+            log(Level.WARNING, "Failed to delete '" + wavFile + "' now; will attempt delete after exit");
+        }
     }
 
     // Private methods

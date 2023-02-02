@@ -52,6 +52,8 @@ import app.auditranscribe.system.OSMethods;
 import app.auditranscribe.system.OSType;
 import app.auditranscribe.utils.*;
 import javafx.application.Platform;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -122,6 +124,8 @@ public class TranscriptionViewController extends SwitchableViewController {
     private ProjectsDB projectsDB;
 
     private Audio audio;
+    private final DoubleProperty playheadX = new SimpleDoubleProperty(0);
+    private double currTime = 0;
     private double audioDuration = 0;  // Will be updated upon scene initialization
     private double sampleRate;
 
@@ -137,6 +141,9 @@ public class TranscriptionViewController extends SwitchableViewController {
     private int octaveNum = 4;  // Currently highlighted octave number
     private boolean isAudioMuted = false;
     private boolean areNotesMuted = false;
+
+    private boolean scrollToPlayhead = false;
+    private boolean canEditNotes = false;
 
     private MusicKey musicKey = MusicKey.C_MAJOR;
     private double bpm = 120;
@@ -319,6 +326,36 @@ public class TranscriptionViewController extends SwitchableViewController {
         // Todo add the rest
         audioVolumeButton.setOnAction(event -> toggleAudioMuteButton());
         notesVolumeButton.setOnAction(event -> toggleNoteMuteButton());
+
+        scrollButton.setOnAction(event -> toggleScrollButton());
+        editNotesButton.setOnAction(event -> toggleEditNotesButton());
+
+        playButton.setOnAction(event -> togglePlayButton());
+        rewindToBeginningButton.setOnAction(event -> {
+            log(Level.FINE, "Pressed rewind to beginning button");
+
+            isPaused = togglePaused(false);  // Pause the audio
+            seekToTime(0);
+            updateScrollPosition(0, finalWidth);
+        });
+//        toggleSlowedAudioButton.setOnAction(event -> {
+//            // Update the text that is shown
+//            if (usingSlowedAudio) {
+//                // Now no longer using it
+//                toggleSlowedAudioButton.setText("1.0x");
+//            } else {
+//                // Starting to use it
+//                toggleSlowedAudioButton.setText("0.5x");
+//            }
+//
+//            // Update the flag
+//            usingSlowedAudio = !usingSlowedAudio;
+//
+//            log(
+//                    Level.FINE,
+//                    "Toggled audio slowdown; audio playback speed is now " + (usingSlowedAudio ? "0.5x" : "1.0x")
+//            );
+//        });
 
         // Add methods to menu items
         // Todo: add the rest
@@ -705,10 +742,6 @@ public class TranscriptionViewController extends SwitchableViewController {
 //        audio.setRawOriginalMP3Bytes(rawOriginalMP3Bytes);
 //        audio.setRawSlowedMP3Bytes(rawSlowedMP3Bytes);
 
-        // Delete the auxiliary files
-        IOMethods.delete(auxOriginalWAVFile);
-//        IOMethods.delete(auxSlowedWAVFile);
-
         // Update the audio object's duration
         // (The `MediaPlayer` duration cannot be trusted)
 //        audio.setDuration(audioDuration);
@@ -817,10 +850,13 @@ public class TranscriptionViewController extends SwitchableViewController {
         }
     }
 
-    // Todo add doc
+    /**
+     * Method that handles the closing of the transcription scene.
+     */
     public void handleSceneClosing() {
         this.removeControllerFromActive();
         scheduler.shutdown();
+        audio.deleteWAVFile();
         // Todo add
     }
 
@@ -870,6 +906,104 @@ public class TranscriptionViewController extends SwitchableViewController {
         IconHelper.setSVGOnButton(
                 rewindToBeginningButton, 20, IMAGE_BUTTON_LENGTH, "step-backward-solid"
         );
+    }
+
+    // Operation methods
+
+    /**
+     * Helper method that seeks to the specified time.
+     *
+     * @param seekTime Time to seek to.
+     */
+    private void seekToTime(double seekTime) {
+        // Update the `hasUnsavedChanges` flag
+        hasUnsavedChanges = true;
+
+        // Ensure that the `seekTime` stays within range
+        if (seekTime < 0 && currTime <= 0) return;  // Do nothing in this case
+        else if (seekTime < 0) seekTime = 0;
+
+        if (seekTime > audioDuration && currTime >= audioDuration) return;  // Do nothing in this case
+        else if (seekTime > audioDuration) {
+            seekTime = audioDuration;
+
+            // Handle weird case where the audio should switch from paused to play for a second to prevent the
+            // double-clicking of the pause button on the next iteration
+            if (isPaused) isPaused = togglePaused(true);
+        }
+
+        // Make audio seek to that time
+        seekTime = MathUtils.round(seekTime, 3);
+        audio.seekToTime(seekTime);
+
+        // Todo remove?
+//        // Update the start time of the audio
+//        // (Do this so that when the player resumes out of a stop state it will start here)
+//        audio.setAudioStartTime(seekTime);
+//
+//        // Set the playback time
+//        // (We do this after updating start time to avoid pesky seeking issues)
+//        audio.setAudioPlaybackTime(seekTime);
+
+        // Update note sequencer current time
+        // Todo implement
+//        if (!areNotesMuted && notePlayerSequencer.isSequencerAvailable()) {
+//            if (!notePlayerSequencer.getSequencer().isRunning() && !isPaused) {  // Not running but unpaused
+//                notePlayerSequencer.play(seekTime, usingSlowedAudio);
+//            } else {
+//                notePlayerSequencer.setCurrTime(seekTime);
+//            }
+//        }
+
+        // Update the current time and current time label
+        currTime = seekTime;
+        currTimeLabel.setText(UnitConversionUtils.secondsToTimeString(seekTime));
+
+        // Update the playhead X position
+        playheadX.set(seekTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X);
+
+        log(Level.FINE, "Seeked to " + seekTime + " seconds");
+    }
+
+    /**
+     * Helper method that toggles the paused state.
+     *
+     * @param isPaused Old paused state.
+     * @return New paused state.
+     */
+    private boolean togglePaused(boolean isPaused) {
+        // Change the icon
+        String iconToUse;
+        if (isPaused) {  // Is currently paused; want to make audio play
+            // Change the icon of the play button from the play icon to the paused icon
+            // (So that the user knows that the next interaction with button will pause audio)
+            iconToUse = "pause-solid";
+
+            // Unpause the audio (i.e. play the audio)
+            audio.play();
+        } else {  // Is currently playing; want to make audio pause
+            // Change the icon of the play button from the paused icon to the play icon
+            // (So that the user knows that the next interaction with button will play audio)
+            iconToUse = "play-solid";
+
+            // Pause the audio
+            audio.pause();
+
+            // Stop note sequencer playback
+//            notePlayerSequencer.stop();
+        }
+
+        Platform.runLater(() -> IconHelper.setSVGOnButton(playButton, 20, IMAGE_BUTTON_LENGTH, iconToUse));
+
+        // Toggle paused state for note rectangles
+//        NoteRectangle.setIsPaused(!isPaused);
+
+        // Toggle disabled state of the toggle slowdown button
+        toggleSlowedAudioButton.setDisable(isPaused);  // If currently paused, will block
+
+        // Return the toggled version of the `isPaused` flag
+        log(Level.FINE, "Toggled pause state; now is " + (!isPaused ? "paused" : "playing"));
+        return !isPaused;
     }
 
     // Updaters
@@ -1050,46 +1184,48 @@ public class TranscriptionViewController extends SwitchableViewController {
             playheadLine = PlottingStuffHandler.createPlayheadLine(finalHeight);
             spectrogramAnchorPane.getChildren().add(playheadLine);
 
-//            // Bind properties
-//            colouredProgressPane.prefWidthProperty().bind(playheadX);
-//            playheadLine.startXProperty().bind(playheadX);
-//            playheadLine.endXProperty().bind(playheadX);
+            // Bind properties
+            colouredProgressPane.prefWidthProperty().bind(playheadX);
+            playheadLine.startXProperty().bind(playheadX);
+            playheadLine.endXProperty().bind(playheadX);
 //
-//            // Schedule playback functionality
-//            scheduler.scheduleAtFixedRate(() -> {
-//                // Nothing really changes if the audio is paused
-//                if (!isPaused) {
-//                    // Get the current audio time
-//                    currTime = audio.getCurrAudioTime(usingSlowedAudio);
-//
-//                    // Update the current time label
-//                    Platform.runLater(() -> currTimeLabel.setText(UnitConversionUtils.secondsToTimeString(currTime)));
-//
-//                    // Update the playhead X position
-//                    playheadX.set(currTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X);
-//
-//                    // Check if the current time has exceeded and is not paused
-//                    if (currTime >= audioDuration) {
-//                        log(Level.FINE, "Playback reached end of audio, will start from beginning upon play");
-//
-//                        // Pause the audio
-//                        isPaused = togglePaused(false);
-//
+            // Schedule playback functionality
+            scheduler.scheduleAtFixedRate(() -> {
+                // Nothing really changes if the audio is paused
+                if (!isPaused) {
+                    // Get the current audio time
+                    currTime = audio.getCurrentTime();
+                    System.out.println(currTime);
+
+                    // Update the current time label
+                    Platform.runLater(() -> currTimeLabel.setText(UnitConversionUtils.secondsToTimeString(currTime)));
+
+                    // Update the playhead X position
+                    playheadX.set(currTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X);
+
+                    // Check if the current time has exceeded and is not paused
+                    if (currTime >= audioDuration) {
+                        log(Level.FINE, "Playback reached end of audio, will start from beginning upon play");
+
+                        // Pause the audio
+                        isPaused = togglePaused(false);
+
+                        // Todo: check if this works?
 //                        // Specially update the start time to 0
 //                        // (Because the `seekToTime` method would have set it to the end, which is not what we want)
 //                        audio.setAudioStartTime(0);
-//
-//                        // We need to do this so that the status is set to paused
+
+                        // We need to do this so that the status is set to paused
 //                        audio.stop();
-//                        audio.pause();
-//                    }
-//
-//                    // Update scrolling
-//                    if (scrollToPlayhead) {
-//                        updateScrollPosition(playheadX.doubleValue(), spectrogramScrollPane.getWidth());
-//                    }
-//                }
-//            }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);
+                        audio.pause();
+                    }
+
+                    // Update scrolling
+                    if (scrollToPlayhead) {
+                        updateScrollPosition(playheadX.doubleValue(), spectrogramScrollPane.getWidth());
+                    }
+                }
+            }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);
 //
 //            // Schedule debug view updating
 //            if (debugMode) {
@@ -1412,6 +1548,73 @@ public class TranscriptionViewController extends SwitchableViewController {
     // Button handlers
 
     /**
+     * Helper method that toggles the play button.
+     */
+    private void togglePlayButton() {
+        // Update the `hasUnsavedChanges` flag
+        hasUnsavedChanges = true;
+
+        // Handle note rectangle operations when toggle paused
+        // Todo implement
+//        if (isPaused && !areNotesMuted) {  // We use `isPaused` here because we will toggle it later
+//            // Set up the note player sequencer by setting the notes on it
+//            setupNotePlayerSequencer();
+//        }
+
+        // Toggle audio paused state
+        if (currTime == audioDuration) {
+            audio.seekToTime(0);
+        }
+        isPaused = togglePaused(isPaused);
+
+        // Play notes on note player sequencer
+        // (We separate this method from above to ensure a more accurate note playing delay)
+        // Todo implement
+//        if (!isPaused && !areNotesMuted) {  // We use `!isPaused` here because it was toggled already
+//            notePlayerSequencer.play(currTime, usingSlowedAudio);
+//        }
+
+        // Disable note volume slider and note muting button if playing
+        notesVolumeButton.setDisable(!isPaused);
+        notesVolumeSlider.setDisable(!isPaused);
+
+        log(Level.FINE, "Toggled play button; audio is now " + (!isPaused ? "paused" : "playing"));
+    }
+
+    /**
+     * Helper method that toggles the scroll button.
+     */
+    private void toggleScrollButton() {
+        // Change the icon
+        String iconToUse = "map-marker-solid";
+        if (scrollToPlayhead) iconToUse = "map-marker-line";  // Want to change from filled to non-filled
+        IconHelper.setSVGOnButton(
+                scrollButton, 15, 22.5, IMAGE_BUTTON_LENGTH, IMAGE_BUTTON_LENGTH, iconToUse
+        );
+
+        // Toggle the `scrollToPlayhead` flag
+        scrollToPlayhead = !scrollToPlayhead;
+
+        log(Level.FINE, "Toggled scroll (scroll is now " + scrollToPlayhead + ")");
+    }
+
+    /**
+     * Helper method that toggles the edit notes button.
+     */
+    private void toggleEditNotesButton() {
+        // Change the icon
+        String iconToUse = "pencil-solid";
+        if (canEditNotes) iconToUse = "pencil-line";  // Want to change from filled to non-filled
+        IconHelper.setSVGOnButton(editNotesButton, 20, IMAGE_BUTTON_LENGTH, iconToUse);
+
+        // Toggle the `canEditNotes` flag
+        canEditNotes = !canEditNotes;
+//        NoteRectangle.setCanEdit(canEditNotes);  // Todo implement
+
+        log(Level.FINE, "Toggled editing notes (editing notes is now " + canEditNotes + ")");
+    }
+
+    /**
      * Helper method that toggles the audio mute button.
      */
     private void toggleAudioMuteButton() {
@@ -1548,13 +1751,13 @@ public class TranscriptionViewController extends SwitchableViewController {
 
         switch (code) {
             // Non-note playing key press inputs
-//            case SPACE -> togglePlayButton();
+            case SPACE -> togglePlayButton();
             case UP -> audioVolumeSlider.setValue(audioVolumeSlider.getValue() + VOLUME_VALUE_DELTA_ON_KEY_PRESS);
             case DOWN -> audioVolumeSlider.setValue(audioVolumeSlider.getValue() - VOLUME_VALUE_DELTA_ON_KEY_PRESS);
             case M -> toggleAudioMuteButton();
-//            case LEFT -> seekToTime(currTime - 1);
-//            case RIGHT -> seekToTime(currTime + 1);
-//            case PERIOD -> toggleScrollButton();
+            case LEFT -> seekToTime(currTime - 1);
+            case RIGHT -> seekToTime(currTime + 1);
+            case PERIOD -> toggleScrollButton();
 //            case N -> toggleEditNotesButton();
             case MINUS -> {
                 notePlayerSynth.silenceChannel();  // Stop any notes from playing
