@@ -53,14 +53,17 @@ class AudioTest {
     @Test
     @DisabledIf("isPlaybackTestDisabled")
     void playback() throws InterruptedException {
+        System.out.println("VOLUME 25%");
+        audio.setVolume(0.25);
         audio.play();
 
 //        audio.getAudioPlaybackThread().join();
 
-        System.out.println("SLEEPING");
         Thread t = new Thread(() -> {
             try {
-                audio.setPlaybackVolume(1);
+                Thread.sleep(1500);
+                System.out.println("VOLUME 100%");
+                audio.setVolume(1);
                 Thread.sleep(1000);
                 System.out.println("SEEK 2.75");
                 audio.seekToTime(2.75);
@@ -73,14 +76,14 @@ class AudioTest {
                 System.out.println("CHECK TIME: " + audio.getCurrentTime());
                 Thread.sleep(1000);
                 System.out.println("VOLUME 50%");
-                audio.setPlaybackVolume(0.5);
+                audio.setVolume(0.5);
                 Thread.sleep(1000);
                 System.out.println("SEEK 1");
                 audio.seekToTime(1);
                 Thread.sleep(1000);
                 audio.pause();
-                System.out.println("PAUSED");
-                Thread.sleep(1000);
+                System.out.println("PAUSED 1.5");
+                Thread.sleep(1500);
                 audio.play();
                 System.out.println("RESUMED");
                 Thread.sleep(1000);
@@ -88,7 +91,7 @@ class AudioTest {
                 audio.seekToTime(0);
                 Thread.sleep(1000);
                 System.out.println("VOLUME 150%");
-                audio.setPlaybackVolume(1.5);
+                audio.setVolume(1.5);
                 Thread.sleep(3000);
                 System.out.println("DONE");
             } catch (InterruptedException e) {

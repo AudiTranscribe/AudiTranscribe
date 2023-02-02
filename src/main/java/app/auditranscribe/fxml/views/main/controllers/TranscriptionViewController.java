@@ -253,7 +253,7 @@ public class TranscriptionViewController extends SwitchableViewController {
             }
 
             // Update audio volume
-            audio.setPlaybackVolume(audioVolume);
+            audio.setVolume(audioVolume);
 
             // Update CSS
             updateSliderCSS(audioVolumeSlider, audioVolume);
@@ -1285,13 +1285,13 @@ public class TranscriptionViewController extends SwitchableViewController {
             iconToUse = "volume-up-solid";
 
             // Unmute the audio by setting the volume back to the value before the mute
-            audio.setPlaybackVolume(audioVolume);
+            audio.setVolume(audioVolume);
         } else {
             // Want to change from non-mute to mute
             iconToUse = "volume-mute-solid";
 
             // Mute the audio by setting the volume to zero
-            audio.setPlaybackVolume(0);
+            audio.setVolume(0);
         }
 
         // Change the icon
