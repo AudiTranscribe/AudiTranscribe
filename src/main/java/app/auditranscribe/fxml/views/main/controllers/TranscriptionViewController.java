@@ -1195,7 +1195,6 @@ public class TranscriptionViewController extends SwitchableViewController {
                 if (!isPaused) {
                     // Get the current audio time
                     currTime = audio.getCurrentTime();
-                    System.out.println(currTime);
 
                     // Update the current time label
                     Platform.runLater(() -> currTimeLabel.setText(UnitConversionUtils.secondsToTimeString(currTime)));

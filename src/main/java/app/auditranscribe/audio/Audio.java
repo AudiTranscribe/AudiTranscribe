@@ -54,11 +54,11 @@ public class Audio extends LoggableClass {
 
     private final int frameSize;
     private final double frameRate;
-    private final double bytesPerSecond;
     private final double sampleRate;
     private final double duration;  // In seconds
 
-    private long totalNumBytesProcessed;
+    private double prevElapsedTime;  // Time (in seconds) that was elapsed before a skip forwards/backwards
+
     private double volume;
     private boolean paused = false;
 
@@ -105,7 +105,6 @@ public class Audio extends LoggableClass {
 
         frameSize = audioFormat.getFrameSize();
         frameRate = audioFormat.getFrameRate();
-        bytesPerSecond = frameSize * frameRate;
         sampleRate = audioFormat.getSampleRate();
 
         // Compute the duration of the audio file
@@ -144,13 +143,13 @@ public class Audio extends LoggableClass {
                             try {
                                 numBytesRead = audioStream.read(bufferBytes);
                                 if (numBytesRead == -1) break;
-                                totalNumBytesProcessed += numBytesRead;
                             } catch (IOException e) {
                                 Thread.currentThread().interrupt();
                                 logException(e);
                             }
 
                             // Write audio bytes for playback
+                            // Fixme: pausing is not instantaneous
                             sourceDataLine.write(bufferBytes, 0, numBytesRead);
                         }
                     }
@@ -189,7 +188,7 @@ public class Audio extends LoggableClass {
     }
 
     public double getCurrentTime() {
-        return totalNumBytesProcessed / bytesPerSecond;
+        return sourceDataLine.getMicrosecondPosition() / 1e6 - prevElapsedTime;
     }
 
     // Audio playback methods
@@ -229,7 +228,7 @@ public class Audio extends LoggableClass {
             audioStream.close();
             paused = false;
         } catch (IOException e) {
-            throw new RuntimeException(e);  // Todo is this right?
+            throw new RuntimeException(e);
         }
     }
 
@@ -246,6 +245,9 @@ public class Audio extends LoggableClass {
         } else {  // Want to seek to earlier part of audio; seek backwards
             seekBackwards(seekTime);
         }
+
+        // Update the previously elapsed time
+        prevElapsedTime = sourceDataLine.getMicrosecondPosition() / 1e6 - seekTime;
     }
 
     /**
@@ -449,8 +451,6 @@ public class Audio extends LoggableClass {
             try {
                 audioStream.close();
                 audioStream = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream(wavFile)));
-
-                totalNumBytesProcessed = 0;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -753,7 +753,6 @@ public class Audio extends LoggableClass {
     private void seekForwards(double secondsToSkip) {
         // Compute the number of bytes to skip
         long bytesToSkip = (long) (frameSize * frameRate * secondsToSkip);
-        totalNumBytesProcessed += bytesToSkip;
 
         // Now skip until the correct number of bytes have been skipped
         try {
@@ -762,7 +761,7 @@ public class Audio extends LoggableClass {
                 bytesToSkip -= justSkipped;
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);  // Todo is this right?
+            throw new RuntimeException(e);
         }
     }
 
