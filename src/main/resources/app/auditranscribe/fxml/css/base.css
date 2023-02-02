@@ -109,6 +109,10 @@
 }
 
 /* Progress bars */
+.progress-bar > .track {
+    -fx-background-color: progress-bar-unfilled-colour;
+}
+
 .progress-bar > .bar {
     -fx-background-color: progress-bar-filled-colour;
 }

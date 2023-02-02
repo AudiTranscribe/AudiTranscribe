@@ -14,7 +14,8 @@
     text-colour-secondary: rgb(175, 175, 175); /* Slightly darker */
     text-colour-hyperlink: rgb(148, 179, 242);
 
-    progress-bar-filled-colour: rgb(49, 87, 140);
+    progress-bar-unfilled-colour: rgb(60, 60, 60);
+    progress-bar-filled-colour: rgb(30, 145, 255);
 
     slider-track-unfilled-colour: rgb(140, 140, 140);
     slider-track-filled-colour: rgb(30, 150, 255);
