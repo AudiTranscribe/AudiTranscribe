@@ -37,15 +37,15 @@ import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.audt_file.ProjectData;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.AudioDataObject;
+import app.auditranscribe.io.audt_file.base.data_encapsulators.MusicNotesDataObject;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.QTransformDataObject;
 import app.auditranscribe.io.data_files.DataFiles;
 import app.auditranscribe.io.db.ProjectsDB;
 import app.auditranscribe.misc.CustomTask;
 import app.auditranscribe.fxml.spinners.CustomDoubleSpinnerValueFactory;
-import app.auditranscribe.music.BPMEstimator;
-import app.auditranscribe.music.MusicKey;
-import app.auditranscribe.music.MusicKeyEstimator;
-import app.auditranscribe.music.TimeSignature;
+import app.auditranscribe.music.*;
+import app.auditranscribe.music.playback.MIDIInstrument;
+import app.auditranscribe.music.playback.NotePlayerSynth;
 import app.auditranscribe.signal.windowing.SignalWindow;
 import app.auditranscribe.system.OSMethods;
 import app.auditranscribe.system.OSType;
@@ -56,10 +56,15 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 
+import javax.sound.midi.MidiUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -95,6 +100,23 @@ public class TranscriptionViewController extends SwitchableViewController {
 
     private final double IMAGE_BUTTON_LENGTH = 50;  // In pixels
 
+    private final int MIDI_CHANNEL_NUM = 0;
+    private final MIDIInstrument NOTE_INSTRUMENT = MIDIInstrument.PIANO;
+    private final int NOTE_ON_VELOCITY = 96;  // Within the range [0, 127]
+    private final int NOTE_OFF_VELOCITY = 10;   // Within the range [0, 127]
+    private final long NOTE_ON_DURATION = 75;  // In milliseconds
+    private final long NOTE_OFF_DURATION = 925;  // In milliseconds
+
+    private final double VOLUME_VALUE_DELTA_ON_KEY_PRESS = 0.05;  // Amount to change the volume by
+    private final KeyCodeCombination SAVE_PROJECT_COMBINATION =
+            new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN);
+    private final KeyCodeCombination UNDO_NOTE_EDIT_COMBINATION =
+            new KeyCodeCombination(KeyCode.Z, KeyCombination.SHORTCUT_DOWN);
+    private final KeyCodeCombination REDO_NOTE_EDIT_COMBINATION =
+            new KeyCodeCombination(KeyCode.Z, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
+    private final KeyCodeCombination DEBUG_COMBINATION =
+            new KeyCodeCombination(KeyCode.D, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
+
     // Attributes
     private int numSkippableBytes;
 
@@ -127,6 +149,10 @@ public class TranscriptionViewController extends SwitchableViewController {
     private boolean changedProjectName = false;
 
     private boolean isPaused = true;
+
+    private NotePlayerSynth notePlayerSynth;
+//    private NotePlayerSequencer notePlayerSequencer;
+    private MusicNotesDataObject musicNotesData;
 
     private boolean debugMode = false;
 
@@ -216,6 +242,12 @@ public class TranscriptionViewController extends SwitchableViewController {
         // Make macOS systems use the system menu bar
         if (OSMethods.getOS() == OSType.MAC) {
             menuBar.useSystemMenuBarProperty().set(true);
+        }
+
+        // Update note players
+        try {
+            notePlayerSynth = new NotePlayerSynth(NOTE_INSTRUMENT, MIDI_CHANNEL_NUM);
+        } catch (MidiUnavailableException ignored) {  // We will notify the user that MIDI unavailable later
         }
 
         // Set spinners' factories
@@ -364,8 +396,8 @@ public class TranscriptionViewController extends SwitchableViewController {
 //        currTimeLabel.setText(UnitConversionUtils.secondsToTimeString(currTime));
 
         // Set keyboard button press/release methods
-//        mainPane.getScene().addEventFilter(KeyEvent.KEY_PRESSED, this::keyPressEventHandler);
-//        mainPane.getScene().addEventFilter(KeyEvent.KEY_RELEASED, this::keyReleasedEventHandler);
+        mainVBox.getScene().addEventFilter(KeyEvent.KEY_PRESSED, this::keyPressEventHandler);
+        mainVBox.getScene().addEventFilter(KeyEvent.KEY_RELEASED, this::keyReleasedEventHandler);
 
         // Define the lists note rectangles by note number
 //        NoteRectangle.defineNoteRectanglesByNoteNumberLists(MAX_NOTE_NUMBER - MIN_NOTE_NUMBER + 1);
@@ -1361,5 +1393,145 @@ public class TranscriptionViewController extends SwitchableViewController {
 
         // Return needed information
         return new Pair<>(TypeConversionUtils.toByteArray(rawMP3Bytes), auxiliaryWAVFile);
+    }
+
+    // Keyboard event handlers
+
+    /**
+     * Helper method that handles a keyboard key press event.
+     *
+     * @param keyEvent Key press event.
+     */
+    private void keyPressEventHandler(KeyEvent keyEvent) {
+        // If the spectrogram is not ready or if in the middle of editing do not do anything
+//        if (!isEverythingReady || NoteRectangle.isEditing) {
+        if (!isEverythingReady) {
+            keyEvent.consume();
+            return;
+        }
+
+        // Get the key event's target
+        Node target = (Node) keyEvent.getTarget();
+
+        // Check if the target is a text field or a spinner
+        if (target instanceof TextField || target instanceof Spinner) {
+            // If it is, do nothing
+            return;
+        }
+
+        // Check if user is using any shortcuts
+        if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {  // Save current project
+//            handleSavingProject(false, false);
+            return;
+        } else if (UNDO_NOTE_EDIT_COMBINATION.match(keyEvent)) {  // Undo note edit
+//            NoteRectangle.editAction(NoteRectangle.EditAction.UNDO);
+            return;
+        } else if (REDO_NOTE_EDIT_COMBINATION.match(keyEvent)) {  // Redo note edit
+//            NoteRectangle.editAction(NoteRectangle.EditAction.REDO);
+            return;
+        } else if (DEBUG_COMBINATION.match(keyEvent)) {  // Show debug view
+//            debugViewController = DebugViewController.showDebugView(rootPane.getScene().getWindow());
+            return;
+        }
+
+        // Otherwise, get the key event's key code
+        KeyCode code = keyEvent.getCode();
+
+        // Handle key press input
+        keyEvent.consume();
+
+        switch (code) {
+            // Non-note playing key press inputs
+//            case SPACE -> togglePlayButton();
+            case UP -> audioVolumeSlider.setValue(audioVolumeSlider.getValue() + VOLUME_VALUE_DELTA_ON_KEY_PRESS);
+            case DOWN -> audioVolumeSlider.setValue(audioVolumeSlider.getValue() - VOLUME_VALUE_DELTA_ON_KEY_PRESS);
+            case M -> toggleAudioMuteButton();
+//            case LEFT -> seekToTime(currTime - 1);
+//            case RIGHT -> seekToTime(currTime + 1);
+//            case PERIOD -> toggleScrollButton();
+//            case N -> toggleEditNotesButton();
+            case MINUS -> {
+                notePlayerSynth.silenceChannel();  // Stop any notes from playing
+                if (octaveNum > 0) {
+                    log(Level.FINE, "Playback octave raised to " + octaveNum);
+                    PlottingStuffHandler.updateCurrentOctaveRectangle(
+                            currentOctaveRectangle, finalHeight, --octaveNum, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER
+                    );
+                }
+            }
+            case EQUALS -> {
+                notePlayerSynth.silenceChannel();  // Stop any notes from playing
+                if (octaveNum < 8) {
+                    log(Level.FINE, "Playback octave lowered to " + octaveNum);
+                    PlottingStuffHandler.updateCurrentOctaveRectangle(
+                            currentOctaveRectangle, finalHeight, ++octaveNum, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER
+                    );
+                }
+            }
+
+            // Note playing keyboard inputs
+            case A -> notePlayerSynth.noteOn(octaveNum * 12, NOTE_ON_VELOCITY);               // C
+            case W -> notePlayerSynth.noteOn(octaveNum * 12 + 1, NOTE_ON_VELOCITY);           // C#
+            case S -> notePlayerSynth.noteOn(octaveNum * 12 + 2, NOTE_ON_VELOCITY);           // D
+            case E -> notePlayerSynth.noteOn(octaveNum * 12 + 3, NOTE_ON_VELOCITY);           // D#
+            case D -> notePlayerSynth.noteOn(octaveNum * 12 + 4, NOTE_ON_VELOCITY);           // E
+            case F -> notePlayerSynth.noteOn(octaveNum * 12 + 5, NOTE_ON_VELOCITY);           // F
+            case T -> notePlayerSynth.noteOn(octaveNum * 12 + 6, NOTE_ON_VELOCITY);           // F#
+            case G -> notePlayerSynth.noteOn(octaveNum * 12 + 7, NOTE_ON_VELOCITY);           // G
+            case Y -> notePlayerSynth.noteOn(octaveNum * 12 + 8, NOTE_ON_VELOCITY);           // G#
+            case H -> notePlayerSynth.noteOn(octaveNum * 12 + 9, NOTE_ON_VELOCITY);           // A
+            case U -> notePlayerSynth.noteOn(octaveNum * 12 + 10, NOTE_ON_VELOCITY);          // A#
+            case J -> notePlayerSynth.noteOn(octaveNum * 12 + 11, NOTE_ON_VELOCITY);          // B
+            case K -> notePlayerSynth.noteOn(octaveNum * 12 + 12, NOTE_ON_VELOCITY);          // C'
+            case O -> notePlayerSynth.noteOn(octaveNum * 12 + 13, NOTE_ON_VELOCITY);          // C#'
+            case L -> notePlayerSynth.noteOn(octaveNum * 12 + 14, NOTE_ON_VELOCITY);          // D'
+            case P -> notePlayerSynth.noteOn(octaveNum * 12 + 15, NOTE_ON_VELOCITY);          // D#'
+            case SEMICOLON -> notePlayerSynth.noteOn(octaveNum * 12 + 16, NOTE_ON_VELOCITY);  // E'
+            case QUOTE -> notePlayerSynth.noteOn(octaveNum * 12 + 17, NOTE_ON_VELOCITY);      // F'
+        }
+    }
+
+    /**
+     * Helper method that handles a keyboard key released event.
+     *
+     * @param keyEvent Key released event.
+     */
+    private void keyReleasedEventHandler(KeyEvent keyEvent) {
+        // If the spectrogram is not ready or if in the middle of editing do not do anything
+//        if (!isEverythingReady || NoteRectangle.isEditing) {
+        if (!isEverythingReady) {
+            keyEvent.consume();
+            return;
+        }
+
+        // If the key event is part of the save project combination, ignore
+        if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {
+            keyEvent.consume();
+            return;
+        }
+
+        // Handle key event
+        KeyCode code = keyEvent.getCode();
+
+        switch (code) {
+            case A -> notePlayerSynth.noteOff(octaveNum * 12, NOTE_OFF_VELOCITY);               // C
+            case W -> notePlayerSynth.noteOff(octaveNum * 12 + 1, NOTE_OFF_VELOCITY);           // C#
+            case S -> notePlayerSynth.noteOff(octaveNum * 12 + 2, NOTE_OFF_VELOCITY);           // D
+            case E -> notePlayerSynth.noteOff(octaveNum * 12 + 3, NOTE_OFF_VELOCITY);           // D#
+            case D -> notePlayerSynth.noteOff(octaveNum * 12 + 4, NOTE_OFF_VELOCITY);           // E
+            case F -> notePlayerSynth.noteOff(octaveNum * 12 + 5, NOTE_OFF_VELOCITY);           // F
+            case T -> notePlayerSynth.noteOff(octaveNum * 12 + 6, NOTE_OFF_VELOCITY);           // F#
+            case G -> notePlayerSynth.noteOff(octaveNum * 12 + 7, NOTE_OFF_VELOCITY);           // G
+            case Y -> notePlayerSynth.noteOff(octaveNum * 12 + 8, NOTE_OFF_VELOCITY);           // G#
+            case H -> notePlayerSynth.noteOff(octaveNum * 12 + 9, NOTE_OFF_VELOCITY);           // A
+            case U -> notePlayerSynth.noteOff(octaveNum * 12 + 10, NOTE_OFF_VELOCITY);          // A#
+            case J -> notePlayerSynth.noteOff(octaveNum * 12 + 11, NOTE_OFF_VELOCITY);          // B
+            case K -> notePlayerSynth.noteOff(octaveNum * 12 + 12, NOTE_OFF_VELOCITY);          // C'
+            case O -> notePlayerSynth.noteOff(octaveNum * 12 + 13, NOTE_OFF_VELOCITY);          // C#'
+            case L -> notePlayerSynth.noteOff(octaveNum * 12 + 14, NOTE_OFF_VELOCITY);          // D'
+            case P -> notePlayerSynth.noteOff(octaveNum * 12 + 15, NOTE_OFF_VELOCITY);          // D#'
+            case SEMICOLON -> notePlayerSynth.noteOff(octaveNum * 12 + 16, NOTE_OFF_VELOCITY);  // E'
+            case QUOTE -> notePlayerSynth.noteOff(octaveNum * 12 + 17, NOTE_OFF_VELOCITY);      // F'
+        }
     }
 }
