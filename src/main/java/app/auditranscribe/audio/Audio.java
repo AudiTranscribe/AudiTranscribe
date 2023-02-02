@@ -64,7 +64,7 @@ public class Audio extends LoggableClass {
 
     private boolean withPlayback = false;
     private SourceDataLine sourceDataLine;
-    private final StoppableThread audioPlaybackThread;
+    private StoppableThread audioPlaybackThread;
 
     private int numRawSamples;
     private int numMonoSamples;
@@ -129,32 +129,7 @@ public class Audio extends LoggableClass {
         // Allow audio playback if requested
         if (modes.contains(AudioProcessingMode.WITH_PLAYBACK)) {
             withPlayback = true;
-            audioPlaybackThread = new StoppableThread() {
-                // Get playback buffer size
-                final int playbackBufferSize = DataFiles.SETTINGS_DATA_FILE.data.playbackBufferSize;
-                final byte[] bufferBytes = new byte[playbackBufferSize];
-                int numBytesRead;
-
-                @Override
-                public void runner() {
-                    while (running.get()) {
-                        // Attempt to read bytes from audio stream if not paused
-                        if (!paused) {
-                            try {
-                                numBytesRead = audioStream.read(bufferBytes);
-                                if (numBytesRead == -1) break;
-                            } catch (IOException e) {
-                                Thread.currentThread().interrupt();
-                                logException(e);
-                            }
-
-                            // Write audio bytes for playback
-                            // Fixme: pausing is not instantaneous
-                            sourceDataLine.write(bufferBytes, 0, numBytesRead);
-                        }
-                    }
-                }
-            };
+            setAudioPlaybackThread();
         } else {
             sourceDataLine = null;
             audioPlaybackThread = null;
@@ -262,6 +237,16 @@ public class Audio extends LoggableClass {
         if (sourceDataLine != null) {
             updatePlaybackVolume(volume);
         }
+    }
+
+    /**
+     * Method that resets the playback system entirely.
+     */
+    public void resetPlaybackSystem() {
+        prevElapsedTime = 0;
+        setupSourceDataLine();
+        resetAudioStream();
+        setAudioPlaybackThread();
     }
 
     // Audio device methods
@@ -471,6 +456,38 @@ public class Audio extends LoggableClass {
         } else {
             volumeControl.setValue(20f * (float) Math.log10(volume));  // Gain of this amount of dB
         }
+    }
+
+    /**
+     * Helper method that sets the audio playback thread.
+     */
+    private void setAudioPlaybackThread() {
+        audioPlaybackThread = new StoppableThread() {
+            // Get playback buffer size
+            final int playbackBufferSize = DataFiles.SETTINGS_DATA_FILE.data.playbackBufferSize;
+            final byte[] bufferBytes = new byte[playbackBufferSize];
+            int numBytesRead;
+
+            @Override
+            public void runner() {
+                while (running.get()) {
+                    // Attempt to read bytes from audio stream if not paused
+                    if (!paused) {
+                        try {
+                            numBytesRead = audioStream.read(bufferBytes);
+                            if (numBytesRead == -1) break;
+                        } catch (IOException e) {
+                            Thread.currentThread().interrupt();
+                            logException(e);
+                        }
+
+                        // Write audio bytes for playback
+                        // Fixme: pausing is not instantaneous
+                        sourceDataLine.write(bufferBytes, 0, numBytesRead);
+                    }
+                }
+            }
+        };
     }
 
     /**

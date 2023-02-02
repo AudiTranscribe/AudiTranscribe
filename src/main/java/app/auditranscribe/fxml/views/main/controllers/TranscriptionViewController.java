@@ -855,6 +855,7 @@ public class TranscriptionViewController extends SwitchableViewController {
     public void handleSceneClosing() {
         this.removeControllerFromActive();
         scheduler.shutdown();
+        audio.stop();
         audio.deleteWAVFile();
         // Todo add
     }
@@ -1208,14 +1209,9 @@ public class TranscriptionViewController extends SwitchableViewController {
                         // Pause the audio
                         isPaused = togglePaused(false);
 
-                        // Todo: check if this works?
-//                        // Specially update the start time to 0
-//                        // (Because the `seekToTime` method would have set it to the end, which is not what we want)
-//                        audio.setAudioStartTime(0);
-
-                        // We need to do this so that the status is set to paused
-//                        audio.stop();
-                        audio.pause();
+                        // Reset the audio to the start
+                        audio.stop();
+                        audio.resetPlaybackSystem();
                     }
 
                     // Update scrolling
