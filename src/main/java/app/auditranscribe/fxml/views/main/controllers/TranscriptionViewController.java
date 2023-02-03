@@ -535,7 +535,6 @@ public class TranscriptionViewController extends SwitchableViewController {
 
         // Update labels
         totalTimeLabel.setText(UnitConversionUtils.secondsToTimeString(audioDuration));
-//        currTimeLabel.setText(UnitConversionUtils.secondsToTimeString(currTime));
 
         // Set keyboard button press/release methods
         mainVBox.getScene().addEventFilter(KeyEvent.KEY_PRESSED, this::keyPressEventHandler);
@@ -793,7 +792,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         bpm = projectData.projectInfoData.bpm;
         offset = projectData.projectInfoData.offsetSeconds;
         audioVolume = projectData.projectInfoData.playbackVolume;
-//        currTime = projectData.projectInfoData.currTimeInMS / 1000.;
+        currTime = projectData.projectInfoData.currTimeInMS / 1000.;
 
 //        // Set the music notes data attribute
 //        this.musicNotesData = projectData.musicNotesData;
@@ -1422,13 +1421,6 @@ public class TranscriptionViewController extends SwitchableViewController {
                 // Update the BPM value
                 updateBPMValue(bpm, true);
 
-//                // Update playhead position
-//                seekToTime(currTime);
-//                updateScrollPosition(
-//                        currTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X,
-//                        spectrogramScrollPane.getWidth()
-//                );
-//
 //                // Set up note rectangles
 //                if (musicNotesData != null) {
 //                    int numNoteRectangles = musicNotesData.noteNums.length;
@@ -1487,6 +1479,13 @@ public class TranscriptionViewController extends SwitchableViewController {
                 // Initialize the source data line for the audio
                 audio.play();
                 audio.pause();
+
+                // Update playhead position
+                seekToTime(currTime);
+                updateScrollPosition(
+                        currTime * PX_PER_SECOND * SPECTROGRAM_ZOOM_SCALE_X,
+                        spectrogramScrollPane.getWidth()
+                );
 
 //                // Clear note rectangles' stacks
 //                NoteRectangle.clearStacks();
