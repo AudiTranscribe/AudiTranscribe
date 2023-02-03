@@ -53,13 +53,4 @@ public abstract class AudioDataObject extends AbstractAUDTDataObject {
         result = 31 * result + Arrays.hashCode(mp3Bytes);
         return result;
     }
-
-    @Override
-    public String toString() {
-        return "AudioDataObject{" +
-                "mp3Bytes=" + Arrays.toString(mp3Bytes) +
-                ", sampleRate=" + sampleRate +
-                ", totalDurationInMS=" + totalDurationInMS +
-                '}';
-    }
 }

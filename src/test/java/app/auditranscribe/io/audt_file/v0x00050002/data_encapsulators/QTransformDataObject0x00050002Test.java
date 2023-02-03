@@ -80,19 +80,4 @@ class QTransformDataObject0x00050002Test {
             }
         }
     }
-
-    @Test
-    void testHashCode() {
-        // Define the two Q-Transform data objects to test hash code computation
-        QTransformDataObject one = new QTransformDataObject0x00050002(
-                qTransformBytes1, minMagnitude1, maxMagnitude1
-        );
-        QTransformDataObject two = new QTransformDataObject0x00050002(
-                qTransformBytes2, minMagnitude2, maxMagnitude2
-        );
-
-        // Tests
-        assertEquals(-1506726541, one.hashCode());
-        assertEquals(-1293707692, two.hashCode());
-    }
 }

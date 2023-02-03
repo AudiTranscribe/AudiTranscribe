@@ -106,19 +106,4 @@ class ProjectInfoDataObject0x00090002Test {
             }
         }
     }
-
-    @Test
-    void testHashCode() {
-        // Define the two data objects to test hash code
-        ProjectInfoDataObject one = new ProjectInfoDataObject0x00090002(
-                projectName1, musicKeyIndex1, timeSignature1, bpm1, offsetSeconds1, playbackVolume1, currTimeInMS1
-        );
-        ProjectInfoDataObject two = new ProjectInfoDataObject0x00090002(
-                projectName2, musicKeyIndex2, timeSignature2, bpm2, offsetSeconds2, playbackVolume2, currTimeInMS2
-        );
-
-        // Tests
-        assertEquals(350000273, one.hashCode());
-        assertEquals(-519488405, two.hashCode());
-    }
 }

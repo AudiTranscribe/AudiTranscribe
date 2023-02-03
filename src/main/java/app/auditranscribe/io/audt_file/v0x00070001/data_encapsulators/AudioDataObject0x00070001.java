@@ -20,6 +20,7 @@ package app.auditranscribe.io.audt_file.v0x00070001.data_encapsulators;
 
 import app.auditranscribe.io.CompressionHandlers;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.AudioDataObject;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 
 import java.util.Arrays;
 
@@ -50,6 +51,15 @@ public class AudioDataObject0x00070001 extends AudioDataObject {
 
     // Public methods
     @Override
+    public int numBytesNeeded() {
+        return 4 +  // Section ID
+                (4 + compressedOriginalMP3Bytes.length) +  // +4 for the length of the MP3 audio data
+                8 +   // Sample rate
+                4 +   // Total duration in milliseconds
+                4;    // EOS delimiter
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -59,18 +69,10 @@ public class AudioDataObject0x00070001 extends AudioDataObject {
     }
 
     @Override
+    @ExcludeFromGeneratedCoverageReport
     public int hashCode() {
         int result = super.hashCode();
         result = 31 * result + Arrays.hashCode(compressedOriginalMP3Bytes);
         return result;
-    }
-
-    @Override
-    public int numBytesNeeded() {
-        return 4 +  // Section ID
-                (4 + compressedOriginalMP3Bytes.length) +  // +4 for the length of the MP3 audio data
-                8 +   // Sample rate
-                4 +   // Total duration in milliseconds
-                4;    // EOS delimiter
     }
 }

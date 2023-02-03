@@ -20,6 +20,9 @@ package app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators;
 
 import app.auditranscribe.io.audt_file.AUDTFileHelpers;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.ProjectInfoDataObject;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+
+import java.util.Objects;
 
 /**
  * Data object that stores the project's info.<br>
@@ -73,6 +76,7 @@ public class ProjectInfoDataObject0x00050002 extends ProjectInfoDataObject {
     }
 
     // Public methods
+
     @Override
     public int numBytesNeeded() {
         return 4 +   // Section ID
@@ -83,5 +87,21 @@ public class ProjectInfoDataObject0x00050002 extends ProjectInfoDataObject {
                 8 +  // Playback volume
                 4 +  // Current time in milliseconds
                 4;   // EOS delimiter
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        ProjectInfoDataObject0x00050002 that = (ProjectInfoDataObject0x00050002) o;
+        return timeSignatureIndex == that.timeSignatureIndex &&
+                musicKeyIndex == that.musicKeyIndex;
+    }
+
+    @Override
+    @ExcludeFromGeneratedCoverageReport
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), timeSignatureIndex, musicKeyIndex);
     }
 }

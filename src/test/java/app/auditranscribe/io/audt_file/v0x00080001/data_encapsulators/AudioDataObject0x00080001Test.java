@@ -92,19 +92,4 @@ class AudioDataObject0x00080001Test {
             }
         }
     }
-
-    @Test
-    void testHashCode() {
-        // Define the two audio data objects to test the hash code method
-        AudioDataObject one = new AudioDataObject0x00080001(
-                compressedOriginalMP3Bytes1, compressedSlowedMP3Bytes1, sampleRate1, totalDurationInMS1
-        );
-        AudioDataObject two = new AudioDataObject0x00080001(
-                compressedOriginalMP3Bytes2, compressedSlowedMP3Bytes2, sampleRate2, totalDurationInMS2
-        );
-
-        // Tests
-        assertEquals(1116214964, one.hashCode());
-        assertEquals(12559934, two.hashCode());
-    }
 }

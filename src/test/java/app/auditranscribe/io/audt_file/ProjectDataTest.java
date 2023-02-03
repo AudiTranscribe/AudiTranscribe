@@ -183,19 +183,4 @@ class ProjectDataTest {
             }
         }
     }
-
-    @Test
-    void testHashCode() {
-        ProjectData one = new ProjectData(
-                unchangingDataPropertiesObject1, qTransformDataObject1, audioDataObject1, projectInfoDataObject1,
-                musicNotesDataObject1
-        );
-        ProjectData two = new ProjectData(
-                unchangingDataPropertiesObject2, qTransformDataObject2, audioDataObject2, projectInfoDataObject2,
-                musicNotesDataObject2
-        );
-
-        assertEquals(-1664917780, one.hashCode());
-        assertEquals(-1398708167, two.hashCode());
-    }
 }

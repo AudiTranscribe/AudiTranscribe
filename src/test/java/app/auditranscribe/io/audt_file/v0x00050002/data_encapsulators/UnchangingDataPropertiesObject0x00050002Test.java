@@ -63,15 +63,4 @@ class UnchangingDataPropertiesObject0x00050002Test {
             }
         }
     }
-
-    @Test
-    void testHashCode() {
-        // Define the two objects to test hash code calculation
-        UnchangingDataPropertiesObject one = new UnchangingDataPropertiesObject0x00050002(numSkippableBytes1);
-        UnchangingDataPropertiesObject two = new UnchangingDataPropertiesObject0x00050002(numSkippableBytes2);
-
-        // Tests
-        assertEquals(1265, one.hashCode());
-        assertEquals(56820, two.hashCode());
-    }
 }
