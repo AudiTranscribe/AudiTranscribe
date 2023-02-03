@@ -1395,12 +1395,11 @@ public class TranscriptionViewController extends SwitchableViewController {
             MusicKey key = returnedPair.value1();
 
             // Update the BPM value
-            updateBPMValue(newBPM, false);
+            updateBPMValue(newBPM, true);
             bpmSpinnerFactory.setValue(newBPM);
 
             // Update the music key choice
-            // Fixme: is `sceneSwitchingData.estimateMusicKey` correct?
-            updateMusicKeyValue(key, sceneSwitchingData.estimateMusicKey);
+            updateMusicKeyValue(key, true);
             musicKeyChoice.setValue(key);
 
             // Mark the task as completed
