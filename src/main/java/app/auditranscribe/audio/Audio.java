@@ -57,6 +57,7 @@ public class Audio extends LoggableClass {
     private final double sampleRate;
     private final double duration;  // In seconds
 
+    private double timeToResumeAt;  // Time that the audio should continue playing at upon resuming
     private double prevElapsedTime;  // Time (in seconds) that was elapsed before a skip forwards/backwards
 
     private double volume;
@@ -176,6 +177,7 @@ public class Audio extends LoggableClass {
         if (sourceDataLine == null) setupSourceDataLine();
 
         if (audioPlaybackThread.isStarted()) {
+            seekToTime(timeToResumeAt);
             paused = false;
         } else {
             updatePlaybackVolume(volume);
@@ -189,6 +191,8 @@ public class Audio extends LoggableClass {
      */
     public void pause() {
         paused = true;
+        timeToResumeAt = getCurrentTime();
+        sourceDataLine.flush();
     }
 
     /**
@@ -221,8 +225,9 @@ public class Audio extends LoggableClass {
             seekBackwards(seekTime);
         }
 
-        // Update the previously elapsed time
+        // Update the previously elapsed time and the time to resume at
         prevElapsedTime = sourceDataLine.getMicrosecondPosition() / 1e6 - seekTime;
+        timeToResumeAt = seekTime;
     }
 
     /**
@@ -482,7 +487,6 @@ public class Audio extends LoggableClass {
                         }
 
                         // Write audio bytes for playback
-                        // Fixme: pausing is not instantaneous
                         sourceDataLine.write(bufferBytes, 0, numBytesRead);
                     }
                 }
