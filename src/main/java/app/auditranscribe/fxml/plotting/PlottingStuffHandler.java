@@ -20,7 +20,6 @@ package app.auditranscribe.fxml.plotting;
 
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.music.MusicKey;
-import app.auditranscribe.utils.MusicUtils;
 import app.auditranscribe.utils.UnitConversionUtils;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -31,8 +30,6 @@ import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextBoundsType;
 
 import java.util.HashSet;
 
@@ -101,7 +98,7 @@ public final class PlottingStuffHandler {
             int maxNoteNumber, boolean fancyAccidentals
     ) {
         // Get the width of the note pane
-        double width = notePane.getWidth() - 2;  // Minus 2 for the borders
+        double width = notePane.getPrefWidth() - 2;  // Minus 2 for the borders
 
         // Get the note offsets that are in the key
         HashSet<Integer> noteOffsets = musicKey.notesInKey;

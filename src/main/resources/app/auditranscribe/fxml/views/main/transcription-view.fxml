@@ -123,7 +123,7 @@
                                 <content>
                                   <AnchorPane fx:id="leftAnchorPane" minHeight="0.0" minWidth="0.0" prefWidth="40.0" styleClass="edge-anchor-pane">
                                        <children>
-                                          <Pane fx:id="notePane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                          <Pane fx:id="notePane" prefWidth="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                        </children>
                                     </AnchorPane>
                                 </content>
