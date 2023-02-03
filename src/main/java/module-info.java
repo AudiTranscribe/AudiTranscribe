@@ -39,6 +39,9 @@ module AudiTranscribe {
     exports app.auditranscribe.fxml.views.main;
     exports app.auditranscribe.generic;
     exports app.auditranscribe.generic.tuples;
+    exports app.auditranscribe.io.audt_file;
+    exports app.auditranscribe.io.audt_file.base;
+    exports app.auditranscribe.io.audt_file.base.data_encapsulators;
     exports app.auditranscribe.io.data_files;
     exports app.auditranscribe.io.data_files.data_encapsulators;
     exports app.auditranscribe.io.data_files.file_classes;

@@ -18,6 +18,8 @@
 
 package app.auditranscribe.io.audt_file.base.data_encapsulators;
 
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+
 import java.util.Objects;
 
 /**
@@ -45,6 +47,7 @@ public abstract class UnchangingDataPropertiesObject extends AbstractAUDTDataObj
     }
 
     @Override
+    @ExcludeFromGeneratedCoverageReport
     public int hashCode() {
         return Objects.hash(numSkippableBytes);
     }

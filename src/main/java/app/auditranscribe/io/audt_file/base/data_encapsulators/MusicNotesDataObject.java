@@ -18,6 +18,8 @@
 
 package app.auditranscribe.io.audt_file.base.data_encapsulators;
 
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+
 import java.util.Arrays;
 
 /**
@@ -44,6 +46,7 @@ public abstract class MusicNotesDataObject extends AbstractAUDTDataObject {
     }
 
     @Override
+    @ExcludeFromGeneratedCoverageReport
     public int hashCode() {
         int result = Arrays.hashCode(timesToPlaceRectangles);
         result = 31 * result + Arrays.hashCode(noteDurations);

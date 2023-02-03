@@ -23,6 +23,7 @@ import app.auditranscribe.io.ByteConversionHandler;
 import app.auditranscribe.io.CompressionHandlers;
 import app.auditranscribe.io.audt_file.AUDTFileHelpers;
 import app.auditranscribe.misc.CustomTask;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.utils.TypeConversionUtils;
 
 import java.io.IOException;
@@ -114,6 +115,7 @@ public abstract class QTransformDataObject extends AbstractAUDTDataObject {
     }
 
     @Override
+    @ExcludeFromGeneratedCoverageReport
     public int hashCode() {
         int result = Objects.hash(minMagnitude, maxMagnitude);
         result = 31 * result + Arrays.hashCode(qTransformBytes);

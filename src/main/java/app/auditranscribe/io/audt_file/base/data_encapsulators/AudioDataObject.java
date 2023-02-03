@@ -18,6 +18,8 @@
 
 package app.auditranscribe.io.audt_file.base.data_encapsulators;
 
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -47,6 +49,7 @@ public abstract class AudioDataObject extends AbstractAUDTDataObject {
     }
 
     @Override
+    @ExcludeFromGeneratedCoverageReport
     public int hashCode() {
         int result = Objects.hash(sampleRate, totalDurationInMS);
         result = 31 * result + Arrays.hashCode(compressedOriginalMP3Bytes);

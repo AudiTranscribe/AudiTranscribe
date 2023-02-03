@@ -18,6 +18,7 @@
 
 package app.auditranscribe.io.audt_file.base.data_encapsulators;
 
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.music.MusicKey;
 import app.auditranscribe.music.TimeSignature;
 
@@ -58,6 +59,7 @@ public abstract class ProjectInfoDataObject extends AbstractAUDTDataObject {
     }
 
     @Override
+    @ExcludeFromGeneratedCoverageReport
     public int hashCode() {
         return Objects.hash(
                 projectName, musicKey.name, timeSignature.displayText(), bpm, offsetSeconds, playbackVolume,
