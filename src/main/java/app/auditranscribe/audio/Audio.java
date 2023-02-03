@@ -20,8 +20,10 @@ package app.auditranscribe.audio;
 
 import app.auditranscribe.audio.exceptions.AudioPlaybackNotSupported;
 import app.auditranscribe.audio.exceptions.AudioTooLongException;
+import app.auditranscribe.audio.exceptions.FFmpegNotFoundException;
 import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.generic.exceptions.ValueException;
+import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.data_files.DataFiles;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
@@ -31,6 +33,8 @@ import app.auditranscribe.utils.MathUtils;
 
 import javax.sound.sampled.*;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.InvalidParameterException;
 import java.util.*;
 import java.util.logging.Level;
@@ -71,6 +75,9 @@ public class Audio extends LoggableClass {
     private int numMonoSamples;
     private double[] rawSamples;
     private double[] monoSamples;
+
+    private final byte[] rawWAVBytes;
+    private byte[] rawMP3Bytes;
 
     /**
      * Initializes an <code>Audio</code> object based on a file.
@@ -135,6 +142,9 @@ public class Audio extends LoggableClass {
             sourceDataLine = null;
             audioPlaybackThread = null;
         }
+
+        // Save the file's raw WAV bytes
+        rawWAVBytes = Files.readAllBytes(wavFile.toPath());
     }
 
     // Getter/Setter methods
@@ -157,6 +167,10 @@ public class Audio extends LoggableClass {
 
     public double[] getMonoSamples() {
         return monoSamples;
+    }
+
+    public void setMP3Bytes(byte[] rawMP3Bytes) {
+        this.rawMP3Bytes = rawMP3Bytes;
     }
 
     public double getDuration() {
@@ -396,6 +410,53 @@ public class Audio extends LoggableClass {
 
         // Return the resampled array
         return yHat;
+    }
+
+    /**
+     * Helper method that converts the WAV bytes into MP3 bytes.
+     *
+     * @param ffmpegPath The path to the ffmpeg executable.
+     * @throws FFmpegNotFoundException If FFmpeg was not found at the specified path.
+     * @throws IOException             If writing to the final audio file encounters an error.
+     */
+    public byte[] wavBytesToMP3Bytes(String ffmpegPath) throws FFmpegNotFoundException, IOException {
+        // Check if we have already processed the audio
+        if (rawMP3Bytes != null) {
+            log(Level.FINE, "Returning previously processed MP3 bytes");
+        } else {
+            log(Level.FINE, "Converting WAV bytes to MP3 bytes");
+
+            // Ensure that the temporary directory exists
+            IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
+            log(Level.FINE, "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH);
+
+            // Initialize the FFmpeg handler (if not done already)
+            FFmpegHandler.initFFmpegHandler(ffmpegPath);
+
+            // Generate the output path to the MP3 file
+            String inputPath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-1.wav");
+            String outputPath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-2.mp3");
+
+            // Write WAV bytes into a file specified at the input path
+            IOMethods.createFile(inputPath);
+            Files.write(Paths.get(inputPath), rawWAVBytes);
+
+            // Convert the original WAV file to a temporary MP3 file
+            outputPath = FFmpegHandler.convertAudio(new File(inputPath), outputPath);
+
+            // Read the raw MP3 bytes into a temporary file
+            byte[] rawMP3Bytes = Files.readAllBytes(Paths.get(outputPath));
+
+            // Delete the temporary files
+            IOMethods.delete(inputPath);
+            IOMethods.delete(outputPath);
+
+            // Return the raw MP3 bytes
+            log(Level.FINE, "Done converting WAV to MP3 bytes");
+            return rawMP3Bytes;
+        }
+
+        return rawMP3Bytes;
     }
 
     // Miscellaneous public methods
