@@ -18,6 +18,7 @@
 
 package app.auditranscribe.fxml.views.main.scene_switching;
 
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.music.MusicKey;
 
 import java.io.File;
@@ -25,7 +26,9 @@ import java.io.File;
 /**
  * Data that is used for the scene switcher.
  */
+@ExcludeFromGeneratedCoverageReport
 public class SceneSwitchingData {
+    // Attributes
     public String projectName;
     public File file;  // Can either be an audio file or an AUDT file
 
@@ -36,4 +39,18 @@ public class SceneSwitchingData {
 
     public boolean estimateMusicKey;
     public MusicKey musicKey;
+
+    // Public methods
+    @Override
+    public String toString() {
+        return "SceneSwitchingData{" +
+                "projectName='" + projectName + "'" +
+                ", file=" + file +
+                ", isProjectSetup=" + isProjectSetup +
+                ", estimateBPM=" + estimateBPM +
+                ", manualBPM=" + manualBPM +
+                ", estimateMusicKey=" + estimateMusicKey +
+                ", musicKey=" + musicKey +
+                "}";
+    }
 }

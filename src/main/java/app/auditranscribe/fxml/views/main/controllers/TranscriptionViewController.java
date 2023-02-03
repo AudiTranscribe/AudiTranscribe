@@ -323,7 +323,6 @@ public class TranscriptionViewController extends SwitchableViewController {
         });
 
         // Add methods to buttons
-        // Todo add the rest
         audioVolumeButton.setOnAction(event -> toggleAudioMuteButton());
         notesVolumeButton.setOnAction(event -> toggleNoteMuteButton());
 
@@ -338,6 +337,8 @@ public class TranscriptionViewController extends SwitchableViewController {
             seekToTime(0);
             updateScrollPosition(0, finalWidth);
         });
+
+        // Todo implement
 //        toggleSlowedAudioButton.setOnAction(event -> {
 //            // Update the text that is shown
 //            if (usingSlowedAudio) {
@@ -570,7 +571,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         projectName = data.projectName;
 
         // Generate spectrogram image based on audio
-        CustomTask<WritableImage> spectrogramTask = new CustomTask<>() {
+        CustomTask<WritableImage> spectrogramTask = new CustomTask<>("Generate Spectrogram") {
             @Override
             protected WritableImage call() {
                 // Todo somehow implement saving of magnitudes
@@ -587,22 +588,22 @@ public class TranscriptionViewController extends SwitchableViewController {
 
         // Create an estimation task to estimate both the BPM and the music key
         // Fixme estimation task does not seem to update fields correctly
-        CustomTask<Pair<Double, MusicKey>> estimationTask = new CustomTask<>("Estimation Task") {
+        CustomTask<Pair<Double, MusicKey>> estimationTask = new CustomTask<>("Estimate BPM and key") {
             @Override
             protected Pair<Double, MusicKey> call() {
                 // First estimate BPM
                 this.setMessage("Estimating BPM...");
                 double bpm;
-                if (sceneSwitchingData.estimateBPM) {
+                if (data.estimateBPM) {
                     bpm = BPMEstimator.estimate(audio.getMonoSamples(), sampleRate).get(0);  // Take first element
                 } else {
-                    bpm = sceneSwitchingData.manualBPM;  // Use provided BPM
+                    bpm = data.manualBPM;  // Use provided BPM
                 }
 
                 // Next estimate key
                 this.setMessage("Estimating key...");
                 MusicKey key;
-                if (sceneSwitchingData.estimateMusicKey) {
+                if (data.estimateMusicKey) {
                     // Get the top 4 most likely keys
                     List<Pair<MusicKey, Double>> mostLikelyKeys = MusicKeyEstimator.getMostLikelyKeysWithCorrelation(
                             audio.getMonoSamples(), sampleRate, 4, this
@@ -644,7 +645,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                     // Return the most likely key
                     key = mostLikelyKey;
                 } else {
-                    key = sceneSwitchingData.musicKey;
+                    key = data.musicKey;
                 }
 
                 // Now return them both as a pair
@@ -1187,7 +1188,7 @@ public class TranscriptionViewController extends SwitchableViewController {
             colouredProgressPane.prefWidthProperty().bind(playheadX);
             playheadLine.startXProperty().bind(playheadX);
             playheadLine.endXProperty().bind(playheadX);
-//
+
             // Schedule playback functionality
             scheduler.scheduleAtFixedRate(() -> {
                 // Nothing really changes if the audio is paused
@@ -1321,19 +1322,16 @@ public class TranscriptionViewController extends SwitchableViewController {
         task.setOnSucceeded(event -> {
             // Get the BPM and key values
             Pair<Double, MusicKey> returnedPair = task.getValue();
-            double newBPM = returnedPair.value0();
+            double newBPM = MathUtils.round(returnedPair.value0(), 1);
             MusicKey key = returnedPair.value1();
 
             // Update the BPM value
-            updateBPMValue(MathUtils.round(newBPM, 1), false);
-
-            // Update BPM spinner initial value
-            bpmSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
-                    BPM_RANGE.value0(), BPM_RANGE.value1(), bpm, 0.1, 2
-            ));
+            updateBPMValue(newBPM, false);
+            bpmSpinnerFactory.setValue(newBPM);
 
             // Update the music key choice
-            updateMusicKeyValue(key, sceneSwitchingData.estimateMusicKey);  // Will force update if estimating key
+            // Fixme: is `sceneSwitchingData.estimateMusicKey` correct?
+            updateMusicKeyValue(key, sceneSwitchingData.estimateMusicKey);
             musicKeyChoice.setValue(key);
 
             // Mark the task as completed
