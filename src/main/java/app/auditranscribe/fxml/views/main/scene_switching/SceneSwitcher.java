@@ -223,58 +223,21 @@ public class SceneSwitcher extends LoggableClass {
             IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
             log(Level.FINE, "Temporary folder: " + IOConstants.TEMP_FOLDER_PATH);
 
-            // Get the paths for the auxiliary files
-            String baseName = IOMethods.joinPaths(
+            // Get the paths for the auxiliary file
+            String wavFilePath = IOMethods.joinPaths(
                     IOConstants.TEMP_FOLDER_PATH,
-                    audioFile.getName().replace(fileExt, "")
+                    audioFile.getName().replace(fileExt, ".wav")
             );
-            String samplesWAVPath = baseName + "-samples.wav";
-            String slowedWAVPath = baseName + "-slowed.wav";
 
             // Set up FFmpeg handler
             // (Failure to do so will throw exceptions)
             FFmpegHandler.initFFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
 
-            // Generate the WAV files
-//            File samplesWAVFile = new File(
-//                    FFmpegHandler.convertAudio(audioFile, samplesWAVPath)
-//            );
-//            File slowedWAVFile = new File(
-//                    FFmpegHandler.generateAltTempoAudio(audioFile, slowedWAVPath, 0.5)
-//            );
-            File wavFile = new File(
-                    FFmpegHandler.convertAudio(audioFile, samplesWAVPath)
-            );
-
-            // Try and read the WAV files as an `Audio` object
-            // (Failure to read will throw exceptions)
-//            Audio audio = new Audio(
-//                    samplesWAVFile, slowedWAVFile,
-//                    AudioProcessingMode.WITH_SAMPLES, AudioProcessingMode.WITH_PLAYBACK,
-//                    AudioProcessingMode.WITH_SLOWDOWN
-//            );
+            // Convert original audio file into a WAV file for processing
             Audio audio = new Audio(
-                    wavFile,
+                    new File(FFmpegHandler.convertAudio(audioFile, wavFilePath)),
                     AudioProcessingMode.WITH_SAMPLES, AudioProcessingMode.WITH_PLAYBACK
             );
-
-            // Delete auxiliary WAV files
-//            boolean successfullyDeleted = IOMethods.delete(samplesWAVFile);
-//            successfullyDeleted = (successfullyDeleted && IOMethods.delete(slowedWAVFile));
-//
-//            if (successfullyDeleted) {
-//                log(Level.FINE, "Successfully deleted auxiliary WAV files.");
-//            } else {
-//                log(Level.WARNING, "Failed to delete auxiliary WAV files now; will attempt delete after exit.");
-//            }
-
-            boolean successfullyDeleted = IOMethods.delete(wavFile);
-
-            if (successfullyDeleted) {
-                log(Level.FINE, "Successfully deleted auxiliary WAV file.");
-            } else {
-                log(Level.WARNING, "Failed to delete auxiliary WAV file now; will attempt delete after exit.");
-            }
 
             // Get the current scene and the spectrogram view controller
             Pair<Scene, TranscriptionViewController> stageSceneAndController = setupTranscriptionScene();
@@ -412,6 +375,7 @@ public class SceneSwitcher extends LoggableClass {
             controller.setThemeOnScene();
 
             // Set the file version that is used
+            // Todo remove?
 //            controller.setFileVersion(fileVersion);
 
             // Set the project data for the existing project

@@ -587,6 +587,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         };
 
         // Create an estimation task to estimate both the BPM and the music key
+        // Fixme estimation task does not seem to update fields correctly
         CustomTask<Pair<Double, MusicKey>> estimationTask = new CustomTask<>("Estimation Task") {
             @Override
             protected Pair<Double, MusicKey> call() {
@@ -837,10 +838,9 @@ public class TranscriptionViewController extends SwitchableViewController {
         // Update beats per bar
         beatsPerBar = timeSignature.beatsPerBar;
 
-        // Attempt to add this project to the projects' database
+        // Attempt to insert this project to the projects' database
         try {
             if (projectsDB.checkIfProjectDoesNotExist(audtFilePath)) {
-                // Insert the record into the database
                 projectsDB.insertProjectRecord(audtFilePath, projectName);
             }
         } catch (SQLException e) {

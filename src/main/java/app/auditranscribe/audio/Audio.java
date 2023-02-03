@@ -60,7 +60,7 @@ public class Audio extends LoggableClass {
     private double timeToResumeAt;  // Time that the audio should continue playing at upon resuming
     private double prevElapsedTime;  // Time (in seconds) that was elapsed before a skip forwards/backwards
 
-    private double volume;
+    private double volume = 1;
     private boolean paused = false;
 
     private boolean withPlayback = false;
