@@ -107,7 +107,7 @@
                               <HBox spacing="10.0">
                                  <children>
                                     <Label prefHeight="30.0" prefWidth="150.0" styleClass="setting-label" text="Autosave interval:" />
-                                    <Spinner fx:id="autosaveIntervalSpinner" editable="true" prefHeight="30.0" prefWidth="150.0" />
+                                    <Spinner fx:id="autosaveIntervalSpinner" prefHeight="30.0" prefWidth="150.0" />
                                  </children>
                               </HBox>
                               <Separator prefWidth="200.0" />
@@ -115,7 +115,7 @@
                               <HBox spacing="10.0">
                                  <children>
                                     <Label prefHeight="30.0" prefWidth="150.0" styleClass="setting-label" text="Log file persistence:" />
-                                    <Spinner fx:id="logFilePersistenceSpinner" editable="true" prefHeight="30.0" prefWidth="150.0" />
+                                    <Spinner fx:id="logFilePersistenceSpinner" prefHeight="30.0" prefWidth="150.0" />
                                  </children>
                               </HBox>
                               <HBox layoutX="10.0" layoutY="113.0" spacing="10.0">

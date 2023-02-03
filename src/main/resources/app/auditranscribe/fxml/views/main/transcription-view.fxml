@@ -92,7 +92,7 @@
                                     <Tooltip text="Music key" />
                                  </tooltip>
                               </ChoiceBox>
-                              <Spinner fx:id="bpmSpinner" disable="true" prefHeight="30.0" prefWidth="110.0">
+                              <Spinner fx:id="bpmSpinner" disable="true" editable="true" prefHeight="30.0" prefWidth="110.0">
                                  <tooltip>
                                     <Tooltip text="Beats per minute" />
                                  </tooltip>
@@ -102,7 +102,7 @@
                                     <Tooltip text="Time signature" />
                                  </tooltip>
                               </ChoiceBox>
-                              <Spinner fx:id="offsetSpinner" disable="true" prefHeight="30.0" prefWidth="110.0">
+                              <Spinner fx:id="offsetSpinner" disable="true" editable="true" prefHeight="30.0" prefWidth="110.0">
                                  <tooltip>
                                     <Tooltip text="Offset" />
                                  </tooltip>
@@ -153,7 +153,7 @@
                                 </content>
                               </ScrollPane>
                            </children></AnchorPane>
-                        <HBox fx:id="memoryUseHBox" alignment="CENTER_RIGHT" spacing="3.0" styleClass="memory-use-hbox" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="1.0">
+                        <HBox alignment="CENTER_RIGHT" spacing="3.0" styleClass="memory-use-hbox" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="1.0">
                            <children>
                               <Label fx:id="freeMemoryLabel" text="??????? MB" />
                               <Label text="/" />

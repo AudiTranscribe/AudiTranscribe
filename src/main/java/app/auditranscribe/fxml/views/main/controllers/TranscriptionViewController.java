@@ -213,7 +213,7 @@ public class TranscriptionViewController extends SwitchableViewController {
     private Spinner<Double> bpmSpinner, offsetSpinner;
 
     @FXML
-    private HBox progressBarHBox, memoryUseHBox;
+    private HBox progressBarHBox;
 
     @FXML
     private ProgressBar progressBar;
@@ -258,14 +258,12 @@ public class TranscriptionViewController extends SwitchableViewController {
 
         // Set spinners' factories
         bpmSpinnerFactory = new CustomDoubleSpinnerValueFactory(
-                BPM_RANGE.value0(), BPM_RANGE.value1(), 120, 0.1, 2, "",
-                " bpm"
+                BPM_RANGE.value0(), BPM_RANGE.value1(), 120, 0.1, 2
         );
         bpmSpinner.setValueFactory(bpmSpinnerFactory);
 
         offsetSpinnerFactory = new CustomDoubleSpinnerValueFactory(
-                OFFSET_RANGE.value0(), OFFSET_RANGE.value1(), 0, 0.01, 2, "",
-                " s"
+                OFFSET_RANGE.value0(), OFFSET_RANGE.value1(), 0, 0.01, 2
         );
         offsetSpinner.setValueFactory(offsetSpinnerFactory);
 
