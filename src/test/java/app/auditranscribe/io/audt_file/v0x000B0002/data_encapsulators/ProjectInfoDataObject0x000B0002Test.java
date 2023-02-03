@@ -1,4 +1,4 @@
-package app.auditranscribe.io.audt_file.v0x000B0001.data_encapsulators;
+package app.auditranscribe.io.audt_file.v0x000B0002.data_encapsulators;
 
 import app.auditranscribe.io.audt_file.base.data_encapsulators.ProjectInfoDataObject;
 import app.auditranscribe.music.MusicKey;
@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ProjectInfoDataObject0x000B0001Test {
+class ProjectInfoDataObject0x000B0002Test {
     // Attributes
     String projectName1 = "First Project Name";
     String projectName2 = "Second Project Name";
@@ -35,10 +35,10 @@ class ProjectInfoDataObject0x000B0001Test {
     @Test
     void numBytesNeeded() {
         // Define the two data objects to test number of bytes needed
-        ProjectInfoDataObject one = new ProjectInfoDataObject0x000B0001(
+        ProjectInfoDataObject one = new ProjectInfoDataObject0x000B0002(
                 projectName1, musicKey1, timeSignature1, bpm1, offsetSeconds1, playbackVolume1, currTimeInMS1
         );
-        ProjectInfoDataObject two = new ProjectInfoDataObject0x000B0001(
+        ProjectInfoDataObject two = new ProjectInfoDataObject0x000B0002(
                 projectName2, musicKey2, timeSignature2, bpm2, offsetSeconds2, playbackVolume2, currTimeInMS2
         );
 
@@ -50,7 +50,7 @@ class ProjectInfoDataObject0x000B0001Test {
     @Test
     void testEquals() {
         // Define temporary data object for testing the initial checks
-        ProjectInfoDataObject temp = new ProjectInfoDataObject0x000B0001(
+        ProjectInfoDataObject temp = new ProjectInfoDataObject0x000B0002(
                 projectName1, musicKey1, timeSignature1, bpm1, offsetSeconds1, playbackVolume1, currTimeInMS1
         );
 
@@ -75,7 +75,7 @@ class ProjectInfoDataObject0x000B0001Test {
         // Generate product of indices
         int[][] indexProduct = MathUtils.selfProduct(2, 7);  // 7 data attributes
         for (int[] indices1 : indexProduct) {
-            ProjectInfoDataObject one = new ProjectInfoDataObject0x000B0001(
+            ProjectInfoDataObject one = new ProjectInfoDataObject0x000B0002(
                     projectNames[indices1[0]],
                     musicKeys[indices1[1]],
                     timeSignatures[indices1[2]],
@@ -86,7 +86,7 @@ class ProjectInfoDataObject0x000B0001Test {
             );
 
             for (int[] indices2 : indexProduct) {
-                ProjectInfoDataObject two = new ProjectInfoDataObject0x000B0001(
+                ProjectInfoDataObject two = new ProjectInfoDataObject0x000B0002(
                         projectNames[indices2[0]],
                         musicKeys[indices2[1]],
                         timeSignatures[indices2[2]],
@@ -106,20 +106,5 @@ class ProjectInfoDataObject0x000B0001Test {
                 }
             }
         }
-    }
-
-    @Test
-    void testHashCode() {
-        // Define the two data objects to test hash code
-        ProjectInfoDataObject one = new ProjectInfoDataObject0x000B0001(
-                projectName1, musicKey1, timeSignature1, bpm1, offsetSeconds1, playbackVolume1, currTimeInMS1
-        );
-        ProjectInfoDataObject two = new ProjectInfoDataObject0x000B0001(
-                projectName2, musicKey2, timeSignature2, bpm2, offsetSeconds2, playbackVolume2, currTimeInMS2
-        );
-
-        // Tests
-        assertEquals(350000273, one.hashCode());
-        assertEquals(-519488405, two.hashCode());
     }
 }

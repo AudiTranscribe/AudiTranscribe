@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package app.auditranscribe.io.audt_file.v0x000B0001.data_encapsulators;
+package app.auditranscribe.io.audt_file.v0x000B0002.data_encapsulators;
 
 import app.auditranscribe.io.audt_file.base.data_encapsulators.ProjectInfoDataObject;
 import app.auditranscribe.music.MusicKey;
@@ -28,7 +28,7 @@ import app.auditranscribe.music.TimeSignature;
  * storing the project's info, whereas the <code>ProjectData</code> object stores all the different
  * data encapsulators.
  */
-public class ProjectInfoDataObject0x000B0001 extends ProjectInfoDataObject {
+public class ProjectInfoDataObject0x000B0002 extends ProjectInfoDataObject {
     /**
      * Initialization method for the project info data object.
      *
@@ -40,7 +40,7 @@ public class ProjectInfoDataObject0x000B0001 extends ProjectInfoDataObject {
      * @param playbackVolume Volume to play back at.
      * @param currTimeInMS   Current playback time of the audio in <b>milliseconds</b>.
      */
-    public ProjectInfoDataObject0x000B0001(
+    public ProjectInfoDataObject0x000B0002(
             String projectName, MusicKey musicKey, TimeSignature timeSignature, double bpm, double offsetSeconds,
             double playbackVolume, int currTimeInMS
     ) {

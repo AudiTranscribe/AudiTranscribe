@@ -22,7 +22,7 @@ import os
 import re
 
 # CONSTANTS
-VERSION = "0x000B0001"
+VERSION = "0x000B0002"
 
 ORIGINAL_AUDT_FILE = f"test-AUDTFile{VERSION}Test.audt"  # Original file to be edited
 TESTING_FILES_FOLDER = "../src/main/resources/app/auditranscribe/test-files/io/audt_file/" + \

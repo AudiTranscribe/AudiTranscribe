@@ -1,7 +1,6 @@
-package app.auditranscribe.io.audt_file.v0x000B0001;
+package app.auditranscribe.io.audt_file.v0x000B0002;
 
 import app.auditranscribe.generic.tuples.Triple;
-import app.auditranscribe.io.CompressionHandlers;
 import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.audt_file.ProjectData;
@@ -11,8 +10,8 @@ import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.MusicNotesDataObject0x00050002;
 import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.QTransformDataObject0x00050002;
 import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.UnchangingDataPropertiesObject0x00050002;
-import app.auditranscribe.io.audt_file.v0x00080001.data_encapsulators.AudioDataObject0x00080001;
-import app.auditranscribe.io.audt_file.v0x000B0001.data_encapsulators.ProjectInfoDataObject0x000B0001;
+import app.auditranscribe.io.audt_file.v0x000B0002.data_encapsulators.AudioDataObject0x000B0002;
+import app.auditranscribe.io.audt_file.v0x000B0002.data_encapsulators.ProjectInfoDataObject0x000B0002;
 import app.auditranscribe.io.exceptions.FailedToReadDataException;
 import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
 import app.auditranscribe.io.exceptions.InvalidFileVersionException;
@@ -30,11 +29,11 @@ import java.nio.file.Paths;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class AUDTFile0x000B0001Test {
+class AUDTFile0x000B0002Test {
     // Define the file path
     static final String FILE_PATH = IOMethods.joinPaths(
             IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-            "test-files", "io", "audt_file", "v0x000B0001", "test-AUDTFile0x000B0001Test.audt"
+            "test-files", "io", "audt_file", "v0x000B0002", "test-AUDTFile0x000B0002Test.audt"
     );
 
     // Define helper attributes
@@ -64,7 +63,7 @@ class AUDTFile0x000B0001Test {
     ProjectData projectData2;
 
     // Initialization method
-    AUDTFile0x000B0001Test() throws IOException {
+    AUDTFile0x000B0002Test() throws IOException {
         // Define sample array data
         // (These are example arrays, not actual data)
         qTransformMagnitudes = new double[][]{
@@ -92,21 +91,17 @@ class AUDTFile0x000B0001Test {
         qTransformDataObject = new QTransformDataObject0x00050002(
                 qTransformBytes, minMagnitude, maxMagnitude
         );
-        audioDataObject = new AudioDataObject0x00080001(
-                CompressionHandlers.lz4Compress(Files.readAllBytes(Paths.get(
+        audioDataObject = new AudioDataObject0x000B0002(
+                Files.readAllBytes(Paths.get(
                         IOMethods.getAbsoluteFilePath("test-files/general/audio/VeryShortAudio.mp3")
-                ))),
-                CompressionHandlers.lz4Compress(Files.readAllBytes(Paths.get(
-                        IOMethods.getAbsoluteFilePath("test-files/general/audio/SlightlyShortAudio.mp3")
-                ))),
-                44100, 200
+                )), 44100, 200
         );
 
-        projectInfoDataObject1 = new ProjectInfoDataObject0x000B0001(
+        projectInfoDataObject1 = new ProjectInfoDataObject0x000B0002(
                 "Test-1", MusicKey.C_SHARP_MAJOR, TimeSignature.TWO_TWO, 123.45, 0.01,
                 0.55, 12
         );
-        projectInfoDataObject2 = new ProjectInfoDataObject0x000B0001(
+        projectInfoDataObject2 = new ProjectInfoDataObject0x000B0002(
                 "Test-2", MusicKey.G_FLAT_MAJOR, TimeSignature.SIX_FOUR, 67.89, -1.23,
                 0.124, 34
         );
@@ -141,7 +136,7 @@ class AUDTFile0x000B0001Test {
     @Order(1)
     void fileWriter_initialWrite() throws IOException, InvalidFileVersionException {
         // Create a file writer object
-        AUDTFileWriter fileWriter = AUDTFileWriter.getWriter(0x000B0001, FILE_PATH);
+        AUDTFileWriter fileWriter = AUDTFileWriter.getWriter(0x000B0002, FILE_PATH);
 
         // Test writing some data
         fileWriter.writeUnchangingDataProperties(unchangingDataPropertiesObject);
@@ -233,7 +228,7 @@ class AUDTFile0x000B0001Test {
     @Order(3)
     void fileWriter_initialWriteAlt() throws IOException, InvalidFileVersionException {
         // Create a file writer object
-        AUDTFileWriter fileWriter = AUDTFileWriter.getWriter(0x000B0001, FILE_PATH, 0);
+        AUDTFileWriter fileWriter = AUDTFileWriter.getWriter(0x000B0002, FILE_PATH, 0);
 
         // Test writing some data
         fileWriter.writeUnchangingDataProperties(unchangingDataPropertiesObject);
@@ -292,7 +287,7 @@ class AUDTFile0x000B0001Test {
     void fileWriter_2() throws IOException, InvalidFileVersionException {
         // Create a file writer object
         AUDTFileWriter fileWriter = AUDTFileWriter.getWriter(
-                0x000B0001, FILE_PATH, unchangingDataPropertiesObject.numSkippableBytes
+                0x000B0002, FILE_PATH, unchangingDataPropertiesObject.numSkippableBytes
         );
 
         // Test writing only the GUI and music notes data
@@ -349,7 +344,7 @@ class AUDTFile0x000B0001Test {
         // Define files' folder
         String folder = IOMethods.joinPaths(
                 IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-                "test-files", "io", "audt_file", "v0x000B0001", "AUDTFile0x000B0001Test"
+                "test-files", "io", "audt_file", "v0x000B0002", "AUDTFile0x000B0002Test"
         );
 
         // Perform tests

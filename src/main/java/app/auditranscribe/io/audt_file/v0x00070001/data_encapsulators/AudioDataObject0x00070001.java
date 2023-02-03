@@ -18,15 +18,18 @@
 
 package app.auditranscribe.io.audt_file.v0x00070001.data_encapsulators;
 
+import app.auditranscribe.io.CompressionHandlers;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.AudioDataObject;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * Data object that stores the audio data.
  */
 public class AudioDataObject0x00070001 extends AudioDataObject {
+    // Attributes
+    public final byte[] compressedOriginalMP3Bytes;
+
     /**
      * Initialization method for the audio data object.
      *
@@ -37,12 +40,31 @@ public class AudioDataObject0x00070001 extends AudioDataObject {
     public AudioDataObject0x00070001(
             byte[] compressedMP3Bytes, double sampleRate, int totalDurationInMS
     ) {
-        this.compressedOriginalMP3Bytes = compressedMP3Bytes;
+        this.mp3Bytes = CompressionHandlers.lz4DecompressFailSilently(compressedMP3Bytes);
         this.sampleRate = sampleRate;
         this.totalDurationInMS = totalDurationInMS;
+
+        // No longer in superclass
+        this.compressedOriginalMP3Bytes = compressedMP3Bytes;
     }
 
     // Public methods
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        AudioDataObject0x00070001 that = (AudioDataObject0x00070001) o;
+        return Arrays.equals(compressedOriginalMP3Bytes, that.compressedOriginalMP3Bytes);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + Arrays.hashCode(compressedOriginalMP3Bytes);
+        return result;
+    }
+
     @Override
     public int numBytesNeeded() {
         return 4 +  // Section ID

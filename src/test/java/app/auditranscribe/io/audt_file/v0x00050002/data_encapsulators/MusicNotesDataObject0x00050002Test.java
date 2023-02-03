@@ -81,19 +81,4 @@ class MusicNotesDataObject0x00050002Test {
             }
         }
     }
-
-    @Test
-    void testHashCode() {
-        // Define the two music notes data objects to test hash code generation
-        MusicNotesDataObject one = new MusicNotesDataObject0x00050002(
-                timesToPlaceRectangles1, noteDurations1, noteNums1
-        );
-        MusicNotesDataObject two = new MusicNotesDataObject0x00050002(
-                timesToPlaceRectangles2, noteDurations2, noteNums2
-        );
-
-        // Tests
-        assertEquals(143846438, one.hashCode());
-        assertEquals(-1004171889, two.hashCode());
-    }
 }

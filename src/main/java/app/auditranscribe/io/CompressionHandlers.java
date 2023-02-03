@@ -19,6 +19,7 @@
 package app.auditranscribe.io;
 
 import app.auditranscribe.misc.CustomTask;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import org.apache.commons.compress.compressors.lz4.BlockLZ4CompressorInputStream;
 import org.apache.commons.compress.compressors.lz4.BlockLZ4CompressorOutputStream;
 
@@ -124,6 +125,22 @@ public final class CompressionHandlers {
 
         // Get the resulting byte array
         return outputStream.toByteArray();
+    }
+
+    /**
+     * Method that decompressed the input LZ4 bytes and returns the decompressed bytes.<br>
+     * Fails silently, so no exception is thrown.
+     *
+     * @param lz4Bytes LZ4 compressed bytes that are to be decompressed.
+     * @return Decompressed bytes. Returns <code>null</code> if an error occurred.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static byte[] lz4DecompressFailSilently(byte[] lz4Bytes) {
+        try {
+            return lz4Decompress(lz4Bytes);
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     // ZIP compression

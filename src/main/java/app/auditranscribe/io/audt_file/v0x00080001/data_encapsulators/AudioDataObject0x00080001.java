@@ -18,12 +18,19 @@
 
 package app.auditranscribe.io.audt_file.v0x00080001.data_encapsulators;
 
+import app.auditranscribe.io.CompressionHandlers;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.AudioDataObject;
+
+import java.util.Arrays;
 
 /**
  * Data object that stores the audio data.
  */
 public class AudioDataObject0x00080001 extends AudioDataObject {
+    // Attributes
+    public final byte[] compressedOriginalMP3Bytes;
+    public final byte[] compressedSlowedMP3Bytes;
+
     /**
      * Initialization method for the audio data object.
      *
@@ -35,13 +42,34 @@ public class AudioDataObject0x00080001 extends AudioDataObject {
     public AudioDataObject0x00080001(
             byte[] compressedOriginalMP3Bytes, byte[] compressedSlowedMP3Bytes, double sampleRate, int totalDurationInMS
     ) {
-        this.compressedOriginalMP3Bytes = compressedOriginalMP3Bytes;
-        this.compressedSlowedMP3Bytes = compressedSlowedMP3Bytes;
+        this.mp3Bytes = CompressionHandlers.lz4DecompressFailSilently(compressedOriginalMP3Bytes);
         this.sampleRate = sampleRate;
         this.totalDurationInMS = totalDurationInMS;
+
+        // No longer in superclass
+        this.compressedOriginalMP3Bytes = compressedOriginalMP3Bytes;
+        this.compressedSlowedMP3Bytes = compressedSlowedMP3Bytes;
     }
 
     // Public methods
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        AudioDataObject0x00080001 that = (AudioDataObject0x00080001) o;
+        return Arrays.equals(compressedOriginalMP3Bytes, that.compressedOriginalMP3Bytes) &&
+                Arrays.equals(compressedSlowedMP3Bytes, that.compressedSlowedMP3Bytes);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + Arrays.hashCode(compressedOriginalMP3Bytes);
+        result = 31 * result + Arrays.hashCode(compressedSlowedMP3Bytes);
+        return result;
+    }
+
     @Override
     public int numBytesNeeded() {
         return 4 +  // Section ID

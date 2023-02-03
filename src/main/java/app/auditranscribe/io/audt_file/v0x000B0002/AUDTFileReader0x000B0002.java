@@ -1,5 +1,5 @@
 /*
- * AUDTFileReader0x000B0001.java
+ * AUDTFileReader0x000B0002.java
  * Description: Class that handles the reading of the AudiTranscribe (AUDT) file for file version
  *              0x000B0001.
  *
@@ -17,11 +17,13 @@
  * Copyright © AudiTranscribe Team
  */
 
-package app.auditranscribe.io.audt_file.v0x000B0001;
+package app.auditranscribe.io.audt_file.v0x000B0002;
 
+import app.auditranscribe.io.audt_file.base.data_encapsulators.AudioDataObject;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.ProjectInfoDataObject;
 import app.auditranscribe.io.audt_file.v0x00090002.AUDTFileReader0x00090002;
-import app.auditranscribe.io.audt_file.v0x000B0001.data_encapsulators.ProjectInfoDataObject0x000B0001;
+import app.auditranscribe.io.audt_file.v0x000B0002.data_encapsulators.AudioDataObject0x000B0002;
+import app.auditranscribe.io.audt_file.v0x000B0002.data_encapsulators.ProjectInfoDataObject0x000B0002;
 import app.auditranscribe.io.exceptions.FailedToReadDataException;
 import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
 import app.auditranscribe.io.exceptions.InvalidFileVersionException;
@@ -31,9 +33,9 @@ import app.auditranscribe.music.TimeSignature;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class AUDTFileReader0x000B0001 extends AUDTFileReader0x00090002 {
+public class AUDTFileReader0x000B0002 extends AUDTFileReader0x00090002 {
     /**
-     * Initialization method to make an <code>AUDTFileReader0x000B0001</code> object.
+     * Initialization method to make an <code>AUDTFileReader0x000B0002</code> object.
      *
      * @param filepath    Path to the AUDT file. The file name at the end of the file path should
      *                    <b>include</b> the extension of the AUDT file.
@@ -42,13 +44,38 @@ public class AUDTFileReader0x000B0001 extends AUDTFileReader0x00090002 {
      * @throws IncorrectFileFormatException If the file was formatted incorrectly.
      * @throws InvalidFileVersionException  If the LZ4 version is outdated.
      */
-    public AUDTFileReader0x000B0001(
+    public AUDTFileReader0x000B0002(
             String filepath, InputStream inputStream
     ) throws IOException, IncorrectFileFormatException, InvalidFileVersionException {
         super(filepath, inputStream);
     }
 
     // Public methods
+    @Override
+    public AudioDataObject readAudioData() throws FailedToReadDataException {
+        // Ensure that the audio data section ID is correct
+        int sectionID = readSectionID();
+        if (sectionID != AudioDataObject.SECTION_ID) {
+            throw new FailedToReadDataException(
+                    "Failed to read audio data; the audio data section has the incorrect section ID of " + sectionID +
+                            " (expected: " + AudioDataObject.SECTION_ID + ")"
+            );
+        }
+
+        // Read in the rest of the data
+        byte[] mp3Bytes = readByteArray();
+        double sampleRate = readDouble();
+        int totalDurationInMS = readInteger();
+
+        // Check if there is an EOS
+        if (!checkEOSDelimiter()) {
+            throw new FailedToReadDataException("Failed to read audio data; end of section delimiter missing");
+        }
+
+        // Create and return an `AudioDataObject`
+        return new AudioDataObject0x000B0002(mp3Bytes, sampleRate, totalDurationInMS);
+    }
+
     @Override
     public ProjectInfoDataObject readProjectInfoData() throws FailedToReadDataException {
         // Ensure that the project info data section ID is correct
@@ -82,7 +109,7 @@ public class AUDTFileReader0x000B0001 extends AUDTFileReader0x00090002 {
         TimeSignature timeSignature = TimeSignature.displayTextToTimeSignature(timeSignatureDisplayText);
 
         // Create and return a `ProjectInfoDataObject`
-        return new ProjectInfoDataObject0x000B0001(
+        return new ProjectInfoDataObject0x000B0002(
                 projectName, musicKey, timeSignature, bpm, offsetSeconds, playbackVolume, currTimeInMS
         );
     }

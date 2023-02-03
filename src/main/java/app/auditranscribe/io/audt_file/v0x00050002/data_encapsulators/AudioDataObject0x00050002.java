@@ -18,8 +18,11 @@
 
 package app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators;
 
+import app.auditranscribe.io.CompressionHandlers;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.AudioDataObject;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -28,6 +31,7 @@ import java.util.Objects;
 public class AudioDataObject0x00050002 extends AudioDataObject {
     // Attributes
     private final String audioFileName;
+    public final byte[] compressedOriginalMP3Bytes;
 
     /**
      * Initialization method for the audio data object.
@@ -40,11 +44,13 @@ public class AudioDataObject0x00050002 extends AudioDataObject {
     public AudioDataObject0x00050002(
             byte[] compressedMP3Bytes, double sampleRate, int totalDurationInMS, String audioFileName
     ) {
-        this.compressedOriginalMP3Bytes = compressedMP3Bytes;
         this.sampleRate = sampleRate;
         this.totalDurationInMS = totalDurationInMS;
+        this.mp3Bytes = CompressionHandlers.lz4DecompressFailSilently(compressedMP3Bytes);
 
-        this.audioFileName = audioFileName;  // No longer in the superclass
+        // No longer in the superclass
+        this.audioFileName = audioFileName;
+        this.compressedOriginalMP3Bytes = compressedMP3Bytes;
     }
 
     // Getter/setter methods
@@ -67,12 +73,15 @@ public class AudioDataObject0x00050002 extends AudioDataObject {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         AudioDataObject0x00050002 that = (AudioDataObject0x00050002) o;
-        return Objects.equals(audioFileName, that.audioFileName);
+        return Objects.equals(audioFileName, that.audioFileName) &&
+                Arrays.equals(compressedOriginalMP3Bytes, that.compressedOriginalMP3Bytes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), audioFileName);
+        int result = Objects.hash(super.hashCode(), audioFileName);
+        result = 31 * result + Arrays.hashCode(compressedOriginalMP3Bytes);
+        return result;
     }
 
     @Override

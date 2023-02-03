@@ -31,8 +31,7 @@ public abstract class AudioDataObject extends AbstractAUDTDataObject {
     public static final int SECTION_ID = 3;
 
     // Attributes
-    public byte[] compressedOriginalMP3Bytes;
-    public byte[] compressedSlowedMP3Bytes;
+    public byte[] mp3Bytes;
     public double sampleRate;
     public int totalDurationInMS;
 
@@ -42,8 +41,7 @@ public abstract class AudioDataObject extends AbstractAUDTDataObject {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AudioDataObject that = (AudioDataObject) o;
-        return Arrays.equals(compressedOriginalMP3Bytes, that.compressedOriginalMP3Bytes) &&
-                Arrays.equals(compressedSlowedMP3Bytes, that.compressedSlowedMP3Bytes) &&
+        return Arrays.equals(mp3Bytes, that.mp3Bytes) &&
                 Double.compare(that.sampleRate, sampleRate) == 0 &&
                 totalDurationInMS == that.totalDurationInMS;
     }
@@ -52,8 +50,16 @@ public abstract class AudioDataObject extends AbstractAUDTDataObject {
     @ExcludeFromGeneratedCoverageReport
     public int hashCode() {
         int result = Objects.hash(sampleRate, totalDurationInMS);
-        result = 31 * result + Arrays.hashCode(compressedOriginalMP3Bytes);
-        result = 31 * result + Arrays.hashCode(compressedSlowedMP3Bytes);
+        result = 31 * result + Arrays.hashCode(mp3Bytes);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "AudioDataObject{" +
+                "mp3Bytes=" + Arrays.toString(mp3Bytes) +
+                ", sampleRate=" + sampleRate +
+                ", totalDurationInMS=" + totalDurationInMS +
+                '}';
     }
 }
