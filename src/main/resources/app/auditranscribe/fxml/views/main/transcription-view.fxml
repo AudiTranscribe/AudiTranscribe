@@ -190,7 +190,7 @@
                                     <Tooltip text="Seek to start" />
                                  </tooltip>
                               </Button>
-                              <Button fx:id="toggleSlowedAudioButton" disable="true" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" text="1.0x">
+                              <Button fx:id="toggleSlowedAudioButton" disable="true" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" text="1.0x" visible="false">
                                  <tooltip>
                                     <Tooltip text="Playback speed" />
                                  </tooltip>

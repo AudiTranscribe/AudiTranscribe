@@ -1535,8 +1535,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                         bpmSpinner, timeSignatureChoice, offsetSpinner,
 
                         // Bottom Hbox
-                        scrollButton, editNotesButton, playButton, rewindToBeginningButton,
-//                        toggleSlowedAudioButton  // Todo: uncomment once slowed audio feature is active
+                        scrollButton, editNotesButton, playButton, rewindToBeginningButton, toggleSlowedAudioButton
                 };
 
                 for (Node node : disabledNodes) node.setDisable(false);
