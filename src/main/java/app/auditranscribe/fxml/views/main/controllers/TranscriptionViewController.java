@@ -322,6 +322,68 @@ public class TranscriptionViewController extends SwitchableViewController {
             log(Level.FINE, "Changed notes volume from " + oldValue + " to " + newValue);
         });
 
+        // Set methods on spinners
+        bpmSpinner.valueProperty().addListener(
+                (observable, oldValue, newValue) -> updateBPMValue(newValue, false)
+        );
+        offsetSpinner.valueProperty().addListener(
+                ((observable, oldValue, newValue) -> updateOffsetValue(newValue, false))
+        );
+
+        bpmSpinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {  // Lost focus
+                updateBPMValue(bpmSpinner.getValue(), false);
+            }
+        });
+
+        offsetSpinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {  // Lost focus
+                updateOffsetValue(offsetSpinner.getValue(), false);
+            }
+        });
+
+        // Set methods on choice box fields
+        musicKeyChoice.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (!Objects.equals(newValue, oldValue)) {
+                updateMusicKeyValue(newValue, false);
+            }
+        });
+
+        timeSignatureChoice.getSelectionModel().selectedItemProperty()
+                .addListener((observable, oldValue, newValue) -> {
+                    log(Level.FINE, "Changed time signature from " + oldValue + " to " + newValue);
+
+                    // Update the `hasUnsavedChanges` flag
+                    hasUnsavedChanges = true;
+
+                    // Get the old and new beats per bar
+                    int oldBeatsPerBar = 0;
+                    if (oldValue != null) {
+                        oldBeatsPerBar = oldValue.beatsPerBar;
+                    }
+                    int newBeatsPerBar = newValue.beatsPerBar;
+
+                    // Update the beat lines and bar number ellipses, if the spectrogram is ready
+                    if (isEverythingReady) {
+                        beatLines = PlottingStuffHandler.updateBeatLines(
+                                spectrogramAnchorPane, beatLines, audioDuration, bpm, bpm, offset, offset,
+                                finalHeight, oldBeatsPerBar, newBeatsPerBar, PX_PER_SECOND, SPECTROGRAM_ZOOM_SCALE_X
+                        );
+
+                        barNumberEllipses = PlottingStuffHandler.updateBarNumberEllipses(
+                                barNumberPane, barNumberEllipses, audioDuration, bpm, bpm, offset, offset,
+                                barNumberPane.getPrefHeight(), oldBeatsPerBar, newBeatsPerBar, PX_PER_SECOND,
+                                SPECTROGRAM_ZOOM_SCALE_X, spectrogramScrollPane.getWidth()
+                        );
+                    }
+
+                    // Update the time signature index
+                    timeSignature = newValue;
+
+                    // Update the beats per bar
+                    beatsPerBar = newBeatsPerBar;
+                });
+
         // Add methods to buttons
         audioVolumeButton.setOnAction(event -> toggleAudioMuteButton());
         notesVolumeButton.setOnAction(event -> toggleNoteMuteButton());
