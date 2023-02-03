@@ -996,7 +996,14 @@ public class TranscriptionViewController extends SwitchableViewController {
 
         // Make audio seek to that time
         seekTime = MathUtils.round(seekTime, 3);
-        audio.seekToTime(seekTime);
+        if (!isPaused) {
+            // Hacky solution but it works
+            togglePaused(false);
+            audio.seekToTime(seekTime);
+            togglePaused(true);
+        } else {
+            audio.seekToTime(seekTime);
+        }
 
         // Todo remove?
 //        // Update the start time of the audio
