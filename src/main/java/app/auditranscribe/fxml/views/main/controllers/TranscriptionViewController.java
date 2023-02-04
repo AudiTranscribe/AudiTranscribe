@@ -429,7 +429,7 @@ public class TranscriptionViewController extends SwitchableViewController {
 
         // Add methods to menu items
         // Todo add the rest
-//        newProjectMenuItem.setOnAction(this::handleNewProject);
+        newProjectMenuItem.setOnAction(this::handleNewProject);
         openProjectMenuItem.setOnAction(this::handleOpenProject);
 //        renameProjectMenuItem.setOnAction(this::handleRenameProject);
         saveProjectMenuItem.setOnAction(event -> handleSavingProject(false, false));
@@ -1162,6 +1162,41 @@ public class TranscriptionViewController extends SwitchableViewController {
     }
 
     // IO handlers
+
+
+    /**
+     * Helper method that helps open a new project.
+     *
+     * @param event Event that triggered this function.
+     */
+    private void handleNewProject(Event event) {
+        // Do not do anything if we are not ready
+        if (!isEverythingReady) return;
+
+        // Pause the current audio
+        isPaused = togglePaused(false);
+
+        // Stop note sequencer playback
+//        notePlayerSequencer.stop();
+
+        // Deal with possible unsaved changes
+        boolean canCloseWindow = handleUnsavedChanges();
+        if (canCloseWindow) {
+            // Get the scene switching data
+            Pair<Boolean, SceneSwitchingData> pair = ProjectSetupViewController.showProjectSetupView();
+            boolean shouldProceed = pair.value0();
+            sceneSwitchingData = pair.value1();
+
+            // Specify the scene switching state
+            if (shouldProceed) {
+                // Signal the creation of a new project
+                sceneSwitchingState = SceneSwitchingState.NEW_PROJECT;
+
+                // Close this stage
+                ((Stage) rootPane.getScene().getWindow()).close();
+            }
+        }
+    }
 
     /**
      * Helper method that helps open an existing project.
