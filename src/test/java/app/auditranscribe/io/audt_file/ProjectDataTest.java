@@ -65,12 +65,12 @@ class ProjectDataTest {
 
         // Convert the magnitude data to required form
         Triple<Byte[], Double, Double> conversionTuple1 =
-                QTransformDataObject.qTransformMagnitudesToByteData(qTransformMagnitudes1, null);
+                QTransformDataObject0x000500.qTransformMagnitudesToByteData(qTransformMagnitudes1, null);
         byte[] qTransformBytes1 = TypeConversionUtils.toByteArray(conversionTuple1.value0());
         double minMagnitude1 = conversionTuple1.value1();
         double maxMagnitude1 = conversionTuple1.value2();
         Triple<Byte[], Double, Double> conversionTuple2 =
-                QTransformDataObject.qTransformMagnitudesToByteData(qTransformMagnitudes2, null);
+                QTransformDataObject0x000500.qTransformMagnitudesToByteData(qTransformMagnitudes2, null);
         byte[] qTransformBytes2 = TypeConversionUtils.toByteArray(conversionTuple2.value0());
         double minMagnitude2 = conversionTuple2.value1();
         double maxMagnitude2 = conversionTuple2.value2();

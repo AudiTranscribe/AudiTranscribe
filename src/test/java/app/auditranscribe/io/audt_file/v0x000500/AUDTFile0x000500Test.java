@@ -77,7 +77,7 @@ class AUDTFile0x000500Test {
 
         // Convert the magnitude data to required form
         Triple<Byte[], Double, Double> conversionTuple =
-                QTransformDataObject.qTransformMagnitudesToByteData(qTransformMagnitudes, null);
+                QTransformDataObject0x000500.qTransformMagnitudesToByteData(qTransformMagnitudes, null);
         byte[] qTransformBytes = TypeConversionUtils.toByteArray(conversionTuple.value0());
         double minMagnitude = conversionTuple.value1();
         double maxMagnitude = conversionTuple.value2();
@@ -170,7 +170,7 @@ class AUDTFile0x000500Test {
         assertEquals(musicNotesDataObject1, readMusicData);
 
         // Check if the decompressed version of the Q-Transform magnitudes is the same
-        double[][] array = QTransformDataObject.byteDataToQTransformMagnitudes(
+        double[][] array = QTransformDataObject0x000500.byteDataToQTransformMagnitudes(
                 qTransformDataObject.qTransformBytes,
                 qTransformDataObject.minMagnitude,
                 qTransformDataObject.maxMagnitude
@@ -262,7 +262,7 @@ class AUDTFile0x000500Test {
         assertEquals(musicNotesDataObject1, readMusicData);
 
         // Check if the decompressed version of the Q-Transform magnitudes is the same
-        double[][] array = QTransformDataObject.byteDataToQTransformMagnitudes(
+        double[][] array = QTransformDataObject0x000500.byteDataToQTransformMagnitudes(
                 qTransformDataObject.qTransformBytes,
                 qTransformDataObject.minMagnitude,
                 qTransformDataObject.maxMagnitude
@@ -319,7 +319,7 @@ class AUDTFile0x000500Test {
         assertEquals(musicNotesDataObject2, readMusicData);
 
         // Check if the decompressed version of the Q-Transform magnitudes is the same
-        double[][] array = QTransformDataObject.byteDataToQTransformMagnitudes(
+        double[][] array = QTransformDataObject0x000500.byteDataToQTransformMagnitudes(
                 qTransformDataObject.qTransformBytes,
                 qTransformDataObject.minMagnitude,
                 qTransformDataObject.maxMagnitude
