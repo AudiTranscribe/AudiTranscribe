@@ -1490,6 +1490,9 @@ public class TranscriptionViewController extends SwitchableViewController {
 
             // Save the project
             ProjectHandler.saveProject(saveDest, projectData);
+
+            // Update file version number
+            if (!forceChooseFile) fileVersion = AUDTFileConstants.FILE_VERSION_NUMBER;
         } else {
             ProjectHandler.saveProject(saveDest, numSkippableBytes, projectInfoData, musicNotesData);
         }
