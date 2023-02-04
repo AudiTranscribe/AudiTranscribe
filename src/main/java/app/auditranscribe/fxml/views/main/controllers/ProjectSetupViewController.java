@@ -37,6 +37,7 @@ import javafx.stage.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
@@ -325,7 +326,9 @@ public class ProjectSetupViewController extends AbstractViewController {
             audioFileLabel.setText(fileName);
 
             // If the project name has not been set, we use the name of the file as a project name
-            projectNameField.setText(fileName.substring(0, fileName.lastIndexOf('.')));
+            if (Objects.equals(projectNameField.getText(), "")) {
+                projectNameField.setText(fileName.substring(0, fileName.lastIndexOf('.')));
+            }
         }
     }
 
