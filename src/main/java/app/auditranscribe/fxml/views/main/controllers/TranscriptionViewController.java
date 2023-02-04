@@ -30,16 +30,20 @@ import app.auditranscribe.fxml.plotting.ColourScale;
 import app.auditranscribe.fxml.plotting.PlottingHelpers;
 import app.auditranscribe.fxml.plotting.PlottingStuffHandler;
 import app.auditranscribe.fxml.plotting.Spectrogram;
+import app.auditranscribe.fxml.views.main.ProjectHandler;
 import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitchingData;
 import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitchingState;
 import app.auditranscribe.generic.tuples.Pair;
-import app.auditranscribe.io.CompressionHandlers;
 import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
+import app.auditranscribe.io.audt_file.AUDTFileConstants;
 import app.auditranscribe.io.audt_file.ProjectData;
-import app.auditranscribe.io.audt_file.base.data_encapsulators.AudioDataObject;
-import app.auditranscribe.io.audt_file.base.data_encapsulators.MusicNotesDataObject;
-import app.auditranscribe.io.audt_file.base.data_encapsulators.QTransformDataObject;
+import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
+import app.auditranscribe.io.audt_file.v0x000500.data_encapsulators.MusicNotesDataObject0x000500;
+import app.auditranscribe.io.audt_file.v0x000500.data_encapsulators.QTransformDataObject0x000500;
+import app.auditranscribe.io.audt_file.v0x000500.data_encapsulators.UnchangingDataPropertiesObject0x000500;
+import app.auditranscribe.io.audt_file.v0x000B00.data_encapsulators.AudioDataObject0x000B00;
+import app.auditranscribe.io.audt_file.v0x000B00.data_encapsulators.ProjectInfoDataObject0x000B00;
 import app.auditranscribe.io.data_files.DataFiles;
 import app.auditranscribe.io.db.ProjectsDB;
 import app.auditranscribe.misc.CustomTask;
@@ -64,6 +68,8 @@ import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
 
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -121,6 +127,9 @@ public class TranscriptionViewController extends SwitchableViewController {
     // Attributes
     private int numSkippableBytes;
 
+    private String audtFilePath;
+    private String audtFileName;
+    public int fileVersion;
     private ProjectsDB projectsDB;
 
     private Audio audio;
@@ -129,9 +138,7 @@ public class TranscriptionViewController extends SwitchableViewController {
     private double audioDuration = 0;  // Will be updated upon scene initialization
     private double sampleRate;
 
-    private byte[] qTransformBytes;
-    private double minQTransformMagnitude;
-    private double maxQTransformMagnitude;
+    private Spectrogram spectrogram;
 
     private double finalWidth;
     private double finalHeight;
@@ -423,8 +430,8 @@ public class TranscriptionViewController extends SwitchableViewController {
 //        newProjectMenuItem.setOnAction(this::handleNewProject);
 //        openProjectMenuItem.setOnAction(this::handleOpenProject);
 //        renameProjectMenuItem.setOnAction(this::handleRenameProject);
-//        saveProjectMenuItem.setOnAction(event -> handleSavingProject(false, false));
-//        saveAsMenuItem.setOnAction(event -> handleSavingProject(false, true));
+        saveProjectMenuItem.setOnAction(event -> handleSavingProject(false, false));
+        saveAsMenuItem.setOnAction(event -> handleSavingProject(false, true));
 //        exportMIDIMenuItem.setOnAction(event -> handleExportMIDI());
         settingsMenuItem.setOnAction(event -> SettingsViewController.showSettingsWindow());
 //        undoMenuItem.setOnAction(event -> NoteRectangle.editAction(NoteRectangle.EditAction.UNDO));
@@ -570,7 +577,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         this.debugMode = debugMode;
 
         if (debugMode) {
-            log(Level.INFO, "Debug mode enabled");
+            log("Debug mode enabled");
         }
     }
 
@@ -605,7 +612,7 @@ public class TranscriptionViewController extends SwitchableViewController {
 //        NoteRectangle.defineNoteRectanglesByNoteNumberLists(MAX_NOTE_NUMBER - MIN_NOTE_NUMBER + 1);
 
         // Report that the transcription view is ready to be shown
-        log(Level.INFO, "Transcription view ready to be shown");
+        log("Transcription view ready to be shown");
     }
 
     @Override
@@ -630,15 +637,17 @@ public class TranscriptionViewController extends SwitchableViewController {
 
         projectName = data.projectName;
 
+        // Initialize the spectrogram
+        spectrogram = new Spectrogram(
+                audio, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER, BINS_PER_OCTAVE, SPECTROGRAM_HOP_LENGTH,
+                PX_PER_SECOND, NUM_PX_PER_OCTAVE
+        );
+
         // Generate spectrogram image based on audio
         CustomTask<WritableImage> spectrogramTask = new CustomTask<>("Generate Spectrogram") {
             @Override
             protected WritableImage call() {
-                // Todo somehow implement saving of magnitudes
-                Spectrogram spectrogram = new Spectrogram(
-                        audio, MIN_NOTE_NUMBER, MAX_NOTE_NUMBER, BINS_PER_OCTAVE, SPECTROGRAM_HOP_LENGTH,
-                        PX_PER_SECOND, NUM_PX_PER_OCTAVE, this
-                );
+                spectrogram.setTask(this);
                 return spectrogram.generateSpectrogram(
                         SignalWindow.values()[DataFiles.SETTINGS_DATA_FILE.data.windowFunctionEnumOrdinal],
                         ColourScale.values()[DataFiles.SETTINGS_DATA_FILE.data.colourScaleEnumOrdinal]
@@ -647,7 +656,6 @@ public class TranscriptionViewController extends SwitchableViewController {
         };
 
         // Create an estimation task to estimate both the BPM and the music key
-        // Fixme estimation task does not seem to update fields correctly
         CustomTask<Pair<Double, MusicKey>> estimationTask = new CustomTask<>("Estimate BPM and key") {
             @Override
             protected Pair<Double, MusicKey> call() {
@@ -743,9 +751,14 @@ public class TranscriptionViewController extends SwitchableViewController {
         sampleRate = audioData.sampleRate;
         audioDuration = audioData.totalDurationInMS / 1000.;
 
-        qTransformBytes = qTransformData.qTransformBytes;
-        minQTransformMagnitude = qTransformData.minMagnitude;
-        maxQTransformMagnitude = qTransformData.maxMagnitude;
+        // Initialize a spectrogram for plotting
+        spectrogram = new Spectrogram(
+                MIN_NOTE_NUMBER, MAX_NOTE_NUMBER, BINS_PER_OCTAVE, SPECTROGRAM_HOP_LENGTH, PX_PER_SECOND,
+                NUM_PX_PER_OCTAVE, sampleRate, audioDuration
+        );
+        spectrogram.qTransformBytes = qTransformData.qTransformBytes;
+        spectrogram.minMagnitude = qTransformData.minMagnitude;
+        spectrogram.maxMagnitude = qTransformData.maxMagnitude;
 
         // Ensure that the temporary directory exists
         IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
@@ -754,20 +767,18 @@ public class TranscriptionViewController extends SwitchableViewController {
         // Initialize the FFmpeg handler (if not done already)
         FFmpegHandler.initFFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
 
-        // Handle the compressed original MP3 bytes
-        Pair<Byte[], File> returnedData = handleCompressedMP3Bytes(audioData.compressedOriginalMP3Bytes);
-//        byte[] rawOriginalMP3Bytes = TypeConversionUtils.toByteArray(returnedData.value0());
-        File auxOriginalWAVFile = returnedData.value1();
+        // Handle the MP3 bytes
+        File auxOriginalWAVFile = handleReadMP3Bytes(audioData.mp3Bytes);
 
 //        // Attempt to process the slowed MP3 bytes
 //        byte[] rawSlowedMP3Bytes;
 //        File auxSlowedWAVFile;
 //        if (audioData.compressedSlowedMP3Bytes != null) {
-//            returnedData = handleCompressedMP3Bytes(ffmpegHandler, audioData.compressedSlowedMP3Bytes);
+//            returnedData = handleReadMP3Bytes(ffmpegHandler, audioData.compressedSlowedMP3Bytes);
 //            rawSlowedMP3Bytes = TypeConversionUtils.toByteArray(returnedData.value0());
 //            auxSlowedWAVFile = returnedData.value1();
 //        } else {
-//            log(Level.INFO, "Slowed audio not yet generated; generating now");
+//            log("Slowed audio not yet generated; generating now");
 //
 //            // Slow down the original WAV file
 //            String auxSlowedMP3Path = FFmpegHandler.generateAltTempoAudio(
@@ -787,7 +798,7 @@ public class TranscriptionViewController extends SwitchableViewController {
 //            // Delete unneeded files
 //            IOMethods.delete(auxSlowedMP3File);
 //
-//            log(Level.INFO, "Slowed audio generated");
+//            log("Slowed audio generated");
 //        }
 
         // Create the `Audio` object
@@ -806,21 +817,12 @@ public class TranscriptionViewController extends SwitchableViewController {
         // (The `MediaPlayer` duration cannot be trusted)
 //        audio.setDuration(audioDuration);
 
-        // Convert the bytes back into magnitude data
-        double[][] magnitudes = QTransformDataObject.byteDataToQTransformMagnitudes(
-                qTransformBytes, minQTransformMagnitude, maxQTransformMagnitude
-        );
-
         // Generate spectrogram image based on existing magnitude data
         CustomTask<WritableImage> spectrogramTask = new CustomTask<>("Load Spectrogram") {
             @Override
             protected WritableImage call() {
-                Spectrogram spectrogram = new Spectrogram(
-                        MIN_NOTE_NUMBER, MAX_NOTE_NUMBER, BINS_PER_OCTAVE, SPECTROGRAM_HOP_LENGTH, PX_PER_SECOND,
-                        NUM_PX_PER_OCTAVE, sampleRate, audioDuration, this
-                );
+                spectrogram.setTask(this);
                 return spectrogram.generateSpectrogram(
-                        magnitudes,
                         ColourScale.values()[DataFiles.SETTINGS_DATA_FILE.data.colourScaleEnumOrdinal]
                 );
             }
@@ -842,7 +844,6 @@ public class TranscriptionViewController extends SwitchableViewController {
      * @param projectData  The project data.
      */
     public void useExistingData(String audtFilePath, String audtFileName, ProjectData projectData) {
-        // Todo implement
         // Get number of skippable bytes
         numSkippableBytes = projectData.unchangingDataProperties.numSkippableBytes;
 
@@ -855,12 +856,12 @@ public class TranscriptionViewController extends SwitchableViewController {
         audioVolume = projectData.projectInfoData.playbackVolume;
         currTime = projectData.projectInfoData.currTimeInMS / 1000.;
 
-//        // Set the music notes data attribute
-//        this.musicNotesData = projectData.musicNotesData;
-//
-//        // Set the AudiTranscribe file's file path and file name
-//        this.audtFilePath = audtFilePath;
-//        this.audtFileName = audtFileName;
+        // Set the music notes data attribute
+        this.musicNotesData = projectData.musicNotesData;
+
+        // Set the AudiTranscribe file's file path and file name
+        this.audtFilePath = audtFilePath;
+        this.audtFileName = audtFileName;
 
         // Set up Q-Transform data and audio data
         try {
@@ -1210,6 +1211,194 @@ public class TranscriptionViewController extends SwitchableViewController {
         if (track != null) track.setStyle(style);
     }
 
+    // IO handlers
+
+    /**
+     * Helper method that handles the saving of the project.
+     *
+     * @param isAutosave      Whether this is an autosave or not.
+     * @param forceChooseFile Boolean whether to force the user to choose a file.
+     */
+    private void handleSavingProject(boolean isAutosave, boolean forceChooseFile) {
+        // Do not do anything if we are not ready
+        if (!isEverythingReady) return;
+
+        // Get the save destination
+        String saveDest = getSaveDestination(forceChooseFile);
+
+        if (saveDest == null) {
+            Popups.showInformationAlert(
+                    rootPane.getScene().getWindow(), "Info", "No destination specified."
+            );
+            return;
+        }
+
+        // Set up task to run in alternate thread
+        CustomTask<Void> task = new CustomTask<>("Save Project") {
+            @Override
+            protected Void call() throws Exception {
+                saveData(forceChooseFile, saveDest);
+                return null;
+            }
+        };
+
+        // Link the progress of the task with the progress bar
+        progressBarHBox.setVisible(true);
+        progressBar.progressProperty().bind(task.progressProperty());
+        progressLabel.setText("Saving file...");
+
+        // Methods to run after task succeeded
+        task.setOnSucceeded(event -> {
+            // Handle database operations
+            try {
+                // Update the project file list
+                if (projectsDB.checkIfProjectDoesNotExist(audtFilePath)) {
+                    // Insert the record into the database
+                    projectsDB.insertProjectRecord(audtFilePath, projectName);
+                }
+
+                // If changed project name, also update
+                if (changedProjectName) {
+                    projectsDB.updateProjectName(audtFilePath, projectName);
+                    changedProjectName = false;  // Revert once complete
+                }
+            } catch (SQLException e) {
+                logException(e);
+                throw new RuntimeException(e);
+            }
+
+            // Hide the progress box
+            progressBarHBox.setVisible(false);
+            progressBar.progressProperty().unbind();
+
+            // Show popup upon saving completion, if it is not an autosave
+            if (!isAutosave) {
+                Popups.showInformationAlert(
+                        rootPane.getScene().getWindow(),
+                        "Saved Successfully",
+                        "Project was saved successfully."
+                );
+            }
+        });
+
+        // Start new thread to save the file
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    /**
+     * Helper method that helps save the data into an AUDT file.
+     *
+     * @param forceChooseFile Whether the file was forcibly chosen.
+     * @param saveDest        The destination to save the file to.
+     * @throws FFmpegNotFoundException If the FFmpeg binary could not be found.
+     * @throws IOException             If the saving to the AUDT file failed.
+     */
+    private void saveData(boolean forceChooseFile, String saveDest) throws FFmpegNotFoundException, IOException {
+        // Get note rectangles' data
+//        int numRectangles = NoteRectangle.allNoteRectangles.size();
+//        Object[] noteRectsKeys = NoteRectangle.allNoteRectangles.keySet().toArray();
+//
+//        double[] timesToPlaceRectangles = new double[numRectangles];
+//        double[] noteDurations = new double[numRectangles];
+//        int[] noteNums = new int[numRectangles];
+//
+//        for (int i = 0; i < numRectangles; i++) {
+//            String key = (String) noteRectsKeys[i];
+//            NoteRectangle noteRectangle = NoteRectangle.allNoteRectangles.get(key);
+//
+//            timesToPlaceRectangles[i] = noteRectangle.getNoteOnsetTime();
+//            noteDurations[i] = noteRectangle.getNoteDuration();
+//            noteNums[i] = noteRectangle.noteNum;
+//        }
+
+        // Package project info data and music notes data for saving
+        log("Packaging data for saving");
+
+        ProjectInfoDataObject projectInfoData = new ProjectInfoDataObject0x000B00(
+                projectName, musicKey, timeSignature, bpm, offset, audioVolume,
+                (int) (currTime * 1000)
+        );
+//        MusicNotesDataObject musicNotesData = new MusicNotesDataObject0x000500(
+//                timesToPlaceRectangles, noteDurations, noteNums
+//        );
+        // Todo remove; this is here for compatibility
+        MusicNotesDataObject musicNotesData = Objects.requireNonNullElseGet(
+                this.musicNotesData,
+                () -> new MusicNotesDataObject0x000500(new double[0], new double[0], new int[0])
+        );
+
+        // Determine what mode of the writer should be used
+        if (numSkippableBytes == 0 || forceChooseFile || fileVersion != AUDTFileConstants.FILE_VERSION_NUMBER) {
+            // Todo remove
+//            // Compress the audio data
+//            byte[] compressedOriginalMP3Bytes;
+//            try {
+//                compressedOriginalMP3Bytes = CompressionHandlers.lz4Compress(
+//                        audio.wavBytesToMP3Bytes(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath),
+//                        task
+//                );
+//            } catch (IOException e) {
+//                logException(e);
+//                throw new RuntimeException(e);
+//            }
+//
+//            byte[] compressedSlowedMP3Bytes;
+//            try {
+//                compressedSlowedMP3Bytes = CompressionHandlers.lz4Compress(
+//                        audio.slowedWAVBytesToMP3Bytes(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath),
+//                        task
+//                );
+//            } catch (IOException e) {
+//                logException(e);
+//                throw new RuntimeException(e);
+//            }
+
+            // Obtain the MP3 bytes
+            byte[] mp3Bytes;
+            try {
+                mp3Bytes = audio.wavBytesToMP3Bytes(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
+            } catch (IOException e) {
+                logException(e);
+                throw new RuntimeException(e);
+            }
+
+            // Package Q-transform data and audio data for saving
+            QTransformDataObject qTransformData = new QTransformDataObject0x000500(
+                    spectrogram.qTransformBytes, spectrogram.minMagnitude, spectrogram.maxMagnitude
+            );
+            AudioDataObject audioData = new AudioDataObject0x000B00(mp3Bytes, sampleRate, (int) (audioDuration * 1000));
+
+            // Calculate the number of skippable bytes
+            numSkippableBytes = 32 +  // Header section
+                    UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
+                    qTransformData.numBytesNeeded() +
+                    audioData.numBytesNeeded();
+
+            // Update the unchanging data properties
+            UnchangingDataPropertiesObject unchangingDataProperties = new UnchangingDataPropertiesObject0x000500(
+                    numSkippableBytes
+            );
+
+            // Package all the current data into a `ProjectData`
+            ProjectData projectData = new ProjectData(
+                    unchangingDataProperties, qTransformData, audioData, projectInfoData, musicNotesData
+            );
+
+            // Save the project
+            ProjectHandler.saveProject(saveDest, projectData);
+        } else {
+            ProjectHandler.saveProject(saveDest, numSkippableBytes, projectInfoData, musicNotesData);
+        }
+
+        // Set flags
+        hasUnsavedChanges = false;
+//        NoteRectangle.setHasEditedNoteRectangles(false);
+
+        log("File saved successfully");
+    }
+
     // Task handlers
 
     /**
@@ -1287,7 +1476,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                     }
                 }
             }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);
-//
+
 //            // Schedule debug view updating
 //            if (debugMode) {
 //                scheduler.scheduleAtFixedRate(() -> {
@@ -1296,21 +1485,21 @@ public class TranscriptionViewController extends SwitchableViewController {
 //                    }
 //                }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);
 //            }
-//
-//            // Schedule autosave functionality
-//            scheduler.scheduleAtFixedRate(() -> Platform.runLater(
-//                            () -> {
-//                                if (audtFilePath != null) {
-//                                    handleSavingProject(true, false);
-//                                    log(Level.INFO, "Autosave project successful");
-//                                } else {
-//                                    log(Level.INFO, "Autosave skipped, since project was not loaded from file");
-//                                }
-//                            }),
-//                    DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval,
-//                    DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval,
-//                    TimeUnit.MINUTES
-//            );
+
+            // Schedule autosave functionality
+            scheduler.scheduleAtFixedRate(() -> Platform.runLater(
+                            () -> {
+                                if (audtFilePath != null) {
+                                    handleSavingProject(true, false);
+                                    log("Autosave project successful");
+                                } else {
+                                    log("Autosave skipped since project was not loaded from file");
+                                }
+                            }),
+                    DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval,
+                    DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval,
+                    TimeUnit.MINUTES
+            );
 
             // Set image on the spectrogram area
             spectrogramImage.setFitHeight(finalWidth);
@@ -1461,7 +1650,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                     thread.setDaemon(true);
                     thread.start();
 
-                    log(Level.INFO, "Started task: '" + task.name + "'");
+                    log("Started task: '" + task.name + "'");
 
                     // Await for completion
                     try {
@@ -1472,7 +1661,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                     }
                 }
 
-                log(Level.INFO, "All tasks complete");
+                log("All tasks complete");
                 return true;
             }
         };
@@ -1723,20 +1912,16 @@ public class TranscriptionViewController extends SwitchableViewController {
     // Miscellaneous handlers
 
     /**
-     * Helper method that handles the compressed MP3 bytes.
+     * Helper method that handles the read MP3 bytes.
      *
-     * @param compressedMP3Bytes Compressed MP3 bytes.
-     * @return A pair. The first value is a byte array, representing the raw MP3 bytes. The second
-     * is a <code>File</code> object pointing to a WAV file representing the audio data.
+     * @param mp3Bytes Read MP3 bytes from the AudiTranscribe file.
+     * @return A <code>File</code> object pointing to a WAV file representing the audio data.
      * @throws IOException If the auxiliary MP3 file does not exist, or if the decompression process
      *                     fails.
      */
-    private Pair<Byte[], File> handleCompressedMP3Bytes(byte[] compressedMP3Bytes) throws IOException {
-        // Obtain the raw MP3 bytes
-        byte[] rawMP3Bytes = CompressionHandlers.lz4Decompress(compressedMP3Bytes);
-
+    private File handleReadMP3Bytes(byte[] mp3Bytes) throws IOException {
         // Generate a UUID for unique file identification
-        String uuid = MiscUtils.generateUUID(rawMP3Bytes.length);
+        String uuid = MiscUtils.generateUUID(mp3Bytes.length);
 
         // Create an empty temporary MP3 file in the temporary directory
         File auxiliaryMP3File = new File(IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, uuid + ".mp3"));
@@ -1744,7 +1929,7 @@ public class TranscriptionViewController extends SwitchableViewController {
 
         // Write the raw MP3 bytes into the temporary files
         FileOutputStream fos = new FileOutputStream(auxiliaryMP3File);
-        fos.write(rawMP3Bytes);
+        fos.write(mp3Bytes);
         fos.close();
 
         // Generate the output path to the MP3 file
@@ -1759,8 +1944,8 @@ public class TranscriptionViewController extends SwitchableViewController {
         // Delete the original MP3 file
         IOMethods.delete(auxiliaryMP3File);
 
-        // Return needed information
-        return new Pair<>(TypeConversionUtils.toByteArray(rawMP3Bytes), auxiliaryWAVFile);
+        // Return `File` pointer
+        return auxiliaryWAVFile;
     }
 
     // Keyboard event handlers
@@ -1789,7 +1974,7 @@ public class TranscriptionViewController extends SwitchableViewController {
 
         // Check if user is using any shortcuts
         if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {  // Save current project
-//            handleSavingProject(false, false);
+            handleSavingProject(false, false);
             return;
         } else if (UNDO_NOTE_EDIT_COMBINATION.match(keyEvent)) {  // Undo note edit
 //            NoteRectangle.editAction(NoteRectangle.EditAction.UNDO);
@@ -1901,5 +2086,59 @@ public class TranscriptionViewController extends SwitchableViewController {
             case SEMICOLON -> notePlayerSynth.noteOff(octaveNum * 12 + 16, NOTE_OFF_VELOCITY);  // E'
             case QUOTE -> notePlayerSynth.noteOff(octaveNum * 12 + 17, NOTE_OFF_VELOCITY);      // F'
         }
+    }
+
+    // Miscellaneous methods
+
+    /**
+     * Helper method that gets the save destination.
+     *
+     * @param forceChooseFile Whether the save destination must be forcibly chosen.
+     * @return String representing the save destination. Returns <code>null</code> if no destination
+     * was specified.
+     */
+    private String getSaveDestination(boolean forceChooseFile) {
+        String saveDest, saveName;
+
+        // Check if there already exist a place to save
+        if (audtFilePath == null || forceChooseFile) {
+            log(Level.FINE, "AUDT file destination not yet set; asking now");
+
+            // Get current window
+            Window window = rootPane.getScene().getWindow();
+
+            // Ask user to choose a file
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                    "AudiTranscribe File (*.audt)", "*.audt"
+            );
+            File file = GUIUtils.saveFileDialog(window, extFilter);
+
+            // If operation was cancelled return
+            if (file == null) return null;
+
+            // Set the actual destination to save the file
+            saveDest = file.getAbsolutePath();
+            saveName = file.getName();
+
+            if (!saveDest.toLowerCase().endsWith(".audt")) saveDest += ".audt";
+            if (!saveName.toLowerCase().endsWith(".audt")) saveName += ".audt";
+
+            // Update the file path and file name
+            if (audtFilePath == null) {
+                audtFilePath = saveDest;
+                audtFileName = saveName;
+            }
+
+            log(Level.FINE, "AUDT file destination set to: " + saveDest);
+        } else {
+            // Use the existing file path and file name
+            saveDest = audtFilePath;
+            saveName = audtFileName;
+
+            log(Level.FINE, "Saving '" + saveName + "' to: " + saveDest);
+        }
+
+        // Return the needed data
+        return saveDest;
     }
 }

@@ -46,17 +46,6 @@ public final class CompressionHandlers {
      * Method that returns an LZ4 compressed version of the bytes array.
      *
      * @param bytes Bytes array to be LZ4 compressed.
-     * @return Compressed bytes.
-     * @throws IOException If something went wrong when compressing the bytes.
-     */
-    public static byte[] lz4Compress(byte[] bytes) throws IOException {
-        return lz4Compress(bytes, null);
-    }
-
-    /**
-     * Method that returns an LZ4 compressed version of the bytes array.
-     *
-     * @param bytes Bytes array to be LZ4 compressed.
      * @param task  The <code>CustomTask</code> object that is handling the generation. Pass in
      *              <code>null</code> if no such task is being used.
      * @return Compressed bytes.
@@ -92,6 +81,47 @@ public final class CompressionHandlers {
 
         // Get the resulting byte array
         return outputStream.toByteArray();
+    }
+
+    /**
+     * Method that returns an LZ4 compressed version of the bytes array.
+     *
+     * @param bytes Bytes array to be LZ4 compressed.
+     * @return Compressed bytes.
+     * @throws IOException If something went wrong when compressing the bytes.
+     */
+    public static byte[] lz4Compress(byte[] bytes) throws IOException {
+        return lz4Compress(bytes, null);
+    }
+
+    /**
+     * Method that returns an LZ4 compressed version of the bytes array.<br>
+     * Fails silently, so no exception is thrown.
+     *
+     * @param bytes Bytes array to be LZ4 compressed.
+     * @param task  The <code>CustomTask</code> object that is handling the generation. Pass in
+     *              <code>null</code> if no such task is being used.
+     * @return Compressed bytes. Returns <code>null</code> if an error occurred.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static byte[] lz4CompressFailSilently(byte[] bytes, CustomTask<?> task) {
+        try {
+            return lz4Compress(bytes, task);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Method that returns an LZ4 compressed version of the bytes array.<br>
+     * Fails silently, so no exception is thrown.
+     *
+     * @param bytes Bytes array to be LZ4 compressed.
+     * @return Compressed bytes. Returns <code>null</code> if an error occurred.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static byte[] lz4CompressFailSilently(byte[] bytes) {
+        return lz4CompressFailSilently(bytes, null);
     }
 
     /**

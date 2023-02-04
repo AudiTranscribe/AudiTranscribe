@@ -1,6 +1,6 @@
 /*
  * AUDTFileConstants.java
- * Description: Constants that are needed when processing the AudiTranscribe file format.
+ * Description: Constants that are needed when processing AudiTranscribe files.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -21,7 +21,7 @@ package app.auditranscribe.io.audt_file;
 import app.auditranscribe.io.CompressionHandlers;
 
 /**
- * Constants that are needed when processing the AudiTranscribe file format.
+ * Constants that are needed when processing AudiTranscribe files.
  */
 public final class AUDTFileConstants {
     // Constants
@@ -41,8 +41,7 @@ public final class AUDTFileConstants {
             (byte) 0xad, (byte) 0x75, (byte) 0xc1, (byte) 0xbe
     };
 
-    // Todo update to latest version
-    public static final int FILE_VERSION_NUMBER = 0x00090002;  // File version 0.9.0, revision 2 -> 00 09 00 02
+    public static final int FILE_VERSION_NUMBER = 0x000B0002;  // File version 0.11.0, revision 2 -> 00 0B 00 02
     public static final int COMPRESSOR_VERSION_NUMBER = CompressionHandlers.VERSION_NUMBER;
 
     private AUDTFileConstants() {

@@ -44,6 +44,7 @@ public abstract class QTransformDataObject extends AbstractAUDTDataObject {
     public double maxMagnitude;
 
     // Public methods
+    // Todo: remove
 
     /**
      * Method that converts given Q-Transform magnitude data to byte data.

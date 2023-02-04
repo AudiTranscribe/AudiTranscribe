@@ -375,8 +375,7 @@ public class SceneSwitcher extends LoggableClass {
             controller.setThemeOnScene();
 
             // Set the file version that is used
-            // Todo remove?
-//            controller.setFileVersion(fileVersion);
+            controller.fileVersion = fileVersion;
 
             // Set the project data for the existing project
             controller.useExistingData(audtFilePath, audtFileName, projectData);

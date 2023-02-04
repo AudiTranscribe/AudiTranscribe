@@ -22,6 +22,10 @@ import app.auditranscribe.audio.Audio;
 import app.auditranscribe.fxml.plotting.interpolation.AbstractInterpolation;
 import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.generic.exceptions.ValueException;
+import app.auditranscribe.generic.tuples.Triple;
+import app.auditranscribe.io.ByteConversionHandler;
+import app.auditranscribe.io.CompressionHandlers;
+import app.auditranscribe.io.audt_file.AUDTFileHelpers;
 import app.auditranscribe.misc.Complex;
 import app.auditranscribe.misc.CustomTask;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
@@ -30,6 +34,7 @@ import app.auditranscribe.signal.representations.QTransform;
 import app.auditranscribe.signal.windowing.SignalWindow;
 import app.auditranscribe.utils.MathUtils;
 import app.auditranscribe.utils.MatrixUtils;
+import app.auditranscribe.utils.TypeConversionUtils;
 import app.auditranscribe.utils.UnitConversionUtils;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.WritableImage;
@@ -74,7 +79,11 @@ public class Spectrogram extends LoggableClass {
 
     public double[] frequencyBins;
 
-    final CustomTask<?> task;
+    public byte[] qTransformBytes;
+    public double minMagnitude;
+    public double maxMagnitude;
+
+    private CustomTask<?> task;
 
     /**
      * Initialization method for a <code>Spectrogram</code> object.
@@ -86,13 +95,12 @@ public class Spectrogram extends LoggableClass {
      * @param hopLength      Number of samples between successive columns.
      * @param numPxPerSecond Number of pixels of the spectrogram dedicated to each second of audio.
      * @param numPxPerOctave Number of pixels allocated for each octave.
-     * @param task           The <code>CustomTask</code> object that is handling the generation.
      * @throws ValueException If the value of <code>maxNoteNumber - minNoteNumber + 1</code> is not
      *                        a multiple of 12.
      */
     public Spectrogram(
             Audio audioObj, int minNoteNumber, int maxNoteNumber, int binsPerOctave, int hopLength,
-            double numPxPerSecond, double numPxPerOctave, CustomTask<?> task
+            double numPxPerSecond, double numPxPerOctave
     ) {
         // Validate that `maxNoteNumber - minNoteNumber + 1` is a multiple of 12
         int numNotes = maxNoteNumber - minNoteNumber + 1;
@@ -116,8 +124,6 @@ public class Spectrogram extends LoggableClass {
 
         sampleRate = audioObj.getSampleRate();
         this.hopLength = hopLength;
-
-        this.task = task;
 
         log(Level.FINE, "Audio sample rate is " + sampleRate);
 
@@ -154,7 +160,7 @@ public class Spectrogram extends LoggableClass {
      */
     public Spectrogram(
             int minNoteNumber, int maxNoteNumber, int binsPerOctave, int hopLength, double numPxPerSecond,
-            double numPxPerOctave, double sampleRate, double duration, CustomTask<?> task
+            double numPxPerOctave, double sampleRate, double duration
     ) {
         // Validate that `maxNoteNumber - minNoteNumber + 1` is a multiple of 12
         int numNotes = maxNoteNumber - minNoteNumber + 1;
@@ -179,8 +185,6 @@ public class Spectrogram extends LoggableClass {
         this.sampleRate = sampleRate;
         this.hopLength = hopLength;
 
-        this.task = task;
-
         log(Level.FINE, "Audio sample rate is " + sampleRate);
 
         // Set the width and height of the image
@@ -197,28 +201,70 @@ public class Spectrogram extends LoggableClass {
         frequencyBins = FrequencyRangeGeneration.qTransformFreqBins(numFreqBins, binsPerOctave, minFreq);
     }
 
+    // Getter/setter methods
+    public void setTask(CustomTask<?> task) {
+        this.task = task;
+    }
+
+
     // Public methods
 
     /**
-     * Generates the spectrogram image for the given Q-Transform magnitude data.
+     * Generates the spectrogram image.<br>
+     * Assumes an <code>Audio</code> object was provided in the constructor, as that object's data
+     * will be used to generate the magnitude data, before plotting the spectrogram.
      *
      * @param windowFunction The signal window function to use on the signal data.
      * @param colourScale    The colour scale to use for the spectrogram.
      * @return The spectrogram image.
      */
     public WritableImage generateSpectrogram(SignalWindow windowFunction, ColourScale colourScale) {
-        return plot(generateMagnitudes(windowFunction), generateColourMap(colourScale));
+        // Generate magnitudes
+        double[][] magnitudes = generateMagnitudes(windowFunction);
+
+        // Convert the double data to integer data
+        Triple<Integer[][], Double, Double> convertedTuple = AUDTFileHelpers.doubles2DtoInt2D(magnitudes);
+        Integer[][] intData = convertedTuple.value0();
+        minMagnitude = convertedTuple.value1();
+        maxMagnitude = convertedTuple.value2();
+
+        // Convert non-primitive integers to primitive integers
+        int[][] intDataPrimitive = new int[intData.length][intData[0].length];
+        for (int i = 0; i < intData.length; i++) {
+            intDataPrimitive[i] = TypeConversionUtils.toIntegerArray(intData[i]);
+        }
+
+        // Convert the integer data to bytes
+        byte[] plainBytes = ByteConversionHandler.twoDimensionalIntegerArrayToBytes(intDataPrimitive);
+
+        // Compress the bytes and update attribute
+        qTransformBytes = CompressionHandlers.lz4CompressFailSilently(plainBytes, task);
+
+        // Return spectrogram plot
+        return plot(magnitudes, generateColourMap(colourScale));
     }
 
     /**
-     * Generates the spectrogram image for the given Q-Transform magnitude data.
+     * Generates the spectrogram image.<br>
+     * Assumes that the attributes <code>qTransformBytes</code>, <code>minMagnitude</code>, and
+     * <code>maxMagnitude</code> have been set. These values will be used to reconstruct the
+     * magnitude data, which will then be used to plot the spectrogram.
      *
-     * @param magnitudes  Existing magnitudes to use on the spectrogram.
      * @param colourScale The colour scale to use for the spectrogram.
      * @return The spectrogram image.
      */
-    public WritableImage generateSpectrogram(double[][] magnitudes, ColourScale colourScale) {
-        return plot(magnitudes, generateColourMap(colourScale));
+    public WritableImage generateSpectrogram(ColourScale colourScale) {
+        // Decompress the bytes
+        byte[] plainBytes = CompressionHandlers.lz4DecompressFailSilently(qTransformBytes);
+
+        // Convert bytes to 2D integer array
+        int[][] intData = ByteConversionHandler.bytesToTwoDimensionalIntegerArray(plainBytes);
+
+        // Plot the given integer data
+        return plot(
+                AUDTFileHelpers.int2DtoDoubles2D(intData, minMagnitude, maxMagnitude),
+                generateColourMap(colourScale)
+        );
     }
 
     // Private methods
