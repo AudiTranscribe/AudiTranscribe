@@ -1,6 +1,6 @@
 /*
  * AUDTFileReader.java
- * Description: Class that handles the reading of the AudiTranscribe (AUDT) file.
+ * Description: Handles the reading of the AudiTranscribe file.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -23,11 +23,11 @@ import app.auditranscribe.io.ByteConversionHandler;
 import app.auditranscribe.io.CompressionHandlers;
 import app.auditranscribe.io.audt_file.AUDTFileConstants;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import app.auditranscribe.io.audt_file.v0x00050002.AUDTFileReader0x00050002;
-import app.auditranscribe.io.audt_file.v0x00070001.AUDTFileReader0x00070001;
-import app.auditranscribe.io.audt_file.v0x00080001.AUDTFileReader0x00080001;
-import app.auditranscribe.io.audt_file.v0x00090002.AUDTFileReader0x00090002;
-import app.auditranscribe.io.audt_file.v0x000B0002.AUDTFileReader0x000B0002;
+import app.auditranscribe.io.audt_file.v0x000500.AUDTFileReader0x000500;
+import app.auditranscribe.io.audt_file.v0x000700.AUDTFileReader0x000700;
+import app.auditranscribe.io.audt_file.v0x000800.AUDTFileReader0x000800;
+import app.auditranscribe.io.audt_file.v0x000900.AUDTFileReader0x000900;
+import app.auditranscribe.io.audt_file.v0x000B00.AUDTFileReader0x000B00;
 import app.auditranscribe.io.exceptions.FailedToReadDataException;
 import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
 import app.auditranscribe.io.exceptions.InvalidFileVersionException;
@@ -41,7 +41,7 @@ import java.util.Arrays;
 import java.util.logging.Level;
 
 /**
- * Class that handles the reading of the AudiTranscribe (AUDT) file.
+ * Handles the reading of the AudiTranscribe file.
  */
 public abstract class AUDTFileReader extends LoggableClass {
     // Attributes
@@ -119,11 +119,11 @@ public abstract class AUDTFileReader extends LoggableClass {
 
         try (InputStream inputStream = new FileInputStream(filepath)) {  // Do this so that the read point is the start
             AUDTFileReader reader = switch (fileVersion) {
-                case 0x00050002 -> new AUDTFileReader0x00050002(filepath, inputStream);
-                case 0x00070001 -> new AUDTFileReader0x00070001(filepath, inputStream);
-                case 0x00080001 -> new AUDTFileReader0x00080001(filepath, inputStream);
-                case 0x00090002 -> new AUDTFileReader0x00090002(filepath, inputStream);
-                case 0x000B0002 -> new AUDTFileReader0x000B0002(filepath, inputStream);
+                case 0x00050002 -> new AUDTFileReader0x000500(filepath, inputStream);
+                case 0x00070001 -> new AUDTFileReader0x000700(filepath, inputStream);
+                case 0x00080001 -> new AUDTFileReader0x000800(filepath, inputStream);
+                case 0x00090002 -> new AUDTFileReader0x000900(filepath, inputStream);
+                case 0x000B0002 -> new AUDTFileReader0x000B00(filepath, inputStream);
                 default -> throw new InvalidFileVersionException(
                         "Invalid file version '" + MiscUtils.intAsPaddedHexStr(fileVersion) + "'."
                 );

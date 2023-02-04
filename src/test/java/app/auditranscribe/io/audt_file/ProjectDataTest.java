@@ -2,7 +2,7 @@ package app.auditranscribe.io.audt_file;
 
 import app.auditranscribe.generic.tuples.Triple;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.*;
+import app.auditranscribe.io.audt_file.v0x000500.data_encapsulators.*;
 import app.auditranscribe.utils.MathUtils;
 import app.auditranscribe.utils.TypeConversionUtils;
 import org.junit.jupiter.api.Test;
@@ -76,41 +76,41 @@ class ProjectDataTest {
         double maxMagnitude2 = conversionTuple2.value2();
 
         // Define data to be used within the tests
-        qTransformDataObject1 = new QTransformDataObject0x00050002(
+        qTransformDataObject1 = new QTransformDataObject0x000500(
                 qTransformBytes1, minMagnitude1, maxMagnitude1
         );
-        qTransformDataObject2 = new QTransformDataObject0x00050002(
+        qTransformDataObject2 = new QTransformDataObject0x000500(
                 qTransformBytes2, minMagnitude2, maxMagnitude2
         );
 
-        audioDataObject1 = new AudioDataObject0x00050002(
+        audioDataObject1 = new AudioDataObject0x000500(
                 new byte[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
                 44100, 8000, "A440.wav");
-        audioDataObject2 = new AudioDataObject0x00050002(
+        audioDataObject2 = new AudioDataObject0x000500(
                 new byte[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19},
                 44100, 5000, "Choice.wav");
 
-        projectInfoDataObject1 = new ProjectInfoDataObject0x00050002(
+        projectInfoDataObject1 = new ProjectInfoDataObject0x000500(
                 1, 0, 123.45, 0.01, 0.55, 9000
         );
-        projectInfoDataObject2 = new ProjectInfoDataObject0x00050002(
+        projectInfoDataObject2 = new ProjectInfoDataObject0x000500(
                 8, 7, 67.89, -1.23, 0.124, 2048
         );
 
-        musicNotesDataObject1 = new MusicNotesDataObject0x00050002(
+        musicNotesDataObject1 = new MusicNotesDataObject0x000500(
                 timesToPlaceRectangles1, noteDurations1, noteNums1
         );
-        musicNotesDataObject2 = new MusicNotesDataObject0x00050002(
+        musicNotesDataObject2 = new MusicNotesDataObject0x000500(
                 timesToPlaceRectangles2, noteDurations2, noteNums2
         );
 
-        unchangingDataPropertiesObject1 = new UnchangingDataPropertiesObject0x00050002(
+        unchangingDataPropertiesObject1 = new UnchangingDataPropertiesObject0x000500(
                 32 +  // Header section
                         UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
                         qTransformDataObject1.numBytesNeeded() +
                         audioDataObject1.numBytesNeeded()
         );
-        unchangingDataPropertiesObject2 = new UnchangingDataPropertiesObject0x00050002(
+        unchangingDataPropertiesObject2 = new UnchangingDataPropertiesObject0x000500(
                 32 +  // Header section
                         UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
                         qTransformDataObject2.numBytesNeeded() +

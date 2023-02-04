@@ -1,6 +1,6 @@
 /*
  * AUDTFileWriter.java
- * Description: Class that handles the writing of the AudiTranscribe (AUDT) file.
+ * Description: Handles the writing of the AudiTranscribe file.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -24,11 +24,11 @@ import app.auditranscribe.io.CompressionHandlers;
 import app.auditranscribe.io.audt_file.AUDTFileConstants;
 import app.auditranscribe.io.audt_file.AUDTFileHelpers;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import app.auditranscribe.io.audt_file.v0x00050002.AUDTFileWriter0x00050002;
-import app.auditranscribe.io.audt_file.v0x00070001.AUDTFileWriter0x00070001;
-import app.auditranscribe.io.audt_file.v0x00080001.AUDTFileWriter0x00080001;
-import app.auditranscribe.io.audt_file.v0x00090002.AUDTFileWriter0x00090002;
-import app.auditranscribe.io.audt_file.v0x000B0002.AUDTFileWriter0x000B0002;
+import app.auditranscribe.io.audt_file.v0x000500.AUDTFileWriter0x000500;
+import app.auditranscribe.io.audt_file.v0x000700.AUDTFileWriter0x000700;
+import app.auditranscribe.io.audt_file.v0x000800.AUDTFileWriter0x000800;
+import app.auditranscribe.io.audt_file.v0x000900.AUDTFileWriter0x000900;
+import app.auditranscribe.io.audt_file.v0x000B00.AUDTFileWriter0x000B00;
 import app.auditranscribe.io.exceptions.InvalidFileVersionException;
 import app.auditranscribe.misc.CustomLogger;
 import app.auditranscribe.utils.MiscUtils;
@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 /**
- * Class that handles the writing of the AudiTranscribe (AUDT) file.
+ * Handles the writing of the AudiTranscribe file.
  */
 public abstract class AUDTFileWriter extends LoggableClass {
     // Attributes
@@ -87,11 +87,11 @@ public abstract class AUDTFileWriter extends LoggableClass {
      */
     public static AUDTFileWriter getWriter(int fileVersion, String filepath) throws InvalidFileVersionException {
         AUDTFileWriter writer = switch (fileVersion) {
-            case 0x00050002 -> new AUDTFileWriter0x00050002(filepath);
-            case 0x00070001 -> new AUDTFileWriter0x00070001(filepath);
-            case 0x00080001 -> new AUDTFileWriter0x00080001(filepath);
-            case 0x00090002 -> new AUDTFileWriter0x00090002(filepath);
-            case 0x000B0002 -> new AUDTFileWriter0x000B0002(filepath);
+            case 0x00050002 -> new AUDTFileWriter0x000500(filepath);
+            case 0x00070001 -> new AUDTFileWriter0x000700(filepath);
+            case 0x00080001 -> new AUDTFileWriter0x000800(filepath);
+            case 0x00090002 -> new AUDTFileWriter0x000900(filepath);
+            case 0x000B0002 -> new AUDTFileWriter0x000B00(filepath);
             default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
         };
 
@@ -117,11 +117,11 @@ public abstract class AUDTFileWriter extends LoggableClass {
     public static AUDTFileWriter getWriter(int fileVersion, String filepath, int numBytesToSkip)
             throws InvalidFileVersionException {
         AUDTFileWriter writer = switch (fileVersion) {
-            case 0x00050002 -> new AUDTFileWriter0x00050002(filepath, numBytesToSkip);
-            case 0x00070001 -> new AUDTFileWriter0x00070001(filepath, numBytesToSkip);
-            case 0x00080001 -> new AUDTFileWriter0x00080001(filepath, numBytesToSkip);
-            case 0x00090002 -> new AUDTFileWriter0x00090002(filepath, numBytesToSkip);
-            case 0x000B0002 -> new AUDTFileWriter0x000B0002(filepath, numBytesToSkip);
+            case 0x00050002 -> new AUDTFileWriter0x000500(filepath, numBytesToSkip);
+            case 0x00070001 -> new AUDTFileWriter0x000700(filepath, numBytesToSkip);
+            case 0x00080001 -> new AUDTFileWriter0x000800(filepath, numBytesToSkip);
+            case 0x00090002 -> new AUDTFileWriter0x000900(filepath, numBytesToSkip);
+            case 0x000B0002 -> new AUDTFileWriter0x000B00(filepath, numBytesToSkip);
             default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
         };
 
