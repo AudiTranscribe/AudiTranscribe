@@ -152,7 +152,7 @@ public class TranscriptionViewController extends SwitchableViewController {
     private boolean areNotesMuted = false;
 
     private boolean scrollToPlayhead = false;
-    private boolean canEditNotes = false;
+//    private boolean canEditNotes = false;
 
     private MusicKey musicKey = MusicKey.C_MAJOR;
     private double bpm = 120;
@@ -396,7 +396,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         notesVolumeButton.setOnAction(event -> toggleNoteMuteButton());
 
         scrollButton.setOnAction(event -> toggleScrollButton());
-        editNotesButton.setOnAction(event -> toggleEditNotesButton());
+//        editNotesButton.setOnAction(event -> toggleEditNotesButton());
 
         playButton.setOnAction(event -> togglePlayButton());
         rewindToBeginningButton.setOnAction(event -> {
@@ -1953,16 +1953,16 @@ public class TranscriptionViewController extends SwitchableViewController {
      * Helper method that toggles the edit notes button.
      */
     private void toggleEditNotesButton() {
-        // Change the icon
-        String iconToUse = "pencil-solid";
-        if (canEditNotes) iconToUse = "pencil-line";  // Want to change from filled to non-filled
-        IconHelper.setSVGOnButton(editNotesButton, 20, IMAGE_BUTTON_LENGTH, iconToUse);
-
-        // Toggle the `canEditNotes` flag
-        canEditNotes = !canEditNotes;
+//        // Change the icon
+//        String iconToUse = "pencil-solid";
+//        if (canEditNotes) iconToUse = "pencil-line";  // Want to change from filled to non-filled
+//        IconHelper.setSVGOnButton(editNotesButton, 20, IMAGE_BUTTON_LENGTH, iconToUse);
+//
+//        // Toggle the `canEditNotes` flag
+//        canEditNotes = !canEditNotes;
 //        NoteRectangle.setCanEdit(canEditNotes);  // Todo implement
-
-        log(Level.FINE, "Toggled editing notes (editing notes is now " + canEditNotes + ")");
+//
+//        log(Level.FINE, "Toggled editing notes (editing notes is now " + canEditNotes + ")");
     }
 
     /**
