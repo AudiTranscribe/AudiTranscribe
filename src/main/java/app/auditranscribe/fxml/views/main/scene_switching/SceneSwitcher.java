@@ -139,12 +139,12 @@ public class SceneSwitcher extends LoggableClass {
                     data = returnedPair.value1();
                 }
             } catch (Exception e) {  // Catch any alert that was not handled correctly
+                logException(e);
                 Popups.showExceptionAlert(
                         null, "An Exception Occurred",
                         "An exception occurred during the execution of the program.",
                         e
                 );
-                logException(e);
             }
         }
 

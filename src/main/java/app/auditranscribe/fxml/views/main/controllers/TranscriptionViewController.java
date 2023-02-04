@@ -426,7 +426,7 @@ public class TranscriptionViewController extends SwitchableViewController {
 //        });
 
         // Add methods to menu items
-        // Todo: add the rest
+        // Todo add the rest
 //        newProjectMenuItem.setOnAction(this::handleNewProject);
 //        openProjectMenuItem.setOnAction(this::handleOpenProject);
 //        renameProjectMenuItem.setOnAction(this::handleRenameProject);
@@ -471,6 +471,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                         // Now estimate the note number
                         int estimatedNoteNum = (int) Math.round(UnitConversionUtils.freqToNoteNumber(estimatedFreq));
 
+                        // Todo implement
 //                        if (canEditNotes) {
 //                            if (isPaused) {  // Permit note placement only when paused
 //                                // Compute the time that the mouse click would correspond to
@@ -768,54 +769,14 @@ public class TranscriptionViewController extends SwitchableViewController {
         FFmpegHandler.initFFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
 
         // Handle the MP3 bytes
-        File auxOriginalWAVFile = handleReadMP3Bytes(audioData.mp3Bytes);
-
-//        // Attempt to process the slowed MP3 bytes
-//        byte[] rawSlowedMP3Bytes;
-//        File auxSlowedWAVFile;
-//        if (audioData.compressedSlowedMP3Bytes != null) {
-//            returnedData = handleReadMP3Bytes(ffmpegHandler, audioData.compressedSlowedMP3Bytes);
-//            rawSlowedMP3Bytes = TypeConversionUtils.toByteArray(returnedData.value0());
-//            auxSlowedWAVFile = returnedData.value1();
-//        } else {
-//            log("Slowed audio not yet generated; generating now");
-//
-//            // Slow down the original WAV file
-//            String auxSlowedMP3Path = FFmpegHandler.generateAltTempoAudio(
-//                    auxOriginalWAVFile,
-//                    IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "slowed-temp-1.mp3"),
-//                    0.5
-//            );
-//            File auxSlowedMP3File = new File(auxSlowedMP3Path);
-//            rawSlowedMP3Bytes = Files.readAllBytes(Path.of(auxSlowedMP3Path));
-//
-//            // Convert the returned MP3 file into a WAV file
-//            String auxSlowedWAVPath = ffmpegHandler.convertAudio(
-//                    auxSlowedMP3File, IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "slowed-temp-2.wav")
-//            );
-//            auxSlowedWAVFile = new File(auxSlowedWAVPath);
-//
-//            // Delete unneeded files
-//            IOMethods.delete(auxSlowedMP3File);
-//
-//            log("Slowed audio generated");
-//        }
+        File auxOriginalWAVFile = generateWAVFileFromMP3(audioData.mp3Bytes);
 
         // Create the `Audio` object
-//        audio = new Audio(
-//                auxOriginalWAVFile, auxSlowedWAVFile, AudioProcessingMode.WITH_PLAYBACK,
-//                AudioProcessingMode.WITH_SLOWDOWN
-//        );
         audio = new Audio(auxOriginalWAVFile, AudioProcessingMode.WITH_PLAYBACK);
 
         // Update the raw MP3 bytes of the audio object
         // (This is to reduce the time needed to save the file later)
-//        audio.setRawOriginalMP3Bytes(rawOriginalMP3Bytes);
-//        audio.setRawSlowedMP3Bytes(rawSlowedMP3Bytes);
-
-        // Update the audio object's duration
-        // (The `MediaPlayer` duration cannot be trusted)
-//        audio.setDuration(audioDuration);
+        audio.setMP3Bytes(audioData.mp3Bytes);
 
         // Generate spectrogram image based on existing magnitude data
         CustomTask<WritableImage> spectrogramTask = new CustomTask<>("Load Spectrogram") {
@@ -867,6 +828,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         try {
             setAudioAndSpectrogramData(projectData.qTransformData, projectData.audioData);
         } catch (IOException | UnsupportedAudioFileException e) {
+            logException(e);
             Popups.showExceptionAlert(
                     rootPane.getScene().getWindow(),
                     "Error loading audio data.",
@@ -874,26 +836,22 @@ public class TranscriptionViewController extends SwitchableViewController {
                             "still exist at the original location?",
                     e
             );
-            logException(e);
-            e.printStackTrace();
         } catch (FFmpegNotFoundException e) {
+            logException(e);
             Popups.showExceptionAlert(
                     rootPane.getScene().getWindow(),
                     "Error loading audio data.",
                     "FFmpeg was not found. Please install it and try again.",
                     e
             );
-            logException(e);
-            e.printStackTrace();
         } catch (AudioTooLongException e) {
+            logException(e);
             Popups.showExceptionAlert(
                     rootPane.getScene().getWindow(),
                     "Error loading audio data.",
                     "The audio file is too long. Please select a shorter audio file.",
                     e
             );
-            logException(e);
-            e.printStackTrace();
         }
 
         // Update beats per bar
@@ -918,7 +876,6 @@ public class TranscriptionViewController extends SwitchableViewController {
         scheduler.shutdown();
         audio.stop();
         audio.deleteWAVFile();
-        // Todo add
     }
 
     /**
@@ -1003,15 +960,6 @@ public class TranscriptionViewController extends SwitchableViewController {
         } else {
             audio.seekToTime(seekTime);
         }
-
-        // Todo remove?
-//        // Update the start time of the audio
-//        // (Do this so that when the player resumes out of a stop state it will start here)
-//        audio.setAudioStartTime(seekTime);
-//
-//        // Set the playback time
-//        // (We do this after updating start time to avoid pesky seeking issues)
-//        audio.setAudioPlaybackTime(seekTime);
 
         // Update note sequencer current time
         // Todo implement
@@ -1297,6 +1245,7 @@ public class TranscriptionViewController extends SwitchableViewController {
      */
     private void saveData(boolean forceChooseFile, String saveDest) throws FFmpegNotFoundException, IOException {
         // Get note rectangles' data
+        // Todo implement
 //        int numRectangles = NoteRectangle.allNoteRectangles.size();
 //        Object[] noteRectsKeys = NoteRectangle.allNoteRectangles.keySet().toArray();
 //
@@ -1331,30 +1280,6 @@ public class TranscriptionViewController extends SwitchableViewController {
 
         // Determine what mode of the writer should be used
         if (numSkippableBytes == 0 || forceChooseFile || fileVersion != AUDTFileConstants.FILE_VERSION_NUMBER) {
-            // Todo remove
-//            // Compress the audio data
-//            byte[] compressedOriginalMP3Bytes;
-//            try {
-//                compressedOriginalMP3Bytes = CompressionHandlers.lz4Compress(
-//                        audio.wavBytesToMP3Bytes(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath),
-//                        task
-//                );
-//            } catch (IOException e) {
-//                logException(e);
-//                throw new RuntimeException(e);
-//            }
-//
-//            byte[] compressedSlowedMP3Bytes;
-//            try {
-//                compressedSlowedMP3Bytes = CompressionHandlers.lz4Compress(
-//                        audio.slowedWAVBytesToMP3Bytes(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath),
-//                        task
-//                );
-//            } catch (IOException e) {
-//                logException(e);
-//                throw new RuntimeException(e);
-//            }
-
             // Obtain the MP3 bytes
             byte[] mp3Bytes;
             try {
@@ -1674,6 +1599,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                 // Update the BPM value
                 updateBPMValue(bpm, true);
 
+                // Todo implement
 //                // Set up note rectangles
 //                if (musicNotesData != null) {
 //                    int numNoteRectangles = musicNotesData.noteNums.length;
@@ -1738,6 +1664,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                         spectrogramScrollPane.getWidth()
                 );
 
+                // Todo implement
 //                // Clear note rectangles' stacks
 //                NoteRectangle.clearStacks();
 //
@@ -1907,45 +1834,6 @@ public class TranscriptionViewController extends SwitchableViewController {
         areNotesMuted = !areNotesMuted;
 
         log(Level.FINE, "Toggled notes mute button (notes muted is now " + areNotesMuted + ")");
-    }
-
-    // Miscellaneous handlers
-
-    /**
-     * Helper method that handles the read MP3 bytes.
-     *
-     * @param mp3Bytes Read MP3 bytes from the AudiTranscribe file.
-     * @return A <code>File</code> object pointing to a WAV file representing the audio data.
-     * @throws IOException If the auxiliary MP3 file does not exist, or if the decompression process
-     *                     fails.
-     */
-    private File handleReadMP3Bytes(byte[] mp3Bytes) throws IOException {
-        // Generate a UUID for unique file identification
-        String uuid = MiscUtils.generateUUID(mp3Bytes.length);
-
-        // Create an empty temporary MP3 file in the temporary directory
-        File auxiliaryMP3File = new File(IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, uuid + ".mp3"));
-        IOMethods.createFile(auxiliaryMP3File);
-
-        // Write the raw MP3 bytes into the temporary files
-        FileOutputStream fos = new FileOutputStream(auxiliaryMP3File);
-        fos.write(mp3Bytes);
-        fos.close();
-
-        // Generate the output path to the MP3 file
-        String auxiliaryWAVFilePath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, uuid + "-temp.wav");
-
-        // Convert the auxiliary MP3 files to a WAV files
-        auxiliaryWAVFilePath = FFmpegHandler.convertAudio(auxiliaryMP3File, auxiliaryWAVFilePath);
-
-        // Read the newly created WAV files
-        File auxiliaryWAVFile = new File(auxiliaryWAVFilePath);
-
-        // Delete the original MP3 file
-        IOMethods.delete(auxiliaryMP3File);
-
-        // Return `File` pointer
-        return auxiliaryWAVFile;
     }
 
     // Keyboard event handlers
@@ -2141,4 +2029,44 @@ public class TranscriptionViewController extends SwitchableViewController {
         // Return the needed data
         return saveDest;
     }
+
+    // Miscellaneous methods
+
+    /**
+     * Helper method that generates the auxiliary WAV file for the audio processing/playing.
+     *
+     * @param mp3Bytes Read MP3 bytes from the AudiTranscribe file.
+     * @return A <code>File</code> object pointing to a WAV file representing the audio data.
+     * @throws IOException If the auxiliary MP3 file does not exist, or if the decompression process
+     *                     fails.
+     */
+    private File generateWAVFileFromMP3(byte[] mp3Bytes) throws IOException {
+        // Generate a UUID for unique file identification
+        String uuid = MiscUtils.generateUUID(mp3Bytes.length);
+
+        // Create an empty temporary MP3 file in the temporary directory
+        File auxiliaryMP3File = new File(IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, uuid + ".mp3"));
+        IOMethods.createFile(auxiliaryMP3File);
+
+        // Write the raw MP3 bytes into the temporary files
+        FileOutputStream fos = new FileOutputStream(auxiliaryMP3File);
+        fos.write(mp3Bytes);
+        fos.close();
+
+        // Generate the output path to the MP3 file
+        String auxiliaryWAVFilePath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, uuid + "-temp.wav");
+
+        // Convert the auxiliary MP3 files to a WAV files
+        auxiliaryWAVFilePath = FFmpegHandler.convertAudio(auxiliaryMP3File, auxiliaryWAVFilePath);
+
+        // Read the newly created WAV files
+        File auxiliaryWAVFile = new File(auxiliaryWAVFilePath);
+
+        // Delete the original MP3 file
+        IOMethods.delete(auxiliaryMP3File);
+
+        // Return `File` pointer
+        return auxiliaryWAVFile;
+    }
+
 }
