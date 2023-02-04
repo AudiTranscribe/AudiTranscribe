@@ -58,6 +58,7 @@ import app.auditranscribe.utils.*;
 import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -69,6 +70,7 @@ import javafx.scene.layout.*;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import javax.sound.midi.MidiUnavailableException;
@@ -428,7 +430,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         // Add methods to menu items
         // Todo add the rest
 //        newProjectMenuItem.setOnAction(this::handleNewProject);
-//        openProjectMenuItem.setOnAction(this::handleOpenProject);
+        openProjectMenuItem.setOnAction(this::handleOpenProject);
 //        renameProjectMenuItem.setOnAction(this::handleRenameProject);
         saveProjectMenuItem.setOnAction(event -> handleSavingProject(false, false));
         saveAsMenuItem.setOnAction(event -> handleSavingProject(false, true));
@@ -1162,6 +1164,47 @@ public class TranscriptionViewController extends SwitchableViewController {
     // IO handlers
 
     /**
+     * Helper method that helps open an existing project.
+     *
+     * @param event Event that triggered this function.
+     */
+    private void handleOpenProject(Event event) {
+        // Do not do anything if we are not ready
+        if (!isEverythingReady) return;
+
+        // Pause the current audio
+        isPaused = togglePaused(false);
+
+        // Stop note sequencer playback
+//        notePlayerSequencer.stop();
+
+        // Deal with possible unsaved changes
+        boolean canCloseWindow = handleUnsavedChanges();
+        if (canCloseWindow) {
+            // Get the current window
+            Window window = rootPane.getScene().getWindow();
+
+            // Get user to select an AUDT file
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                    "AudiTranscribe files (*.audt)", "*.audt"
+            );
+            File file = GUIUtils.openFileDialog(window, extFilter);
+
+            // Check that the user selected a file
+            if (file == null) {
+                Popups.showInformationAlert(rootPane.getScene().getWindow(), "Info", "No file selected.");
+            } else {
+                // Set the scene switching status and the selected file
+                sceneSwitchingState = SceneSwitchingState.OPEN_PROJECT;
+                sceneSwitchingData.file = file;
+
+                // Close this stage
+                ((Stage) rootPane.getScene().getWindow()).close();
+            }
+        }
+    }
+
+    /**
      * Helper method that handles the saving of the project.
      *
      * @param isAutosave      Whether this is an autosave or not.
@@ -1233,6 +1276,74 @@ public class TranscriptionViewController extends SwitchableViewController {
         Thread thread = new Thread(task);
         thread.setDaemon(true);
         thread.start();
+    }
+
+    /**
+     * Helper method that handles the unsaved changes.
+     *
+     * @return A boolean, <code>true</code> if the window should be closed, and <code>false</code>
+     * if not.
+     */
+    private boolean handleUnsavedChanges() {
+        // Do not do anything if we are not ready
+        if (!isEverythingReady) return false;
+
+        // Now check if there are unsaved changes
+//        if (hasUnsavedChanges || NoteRectangle.getHasEditedNoteRectangles()) {
+        if (hasUnsavedChanges) {
+            // Prompt user to save work first
+            ButtonType dontSaveButExit = new ButtonType("Don't Save");
+            ButtonType dontSaveDontExit = new ButtonType("Cancel");
+            ButtonType saveAndExit = new ButtonType("Save");
+
+            Optional<ButtonType> selectedButton = Popups.showMultiButtonAlert(
+                    rootPane.getScene().getWindow(),
+                    "",
+                    "",
+                    "Save changes to project before leaving?",
+                    dontSaveButExit, dontSaveDontExit, saveAndExit
+            );
+
+            if (selectedButton.isPresent()) {
+                if (selectedButton.get() == saveAndExit) {
+                    String saveDest = getSaveDestination(false);
+
+                    if (saveDest != null) {
+                        try {
+                            saveData(false, saveDest);
+                            return true;  // Can exit
+                        } catch (IOException | FFmpegNotFoundException e) {
+                            logException(e);
+                            Popups.showExceptionAlert(
+                                    rootPane.getScene().getWindow(),
+                                    "File Saving Failure",
+                                    "AudiTranscribe failed to save the file.",
+                                    e
+                            );
+                            return false;  // Cannot exit
+                        }
+                    } else {
+                        Popups.showInformationAlert(
+                                rootPane.getScene().getWindow(),
+                                "Info",
+                                "No destination specified."
+                        );
+                        return false;  // No file selected; cannot exit
+                    }
+
+                } else if (selectedButton.get() == dontSaveButExit) {
+                    return true;  // We just want to exit
+                } else if (selectedButton.get() == dontSaveDontExit) {
+                    return false;  // Don't want to exit
+                } else {
+                    return false;  // Assume default is don't want to leave
+                }
+            } else {
+                return false;  // Assume don't want to save and don't want to exit
+            }
+        } else {
+            return true;  // If there are no unsaved changes, then closing the window is permitted
+        }
     }
 
     /**
@@ -1664,23 +1775,22 @@ public class TranscriptionViewController extends SwitchableViewController {
                         spectrogramScrollPane.getWidth()
                 );
 
-                // Todo implement
-//                // Clear note rectangles' stacks
+                // Clear note rectangles' stacks
 //                NoteRectangle.clearStacks();
-//
-//                // Handle attempt to close the window
-//                rootPane.getScene().getWindow().setOnCloseRequest((windowEvent) -> {
-//                    // Deal with possible unsaved changes
-//                    boolean canCloseWindow = handleUnsavedChanges();
-//                    if (!canCloseWindow) windowEvent.consume();
-//                });
-//
-//                // If we are using existing data (i.e., AUDT file path was already set), then initially there are no
-//                // unsaved changes
-//                if (audtFilePath != null) {
-//                    hasUnsavedChanges = false;
+
+                // Handle attempt to close the window
+                rootPane.getScene().getWindow().setOnCloseRequest((windowEvent) -> {
+                    // Deal with possible unsaved changes
+                    boolean canCloseWindow = handleUnsavedChanges();
+                    if (!canCloseWindow) windowEvent.consume();
+                });
+
+                // If we are using existing data (i.e., AUDT file path was already set), then initially there are no
+                // unsaved changes
+                if (audtFilePath != null) {
+                    hasUnsavedChanges = false;
 //                    NoteRectangle.setHasEditedNoteRectangles(false);
-//                }
+                }
             }
         });
 
