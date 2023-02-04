@@ -428,10 +428,9 @@ public class TranscriptionViewController extends SwitchableViewController {
 //        });
 
         // Add methods to menu items
-        // Todo add the rest
         newProjectMenuItem.setOnAction(this::handleNewProject);
         openProjectMenuItem.setOnAction(this::handleOpenProject);
-//        renameProjectMenuItem.setOnAction(this::handleRenameProject);
+        renameProjectMenuItem.setOnAction(this::handleRenameProject);
         saveProjectMenuItem.setOnAction(event -> handleSavingProject(false, false));
         saveAsMenuItem.setOnAction(event -> handleSavingProject(false, true));
 //        exportMIDIMenuItem.setOnAction(event -> handleExportMIDI());
@@ -1237,6 +1236,38 @@ public class TranscriptionViewController extends SwitchableViewController {
                 ((Stage) rootPane.getScene().getWindow()).close();
             }
         }
+    }
+
+    /**
+     * Helper method that helps with the renaming of the current project.
+     *
+     * @param event Event that triggered this function.
+     */
+    private void handleRenameProject(Event event) {
+        // Ask user for new project name
+        Optional<String> newProjectNameResponse = Popups.showTextInputDialog(
+                rootPane.getScene().getWindow(),
+                "Rename Project",
+                "Enter New Project Name",
+                "New project name:",
+                projectName
+        );
+
+        // Do nothing if nothing was entered, or if the project name was not changed
+        if ((newProjectNameResponse.isEmpty()) || (newProjectNameResponse.get().equals(projectName))) return;
+
+        // Otherwise, get new project name proper
+        String newProjectName = newProjectNameResponse.get();
+
+        // Change stage title
+        ((Stage) rootPane.getScene().getWindow()).setTitle(newProjectName);
+
+        // Update attributes
+        log(Level.INFO, "Changed project name from '" + projectName + "' to '" + newProjectName + "'");
+
+        projectName = newProjectName;
+        changedProjectName = true;
+        hasUnsavedChanges = true;
     }
 
     /**
