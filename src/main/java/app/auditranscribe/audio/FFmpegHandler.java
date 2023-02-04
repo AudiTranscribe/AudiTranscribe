@@ -245,7 +245,7 @@ public final class FFmpegHandler extends LoggableClass {
                 ffmpegPath,
                 "-y",                 // Override output file
                 "-i", inputFilePath,  // Specify input file
-                "-b:a", "96k",        // Constant bitrate for MP3 and related files of 96,000 bits
+                "-b:a", "128k",       // Constant bitrate for MP3 and related files of 128,000 bits
                 outputFilePath        // Specify output file
         };
 
