@@ -120,12 +120,16 @@ public final class GUIUtils {
     /**
      * Method that helps show a dialog for the user to save a file.
      *
-     * @param window  Window to show the file dialog on.
-     * @param filters Array of file filters to show in the file dialog.
+     * @param window          Window to show the file dialog on.
+     * @param initialFileName The initial save file name (without the extension).
+     * @param filters         Array of file filters to show in the file dialog.
      * @return A <code>File</code> object, representing the location to save the file to.
      */
-    public static File saveFileDialog(Window window, FileChooser.ExtensionFilter... filters) {
+    public static File saveFileDialog(
+            Window window, String initialFileName, FileChooser.ExtensionFilter... filters
+    ) {
         FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialFileName(initialFileName);
 
         for (FileChooser.ExtensionFilter filter : filters) {
             fileChooser.getExtensionFilters().add(filter);

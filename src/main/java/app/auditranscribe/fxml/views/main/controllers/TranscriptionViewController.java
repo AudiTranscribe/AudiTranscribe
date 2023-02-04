@@ -2178,7 +2178,7 @@ public class TranscriptionViewController extends SwitchableViewController {
             FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
                     "AudiTranscribe File (*.audt)", "*.audt"
             );
-            File file = GUIUtils.saveFileDialog(window, extFilter);
+            File file = GUIUtils.saveFileDialog(window, projectName, extFilter);
 
             // If operation was cancelled return
             if (file == null) return null;
