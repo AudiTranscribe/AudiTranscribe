@@ -76,7 +76,6 @@ public class Audio extends LoggableClass {
     private double[] rawSamples;
     private double[] monoSamples;
 
-    private final byte[] rawWAVBytes;
     private byte[] rawMP3Bytes;
 
     /**
@@ -142,9 +141,6 @@ public class Audio extends LoggableClass {
             sourceDataLine = null;
             audioPlaybackThread = null;
         }
-
-        // Save the file's raw WAV bytes
-        rawWAVBytes = Files.readAllBytes(wavFile.toPath());
     }
 
     // Getter/Setter methods
@@ -425,6 +421,9 @@ public class Audio extends LoggableClass {
             log(Level.FINE, "Returning previously processed MP3 bytes");
         } else {
             log(Level.FINE, "Converting WAV bytes to MP3 bytes");
+
+            // Read the raw WAV bytes from the WAV file
+            byte[] rawWAVBytes = Files.readAllBytes(wavFile.toPath());
 
             // Ensure that the temporary directory exists
             IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
