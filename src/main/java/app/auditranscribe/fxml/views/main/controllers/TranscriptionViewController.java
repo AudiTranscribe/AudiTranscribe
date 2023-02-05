@@ -71,6 +71,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.stage.Window;
 
 import javax.sound.midi.MidiUnavailableException;
@@ -704,11 +705,12 @@ public class TranscriptionViewController extends SwitchableViewController {
                         // Show alert
                         Platform.runLater(() -> Popups.showInformationAlert(
                                 rootPane.getScene().getWindow(),
-                                "Music Key Estimation Found Other Possible Keys",
-                                "Most likely music key, with decreasing correlation:\n" +
+                                StageStyle.DECORATED,
+                                "Music Key Estimation Found Multiple Possible Keys",
+                                "Most likely music keys, sorted by decreasing correlation:\n" +
                                         mostLikelyKey.name + ": " + MathUtils.round(mostLikelyKeyCorr, 3) + "\n" +
                                         sb + "\n" +
-                                        "We will select " + mostLikelyKey.name + " as the key of the audio file."
+                                        "We will select " + mostLikelyKey.name + " as the music key."
                         ));
                     }
 
