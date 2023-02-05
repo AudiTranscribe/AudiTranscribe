@@ -32,6 +32,8 @@ import java.net.URL;
  * Handles the setup wizard processes.
  */
 public class SetupWizard extends LoggableClass {
+    // Todo need to implement FFmpeg downloading
+
     // Attributes
     private final Stage stage;
     private final String currentVersion;

@@ -1,0 +1,12 @@
+.root-tab-pane {
+    -fx-tab-max-height: 0;
+}
+
+.root-tab-pane .tab-header-area {
+    visibility: hidden;
+}
+
+.question-label {
+    -fx-font-size: 14pt;
+    -fx-font-weight: bold;
+}
