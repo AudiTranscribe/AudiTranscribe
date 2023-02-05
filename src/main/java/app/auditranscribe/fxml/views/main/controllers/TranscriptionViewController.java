@@ -2249,5 +2249,4 @@ public class TranscriptionViewController extends SwitchableViewController {
         // Return `File` pointer
         return auxiliaryWAVFile;
     }
-
 }

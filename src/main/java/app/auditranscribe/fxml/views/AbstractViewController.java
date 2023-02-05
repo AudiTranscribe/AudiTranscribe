@@ -49,7 +49,7 @@ public abstract class AbstractViewController extends LoggableClass implements In
      * Method that sets the current theme on the scene.
      */
     public void setThemeOnScene() {
-        setThemeOnScene(getCurrentTheme());
+        setThemeOnScene(getPreferredTheme());
     }
 
     /**
@@ -66,7 +66,12 @@ public abstract class AbstractViewController extends LoggableClass implements In
      */
     public abstract void setThemeOnScene(Theme theme);
 
-    public Theme getCurrentTheme() {
+    /**
+     * Method that gets the user's preferred theme, as defined in the settings file.
+     *
+     * @return The theme that the user prefers.
+     */
+    public Theme getPreferredTheme() {
         return Theme.values()[DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal];
     }
 
