@@ -48,6 +48,8 @@ module AudiTranscribe {
     exports app.auditranscribe.io.data_files.file_classes;
     exports app.auditranscribe.io.exceptions;
     exports app.auditranscribe.misc;
+    exports app.auditranscribe.network;
+    exports app.auditranscribe.network.exceptions;
     exports app.auditranscribe.signal;
     exports app.auditranscribe.signal.feature_extraction;
     exports app.auditranscribe.signal.onset_detection;
