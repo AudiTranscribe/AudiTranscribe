@@ -113,9 +113,6 @@ public abstract class AbstractViewController extends LoggableClass implements In
             rootPane.getStylesheets().remove(url);
         }
 
-        // Add shared colours
-        rootPane.getStylesheets().add(IOMethods.getFileURLAsString("fxml/css/theme/shared-colours.css"));
-
         // Set new theme
         rootPane.getStylesheets().add(IOMethods.getFileURLAsString("fxml/css/theme/" + theme.cssFile));
     }
