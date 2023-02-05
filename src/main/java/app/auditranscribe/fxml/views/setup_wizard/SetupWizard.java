@@ -18,6 +18,7 @@
 
 package app.auditranscribe.fxml.views.setup_wizard;
 
+import app.auditranscribe.fxml.views.setup_wizard.controllers.FFmpegSetupViewController;
 import app.auditranscribe.fxml.views.setup_wizard.controllers.InitialViewController;
 import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.io.IOMethods;
@@ -32,8 +33,6 @@ import java.net.URL;
  * Handles the setup wizard processes.
  */
 public class SetupWizard extends LoggableClass {
-    // Todo need to implement FFmpeg downloading
-
     // Attributes
     private final Stage stage;
     private final String currentVersion;
@@ -57,8 +56,8 @@ public class SetupWizard extends LoggableClass {
      * Method that displays the setup wizard.
      */
     public void showSetupWizard() {
-        // Show the initial view for the setup wizard
         showInitialView();
+        String ffmpegPath = showFFmpegSetupView();  // Todo do something with this
     }
 
     // View display methods
@@ -80,6 +79,27 @@ public class SetupWizard extends LoggableClass {
             controller.removeControllerFromActive();
         } catch (IOException ignored) {
         }
+    }
+
+    /**
+     * Helper method that shows the FFmpeg setup view.
+     */
+    private String showFFmpegSetupView() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getSetupWizardView("ffmpeg-setup.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+
+            FFmpegSetupViewController controller = fxmlLoader.getController();
+            controller.setThemeOnScene();
+
+            stage.setScene(scene);
+            while (!controller.isFFmpegInstalled()) stage.showAndWait();
+
+            controller.removeControllerFromActive();
+            return controller.getFFmpegPath();
+        } catch (IOException ignored) {
+        }
+        return null;
     }
 
     // Miscellaneous methods

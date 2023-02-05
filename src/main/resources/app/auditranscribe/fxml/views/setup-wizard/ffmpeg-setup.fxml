@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<TabPane fx:id="rootPane" prefWidth="600.0" styleClass="root-tab-pane" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.auditranscribe.fxml.views.setup_wizard.controllers.SetupFFmpegViewController">
+<TabPane fx:id="rootPane" prefWidth="600.0" styleClass="root-tab-pane" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.auditranscribe.fxml.views.setup_wizard.controllers.FFmpegSetupViewController">
    <tabs>
       <Tab text="Do you have FFmpeg?">
          <content>
@@ -212,7 +212,7 @@
                         <Insets left="75.0" right="75.0" />
                      </padding>
                   </Label>
-                  <Button fx:id="confirmInstallFFmpegButton1" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="40.0" text="Check FFmpeg Path" wrapText="true" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="75.0" AnchorPane.rightAnchor="75.0" />
+                  <Button fx:id="checkFFmpegPathButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="40.0" text="Check FFmpeg Path" wrapText="true" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="75.0" AnchorPane.rightAnchor="75.0" />
                </children>
             </AnchorPane>
          </content>
@@ -259,7 +259,7 @@
                   <HBox alignment="CENTER" prefHeight="40.0" spacing="10.0" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="75.0" AnchorPane.rightAnchor="75.0">
                      <children>
                         <Button fx:id="specifyManuallyButton" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefWidth="250.0" text="Specify Manual Path" wrapText="true" HBox.hgrow="ALWAYS" />
-                        <Button fx:id="readInstallationInstructionsButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefWidth="250.0" text="See Installation Instructions" wrapText="true" HBox.hgrow="ALWAYS" />
+                        <Button fx:id="seeInstructionsButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefWidth="250.0" text="See Installation Instructions" wrapText="true" HBox.hgrow="ALWAYS" />
                      </children>
                   </HBox>
                </children>

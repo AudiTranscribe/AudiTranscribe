@@ -62,5 +62,7 @@ module AudiTranscribe {
     opens app.auditranscribe to javafx.fxml;
     opens app.auditranscribe.fxml to com.google.gson, javafx.fxml;
     opens app.auditranscribe.fxml.views.main.controllers to javafx.fxml;
+    opens app.auditranscribe.fxml.views.setup_wizard to javafx.fxml;
     opens app.auditranscribe.fxml.views.setup_wizard.controllers to javafx.fxml;
+    opens app.auditranscribe.fxml.views.setup_wizard.download_handlers to com.google.gson;
 }
