@@ -24,7 +24,7 @@ import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.data_files.DataFiles;
 import javafx.fxml.Initializable;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +61,7 @@ public abstract class AbstractViewController extends LoggableClass implements In
      *     updateThemeCSS(rootPane, theme);
      *     setGraphics(theme);
      * </code></pre>
-     * This means that the implementation should utilize the {@link #updateThemeCSS(Pane, Theme)}
+     * This means that the implementation should utilize the {@link #updateThemeCSS(Region, Theme)}
      * and {@link #setGraphics(Theme)} methods.
      */
     public abstract void setThemeOnScene(Theme theme);
@@ -107,7 +107,7 @@ public abstract class AbstractViewController extends LoggableClass implements In
      * @param rootPane Root pane of the scene.
      * @param theme    Theme to apply to the scene.
      */
-    protected void updateThemeCSS(Pane rootPane, Theme theme) {
+    protected void updateThemeCSS(Region rootPane, Theme theme) {
         // Clear old themes
         for (String url : Theme.getThemeCSSURLs()) {
             rootPane.getStylesheets().remove(url);
