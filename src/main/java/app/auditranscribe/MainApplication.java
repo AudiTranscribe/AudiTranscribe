@@ -19,6 +19,7 @@
 package app.auditranscribe;
 
 import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitcher;
+import app.auditranscribe.fxml.views.setup_wizard.SetupWizard;
 import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.PropertyFile;
@@ -31,6 +32,9 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+/**
+ * Main application class.
+ */
 @ExcludeFromGeneratedCoverageReport
 public class MainApplication extends Application {
     @Override
@@ -45,13 +49,6 @@ public class MainApplication extends Application {
             IOMethods.createFolder(path);
         }
 
-        // Clear any old logs
-        CustomLogger.clearOldLogs(DataFiles.SETTINGS_DATA_FILE.data.logFilePersistence);
-
-        // Todo: Run setup wizard
-//        SetupWizard setupWizard = new SetupWizard();
-//        setupWizard.showSetupWizard();
-
         // Get the current version
         String currentVersion;
         try {
@@ -63,6 +60,15 @@ public class MainApplication extends Application {
         } catch (IOException | NoSuchPropertyException e) {
             CustomLogger.logException(e);
             throw new RuntimeException(e);
+        }
+
+        // Clear any old logs
+        CustomLogger.clearOldLogs(DataFiles.SETTINGS_DATA_FILE.data.logFilePersistence);
+
+        // Run setup wizard if setup is not complete
+        if (!DataFiles.PERSISTENT_DATA_FILE.data.isSetupComplete) {
+            SetupWizard setupWizard = new SetupWizard(currentVersion);
+            setupWizard.showSetupWizard();
         }
 
         // Check if there are any updates

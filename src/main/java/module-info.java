@@ -37,6 +37,7 @@ module AudiTranscribe {
     exports app.auditranscribe.fxml;
     exports app.auditranscribe.fxml.views;
     exports app.auditranscribe.fxml.views.main;
+    exports app.auditranscribe.fxml.views.setup_wizard;
     exports app.auditranscribe.generic;
     exports app.auditranscribe.generic.tuples;
     exports app.auditranscribe.io.audt_file;
@@ -59,4 +60,5 @@ module AudiTranscribe {
     opens app.auditranscribe to javafx.fxml;
     opens app.auditranscribe.fxml to com.google.gson, javafx.fxml;
     opens app.auditranscribe.fxml.views.main.controllers to javafx.fxml;
+    opens app.auditranscribe.fxml.views.setup_wizard.controllers to javafx.fxml;
 }
