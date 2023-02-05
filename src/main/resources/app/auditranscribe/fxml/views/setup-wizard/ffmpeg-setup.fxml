@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<TabPane fx:id="rootPane" prefWidth="600.0" styleClass="root-tab-pane" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.auditranscribe.fxml.views.setup_wizard.controllers.FFmpegSetupViewController">
+<TabPane fx:id="rootPane" prefHeight="400.0" prefWidth="600.0" styleClass="root-tab-pane" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.auditranscribe.fxml.views.setup_wizard.controllers.FFmpegSetupViewController">
    <tabs>
       <Tab text="Do you have FFmpeg?">
          <content>
@@ -272,6 +272,11 @@
                <children>
                   <VBox spacing="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
                      <children>
+                        <Label text="AudiTranscribe has located a valid FFmpeg binary." textAlignment="JUSTIFY" wrapText="true">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
                         <Label text="The FFmpeg portion of the setup is complete." textAlignment="JUSTIFY" wrapText="true">
                            <font>
                               <Font size="14.0" />

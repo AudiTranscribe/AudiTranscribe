@@ -1,3 +1,10 @@
+/* General styling */
 .label, .button, .hyperlink {
     -fx-font-size: 12pt;
+}
+
+/* Class-based styling */
+.question-label {
+    -fx-font-size: 14pt;
+    -fx-font-weight: bold;
 }

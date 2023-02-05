@@ -20,8 +20,12 @@ package app.auditranscribe.fxml.views.setup_wizard;
 
 import app.auditranscribe.fxml.views.setup_wizard.controllers.FFmpegSetupViewController;
 import app.auditranscribe.fxml.views.setup_wizard.controllers.InitialViewController;
+import app.auditranscribe.fxml.views.setup_wizard.controllers.SetupCompleteViewController;
+import app.auditranscribe.fxml.views.setup_wizard.controllers.ThemeSetupViewController;
 import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.io.IOMethods;
+import app.auditranscribe.io.data_files.DataFiles;
+import app.auditranscribe.io.data_files.data_encapsulators.SettingsData;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -56,8 +60,19 @@ public class SetupWizard extends LoggableClass {
      * Method that displays the setup wizard.
      */
     public void showSetupWizard() {
+        // Show required views
         showInitialView();
-        String ffmpegPath = showFFmpegSetupView();  // Todo do something with this
+        DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath = showFFmpegSetupView();
+        DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal = showThemeSetupView();
+        showSetupCompleteView();
+
+        // Update files' data
+        DataFiles.PERSISTENT_DATA_FILE.data.isSetupComplete = true;
+
+        DataFiles.SETTINGS_DATA_FILE.saveFile();
+        DataFiles.PERSISTENT_DATA_FILE.saveFile();
+
+        log("AudiTranscribe setup complete");
     }
 
     // View display methods
@@ -83,6 +98,8 @@ public class SetupWizard extends LoggableClass {
 
     /**
      * Helper method that shows the FFmpeg setup view.
+     *
+     * @return The path to the FFmpeg binary.
      */
     private String showFFmpegSetupView() {
         try {
@@ -100,6 +117,47 @@ public class SetupWizard extends LoggableClass {
         } catch (IOException ignored) {
         }
         return null;
+    }
+
+    /**
+     * Helper method that shows the theme setup view.
+     *
+     * @return The ordinal for the theme that the user wants.
+     */
+    private int showThemeSetupView() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getSetupWizardView("theme-setup-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+
+            ThemeSetupViewController controller = fxmlLoader.getController();
+            controller.setThemeOnScene();
+
+            stage.setScene(scene);
+            stage.showAndWait();
+
+            controller.removeControllerFromActive();
+            return controller.getTheme().ordinal();
+        } catch (IOException ignored) {
+        }
+        return SettingsData.THEME_ENUM_ORDINAL;
+    }
+
+    /**
+     * Helper method that shows the "setup complete" view of the setup wizard.
+     */
+    private void showSetupCompleteView() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getSetupWizardView("setup-complete-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+
+            SetupCompleteViewController controller = fxmlLoader.getController();
+            controller.setThemeOnScene();
+
+            stage.setScene(scene);
+            stage.showAndWait();
+            controller.removeControllerFromActive();
+        } catch (IOException ignored) {
+        }
     }
 
     // Miscellaneous methods
