@@ -37,6 +37,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.Optional;
 import java.util.logging.Level;
 
@@ -49,7 +50,7 @@ public class UpdateChecker extends LoggableClass {
     public static int CONNECTION_TIMEOUT = 1500;  // In milliseconds
     public static int READ_TIMEOUT = 2500;
 
-    public static int CHECK_FOR_UPDATE_INTERVAL = 86400;  // In seconds
+    public static int CHECK_FOR_UPDATE_INTERVAL = 10800;  // In seconds; 3 hours
 
     public static String AUDITRANSCRIBE_REPO = "AudiTranscribe/AudiTranscribe";
 
@@ -183,7 +184,15 @@ public class UpdateChecker extends LoggableClass {
                 );
             }
         } catch (IOException e) {
-            logException(e);
+            if (e instanceof UnknownHostException) {
+                log(
+                        Level.SEVERE,
+                        "Could not reach '" + e.getMessage() + "'; is internet access available?",
+                        UpdateChecker.class.getName()
+                );
+            } else {
+                logException(e);
+            }
             tags = new Version[0];
         }
         return tags;
