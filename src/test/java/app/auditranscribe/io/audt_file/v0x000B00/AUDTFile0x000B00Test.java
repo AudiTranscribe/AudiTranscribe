@@ -1,6 +1,5 @@
 package app.auditranscribe.io.audt_file.v0x000B00;
 
-import app.auditranscribe.generic.tuples.Triple;
 import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.audt_file.ProjectData;
@@ -17,7 +16,6 @@ import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
 import app.auditranscribe.io.exceptions.InvalidFileVersionException;
 import app.auditranscribe.music.MusicKey;
 import app.auditranscribe.music.TimeSignature;
-import app.auditranscribe.utils.TypeConversionUtils;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;
@@ -80,17 +78,9 @@ class AUDTFile0x000B00Test {
         noteDurations2 = new double[]{0.9, 0.3, 0.6, 0.6, 0.9, 0.3, 0.6, 0.6};
         noteNums2 = new int[]{64, 62, 53, 55, 60, 59, 52, 53};
 
-        // Convert the magnitude data to required form
-        Triple<Byte[], Double, Double> conversionTuple =
-                QTransformDataObject0x000500.magnitudesToByteData(qTransformMagnitudes, null);
-        byte[] qTransformBytes = TypeConversionUtils.toByteArray(conversionTuple.value0());
-        double minMagnitude = conversionTuple.value1();
-        double maxMagnitude = conversionTuple.value2();
-
         // Define data to be used within the tests
-        qTransformDataObject = new QTransformDataObject0x000500(
-                qTransformBytes, minMagnitude, maxMagnitude
-        );
+        qTransformDataObject = QTransformDataObject0x000500.getEmptyInstance();
+        qTransformDataObject.magnitudesToSaveData(qTransformMagnitudes, null);
         audioDataObject = new AudioDataObject0x000B00(
                 Files.readAllBytes(Paths.get(
                         IOMethods.getAbsoluteFilePath("test-files/general/audio/VeryShortAudio.mp3")
@@ -171,11 +161,7 @@ class AUDTFile0x000B00Test {
         assertEquals(musicNotesDataObject1, readMusicData);
 
         // Check if the decompressed version of the Q-Transform magnitudes is the same
-        double[][] array = QTransformDataObject0x000500.byteDataToMagnitudes(
-                qTransformDataObject.qTransformBytes,
-                qTransformDataObject.minMagnitude,
-                qTransformDataObject.maxMagnitude
-        );
+        double[][] array = qTransformDataObject.saveDataToMagnitudes();
 
         assertEquals(array.length, qTransformMagnitudes.length);
         for (int i = 0; i < array.length; i++) {
@@ -263,11 +249,7 @@ class AUDTFile0x000B00Test {
         assertEquals(musicNotesDataObject1, readMusicData);
 
         // Check if the decompressed version of the Q-Transform magnitudes is the same
-        double[][] array = QTransformDataObject0x000500.byteDataToMagnitudes(
-                qTransformDataObject.qTransformBytes,
-                qTransformDataObject.minMagnitude,
-                qTransformDataObject.maxMagnitude
-        );
+        double[][] array = qTransformDataObject.saveDataToMagnitudes();
 
         assertEquals(array.length, qTransformMagnitudes.length);
         for (int i = 0; i < array.length; i++) {
@@ -320,11 +302,7 @@ class AUDTFile0x000B00Test {
         assertEquals(musicNotesDataObject2, readMusicData);
 
         // Check if the decompressed version of the Q-Transform magnitudes is the same
-        double[][] array = QTransformDataObject0x000500.byteDataToMagnitudes(
-                qTransformDataObject.qTransformBytes,
-                qTransformDataObject.minMagnitude,
-                qTransformDataObject.maxMagnitude
-        );
+        double[][] array = qTransformDataObject.saveDataToMagnitudes();
 
         assertEquals(array.length, qTransformMagnitudes.length);
         for (int i = 0; i < array.length; i++) {

@@ -46,6 +46,15 @@ public class QTransformDataObject0x000500 extends QTransformDataObject {
     // Public methods
 
     /**
+     * Obtains an 'empty' instance of the data object for processing.
+     *
+     * @return An 'empty' instance.
+     */
+    public static QTransformDataObject0x000500 getEmptyInstance() {
+        return new QTransformDataObject0x000500(null, 0, 0);
+    }
+
+    /**
      * Method that converts given Q-Transform magnitude data to byte data.
      *
      * @param magnitudes The Q-Transform magnitude data to convert.
@@ -86,6 +95,19 @@ public class QTransformDataObject0x000500 extends QTransformDataObject {
 
         // Finally convert the integer data to double
         return AUDTFileHelpers.int2DtoDoubles2D(intData, minMagnitude, maxMagnitude);
+    }
+
+    @Override
+    public void magnitudesToSaveData(double[][] magnitudes, CustomTask<?> task) {
+        Triple<Byte[], Double, Double> convertedTuple = magnitudesToByteData(magnitudes, task);
+        qTransformBytes = TypeConversionUtils.toByteArray(convertedTuple.value0());
+        minMagnitude = convertedTuple.value1();
+        maxMagnitude = convertedTuple.value2();
+    }
+
+    @Override
+    public double[][] saveDataToMagnitudes() {
+        return byteDataToMagnitudes(qTransformBytes, minMagnitude, maxMagnitude);
     }
 
     @Override
