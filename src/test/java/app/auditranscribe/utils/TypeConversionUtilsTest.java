@@ -28,6 +28,11 @@ class TypeConversionUtilsTest {
         // Assertions
         assertArrayEquals(array1, TypeConversionUtils.toByteArray(TypeConversionUtils.toByteArray(array1)));
         assertArrayEquals(array2, TypeConversionUtils.toByteArray(TypeConversionUtils.toByteArray(array2)));
+
+        //noinspection ConstantValue
+        assertNull(TypeConversionUtils.toByteArray((byte[]) null));
+        //noinspection ConstantValue
+        assertNull(TypeConversionUtils.toByteArray((Byte[]) null));
     }
 
     @Test
@@ -45,6 +50,11 @@ class TypeConversionUtilsTest {
         // Assertions
         assertArrayEquals(array1, TypeConversionUtils.toIntegerArray(TypeConversionUtils.toIntegerArray(array1)));
         assertArrayEquals(array2, TypeConversionUtils.toIntegerArray(TypeConversionUtils.toIntegerArray(array2)));
+
+        //noinspection ConstantValue
+        assertNull(TypeConversionUtils.toIntegerArray((int[]) null));
+        //noinspection ConstantValue
+        assertNull(TypeConversionUtils.toIntegerArray((Integer[]) null));
     }
 
     @Test
@@ -67,6 +77,12 @@ class TypeConversionUtilsTest {
         assertArrayEquals(array1, TypeConversionUtils.toDoubleArray(TypeConversionUtils.toDoubleArray(array1)));
         assertArrayEquals(array2, TypeConversionUtils.toDoubleArray(TypeConversionUtils.toDoubleArray(array2)));
         assertArrayEquals(array1, TypeConversionUtils.toDoubleArray(list));
+
+        //noinspection ConstantValue
+        assertNull(TypeConversionUtils.toDoubleArray((double[]) null));
+        //noinspection ConstantValue
+        assertNull(TypeConversionUtils.toDoubleArray((Double[]) null));
+        assertNull(TypeConversionUtils.toDoubleArray((List<Double>) null));
     }
 
     @Test
