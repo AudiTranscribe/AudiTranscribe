@@ -31,19 +31,19 @@ class CompressionHandlersTest {
                 "def0123456789abcdef0123456789abcdef0123456789abcdef0123456789abc";
 
         // Define the hex string of the supposed resulting bytes
-        String lz4HexStr =
+        String compressedHexStr =
                 "8f0123456789abcdef0800058ff0123456789abcde0800051fef41000c1fde410000c056789abcdef0123456789abc";
 
         // Get the result of the compression
         byte[] result = CompressionHandlers.lz4Compress(HexFormat.of().parseHex(hexStr));
 
         // Check if they are the same
-        assertEquals(HexFormat.of().formatHex(result), lz4HexStr);
+        assertEquals(compressedHexStr, HexFormat.of().formatHex(result));
     }
 
     @Test
     @Order(0)
-    void lz4CompressWithFakeTask() throws IOException {
+    void lz4Compress_withFakeTask() throws IOException {
         // Start JavaFX toolkit
         new JFXPanel();
 
@@ -54,7 +54,7 @@ class CompressionHandlersTest {
                 "def0123456789abcdef0123456789abcdef0123456789abcdef0123456789abc";
 
         // Define the hex string of the supposed resulting bytes
-        String lz4HexStr =
+        String compressedHexStr =
                 "8f0123456789abcdef0800058ff0123456789abcde0800051fef41000c1fde410000c056789abcdef0123456789abc";
 
         // Get the result of the compression
@@ -66,14 +66,14 @@ class CompressionHandlersTest {
         });
 
         // Check if they are the same
-        assertEquals(HexFormat.of().formatHex(result), lz4HexStr);
+        assertEquals(compressedHexStr, HexFormat.of().formatHex(result));
     }
 
     @Test
     @Order(0)
     void lz4Decompress() throws IOException {
         // Define the hex string of the LZ4 bytes
-        String lz4HexStr =
+        String compressedHexStr =
                 "8f0123456789abcdef0800058ff0123456789abcde0800051fef41000c1fde410000c056789abcdef0123456789abc";
 
         // Define the hex string of the original bytes
@@ -83,14 +83,80 @@ class CompressionHandlersTest {
                 "def0123456789abcdef0123456789abcdef0123456789abcdef0123456789abc";
 
         // Get the result of the decompression
-        byte[] result = CompressionHandlers.lz4Decompress(HexFormat.of().parseHex(lz4HexStr));
+        byte[] result = CompressionHandlers.lz4Decompress(HexFormat.of().parseHex(compressedHexStr));
 
         // Check if they are the same
-        assertEquals(HexFormat.of().formatHex(result), hexStr);
+        assertEquals(hexStr, HexFormat.of().formatHex(result));
+    }
+
+    // DEFLATE compression
+    @Test
+    @Order(0)
+    void deflateCompress() throws IOException {
+        // Define the hex string of the bytes to compress
+        String hexStr = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" +
+                "f0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde" +
+                "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd" +
+                "def0123456789abcdef0123456789abcdef0123456789abcdef0123456789abc";
+
+        // Define the hex string of the supposed resulting bytes
+        String compressedHexStr =
+                "789c6354764def5c7df63d230efa83904958c5ac3df770d1383542699c1aa13400b1c13fc1";
+
+        // Get the result of the compression
+        byte[] result = CompressionHandlers.deflateCompress(HexFormat.of().parseHex(hexStr));
+
+        // Check if they are the same
+        assertEquals(compressedHexStr, HexFormat.of().formatHex(result));
+    }
+
+    @Test
+    @Order(0)
+    void deflateCompress_withFakeTask() throws IOException {
+        // Start JavaFX toolkit
+        new JFXPanel();
+
+        // Define the hex string of the bytes to compress
+        String hexStr = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" +
+                "f0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde" +
+                "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd" +
+                "def0123456789abcdef0123456789abcdef0123456789abcdef0123456789abc";
+
+        // Define the hex string of the supposed resulting bytes
+        String compressedHexStr = "789c6354764def5c7df63d230efa83904958c5ac3df770d1383542699c1aa13400b1c13fc1";
+
+        // Get the result of the compression
+        byte[] result = CompressionHandlers.deflateCompress(HexFormat.of().parseHex(hexStr), new CustomTask<Void>() {
+            @Override
+            protected Void call() {
+                return null;
+            }
+        });
+
+        // Check if they are the same
+        assertEquals(compressedHexStr, HexFormat.of().formatHex(result));
+    }
+
+    @Test
+    @Order(0)
+    void deflateDecompress() throws IOException {
+        // Define the hex string of the DEFLATE bytes
+        String compressedHexStr = "789c6354764def5c7df63d230efa83904958c5ac3df770d1383542699c1aa13400b1c13fc1";
+
+        // Define the hex string of the original bytes
+        String hexStr = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" +
+                "f0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde" +
+                "ef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcd" +
+                "def0123456789abcdef0123456789abcdef0123456789abcdef0123456789abc";
+
+        // Get the result of the decompression
+        byte[] result = CompressionHandlers.deflateDecompress(HexFormat.of().parseHex(compressedHexStr));
+
+        // Check if they are the same
+        assertEquals(hexStr, HexFormat.of().formatHex(result));
     }
 
     // ZIP compression
-
     @Test
     @Order(1)
     void zipDecompress() throws NoSuchAlgorithmException, IOException {
