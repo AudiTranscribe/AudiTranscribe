@@ -97,7 +97,7 @@ class AUDTFile0x000700Test {
 
         // Define data to be used within the tests
         qTransformDataObject = QTransformDataObject0x000500.getEmptyInstance();
-        qTransformDataObject.magnitudesToSaveData(qTransformMagnitudes, null);
+        qTransformDataObject.setDataUsingMagnitudes(qTransformMagnitudes, null);
         audioDataObject = new AudioDataObject0x000700(
                 CompressionHandlers.lz4Compress(Files.readAllBytes(Paths.get(
                         IOMethods.getAbsoluteFilePath("test-files/general/audio/VeryShortAudio.mp3")
@@ -179,7 +179,7 @@ class AUDTFile0x000700Test {
         assertEquals(musicNotesDataObject1, readMusicData);
 
         // Check if the decompressed version of the Q-Transform magnitudes is the same
-        double[][] array = qTransformDataObject.saveDataToMagnitudes();
+        double[][] array = qTransformDataObject.obtainMagnitudesFromData();
 
         assertEquals(array.length, qTransformMagnitudes.length);
         for (int i = 0; i < array.length; i++) {
@@ -267,7 +267,7 @@ class AUDTFile0x000700Test {
         assertEquals(musicNotesDataObject1, readMusicData);
 
         // Check if the decompressed version of the Q-Transform magnitudes is the same
-        double[][] array = qTransformDataObject.saveDataToMagnitudes();
+        double[][] array = qTransformDataObject.obtainMagnitudesFromData();
 
         assertEquals(array.length, qTransformMagnitudes.length);
         for (int i = 0; i < array.length; i++) {
@@ -320,7 +320,7 @@ class AUDTFile0x000700Test {
         assertEquals(musicNotesDataObject2, readMusicData);
 
         // Check if the decompressed version of the Q-Transform magnitudes is the same
-        double[][] array = qTransformDataObject.saveDataToMagnitudes();
+        double[][] array = qTransformDataObject.obtainMagnitudesFromData();
 
         assertEquals(array.length, qTransformMagnitudes.length);
         for (int i = 0; i < array.length; i++) {

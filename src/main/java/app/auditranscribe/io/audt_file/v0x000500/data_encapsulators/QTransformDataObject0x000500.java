@@ -98,7 +98,7 @@ public class QTransformDataObject0x000500 extends QTransformDataObject {
     }
 
     @Override
-    public void magnitudesToSaveData(double[][] magnitudes, CustomTask<?> task) {
+    public void setDataUsingMagnitudes(double[][] magnitudes, CustomTask<?> task) {
         Triple<Byte[], Double, Double> convertedTuple = magnitudesToByteData(magnitudes, task);
         qTransformBytes = TypeConversionUtils.toByteArray(convertedTuple.value0());
         minMagnitude = convertedTuple.value1();
@@ -106,7 +106,7 @@ public class QTransformDataObject0x000500 extends QTransformDataObject {
     }
 
     @Override
-    public double[][] saveDataToMagnitudes() {
+    public double[][] obtainMagnitudesFromData() {
         return byteDataToMagnitudes(qTransformBytes, minMagnitude, maxMagnitude);
     }
 

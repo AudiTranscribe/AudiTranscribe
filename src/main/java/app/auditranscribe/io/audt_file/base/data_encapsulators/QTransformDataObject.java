@@ -50,14 +50,14 @@ public abstract class QTransformDataObject extends AbstractAUDTDataObject {
      *                   progress.<br>
      *                   Pass in <code>null</code> if not using a task.
      */
-    public abstract void magnitudesToSaveData(double[][] magnitudes, CustomTask<?> task);
+    public abstract void setDataUsingMagnitudes(double[][] magnitudes, CustomTask<?> task);
 
     /**
      * Converts the attributes' values to magnitude data.
      *
      * @return Magnitude data.
      */
-    public abstract double[][] saveDataToMagnitudes();
+    public abstract double[][] obtainMagnitudesFromData();
 
     @Override
     public boolean equals(Object o) {
