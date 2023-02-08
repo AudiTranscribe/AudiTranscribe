@@ -50,32 +50,22 @@ public class QTransformDataObject0x000500 extends QTransformDataObject {
     /**
      * Method that converts given Q-Transform magnitude data to byte data.
      *
-     * @param qTransformMagnitudes The Q-Transform magnitude data to convert.
-     * @param task                 The <code>CustomTask</code>object that is handling the
-     *                             generation. Pass in <code>null</code> if no such task is being
-     *                             used.
+     * @param magnitudes The Q-Transform magnitude data to convert.
+     * @param task       The <code>CustomTask</code>object that is handling the compression of the
+     *                   byte data. Pass in <code>null</code> if no such task is being used.
      * @return Triplet of values. First value is the byte data. Second value is the minimum
      * magnitude of the Q-Transform data. Final value is the maximum magnitude of the Q-Transform
      * data.
      * @throws IOException If something went wrong when compressing the bytes.
      */
-    public static Triple<Byte[], Double, Double> qTransformMagnitudesToByteData(
-            double[][] qTransformMagnitudes, CustomTask<?> task
+    public static Triple<Byte[], Double, Double> magnitudesToByteData(
+            double[][] magnitudes, CustomTask<?> task
     ) throws IOException {
-        // Convert the double data to integer data
-        Triple<Integer[][], Double, Double> convertedTuple = AUDTFileHelpers.doubles2DtoInt2D(qTransformMagnitudes);
-        Integer[][] intData = convertedTuple.value0();
+        // Obtain the byte data
+        Triple<Byte[], Double, Double> convertedTuple = magnitudesToUncompressedByteDataHelper(magnitudes);
+        byte[] plainBytes = TypeConversionUtils.toByteArray(convertedTuple.value0());
         double min = convertedTuple.value1();
         double max = convertedTuple.value2();
-
-        // Convert non-primitive integers to primitive integers
-        int[][] intDataPrimitive = new int[intData.length][intData[0].length];
-        for (int i = 0; i < intData.length; i++) {
-            intDataPrimitive[i] = TypeConversionUtils.toIntegerArray(intData[i]);
-        }
-
-        // Convert the integer data to bytes
-        byte[] plainBytes = ByteConversionHandler.twoDimensionalIntegerArrayToBytes(intDataPrimitive);
 
         // Compress the bytes
         byte[] bytes = CompressionHandlers.lz4Compress(plainBytes, task);
@@ -93,7 +83,7 @@ public class QTransformDataObject0x000500 extends QTransformDataObject {
      * @return The Q-Transform magnitude data.
      * @throws IOException If something went wrong when decompressing the bytes.
      */
-    public static double[][] byteDataToQTransformMagnitudes(
+    public static double[][] byteDataToMagnitudes(
             byte[] bytes, double minMagnitude, double maxMagnitude
     ) throws IOException {
         // Decompress the bytes

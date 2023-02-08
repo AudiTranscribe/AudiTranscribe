@@ -104,7 +104,7 @@ class QTransformDataObject0x000500Test {
         double correctMaxMagnitude = 9;
 
         // Run the method
-        Triple<Byte[], Double, Double> returned = QTransformDataObject0x000500.qTransformMagnitudesToByteData(
+        Triple<Byte[], Double, Double> returned = QTransformDataObject0x000500.magnitudesToByteData(
                 magnitudes, null
         );
 
@@ -133,7 +133,7 @@ class QTransformDataObject0x000500Test {
         };
 
         // Run the method
-        double[][] magnitudes = QTransformDataObject0x000500.byteDataToQTransformMagnitudes(bytes, minMagnitude, maxMagnitude);
+        double[][] magnitudes = QTransformDataObject0x000500.byteDataToMagnitudes(bytes, minMagnitude, maxMagnitude);
 
         // Check lengths
         assertEquals(correctMagnitudes.length, magnitudes.length);
