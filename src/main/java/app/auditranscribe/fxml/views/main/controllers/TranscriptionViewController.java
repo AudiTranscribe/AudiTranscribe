@@ -40,7 +40,6 @@ import app.auditranscribe.io.audt_file.AUDTFileConstants;
 import app.auditranscribe.io.audt_file.ProjectData;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import app.auditranscribe.io.audt_file.v0x000500.data_encapsulators.MusicNotesDataObject0x000500;
-import app.auditranscribe.io.audt_file.v0x000500.data_encapsulators.QTransformDataObject0x000500;
 import app.auditranscribe.io.audt_file.v0x000500.data_encapsulators.UnchangingDataPropertiesObject0x000500;
 import app.auditranscribe.io.audt_file.v0x000B00.data_encapsulators.AudioDataObject0x000B00;
 import app.auditranscribe.io.audt_file.v0x000B00.data_encapsulators.ProjectInfoDataObject0x000B00;
@@ -760,9 +759,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                 MIN_NOTE_NUMBER, MAX_NOTE_NUMBER, BINS_PER_OCTAVE, SPECTROGRAM_HOP_LENGTH, PX_PER_SECOND,
                 NUM_PX_PER_OCTAVE, sampleRate, audioDuration
         );
-        spectrogram.qTransformBytes = qTransformData.qTransformBytes;
-        spectrogram.minMagnitude = qTransformData.minMagnitude;
-        spectrogram.maxMagnitude = qTransformData.maxMagnitude;
+        spectrogram.qTransformDataObject = qTransformData;
 
         // Ensure that the temporary directory exists
         IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
@@ -1468,16 +1465,13 @@ public class TranscriptionViewController extends SwitchableViewController {
                 throw new RuntimeException(e);
             }
 
-            // Package Q-transform data and audio data for saving
-            QTransformDataObject qTransformData = new QTransformDataObject0x000500(
-                    spectrogram.qTransformBytes, spectrogram.minMagnitude, spectrogram.maxMagnitude
-            );
+            // Package audio data for saving
             AudioDataObject audioData = new AudioDataObject0x000B00(mp3Bytes, sampleRate, (int) (audioDuration * 1000));
 
             // Calculate the number of skippable bytes
             numSkippableBytes = 32 +  // Header section
                     UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
-                    qTransformData.numBytesNeeded() +
+                    spectrogram.qTransformDataObject.numBytesNeeded() +
                     audioData.numBytesNeeded();
 
             // Update the unchanging data properties
@@ -1487,7 +1481,8 @@ public class TranscriptionViewController extends SwitchableViewController {
 
             // Package all the current data into a `ProjectData`
             ProjectData projectData = new ProjectData(
-                    unchangingDataProperties, qTransformData, audioData, projectInfoData, musicNotesData
+                    unchangingDataProperties, spectrogram.qTransformDataObject, audioData, projectInfoData,
+                    musicNotesData
             );
 
             // Save the project

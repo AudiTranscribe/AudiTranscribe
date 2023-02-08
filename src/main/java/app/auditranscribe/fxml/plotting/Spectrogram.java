@@ -22,7 +22,7 @@ import app.auditranscribe.audio.Audio;
 import app.auditranscribe.fxml.plotting.interpolation.AbstractInterpolation;
 import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.generic.exceptions.ValueException;
-import app.auditranscribe.generic.tuples.Triple;
+import app.auditranscribe.io.audt_file.base.data_encapsulators.QTransformDataObject;
 import app.auditranscribe.io.audt_file.v0x000500.data_encapsulators.QTransformDataObject0x000500;
 import app.auditranscribe.misc.Complex;
 import app.auditranscribe.misc.CustomTask;
@@ -32,7 +32,6 @@ import app.auditranscribe.signal.representations.QTransform;
 import app.auditranscribe.signal.windowing.SignalWindow;
 import app.auditranscribe.utils.MathUtils;
 import app.auditranscribe.utils.MatrixUtils;
-import app.auditranscribe.utils.TypeConversionUtils;
 import app.auditranscribe.utils.UnitConversionUtils;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.WritableImage;
@@ -74,13 +73,9 @@ public class Spectrogram extends LoggableClass {
     public final int height;
 
     final int hopLength;
-
     public double[] frequencyBins;
 
-    public byte[] qTransformBytes;
-    public double minMagnitude;
-    public double maxMagnitude;
-
+    public QTransformDataObject qTransformDataObject;
     private CustomTask<?> task;
 
     /**
@@ -219,11 +214,8 @@ public class Spectrogram extends LoggableClass {
     public WritableImage generateSpectrogram(SignalWindow windowFunction, ColourScale colourScale) {
         double[][] magnitudes = generateMagnitudes(windowFunction);
 
-        Triple<Byte[], Double, Double> convertedTuple =
-                QTransformDataObject0x000500.magnitudesToByteData(magnitudes, task);
-        qTransformBytes = TypeConversionUtils.toByteArray(convertedTuple.value0());
-        minMagnitude = convertedTuple.value1();
-        maxMagnitude = convertedTuple.value2();
+        qTransformDataObject = QTransformDataObject0x000500.getEmptyInstance();
+        qTransformDataObject.setDataUsingMagnitudes(magnitudes, task);
 
         return plot(magnitudes, generateColourMap(colourScale));
     }
@@ -238,9 +230,7 @@ public class Spectrogram extends LoggableClass {
      * @return The spectrogram image.
      */
     public WritableImage generateSpectrogram(ColourScale colourScale) {
-        double[][] magnitudes = QTransformDataObject0x000500.byteDataToMagnitudes(
-                qTransformBytes, minMagnitude, maxMagnitude
-        );
+        double[][] magnitudes = qTransformDataObject.obtainMagnitudesFromData();
         return plot(magnitudes, generateColourMap(colourScale));
     }
 
