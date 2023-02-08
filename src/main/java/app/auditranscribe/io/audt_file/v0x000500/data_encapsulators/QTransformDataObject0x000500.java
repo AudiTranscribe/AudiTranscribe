@@ -26,8 +26,6 @@ import app.auditranscribe.io.audt_file.base.data_encapsulators.QTransformDataObj
 import app.auditranscribe.misc.CustomTask;
 import app.auditranscribe.utils.TypeConversionUtils;
 
-import java.io.IOException;
-
 /**
  * Data object that stores the Q-Transform data.
  */
@@ -56,11 +54,8 @@ public class QTransformDataObject0x000500 extends QTransformDataObject {
      * @return Triplet of values. First value is the byte data. Second value is the minimum
      * magnitude of the Q-Transform data. Final value is the maximum magnitude of the Q-Transform
      * data.
-     * @throws IOException If something went wrong when compressing the bytes.
      */
-    public static Triple<Byte[], Double, Double> magnitudesToByteData(
-            double[][] magnitudes, CustomTask<?> task
-    ) throws IOException {
+    public static Triple<Byte[], Double, Double> magnitudesToByteData(double[][] magnitudes, CustomTask<?> task) {
         // Obtain the byte data
         Triple<Byte[], Double, Double> convertedTuple = magnitudesToUncompressedByteDataHelper(magnitudes);
         byte[] plainBytes = TypeConversionUtils.toByteArray(convertedTuple.value0());
@@ -68,7 +63,7 @@ public class QTransformDataObject0x000500 extends QTransformDataObject {
         double max = convertedTuple.value2();
 
         // Compress the bytes
-        byte[] bytes = CompressionHandlers.lz4Compress(plainBytes, task);
+        byte[] bytes = CompressionHandlers.lz4CompressFailSilently(plainBytes, task);
 
         // Return the bytes and the min and max values
         return new Triple<>(TypeConversionUtils.toByteArray(bytes), min, max);
@@ -81,13 +76,10 @@ public class QTransformDataObject0x000500 extends QTransformDataObject {
      * @param minMagnitude The minimum magnitude of the Q-Transform data.
      * @param maxMagnitude The maximum magnitude of the Q-Transform data.
      * @return The Q-Transform magnitude data.
-     * @throws IOException If something went wrong when decompressing the bytes.
      */
-    public static double[][] byteDataToMagnitudes(
-            byte[] bytes, double minMagnitude, double maxMagnitude
-    ) throws IOException {
+    public static double[][] byteDataToMagnitudes(byte[] bytes, double minMagnitude, double maxMagnitude) {
         // Decompress the bytes
-        byte[] plainBytes = CompressionHandlers.lz4Decompress(bytes);
+        byte[] plainBytes = CompressionHandlers.lz4DecompressFailSilently(bytes);
 
         // Convert bytes to 2D integer array
         int[][] intData = ByteConversionHandler.bytesToTwoDimensionalIntegerArray(plainBytes);

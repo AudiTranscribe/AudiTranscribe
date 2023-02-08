@@ -23,9 +23,7 @@ import app.auditranscribe.fxml.plotting.interpolation.AbstractInterpolation;
 import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.generic.exceptions.ValueException;
 import app.auditranscribe.generic.tuples.Triple;
-import app.auditranscribe.io.ByteConversionHandler;
-import app.auditranscribe.io.CompressionHandlers;
-import app.auditranscribe.io.audt_file.AUDTFileHelpers;
+import app.auditranscribe.io.audt_file.v0x000500.data_encapsulators.QTransformDataObject0x000500;
 import app.auditranscribe.misc.Complex;
 import app.auditranscribe.misc.CustomTask;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
@@ -219,28 +217,14 @@ public class Spectrogram extends LoggableClass {
      * @return The spectrogram image.
      */
     public WritableImage generateSpectrogram(SignalWindow windowFunction, ColourScale colourScale) {
-        // Generate magnitudes
         double[][] magnitudes = generateMagnitudes(windowFunction);
 
-        // Convert the double data to integer data
-        Triple<Integer[][], Double, Double> convertedTuple = AUDTFileHelpers.doubles2DtoInt2D(magnitudes);
-        Integer[][] intData = convertedTuple.value0();
+        Triple<Byte[], Double, Double> convertedTuple =
+                QTransformDataObject0x000500.magnitudesToByteData(magnitudes, task);
+        qTransformBytes = TypeConversionUtils.toByteArray(convertedTuple.value0());
         minMagnitude = convertedTuple.value1();
         maxMagnitude = convertedTuple.value2();
 
-        // Convert non-primitive integers to primitive integers
-        int[][] intDataPrimitive = new int[intData.length][intData[0].length];
-        for (int i = 0; i < intData.length; i++) {
-            intDataPrimitive[i] = TypeConversionUtils.toIntegerArray(intData[i]);
-        }
-
-        // Convert the integer data to bytes
-        byte[] plainBytes = ByteConversionHandler.twoDimensionalIntegerArrayToBytes(intDataPrimitive);
-
-        // Compress the bytes and update attribute
-        qTransformBytes = CompressionHandlers.lz4CompressFailSilently(plainBytes, task);
-
-        // Return spectrogram plot
         return plot(magnitudes, generateColourMap(colourScale));
     }
 
@@ -254,17 +238,10 @@ public class Spectrogram extends LoggableClass {
      * @return The spectrogram image.
      */
     public WritableImage generateSpectrogram(ColourScale colourScale) {
-        // Decompress the bytes
-        byte[] plainBytes = CompressionHandlers.lz4DecompressFailSilently(qTransformBytes);
-
-        // Convert bytes to 2D integer array
-        int[][] intData = ByteConversionHandler.bytesToTwoDimensionalIntegerArray(plainBytes);
-
-        // Plot the given integer data
-        return plot(
-                AUDTFileHelpers.int2DtoDoubles2D(intData, minMagnitude, maxMagnitude),
-                generateColourMap(colourScale)
+        double[][] magnitudes = QTransformDataObject0x000500.byteDataToMagnitudes(
+                qTransformBytes, minMagnitude, maxMagnitude
         );
+        return plot(magnitudes, generateColourMap(colourScale));
     }
 
     // Private methods
