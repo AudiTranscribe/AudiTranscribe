@@ -231,6 +231,15 @@ public class Spectrogram extends LoggableClass {
      */
     public WritableImage generateSpectrogram(ColourScale colourScale) {
         double[][] magnitudes = qTransformDataObject.obtainMagnitudesFromData();
+
+        // If `qTransformDataObject` is not latest we update it
+        if (!(qTransformDataObject instanceof QTransformDataObject0x000B00)) {
+            log("Q-Transform data object outdated; updating...");
+            qTransformDataObject = new QTransformDataObject0x000B00();
+            qTransformDataObject.setDataUsingMagnitudes(magnitudes, task);
+            log("Updated Q-Transform data object to latest version");
+        }
+
         return plot(magnitudes, generateColourMap(colourScale));
     }
 
