@@ -135,7 +135,7 @@ class AUDTFile0x000500Test {
         fileWriter.writeMusicNotesData(musicNotesDataObject1);
 
         // Write the bytes to file
-        fileWriter.writeBytesToFile();
+        fileWriter.writeToFile();
     }
 
     @Test
@@ -223,7 +223,7 @@ class AUDTFile0x000500Test {
         fileWriter.writeMusicNotesData(musicNotesDataObject1);
 
         // Write the bytes to file
-        fileWriter.writeBytesToFile();
+        fileWriter.writeToFile();
     }
 
     @Test
@@ -276,7 +276,7 @@ class AUDTFile0x000500Test {
         fileWriter.writeMusicNotesData(musicNotesDataObject2);
 
         // Write the bytes to file
-        fileWriter.writeBytesToFile();
+        fileWriter.writeToFile();
     }
 
     @Test

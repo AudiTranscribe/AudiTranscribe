@@ -61,7 +61,7 @@ public final class ProjectHandler {
             fileWriter.writeProjectInfoData(guiData);
             fileWriter.writeMusicNotesData(musicNotesData);
 
-            fileWriter.writeBytesToFile();
+            fileWriter.writeToFile();
         } catch (InvalidFileVersionException ignored) {  // Impossible for the version to be wrong
         }
     }
@@ -85,7 +85,7 @@ public final class ProjectHandler {
             fileWriter.writeProjectInfoData(projectData.projectInfoData);
             fileWriter.writeMusicNotesData(projectData.musicNotesData);
 
-            fileWriter.writeBytesToFile();
+            fileWriter.writeToFile();
         } catch (InvalidFileVersionException ignored) {  // Impossible for the version to be wrong
         }
     }
