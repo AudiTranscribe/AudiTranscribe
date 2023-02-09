@@ -43,7 +43,7 @@ class MusicKeyEstimatorTest {
         List<MusicKey> mostLikelyKeys2 = getMostLikelyKeys(samples2, sampleRate2, 4);
 
         assertEquals(
-                List.of(MusicKey.F_MAJOR, MusicKey.F_MINOR, MusicKey.B_FLAT_MAJOR, MusicKey.A_SHARP_MINOR),
+                List.of(MusicKey.C_SHARP_MINOR, MusicKey.F_MAJOR,MusicKey.B_FLAT_MAJOR,  MusicKey.F_MINOR),
                 mostLikelyKeys2
         );
 

@@ -35,8 +35,9 @@ import java.util.List;
  */
 public final class MusicKeyEstimator {
     // Constants
-    final static double[] MAJOR_PROFILE = {6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88};
-    final static double[] MINOR_PROFILE = {6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17};
+    // (Read `getKeyCorrelations()` Javadoc)
+    final static double[] MAJOR_PROFILE = {5, 2, 3.5, 2, 4.5, 4, 2, 4.5, 2, 3.5, 1.5, 4};
+    final static double[] MINOR_PROFILE = {5, 2, 3.5, 4.5, 2, 4, 2, 4.5, 3.5, 2, 1.5, 4};
 
     private MusicKeyEstimator() {
         // Private constructor to signal this is a utility class
@@ -53,9 +54,12 @@ public final class MusicKeyEstimator {
      *                   This number cannot be less than 1 or more than 30.
      * @param task       The <code>CustomTask</code> object that is handling the generation. Pass in
      *                   <code>null</code> if no such task is being used.
-     * @return A list of pairs.<br>
-     * First element in each pair is a likely music key. Second element is the correlation of that key.<br>
-     * Keys are sorted in <b>decreasing </b> likelihood of being the actual music key.
+     * @return A list of pairs.
+     * <ul>
+     *     <li>First element in each pair is a likely music key.</li>
+     *     <li>Second element in each pair is the correlation coefficient of that key.</li>
+     * </ul>
+     * Keys are sorted in <b>decreasing</b> likelihood of being the actual music key.
      */
     public static List<Pair<MusicKey, Double>> getMostLikelyKeysWithCorrelation(
             double[] x, double sampleRate, int numKeys, CustomTask<?> task
@@ -113,7 +117,12 @@ public final class MusicKeyEstimator {
      *     <li>The third element is the correlation coefficient, describing the 'strength' of the
      *     match.</li>
      * </ul>
-     * @implNote Uses the Krumhansl-Schmuckler key-finding algorithm to estimate the key.
+     * @implNote Uses the Krumhansl-Schmuckler key-finding algorithm to estimate the key. Key
+     * profiles referenced from Temperley, D. (1999). What's Key for Key? The Krumhansl-Schmuckler
+     * Key-Finding Algorithm Reconsidered. <em>Music Perception, 17</em>(1), 65–100.
+     * <a href="https://doi.org/10.2307/40285812">DOI</a>. Online copy available
+     * <a href="http://davidtemperley.com/wp-content/uploads/2015/11/temperley-mp99.pdf">here</a>.
+     * Specifically referenced Page 74's key profiles.
      */
     private static List<Triple<Integer, Boolean, Double>> getKeyCorrelations(
             double[] x, double sampleRate, CustomTask<?> task
