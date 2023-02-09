@@ -47,7 +47,6 @@ public abstract class AUDTFileReader extends LoggableClass {
     // Attributes
     public final String filepath;
     public int fileFormatVersion;
-    public int compressorVersion;
 
     protected final byte[] bytes;
     protected int bytePos = 0;  // Position of the NEXT byte to read
@@ -206,7 +205,6 @@ public abstract class AUDTFileReader extends LoggableClass {
             }
         }
 
-        // Otherwise, both checks passed => bytes match
         return true;
     }
 
@@ -215,32 +213,36 @@ public abstract class AUDTFileReader extends LoggableClass {
      *
      * @return Boolean, where <code>true</code> means that the file format is correct and
      * <code>false</code> otherwise.
-     * @throws InvalidFileVersionException If the LZ4 version is not current.
      */
-    protected boolean verifyHeaderSection() throws InvalidFileVersionException {
-        // Check if the first 20 bytes follows the AUDT file header
-        byte[] first20Bytes = Arrays.copyOfRange(bytes, 0, 20);
-        if (!checkBytesMatch(AUDTFileConstants.AUDT_FILE_HEADER, first20Bytes)) {
+    protected boolean verifyHeaderSection() {
+        // Check if the first 16 bytes follows the AUDT file heading
+        byte[] first16Bytes = Arrays.copyOfRange(bytes, 0, 16);
+        if (!checkBytesMatch(AUDTFileConstants.AUDT_FILE_HEADING, first16Bytes)) {
             return false;
         }
 
-        // Update byte position
-        bytePos = 20;
-
-        // Get the file format version and the compressor version
-        fileFormatVersion = readInteger();
-        compressorVersion = readInteger();
-
-        // Check if the compressor version is outdated
-        if (compressorVersion < AUDTFileConstants.COMPRESSOR_VERSION_NUMBER) {
-            throw new InvalidFileVersionException(
-                    "Outdated compressor version (compressor version is " + compressorVersion +
-                            " but current version is " + AUDTFileConstants.COMPRESSOR_VERSION_NUMBER + ")"
-            );
+        // Check if the next 4 bytes is the AUDT magic constant
+        byte[] next4Bytes = Arrays.copyOfRange(bytes, 16, 20);
+        if (!checkBytesMatch(AUDTFileConstants.AUDT_MAGIC_CONSTANT, next4Bytes)) {
+            return false;
         }
+
+        // Get the file format version
+        bytePos = 20;
+        fileFormatVersion = readInteger();
+        skipBytes(4);  // Older versions may use compressor version instead of magic constant
 
         // Verify that the header ends with an end-of-section delimiter
         return checkEOSDelimiter();
+    }
+
+    /**
+     * Helper method that skips the specified number of bytes.
+     *
+     * @param numBytesToSkip Number of bytes to skip.
+     */
+    protected void skipBytes(int numBytesToSkip) {
+        bytePos += numBytesToSkip;
     }
 
     /**

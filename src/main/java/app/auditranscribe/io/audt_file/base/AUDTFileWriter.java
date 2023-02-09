@@ -360,16 +360,17 @@ public abstract class AUDTFileWriter extends LoggableClass {
      */
     private void writeHeaderSection(int fileVersion) {
         // Write the file header
-        AUDTFileHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_FILE_HEADER);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_FILE_HEADING);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_MAGIC_CONSTANT);
 
-        // Write version numbers
+        // Write the file version
         byte[] fileVersionBytes = ByteConversionHandler.intToBytes(fileVersion);
-        byte[] lz4VersionBytes = ByteConversionHandler.intToBytes(AUDTFileConstants.COMPRESSOR_VERSION_NUMBER);
-
         AUDTFileHelpers.addBytesIntoBytesList(bytes, fileVersionBytes);
-        AUDTFileHelpers.addBytesIntoBytesList(bytes, lz4VersionBytes);
 
-        // Write the end-of-section delimiter
+        // Then write the magic constant again
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_MAGIC_CONSTANT);
+
+        // Finally write the end-of-section delimiter
         writeEOSDelimiter();
     }
 

@@ -32,7 +32,6 @@ import java.util.zip.*;
 public final class CompressionHandlers {
     // Constants
     public static final int BUFFER_SIZE = 2048;  // In bytes
-    public static final int VERSION_NUMBER = 1;
 
     private CompressionHandlers() {
         // Private constructor to signal this is a utility class

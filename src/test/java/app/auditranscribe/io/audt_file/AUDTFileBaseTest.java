@@ -37,9 +37,6 @@ public class AUDTFileBaseTest {
         assertThrowsExactly(InvalidFileVersionException.class, () ->
                 AUDTFileReader.getFileReader(IOMethods.joinPaths(folder, "invalid-file-version.audt"))
         );
-        assertThrowsExactly(InvalidFileVersionException.class, () ->
-                AUDTFileReader.getFileReader(IOMethods.joinPaths(folder, "lz4-version-incorrect.audt"))
-        );
         assertThrowsExactly(IncorrectFileFormatException.class, () ->
                 AUDTFileReader.getFileReader(IOMethods.joinPaths(folder, "eof-incorrect.audt"))
         );
