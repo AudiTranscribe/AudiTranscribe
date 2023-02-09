@@ -41,7 +41,7 @@ public final class AUDTFileConstants {
             (byte) 0xad, (byte) 0x75, (byte) 0xc1, (byte) 0xbe
     };
 
-    public static final int FILE_VERSION_NUMBER = 0x000B0002;  // File version 0.11.0, revision 2 -> 00 0B 00 02
+    public static final int FILE_VERSION_NUMBER = 0x000B0003;  // File version 0.11.0, revision 3 -> 00 0B 00 03
     public static final int COMPRESSOR_VERSION_NUMBER = CompressionHandlers.VERSION_NUMBER;
 
     private AUDTFileConstants() {

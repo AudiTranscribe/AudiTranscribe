@@ -23,7 +23,7 @@ import app.auditranscribe.fxml.plotting.interpolation.AbstractInterpolation;
 import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.generic.exceptions.ValueException;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.QTransformDataObject;
-import app.auditranscribe.io.audt_file.v0x000500.data_encapsulators.QTransformDataObject0x000500;
+import app.auditranscribe.io.audt_file.v0x000B00.data_encapsulators.QTransformDataObject0x000B00;
 import app.auditranscribe.misc.Complex;
 import app.auditranscribe.misc.CustomTask;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
@@ -214,7 +214,7 @@ public class Spectrogram extends LoggableClass {
     public WritableImage generateSpectrogram(SignalWindow windowFunction, ColourScale colourScale) {
         double[][] magnitudes = generateMagnitudes(windowFunction);
 
-        qTransformDataObject = new QTransformDataObject0x000500();
+        qTransformDataObject = new QTransformDataObject0x000B00();
         qTransformDataObject.setDataUsingMagnitudes(magnitudes, task);
 
         return plot(magnitudes, generateColourMap(colourScale));
