@@ -78,7 +78,7 @@ class AUDTFile0x000800Test {
         noteNums2 = new int[]{64, 62, 53, 55, 60, 59, 52, 53};
 
         // Define data to be used within the tests
-        qTransformDataObject = QTransformDataObject0x000500.getEmptyInstance();
+        qTransformDataObject = new QTransformDataObject0x000500();
         qTransformDataObject.setDataUsingMagnitudes(qTransformMagnitudes, null);
         audioDataObject = new AudioDataObject0x000800(
                 CompressionHandlers.lz4Compress(Files.readAllBytes(Paths.get(

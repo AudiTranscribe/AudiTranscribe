@@ -214,7 +214,7 @@ public class Spectrogram extends LoggableClass {
     public WritableImage generateSpectrogram(SignalWindow windowFunction, ColourScale colourScale) {
         double[][] magnitudes = generateMagnitudes(windowFunction);
 
-        qTransformDataObject = QTransformDataObject0x000500.getEmptyInstance();
+        qTransformDataObject = new QTransformDataObject0x000500();
         qTransformDataObject.setDataUsingMagnitudes(magnitudes, task);
 
         return plot(magnitudes, generateColourMap(colourScale));

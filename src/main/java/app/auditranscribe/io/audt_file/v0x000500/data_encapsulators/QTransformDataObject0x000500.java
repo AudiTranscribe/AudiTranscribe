@@ -43,16 +43,17 @@ public class QTransformDataObject0x000500 extends QTransformDataObject {
         this.maxMagnitude = maxMagnitude;
     }
 
-    // Public methods
-
     /**
-     * Obtains an 'empty' instance of the data object for processing.
-     *
-     * @return An 'empty' instance.
+     * Initialization method for an empty Q-Transform data object.<br>
+     * The attribute values' must be set using the <code>setDataUsingMagnitudes</code> method.
      */
-    public static QTransformDataObject0x000500 getEmptyInstance() {
-        return new QTransformDataObject0x000500(null, 0, 0);
+    public QTransformDataObject0x000500() {
+        this.qTransformBytes = null;
+        this.minMagnitude = 0;
+        this.maxMagnitude = 0;
     }
+
+    // Public methods
 
     /**
      * Method that converts given Q-Transform magnitude data to byte data.
