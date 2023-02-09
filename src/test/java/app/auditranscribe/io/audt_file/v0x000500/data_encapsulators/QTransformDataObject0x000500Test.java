@@ -85,7 +85,7 @@ class QTransformDataObject0x000500Test {
     }
 
     @Test
-    void qTransformMagnitudesToByteData() {
+    void magnitudesToByteData() {
         // Define sample Q-transform magnitudes
         double[][] magnitudes = {
                 {0.1, -0.2, 0.3},
@@ -114,7 +114,7 @@ class QTransformDataObject0x000500Test {
     }
 
     @Test
-    void byteDataToQTransformMagnitudes() {
+    void byteDataToMagnitudes() {
         // Define sample byte data and the min and max magnitudes
         byte[] bytes = {
                 64, 0, 0, 0, 3, 4, 0, -16, 21, -7, -7, -7, -6, -11, 117, 117, 117, -4, -4, -4,
