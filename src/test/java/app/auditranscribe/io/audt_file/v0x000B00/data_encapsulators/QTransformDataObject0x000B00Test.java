@@ -1,4 +1,4 @@
-package app.auditranscribe.io.audt_file.v0x000500.data_encapsulators;
+package app.auditranscribe.io.audt_file.v0x000B00.data_encapsulators;
 
 import app.auditranscribe.generic.tuples.Triple;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.QTransformDataObject;
@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class QTransformDataObject0x000500Test {
+class QTransformDataObject0x000B00Test {
     // Attributes
     byte[] qTransformBytes1 = new byte[]{(byte) 0xab, (byte) 0xcd, (byte) 0xef};  // Not real data; do NOT decompress
     byte[] qTransformBytes2 = new byte[]{(byte) 0x12, (byte) 0x34, (byte) 0x56, (byte) 0x78, (byte) 0x9a};
@@ -23,10 +23,10 @@ class QTransformDataObject0x000500Test {
     @Test
     void numBytesNeeded() {
         // Define the two Q-Transform data objects to test number of bytes needed
-        QTransformDataObject one = new QTransformDataObject0x000500(
+        QTransformDataObject one = new QTransformDataObject0x000B00(
                 qTransformBytes1, minMagnitude1, maxMagnitude1
         );
-        QTransformDataObject two = new QTransformDataObject0x000500(
+        QTransformDataObject two = new QTransformDataObject0x000B00(
                 qTransformBytes2, minMagnitude2, maxMagnitude2
         );
 
@@ -38,7 +38,7 @@ class QTransformDataObject0x000500Test {
     @Test
     void testEquals() {
         // Define temporary data object for testing the initial checks
-        QTransformDataObject temp = new QTransformDataObject0x000500(
+        QTransformDataObject temp = new QTransformDataObject0x000B00(
                 qTransformBytes1, minMagnitude1, maxMagnitude1
         );
 
@@ -59,14 +59,14 @@ class QTransformDataObject0x000500Test {
         // Generate product of indices
         int[][] indexProduct = MathUtils.selfProduct(2, 3);  // 3 data attributes
         for (int[] indices1 : indexProduct) {
-            QTransformDataObject one = new QTransformDataObject0x000500(
+            QTransformDataObject one = new QTransformDataObject0x000B00(
                     qTransformBytes[indices1[0]],
                     minMagnitudes[indices1[1]],
                     maxMagnitudes[indices1[2]]
             );
 
             for (int[] indices2 : indexProduct) {
-                QTransformDataObject two = new QTransformDataObject0x000500(
+                QTransformDataObject two = new QTransformDataObject0x000B00(
                         qTransformBytes[indices2[0]],
                         minMagnitudes[indices2[1]],
                         maxMagnitudes[indices2[2]]
@@ -95,15 +95,16 @@ class QTransformDataObject0x000500Test {
 
         // Define correct return values
         byte[] correctBytes = {
-                64, 0, 0, 0, 3, 4, 0, -16, 21, -7, -7, -7, -6, -11, 117, 117,
-                117, -4, -4, -4, -3, 52, -76, -76, -76, -83, 45, 45, 45, 82, -46, -46,
-                -46, 97, -31, -31, -31, -128, 0, 0, 0, 127, -1, -1, -1
+                120, -100, 99, 96, 96, 96, 102, 0, -30, -97, 63, 127, -2, -6, 90, 90,
+                90, -6, -25, -49, -97, -65, 38, 91, -74, 108, 89, -85, -85, -85, 27, 116,
+                -23, -46, -91, -60, -121, 15, 31, 54, 0, 21, -44, -1, -1, -1, 31, 0,
+                -44, 113, 23, 125
         };
         double correctMinMagnitude = -8;
         double correctMaxMagnitude = 9;
 
         // Run the method
-        Triple<Byte[], Double, Double> returned = QTransformDataObject0x000500.magnitudesToByteData(
+        Triple<Byte[], Double, Double> returned = QTransformDataObject0x000B00.magnitudesToByteData(
                 magnitudes, null
         );
 
@@ -117,9 +118,10 @@ class QTransformDataObject0x000500Test {
     void byteDataToMagnitudes() {
         // Define sample byte data and the min and max magnitudes
         byte[] bytes = {
-                64, 0, 0, 0, 3, 4, 0, -16, 21, -7, -7, -7, -6, -11, 117, 117,
-                117, -4, -4, -4, -3, 52, -76, -76, -76, -83, 45, 45, 45, 82, -46, -46,
-                -46, 97, -31, -31, -31, -128, 0, 0, 0, 127, -1, -1, -1
+                120, -100, 99, 96, 96, 96, 102, 0, -30, -97, 63, 127, -2, -6, 90, 90,
+                90, -6, -25, -49, -97, -65, 38, 91, -74, 108, 89, -85, -85, -85, 27, 116,
+                -23, -46, -91, -60, -121, 15, 31, 54, 0, 21, -44, -1, -1, -1, 31, 0,
+                -44, 113, 23, 125
         };
         double minMagnitude = -8;
         double maxMagnitude = 9;
@@ -132,7 +134,7 @@ class QTransformDataObject0x000500Test {
         };
 
         // Run the method
-        double[][] magnitudes = QTransformDataObject0x000500.byteDataToMagnitudes(bytes, minMagnitude, maxMagnitude);
+        double[][] magnitudes = QTransformDataObject0x000B00.byteDataToMagnitudes(bytes, minMagnitude, maxMagnitude);
 
         // Check lengths
         assertEquals(correctMagnitudes.length, magnitudes.length);

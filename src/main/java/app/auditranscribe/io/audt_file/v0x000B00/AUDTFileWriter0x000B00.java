@@ -20,9 +20,11 @@ package app.auditranscribe.io.audt_file.v0x000B00;
 
 import app.auditranscribe.io.audt_file.base.data_encapsulators.AudioDataObject;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.ProjectInfoDataObject;
+import app.auditranscribe.io.audt_file.base.data_encapsulators.QTransformDataObject;
 import app.auditranscribe.io.audt_file.v0x000900.AUDTFileWriter0x000900;
 import app.auditranscribe.io.audt_file.v0x000B00.data_encapsulators.AudioDataObject0x000B00;
 import app.auditranscribe.io.audt_file.v0x000B00.data_encapsulators.ProjectInfoDataObject0x000B00;
+import app.auditranscribe.io.audt_file.v0x000B00.data_encapsulators.QTransformDataObject0x000B00;
 
 /**
  * Handles the writing of the AudiTranscribe file for version 0.11.0.
@@ -50,6 +52,19 @@ public class AUDTFileWriter0x000B00 extends AUDTFileWriter0x000900 {
     }
 
     // Public methods
+    @Override
+    public void writeQTransformData(QTransformDataObject object) {
+        // Cast to the correct version of the object
+        QTransformDataObject0x000B00 obj = (QTransformDataObject0x000B00) object;
+
+        // Write to file
+        writeSectionID(QTransformDataObject0x000B00.SECTION_ID);
+        writeDouble(obj.minMagnitude);
+        writeDouble(obj.maxMagnitude);
+        writeByteArray(obj.qTransformBytes);
+        writeEOSDelimiter();
+    }
+
     @Override
     public void writeAudioData(AudioDataObject object) {
         // Cast to the correct version of the object

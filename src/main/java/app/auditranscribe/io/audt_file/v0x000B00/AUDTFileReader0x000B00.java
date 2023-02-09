@@ -20,9 +20,11 @@ package app.auditranscribe.io.audt_file.v0x000B00;
 
 import app.auditranscribe.io.audt_file.base.data_encapsulators.AudioDataObject;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.ProjectInfoDataObject;
+import app.auditranscribe.io.audt_file.base.data_encapsulators.QTransformDataObject;
 import app.auditranscribe.io.audt_file.v0x000900.AUDTFileReader0x000900;
 import app.auditranscribe.io.audt_file.v0x000B00.data_encapsulators.AudioDataObject0x000B00;
 import app.auditranscribe.io.audt_file.v0x000B00.data_encapsulators.ProjectInfoDataObject0x000B00;
+import app.auditranscribe.io.audt_file.v0x000B00.data_encapsulators.QTransformDataObject0x000B00;
 import app.auditranscribe.io.exceptions.FailedToReadDataException;
 import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
 import app.auditranscribe.io.exceptions.InvalidFileVersionException;
@@ -53,6 +55,31 @@ public class AUDTFileReader0x000B00 extends AUDTFileReader0x000900 {
     }
 
     // Public methods
+    @Override
+    public QTransformDataObject readQTransformData() throws FailedToReadDataException {
+        // Ensure that the Q-Transform data section ID is correct
+        int sectionID = readSectionID();
+        if (sectionID != QTransformDataObject.SECTION_ID) {
+            throw new FailedToReadDataException(
+                    "Failed to read Q-Transform data; the Q-Transform data section has the incorrect " +
+                            "section ID of " + sectionID + " (expected: " + QTransformDataObject.SECTION_ID + ")"
+            );
+        }
+
+        // Read in the rest of the data
+        double minMagnitude = readDouble();
+        double maxMagnitude = readDouble();
+        byte[] qTransformData = readByteArray();
+
+        // Check if there is an EOS
+        if (!checkEOSDelimiter()) {
+            throw new FailedToReadDataException("Failed to read Q-Transform data; end of section delimiter missing");
+        }
+
+        // Create and return a `QTransformDataObject`
+        return new QTransformDataObject0x000B00(qTransformData, minMagnitude, maxMagnitude);
+    }
+
     @Override
     public AudioDataObject readAudioData() throws FailedToReadDataException {
         // Ensure that the audio data section ID is correct

@@ -123,7 +123,7 @@ public abstract class AUDTFileReader extends LoggableClass {
                 case 0x00070001 -> new AUDTFileReader0x000700(filepath, inputStream);
                 case 0x00080001 -> new AUDTFileReader0x000800(filepath, inputStream);
                 case 0x00090002 -> new AUDTFileReader0x000900(filepath, inputStream);
-                case 0x000B0002 -> new AUDTFileReader0x000B00(filepath, inputStream);
+                case 0x000B0003 -> new AUDTFileReader0x000B00(filepath, inputStream);
                 default -> throw new InvalidFileVersionException(
                         "Invalid file version '" + MiscUtils.intAsPaddedHexStr(fileVersion) + "'."
                 );

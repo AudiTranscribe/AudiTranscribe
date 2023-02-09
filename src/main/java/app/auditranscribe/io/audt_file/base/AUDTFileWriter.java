@@ -91,7 +91,7 @@ public abstract class AUDTFileWriter extends LoggableClass {
             case 0x00070001 -> new AUDTFileWriter0x000700(filepath);
             case 0x00080001 -> new AUDTFileWriter0x000800(filepath);
             case 0x00090002 -> new AUDTFileWriter0x000900(filepath);
-            case 0x000B0002 -> new AUDTFileWriter0x000B00(filepath);
+            case 0x000B0003 -> new AUDTFileWriter0x000B00(filepath);
             default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
         };
 
@@ -121,7 +121,7 @@ public abstract class AUDTFileWriter extends LoggableClass {
             case 0x00070001 -> new AUDTFileWriter0x000700(filepath, numBytesToSkip);
             case 0x00080001 -> new AUDTFileWriter0x000800(filepath, numBytesToSkip);
             case 0x00090002 -> new AUDTFileWriter0x000900(filepath, numBytesToSkip);
-            case 0x000B0002 -> new AUDTFileWriter0x000B00(filepath, numBytesToSkip);
+            case 0x000B0003 -> new AUDTFileWriter0x000B00(filepath, numBytesToSkip);
             default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
         };
 

@@ -7,10 +7,10 @@ import app.auditranscribe.io.audt_file.base.AUDTFileReader;
 import app.auditranscribe.io.audt_file.base.AUDTFileWriter;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import app.auditranscribe.io.audt_file.v0x000500.data_encapsulators.MusicNotesDataObject0x000500;
-import app.auditranscribe.io.audt_file.v0x000500.data_encapsulators.QTransformDataObject0x000500;
 import app.auditranscribe.io.audt_file.v0x000500.data_encapsulators.UnchangingDataPropertiesObject0x000500;
 import app.auditranscribe.io.audt_file.v0x000B00.data_encapsulators.AudioDataObject0x000B00;
 import app.auditranscribe.io.audt_file.v0x000B00.data_encapsulators.ProjectInfoDataObject0x000B00;
+import app.auditranscribe.io.audt_file.v0x000B00.data_encapsulators.QTransformDataObject0x000B00;
 import app.auditranscribe.io.exceptions.FailedToReadDataException;
 import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
 import app.auditranscribe.io.exceptions.InvalidFileVersionException;
@@ -79,7 +79,7 @@ class AUDTFile0x000B00Test {
         noteNums2 = new int[]{64, 62, 53, 55, 60, 59, 52, 53};
 
         // Define data to be used within the tests
-        qTransformDataObject = new QTransformDataObject0x000500();
+        qTransformDataObject = new QTransformDataObject0x000B00();
         qTransformDataObject.setDataUsingMagnitudes(qTransformMagnitudes, null);
         audioDataObject = new AudioDataObject0x000B00(
                 Files.readAllBytes(Paths.get(
@@ -126,7 +126,7 @@ class AUDTFile0x000B00Test {
     @Order(1)
     void fileWriter_initialWrite() throws IOException, InvalidFileVersionException {
         // Create a file writer object
-        AUDTFileWriter fileWriter = AUDTFileWriter.getWriter(0x000B0002, FILE_PATH);
+        AUDTFileWriter fileWriter = AUDTFileWriter.getWriter(0x000B0003, FILE_PATH);
 
         // Test writing some data
         fileWriter.writeUnchangingDataProperties(unchangingDataPropertiesObject);
@@ -214,7 +214,7 @@ class AUDTFile0x000B00Test {
     @Order(3)
     void fileWriter_initialWriteAlt() throws IOException, InvalidFileVersionException {
         // Create a file writer object
-        AUDTFileWriter fileWriter = AUDTFileWriter.getWriter(0x000B0002, FILE_PATH, 0);
+        AUDTFileWriter fileWriter = AUDTFileWriter.getWriter(0x000B0003, FILE_PATH, 0);
 
         // Test writing some data
         fileWriter.writeUnchangingDataProperties(unchangingDataPropertiesObject);
@@ -269,7 +269,7 @@ class AUDTFile0x000B00Test {
     void fileWriter_2() throws IOException, InvalidFileVersionException {
         // Create a file writer object
         AUDTFileWriter fileWriter = AUDTFileWriter.getWriter(
-                0x000B0002, FILE_PATH, unchangingDataPropertiesObject.numSkippableBytes
+                0x000B0003, FILE_PATH, unchangingDataPropertiesObject.numSkippableBytes
         );
 
         // Test writing only the GUI and music notes data
