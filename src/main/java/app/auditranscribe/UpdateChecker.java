@@ -50,7 +50,7 @@ public class UpdateChecker extends LoggableClass {
     public static int CONNECTION_TIMEOUT = 1500;  // In milliseconds
     public static int READ_TIMEOUT = 2500;
 
-    public static int CHECK_FOR_UPDATE_INTERVAL = 10800;  // In seconds; 3 hours
+    public static int UPDATE_CHECKING_PAUSE_DURATION = 86400;  // In seconds; 1 day
 
     public static String AUDITRANSCRIBE_REPO = "AudiTranscribe/AudiTranscribe";
 
@@ -65,8 +65,11 @@ public class UpdateChecker extends LoggableClass {
     public static void checkForUpdates(String currentVersion) {
         // Determine if we need to check for updates
         int currentTime = (int) MiscUtils.getUnixTimestamp();
-        int lastChecked = DataFiles.PERSISTENT_DATA_FILE.data.lastCheckedForUpdates;
-        if (currentTime - lastChecked <= CHECK_FOR_UPDATE_INTERVAL) return;
+        int pausedUntil = DataFiles.PERSISTENT_DATA_FILE.data.updateCheckingPausedUntil;
+        if (currentTime < pausedUntil) {
+            log(Level.INFO, "Update checking paused until " + pausedUntil, UpdateChecker.class.getName());
+            return;
+        }
 
         // Check if there is any new updates available
         Pair<Boolean, String> response = checkIfHaveNewVersion(currentVersion);
@@ -99,16 +102,13 @@ public class UpdateChecker extends LoggableClass {
                     GUIUtils.openURLInBrowser(urlString);
                 } else if (selectedButton.get() == remindLater) {
                     // Suppress alert for a set duration
-                    DataFiles.PERSISTENT_DATA_FILE.data.lastCheckedForUpdates = currentTime;
+                    DataFiles.PERSISTENT_DATA_FILE.data.updateCheckingPausedUntil =
+                            currentTime + UPDATE_CHECKING_PAUSE_DURATION;
                     DataFiles.PERSISTENT_DATA_FILE.saveFile();
                 }
             }
         } else {
             log(Level.INFO, "AudiTranscribe is up to date", UpdateChecker.class.getName());
-
-            // Suppress alert for a set duration
-            DataFiles.PERSISTENT_DATA_FILE.data.lastCheckedForUpdates = currentTime;
-            DataFiles.PERSISTENT_DATA_FILE.saveFile();
         }
     }
 
