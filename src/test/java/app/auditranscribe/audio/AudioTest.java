@@ -48,6 +48,16 @@ class AudioTest {
         assertEquals(220500, audio.getNumMonoSamples());
     }
 
+    @Test
+    void checkMonoSamples() {
+        double[] samples = audio.getMonoSamples();
+        assertEquals(0.07012939453125, samples[1234], 1e-5);
+        assertEquals(0.0779266357421875, samples[2345], 1e-5);
+        assertEquals(0.0315704345703125, samples[3456], 1e-5);
+        assertEquals(-0.0475616455078125, samples[45678], 1e-5);
+        assertEquals(-0.0015411376953125, samples[212345], 1e-5);
+    }
+
     final boolean TEST_PLAYBACK = false;
 
     @Test
