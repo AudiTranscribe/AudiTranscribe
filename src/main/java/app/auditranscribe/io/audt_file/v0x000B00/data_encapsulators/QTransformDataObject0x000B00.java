@@ -19,7 +19,7 @@
 package app.auditranscribe.io.audt_file.v0x000B00.data_encapsulators;
 
 import app.auditranscribe.generic.tuples.Triple;
-import app.auditranscribe.io.ByteConversionHandler;
+import app.auditranscribe.utils.ByteConversionUtils;
 import app.auditranscribe.io.CompressionHandlers;
 import app.auditranscribe.io.audt_file.AUDTFileHelpers;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.QTransformDataObject;
@@ -92,7 +92,7 @@ public class QTransformDataObject0x000B00 extends QTransformDataObject {
         byte[] plainBytes = CompressionHandlers.deflateDecompressFailSilently(bytes);
 
         // Convert bytes to 2D integer array
-        int[][] intData = ByteConversionHandler.bytesToTwoDimensionalIntegerArray(plainBytes);
+        int[][] intData = ByteConversionUtils.bytesToTwoDimensionalIntegerArray(plainBytes);
 
         // Finally convert the integer data to double
         return AUDTFileHelpers.int2DtoDoubles2D(intData, minMagnitude, maxMagnitude);

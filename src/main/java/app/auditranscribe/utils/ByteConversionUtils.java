@@ -1,6 +1,6 @@
 /*
- * ByteConversionHandler.java
- * Description: Class that handles the conversion of bytes to different types.
+ * ByteConversionUtils.java
+ * Description: Byte conversion utilities.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package app.auditranscribe.io;
+package app.auditranscribe.utils;
 
 import app.auditranscribe.generic.exceptions.LengthException;
 
@@ -25,10 +25,10 @@ import java.nio.ByteOrder;
 import java.util.Arrays;
 
 /**
- * Class that handles the conversion of bytes to different types.
+ * Byte conversion utilities.
  */
-public final class ByteConversionHandler {
-    private ByteConversionHandler() {
+public final class ByteConversionUtils {
+    private ByteConversionUtils() {
         // Private constructor to signal this is a utility class
     }
 
