@@ -153,10 +153,6 @@ public class Audio extends LoggableClass {
         return numRawSamples;
     }
 
-    public double[] getRawSamples() {
-        return rawSamples;
-    }
-
     public int getNumMonoSamples() {
         return numMonoSamples;
     }
@@ -659,7 +655,7 @@ public class Audio extends LoggableClass {
             int cycleNum = 0;  // Number of times we read from the audio stream
             while ((numBytesRead = audioStream.read(bytes)) != -1) {
                 // Unpack the bytes into samples
-                unpackBytes(samples, transfer, bytes, numBytesRead);
+                unpackBytes(bytes, samples, transfer, numBytesRead);
 
                 // Add it to the master list of samples
                 if (numBytesRead / bytesPerSample >= 0) {
@@ -716,23 +712,22 @@ public class Audio extends LoggableClass {
     }
 
     /**
-     * Unpacks the set of bytes from a file (the array <code>bytes</code>) into audio sample data
-     * (into the array <code>samples</code>).
+     * Unpacks the raw audio bytes in the array <code>bytes</code> into audio sample data.
      *
-     * @param samples       (Initially) empty array that stores the samples. Fixed in length at
-     *                      <code>SAMPLES_BUFFER_SIZE * audioFormat.getChannels()</code> float
-     *                      data.
-     * @param transfer      (Initially) empty array that helps move data within the function. Fixed
-     *                      in length at <code>samples.length</code> long data.
-     * @param bytes         Array of bytes that is read in from the audio file. Fixed in length at
-     *                      <code>samples.length * bytesPerSample</code> bytes.
+     * @param bytes         Array of bytes that is read in from the audio file. Should have length
+     *                      <code>SAMPLES_BUFFER_SIZE * audioFormat.getChannels() *
+     *                      bytesPerSample</code>.
+     * @param samples       (Initially) empty array that stores the samples. Has length
+     *                      <code>SAMPLES_BUFFER_SIZE * audioFormat.getChannels()</code>.
+     * @param transfer      (Initially) empty array that helps move data within the function. Should
+     *                      have the same length as <code>samples</code>.
      * @param numValidBytes Number of valid bytes in the <code>bytes</code> array.
      * @implNote See the <a href="https://tinyurl.com/stefanSpectrogramOriginal">original
      * implementation on GitHub</a>. This code was largely adapted from that source.
      */
-    private void unpackBytes(float[] samples, long[] transfer, byte[] bytes, int numValidBytes) {
-        if (audioFormat.getEncoding() != AudioFormat.Encoding.PCM_SIGNED
-                && audioFormat.getEncoding() != AudioFormat.Encoding.PCM_UNSIGNED) {
+    private void unpackBytes(byte[] bytes, float[] samples, long[] transfer, int numValidBytes) {
+        AudioFormat.Encoding encoding = audioFormat.getEncoding();
+        if (encoding != AudioFormat.Encoding.PCM_SIGNED && encoding != AudioFormat.Encoding.PCM_UNSIGNED) {
             // `samples` is already good; no need to process
             return;
         }
@@ -748,7 +743,6 @@ public class Audio extends LoggableClass {
          * There are two loops converting bytes to raw long samples. Integral primitives in Java get sign extended when
          * they are promoted to a larger type, so the `& 0xffL` mask keeps them intact.
          */
-
         if (audioFormat.isBigEndian()) {
             for (int i = 0, k = 0, b; i < numValidBytes; i += bytesPerSample, k++) {
                 // Reset the current element's value to zero, so what was originally in `transfer` doesn't matter
@@ -773,10 +767,10 @@ public class Audio extends LoggableClass {
         }
 
         // Calculate scaling factor to normalize the samples to the interval [-1, 1]
-        final long fullScale = (long) Math.pow(2., bitsPerSample - 1);
+        long fullScale = (long) Math.pow(2., bitsPerSample - 1);
 
         // The OR is not quite enough to convert; signage needs to be corrected
-        if (audioFormat.getEncoding() == AudioFormat.Encoding.PCM_SIGNED) {
+        if (encoding == AudioFormat.Encoding.PCM_SIGNED) {
             /*
              * If the samples were signed, they must be extended to the 64-bit long.
              *
@@ -802,8 +796,7 @@ public class Audio extends LoggableClass {
              *    11111011
              */
 
-            final long signShift = 64L - bitsPerSample;
-
+            long signShift = 64L - bitsPerSample;
             for (int i = 0; i < transfer.length; i++) {
                 transfer[i] = ((transfer[i] << signShift) >> signShift);
             }
@@ -820,7 +813,7 @@ public class Audio extends LoggableClass {
 
         // Finally, normalise range to [-1, 1]
         for (int i = 0; i < transfer.length; i++) {
-            samples[i] = (float) transfer[i] / (float) fullScale;
+            samples[i] = (float) transfer[i] / fullScale;
         }
     }
 
