@@ -103,7 +103,7 @@ public class SetupWizard extends LoggableClass {
      */
     private String showFFmpegSetupView() {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getSetupWizardView("ffmpeg-setup.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getSetupWizardView("ffmpeg-setup-view.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
 
             FFmpegSetupViewController controller = fxmlLoader.getController();

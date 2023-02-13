@@ -220,7 +220,7 @@ public class FFmpegSetupViewController extends AbstractViewController {
     private String showDownloadingFFmpegView() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL(
-                    "fxml/views/setup-wizard/downloading-ffmpeg.fxml"
+                    "fxml/views/setup-wizard/downloading-ffmpeg-view.fxml"
             ));
             Scene scene = new Scene(fxmlLoader.load());
 

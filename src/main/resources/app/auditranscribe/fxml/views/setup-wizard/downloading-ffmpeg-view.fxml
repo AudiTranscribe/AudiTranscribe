@@ -32,7 +32,7 @@
    <stylesheets>
       <URL value="@../../css/base.css" />
       <URL value="@../../css/views/setup-wizard/common.css" />
-      <URL value="@../../css/views/setup-wizard/downloading-ffmpeg.css" />
+      <URL value="@../../css/views/setup-wizard/downloading-ffmpeg-view.css" />
       <URL value="@../../css/theme/shared-colours.css" />
       <URL value="@../../css/theme/light.css" />
    </stylesheets>

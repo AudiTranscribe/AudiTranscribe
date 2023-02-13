@@ -125,7 +125,7 @@
    </children>
    <stylesheets>
       <URL value="@../../css/base.css" />
-      <URL value="@../../css/views/main/homepage.css" />
+      <URL value="@../../css/views/main/homepage-view.css" />
       <URL value="@../../css/theme/shared-colours.css" />
       <URL value="@../../css/theme/light.css" />
    </stylesheets>

@@ -87,7 +87,7 @@
    </children>
    <stylesheets>
       <URL value="@../../css/base.css" />
-      <URL value="@../../css/views/main/project-setup.css" />
+      <URL value="@../../css/views/main/project-setup-view.css" />
       <URL value="@../../css/theme/shared-colours.css" />
       <URL value="@../../css/theme/light.css" />
    </stylesheets>
