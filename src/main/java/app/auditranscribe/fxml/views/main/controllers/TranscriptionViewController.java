@@ -170,6 +170,7 @@ public class TranscriptionViewController extends SwitchableViewController {
     private MusicNotesDataObject musicNotesData;
 
     private boolean debugMode = false;
+    private DebugViewController debugViewController = null;
 
     private boolean isEverythingReady = false;
 
@@ -1579,14 +1580,14 @@ public class TranscriptionViewController extends SwitchableViewController {
                 }
             }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);
 
-//            // Schedule debug view updating
-//            if (debugMode) {
-//                scheduler.scheduleAtFixedRate(() -> {
-//                    if (debugViewController != null) {
-//                        debugViewController.setListContent(getDebugInfo());
-//                    }
-//                }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);
-//            }
+            // Schedule debug view updating
+            if (debugMode) {
+                scheduler.scheduleAtFixedRate(() -> {
+                    if (debugViewController != null) {
+                        debugViewController.setListContent(getDebugInfo());
+                    }
+                }, 0, UPDATE_PLAYBACK_SCHEDULER_PERIOD, TimeUnit.MILLISECONDS);
+            }
 
             // Schedule autosave functionality
             scheduler.scheduleAtFixedRate(() -> Platform.runLater(
@@ -2047,7 +2048,7 @@ public class TranscriptionViewController extends SwitchableViewController {
 //            NoteRectangle.editAction(NoteRectangle.EditAction.REDO);
             return;
         } else if (DEBUG_COMBINATION.match(keyEvent)) {  // Show debug view
-//            debugViewController = DebugViewController.showDebugView(rootPane.getScene().getWindow());
+            if (debugMode) debugViewController = DebugViewController.showDebugView(rootPane.getScene().getWindow());
             return;
         }
 
@@ -2243,5 +2244,32 @@ public class TranscriptionViewController extends SwitchableViewController {
 
         // Return `File` pointer
         return auxiliaryWAVFile;
+    }
+
+    /**
+     * Helper method that returns the debug information needed for the debug view's lists.
+     *
+     * @return Debug information as a list of pairs.
+     */
+    private List<Pair<String, String>> getDebugInfo() {
+        return List.of(
+                new Pair<>("finalWidth", Double.toString(finalWidth)),
+                new Pair<>("finalHeight", Double.toString(finalHeight)),
+                new Pair<>("-----", "-----"),
+                new Pair<>("isPaused", Boolean.toString(isPaused)),
+                new Pair<>("currTime", Double.toString(currTime)),
+                new Pair<>("playheadX", playheadX.toString()),
+                new Pair<>("Playhead Line X-Coord", playheadLine.startXProperty().toString()),
+                new Pair<>("Coloured Progress Pane Position", colouredProgressPane.widthProperty().toString()),
+                new Pair<>("-----", "-----"),
+                new Pair<>("hasUnsavedChanges", Boolean.toString(hasUnsavedChanges)),
+                new Pair<>("audtFilePath", audtFilePath),
+                new Pair<>("audtFileName", audtFileName),
+                new Pair<>("-----", "-----"),
+                new Pair<>("isAudioMuted", Boolean.toString(isAudioMuted)),
+                new Pair<>("Audio Volume", Double.toString(audioVolumeSlider.getValue())),
+                new Pair<>("areNotesMuted", Boolean.toString(areNotesMuted)),
+                new Pair<>("Notes Volume", Double.toString(notesVolumeSlider.getValue()))
+        );
     }
 }
