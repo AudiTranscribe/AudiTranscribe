@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,9 +30,9 @@ class FFTTest {
         Complex[] fftArray3 = FFT.fft(array3);
 
         // Check the FFT output
-        assertEquals(fftArray1.length, 8);
-        assertEquals(fftArray2.length, 6);
-        assertEquals(fftArray3.length, 0);
+        assertEquals(8, fftArray1.length);
+        assertEquals(6, fftArray2.length);
+        assertEquals(0, fftArray3.length);
 
         assertEquals(new Complex(-4, -4), fftArray1[0].round(3));
         assertEquals(new Complex(-4, -9.657), fftArray1[1].round(3));
@@ -78,6 +79,7 @@ class FFTTest {
                 68.66050464419456, 98.64623871074612, 20.397346011908567, 33.125277868376244,
                 13.969015082960123, 58.838543552236466, 27.565901473219746, 81.41318148048603
         };
+        System.out.println(Arrays.toString(FFT.fft(realArrToComplex(array2))));
 
         // Convert both to complex number arrays
         Complex[] complexArray1 = realArrToComplex(array1);
@@ -88,8 +90,8 @@ class FFTTest {
         Complex[] rfftArray2 = FFT.rfft(complexArray2);
 
         // Check the RFFT outputs
-        assertEquals(rfftArray1.length, 4);
-        assertEquals(rfftArray2.length, 9);
+        assertEquals(4, rfftArray1.length);
+        assertEquals(9, rfftArray2.length);
 
         assertEquals(Complex.ZERO.round(5), rfftArray1[0].round(5));
         assertEquals(new Complex(-3.68598068, 5.64282152).round(5), rfftArray1[1].round(5));
@@ -127,8 +129,8 @@ class FFTTest {
         Complex[] complexNumberArray2 = FFT.ifft(fftComplexNumberArray2);
 
         // Check the IFFT output
-        assertEquals(complexNumberArray1.length, 8);
-        assertEquals(complexNumberArray2.length, 6);
+        assertEquals(8, complexNumberArray1.length);
+        assertEquals(6, complexNumberArray2.length);
 
         assertEquals(new Complex(1).round(5), complexNumberArray1[0].round(5));
         assertEquals(new Complex(0, 2).round(5), complexNumberArray1[1].round(5));
@@ -145,6 +147,55 @@ class FFTTest {
         assertEquals(new Complex(0, -4).round(5), complexNumberArray2[3].round(5));
         assertEquals(new Complex(5), complexNumberArray2[4].round(5));
         assertEquals(new Complex(0, 6).round(5), complexNumberArray2[5].round(5));
+    }
+
+    @Test
+    void irfft() {
+        // Define arrays to run IRFFT on
+        Complex[] rfftComplexArray1 = {
+                Complex.ZERO, new Complex(-3.68598068, 5.64282152),
+                new Complex(0.03318787, -19.7157882), new Complex(7.15279281, -2.16708578)
+        };
+        Complex[] rfftComplexArray2 = {
+                new Complex(719.8865527), new Complex(27.3594107, -15.5522762),
+                new Complex(73.3602140, -63.9871918), new Complex(-102.5935467, 137.5257334),
+                new Complex(76.5639314, -63.5043533), new Complex(-28.2492181, 37.7966577),
+                new Complex(-37.9363571, -29.8598376), new Complex(-69.3873350, 78.5321617),
+                new Complex(-191.0354334)
+        };
+
+        // Generate the IRFFT output
+        Complex[] complexArray1 = FFT.irfft(rfftComplexArray1, 7);
+        Complex[] complexArray2 = FFT.irfft(rfftComplexArray2, 16);
+
+        // Check the IRFFT output
+        assertEquals(7, complexArray1.length);
+        assertEquals(16, complexArray2.length);
+
+        assertEquals(new Complex(1), complexArray1[0].round(5));
+        assertEquals(new Complex(2), complexArray1[1].round(5));
+        assertEquals(new Complex(-3), complexArray1[2].round(5));
+        assertEquals(new Complex(-4), complexArray1[3].round(5));
+        assertEquals(new Complex(5), complexArray1[4].round(5));
+        assertEquals(new Complex(6), complexArray1[5].round(5));
+        assertEquals(new Complex(-7), complexArray1[6].round(5));
+
+        assertEquals(new Complex(25.442832341330558).round(5), complexArray2[0].round(5));
+        assertEquals(new Complex(67.35970565394922).round(5), complexArray2[1].round(5));
+        assertEquals(new Complex(35.09989960920626).round(5), complexArray2[2].round(5));
+        assertEquals(new Complex(61.77920972475006).round(5), complexArray2[3].round(5));
+        assertEquals(new Complex(62.4223934582534).round(5), complexArray2[4].round(5));
+        assertEquals(new Complex(34.63818528787935).round(5), complexArray2[5].round(5));
+        assertEquals(new Complex(10.867667057159514).round(5), complexArray2[6].round(5));
+        assertEquals(new Complex(19.66065078483943).round(5), complexArray2[7].round(5));
+        assertEquals(new Complex(68.66050464419456).round(5), complexArray2[8].round(5));
+        assertEquals(new Complex(98.64623871074612).round(5), complexArray2[9].round(5));
+        assertEquals(new Complex(20.397346011908567).round(5), complexArray2[10].round(5));
+        assertEquals(new Complex(33.125277868376244).round(5), complexArray2[11].round(5));
+        assertEquals(new Complex(13.969015082960123).round(5), complexArray2[12].round(5));
+        assertEquals(new Complex(58.838543552236466).round(5), complexArray2[13].round(5));
+        assertEquals(new Complex(27.565901473219746).round(5), complexArray2[14].round(5));
+        assertEquals(new Complex(81.41318148048603).round(5), complexArray2[15].round(5));
     }
 
     @Test

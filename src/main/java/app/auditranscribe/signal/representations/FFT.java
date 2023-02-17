@@ -82,8 +82,7 @@ public final class FFT {
     }
 
     /**
-     * Computes the Inverse FFT (IFFT) of a complex number array.<br>
-     * This assumes that the length of the input array is a power of 2.
+     * Computes the Inverse FFT (IFFT) of a complex number array.
      *
      * @param array The complex number array to apply the IFFT to.
      * @return An array of <code>Complex</code> objects representing the IFFT of <code>array</code>.
@@ -113,6 +112,28 @@ public final class FFT {
 
         // Return the inverse FFT array
         return y;
+    }
+
+    /**
+     * Computes the inverse Real-Valued FFT (IRFFT) of a complex number array.
+     *
+     * @param array                The complex number array to apply the IRFFT to.
+     * @param originalSignalLength Original length of the signal that was passed into the RFFT.
+     * @return An array of <code>Complex</code> objects representing the IRFFT of <code>array</code>.
+     */
+    public static Complex[] irfft(Complex[] array, int originalSignalLength) {
+        // Recover original 'full-length' complex array
+        Complex[] fullLengthArr = new Complex[originalSignalLength];
+        int length = array.length;
+
+        fullLengthArr[0] = array[0];
+        for (int i = 1; i < length; i++) {
+            fullLengthArr[i] = array[i];
+            fullLengthArr[originalSignalLength - i] = array[i].conjugate();
+        }
+
+        // Now perform inverse FFT
+        return ifft(fullLengthArr);
     }
 
     // Private methods
