@@ -396,7 +396,7 @@ public final class ArrayUtils {
      * <ul>
      *     <li>
      *         <code>[[1, 3, 5, 7, 9], [2, 4, 6, 8, 10], [3, 5, 7, 9, 11]]</code> if
-     *         <code>verticalFraming</code> is true; and
+     *         <code>verticalFraming</code> is <code>true</code>; and
      *     </li>
      *     <li>
      *         <code>[[1, 2, 3], [3, 4, 5], [5, 6, 7], [7, 8, 9], [9, 10, 11]]</code> if not (that
