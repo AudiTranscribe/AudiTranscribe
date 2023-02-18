@@ -52,7 +52,7 @@ public final class STFT {
      * @return Complex-valued matrix of STFT coefficients.
      * @implNote See
      * <a href="https://librosa.org/doc/main/_modules/librosa/core/spectrum.html#stft">Librosa's
-     * Implementation</a> of the STFT.
+     * implementation</a> of the STFT.
      */
     public static Complex[][] stft(double[] x, int numFFT, int hopLength, SignalWindow windowFunction) {
         // Get the FFT window
@@ -139,27 +139,22 @@ public final class STFT {
      * @return Signal reconstructed from the STFT matrix.
      * @implNote See
      * <a href="https://librosa.org/doc/main/_modules/librosa/core/spectrum.html#istft">Librosa's
-     * Implementation</a> of the ISTFT.
+     * implementation</a> of the ISTFT.
+     * @see <a href="https://www.audiolabs-erlangen.de/resources/MIR/FMP/C2/C2_STFT-Inverse.html">
+     * This resource</a> on how ISTFT is implemented in theory and in practice.
      */
     public static double[] istft(
             Complex[][] stftMatrix, int numFFT, int hopLength, SignalWindow windowFunction
     ) {
         int numFrames = stftMatrix[0].length;
 
-        // Get the inverse FFT window
+        // Get the inverse FFT window and pad
         double[] ifftWindow = windowFunction.window.generateWindow(numFFT, false);
-
-        // Pad the window out to `numFFT` size
         ifftWindow = ArrayUtils.padCenter(ifftWindow, numFFT);
 
-        // Define output array
-        int expectedSignalLength = (numFrames - 1) * hopLength + numFFT - 2 * (numFFT / 2);
-        int shape = expectedSignalLength;  // Todo: remove useless variable
-        double[] y = new double[shape];
-
-        // First handle frames that do not depend on padding
+        // Apply inverse FFT on head frame
         /*
-         * First index, k, that does not depend on padding satisfies the inequality
+         * First index (say, k) that does not depend on padding satisfies the inequality
          *      k * hopLength - numFFT / 2 >= 0
          * which implies
          *      k >= (numFFT / 2) / hopLength
@@ -185,27 +180,36 @@ public final class STFT {
         }
 
         // Perform overlap-add on head block
-        shape = (startFrame - 1) * hopLength + numFFT;
-        double[] headBuffer = new double[shape];
+        double[] headBuffer = new double[(startFrame - 1) * hopLength + numFFT];
         overlapAdd(headBuffer, yTemp, hopLength);
 
-        // If y is smaller than the head buffer, take everything. If not, trim off the first `numFFT / 2` samples from
-        // the head and copy into target buffer
-        System.arraycopy(headBuffer, numFFT / 2, y, 0, Math.min(y.length, shape - (numFFT / 2)));
+        // Define output array
+        double[] output = new double[(numFrames - 1) * hopLength + numFFT - 2 * (numFFT / 2)];
+
+        // If `output` is smaller than the head buffer, take everything. If not, trim off the first `numFFT / 2` samples
+        // from the head and copy into target buffer
+        System.arraycopy(
+                headBuffer,
+                numFFT / 2,
+                output,
+                0,
+                Math.min(output.length, headBuffer.length - (numFFT / 2))
+        );
+
+        // Determine the number of entries that we can process per iteration
+        // (note we multiply by 8 because there are 8 bytes per double)
+        int entriesPerIteration = Math.max(1, MAX_MEM_SIZE / (stftMatrix.length * stftMatrix[0].length * 8));
 
         // This offset compensates for any differences between frame alignment and padding truncation
-        // todo: remove variable
         int offset = startFrame * hopLength - (numFFT / 2);
 
-        // Determine number of columns to use when processing the ISTFT
-        int numCols = Math.max(1, MAX_MEM_SIZE / (stftMatrix.length * stftMatrix[0].length * 8));  // 8 bytes in double
-
-        for (int bl_s = startFrame, frame = 0; bl_s < numFrames; bl_s += numCols) {  // Todo: rename `bl_s`
-            int bl_t = Math.min(bl_s + numCols, numFrames);  // Todo: rename `bl_t`
-            yTemp = new double[numFFT][bl_t - bl_s];
+        // Process the remaining frames
+        for (int blockStart = startFrame, frameNum = 0; blockStart < numFrames; blockStart += entriesPerIteration) {
+            int blockEnd = Math.min(blockStart + entriesPerIteration, numFrames);
+            yTemp = new double[numFFT][blockEnd - blockStart];
 
             // Apply IRFFT to the block
-            for (int i = bl_s; i < bl_t; i++) {
+            for (int i = blockStart; i < blockEnd; i++) {
                 // Obtain the values to apply the IRFFT on
                 for (int j = 0; j < 1 + numFFT / 2; j++) {
                     tempFFT[j] = stftMatrix[j][i];
@@ -216,144 +220,95 @@ public final class STFT {
 
                 // Move values back the temp matrix
                 for (int j = 0; j < numFFT; j++) {
-                    yTemp[j][i - bl_s] = tempWindow[j].re * ifftWindow[j];
+                    yTemp[j][i - blockStart] = tempWindow[j].re * ifftWindow[j];
                 }
             }
 
             // Overlap-add the ISTFT block starting at the current frame
-            headBuffer = new double[y.length - (frame * hopLength + offset)];
+            headBuffer = new double[output.length - (frameNum * hopLength + offset)];
             overlapAdd(headBuffer, yTemp, hopLength);
 
             for (int i = 0; i < headBuffer.length; i++) {
-                y[i + frame * hopLength + offset] += headBuffer[i];
+                output[i + frameNum * hopLength + offset] += headBuffer[i];
             }
 
-            // Increment frame count
-            frame += bl_t - bl_s;
+            // Increment frame number
+            frameNum += blockEnd - blockStart;
         }
 
         // Normalize by sum of squared window
         double[] ifftWindowSumTemp = windowSumSquare(windowFunction, numFrames, hopLength, numFFT);
-        int start = numFFT / 2;  // Todo remove
+        double[] ifftWindowSum = new double[output.length];
+        System.arraycopy(
+                ifftWindowSumTemp,
+                numFFT / 2,
+                ifftWindowSum,
+                0,
+                Math.min(output.length, ifftWindowSumTemp.length)
+        );
 
-        double[] ifftWindowSum = new double[y.length];
-        System.arraycopy(ifftWindowSumTemp, start, ifftWindowSum, 0, Math.min(y.length, ifftWindowSumTemp.length));
-        for (int i = 0; i < y.length; i++) {
-            if (ifftWindowSum[i] != 0) y[i] /= ifftWindowSum[i];
+        for (int i = 0; i < output.length; i++) {
+            if (ifftWindowSum[i] != 0) output[i] /= ifftWindowSum[i];
         }
 
-        return y;
-
-        // TODO REMOVE
-
-//        // Obtain windowed frames
-//        double[][] xFrames = new double[numFFT][innerArrayLength];
-//        Complex[] tempFFT = new Complex[numFFT / 2 + 1];
-//        Complex[] tempWindow;
-//
-//        for (int i = 0; i < innerArrayLength; i++) {
-//            // Locate the complex array to apply the IRFFT to
-//            for (int j = 0; j < 1 + numFFT / 2; j++) {
-//                tempFFT[j] = stftMatrix[j][i];
-//            }
-//
-//            // Apply IRFFT to the temp array
-//            tempWindow = FFT.irfft(tempFFT, numFFT);
-//
-//            // Move values back into the matrix
-//            // FIXME: See https://www.audiolabs-erlangen.de/resources/MIR/FMP/C2/C2_STFT-Inverse.html
-//            for (int j = 0; j < numFFT; j++) {
-//                System.out.println(ifftWindow[j]);
-//                xFrames[j][i] = tempWindow[j].re / ifftWindow[j];
-//            }
-//            System.out.println();
-//        }
-//
-//        // Undo vertical framing
-//        int xHatLength = (xFrames[0].length - 1) * hopLength + numFFT;
-//        double[] xHat = new double[xHatLength];
-//        for (int index = 0, endFrameIndex = 0; endFrameIndex < xHatLength;
-//             index++, endFrameIndex += hopLength) {  // Iterate through the `framed` array
-//            for (int i = 0; i < numFFT; i++) {  // Iterate through the frame
-//                // Validate the value of `i`
-//                if (i + endFrameIndex < xHatLength && index < xFrames[0].length) {
-//                    xHat[i + endFrameIndex] = xFrames[i][index];
-//                }
-//            }
-//        }
-//
-//        // Undo pad center
-//        double[] x = new double[xHat.length - numFFT];
-//        System.arraycopy(xHat, numFFT, x, 0, xHat.length - numFFT);
-//
-//        return x;
-
-        // TODO REMOVE
-
-//        // Get the inverse FFT window
-//        double[] ifftWindow = windowFunction.window.generateWindow(numFFT, false);
-//
-//        // Pad the window out to `numFFT` size
-//        ifftWindow = ArrayUtils.padCenter(ifftWindow, numFFT);
-//
-//        // Compute the expected signal length
-//        int expectedSignalLen = numFFT + hopLength * (stftMatrix[0].length - 1);
-//        expectedSignalLen -= 2 * (numFFT / 2);  // `numFFT / 2` is floor division
-//
-//        // Initialize output matrix TODO ??
-//        double[][] y = new double[stftMatrix.length][expectedSignalLen];
-//
-//        // Find the starting frame
-//        /*
-//         * First index, k, that does not depend on padding satisfies the inequality
-//         *      k * hopLength - numFFT / 2 >= 0
-//         * which implies
-//         *      k >= (numFFT / 2) / hopLength
-//         */
-//        int startFrame = (int) (Math.ceil((double) numFFT / 2) / hopLength);
+        return output;
     }
 
     // Private methods
 
-    // Todo add docs
-    // Todo fix?
+    /**
+     * Helper method that performs the <em>overlap-add</em> operation for the ISTFT.
+     *
+     * @param y         Pre-allocated output buffer.
+     * @param yTemp     Windowed inverse-stft frames.
+     * @param hopLength Hop-length of the STFT analysis.
+     * @implNote See <a href="https://librosa.org/doc/main/_modules/librosa/core/spectrum.html">
+     * Librosa's implementation</a> of this method.
+     */
     private static void overlapAdd(double[] y, double[][] yTemp, int hopLength) {
-        int numFFT = yTemp.length;  // todo remove
-        int N = numFFT;
+        int numToProcess = yTemp.length;
 
         for (int frame = 0; frame < yTemp[0].length; frame++) {
             int sample = frame * hopLength;
-            if (N > y.length - sample) N = y.length - sample;
+            if (numToProcess > y.length - sample) numToProcess = y.length - sample;
 
-            for (int i = 0; i < N; i++) {
-                y[i + sample] += yTemp[i][frame];  // Fixme: is this right?
+            for (int i = 0; i < numToProcess; i++) {
+                y[i + sample] += yTemp[i][frame];
             }
         }
     }
 
-    // Todo add docs
-    private static double[] windowSumSquare(SignalWindow windowFunction, int numFrames, int hopLength, int numFFT) {
-        int windowLength = numFFT; // todo remove
-
-        // todo rename
-        int n = (numFrames - 1) * hopLength + numFFT;
-        double[] x = new double[n];
-
+    /**
+     * Compute the sum-square envelope of a window function at a given hop length.
+     *
+     * @param windowFunction Signal window function.
+     * @param numFrames      The number of analysis frames.
+     * @param hopLength      The number of samples to advance between frames.
+     * @param numFFT         Number of FFT bins.
+     * @return The sum-squared envelope of the window function.
+     * @implNote See
+     * <a href="https://librosa.org/doc/main/_modules/librosa/filters.html#window_sumsquare">
+     * Librosa's implementation</a> of this method.
+     */
+    private static double[] windowSumSquare(
+            SignalWindow windowFunction, int numFrames, int hopLength, int numFFT
+    ) {
         // Compute the squared window at the desired length
-        double[] winSq = windowFunction.window.generateWindow(windowLength, false);
-
-        for (int i = 0; i < windowLength; i++) winSq[i] *= winSq[i];  // Square each value
+        double[] winSq = windowFunction.window.generateWindow(numFFT, false);
+        for (int i = 0; i < numFFT; i++) winSq[i] *= winSq[i];  // Square each value
         winSq = ArrayUtils.padCenter(winSq, numFFT);
 
         // Fill the envelope
+        double[] sumSquare = new double[(numFrames - 1) * hopLength + numFFT];
+
         for (int i = 0; i < numFrames; i++) {
             int sampleNum = i * hopLength;
-            int end = Math.min(n, sampleNum + numFFT);
+            int end = Math.min(sumSquare.length, sampleNum + numFFT);
             for (int j = sampleNum; j < end; j++) {
-                x[j] += winSq[j - sampleNum];
+                sumSquare[j] += winSq[j - sampleNum];
             }
         }
 
-        return x;
+        return sumSquare;
     }
 }
