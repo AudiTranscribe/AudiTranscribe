@@ -26,10 +26,14 @@ import app.auditranscribe.generic.exceptions.ValueException;
 import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.data_files.DataFiles;
+import app.auditranscribe.misc.Complex;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.misc.StoppableThread;
+import app.auditranscribe.signal.representations.STFT;
 import app.auditranscribe.signal.resampling_filters.Filter;
+import app.auditranscribe.signal.windowing.SignalWindow;
 import app.auditranscribe.utils.MathUtils;
+import app.auditranscribe.utils.TypeConversionUtils;
 
 import javax.sound.sampled.*;
 import java.io.*;
@@ -47,6 +51,10 @@ public class Audio extends LoggableClass {
     // Constants
     public static final int SAMPLES_BUFFER_SIZE = 1024;  // In number of samples; 1024 = 2^10
     public static final int[] VALID_PLAYBACK_BUFFER_SIZES = {1024, 2048, 4096};  // In bytes
+
+    public static final int SLOWDOWN_NUM_FFT = 256;
+    public static final int SLOWDOWN_HOP_LENGTH = SLOWDOWN_NUM_FFT / 4;
+    public static final SignalWindow SLOWDOWN_WINDOW = SignalWindow.HANN_WINDOW;
 
     final int MAX_AUDIO_DURATION = 5;  // In minutes
 
@@ -707,17 +715,6 @@ public class Audio extends LoggableClass {
     }
 
     /**
-     * Returns the minimum number of bytes that are needed to fully store the number of bits
-     * specified.
-     *
-     * @param numBits Number of bits to store.
-     * @return Required number of bytes.
-     */
-    private static int numBytesForNumBits(int numBits) {
-        return numBits + 7 >> 3;
-    }
-
-    /**
      * Unpacks the raw audio bytes in the array <code>bytes</code> into audio sample data.
      *
      * @param bytes         Array of bytes that is read in from the audio file. Should have length
@@ -781,7 +778,7 @@ public class Audio extends LoggableClass {
              * set, so sign extend by first shifting left so that if the sample is supposed to be negative, it will
              * shift the sign bit in to the 64-bit MSB then shift back and fill with 1's.
              *
-             * As an example, imagining these were 4-bit samples originally and the destination is 8-bit, if we have a
+             * As an example, imagine these were 4-bit samples originally and the destination is 8-bit. If we have a
              * hypothetical sample -5 that ought to be negative, the left shift looks like this:
              *
              *    00001011
@@ -821,6 +818,82 @@ public class Audio extends LoggableClass {
     }
 
     /**
+     * Packs the provided samples into raw byte data.
+     *
+     * @param samples Samples to pack into byte data.
+     * @return Audio bytes.
+     */
+    private byte[] packBytes(float[] samples) {
+        // Declare a transfer array for moving data within the function
+        long[] transfer = new long[samples.length];
+
+        // Calculate scaling factor to normalize the samples to the interval [-1, 1]
+        long fullScale = (long) Math.pow(2., bitsPerSample - 1);
+
+        // Un-normalize samples
+        for (int i = 0; i < transfer.length; i++) {
+            transfer[i] = (long) (samples[i] * fullScale);
+        }
+
+        // Fix signing
+        AudioFormat.Encoding encoding = audioFormat.getEncoding();
+
+        if (encoding == AudioFormat.Encoding.PCM_SIGNED) {
+            /*
+             * De-extend the samples by truncating the extension from the 64-bit long.
+             *
+             * The number of bits that were extended is `64L - bitsPerSample`. So there are that many unused bytes
+             * before the actual sample value. Hence, a bitwise 'and' with the number with `bitsPerSample` 1s at the end
+             * should yield the original sample.
+             *
+             * As an example, imagine these were 4-bit samples originally and the destination is 8-bit. If we have a
+             * hypothetical sample -5, the 'unpacked' value would be
+             *      11111011
+             *
+             * The mask that we will be considering has four 1's at the end
+             *      00001111
+             *
+             * so the original sample can be retrieved by performing a bitwise 'and':
+             *      11111011
+             *    & 00001111
+             * =============
+             *      00001011
+             */
+
+            long bitmask = (1L << bitsPerSample) - 1;  // Generate `bitsPerSample` 1s
+
+            for (int i = 0; i < transfer.length; i++) {
+                transfer[i] &= bitmask;  // Apply bitmask to each
+            }
+        } else {
+            // Convert the signed values to unsigned values by adding the `fullScale` value
+            for (int i = 0; i < transfer.length; i++) {
+                transfer[i] += fullScale;
+            }
+        }
+
+        // Convert the long values back into bytes
+        byte[] bytes = new byte[transfer.length * bytesPerSample];
+
+        if (audioFormat.isBigEndian()) {
+            for (int i = 0, k = 0, b; i < bytes.length; i += bytesPerSample, k++) {
+                int least = i + bytesPerSample - 1;
+                for (b = 0; b < bytesPerSample; b++) {
+                    bytes[least - b] = (byte) ((transfer[k] >> (8 * b)) & 0xffL);  // `0xffL` removes all 'higher' values
+                }
+            }
+        } else {
+            for (int i = 0, k = 0, b; i < bytes.length; i += bytesPerSample, k++) {
+                for (b = 0; b < bytesPerSample; b++) {
+                    bytes[i + b] = (byte) ((transfer[k] >> (8 * b)) & 0xffL);  // `0xffL` removes all 'higher' values
+                }
+            }
+        }
+
+        return bytes;
+    }
+
+    /**
      * Helper method that assists with skipping forwards in the audio.
      *
      * @param secondsToSkip Number of seconds to skip forwards from the current position.
@@ -850,5 +923,57 @@ public class Audio extends LoggableClass {
     private void seekBackwards(double timeToSeekTo) {
         resetAudioStream();
         seekForwards(timeToSeekTo);
+    }
+
+    /**
+     * Helper method that generates 0.5x speed audio bytes.
+     *
+     * @param rawBytes      Bytes from the audio that is playing at normal speed.
+     * @param numValidBytes Number of valid bytes that can be read.
+     * @return The slowed bytes.
+     */
+    private byte[] generateSlowedBytes(byte[] rawBytes, int numValidBytes) {
+        // First unpack the bytes
+        int numSamplesPerBuffer = SAMPLES_BUFFER_SIZE * audioFormat.getChannels();
+        float[] rawSamples = new float[numSamplesPerBuffer];
+        unpackBytes(rawBytes, rawSamples, numValidBytes);
+
+        // Convert the samples to doubles
+        double[] originalSamples = TypeConversionUtils.floatArrayToDoubleArray(rawSamples);
+
+        // Perform STFT on samples
+        Complex[][] stftMatrix = STFT.stft(originalSamples, SLOWDOWN_NUM_FFT, SLOWDOWN_HOP_LENGTH, SLOWDOWN_WINDOW);
+
+        // Duplicate every entry row-wise, except final entry
+        // (i.e., increase the inner array length of the matrix)
+        int numSTFTBins = SLOWDOWN_NUM_FFT / 2 + 1;
+        int innerArrayLength = stftMatrix[0].length;
+
+        Complex[][] modifiedSTFTMatrix = new Complex[numSTFTBins][2 * innerArrayLength];
+        for (int i = 0; i < numSTFTBins; i++) {
+            for (int j = 0; j < innerArrayLength; j++) {
+                modifiedSTFTMatrix[i][j] = stftMatrix[i][j];
+                modifiedSTFTMatrix[i][j + 1] = stftMatrix[i][j];
+            }
+        }
+
+        // Retrieve modified audio samples
+        float[] modifiedSamples = TypeConversionUtils.doubleArrayToFloatArray(
+                STFT.istft(modifiedSTFTMatrix, SLOWDOWN_NUM_FFT, SLOWDOWN_HOP_LENGTH, SLOWDOWN_WINDOW)
+        );
+
+        // Pack into audio bytes
+        return packBytes(modifiedSamples);
+    }
+
+    /**
+     * Returns the minimum number of bytes that are needed to fully store the number of bits
+     * specified.
+     *
+     * @param numBits Number of bits to store.
+     * @return Required number of bytes.
+     */
+    private static int numBytesForNumBits(int numBits) {
+        return numBits + 7 >> 3;
     }
 }
