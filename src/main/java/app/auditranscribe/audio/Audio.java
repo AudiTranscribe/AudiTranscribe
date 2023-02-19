@@ -955,22 +955,9 @@ public class Audio extends LoggableClass {
         Complex[][] stftMatrix = STFT.stft(originalSamples, SLOWDOWN_NUM_FFT, SLOWDOWN_HOP_LENGTH, SLOWDOWN_WINDOW);
 
         // Fixme: this approach of audio slowdown produces horrible smearing
-        // Duplicate every entry row-wise, except final entry
-        // (i.e., increase the inner array length of the matrix)
-        int numSTFTBins = SLOWDOWN_NUM_FFT / 2 + 1;
-        int innerArrayLength = stftMatrix[0].length;
-
-        Complex[][] modifiedSTFTMatrix = new Complex[numSTFTBins][innerArrayLength * 2];
-        for (int i = 0; i < numSTFTBins; i++) {
-            for (int j = 0; j < innerArrayLength * 2; j += 2) {
-                modifiedSTFTMatrix[i][j] = stftMatrix[i][j / 2];
-                modifiedSTFTMatrix[i][j + 1] = stftMatrix[i][j / 2];
-            }
-        }
-
-        // Retrieve modified audio samples
+        //        cf. https://seyong92.github.io/PyTSMod-ISMIR2020LBD/
         float[] modifiedSamples = TypeConversionUtils.doubleArrayToFloatArray(
-                STFT.istft(modifiedSTFTMatrix, SLOWDOWN_NUM_FFT, SLOWDOWN_HOP_LENGTH, SLOWDOWN_WINDOW)
+                STFT.istft(stftMatrix, SLOWDOWN_NUM_FFT, SLOWDOWN_HOP_LENGTH * 2, SLOWDOWN_WINDOW)
         );
 
         // Pack into audio bytes
