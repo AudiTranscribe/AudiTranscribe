@@ -667,19 +667,16 @@ public class Audio extends LoggableClass {
             int numSamplesPerBuffer = SAMPLES_BUFFER_SIZE * audioFormat.getChannels();
             int numBuffers = MathUtils.ceilDiv(numRawSamples, numSamplesPerBuffer);
 
-            // Create a `finalSamples` array to store the samples
-            float[] finalSamples = new float[numBuffers * numSamplesPerBuffer];
-
             // Define helper arrays
-            float[] samples = new float[numSamplesPerBuffer];
             byte[] bytes = new byte[numSamplesPerBuffer * bytesPerSample];
+            float[] finalSamples = new float[numBuffers * numSamplesPerBuffer];  // Stores the final samples
 
             // Get samples
             int numBytesRead;
             int cycleNum = 0;  // Number of times we read from the audio stream
             while ((numBytesRead = audioStream.read(bytes)) != -1) {
                 // Unpack the bytes into samples
-                unpackBytes(bytes, samples, numBytesRead);
+                float[] samples = unpackBytes(bytes, numBytesRead);
 
                 // Add it to the master list of samples
                 if (numBytesRead / bytesPerSample >= 0) {
@@ -730,17 +727,20 @@ public class Audio extends LoggableClass {
      * @param bytes         Array of bytes that is read in from the audio file. Should have length
      *                      <code>SAMPLES_BUFFER_SIZE * audioFormat.getChannels() *
      *                      bytesPerSample</code>.
-     * @param samples       (Initially) empty array that stores the samples. Has length
-     *                      <code>SAMPLES_BUFFER_SIZE * audioFormat.getChannels()</code>.
      * @param numValidBytes Number of valid bytes in the <code>bytes</code> array.
+     * @return Array that stores the audio samples.
      * @implNote See the <a href="https://tinyurl.com/stefanSpectrogramOriginal">original
      * implementation on GitHub</a>. This code was largely adapted from that source.
      */
-    private void unpackBytes(byte[] bytes, float[] samples, int numValidBytes) {
+    private float[] unpackBytes(byte[] bytes, int numValidBytes) {
+        // Declare the samples array
+        float[] samples = new float[bytes.length / bytesPerSample];
+
+        // Check if we need to process the `samples` array
         AudioFormat.Encoding encoding = audioFormat.getEncoding();
         if (encoding != AudioFormat.Encoding.PCM_SIGNED && encoding != AudioFormat.Encoding.PCM_UNSIGNED) {
             // `samples` is already good; no need to process
-            return;
+            return samples;
         }
 
         // Declare a transfer array for moving data within the function
@@ -825,6 +825,8 @@ public class Audio extends LoggableClass {
         for (int i = 0; i < transfer.length; i++) {
             samples[i] = (float) transfer[i] / fullScale;
         }
+
+        return samples;
     }
 
     /**
@@ -944,9 +946,7 @@ public class Audio extends LoggableClass {
      */
     private byte[] generateSlowedBytes(byte[] rawBytes, int numValidBytes) {
         // First unpack the bytes
-        int numSamplesPerBuffer = SAMPLES_BUFFER_SIZE * audioFormat.getChannels();
-        float[] rawSamples = new float[numSamplesPerBuffer];
-        unpackBytes(rawBytes, rawSamples, numValidBytes);
+        float[] rawSamples = unpackBytes(rawBytes, numValidBytes);
 
         // Convert the samples to doubles
         double[] originalSamples = TypeConversionUtils.floatArrayToDoubleArray(rawSamples);
