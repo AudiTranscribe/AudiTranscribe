@@ -28,7 +28,7 @@ public final class TypeConversionUtils {
         // Private constructor to signal this is a utility class
     }
 
-    // Public methods
+    // Primitive - non-primitive type conversion
 
     /**
      * Method that converts primitive byte array to a non-primitive byte array.
@@ -182,5 +182,36 @@ public final class TypeConversionUtils {
             result[i] = booleans[i];
         }
         return result;
+    }
+
+    // Other type conversions
+
+    /**
+     * Method that converts a double array to a float array.<br>
+     * <b>Warning</b>: Precision may be lost when converting from doubles to floats.
+     *
+     * @param array Double array.
+     * @return Float array.
+     */
+    public static float[] doubleArrayToFloatArray(double[] array) {
+        float[] output = new float[array.length];
+        for (int i = 0; i < array.length; i++) {
+            output[i] = (float) array[i];
+        }
+        return output;
+    }
+
+    /**
+     * Method that converts a float array to a double array.
+     *
+     * @param array Float array.
+     * @return Double array.
+     */
+    public static double[] floatArrayToDoubleArray(float[] array) {
+        double[] output = new double[array.length];
+        for (int i = 0; i < array.length; i++) {
+            output[i] = array[i];
+        }
+        return output;
     }
 }
