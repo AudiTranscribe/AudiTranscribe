@@ -61,6 +61,9 @@ public class Audio extends LoggableClass {
     private final double sampleRate;
     private final double duration;  // In seconds
 
+    final int bitsPerSample;
+    final int bytesPerSample;
+
     private double timeToResumeAt;  // Time that the audio should continue playing at upon resuming
     private double prevElapsedTime;  // Time (in seconds) that was elapsed before a skip forwards/backwards
 
@@ -113,6 +116,10 @@ public class Audio extends LoggableClass {
         frameSize = audioFormat.getFrameSize();
         frameRate = audioFormat.getFrameRate();
         sampleRate = audioFormat.getSampleRate();
+
+        // Calculate the number of bytes needed to store each sample
+        bitsPerSample = audioFormat.getSampleSizeInBits();
+        bytesPerSample = numBytesForNumBits(bitsPerSample);
 
         // Compute the duration of the audio file
         long frames = audioStream.getFrameLength();
@@ -647,7 +654,6 @@ public class Audio extends LoggableClass {
 
             // Define helper arrays
             float[] samples = new float[numSamplesPerBuffer];
-            long[] transfer = new long[numSamplesPerBuffer];
             byte[] bytes = new byte[numSamplesPerBuffer * bytesPerSample];
 
             // Get samples
@@ -655,7 +661,7 @@ public class Audio extends LoggableClass {
             int cycleNum = 0;  // Number of times we read from the audio stream
             while ((numBytesRead = audioStream.read(bytes)) != -1) {
                 // Unpack the bytes into samples
-                unpackBytes(bytes, samples, transfer, numBytesRead);
+                unpackBytes(bytes, samples, numBytesRead);
 
                 // Add it to the master list of samples
                 if (numBytesRead / bytesPerSample >= 0) {
@@ -719,22 +725,19 @@ public class Audio extends LoggableClass {
      *                      bytesPerSample</code>.
      * @param samples       (Initially) empty array that stores the samples. Has length
      *                      <code>SAMPLES_BUFFER_SIZE * audioFormat.getChannels()</code>.
-     * @param transfer      (Initially) empty array that helps move data within the function. Should
-     *                      have the same length as <code>samples</code>.
      * @param numValidBytes Number of valid bytes in the <code>bytes</code> array.
      * @implNote See the <a href="https://tinyurl.com/stefanSpectrogramOriginal">original
      * implementation on GitHub</a>. This code was largely adapted from that source.
      */
-    private void unpackBytes(byte[] bytes, float[] samples, long[] transfer, int numValidBytes) {
+    private void unpackBytes(byte[] bytes, float[] samples, int numValidBytes) {
         AudioFormat.Encoding encoding = audioFormat.getEncoding();
         if (encoding != AudioFormat.Encoding.PCM_SIGNED && encoding != AudioFormat.Encoding.PCM_UNSIGNED) {
             // `samples` is already good; no need to process
             return;
         }
 
-        // Calculate the number of bytes needed to store each sample
-        final int bitsPerSample = audioFormat.getSampleSizeInBits();
-        final int bytesPerSample = numBytesForNumBits(bitsPerSample);
+        // Declare a transfer array for moving data within the function
+        long[] transfer = new long[samples.length];
 
         /*
          * This isn't the most DRY way to do this, but it's more efficient. The helper array `transfer` allows the logic
