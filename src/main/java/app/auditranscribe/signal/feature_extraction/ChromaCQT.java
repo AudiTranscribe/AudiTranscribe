@@ -116,11 +116,23 @@ public final class ChromaCQT {
         }
 
         // Normalize the chroma values
-        double[][] chromaTransposed = MatrixUtils.transpose(chroma);
-        for (int i = 0; i < chromaTransposed.length; i++) {
-            chromaTransposed[i] = ArrayUtils.lpNormalize(chromaTransposed[i], Double.POSITIVE_INFINITY);
+        double[] temp = new double[chroma.length];
+        for (int i = 0; i < chroma[0].length; i++) {
+            // Place column into `temp` array
+            for (int j = 0; j < chroma.length; j++) {
+                temp[j] = chroma[j][i];
+            }
+
+            // Normalize the `temp` array
+            temp = ArrayUtils.lpNormalize(temp, Double.POSITIVE_INFINITY);
+
+            // Place back into the `chroma` array
+            for (int j = 0; j < chroma.length; j++) {
+                chroma[j][i] = temp[j];
+            }
         }
-        return MatrixUtils.transpose(chromaTransposed);
+
+        return chroma;
     }
 
     // Private methods

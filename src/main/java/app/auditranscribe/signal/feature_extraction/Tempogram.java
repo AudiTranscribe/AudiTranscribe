@@ -24,7 +24,6 @@ import app.auditranscribe.signal.time_domain_processing.Autocorrelation;
 import app.auditranscribe.signal.windowing.SignalWindow;
 import app.auditranscribe.utils.ArrayUtils;
 import app.auditranscribe.utils.MathUtils;
-import app.auditranscribe.utils.MatrixUtils;
 
 /**
  * Computes the local autocorrelation of the onset strength envelope.
@@ -64,21 +63,14 @@ public class Tempogram {
 
         for (int i = 0; i < padAmount; i++) {
             onsetEnvelope[i] = MathUtils.normalize(
-                    (double) (i + 1) / padAmount,
-                    0,
-                    1,
-                    0,
-                    rawOnsetEnvelope[0]
+                    (double) (i + 1) / padAmount, 0, 1, 0, rawOnsetEnvelope[0]
             );
         }
         System.arraycopy(rawOnsetEnvelope, 0, onsetEnvelope, padAmount, n);
         for (int i = padAmount + n; i < onsetEnvelope.length; i++) {
             onsetEnvelope[i] = MathUtils.normalize(
-                    (double) (i - padAmount - n + 1) / padAmount,
-                    0,
-                    1,
-                    rawOnsetEnvelope[rawOnsetEnvelope.length - 1],
-                    0
+                    (double) (i - padAmount - n + 1) / padAmount, 0, 1,
+                    rawOnsetEnvelope[rawOnsetEnvelope.length - 1], 0
             );
         }
 
@@ -106,16 +98,23 @@ public class Tempogram {
         // Autocorrelate the windowed onset envelope
         double[][] autocorrelated = Autocorrelation.autocorrelation(odfWindowed);
 
-        // Transpose the autocorrelation
-        double[][] autocorrelatedTransposed = MatrixUtils.transpose(autocorrelated);
-
-        // Normalize the transposed autocorrelation
-        double[][] normalizedTransposed = new double[n][winLength];
+        // Normalize autocorrelation
+        double[] temp = new double[winLength];
         for (int i = 0; i < n; i++) {
-            normalizedTransposed[i] = ArrayUtils.lpNormalize(autocorrelatedTransposed[i], Double.POSITIVE_INFINITY);
+            // Place column into `temp` array
+            for (int j = 0; j < winLength; j++) {
+                temp[j] = autocorrelated[j][i];
+            }
+
+            // Normalize the `temp` array
+            temp = ArrayUtils.lpNormalize(temp, Double.POSITIVE_INFINITY);
+
+            // Place back into the autocorrelation matrix
+            for (int j = 0; j < winLength; j++) {
+                autocorrelated[j][i] = temp[j];
+            }
         }
 
-        // Transpose back and return
-        return MatrixUtils.transpose(normalizedTransposed);
+        return autocorrelated;
     }
 }
