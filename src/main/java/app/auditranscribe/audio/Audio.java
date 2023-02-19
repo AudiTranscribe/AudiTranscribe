@@ -77,6 +77,7 @@ public class Audio extends LoggableClass {
 
     private double volume = 1;
     private boolean paused = false;
+    private boolean isSlowed = false;
 
     private boolean withPlayback = false;
     private SourceDataLine sourceDataLine;
@@ -185,7 +186,11 @@ public class Audio extends LoggableClass {
     }
 
     public double getCurrentTime() {
-        return sourceDataLine.getMicrosecondPosition() / 1e6 - prevElapsedTime;
+        return sourceDataLine.getMicrosecondPosition() / 1e6 - prevElapsedTime;  // Todo: work with slowed audio
+    }
+
+    public void setSlowed(boolean slowed) {
+        isSlowed = slowed;
     }
 
     // Audio playback methods
@@ -247,7 +252,7 @@ public class Audio extends LoggableClass {
         }
 
         // Update the previously elapsed time and the time to resume at
-        prevElapsedTime = sourceDataLine.getMicrosecondPosition() / 1e6 - seekTime;
+        prevElapsedTime = sourceDataLine.getMicrosecondPosition() / 1e6 - seekTime;  // Todo: work with slowed audio
         timeToResumeAt = seekTime;
     }
 
@@ -558,7 +563,12 @@ public class Audio extends LoggableClass {
                         }
 
                         // Write audio bytes for playback
-                        sourceDataLine.write(bufferBytes, 0, numBytesRead);
+                        if (!isSlowed) {
+                            sourceDataLine.write(bufferBytes, 0, numBytesRead);
+                        } else {
+                            byte[] slowedBytes = generateSlowedBytes(bufferBytes, numBytesRead);
+                            sourceDataLine.write(slowedBytes, 0, slowedBytes.length);
+                        }
                     }
                 }
             }
@@ -879,13 +889,13 @@ public class Audio extends LoggableClass {
             for (int i = 0, k = 0, b; i < bytes.length; i += bytesPerSample, k++) {
                 int least = i + bytesPerSample - 1;
                 for (b = 0; b < bytesPerSample; b++) {
-                    bytes[least - b] = (byte) ((transfer[k] >> (8 * b)) & 0xffL);  // `0xffL` removes all 'higher' values
+                    bytes[least - b] = (byte) ((transfer[k] >> (8 * b)) & 0xffL);  // `0xffL` removes 'higher' values
                 }
             }
         } else {
             for (int i = 0, k = 0, b; i < bytes.length; i += bytesPerSample, k++) {
                 for (b = 0; b < bytesPerSample; b++) {
-                    bytes[i + b] = (byte) ((transfer[k] >> (8 * b)) & 0xffL);  // `0xffL` removes all 'higher' values
+                    bytes[i + b] = (byte) ((transfer[k] >> (8 * b)) & 0xffL);  // `0xffL` removes 'higher' values
                 }
             }
         }
@@ -944,16 +954,17 @@ public class Audio extends LoggableClass {
         // Perform STFT on samples
         Complex[][] stftMatrix = STFT.stft(originalSamples, SLOWDOWN_NUM_FFT, SLOWDOWN_HOP_LENGTH, SLOWDOWN_WINDOW);
 
+        // Fixme: this approach of audio slowdown produces horrible smearing
         // Duplicate every entry row-wise, except final entry
         // (i.e., increase the inner array length of the matrix)
         int numSTFTBins = SLOWDOWN_NUM_FFT / 2 + 1;
         int innerArrayLength = stftMatrix[0].length;
 
-        Complex[][] modifiedSTFTMatrix = new Complex[numSTFTBins][2 * innerArrayLength];
+        Complex[][] modifiedSTFTMatrix = new Complex[numSTFTBins][innerArrayLength * 2];
         for (int i = 0; i < numSTFTBins; i++) {
-            for (int j = 0; j < innerArrayLength; j++) {
-                modifiedSTFTMatrix[i][j] = stftMatrix[i][j];
-                modifiedSTFTMatrix[i][j + 1] = stftMatrix[i][j];
+            for (int j = 0; j < innerArrayLength * 2; j += 2) {
+                modifiedSTFTMatrix[i][j] = stftMatrix[i][j / 2];
+                modifiedSTFTMatrix[i][j + 1] = stftMatrix[i][j / 2];
             }
         }
 
