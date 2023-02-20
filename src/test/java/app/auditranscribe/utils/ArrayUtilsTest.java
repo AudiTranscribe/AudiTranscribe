@@ -106,6 +106,27 @@ class ArrayUtilsTest {
     }
 
     @Test
+    void arange() {
+        // Define correct arrays
+        double[] correct1 = {
+                -0.5, -0.4, -0.3, -0.2, -0.1, 0., 0.1, 0.2, 0.3, 0.4
+        };
+        double[] correct2 = {
+                1
+        };
+        double[] correct3 = {
+                1, 1.3, 1.6, 1.9
+        };
+        double[] correct4 = {};
+
+        assertArrayEquals(correct1, ArrayUtils.arange(-0.5, 0.5, 0.1), 1e-5);
+        assertArrayEquals(correct2, ArrayUtils.arange(1, 2, 1), 1e-5);
+        assertArrayEquals(correct3, ArrayUtils.arange(1, 2, 0.3), 1e-5);
+        assertArrayEquals(correct4, ArrayUtils.arange(1, 1, 0.2), 1e-5);
+        assertArrayEquals(correct4, ArrayUtils.arange(1, 0, 0.2), 1e-5);
+    }
+
+    @Test
     void linspace() {
         // Define correct arrays
         double[] correct1 = {

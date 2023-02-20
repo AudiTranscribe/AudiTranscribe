@@ -139,6 +139,30 @@ public final class ArrayUtils {
     }
 
     /**
+     * Return evenly spaced values within a given interval.<br>
+     * Returns evenly spaced samples from the interval <code>[start, end)</code> (including
+     * <code>start</code> but not <code>end</code>) separated by <code>step</code>.
+     *
+     * @param start Start of interval.
+     * @param end   End of interval.
+     * @param step  Spacing between values.
+     * @return Array of evenly spaced values.
+     */
+    public static double[] arange(double start, double end, double step) {
+        if (start >= end) return new double[0];
+
+        int length = (int) Math.ceil((end - start) / step);
+        double[] out = new double[length];
+
+        out[0] = start;
+        for (int i = 1; i < length; i++) {
+            out[i] = out[i - 1] + step;
+        }
+
+        return out;
+    }
+
+    /**
      * Return evenly spaced numbers over a specified interval.<br>
      * Returns <code>numElem</code> evenly spaced samples from the interval
      * <code>[start, end]</code> (including endpoints).
