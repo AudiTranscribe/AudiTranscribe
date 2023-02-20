@@ -225,6 +225,18 @@ public class Complex {
     }
 
     /**
+     * Generates a complex number based off the magnitude and phase of the complex number.
+     *
+     * @param magnitude Magnitude (or modulus) of the complex number.
+     * @param phase     Phase (or argument) of the complex number.
+     * @return The complex number with the specified magnitude and phase.
+     */
+    public static Complex fromMagnitudeAndPhase(double magnitude, double phase) {
+        Complex trigPart = new Complex(Math.cos(phase), Math.sin(phase));
+        return trigPart.times(magnitude);
+    }
+
+    /**
      * Rounds both the real and imaginary part of this complex number to a certain number
      * of decimal places, <code>dp</code>.
      *

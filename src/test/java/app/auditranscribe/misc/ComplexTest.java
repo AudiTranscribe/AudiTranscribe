@@ -239,6 +239,26 @@ class ComplexTest {
         );
     }
 
+    @Test
+    void fromMagnitudeAndPhase() {
+        assertEquals(
+                new Complex(2),
+                Complex.fromMagnitudeAndPhase(2, 0).round(7)
+        );
+        assertEquals(
+                new Complex(0, 2),
+                Complex.fromMagnitudeAndPhase(2, Math.PI / 2).round(7)
+        );
+        assertEquals(
+                new Complex(-2),
+                Complex.fromMagnitudeAndPhase(2, Math.PI).round(7)
+        );
+        assertEquals(
+                new Complex(0, -2),
+                Complex.fromMagnitudeAndPhase(2, 3 * Math.PI / 2).round(7)
+        );
+    }
+
     // Overridden methods
     @Test
     void testEquality() {

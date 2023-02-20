@@ -21,6 +21,7 @@ package app.auditranscribe.audio;
 import app.auditranscribe.audio.exceptions.AudioPlaybackNotSupported;
 import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.audio.exceptions.FFmpegNotFoundException;
+import app.auditranscribe.audio.time_stretching.PhaseVocoder;
 import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.generic.exceptions.ValueException;
 import app.auditranscribe.io.IOConstants;
@@ -566,6 +567,7 @@ public class Audio extends LoggableClass {
                         if (!isSlowed) {
                             sourceDataLine.write(bufferBytes, 0, numBytesRead);
                         } else {
+                            // Fixme: is the horrible smearing caused by too small of a buffer?
                             byte[] slowedBytes = generateSlowedBytes(bufferBytes, numBytesRead);
                             sourceDataLine.write(slowedBytes, 0, slowedBytes.length);
                         }
@@ -955,9 +957,12 @@ public class Audio extends LoggableClass {
         Complex[][] stftMatrix = STFT.stft(originalSamples, SLOWDOWN_NUM_FFT, SLOWDOWN_HOP_LENGTH, SLOWDOWN_WINDOW);
 
         // Fixme: this approach of audio slowdown produces horrible smearing
-        //        cf. https://seyong92.github.io/PyTSMod-ISMIR2020LBD/
+        // Perform time stretching
+        Complex[][] modifiedSTFT = PhaseVocoder.phaseVocoder(stftMatrix, SLOWDOWN_HOP_LENGTH, 0.5);
+
+        // Obtain modified samples
         float[] modifiedSamples = TypeConversionUtils.doubleArrayToFloatArray(
-                STFT.istft(stftMatrix, SLOWDOWN_NUM_FFT, SLOWDOWN_HOP_LENGTH * 2, SLOWDOWN_WINDOW)
+                STFT.istft(modifiedSTFT, SLOWDOWN_NUM_FFT, SLOWDOWN_HOP_LENGTH, SLOWDOWN_WINDOW)
         );
 
         // Pack into audio bytes
