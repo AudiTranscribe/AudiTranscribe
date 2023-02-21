@@ -22,6 +22,9 @@ import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.misc.Complex;
 import app.auditranscribe.utils.ArrayUtils;
 
+/**
+ * Implements a phase vocoder.
+ */
 public final class PhaseVocoder extends LoggableClass {
     private PhaseVocoder() {
         // Private constructor to signal this is a utility class
