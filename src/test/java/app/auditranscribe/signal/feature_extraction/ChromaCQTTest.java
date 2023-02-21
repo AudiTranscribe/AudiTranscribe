@@ -1,7 +1,6 @@
 package app.auditranscribe.signal.feature_extraction;
 
 import app.auditranscribe.audio.Audio;
-import app.auditranscribe.audio.AudioProcessingMode;
 import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.generic.exceptions.ValueException;
 import app.auditranscribe.io.IOMethods;
@@ -19,7 +18,7 @@ class ChromaCQTTest {
     // Get audio file, audio samples, and sample rate for the tests
     Audio audio = new Audio(
             new File(IOMethods.getAbsoluteFilePath("test-files/general/audio/Trumpet.wav")),
-            AudioProcessingMode.WITH_SAMPLES
+            Audio.ProcessingMode.WITH_SAMPLES
     );
 
     double[] samples = audio.getMonoSamples();

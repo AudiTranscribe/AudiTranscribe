@@ -1,7 +1,6 @@
 package app.auditranscribe.signal.representations;
 
 import app.auditranscribe.audio.Audio;
-import app.auditranscribe.audio.AudioProcessingMode;
 import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.generic.exceptions.ValueException;
 import app.auditranscribe.io.IOMethods;
@@ -34,7 +33,7 @@ class QTransformTest {
         // Get audio file and audio samples for the tests
         audio = new Audio(
                 new File(IOMethods.getAbsoluteFilePath("test-files/general/audio/Choice.wav")),
-                AudioProcessingMode.WITH_SAMPLES
+                Audio.ProcessingMode.WITH_SAMPLES
         );
         samples = audio.getMonoSamples();
 

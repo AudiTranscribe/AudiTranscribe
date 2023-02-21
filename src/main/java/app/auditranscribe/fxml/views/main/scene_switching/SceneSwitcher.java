@@ -19,7 +19,6 @@
 package app.auditranscribe.fxml.views.main.scene_switching;
 
 import app.auditranscribe.audio.Audio;
-import app.auditranscribe.audio.AudioProcessingMode;
 import app.auditranscribe.audio.FFmpegHandler;
 import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.audio.exceptions.FFmpegNotFoundException;
@@ -236,7 +235,7 @@ public class SceneSwitcher extends LoggableClass {
             // Convert original audio file into a WAV file for processing
             Audio audio = new Audio(
                     new File(FFmpegHandler.convertAudio(audioFile, wavFilePath)),
-                    AudioProcessingMode.WITH_SAMPLES, AudioProcessingMode.WITH_PLAYBACK
+                    Audio.ProcessingMode.WITH_SAMPLES, Audio.ProcessingMode.WITH_PLAYBACK
             );
 
             // Get the current scene and the spectrogram view controller

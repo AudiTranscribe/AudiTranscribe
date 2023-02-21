@@ -1,7 +1,6 @@
 package app.auditranscribe.signal.onset_detection;
 
 import app.auditranscribe.audio.Audio;
-import app.auditranscribe.audio.AudioProcessingMode;
 import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.io.IOMethods;
 import org.junit.jupiter.api.Test;
@@ -18,11 +17,11 @@ class OnsetTest {
         // Get the audio files
         Audio audio1 = new Audio(
                 new File(IOMethods.getAbsoluteFilePath("test-files/general/audio/Choice.wav")),
-                AudioProcessingMode.WITH_SAMPLES
+                Audio.ProcessingMode.WITH_SAMPLES
         );
         Audio audio2 = new Audio(
                 new File(IOMethods.getAbsoluteFilePath("test-files/signal/onset_detection/OnsetTest/LevelsOfC.wav")),
-                AudioProcessingMode.WITH_SAMPLES
+                Audio.ProcessingMode.WITH_SAMPLES
         );
 
         // Extract samples and sample rate

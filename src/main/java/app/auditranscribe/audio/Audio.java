@@ -109,10 +109,10 @@ public class Audio extends LoggableClass {
      *                                       permitted.
      */
     public Audio(
-            File wavFile, AudioProcessingMode... processingModes
+            File wavFile, ProcessingMode... processingModes
     ) throws UnsupportedAudioFileException, IOException, AudioTooLongException {
         // Convert the given processing modes as a list
-        List<AudioProcessingMode> modes = List.of(processingModes);
+        List<ProcessingMode> modes = List.of(processingModes);
 
         // Attempt to convert the input stream into an audio input stream
         this.wavFile = wavFile;
@@ -144,12 +144,12 @@ public class Audio extends LoggableClass {
         }
 
         // Generate audio samples if requested
-        if (modes.contains(AudioProcessingMode.WITH_SAMPLES)) {
+        if (modes.contains(ProcessingMode.WITH_SAMPLES)) {
             generateSamples();
         }
 
         // Allow audio playback if requested
-        if (modes.contains(AudioProcessingMode.WITH_PLAYBACK)) {
+        if (modes.contains(ProcessingMode.WITH_PLAYBACK)) {
             withPlayback = true;
             setAudioPlaybackThread();
         } else {
@@ -972,4 +972,11 @@ public class Audio extends LoggableClass {
     private static int numBytesForNumBits(int numBits) {
         return numBits + 7 >> 3;
     }
+
+    // Helper classes
+
+    /**
+     * Enum that contains different audio processing modes.
+     */
+    public enum ProcessingMode {WITH_SAMPLES, WITH_PLAYBACK}
 }

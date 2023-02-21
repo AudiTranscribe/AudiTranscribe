@@ -1,7 +1,6 @@
 package app.auditranscribe.music;
 
 import app.auditranscribe.audio.Audio;
-import app.auditranscribe.audio.AudioProcessingMode;
 import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.generic.exceptions.ValueException;
 import app.auditranscribe.generic.tuples.Pair;
@@ -22,7 +21,7 @@ class MusicKeyEstimatorTest {
         // Test 1
         Audio audio1 = new Audio(
                 new File(IOMethods.getAbsoluteFilePath("test-files/general/audio/Choice.wav")),
-                AudioProcessingMode.WITH_SAMPLES
+                Audio.ProcessingMode.WITH_SAMPLES
         );
 
         double[] samples1 = audio1.getMonoSamples();
@@ -34,7 +33,7 @@ class MusicKeyEstimatorTest {
         // Test 2
         Audio audio2 = new Audio(
                 new File(IOMethods.getAbsoluteFilePath("test-files/general/audio/Trumpet.wav")),
-                AudioProcessingMode.WITH_SAMPLES
+                Audio.ProcessingMode.WITH_SAMPLES
         );
 
         double[] samples2 = audio2.getMonoSamples();

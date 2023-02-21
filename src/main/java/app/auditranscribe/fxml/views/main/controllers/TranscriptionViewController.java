@@ -19,7 +19,6 @@
 package app.auditranscribe.fxml.views.main.controllers;
 
 import app.auditranscribe.audio.Audio;
-import app.auditranscribe.audio.AudioProcessingMode;
 import app.auditranscribe.audio.FFmpegHandler;
 import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.audio.exceptions.FFmpegNotFoundException;
@@ -786,7 +785,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         File auxOriginalWAVFile = generateWAVFileFromMP3(audioData.mp3Bytes);
 
         // Create the `Audio` object
-        audio = new Audio(auxOriginalWAVFile, AudioProcessingMode.WITH_PLAYBACK);
+        audio = new Audio(auxOriginalWAVFile, Audio.ProcessingMode.WITH_PLAYBACK);
 
         // Update the raw MP3 bytes of the audio object
         // (This is to reduce the time needed to save the file later)

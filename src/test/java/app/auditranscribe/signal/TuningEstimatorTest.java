@@ -1,7 +1,6 @@
 package app.auditranscribe.signal;
 
 import app.auditranscribe.audio.Audio;
-import app.auditranscribe.audio.AudioProcessingMode;
 import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.io.IOMethods;
 import org.junit.jupiter.api.Test;
@@ -16,7 +15,7 @@ class TuningEstimatorTest {
     // Load samples and sample rate for some tests
     Audio audio = new Audio(
             new File(IOMethods.getAbsoluteFilePath("test-files/general/audio/Trumpet.wav")),
-            AudioProcessingMode.WITH_SAMPLES
+            Audio.ProcessingMode.WITH_SAMPLES
     );
 
     double[] samples = audio.getMonoSamples();

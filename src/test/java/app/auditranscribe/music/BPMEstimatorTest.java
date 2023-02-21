@@ -1,7 +1,6 @@
 package app.auditranscribe.music;
 
 import app.auditranscribe.audio.Audio;
-import app.auditranscribe.audio.AudioProcessingMode;
 import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.generic.exceptions.ValueException;
 import app.auditranscribe.io.IOMethods;
@@ -20,11 +19,11 @@ class BPMEstimatorTest {
     // Get the audio files
     Audio audio1 = new Audio(
             new File(IOMethods.getAbsoluteFilePath("test-files/music/BPMEstimatorTest/175bpm.wav")),
-            AudioProcessingMode.WITH_SAMPLES
+            Audio.ProcessingMode.WITH_SAMPLES
     );
     Audio audio2 = new Audio(
             new File(IOMethods.getAbsoluteFilePath("test-files/music/BPMEstimatorTest/137bpmNoisy.wav")),
-            AudioProcessingMode.WITH_SAMPLES
+            Audio.ProcessingMode.WITH_SAMPLES
     );
 
     // Extract samples and sample rate

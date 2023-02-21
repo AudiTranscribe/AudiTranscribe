@@ -19,11 +19,11 @@ class AudioTest {
 
         if (TEST_PLAYBACK) {
             audio = new Audio(
-                    file, AudioProcessingMode.WITH_SAMPLES, AudioProcessingMode.WITH_PLAYBACK
+                    file, Audio.ProcessingMode.WITH_SAMPLES, Audio.ProcessingMode.WITH_PLAYBACK
             );
         } else {
             audio = new Audio(
-                    file, AudioProcessingMode.WITH_SAMPLES
+                    file, Audio.ProcessingMode.WITH_SAMPLES
             );
         }
     }
