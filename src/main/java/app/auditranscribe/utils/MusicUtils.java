@@ -18,11 +18,6 @@
 
 package app.auditranscribe.utils;
 
-import app.auditranscribe.generic.exceptions.ValueException;
-import app.auditranscribe.music.MusicKey;
-
-import java.util.HashSet;
-
 /**
  * Music utilities.
  */
