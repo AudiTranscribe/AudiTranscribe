@@ -545,7 +545,7 @@ public class Audio extends LoggableClass {
         audioPlaybackThread = new StoppableThread() {
             // Get playback buffer size
             final int playbackBufferSize = DataFiles.SETTINGS_DATA_FILE.data.playbackBufferSize;
-            final byte[] bufferBytes = new byte[playbackBufferSize];
+            final byte[] bufferBytes = new byte[playbackBufferSize * bytesPerSample];
             //            final byte[] bufferBytes = new byte[32768];
             int numBytesRead;
 
