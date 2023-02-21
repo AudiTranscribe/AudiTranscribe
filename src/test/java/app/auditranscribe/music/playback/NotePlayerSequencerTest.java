@@ -7,7 +7,6 @@ import app.auditranscribe.music.TimeSignature;
 import app.auditranscribe.utils.HashingUtils;
 import app.auditranscribe.utils.UnitConversionUtils;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIf;
 
@@ -32,8 +31,7 @@ class NotePlayerSequencerTest {
 
     static NotePlayerSequencer notePlayerSequencer;
 
-    @BeforeAll
-    static void beforeAll() {
+    public NotePlayerSequencerTest() {
         // Convert notes to note numbers
         for (int i = 0; i < notes.length; i++) {
             noteNumbers[i] = UnitConversionUtils.noteToNoteNumber(notes[i]);

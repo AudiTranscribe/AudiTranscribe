@@ -370,7 +370,7 @@ public class NotePlayerSequencer extends LoggableClass {
         // Create the time signature byte array
         byte[] timeSignatureByteArray = {
                 (byte) timeSignature.beatsPerBar,
-                (byte) ((int) MathUtils.log2(timeSignature.denominator.numericValue)),
+                (byte) (MathUtils.binlog(timeSignature.denominator.numericValue)),
                 0x18,  // Metronome click once every 24 = 0x18 MIDI clocks
                 0x08   // Eight 32nd notes per beat
         };
@@ -392,14 +392,8 @@ public class NotePlayerSequencer extends LoggableClass {
      * @param key The key to set.
      */
     private void setKeySignatureOfNotePlayer(MusicKey key) {
-        boolean isMinor = key.isMinor;
-        int numericValue = key.numericValue;
-
         // Create the key signature byte array
-        byte[] keySignatureByteArray = {
-                (byte) numericValue,
-                (byte) (isMinor ? 0x01 : 0x00)
-        };
+        byte[] keySignatureByteArray = {(byte) key.numericValue, (byte) (key.isMinor ? 0x01 : 0x00)};
 
         // Create the meta message
         MetaMessage metaMessage = new MetaMessage();
