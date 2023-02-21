@@ -63,7 +63,7 @@ public class NoteRectangle extends StackPane {
     private static final Stack<Triple<String, UndoOrRedoAction, Double[]>> undoStack = new Stack<>();
     private static final Stack<Triple<String, UndoOrRedoAction, Double[]>> redoStack = new Stack<>();
 
-    public static AnchorPane spectrogramPaneAnchor;
+    public static AnchorPane spectrogramAnchorPane;
     public static double spectrogramWidth;
     public static double spectrogramHeight;
     public static int minNoteNum;
@@ -115,12 +115,12 @@ public class NoteRectangle extends StackPane {
      *                        placed.
      * @param noteDuration    The duration (in seconds) of the note.
      * @param noteNum         The note number of the note.
-     * @throws NoteRectangleCollisionException If the creation of this note rectangle would cause a
-     *                                         collision with another note rectangle.
+     * @throws CollisionException If the creation of this note rectangle would cause a collision
+     *                            with another note rectangle.
      */
     public NoteRectangle(
             double timeToPlaceRect, double noteDuration, int noteNum
-    ) throws NoteRectangleCollisionException {
+    ) throws CollisionException {
         this(
                 timeToPlaceRect,
                 noteDuration,
@@ -140,12 +140,12 @@ public class NoteRectangle extends StackPane {
      * @param noteNum         The note number of the note.
      * @param uuid            UUID of the rectangle.
      * @param addToStacks     Whether to add an action to the undo stack.
-     * @throws NoteRectangleCollisionException If the creation of this note rectangle would cause a
-     *                                         collision with another note rectangle.
+     * @throws CollisionException If the creation of this note rectangle would cause a
+     *                            collision with another note rectangle.
      */
     private NoteRectangle(
             double timeToPlaceRect, double noteDuration, int noteNum, String uuid, boolean addToStacks
-    ) throws NoteRectangleCollisionException {
+    ) throws CollisionException {
         // Set the UUID of the rectangle
         this.uuid = uuid;
 
@@ -204,7 +204,7 @@ public class NoteRectangle extends StackPane {
                     "Note rectangle collision detected (" + colLoc + "); not placing note",
                     this.getClass().toString()
             );
-            throw new NoteRectangleCollisionException(
+            throw new CollisionException(
                     "Note rectangle collision detected (" + colLoc + "); not placing note"
             );
         }
@@ -391,13 +391,13 @@ public class NoteRectangle extends StackPane {
                 // Update flags
                 isEditing = false;
                 canUndoOrRedo = true;
-            }
 
-            CustomLogger.log(
-                    Level.FINE,
-                    "Moved rectangle to " + getNoteOnsetTime() + " seconds with note number " + this.noteNum,
-                    this.getClass().toString()
-            );
+                CustomLogger.log(
+                        Level.FINE,
+                        "Moved rectangle to " + getNoteOnsetTime() + " seconds with note number " + this.noteNum,
+                        this.getClass().toString()
+                );
+            }
         });
 
         // Set mouse events for the resizing regions
@@ -582,8 +582,8 @@ public class NoteRectangle extends StackPane {
 
     // Getter/Setter methods
 
-    public static void setSpectrogramPaneAnchor(AnchorPane spectrogramPaneAnchor) {
-        NoteRectangle.spectrogramPaneAnchor = spectrogramPaneAnchor;
+    public static void setSpectrogramAnchorPane(AnchorPane spectrogramAnchorPane) {
+        NoteRectangle.spectrogramAnchorPane = spectrogramAnchorPane;
     }
 
     public static void setSpectrogramWidth(double spectrogramWidth) {
@@ -1043,8 +1043,8 @@ public class NoteRectangle extends StackPane {
             try {
                 // Create a new rectangle
                 NoteRectangle rect = new NoteRectangle(data[0], data[1], data[2].intValue(), uuid, false);
-                spectrogramPaneAnchor.getChildren().add(rect);
-            } catch (NoteRectangleCollisionException ignored) {
+                spectrogramAnchorPane.getChildren().add(rect);
+            } catch (CollisionException ignored) {
             }
         } else if (action == UndoOrRedoAction.DELETE) {
             // Get the relevant rectangle
@@ -1084,8 +1084,8 @@ public class NoteRectangle extends StackPane {
      * Exception that is raised if there is a collision between note rectangles during the creation
      * of a new note rectangle.
      */
-    public static class NoteRectangleCollisionException extends Exception {
-        public NoteRectangleCollisionException(String message) {
+    public static class CollisionException extends Exception {
+        public CollisionException(String message) {
             super(message);
         }
     }
