@@ -1537,22 +1537,21 @@ public class TranscriptionViewController extends SwitchableViewController {
      */
     private void saveData(boolean forceChooseFile, String saveDest) throws FFmpegNotFoundException, IOException {
         // Get note rectangles' data
-        // Todo implement
-//        int numRectangles = NoteRectangle.allNoteRectangles.size();
-//        Object[] noteRectsKeys = NoteRectangle.allNoteRectangles.keySet().toArray();
-//
-//        double[] timesToPlaceRectangles = new double[numRectangles];
-//        double[] noteDurations = new double[numRectangles];
-//        int[] noteNums = new int[numRectangles];
-//
-//        for (int i = 0; i < numRectangles; i++) {
-//            String key = (String) noteRectsKeys[i];
-//            NoteRectangle noteRectangle = NoteRectangle.allNoteRectangles.get(key);
-//
-//            timesToPlaceRectangles[i] = noteRectangle.getNoteOnsetTime();
-//            noteDurations[i] = noteRectangle.getNoteDuration();
-//            noteNums[i] = noteRectangle.noteNum;
-//        }
+        int numRectangles = NoteRectangle.allNoteRectangles.size();
+        Object[] noteRectsKeys = NoteRectangle.allNoteRectangles.keySet().toArray();
+
+        double[] timesToPlaceRectangles = new double[numRectangles];
+        double[] noteDurations = new double[numRectangles];
+        int[] noteNums = new int[numRectangles];
+
+        for (int i = 0; i < numRectangles; i++) {
+            String key = (String) noteRectsKeys[i];
+            NoteRectangle noteRectangle = NoteRectangle.allNoteRectangles.get(key);
+
+            timesToPlaceRectangles[i] = noteRectangle.getNoteOnsetTime();
+            noteDurations[i] = noteRectangle.getNoteDuration();
+            noteNums[i] = noteRectangle.noteNum;
+        }
 
         // Package project info data and music notes data for saving
         log("Packaging data for saving");
@@ -1561,14 +1560,8 @@ public class TranscriptionViewController extends SwitchableViewController {
                 projectName, musicKey, timeSignature, bpm, offset, audioVolume,
                 (int) (currTime * 1000)
         );
-        // Todo remove; this is here for compatibility
-//        MusicNotesDataObject musicNotesData = new MusicNotesDataObject0x000500(
-//                timesToPlaceRectangles, noteDurations, noteNums
-//        );
-        // Todo remove; this is here for compatibility
-        MusicNotesDataObject musicNotesData = Objects.requireNonNullElseGet(
-                this.musicNotesData,
-                () -> new MusicNotesDataObject0x000500(new double[0], new double[0], new int[0])
+        MusicNotesDataObject musicNotesData = new MusicNotesDataObject0x000500(
+                timesToPlaceRectangles, noteDurations, noteNums
         );
 
         // Determine what mode of the writer should be used
