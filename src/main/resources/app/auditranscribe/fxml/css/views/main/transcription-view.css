@@ -103,6 +103,22 @@
     -fx-background-color: coloured-progress-pane-colour;
 }
 
+/* Note rectangles */
+.note-rectangles-pane {
+    -fx-background-color: #00000000; /* Transparent */
+}
+
+.note-borders-region {
+    -fx-border-width: 3px;
+    -fx-border-radius: 5px;
+    -fx-border-color: note-rectangle-border-colour;
+}
+
+.note-main-rectangle {
+    -fx-border-radius: 5px;
+    -fx-fill: note-rectangle-fill-colour;
+}
+
 /* BOTTOM */
 .time-label {
     -fx-font-size: 12pt;

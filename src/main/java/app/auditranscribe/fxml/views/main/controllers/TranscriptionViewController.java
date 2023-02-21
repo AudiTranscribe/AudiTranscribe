@@ -26,6 +26,7 @@ import app.auditranscribe.audio.exceptions.FFmpegNotFoundException;
 import app.auditranscribe.fxml.IconHelper;
 import app.auditranscribe.fxml.Popups;
 import app.auditranscribe.fxml.Theme;
+import app.auditranscribe.fxml.misc.NoteRectangle;
 import app.auditranscribe.fxml.plotting.ColourScale;
 import app.auditranscribe.fxml.plotting.PlottingHelpers;
 import app.auditranscribe.fxml.plotting.PlottingStuffHandler;
@@ -49,6 +50,7 @@ import app.auditranscribe.misc.CustomTask;
 import app.auditranscribe.fxml.spinners.CustomDoubleSpinnerValueFactory;
 import app.auditranscribe.music.*;
 import app.auditranscribe.music.playback.MIDIInstrument;
+import app.auditranscribe.music.playback.NotePlayerSequencer;
 import app.auditranscribe.music.playback.NotePlayerSynth;
 import app.auditranscribe.signal.windowing.SignalWindow;
 import app.auditranscribe.system.OSMethods;
@@ -109,14 +111,15 @@ public class TranscriptionViewController extends SwitchableViewController {
 
     private final double IMAGE_BUTTON_LENGTH = 50;  // In pixels
 
-    private final int MIDI_CHANNEL_NUM = 0;
+    public final double NOTE_PLAYING_DELAY_OFFSET = 0.2;  // In seconds
+    public final int NOTE_PLAYING_MIDI_CHANNEL_NUM = 0;
     private final MIDIInstrument NOTE_INSTRUMENT = MIDIInstrument.PIANO;
     private final int NOTE_ON_VELOCITY = 96;  // Within the range [0, 127]
     private final int NOTE_OFF_VELOCITY = 10;   // Within the range [0, 127]
     private final long NOTE_ON_DURATION = 75;  // In milliseconds
     private final long NOTE_OFF_DURATION = 925;  // In milliseconds
 
-    private final double VOLUME_VALUE_DELTA_ON_KEY_PRESS = 0.05;  // Amount to change the volume by
+    public final double VOLUME_VALUE_DELTA_ON_KEY_PRESS = 0.05;  // Amount to change the volume by
     private final KeyCodeCombination SAVE_PROJECT_COMBINATION =
             new KeyCodeCombination(KeyCode.S, KeyCombination.SHORTCUT_DOWN);
     private final KeyCodeCombination UNDO_NOTE_EDIT_COMBINATION =
@@ -152,7 +155,7 @@ public class TranscriptionViewController extends SwitchableViewController {
     private boolean areNotesMuted = false;
 
     private boolean scrollToPlayhead = false;
-//    private boolean canEditNotes = false;
+    private boolean canEditNotes = false;
 
     private MusicKey musicKey = MusicKey.C_MAJOR;
     private double bpm = 120;
@@ -164,9 +167,10 @@ public class TranscriptionViewController extends SwitchableViewController {
     private boolean changedProjectName = false;
 
     private boolean isPaused = true;
+    private final boolean usingSlowedAudio = false;  // Todo: allow changing after slowed audio is implemented
 
     private NotePlayerSynth notePlayerSynth;
-    //    private NotePlayerSequencer notePlayerSequencer;
+    private NotePlayerSequencer notePlayerSequencer;
     private MusicNotesDataObject musicNotesData;
 
     private boolean debugMode = false;
@@ -260,11 +264,21 @@ public class TranscriptionViewController extends SwitchableViewController {
             menuBar.useSystemMenuBarProperty().set(true);
         }
 
+        // Clear the note rectangles
+        NoteRectangle.allNoteRectangles.clear();
+        NoteRectangle.noteRectanglesByNoteNumber.clear();
+
+        // Set note rectangles' static attributes
+        NoteRectangle.setSpectrogramAnchorPane(spectrogramAnchorPane);
+        NoteRectangle.setIsPaused(isPaused);
+        NoteRectangle.setCanEdit(canEditNotes);
+
         // Update note players
         try {
-            notePlayerSynth = new NotePlayerSynth(NOTE_INSTRUMENT, MIDI_CHANNEL_NUM);
+            notePlayerSynth = new NotePlayerSynth(NOTE_INSTRUMENT, NOTE_PLAYING_MIDI_CHANNEL_NUM);
         } catch (MidiUnavailableException ignored) {  // We will notify the user that MIDI unavailable later
         }
+        notePlayerSequencer = new NotePlayerSequencer(NOTE_PLAYING_DELAY_OFFSET);
 
         // Set spinners' factories
         bpmSpinnerFactory = new CustomDoubleSpinnerValueFactory(
@@ -397,7 +411,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         notesVolumeButton.setOnAction(event -> toggleNoteMuteButton());
 
         scrollButton.setOnAction(event -> toggleScrollButton());
-//        editNotesButton.setOnAction(event -> toggleEditNotesButton());
+        editNotesButton.setOnAction(event -> toggleEditNotesButton());
 
         playButton.setOnAction(event -> togglePlayButton());
         rewindToBeginningButton.setOnAction(event -> {
@@ -434,11 +448,11 @@ public class TranscriptionViewController extends SwitchableViewController {
         renameProjectMenuItem.setOnAction(this::handleRenameProject);
         saveProjectMenuItem.setOnAction(event -> handleSavingProject(false, false));
         saveAsMenuItem.setOnAction(event -> handleSavingProject(false, true));
-//        exportMIDIMenuItem.setOnAction(event -> handleExportMIDI());
+        exportMIDIMenuItem.setOnAction(event -> handleExportMIDI());
         settingsMenuItem.setOnAction(event -> SettingsViewController.showSettingsWindow());
-//        undoMenuItem.setOnAction(event -> NoteRectangle.editAction(NoteRectangle.EditAction.UNDO));
-//        redoMenuItem.setOnAction(event -> NoteRectangle.editAction(NoteRectangle.EditAction.REDO));
-//        quantizeNotesMenuItem.setOnAction(event -> handleQuantizeNotes());
+        undoMenuItem.setOnAction(event -> NoteRectangle.editAction(NoteRectangle.EditAction.UNDO));
+        redoMenuItem.setOnAction(event -> NoteRectangle.editAction(NoteRectangle.EditAction.REDO));
+        quantizeNotesMenuItem.setOnAction(event -> handleQuantizeNotes());
         docsMenuItem.setOnAction(event -> GUIUtils.openURLInBrowser("https://docs.auditranscribe.app/"));
         aboutMenuItem.setOnAction(event -> AboutViewController.showAboutWindow());
 
@@ -473,58 +487,57 @@ public class TranscriptionViewController extends SwitchableViewController {
                         // Now estimate the note number
                         int estimatedNoteNum = (int) Math.round(UnitConversionUtils.freqToNoteNumber(estimatedFreq));
 
-                        // Todo implement
-//                        if (canEditNotes) {
-//                            if (isPaused) {  // Permit note placement only when paused
-//                                // Compute the time that the mouse click would correspond to
-//                                double estimatedTime = clickX / finalWidth * audioDuration;
-//
-//                                // Determine if it is a left click or a right click
-//                                if (event.getButton() == MouseButton.PRIMARY) {
-//                                    // Compute the duration of one beat
-//                                    double beatDuration = 60 / bpm;
-//
-//                                    // Ignore any clicks that are too close to the boundary
-//                                    if (estimatedTime > audioDuration - beatDuration ||
-//                                            estimatedNoteNum < MIN_NOTE_NUMBER + 1 ||
-//                                            estimatedNoteNum > MAX_NOTE_NUMBER - 1
-//                                    ) return;
-//
-//                                    // Attempt to create a new note rectangle
-//                                    try {
-//                                        // Create note rectangle
-//                                        NoteRectangle noteRect = new NoteRectangle(
-//                                                estimatedTime, beatDuration, estimatedNoteNum
-//                                        );
-//
-//                                        // Add the note rectangle to the spectrogram pane
-//                                        spectrogramAnchorPane.getChildren().add(noteRect);
-//                                        log(
-//                                                Level.FINE,
-//                                                "Placed note " + estimatedNoteNum + " at " + estimatedTime +
-//                                                        " seconds"
-//                                        );
-//
-//                                        // Update the `hasUnsavedChanges` flag
-//                                        hasUnsavedChanges = true;
-//                                    } catch (NoteRectangleCollisionException ignored) {
-//                                    }
-//                                }
-//                            }
-//
-//                        } else {
-                        // Play the note
-                        log(
-                                Level.FINE,
-                                "Playing " + UnitConversionUtils.noteNumberToNote(
-                                        estimatedNoteNum, musicKey, false
-                                )
-                        );
-                        notePlayerSynth.playNoteForDuration(
-                                estimatedNoteNum, NOTE_ON_VELOCITY, NOTE_OFF_VELOCITY, NOTE_ON_DURATION,
-                                NOTE_OFF_DURATION
-                        );
-//                        }
+                        if (canEditNotes) {
+                            if (isPaused) {  // Permit note placement only when paused
+                                // Compute the time that the mouse click would correspond to
+                                double estimatedTime = clickX / finalWidth * audioDuration;
+
+                                // Determine if it is a left click or a right click
+                                if (event.getButton() == MouseButton.PRIMARY) {
+                                    // Compute the duration of one beat
+                                    double beatDuration = 60 / bpm;
+
+                                    // Ignore any clicks that are too close to the boundary
+                                    if (estimatedTime > audioDuration - beatDuration ||
+                                            estimatedNoteNum < MIN_NOTE_NUMBER + 1 ||
+                                            estimatedNoteNum > MAX_NOTE_NUMBER - 1
+                                    ) return;
+
+                                    // Attempt to create a new note rectangle
+                                    try {
+                                        // Create note rectangle
+                                        NoteRectangle noteRect = new NoteRectangle(
+                                                estimatedTime, beatDuration, estimatedNoteNum
+                                        );
+
+                                        // Add the note rectangle to the spectrogram pane
+                                        spectrogramAnchorPane.getChildren().add(noteRect);
+                                        log(
+                                                Level.FINE,
+                                                "Placed note " + estimatedNoteNum + " at " + estimatedTime +
+                                                        " seconds"
+                                        );
+
+                                        // Update the `hasUnsavedChanges` flag
+                                        hasUnsavedChanges = true;
+                                    } catch (NoteRectangle.CollisionException ignored) {
+                                    }
+                                }
+                            }
+
+                        } else {
+                            // Play the note
+                            log(
+                                    Level.FINE,
+                                    "Playing " + UnitConversionUtils.noteNumberToNote(
+                                            estimatedNoteNum, musicKey, false
+                                    )
+                            );
+                            notePlayerSynth.playNoteForDuration(
+                                    estimatedNoteNum, NOTE_ON_VELOCITY, NOTE_OFF_VELOCITY, NOTE_ON_DURATION,
+                                    NOTE_OFF_DURATION
+                            );
+                        }
                     }
                 }
             }
@@ -612,7 +625,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         mainVBox.getScene().addEventFilter(KeyEvent.KEY_RELEASED, this::keyReleasedEventHandler);
 
         // Define the lists note rectangles by note number
-//        NoteRectangle.defineNoteRectanglesByNoteNumberLists(MAX_NOTE_NUMBER - MIN_NOTE_NUMBER + 1);
+        NoteRectangle.defineNoteRectanglesByNoteNumberLists(MAX_NOTE_NUMBER - MIN_NOTE_NUMBER + 1);
 
         // Report that the transcription view is ready to be shown
         log("Transcription view ready to be shown");
@@ -877,6 +890,8 @@ public class TranscriptionViewController extends SwitchableViewController {
         scheduler.shutdown();
         audio.stop();
         audio.deleteWAVFile();
+        notePlayerSequencer.close();
+        NoteRectangle.allNoteRectangles.clear();
     }
 
     /**
@@ -963,14 +978,13 @@ public class TranscriptionViewController extends SwitchableViewController {
         }
 
         // Update note sequencer current time
-        // Todo implement
-//        if (!areNotesMuted && notePlayerSequencer.isSequencerAvailable()) {
-//            if (!notePlayerSequencer.getSequencer().isRunning() && !isPaused) {  // Not running but unpaused
-//                notePlayerSequencer.play(seekTime, usingSlowedAudio);
-//            } else {
-//                notePlayerSequencer.setCurrTime(seekTime);
-//            }
-//        }
+        if (!areNotesMuted && notePlayerSequencer.isSequencerAvailable()) {
+            if (!notePlayerSequencer.getSequencer().isRunning() && !isPaused) {  // Not running but unpaused
+                notePlayerSequencer.play(seekTime, usingSlowedAudio);
+            } else {
+                notePlayerSequencer.setCurrTime(seekTime);
+            }
+        }
 
         // Update the current time and current time label
         currTime = seekTime;
@@ -1007,13 +1021,13 @@ public class TranscriptionViewController extends SwitchableViewController {
             audio.pause();
 
             // Stop note sequencer playback
-//            notePlayerSequencer.stop();
+            notePlayerSequencer.stop();
         }
 
         Platform.runLater(() -> IconHelper.setSVGOnButton(playButton, 20, IMAGE_BUTTON_LENGTH, iconToUse));
 
         // Toggle paused state for note rectangles
-//        NoteRectangle.setIsPaused(!isPaused);
+        NoteRectangle.setIsPaused(!isPaused);
 
         // Toggle disabled state of the toggle slowdown button
         toggleSlowedAudioButton.setDisable(isPaused);  // If currently paused, will block
@@ -1021,6 +1035,37 @@ public class TranscriptionViewController extends SwitchableViewController {
         // Return the toggled version of the `isPaused` flag
         log(Level.FINE, "Toggled pause state; now is " + (!isPaused ? "paused" : "playing"));
         return !isPaused;
+    }
+
+    /**
+     * Helper method that sets up the note player sequencer by setting the notes on it.
+     */
+    private void setupNotePlayerSequencer() {
+        // Get note rectangles' data
+        int numNoteRects = NoteRectangle.allNoteRectangles.size();
+        Object[] noteRectsKeys = NoteRectangle.allNoteRectangles.keySet().toArray();
+
+        // Get the note onset times, note durations, and note numbers from the note rectangles
+        double[] noteOnsetTimes = new double[numNoteRects];
+        double[] noteDurations = new double[numNoteRects];
+        int[] noteNums = new int[numNoteRects];
+
+        for (int i = 0; i < numNoteRects; i++) {
+            String key = (String) noteRectsKeys[i];
+
+            noteOnsetTimes[i] = NoteRectangle.allNoteRectangles.get(key).getNoteOnsetTime();
+            noteDurations[i] = NoteRectangle.allNoteRectangles.get(key).getNoteDuration();
+            noteNums[i] = NoteRectangle.allNoteRectangles.get(key).noteNum;
+        }
+
+        // Setup note player sequencer
+        notePlayerSequencer.setOnVelocity(notesVolume);
+        notePlayerSequencer.setOffVelocity(NOTE_OFF_VELOCITY);
+        notePlayerSequencer.setBPM(bpm);
+        notePlayerSequencer.setInstrument(NOTE_INSTRUMENT);
+
+        // Clear existing notes, and set new notes
+        notePlayerSequencer.setNotesOnTrack(noteOnsetTimes, noteDurations, noteNums, usingSlowedAudio);
     }
 
     // Updaters
@@ -1176,7 +1221,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         isPaused = togglePaused(false);
 
         // Stop note sequencer playback
-//        notePlayerSequencer.stop();
+        notePlayerSequencer.stop();
 
         // Deal with possible unsaved changes
         boolean canCloseWindow = handleUnsavedChanges();
@@ -1210,7 +1255,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         isPaused = togglePaused(false);
 
         // Stop note sequencer playback
-//        notePlayerSequencer.stop();
+        notePlayerSequencer.stop();
 
         // Deal with possible unsaved changes
         boolean canCloseWindow = handleUnsavedChanges();
@@ -1355,8 +1400,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         if (!isEverythingReady) return false;
 
         // Now check if there are unsaved changes
-//        if (hasUnsavedChanges || NoteRectangle.getHasEditedNoteRectangles()) {
-        if (hasUnsavedChanges) {
+        if (hasUnsavedChanges || NoteRectangle.getHasEditedNoteRectangles()) {
             // Prompt user to save work first
             ButtonType dontSaveButExit = new ButtonType("Don't Save");
             ButtonType dontSaveDontExit = new ButtonType("Cancel");
@@ -1413,6 +1457,77 @@ public class TranscriptionViewController extends SwitchableViewController {
     }
 
     /**
+     * Helper method that handles the exporting of the note rectangles' data to MIDI.
+     */
+    private void handleExportMIDI() {
+        // Get current window
+        Window window = rootPane.getScene().getWindow();
+
+        // Ask user to choose a file
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                "MIDI Files (*.mid, *.midi)",
+                "*.mid", "*.midi"
+        );
+        File file = GUIUtils.saveFileDialog(window, projectName, extFilter);
+
+        // If operation was cancelled, show error
+        if (file == null) {
+            Popups.showInformationAlert(
+                    rootPane.getScene().getWindow(),
+                    "No destination specified",
+                    "No destination was specified. The MIDI file will not be created."
+            );
+            return;
+        }
+
+        // Set up the note player sequencer by setting the notes on it
+        setupNotePlayerSequencer();
+
+        // Now write the sequence to the MIDI file
+        try {
+            notePlayerSequencer.exportToMIDI(
+                    timeSignature, musicKey, file.getAbsolutePath()
+            );
+            log(Level.FINE, "Exported notes to '" + file.getAbsolutePath() + "'.");
+            Popups.showInformationAlert(
+                    rootPane.getScene().getWindow(),
+                    "Successfully exported to MIDI",
+                    "Successfully exported to MIDI."
+            );
+        } catch (IOException e) {
+            logException(e);
+            Popups.showExceptionAlert(
+                    rootPane.getScene().getWindow(),
+                    "Failed to export to MIDI file",
+                    "An exception occurred when exporting the notes to MIDI file.",
+                    e
+            );
+        }
+    }
+
+    /**
+     * Helper method that helps quantize the notes.
+     */
+    private void handleQuantizeNotes() {
+        if (canEditNotes) {
+            NoteRectangle.quantizeNotes(bpm, offset, timeSignature);
+            Popups.showInformationAlert(
+                    rootPane.getScene().getWindow(),
+                    "Quantized Notes",
+                    "Notes have been quantized."
+            );
+            log(Level.FINE, "Quantized notes");
+        } else {
+            Popups.showWarningAlert(
+                    rootPane.getScene().getWindow(),
+                    "Did Not Quantize Notes",
+                    "Please enter into editing mode before quantizing notes."
+            );
+        }
+
+    }
+
+    /**
      * Helper method that helps save the data into an AUDT file.
      *
      * @param forceChooseFile Whether the file was forcibly chosen.
@@ -1446,6 +1561,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                 projectName, musicKey, timeSignature, bpm, offset, audioVolume,
                 (int) (currTime * 1000)
         );
+        // Todo remove; this is here for compatibility
 //        MusicNotesDataObject musicNotesData = new MusicNotesDataObject0x000500(
 //                timesToPlaceRectangles, noteDurations, noteNums
 //        );
@@ -1497,7 +1613,7 @@ public class TranscriptionViewController extends SwitchableViewController {
 
         // Set flags
         hasUnsavedChanges = false;
-//        NoteRectangle.setHasEditedNoteRectangles(false);
+        NoteRectangle.setHasEditedNoteRectangles(false);
 
         log("File saved successfully");
     }
@@ -1642,12 +1758,12 @@ public class TranscriptionViewController extends SwitchableViewController {
             spectrogramScrollPane.setPrefWidth(finalWidth);
             spectrogramScrollPane.setPrefHeight(finalHeight);
 
-//            // Set `NoteRectangle` static attributes
-//            NoteRectangle.setSpectrogramWidth(finalWidth);
-//            NoteRectangle.setSpectrogramHeight(finalHeight);
-//            NoteRectangle.setMinNoteNum(MIN_NOTE_NUMBER);
-//            NoteRectangle.setMaxNoteNum(MAX_NOTE_NUMBER);
-//            NoteRectangle.setTotalDuration(audioDuration);
+            // Set `NoteRectangle` static attributes
+            NoteRectangle.setSpectrogramWidth(finalWidth);
+            NoteRectangle.setSpectrogramHeight(finalHeight);
+            NoteRectangle.setMinNoteNum(MIN_NOTE_NUMBER);
+            NoteRectangle.setMaxNoteNum(MAX_NOTE_NUMBER);
+            NoteRectangle.setTotalDuration(audioDuration);
 
             // Settle layout of the main pane
             mainVBox.layout();
@@ -1777,47 +1893,47 @@ public class TranscriptionViewController extends SwitchableViewController {
                 // Update the BPM value
                 updateBPMValue(bpm, true);
 
-                // Todo implement
-//                // Set up note rectangles
-//                if (musicNotesData != null) {
-//                    int numNoteRectangles = musicNotesData.noteNums.length;
-//                    for (int i = 0; i < numNoteRectangles; i++) {
-//                        // Get the note rectangle data
-//                        double timeToPlaceRectangle = musicNotesData.timesToPlaceRectangles[i];
-//                        double noteDuration = musicNotesData.noteDurations[i];
-//                        int noteNum = musicNotesData.noteNums[i];
-//
-//                        // Attempt to create a new note rectangle
-//                        try {
-//                            // Create the note rectangle
-//                            NoteRectangle noteRect = new NoteRectangle(timeToPlaceRectangle, noteDuration, noteNum);
-//
-//                            // Add the note rectangle to the spectrogram pane
-//                            spectrogramAnchorPane.getChildren().add(noteRect);
-//
-//                            log(
-//                                    Level.FINE,
-//                                    "Loaded note " + noteNum + " with " + noteDuration + " seconds duration at " +
-//                                            timeToPlaceRectangle + " seconds"
-//                            );
-//                        } catch (NoteRectangleCollisionException ignored) {
-//                        }
-//                    }
-//                }
-//
-//                // Check if the sequencer is available
-//                if (!notePlayerSequencer.isSequencerAvailable()) {
-//                    // Show a warning message to the user
-//                    Popups.showWarningAlert(
-//                            rootPane.getScene().getWindow(),
-//                            "MIDI Playback Unavailable",
-//                            "The MIDI playback is not available on your system. Playback of created " +
-//                                    "notes will not work."
-//                    );
-//                }
-//
-//                // Reset the sequencer
-//                notePlayerSequencer.stop();
+                // Set up note rectangles
+                if (musicNotesData != null) {
+                    int numNoteRectangles = musicNotesData.noteNums.length;
+                    for (int i = 0; i < numNoteRectangles; i++) {
+                        // Get the note rectangle data
+                        double timeToPlaceRectangle = musicNotesData.timesToPlaceRectangles[i];
+                        double noteDuration = musicNotesData.noteDurations[i];
+                        int noteNum = musicNotesData.noteNums[i];
+
+                        // Attempt to create a new note rectangle
+                        try {
+                            // Create the note rectangle
+                            NoteRectangle noteRect = new NoteRectangle(timeToPlaceRectangle, noteDuration, noteNum);
+
+                            // Add the note rectangle to the spectrogram pane
+                            spectrogramAnchorPane.getChildren().add(noteRect);
+
+                            String noteString = UnitConversionUtils.noteNumberToNote(noteNum, musicKey, true);
+                            log(
+                                    Level.FINE,
+                                    "Loaded note " + noteString + " with " + noteDuration + " seconds duration " +
+                                            "at " + timeToPlaceRectangle + " seconds"
+                            );
+                        } catch (NoteRectangle.CollisionException ignored) {
+                        }
+                    }
+                }
+
+                // Check if the sequencer is available
+                if (!notePlayerSequencer.isSequencerAvailable()) {
+                    // Show a warning message to the user
+                    Popups.showWarningAlert(
+                            rootPane.getScene().getWindow(),
+                            "MIDI Playback Unavailable",
+                            "The MIDI playback is not available on your system. Playback of created " +
+                                    "notes will not work."
+                    );
+                }
+
+                // Reset the sequencer
+                notePlayerSequencer.stop();
 
                 // Enable all disabled nodes
                 Node[] disabledNodes = new Node[]{
@@ -1843,7 +1959,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                 );
 
                 // Clear note rectangles' stacks
-//                NoteRectangle.clearStacks();
+                NoteRectangle.clearStacks();
 
                 // Handle attempt to close the window
                 rootPane.getScene().getWindow().setOnCloseRequest((windowEvent) -> {
@@ -1856,7 +1972,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                 // unsaved changes
                 if (audtFilePath != null) {
                     hasUnsavedChanges = false;
-//                    NoteRectangle.setHasEditedNoteRectangles(false);
+                    NoteRectangle.setHasEditedNoteRectangles(false);
                 }
             }
         });
@@ -1907,11 +2023,10 @@ public class TranscriptionViewController extends SwitchableViewController {
         hasUnsavedChanges = true;
 
         // Handle note rectangle operations when toggle paused
-        // Todo implement
-//        if (isPaused && !areNotesMuted) {  // We use `isPaused` here because we will toggle it later
-//            // Set up the note player sequencer by setting the notes on it
-//            setupNotePlayerSequencer();
-//        }
+        if (isPaused && !areNotesMuted) {  // We use `isPaused` here because we will toggle it later
+            // Set up the note player sequencer by setting the notes on it
+            setupNotePlayerSequencer();
+        }
 
         // Toggle audio paused state
         if (currTime == audioDuration) {
@@ -1921,10 +2036,9 @@ public class TranscriptionViewController extends SwitchableViewController {
 
         // Play notes on note player sequencer
         // (We separate this method from above to ensure a more accurate note playing delay)
-        // Todo implement
-//        if (!isPaused && !areNotesMuted) {  // We use `!isPaused` here because it was toggled already
-//            notePlayerSequencer.play(currTime, usingSlowedAudio);
-//        }
+        if (!isPaused && !areNotesMuted) {  // We use `!isPaused` here because it was toggled already
+            notePlayerSequencer.play(currTime, usingSlowedAudio);
+        }
 
         // Disable note volume slider and note muting button if playing
         notesVolumeButton.setDisable(!isPaused);
@@ -1954,16 +2068,16 @@ public class TranscriptionViewController extends SwitchableViewController {
      * Helper method that toggles the edit notes button.
      */
     private void toggleEditNotesButton() {
-//        // Change the icon
-//        String iconToUse = "pencil-solid";
-//        if (canEditNotes) iconToUse = "pencil-line";  // Want to change from filled to non-filled
-//        IconHelper.setSVGOnButton(editNotesButton, 20, IMAGE_BUTTON_LENGTH, iconToUse);
-//
-//        // Toggle the `canEditNotes` flag
-//        canEditNotes = !canEditNotes;
-//        NoteRectangle.setCanEdit(canEditNotes);  // Todo implement
-//
-//        log(Level.FINE, "Toggled editing notes (editing notes is now " + canEditNotes + ")");
+        // Change the icon
+        String iconToUse = "pencil-solid";
+        if (canEditNotes) iconToUse = "pencil-line";  // Want to change from filled to non-filled
+        IconHelper.setSVGOnButton(editNotesButton, 20, IMAGE_BUTTON_LENGTH, iconToUse);
+
+        // Toggle the `canEditNotes` flag
+        canEditNotes = !canEditNotes;
+        NoteRectangle.setCanEdit(canEditNotes);
+
+        log(Level.FINE, "Toggled editing notes (editing notes is now " + canEditNotes + ")");
     }
 
     /**
@@ -2022,8 +2136,7 @@ public class TranscriptionViewController extends SwitchableViewController {
      */
     private void keyPressEventHandler(KeyEvent keyEvent) {
         // If the spectrogram is not ready or if in the middle of editing do not do anything
-//        if (!isEverythingReady || NoteRectangle.isEditing) {
-        if (!isEverythingReady) {
+        if (!isEverythingReady || NoteRectangle.isEditing) {
             keyEvent.consume();
             return;
         }
@@ -2042,10 +2155,10 @@ public class TranscriptionViewController extends SwitchableViewController {
             handleSavingProject(false, false);
             return;
         } else if (UNDO_NOTE_EDIT_COMBINATION.match(keyEvent)) {  // Undo note edit
-//            NoteRectangle.editAction(NoteRectangle.EditAction.UNDO);
+            NoteRectangle.editAction(NoteRectangle.EditAction.UNDO);
             return;
         } else if (REDO_NOTE_EDIT_COMBINATION.match(keyEvent)) {  // Redo note edit
-//            NoteRectangle.editAction(NoteRectangle.EditAction.REDO);
+            NoteRectangle.editAction(NoteRectangle.EditAction.REDO);
             return;
         } else if (DEBUG_COMBINATION.match(keyEvent)) {  // Show debug view
             if (debugMode) debugViewController = DebugViewController.showDebugView(rootPane.getScene().getWindow());
@@ -2067,7 +2180,7 @@ public class TranscriptionViewController extends SwitchableViewController {
             case LEFT -> seekToTime(currTime - 1);
             case RIGHT -> seekToTime(currTime + 1);
             case PERIOD -> toggleScrollButton();
-//            case N -> toggleEditNotesButton();
+            case N -> toggleEditNotesButton();
             case MINUS -> {
                 notePlayerSynth.silenceChannel();  // Stop any notes from playing
                 if (octaveNum > 0) {
@@ -2116,8 +2229,7 @@ public class TranscriptionViewController extends SwitchableViewController {
      */
     private void keyReleasedEventHandler(KeyEvent keyEvent) {
         // If the spectrogram is not ready or if in the middle of editing do not do anything
-//        if (!isEverythingReady || NoteRectangle.isEditing) {
-        if (!isEverythingReady) {
+        if (!isEverythingReady || NoteRectangle.isEditing) {
             keyEvent.consume();
             return;
         }

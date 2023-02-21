@@ -172,7 +172,7 @@
                                  <tooltip>
                                     <Tooltip text="Scroll to playhead" />
                                  </tooltip></Button>
-                              <Button fx:id="editNotesButton" disable="true" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" styleClass="image-button" text="E" visible="false">
+                              <Button fx:id="editNotesButton" disable="true" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" styleClass="image-button" text="E">
                                  <tooltip>
                                     <Tooltip text="Toggle edit mode" />
                                  </tooltip></Button>
