@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package app.auditranscribe.audio.time_stretching;
+package app.auditranscribe.audio.operators;
 
 import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.misc.Complex;

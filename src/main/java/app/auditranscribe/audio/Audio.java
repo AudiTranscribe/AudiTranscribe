@@ -21,7 +21,7 @@ package app.auditranscribe.audio;
 import app.auditranscribe.audio.exceptions.AudioPlaybackNotSupported;
 import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.audio.exceptions.FFmpegNotFoundException;
-import app.auditranscribe.audio.time_stretching.PhaseVocoder;
+import app.auditranscribe.audio.operators.PhaseVocoder;
 import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.generic.exceptions.ValueException;
 import app.auditranscribe.io.IOConstants;
@@ -546,7 +546,7 @@ public class Audio extends LoggableClass {
             // Get playback buffer size
             final int playbackBufferSize = DataFiles.SETTINGS_DATA_FILE.data.playbackBufferSize;
             final byte[] bufferBytes = new byte[playbackBufferSize * bytesPerSample];
-            //            final byte[] bufferBytes = new byte[32768];
+            //            final byte[] bufferBytes = new byte[32768 * bytesPerSample];
             int numBytesRead;
 
             @Override
@@ -562,14 +562,10 @@ public class Audio extends LoggableClass {
                         }
 
                         // Write audio bytes for playback
-                        if (!isSlowed) {
-                            sourceDataLine.write(bufferBytes, 0, numBytesRead);
-                        } else {
-                            // Fixme: horrible smearing caused by too small of a buffer?
-                            //        cf. https://github.com/groakley/phase-vocoder-java/blob/master/src/main/java/com/github/groakley/phasevocoder/processing/players/WavPlayer.java
-                            byte[] slowedBytes = generateSlowedBytes(bufferBytes, numBytesRead);
-                            sourceDataLine.write(slowedBytes, 0, slowedBytes.length);
-                        }
+                        double speedUpFactor = 1;
+                        if (isSlowed) speedUpFactor = 0.5;
+                        byte[] processedBytes = generateTimeStretchedBytes(bufferBytes, numBytesRead, speedUpFactor);
+                        sourceDataLine.write(processedBytes, 0, processedBytes.length);
                     }
                 }
             }
@@ -939,13 +935,14 @@ public class Audio extends LoggableClass {
     }
 
     /**
-     * Helper method that generates 0.5x speed audio bytes.
+     * Helper method that generates slowed audio bytes.
      *
      * @param rawBytes      Bytes from the audio that is playing at normal speed.
      * @param numValidBytes Number of valid bytes that can be read.
+     * @param speedUpFactor Speed-up factor.
      * @return The slowed bytes.
      */
-    private byte[] generateSlowedBytes(byte[] rawBytes, int numValidBytes) {
+    private byte[] generateTimeStretchedBytes(byte[] rawBytes, int numValidBytes, double speedUpFactor) {
         // First unpack the bytes into samples
         double[] rawSamples = TypeConversionUtils.floatArrayToDoubleArray(unpackBytes(rawBytes, numValidBytes));
 
@@ -953,7 +950,7 @@ public class Audio extends LoggableClass {
         Complex[][] stftMatrix = STFT.stft(rawSamples, SLOWDOWN_NUM_FFT, SLOWDOWN_HOP_LENGTH, SLOWDOWN_WINDOW);
 
         // Perform time stretching
-        Complex[][] modifiedSTFT = PhaseVocoder.phaseVocoder(stftMatrix, SLOWDOWN_HOP_LENGTH, 0.5);
+        Complex[][] modifiedSTFT = PhaseVocoder.phaseVocoder(stftMatrix, SLOWDOWN_HOP_LENGTH, speedUpFactor);
 
         // Obtain modified samples
         double[] modifiedSamples = STFT.istft(modifiedSTFT, SLOWDOWN_NUM_FFT, SLOWDOWN_HOP_LENGTH, SLOWDOWN_WINDOW);

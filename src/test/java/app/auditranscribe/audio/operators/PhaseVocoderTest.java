@@ -1,7 +1,6 @@
-package app.auditranscribe.audio.time_stretching;
+package app.auditranscribe.audio.operators;
 
 import app.auditranscribe.audio.Audio;
-import app.auditranscribe.audio.AudioProcessingMode;
 import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.misc.Complex;
@@ -20,7 +19,7 @@ class PhaseVocoderTest {
     void phaseVocoder() throws UnsupportedAudioFileException, AudioTooLongException, IOException {
         // Get the audio file
         File file = new File(IOMethods.getAbsoluteFilePath("test-files/general/audio/Choice.wav"));
-        Audio audio = new Audio(file, AudioProcessingMode.WITH_SAMPLES);
+        Audio audio = new Audio(file, Audio.ProcessingMode.WITH_SAMPLES);
         double[] origSamples = audio.getMonoSamples();
 
         // Process the phase vocoder on the STFT
