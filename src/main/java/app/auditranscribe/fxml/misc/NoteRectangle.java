@@ -125,7 +125,7 @@ public class NoteRectangle extends StackPane {
                 timeToPlaceRect,
                 noteDuration,
                 noteNum,
-                MiscUtils.generateUUID((long) (MiscUtils.getUnixTimestamp() * 1e3)),
+                MiscUtils.generateUUID((long) (MiscUtils.getUnixTimestamp() * 1e9)),
                 true
         );
     }
