@@ -226,6 +226,7 @@ public class Audio extends LoggableClass {
         paused = true;
         timeToResumeAt = getCurrentTime();
         sourceDataLine.flush();
+        clearOutChannelsQueue();
     }
 
     /**
@@ -241,8 +242,9 @@ public class Audio extends LoggableClass {
             audioStream.close();
             paused = false;
 
-            // Stop all operators
-            stopOperators();
+            // Stop and clear all operators' stuff
+            resetOperators();
+            clearOutChannelsQueue();
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -445,7 +447,7 @@ public class Audio extends LoggableClass {
                 queue.put(b);
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logException(e);
         }
     }
 
@@ -504,7 +506,6 @@ public class Audio extends LoggableClass {
      */
     private void setAudioPlaybackThread() {
         Audio audio = this;
-        setupOperators();
 
         audioPlaybackThread = new StoppableThread() {
             // Get playback buffer size
@@ -747,23 +748,33 @@ public class Audio extends LoggableClass {
     }
 
     /**
-     * Helper method that sets up all the operators.
+     * Helper method that sets up all the operators, if they were not already set up.
      */
     private void setupOperators() {
-        for (int i = 0; i < numChannels; i++) {
-            TimeStretchOperator op = new PhaseVocoderOperator(
-                    1., SLOWDOWN_PROCESSING_LENGTH, SLOWDOWN_ANALYSIS_LENGTH, SLOWDOWN_WINDOW
-            );
-            channelOperators.add(op);
-            new Thread(op).start();
+        if (channelOperators.size() < numChannels) {
+            for (int i = 0; i < numChannels; i++) {
+                TimeStretchOperator op = new PhaseVocoderOperator(
+                        1., SLOWDOWN_PROCESSING_LENGTH, SLOWDOWN_ANALYSIS_LENGTH, SLOWDOWN_WINDOW
+                );
+                channelOperators.add(op);
+                new Thread(op).start();
+            }
         }
     }
 
     /**
-     * Helper method that stops all the operators.
+     * Helper method that resets all the operators.
      */
-    private void stopOperators() {
+    private void resetOperators() {
         for (Operator op : channelOperators) op.stop();
+        channelOperators.clear();
+    }
+
+    /**
+     * Helper method that clears all out channels' queues.
+     */
+    private void clearOutChannelsQueue() {
+        for (BlockingQueue<Byte> bq : outChannels) bq.clear();
     }
 
     // Helper classes
