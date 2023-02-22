@@ -44,8 +44,8 @@ public class PhaseVocoderOperator extends TimeStretchOperator {
     private double samplesStretchFactor;  // Slightly different to `stretchFactor`; this is for discrete stretching
 
     double[] prevPhases;
-    double[] principalAdjustedPhases;
     double[] phaseAdvance;  // Expected phase advance
+    double[] principalAdjustedPhases;
 
     private final CapacityQueue<Double> input;
     private final CapacityQueue<Double> output;
@@ -134,23 +134,24 @@ public class PhaseVocoderOperator extends TimeStretchOperator {
                 input.offer(inputBuffer.take());
             }
         }
+
         return TypeConversionUtils.toDoubleArray(input.toArray(new Double[0]));
     }
 
     /**
-     * Windows the samples using the provided window function.
+     * Windows the samples using the operator's window function.
      *
-     * @param rawSamples The raw samples to window.
+     * @param samples The samples to window.
      * @return Windowed samples.
      */
-    private double[] windowSamples(double[] rawSamples) {
-        // Generate the window
+    private double[] windowSamples(double[] samples) {
+        // Generate the window array
         double[] window = windowFunction.window.generateWindow(processingLength, false);
 
         // Window the samples
-        double[] windowedSamples = new double[rawSamples.length];
-        for (int i = 0; i < rawSamples.length; i++) {
-            windowedSamples[i] = rawSamples[i] * window[i];
+        double[] windowedSamples = new double[samples.length];
+        for (int i = 0; i < samples.length; i++) {
+            windowedSamples[i] = samples[i] * window[i];
         }
         return windowedSamples;
     }
@@ -248,17 +249,17 @@ public class PhaseVocoderOperator extends TimeStretchOperator {
      * @return Processed samples.
      */
     private LinkedList<Double> overlapAddAndSlide(double[] stretchedSamples) {
-        LinkedList<Double> finishedBytes = new LinkedList<>();
+        LinkedList<Double> processedSamples = new LinkedList<>();
         for (int i = 0; i < analysisOutputSize; i++) {
-            finishedBytes.add(output.poll());
+            processedSamples.add(output.poll());
             output.offer(0.);
         }
-        Double[] outBytes = output.toArray(new Double[0]);
+        Double[] resultingSamples = output.toArray(new Double[0]);
 
-        for (int i = 0; i < outBytes.length; i++) {
-            outBytes[i] = stretchedSamples[i] + outBytes[i];
+        for (int i = 0; i < resultingSamples.length; i++) {
+            resultingSamples[i] = stretchedSamples[i] + resultingSamples[i];
         }
-        output.addAll(Arrays.asList(outBytes));
-        return finishedBytes;
+        output.addAll(Arrays.asList(resultingSamples));
+        return processedSamples;
     }
 }
