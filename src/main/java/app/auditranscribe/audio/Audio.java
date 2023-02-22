@@ -698,6 +698,8 @@ public class Audio extends LoggableClass {
      * @return Bytes belonging to that channel.
      */
     private byte[] extractChannel(byte[] rawBytes, int channelNum) {
+        if (numChannels == 1) return rawBytes;
+
         byte[] output = new byte[rawBytes.length / numChannels];
         int bytePosition = 0;
         int outIndex = 0;
