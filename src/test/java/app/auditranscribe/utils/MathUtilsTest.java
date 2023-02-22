@@ -34,6 +34,20 @@ class MathUtilsTest {
         assertEquals(3, MathUtils.ceilDiv(789, 321));
     }
 
+    // Trigonometric/angular methods
+    @Test
+    void principalArg() {
+        assertEquals(-Math.PI / 2, MathUtils.principalArg(-Math.PI / 2), 1e-5);
+        assertEquals(0, MathUtils.principalArg(0), 1e-5);
+        assertEquals(Math.PI / 2, MathUtils.principalArg(Math.PI / 2), 1e-5);
+        assertEquals(Math.PI, MathUtils.principalArg(Math.PI), 1e-5);
+
+        assertEquals(-Math.PI / 2, MathUtils.principalArg(-5 * Math.PI / 2), 1e-5);
+        assertEquals(0, MathUtils.principalArg(2 * Math.PI), 1e-5);
+        assertEquals(Math.PI / 2, MathUtils.principalArg(9 * Math.PI / 2), 1e-5);
+        assertEquals(Math.PI, MathUtils.principalArg(9 * Math.PI), 1e-5);
+    }
+
     // Data-related methods
     @Test
     void intLerp() {

@@ -83,6 +83,25 @@ public final class MathUtils {
         return 1 + ((p - 1) / q);
     }
 
+    // Trigonometric/angular methods
+
+    /**
+     * Obtain the principal argument of the provided angle.<br>
+     * The principal argument is in the semi-closed interval (-π, π].
+     *
+     * @param angle Angle in radians.
+     * @return Principal argument of the angle.
+     */
+    public static double principalArg(double angle) {
+        double proportion = angle / (2. * Math.PI);
+
+        int integralPart = (int) proportion;
+        double decimalPart = proportion - integralPart;  // Not that precise but good enough
+        if (decimalPart > 0.5) integralPart++;  // We want to round half down
+
+        return angle - 2. * Math.PI * integralPart;
+    }
+
     // Data-related methods
 
     /**
