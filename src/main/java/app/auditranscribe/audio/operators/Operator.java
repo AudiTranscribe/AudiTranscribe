@@ -19,7 +19,7 @@
 package app.auditranscribe.audio.operators;
 
 import app.auditranscribe.audio.Audio;
-import app.auditranscribe.generic.LoggableClass;
+import app.auditranscribe.misc.StoppableThread;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -27,11 +27,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * An abstract thread that operates on streams of bytes.
  */
-public abstract class Operator extends LoggableClass implements Runnable {
+public abstract class Operator extends StoppableThread {
     // Attributes
     protected BlockingQueue<Double> inputBuffer = new LinkedBlockingQueue<>(8192);
 
-    private volatile boolean isRunning = true;
     private volatile Audio caller = null;
     private volatile int channelNum;
 
@@ -62,8 +61,8 @@ public abstract class Operator extends LoggableClass implements Runnable {
     }
 
     @Override
-    public void run() {
-        while (isRunning) {
+    public void runner() {
+        while (running.get()) {
             if (caller != null) {
                 double[] output;
                 try {
@@ -71,16 +70,10 @@ public abstract class Operator extends LoggableClass implements Runnable {
                     caller.answer(channelNum, output);
                 } catch (InterruptedException e) {
                     logException(e);
+                    Thread.currentThread().interrupt();
                 }
             }
         }
-    }
-
-    /**
-     * Stops the thread and releases any of its resources.
-     */
-    public void stop() {
-        isRunning = false;
     }
 
     /**
