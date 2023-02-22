@@ -50,8 +50,8 @@ public class Audio extends LoggableClass {
     public static final int SAMPLES_BUFFER_SIZE = 1024;  // In number of samples
     public static final int[] VALID_PLAYBACK_BUFFER_SIZES = {1024, 2048, 4096};  // In bytes
 
-    public static final int SLOWDOWN_NUM_FFT = 256;
-    public static final int SLOWDOWN_HOP_LENGTH = SLOWDOWN_NUM_FFT / 4;
+    public static final int SLOWDOWN_PROCESSING_LENGTH = 2048;
+    public static final int SLOWDOWN_ANALYSIS_LENGTH = 512;
     public static final SignalWindow SLOWDOWN_WINDOW = SignalWindow.HANN_WINDOW;
 
     final int OUT_CHANNEL_CAPACITY = 8192;  // In number of samples
@@ -504,9 +504,8 @@ public class Audio extends LoggableClass {
         // Set up operators
         for (int i = 0; i < numChannels; i++) {
             TimeStretchOperator op = new PhaseVocoderOperator(
-                    1., SLOWDOWN_NUM_FFT, SLOWDOWN_HOP_LENGTH, SLOWDOWN_WINDOW
+                    1., SLOWDOWN_PROCESSING_LENGTH, SLOWDOWN_ANALYSIS_LENGTH, SLOWDOWN_WINDOW
             );
-//            TimeStretchOperator op = new IdentityOperator();
             channelOperators.add(op);
             new Thread(op).start();
         }
@@ -752,36 +751,6 @@ public class Audio extends LoggableClass {
         }
         return output;
     }
-
-    // Todo implement
-//    /**
-//     * Helper method that generates slowed audio bytes.
-//     *
-//     * @param rawBytes      Bytes from the audio that is playing at normal speed.
-//     * @param numValidBytes Number of valid bytes that can be read.
-//     * @param speedUpFactor Speed-up factor.
-//     * @return The slowed bytes.
-//     */
-//    private byte[] generateTimeStretchedBytes(byte[] rawBytes, int numValidBytes, double speedUpFactor) {
-//        // First unpack the bytes into samples
-//        double[] rawSamples = TypeConversionUtils.floatArrayToDoubleArray(
-//                AudioHelpers.unpackBytes(rawBytes, numValidBytes, bitsPerSample, audioFormat)
-//        );
-//
-//        // Perform STFT on samples
-//        Complex[][] stftMatrix = STFT.stft(rawSamples, SLOWDOWN_NUM_FFT, SLOWDOWN_HOP_LENGTH, SLOWDOWN_WINDOW);
-//
-//        // Perform time stretching
-//        Complex[][] modifiedSTFT = PhaseVocoder.phaseVocoder(stftMatrix, SLOWDOWN_HOP_LENGTH, speedUpFactor);
-//
-//        // Obtain modified samples
-//        double[] modifiedSamples = STFT.istft(modifiedSTFT, SLOWDOWN_NUM_FFT, SLOWDOWN_HOP_LENGTH, SLOWDOWN_WINDOW);
-//
-//        // Pack into audio bytes
-//        return AudioHelpers.packBytes(
-//                TypeConversionUtils.doubleArrayToFloatArray(modifiedSamples), bitsPerSample, audioFormat
-//        );
-//    }
 
     // Helper classes
 
