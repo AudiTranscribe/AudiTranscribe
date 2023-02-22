@@ -41,13 +41,13 @@ public class PhaseVocoderOperator extends TimeStretchOperator {
     /**
      * Initializes a new phase vocoder.
      *
-     * @param speedUpFactor Initial speed up factor.
+     * @param stretchFactor Initial time stretch factor.
      * @param numFFT        Number of FFT bins.
      * @param hopLength     Number of samples between successive columns.
      * @param window        Signal window to use when windowing samples.
      */
-    public PhaseVocoderOperator(double speedUpFactor, int numFFT, int hopLength, SignalWindow window) {
-        super(speedUpFactor);
+    public PhaseVocoderOperator(double stretchFactor, int numFFT, int hopLength, SignalWindow window) {
+        super(stretchFactor);
         this.numFFT = numFFT;
         this.hopLength = hopLength;
         this.window = window;
@@ -68,7 +68,7 @@ public class PhaseVocoderOperator extends TimeStretchOperator {
         Complex[][] stftMatrix = STFT.stft(rawSamples, numFFT, hopLength, window);
 
         // Perform time stretching
-        Complex[][] modifiedSTFT = PhaseVocoder.phaseVocoder(stftMatrix, hopLength, speedUpFactor);
+        Complex[][] modifiedSTFT = PhaseVocoder.phaseVocoder(stftMatrix, hopLength, 1. / stretchFactor);
 
         // Obtain modified samples
         return STFT.istft(modifiedSTFT, numFFT, hopLength, window);

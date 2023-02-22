@@ -109,10 +109,10 @@ class AudioTest {
                 Thread.sleep(1000);
                 System.out.println("SLOWED");
                 audio.setSlowed(true);
-                Thread.sleep(8000);
+                Thread.sleep(4000);
                 System.out.println("NON-SLOWED");
                 audio.setSlowed(false);
-                Thread.sleep(5000);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

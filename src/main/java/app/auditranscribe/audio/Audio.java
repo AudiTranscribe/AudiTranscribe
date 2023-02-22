@@ -525,7 +525,7 @@ public class Audio extends LoggableClass {
                     while (running.get()) {
                         if (!paused) {
                             // Update speed up factor
-                            for (TimeStretchOperator op : channelOperators) op.setSpeedUpFactor(isSlowed ? 0.5 : 1);
+                            for (TimeStretchOperator op : channelOperators) op.setStretchFactor(isSlowed ? 2 : 1);
 
                             if (readThisIteration) {
                                 // Read bytes from audio stream

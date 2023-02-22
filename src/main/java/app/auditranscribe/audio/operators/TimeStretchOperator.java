@@ -23,23 +23,23 @@ package app.auditranscribe.audio.operators;
  */
 public abstract class TimeStretchOperator extends Operator {
     // Attributes
-    protected double speedUpFactor;
+    protected double stretchFactor;
 
     /**
      * Initializes a new <code>TimeStretchOperator</code>.
      *
-     * @param speedUpFactor Initial speed up factor.
+     * @param stretchFactor Initial time stretch factor.
      */
-    public TimeStretchOperator(double speedUpFactor) {
-        this.speedUpFactor = speedUpFactor;
+    public TimeStretchOperator(double stretchFactor) {
+        this.stretchFactor = stretchFactor;
     }
 
     // Getter/setter methods
-    public double getSpeedUpFactor() {
-        return speedUpFactor;
+    public double getStretchFactor() {
+        return stretchFactor;
     }
 
-    public void setSpeedUpFactor(double speedUpFactor) {
-        this.speedUpFactor = speedUpFactor;
+    public void setStretchFactor(double stretchFactor) {
+        this.stretchFactor = stretchFactor;
     }
 }
