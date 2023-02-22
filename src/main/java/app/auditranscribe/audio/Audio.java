@@ -60,6 +60,7 @@ public class Audio extends LoggableClass {
     private AudioInputStream audioStream;
     private final AudioFormat audioFormat;
 
+    private final int numChannels;
     private final int frameSize;
     private final double frameRate;
     private final double sampleRate;
@@ -118,6 +119,7 @@ public class Audio extends LoggableClass {
         // Get the audio file's audio format, and get the format's properties
         audioFormat = audioStream.getFormat();
 
+        numChannels = audioFormat.getChannels();
         frameSize = audioFormat.getFrameSize();
         frameRate = audioFormat.getFrameRate();
         sampleRate = audioFormat.getSampleRate();
@@ -500,7 +502,7 @@ public class Audio extends LoggableClass {
             numRawSamples = audioStream.available() / bytesPerSample;
 
             // Calculate the number of samples needed for each window
-            int numSamplesPerBuffer = SAMPLES_BUFFER_SIZE * audioFormat.getChannels();
+            int numSamplesPerBuffer = SAMPLES_BUFFER_SIZE * numChannels;
             int numBuffers = MathUtils.ceilDiv(numRawSamples, numSamplesPerBuffer);
 
             // Define helper arrays
@@ -536,19 +538,21 @@ public class Audio extends LoggableClass {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            // Remove stereo samples if they are there
-            if (audioFormat.getChannels() == 2) {  // Stereo
+            if (numChannels > 1) {
                 // Calculate the number of mono samples there are
-                numMonoSamples = numRawSamples / 2;
+                numMonoSamples = numRawSamples / numChannels;
 
                 // Fill in the mono audio samples array
                 monoSamples = new double[numMonoSamples];
 
                 for (int i = 0; i < numMonoSamples; i++) {
-                    monoSamples[i] = (rawSamples[i * 2] + rawSamples[i * 2 + 1]) / 2;
+                    double sampleSum = rawSamples[i * numChannels];
+                    for (int j = 1; j < numChannels; j++) {
+                        sampleSum += rawSamples[i * numChannels + j];
+                    }
+                    monoSamples[i] = sampleSum / numChannels;
                 }
-            } else {  // Mono
-                // Fill in the mono audio samples array
+            } else {  // Single-channel
                 monoSamples = new double[numRawSamples];
                 System.arraycopy(rawSamples, 0, monoSamples, 0, numRawSamples);
             }
