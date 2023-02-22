@@ -18,7 +18,7 @@
 
 package app.auditranscribe.signal.representations;
 
-import app.auditranscribe.audio.Audio;
+import app.auditranscribe.audio.AudioHelpers;
 import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.generic.exceptions.ValueException;
 import app.auditranscribe.generic.tuples.Pair;
@@ -326,7 +326,7 @@ public final class QTransform extends LoggableClass {
             if (myHopLength % 2 == 0) {
                 myHopLength /= 2;
                 mySR /= 2.;
-                myY = Audio.resample(myY, 2, 1, filter, true);
+                myY = AudioHelpers.resample(myY, 2, 1, filter, true);
             }
 
             // Update task progress
@@ -419,7 +419,7 @@ public final class QTransform extends LoggableClass {
                 double newSr = sr / downsampleFactor;
 
                 // Downsample audio sample
-                yNew = Audio.resample(y, sr, newSr, filter, true);
+                yNew = AudioHelpers.resample(y, sr, newSr, filter, true);
                 sr = newSr;
             } else {
                 yNew = y;
