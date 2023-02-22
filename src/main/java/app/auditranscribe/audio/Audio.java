@@ -503,7 +503,10 @@ public class Audio extends LoggableClass {
 
         // Set up operators
         for (int i = 0; i < numChannels; i++) {
-            TimeStretchOperator op = new IdentityOperator();
+            TimeStretchOperator op = new PhaseVocoderOperator(
+                    1., SLOWDOWN_NUM_FFT, SLOWDOWN_HOP_LENGTH, SLOWDOWN_WINDOW
+            );
+//            TimeStretchOperator op = new IdentityOperator();
             channelOperators.add(op);
             new Thread(op).start();
         }
@@ -518,31 +521,37 @@ public class Audio extends LoggableClass {
             @Override
             public void runner() {
                 try {
+                    boolean readThisIteration = true;
                     while (running.get()) {
                         if (!paused) {
                             // Update speed up factor
                             for (TimeStretchOperator op : channelOperators) op.setSpeedUpFactor(isSlowed ? 0.5 : 1);
 
-                            // Read bytes from audio stream
-                            numBytesRead = audioStream.read(bufferBytes);
-                            if (numBytesRead == -1) break;
+                            if (readThisIteration) {
+                                // Read bytes from audio stream
+                                numBytesRead = audioStream.read(bufferBytes);
+                                if (numBytesRead == -1) break;
 
-                            // Separate into channels
-                            ArrayList<byte[]> channels = new ArrayList<>();
-                            for (int i = 0; i < numChannels; i++) {
-                                channels.add(extractChannel(bufferBytes, i));
-                            }
+                                // Separate into channels
+                                ArrayList<byte[]> channels = new ArrayList<>();
+                                for (int i = 0; i < numChannels; i++) {
+                                    channels.add(extractChannel(bufferBytes, i));
+                                }
 
-                            // Call operators to work on the channels' data
-                            for (int i = numChannels - 1; i >= 0; i--) {
-                                byte[] data = channels.get(i);
-                                channelOperators.get(i).call(
-                                        audio, i, TypeConversionUtils.floatArrayToDoubleArray(
-                                                AudioHelpers.unpackBytes(
-                                                        data, numBytesRead / numChannels, bitsPerSample, audioFormat
-                                                )
-                                        )
-                                );
+                                // Call operators to work on the channels' data
+                                for (int i = numChannels - 1; i >= 0; i--) {
+                                    byte[] data = channels.get(i);
+                                    channelOperators.get(i).call(
+                                            audio, i, TypeConversionUtils.floatArrayToDoubleArray(
+                                                    AudioHelpers.unpackBytes(
+                                                            data,
+                                                            numBytesRead / numChannels,
+                                                            bitsPerSample,
+                                                            audioFormat
+                                                    )
+                                            )
+                                    );
+                                }
                             }
 
                             // Check if enough data is in `outChannels`
@@ -567,6 +576,15 @@ public class Audio extends LoggableClass {
                                 }
                                 byte[] interleavedChannels = interleaveChannels(outputSegments);
                                 sourceDataLine.write(interleavedChannels, 0, interleavedChannels.length);
+                            }
+
+                            // Determine if we read this iteration
+                            readThisIteration = true;
+                            for (Operator op : channelOperators) {
+                                if (op.remainingCapacity() < (bufferBytes.length / channelOperators.size())
+                                        / bytesPerSample) {
+                                    readThisIteration = false;
+                                }
                             }
                         }
                     }
@@ -734,6 +752,36 @@ public class Audio extends LoggableClass {
         }
         return output;
     }
+
+    // Todo implement
+//    /**
+//     * Helper method that generates slowed audio bytes.
+//     *
+//     * @param rawBytes      Bytes from the audio that is playing at normal speed.
+//     * @param numValidBytes Number of valid bytes that can be read.
+//     * @param speedUpFactor Speed-up factor.
+//     * @return The slowed bytes.
+//     */
+//    private byte[] generateTimeStretchedBytes(byte[] rawBytes, int numValidBytes, double speedUpFactor) {
+//        // First unpack the bytes into samples
+//        double[] rawSamples = TypeConversionUtils.floatArrayToDoubleArray(
+//                AudioHelpers.unpackBytes(rawBytes, numValidBytes, bitsPerSample, audioFormat)
+//        );
+//
+//        // Perform STFT on samples
+//        Complex[][] stftMatrix = STFT.stft(rawSamples, SLOWDOWN_NUM_FFT, SLOWDOWN_HOP_LENGTH, SLOWDOWN_WINDOW);
+//
+//        // Perform time stretching
+//        Complex[][] modifiedSTFT = PhaseVocoder.phaseVocoder(stftMatrix, SLOWDOWN_HOP_LENGTH, speedUpFactor);
+//
+//        // Obtain modified samples
+//        double[] modifiedSamples = STFT.istft(modifiedSTFT, SLOWDOWN_NUM_FFT, SLOWDOWN_HOP_LENGTH, SLOWDOWN_WINDOW);
+//
+//        // Pack into audio bytes
+//        return AudioHelpers.packBytes(
+//                TypeConversionUtils.doubleArrayToFloatArray(modifiedSamples), bitsPerSample, audioFormat
+//        );
+//    }
 
     // Helper classes
 

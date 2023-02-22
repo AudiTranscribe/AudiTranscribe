@@ -16,6 +16,7 @@ class AudioTest {
 
     AudioTest() throws UnsupportedAudioFileException, AudioTooLongException, IOException {
         File file = new File(IOMethods.getAbsoluteFilePath("test-files/general/audio/Choice.wav"));
+//        File file = new File(IOMethods.getAbsoluteFilePath("test-files/general/audio/Trumpet.wav"));
 
         if (TEST_PLAYBACK) {
             audio = new Audio(
@@ -58,52 +59,60 @@ class AudioTest {
         assertEquals(-0.0015411376953125, samples[212345], 1e-5);
     }
 
-    final boolean TEST_PLAYBACK = false;
+    final boolean TEST_PLAYBACK = true;
 
     @Test
     @DisabledIf("isPlaybackTestDisabled")
     void playback() throws InterruptedException {
-        System.out.println("VOLUME 25%");
-        audio.setVolume(0.25);
         audio.play();
 
 //        audio.getAudioPlaybackThread().join();
 
         Thread t = new Thread(() -> {
             try {
-                Thread.sleep(1500);
-                System.out.println("VOLUME 100%");
-                audio.setVolume(1);
+//                System.out.println("VOLUME 25%");
+//                audio.setVolume(0.25);
+//                Thread.sleep(1500);
+//                System.out.println("VOLUME 100%");
+//                audio.setVolume(1);
+//                Thread.sleep(1000);
+//                System.out.println("SEEK 2.75");
+//                audio.seekToTime(2.75);
+//                Thread.sleep(1000);
+//                System.out.println("CHECK TIME: " + audio.getCurrentTime());
+//                Thread.sleep(500);
+//                System.out.println("SEEK 0.25");
+//                audio.seekToTime(0.25);
+//                Thread.sleep(1000);
+//                System.out.println("CHECK TIME: " + audio.getCurrentTime());
+//                Thread.sleep(1000);
+//                System.out.println("VOLUME 50%");
+//                audio.setVolume(0.5);
+//                Thread.sleep(1000);
+//                System.out.println("SEEK 1");
+//                audio.seekToTime(1);
+//                Thread.sleep(1000);
+//                audio.pause();
+//                System.out.println("PAUSED 1.5");
+//                Thread.sleep(1500);
+//                audio.play();
+//                System.out.println("RESUMED");
+//                Thread.sleep(1000);
+//                System.out.println("SEEK 0");
+//                audio.seekToTime(0);
+//                Thread.sleep(1000);
+//                System.out.println("VOLUME 150%");
+//                audio.setVolume(1.5);
+//                Thread.sleep(3000);
+//                System.out.println("DONE");
+
                 Thread.sleep(1000);
-                System.out.println("SEEK 2.75");
-                audio.seekToTime(2.75);
-                Thread.sleep(1000);
-                System.out.println("CHECK TIME: " + audio.getCurrentTime());
-                Thread.sleep(500);
-                System.out.println("SEEK 0.25");
-                audio.seekToTime(0.25);
-                Thread.sleep(1000);
-                System.out.println("CHECK TIME: " + audio.getCurrentTime());
-                Thread.sleep(1000);
-                System.out.println("VOLUME 50%");
-                audio.setVolume(0.5);
-                Thread.sleep(1000);
-                System.out.println("SEEK 1");
-                audio.seekToTime(1);
-                Thread.sleep(1000);
-                audio.pause();
-                System.out.println("PAUSED 1.5");
-                Thread.sleep(1500);
-                audio.play();
-                System.out.println("RESUMED");
-                Thread.sleep(1000);
-                System.out.println("SEEK 0");
-                audio.seekToTime(0);
-                Thread.sleep(1000);
-                System.out.println("VOLUME 150%");
-                audio.setVolume(1.5);
-                Thread.sleep(3000);
-                System.out.println("DONE");
+                System.out.println("SLOWED");
+                audio.setSlowed(true);
+                Thread.sleep(8000);
+                System.out.println("NON-SLOWED");
+                audio.setSlowed(false);
+                Thread.sleep(5000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
