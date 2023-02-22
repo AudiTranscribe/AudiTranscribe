@@ -18,9 +18,12 @@
 
 package app.auditranscribe.audio.operators;
 
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+
 /**
  * An operator that just returns whatever is passed into the input buffer.
  */
+@ExcludeFromGeneratedCoverageReport
 public class IdentityOperator extends TimeStretchOperator {
     /**
      * Initializes a new <code>IdentityOperator</code>.
