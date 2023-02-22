@@ -79,7 +79,7 @@ class AudioTest {
                 audio.seekToTime(2.75);
                 Thread.sleep(1000);
                 System.out.println("CHECK TIME: " + audio.getCurrentTime());
-                Thread.sleep(1000);
+                Thread.sleep(500);
                 System.out.println("SEEK 0.25");
                 audio.seekToTime(0.25);
                 Thread.sleep(1000);

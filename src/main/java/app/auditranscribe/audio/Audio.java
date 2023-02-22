@@ -21,13 +21,13 @@ package app.auditranscribe.audio;
 import app.auditranscribe.audio.exceptions.AudioPlaybackNotSupported;
 import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.audio.exceptions.FFmpegNotFoundException;
-import app.auditranscribe.audio.operators.PhaseVocoder;
+import app.auditranscribe.audio.operators.*;
 import app.auditranscribe.generic.LoggableClass;
+import app.auditranscribe.generic.exceptions.LengthException;
 import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.data_files.DataFiles;
 import app.auditranscribe.misc.*;
-import app.auditranscribe.signal.representations.STFT;
 import app.auditranscribe.signal.windowing.SignalWindow;
 import app.auditranscribe.utils.MathUtils;
 import app.auditranscribe.utils.TypeConversionUtils;
@@ -37,6 +37,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 
 /**
@@ -45,12 +47,15 @@ import java.util.logging.Level;
 @ExcludeFromGeneratedCoverageReport
 public class Audio extends LoggableClass {
     // Constants
-    public static final int SAMPLES_BUFFER_SIZE = 1024;  // In number of samples; 1024 = 2^10
+    public static final int SAMPLES_BUFFER_SIZE = 1024;  // In number of samples
     public static final int[] VALID_PLAYBACK_BUFFER_SIZES = {1024, 2048, 4096};  // In bytes
 
     public static final int SLOWDOWN_NUM_FFT = 256;
     public static final int SLOWDOWN_HOP_LENGTH = SLOWDOWN_NUM_FFT / 4;
     public static final SignalWindow SLOWDOWN_WINDOW = SignalWindow.HANN_WINDOW;
+
+    final int OUT_CHANNEL_CAPACITY = 8192;  // In number of samples
+    final int OUT_SEGMENT_LENGTH = 1024;  // In number of samples
 
     final int MAX_AUDIO_DURATION = 5;  // In minutes
 
@@ -84,6 +89,9 @@ public class Audio extends LoggableClass {
     private int numMonoSamples;
     private double[] rawSamples;
     private double[] monoSamples;
+
+    private final Vector<BlockingQueue<Byte>> outChannels = new Vector<>();
+    private final Vector<TimeStretchOperator> channelOperators = new Vector<>();
 
     private byte[] rawMP3Bytes;
 
@@ -151,6 +159,12 @@ public class Audio extends LoggableClass {
         if (modes.contains(ProcessingMode.WITH_PLAYBACK)) {
             withPlayback = true;
             setAudioPlaybackThread();
+
+            // Update out channels
+            for (int i = 0; i < numChannels; i++) {
+                outChannels.add(new LinkedBlockingQueue<>(OUT_CHANNEL_CAPACITY * bytesPerSample));
+            }
+
         } else {
             sourceDataLine = null;
             audioPlaybackThread = null;
@@ -225,11 +239,16 @@ public class Audio extends LoggableClass {
     public void stop() {
         if (!withPlayback) throw new AudioPlaybackNotSupported();
         try {
+            // Halt all threads
             audioPlaybackThread.interrupt();
             sourceDataLine.drain();
             sourceDataLine.close();
             audioStream.close();
             paused = false;
+
+            // Stop all operators
+            for (Operator op : channelOperators) op.stop();
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -407,6 +426,25 @@ public class Audio extends LoggableClass {
         }
     }
 
+    /**
+     * Method that operators are to answer to, once they have processed the required data.
+     *
+     * @param channelNum Audio channel number.
+     * @param reply      Reply from the operator.
+     */
+    public void answer(int channelNum, double[] reply) {
+        BlockingQueue<Byte> queue = outChannels.get(channelNum);
+        try {
+            for (Byte b : AudioHelpers.packBytes(
+                    TypeConversionUtils.doubleArrayToFloatArray(reply), bitsPerSample, audioFormat)
+            ) {
+                queue.put(b);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     // Private methods
 
     /**
@@ -460,31 +498,81 @@ public class Audio extends LoggableClass {
      * Helper method that sets the audio playback thread.
      */
     private void setAudioPlaybackThread() {
+        // Get the audio object
+        Audio audio = this;
+
+        // Set up operators
+        for (int i = 0; i < numChannels; i++) {
+            TimeStretchOperator op = new IdentityOperator();
+            channelOperators.add(op);
+            new Thread(op).start();
+        }
+
+        // Set up thread
         audioPlaybackThread = new StoppableThread() {
             // Get playback buffer size
             final int playbackBufferSize = DataFiles.SETTINGS_DATA_FILE.data.playbackBufferSize;
             final byte[] bufferBytes = new byte[playbackBufferSize * bytesPerSample];
-            //            final byte[] bufferBytes = new byte[32768 * bytesPerSample];
             int numBytesRead;
 
             @Override
             public void runner() {
-                while (running.get()) {
-                    if (!paused) {
-                        try {
+                try {
+                    while (running.get()) {
+                        if (!paused) {
+                            // Update speed up factor
+                            for (TimeStretchOperator op : channelOperators) op.setSpeedUpFactor(isSlowed ? 0.5 : 1);
+
+                            // Read bytes from audio stream
                             numBytesRead = audioStream.read(bufferBytes);
                             if (numBytesRead == -1) break;
-                        } catch (IOException e) {
-                            Thread.currentThread().interrupt();
-                            logException(e);
-                        }
 
-                        // Write audio bytes for playback
-                        double speedUpFactor = 1;
-                        if (isSlowed) speedUpFactor = 0.5;
-                        byte[] processedBytes = generateTimeStretchedBytes(bufferBytes, numBytesRead, speedUpFactor);
-                        sourceDataLine.write(processedBytes, 0, processedBytes.length);
+                            // Separate into channels
+                            ArrayList<byte[]> channels = new ArrayList<>();
+                            for (int i = 0; i < numChannels; i++) {
+                                channels.add(extractChannel(bufferBytes, i));
+                            }
+
+                            // Call operators to work on the channels' data
+                            for (int i = numChannels - 1; i >= 0; i--) {
+                                byte[] data = channels.get(i);
+                                channelOperators.get(i).call(
+                                        audio, i, TypeConversionUtils.floatArrayToDoubleArray(
+                                                AudioHelpers.unpackBytes(
+                                                        data, numBytesRead / numChannels, bitsPerSample, audioFormat
+                                                )
+                                        )
+                                );
+                            }
+
+                            // Check if enough data is in `outChannels`
+                            int outSegmentLength = OUT_SEGMENT_LENGTH * bytesPerSample;
+                            boolean enoughData = true;
+                            for (BlockingQueue<Byte> bq : outChannels) {
+                                if (bq.size() < outSegmentLength) {
+                                    enoughData = false;
+                                    break;
+                                }
+                            }
+
+                            // If enough, interleave processed samples and write to source data line
+                            if (enoughData) {
+                                ArrayList<byte[]> outputSegments = new ArrayList<>();
+                                for (BlockingQueue<Byte> bq : outChannels) {
+                                    byte[] segment = new byte[outSegmentLength];
+                                    for (int i = 0; i < segment.length; i++) {
+                                        segment[i] = bq.take();
+                                    }
+                                    outputSegments.add(segment);
+                                }
+                                byte[] interleavedChannels = interleaveChannels(outputSegments);
+                                sourceDataLine.write(interleavedChannels, 0, interleavedChannels.length);
+                            }
+                        }
                     }
+                } catch (IOException | InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    logException(e);
                 }
             }
         };
@@ -594,32 +682,57 @@ public class Audio extends LoggableClass {
     }
 
     /**
-     * Helper method that generates slowed audio bytes.
+     * Helper method that extracts the bytes for a specific channel.
      *
-     * @param rawBytes      Bytes from the audio that is playing at normal speed.
-     * @param numValidBytes Number of valid bytes that can be read.
-     * @param speedUpFactor Speed-up factor.
-     * @return The slowed bytes.
+     * @param rawBytes   The raw bytes that were read from the audio stream.
+     * @param channelNum The channel number to extract.
+     * @return Bytes belonging to that channel.
      */
-    private byte[] generateTimeStretchedBytes(byte[] rawBytes, int numValidBytes, double speedUpFactor) {
-        // First unpack the bytes into samples
-        double[] rawSamples = TypeConversionUtils.floatArrayToDoubleArray(
-                AudioHelpers.unpackBytes(rawBytes, numValidBytes, bitsPerSample, audioFormat)
-        );
+    private byte[] extractChannel(byte[] rawBytes, int channelNum) {
+        byte[] output = new byte[rawBytes.length / numChannels];
+        int bytePosition = 0;
+        int outIndex = 0;
+        for (byte datum : rawBytes) {
+            if (bytePosition >= channelNum * bytesPerSample &&
+                    bytePosition < (channelNum + numChannels - 1) * bytesPerSample) {
+                output[outIndex] = datum;
+                outIndex++;
+            }
+            bytePosition++;
+            if (bytePosition == numChannels * bytesPerSample) {
+                bytePosition = 0;
+            }
+        }
+        return output;
+    }
 
-        // Perform STFT on samples
-        Complex[][] stftMatrix = STFT.stft(rawSamples, SLOWDOWN_NUM_FFT, SLOWDOWN_HOP_LENGTH, SLOWDOWN_WINDOW);
+    /**
+     * Interleave the different channels' bytes into one singular byte array.
+     *
+     * @param channels All channels' bytes.
+     * @return Interleaved bytes array.
+     */
+    private byte[] interleaveChannels(ArrayList<byte[]> channels) {
+        // Check if channels are the same length
+        int first = channels.get(0).length;
+        for (byte[] chan : channels) {
+            if (chan.length != first) {
+                throw new LengthException("Channel lengths were different");
+            }
+        }
 
-        // Perform time stretching
-        Complex[][] modifiedSTFT = PhaseVocoder.phaseVocoder(stftMatrix, SLOWDOWN_HOP_LENGTH, speedUpFactor);
-
-        // Obtain modified samples
-        double[] modifiedSamples = STFT.istft(modifiedSTFT, SLOWDOWN_NUM_FFT, SLOWDOWN_HOP_LENGTH, SLOWDOWN_WINDOW);
-
-        // Pack into audio bytes
-        return AudioHelpers.packBytes(
-                TypeConversionUtils.doubleArrayToFloatArray(modifiedSamples), bitsPerSample, audioFormat
-        );
+        // Interleave channels
+        byte[] output = new byte[first * channels.size()];
+        int outIdx = 0;
+        int chanIdx = 0;
+        while (chanIdx + bytesPerSample <= first) {
+            for (byte[] channel : channels) {
+                System.arraycopy(channel, chanIdx, output, outIdx, bytesPerSample);
+                outIdx += bytesPerSample;
+            }
+            chanIdx += bytesPerSample;
+        }
+        return output;
     }
 
     // Helper classes
