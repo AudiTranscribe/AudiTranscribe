@@ -19,6 +19,7 @@
 package app.auditranscribe.audio.operators;
 
 import app.auditranscribe.audio.Audio;
+import app.auditranscribe.generic.LoggableClass;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -26,9 +27,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * An abstract thread that operates on streams of bytes.
  */
-public abstract class Operator implements Runnable {
+public abstract class Operator extends LoggableClass implements Runnable {
     // Attributes
-    protected BlockingQueue<Double> inputBuffer = new LinkedBlockingQueue<>(8192);  // todo: change capacity?
+    protected BlockingQueue<Double> inputBuffer = new LinkedBlockingQueue<>(8192);
 
     private volatile boolean isRunning = true;
     private volatile Audio caller = null;
@@ -69,7 +70,7 @@ public abstract class Operator implements Runnable {
                     output = process();
                     caller.answer(channelNum, output);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    logException(e);
                 }
             }
         }

@@ -79,7 +79,6 @@ public class Audio extends LoggableClass {
 
     private double volume = 1;
     private boolean paused = false;
-    private boolean isSlowed = false;
 
     private boolean withPlayback = false;
     private SourceDataLine sourceDataLine;
@@ -201,10 +200,6 @@ public class Audio extends LoggableClass {
         return sourceDataLine.getMicrosecondPosition() / 1e6 - prevElapsedTime;  // Todo: work with slowed audio
     }
 
-    public void setSlowed(boolean slowed) {
-        isSlowed = slowed;
-    }
-
     // Audio playback methods
 
     /**
@@ -247,7 +242,7 @@ public class Audio extends LoggableClass {
             paused = false;
 
             // Stop all operators
-            for (Operator op : channelOperators) op.stop();
+            stopOperators();
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -285,6 +280,15 @@ public class Audio extends LoggableClass {
         if (sourceDataLine != null) {
             updatePlaybackVolume(volume);
         }
+    }
+
+    /**
+     * Method that toggles slowed audio.
+     *
+     * @param slowed Whether the audio that is playing should be slowed or not.
+     */
+    public void toggleSlowedAudio(boolean slowed) {
+        for (TimeStretchOperator op : channelOperators) op.setStretchFactor(slowed ? 2 : 1);
     }
 
     /**
@@ -472,6 +476,7 @@ public class Audio extends LoggableClass {
             try {
                 audioStream.close();
                 audioStream = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream(wavFile)));
+                setupOperators();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -498,19 +503,9 @@ public class Audio extends LoggableClass {
      * Helper method that sets the audio playback thread.
      */
     private void setAudioPlaybackThread() {
-        // Get the audio object
         Audio audio = this;
+        setupOperators();
 
-        // Set up operators
-        for (int i = 0; i < numChannels; i++) {
-            TimeStretchOperator op = new PhaseVocoderOperator(
-                    1., SLOWDOWN_PROCESSING_LENGTH, SLOWDOWN_ANALYSIS_LENGTH, SLOWDOWN_WINDOW
-            );
-            channelOperators.add(op);
-            new Thread(op).start();
-        }
-
-        // Set up thread
         audioPlaybackThread = new StoppableThread() {
             // Get playback buffer size
             final int playbackBufferSize = DataFiles.SETTINGS_DATA_FILE.data.playbackBufferSize;
@@ -523,9 +518,6 @@ public class Audio extends LoggableClass {
                     boolean readThisIteration = true;
                     while (running.get()) {
                         if (!paused) {
-                            // Update speed up factor
-                            for (TimeStretchOperator op : channelOperators) op.setStretchFactor(isSlowed ? 2 : 1);
-
                             if (readThisIteration) {
                                 // Read bytes from audio stream
                                 numBytesRead = audioStream.read(bufferBytes);
@@ -750,6 +742,26 @@ public class Audio extends LoggableClass {
             chanIdx += bytesPerSample;
         }
         return output;
+    }
+
+    /**
+     * Helper method that sets up all the operators.
+     */
+    private void setupOperators() {
+        for (int i = 0; i < numChannels; i++) {
+            TimeStretchOperator op = new PhaseVocoderOperator(
+                    1., SLOWDOWN_PROCESSING_LENGTH, SLOWDOWN_ANALYSIS_LENGTH, SLOWDOWN_WINDOW
+            );
+            channelOperators.add(op);
+            new Thread(op).start();
+        }
+    }
+
+    /**
+     * Helper method that stops all the operators.
+     */
+    private void stopOperators() {
+        for (Operator op : channelOperators) op.stop();
     }
 
     // Helper classes

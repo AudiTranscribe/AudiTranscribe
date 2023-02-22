@@ -71,10 +71,10 @@ class AudioTest {
                 if (TEST_SLOWED) {
                     Thread.sleep(1000);
                     System.out.println("SLOWED");
-                    audio.setSlowed(true);
+                    audio.toggleSlowedAudio(true);
                     Thread.sleep(4000);
                     System.out.println("NON-SLOWED");
-                    audio.setSlowed(false);
+                    audio.toggleSlowedAudio(false);
                     Thread.sleep(2000);
                 } else {
                     System.out.println("VOLUME 25%");
