@@ -70,7 +70,7 @@ public abstract class StoppableThread extends LoggableClass implements Runnable 
      */
     public void interrupt() {
         stop();
-        worker.interrupt();
+        if (worker != null) worker.interrupt();
     }
 
     /**
