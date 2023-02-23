@@ -78,7 +78,8 @@ public class Audio extends LoggableClass {
     private double prevElapsedTime;  // Time (in seconds) that was elapsed before a skip forwards/backwards
 
     private double volume = 1;
-    private boolean paused = false;
+    private boolean isPaused = false;
+    private boolean isSlowed = false;
 
     private boolean withPlayback = false;
     private SourceDataLine sourceDataLine;
@@ -196,8 +197,8 @@ public class Audio extends LoggableClass {
     }
 
     public double getCurrentTime() {
-        if (paused) return timeToResumeAt;
-        return sourceDataLine.getMicrosecondPosition() / 1e6 - prevElapsedTime;  // Todo: work with slowed audio
+        if (isPaused) return timeToResumeAt;
+        return calcTime(prevElapsedTime);
     }
 
     // Audio playback methods
@@ -211,7 +212,7 @@ public class Audio extends LoggableClass {
 
         if (audioPlaybackThread.isStarted()) {
             seekToTime(timeToResumeAt);
-            paused = false;
+            isPaused = false;
         } else {
             updatePlaybackVolume(volume);
             sourceDataLine.start();
@@ -225,7 +226,7 @@ public class Audio extends LoggableClass {
     public void pause() {
         timeToResumeAt = getCurrentTime();
 
-        paused = true;
+        isPaused = true;
         sourceDataLine.flush();
         clearChannelsBuffers();
     }
@@ -241,7 +242,7 @@ public class Audio extends LoggableClass {
             sourceDataLine.drain();
             sourceDataLine.close();
             audioStream.close();
-            paused = false;
+            isPaused = false;
 
             // Stop and clear all operators' stuff
             resetOperators();
@@ -267,7 +268,7 @@ public class Audio extends LoggableClass {
         }
 
         // Update the previously elapsed time and the time to resume at
-        prevElapsedTime = sourceDataLine.getMicrosecondPosition() / 1e6 - seekTime;  // Todo: work with slowed audio
+        prevElapsedTime = calcTime(seekTime);
         timeToResumeAt = seekTime;
     }
 
@@ -291,6 +292,7 @@ public class Audio extends LoggableClass {
      * @param slowed Whether the audio that is playing should be slowed or not.
      */
     public void toggleSlowedAudio(boolean slowed) {
+        isSlowed = slowed;
         for (TimeStretchOperator op : channelOperators) op.setStretchFactor(slowed ? 2 : 1);
     }
 
@@ -488,6 +490,23 @@ public class Audio extends LoggableClass {
     }
 
     /**
+     * @return Second position of the source data line, instead of microsecond position.
+     */
+    private double getSourceDataLineSecondPosition() {
+        return sourceDataLine.getMicrosecondPosition() / 1e6;
+    }
+
+    /**
+     * Helper method that calculates the elapsed audio time from the <code>startTime</code>.
+     *
+     * @param startTime Starting time to subtract the current audio time from.
+     * @return The elapsed time from the start time.
+     */
+    private double calcTime(double startTime) {
+        return getSourceDataLineSecondPosition() - startTime;  // Todo: work with slowed audio
+    }
+
+    /**
      * Helper method that updates the source data line's volume.<br>
      * Also updates the slowed audio's media player's volume if it is provided.
      *
@@ -520,7 +539,7 @@ public class Audio extends LoggableClass {
                 try {
                     boolean readThisIteration = true;
                     while (running.get()) {
-                        if (!paused) {
+                        if (!isPaused) {
                             if (readThisIteration) {
                                 // Read bytes from audio stream
                                 if (numBytesRead != -1) numBytesRead = audioStream.read(bufferBytes);

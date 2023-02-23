@@ -69,13 +69,19 @@ class AudioTest {
         Thread thread = new Thread(() -> {
             try {
                 if (TEST_SLOWED) {
-                    Thread.sleep(1000);
+                    Thread.sleep(500);
+                    System.out.println("CHECK TIME: " + audio.getCurrentTime());  // 0.5s
+                    Thread.sleep(500);
                     System.out.println("SLOWED");
                     audio.toggleSlowedAudio(true);
-                    Thread.sleep(4000);
+                    Thread.sleep(2000);
+                    System.out.println("CHECK TIME: " + audio.getCurrentTime());  // 2s
+                    Thread.sleep(2000);
                     System.out.println("NON-SLOWED");
                     audio.toggleSlowedAudio(false);
-                    Thread.sleep(2000);
+                    Thread.sleep(1000);
+                    System.out.println("CHECK TIME: " + audio.getCurrentTime());  // 4s
+                    Thread.sleep(1000);
                 } else {
                     System.out.println("VOLUME 25%");
                     audio.setVolume(0.25);
@@ -86,12 +92,12 @@ class AudioTest {
                     System.out.println("SEEK 2.75");
                     audio.seekToTime(2.75);
                     Thread.sleep(1000);
-                    System.out.println("CHECK TIME: " + audio.getCurrentTime());
+                    System.out.println("CHECK TIME: " + audio.getCurrentTime());  // 3.75s
                     Thread.sleep(500);
                     System.out.println("SEEK 0.25");
                     audio.seekToTime(0.25);
                     Thread.sleep(1000);
-                    System.out.println("CHECK TIME: " + audio.getCurrentTime());
+                    System.out.println("CHECK TIME: " + audio.getCurrentTime());  // 1.25s
                     Thread.sleep(1000);
                     System.out.println("VOLUME 50%");
                     audio.setVolume(0.5);
