@@ -602,8 +602,9 @@ public class Audio extends LoggableClass {
                             if (numBytesRead == -1 && !enoughData && !readThisIteration) break;
                         }
                     }
-                } catch (IOException | InterruptedException e) {
+                } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
+                } catch (IOException e) {
                     logException(e);
                 }
             }
