@@ -227,6 +227,7 @@ public class Audio extends LoggableClass {
         timeToResumeAt = getCurrentTime();
         sourceDataLine.flush();
         clearOutChannelsQueue();
+        clearChannelOperatorsBuffers();
     }
 
     /**
@@ -245,6 +246,7 @@ public class Audio extends LoggableClass {
             // Stop and clear all operators' stuff
             resetOperators();
             clearOutChannelsQueue();
+            clearChannelOperatorsBuffers();
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -775,6 +777,13 @@ public class Audio extends LoggableClass {
      */
     private void clearOutChannelsQueue() {
         for (BlockingQueue<Byte> bq : outChannels) bq.clear();
+    }
+
+    /**
+     * Helper method that clears all channel operators' buffers.
+     */
+    private void clearChannelOperatorsBuffers() {
+        for (Operator op : channelOperators) op.clearBuffers();
     }
 
     // Helper classes

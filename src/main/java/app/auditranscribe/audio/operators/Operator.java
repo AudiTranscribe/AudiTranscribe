@@ -84,4 +84,11 @@ public abstract class Operator extends StoppableThread {
     public int remainingCapacity() {
         return inputBuffer.remainingCapacity();
     }
+
+    /**
+     * Clears all the buffers of the operator.
+     */
+    public void clearBuffers() {
+        inputBuffer.clear();
+    }
 }

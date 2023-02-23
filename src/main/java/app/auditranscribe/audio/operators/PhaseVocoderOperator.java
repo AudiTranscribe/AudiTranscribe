@@ -116,6 +116,13 @@ public class PhaseVocoderOperator extends TimeStretchOperator {
         return finalOutput;
     }
 
+    @Override
+    public void clearBuffers() {
+        super.clearBuffers();
+        input.clear();
+        output.clear();
+    }
+
     // Private methods
 
     /**
@@ -251,7 +258,8 @@ public class PhaseVocoderOperator extends TimeStretchOperator {
     private LinkedList<Double> overlapAddAndSlide(double[] stretchedSamples) {
         LinkedList<Double> processedSamples = new LinkedList<>();
         for (int i = 0; i < analysisOutputSize; i++) {
-            processedSamples.add(output.poll());
+            Double val = output.poll();
+            processedSamples.add(val == null ? 0 : val);
             output.offer(0.);
         }
         Double[] resultingSamples = output.toArray(new Double[0]);
