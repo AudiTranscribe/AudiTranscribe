@@ -196,6 +196,7 @@ public class Audio extends LoggableClass {
     }
 
     public double getCurrentTime() {
+        if (paused) return timeToResumeAt;
         return sourceDataLine.getMicrosecondPosition() / 1e6 - prevElapsedTime;  // Todo: work with slowed audio
     }
 
@@ -222,8 +223,9 @@ public class Audio extends LoggableClass {
      * Pauses the audio.
      */
     public void pause() {
-        paused = true;
         timeToResumeAt = getCurrentTime();
+
+        paused = true;
         sourceDataLine.flush();
         clearChannelsBuffers();
     }
