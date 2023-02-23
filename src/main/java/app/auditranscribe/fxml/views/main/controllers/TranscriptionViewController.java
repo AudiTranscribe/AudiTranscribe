@@ -104,7 +104,7 @@ public class TranscriptionViewController extends SwitchableViewController {
     private final int MIN_NOTE_NUMBER = 0;  // C0
     private final int MAX_NOTE_NUMBER = 107;  // B8
 
-    private final long UPDATE_PLAYBACK_SCHEDULER_PERIOD = 50;  // In milliseconds
+    private final long UPDATE_PLAYBACK_SCHEDULER_PERIOD = 10;  // In milliseconds; todo: allow customisation
 
     private final boolean FANCY_NOTE_LABELS = true;  // Use fancy accidentals for note labels
 
