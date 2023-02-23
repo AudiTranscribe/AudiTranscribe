@@ -443,9 +443,10 @@ public class Audio extends LoggableClass {
     public void answer(int channelNum, double[] reply) {
         BlockingQueue<Byte> queue = outChannels.get(channelNum);
         try {
-            for (Byte b : AudioHelpers.packBytes(
-                    TypeConversionUtils.doubleArrayToFloatArray(reply), bitsPerSample, audioFormat)
-            ) {
+            byte[] replyBytes = AudioHelpers.packBytes(
+                    TypeConversionUtils.doubleArrayToFloatArray(reply), bitsPerSample, audioFormat
+            );
+            for (Byte b : replyBytes) {
                 queue.put(b);
             }
         } catch (InterruptedException e) {
@@ -523,27 +524,26 @@ public class Audio extends LoggableClass {
                         if (!paused) {
                             if (readThisIteration) {
                                 // Read bytes from audio stream
-                                numBytesRead = audioStream.read(bufferBytes);
-                                if (numBytesRead != -1) {
-                                    // Separate into channels
-                                    ArrayList<byte[]> channels = new ArrayList<>();
-                                    for (int i = 0; i < numChannels; i++) {
-                                        channels.add(extractChannel(bufferBytes, i));
-                                    }
+                                if (numBytesRead != -1) numBytesRead = audioStream.read(bufferBytes);
 
-                                    // Call operators to work on the channels' data
-                                    for (int i = numChannels - 1; i >= 0; i--) {
-                                        byte[] data = channels.get(i);
-                                        float[] samplesAsFloats = AudioHelpers.unpackBytes(
-                                                data,
-                                                numBytesRead / numChannels,
-                                                bitsPerSample,
-                                                audioFormat
-                                        );
-                                        channelOperators.get(i).call(
-                                                audio, i, TypeConversionUtils.floatArrayToDoubleArray(samplesAsFloats)
-                                        );
-                                    }
+                                // Separate into channels
+                                ArrayList<byte[]> channels = new ArrayList<>();
+                                for (int i = 0; i < numChannels; i++) {
+                                    channels.add(extractChannel(bufferBytes, i));
+                                }
+
+                                // Call operators to work on the channels' data
+                                for (int i = numChannels - 1; i >= 0; i--) {
+                                    byte[] data = channels.get(i);
+                                    float[] samplesAsFloats = AudioHelpers.unpackBytes(
+                                            data,
+                                            numBytesRead / numChannels,
+                                            bitsPerSample,
+                                            audioFormat
+                                    );
+                                    channelOperators.get(i).call(
+                                            audio, i, TypeConversionUtils.floatArrayToDoubleArray(samplesAsFloats)
+                                    );
                                 }
                             }
 
@@ -574,9 +574,9 @@ public class Audio extends LoggableClass {
                             // Determine if we read this iteration
                             readThisIteration = true;
                             for (Operator op : channelOperators) {
-                                if (op.remainingCapacity() < (bufferBytes.length / channelOperators.size())
-                                        / bytesPerSample) {
+                                if (op.remainingCapacity() < bufferBytes.length / bytesPerSample / numChannels) {
                                     readThisIteration = false;
+                                    break;
                                 }
                             }
 
@@ -757,11 +757,9 @@ public class Audio extends LoggableClass {
     private void setupOperators() {
         if (channelOperators.size() < numChannels) {
             for (int i = 0; i < numChannels; i++) {
-                // Todo: uncomment
-//                TimeStretchOperator op = new PhaseVocoderOperator(
-//                        1., SLOWDOWN_PROCESSING_LENGTH, SLOWDOWN_ANALYSIS_LENGTH, SLOWDOWN_WINDOW
-//                );
-                TimeStretchOperator op = new IdentityOperator();
+                TimeStretchOperator op = new PhaseVocoderOperator(
+                        1., SLOWDOWN_PROCESSING_LENGTH, SLOWDOWN_ANALYSIS_LENGTH, SLOWDOWN_WINDOW
+                );
                 channelOperators.add(op);
                 new Thread(op).start();
             }
