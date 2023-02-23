@@ -32,7 +32,7 @@ import java.util.Map;
 @ExcludeFromGeneratedCoverageReport
 public class SettingsData {
     // Constants
-    public final static int PLAYBACK_BUFFER_SIZE = 2048;  // In sample count
+    public final static int PLAYBACK_BUFFER_SIZE = 2048;  // In number of samples
     public final static Map<String, String> AUDIO_DEVICE_INFO = Map.of(
             "name", "Default Audio Device",
             "vendor", "Unknown Vendor",

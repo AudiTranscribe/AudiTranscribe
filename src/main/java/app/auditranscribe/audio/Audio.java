@@ -48,7 +48,7 @@ import java.util.logging.Level;
 public class Audio extends LoggableClass {
     // Constants
     public static final int SAMPLES_BUFFER_SIZE = 1024;  // In number of samples
-    public static final int[] VALID_PLAYBACK_BUFFER_SIZES = {1024, 2048, 4096};  // In bytes
+    public static final int[] VALID_PLAYBACK_BUFFER_SIZES = {1024, 2048, 4096};  // In number of samples
 
     public static final int SLOWDOWN_PROCESSING_LENGTH = 2048;
     public static final int SLOWDOWN_ANALYSIS_LENGTH = 512;
