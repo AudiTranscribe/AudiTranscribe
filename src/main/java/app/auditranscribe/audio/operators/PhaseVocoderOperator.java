@@ -90,8 +90,11 @@ public class PhaseVocoderOperator extends TimeStretchOperator {
         this.analysisOutputSize = (int) (stretchFactor * analysisLength);
         this.samplesStretchFactor = (double) analysisOutputSize / analysisLength;
 
-        // Get the next set of windowed samples
+        // Get the next set of samples
         double[] rawSamples = getNextSample();
+        if (rawSamples == null) return new double[0];
+
+        // Window the samples
         double[] windowedSamples = windowSamples(rawSamples);
 
         // Shift samples for the FFT so that FFT application would be 'smoother'
