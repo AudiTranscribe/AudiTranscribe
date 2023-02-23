@@ -70,53 +70,104 @@ class AudioTest {
             try {
                 if (TEST_SLOWED) {
                     Thread.sleep(500);
-                    System.out.println("CHECK TIME: " + audio.getCurrentTime());  // 0.5s
+                    System.out.println("CHECK TIME: 0.5 vs " + audio.getCurrentTime());
                     Thread.sleep(500);
+
                     System.out.println("SLOWED");
                     audio.toggleSlowedAudio(true);
                     Thread.sleep(2000);
-                    System.out.println("CHECK TIME: " + audio.getCurrentTime());  // 2s
+
+                    System.out.println("CHECK TIME: 2 vs " + audio.getCurrentTime());
                     Thread.sleep(2000);
+
+                    System.out.println("NON-SLOWED");
+                    audio.toggleSlowedAudio(false);
+                    Thread.sleep(500);
+
+                    System.out.println("CHECK TIME: 3.5 vs " + audio.getCurrentTime());
+                    Thread.sleep(500);
+
+                    System.out.println("SEEK 1.5");
+                    audio.seekToTime(1.5);
+                    System.out.println("CHECK TIME: 1.5 vs " + audio.getCurrentTime());
+                    Thread.sleep(500);
+
+                    System.out.println("SLOWED");
+                    audio.toggleSlowedAudio(true);
+                    Thread.sleep(2000);
+
+                    System.out.println("CHECK TIME: 3 vs " + audio.getCurrentTime());
+                    Thread.sleep(500);
+
+                    System.out.println("SEEK 1");
+                    audio.seekToTime(1);
+                    System.out.println("CHECK TIME: 1 vs " + audio.getCurrentTime());
+                    Thread.sleep(1000);
+
+                    System.out.println("CHECK TIME: 1.5 vs " + audio.getCurrentTime());
+                    Thread.sleep(1000);
+
                     System.out.println("NON-SLOWED");
                     audio.toggleSlowedAudio(false);
                     Thread.sleep(1000);
-                    System.out.println("CHECK TIME: " + audio.getCurrentTime());  // 4s
-                    Thread.sleep(1000);
+
+                    System.out.println("CHECK TIME: 3 vs " + audio.getCurrentTime());
+                    Thread.sleep(2000);
+
+                    System.out.println("DONE");
                 } else {
                     System.out.println("VOLUME 25%");
                     audio.setVolume(0.25);
-                    Thread.sleep(1500);
+                    Thread.sleep(1000);
+
+                    System.out.println("CHECK TIME: 1 vs " + audio.getCurrentTime());
+                    Thread.sleep(500);
+
                     System.out.println("VOLUME 100%");
                     audio.setVolume(1);
                     Thread.sleep(1000);
+
                     System.out.println("SEEK 2.75");
                     audio.seekToTime(2.75);
                     Thread.sleep(1000);
-                    System.out.println("CHECK TIME: " + audio.getCurrentTime());  // 3.75s
+
+                    System.out.println("CHECK TIME: 3.75 vs " + audio.getCurrentTime());
                     Thread.sleep(500);
+
                     System.out.println("SEEK 0.25");
                     audio.seekToTime(0.25);
                     Thread.sleep(1000);
-                    System.out.println("CHECK TIME: " + audio.getCurrentTime());  // 1.25s
+
+                    System.out.println("CHECK TIME: 1.25 vs " + audio.getCurrentTime());
                     Thread.sleep(1000);
+
                     System.out.println("VOLUME 50%");
                     audio.setVolume(0.5);
                     Thread.sleep(1000);
+
                     System.out.println("SEEK 1");
                     audio.seekToTime(1);
                     Thread.sleep(1000);
-                    audio.pause();
+
                     System.out.println("PAUSED 1.5");
+                    audio.pause();
                     Thread.sleep(1500);
-                    audio.play();
+
                     System.out.println("RESUMED");
-                    Thread.sleep(1000);
+                    audio.play();
+                    Thread.sleep(500);
+
+                    System.out.println("CHECK TIME: 2.5 vs " + audio.getCurrentTime());
+                    Thread.sleep(500);
+
                     System.out.println("SEEK 0");
                     audio.seekToTime(0);
                     Thread.sleep(1000);
+
                     System.out.println("VOLUME 150%");
                     audio.setVolume(1.5);
                     Thread.sleep(3000);
+
                     System.out.println("DONE");
                 }
             } catch (InterruptedException e) {

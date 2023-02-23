@@ -74,8 +74,9 @@ public class Audio extends LoggableClass {
     final int bitsPerSample;
     final int bytesPerSample;
 
-    private double timeToResumeAt;  // Time that the audio should continue playing at upon resuming
+    private double timeToResumeAt;   // Time that the audio should continue playing at upon resuming
     private double prevElapsedTime;  // Time (in seconds) that was elapsed before a skip forwards/backwards
+    private double prevCurrTime;     // Last updated current time (in seconds) before a toggling of the audio speed
 
     private double volume = 1;
     private boolean isPaused = false;
@@ -198,7 +199,7 @@ public class Audio extends LoggableClass {
 
     public double getCurrentTime() {
         if (isPaused) return timeToResumeAt;
-        return calcTime(prevElapsedTime);
+        return (getPlaybackElapsedDuration() - prevElapsedTime) / (isSlowed ? 2 : 1) + prevCurrTime;
     }
 
     // Audio playback methods
@@ -267,8 +268,9 @@ public class Audio extends LoggableClass {
             seekBackwards(seekTime);
         }
 
-        // Update the previously elapsed time and the time to resume at
-        prevElapsedTime = calcTime(seekTime);
+        // Update times
+        prevCurrTime = seekTime;
+        prevElapsedTime = getPlaybackElapsedDuration();
         timeToResumeAt = seekTime;
     }
 
@@ -292,6 +294,9 @@ public class Audio extends LoggableClass {
      * @param slowed Whether the audio that is playing should be slowed or not.
      */
     public void toggleSlowedAudio(boolean slowed) {
+        prevCurrTime = getCurrentTime();
+        prevElapsedTime = getPlaybackElapsedDuration();
+
         isSlowed = slowed;
         for (TimeStretchOperator op : channelOperators) op.setStretchFactor(slowed ? 2 : 1);
     }
@@ -475,6 +480,16 @@ public class Audio extends LoggableClass {
     }
 
     /**
+     * Helper method that gets the number of seconds that the source data line is open for. That is,
+     * the elapsed duration of the playback. This does <b>not</b> return the current audio time.
+     *
+     * @return Second position of the source data line, instead of microsecond position.
+     */
+    private double getPlaybackElapsedDuration() {
+        return sourceDataLine.getMicrosecondPosition() / 1e6;
+    }
+
+    /**
      * Helper method that resets the audio stream to the beginning.
      */
     private void resetAudioStream() {
@@ -487,23 +502,6 @@ public class Audio extends LoggableClass {
                 e.printStackTrace();
             }
         }
-    }
-
-    /**
-     * @return Second position of the source data line, instead of microsecond position.
-     */
-    private double getSourceDataLineSecondPosition() {
-        return sourceDataLine.getMicrosecondPosition() / 1e6;
-    }
-
-    /**
-     * Helper method that calculates the elapsed audio time from the <code>startTime</code>.
-     *
-     * @param startTime Starting time to subtract the current audio time from.
-     * @return The elapsed time from the start time.
-     */
-    private double calcTime(double startTime) {
-        return getSourceDataLineSecondPosition() - startTime;  // Todo: work with slowed audio
     }
 
     /**
