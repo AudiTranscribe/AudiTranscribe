@@ -130,15 +130,20 @@ public class PhaseVocoderOperator extends TimeStretchOperator {
      */
     private double[] getNextSample() throws InterruptedException {
         if (input.size() == 0) {
-            while (input.size() < input.getMaxSize()) {
+            while (input.size() < processingLength) {
                 input.offer(inputBuffer.take());
             }
         } else {
+            // We take `analysisLength` more doubles because that's how many are being processed each shot
             for (int i = 0; i < analysisLength; i++) {
                 input.offer(inputBuffer.take());
             }
         }
 
+        // Just in case, make sure the input size is the correct length
+        if (input.size() != processingLength) return null;
+
+        // Convert the input list into an array
         Double[] doubleSamples = input.toArray(new Double[0]);
         double[] samples = new double[doubleSamples.length];
         for (int i = 0; i < samples.length; i++) {
