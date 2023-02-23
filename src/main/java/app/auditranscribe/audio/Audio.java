@@ -524,27 +524,26 @@ public class Audio extends LoggableClass {
                             if (readThisIteration) {
                                 // Read bytes from audio stream
                                 numBytesRead = audioStream.read(bufferBytes);
-                                if (numBytesRead == -1) break;
+                                if (numBytesRead != -1) {
+                                    // Separate into channels
+                                    ArrayList<byte[]> channels = new ArrayList<>();
+                                    for (int i = 0; i < numChannels; i++) {
+                                        channels.add(extractChannel(bufferBytes, i));
+                                    }
 
-                                // Separate into channels
-                                ArrayList<byte[]> channels = new ArrayList<>();
-                                for (int i = 0; i < numChannels; i++) {
-                                    channels.add(extractChannel(bufferBytes, i));
-                                }
-
-                                // Call operators to work on the channels' data
-                                for (int i = numChannels - 1; i >= 0; i--) {
-                                    byte[] data = channels.get(i);
-                                    channelOperators.get(i).call(
-                                            audio, i, TypeConversionUtils.floatArrayToDoubleArray(
-                                                    AudioHelpers.unpackBytes(
-                                                            data,
-                                                            numBytesRead / numChannels,
-                                                            bitsPerSample,
-                                                            audioFormat
-                                                    )
-                                            )
-                                    );
+                                    // Call operators to work on the channels' data
+                                    for (int i = numChannels - 1; i >= 0; i--) {
+                                        byte[] data = channels.get(i);
+                                        float[] samplesAsFloats = AudioHelpers.unpackBytes(
+                                                data,
+                                                numBytesRead / numChannels,
+                                                bitsPerSample,
+                                                audioFormat
+                                        );
+                                        channelOperators.get(i).call(
+                                                audio, i, TypeConversionUtils.floatArrayToDoubleArray(samplesAsFloats)
+                                        );
+                                    }
                                 }
                             }
 
@@ -580,6 +579,9 @@ public class Audio extends LoggableClass {
                                     readThisIteration = false;
                                 }
                             }
+
+                            // Halt if we read no more bytes and there is no more bytes to process
+                            if (numBytesRead == -1 && !enoughData && !readThisIteration) break;
                         }
                     }
                 } catch (IOException | InterruptedException e) {
@@ -755,9 +757,11 @@ public class Audio extends LoggableClass {
     private void setupOperators() {
         if (channelOperators.size() < numChannels) {
             for (int i = 0; i < numChannels; i++) {
-                TimeStretchOperator op = new PhaseVocoderOperator(
-                        1., SLOWDOWN_PROCESSING_LENGTH, SLOWDOWN_ANALYSIS_LENGTH, SLOWDOWN_WINDOW
-                );
+                // Todo: uncomment
+//                TimeStretchOperator op = new PhaseVocoderOperator(
+//                        1., SLOWDOWN_PROCESSING_LENGTH, SLOWDOWN_ANALYSIS_LENGTH, SLOWDOWN_WINDOW
+//                );
+                TimeStretchOperator op = new IdentityOperator();
                 channelOperators.add(op);
                 new Thread(op).start();
             }

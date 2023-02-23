@@ -108,10 +108,8 @@ public class PhaseVocoderOperator extends TimeStretchOperator {
         double[] finalOutput = new double[finishedSamples.size()];
         double overlapScaling = (double) processingLength / (analysisOutputSize * 2.);
         for (int i = 0; i < finalOutput.length; i++) {
-            // Note: no `NullPointerException` will occur here because the number of element we are polling is the same
-            //       as the length of the linked list
-            //noinspection DataFlowIssue
-            finalOutput[i] = finishedSamples.poll() / overlapScaling;
+            Double val = finishedSamples.poll();
+            finalOutput[i] = (val == null ? 0 : val) / overlapScaling;
         }
         return finalOutput;
     }
