@@ -140,7 +140,13 @@ public class PhaseVocoderOperator extends TimeStretchOperator {
             }
         }
 
-        return TypeConversionUtils.toDoubleArray(input.toArray(new Double[0]));
+        Double[] doubleSamples = input.toArray(new Double[0]);
+        double[] samples = new double[doubleSamples.length];
+        for (int i = 0; i < samples.length; i++) {
+            samples[i] = (doubleSamples[i] == null ? 0 : doubleSamples[i]);
+        }
+
+        return samples;
     }
 
     /**
@@ -263,7 +269,8 @@ public class PhaseVocoderOperator extends TimeStretchOperator {
         Double[] resultingSamples = output.toArray(new Double[0]);
 
         for (int i = 0; i < resultingSamples.length; i++) {
-            resultingSamples[i] = stretchedSamples[i] + resultingSamples[i];
+            Double resultingSample = resultingSamples[i];
+            resultingSamples[i] = stretchedSamples[i] + (resultingSample == null ? 0 : resultingSample);
         }
         output.addAll(Arrays.asList(resultingSamples));
         return processedSamples;

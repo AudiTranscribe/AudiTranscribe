@@ -163,7 +163,6 @@ public class Audio extends LoggableClass {
             for (int i = 0; i < numChannels; i++) {
                 outChannels.add(new LinkedBlockingQueue<>(OUT_CHANNEL_CAPACITY * bytesPerSample));
             }
-
         } else {
             sourceDataLine = null;
             audioPlaybackThread = null;
