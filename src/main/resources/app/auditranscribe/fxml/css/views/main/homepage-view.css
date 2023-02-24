@@ -13,7 +13,7 @@
 }
 
 .version-label {
-    -fx-font-size: 10pt;
+    -fx-font-size: 11pt;
     -fx-alignment: center;
     -fx-text-fill: text-colour-secondary;
 }
