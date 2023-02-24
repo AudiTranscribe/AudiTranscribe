@@ -23,6 +23,7 @@ import app.auditranscribe.generic.exceptions.LengthException;
 import app.auditranscribe.generic.exceptions.ValueException;
 import app.auditranscribe.generic.tuples.Pair;
 import app.auditranscribe.generic.tuples.Triple;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.music.MusicKey;
 import app.auditranscribe.music.TimeSignature;
 import app.auditranscribe.utils.MathUtils;
@@ -37,6 +38,7 @@ import java.util.logging.Level;
 /**
  * Class that handles the playing of notes as a MIDI sequence.
  */
+@ExcludeFromGeneratedCoverageReport
 public class NotePlayerSequencer extends LoggableClass {
     // Constants
     public static int TICKS_PER_QUARTER = 10_000;  // Number of ticks per quarter note
