@@ -19,6 +19,7 @@
 package app.auditranscribe.io.audt_file;
 
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 
 import java.util.Objects;
 
@@ -71,6 +72,7 @@ public class ProjectData {
     }
 
     @Override
+    @ExcludeFromGeneratedCoverageReport
     public int hashCode() {
         return Objects.hash(unchangingDataProperties, qTransformData, audioData, projectInfoData, musicNotesData);
     }
