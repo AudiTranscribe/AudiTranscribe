@@ -6,7 +6,7 @@
 
     <groupId>app.auditranscribe</groupId>
     <artifactId>auditranscribe</artifactId>
-    <version>0.11.0-SNAPSHOT</version>  <!-- Todo update -->
+    <version>0.11.0</version>
     <name>AudiTranscribe</name>
 
     <properties>
