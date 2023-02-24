@@ -140,7 +140,6 @@ public enum MusicKey {
     }
 
     @Override
-    @ExcludeFromGeneratedCoverageReport
     public String toString() {
         return name;
     }
