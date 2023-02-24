@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package app.auditranscribe.fxml.views.main.scene_switching;
+package app.auditranscribe.fxml.views.main;
 
 import app.auditranscribe.audio.Audio;
 import app.auditranscribe.audio.FFmpegHandler;
@@ -37,6 +37,8 @@ import app.auditranscribe.io.data_files.DataFiles;
 import app.auditranscribe.io.exceptions.FailedToReadDataException;
 import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
 import app.auditranscribe.io.exceptions.InvalidFileVersionException;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+import app.auditranscribe.music.MusicKey;
 import app.auditranscribe.system.OSMethods;
 import app.auditranscribe.system.OSType;
 import app.auditranscribe.utils.MiscUtils;
@@ -57,6 +59,7 @@ import java.util.logging.Level;
 /**
  * Class that handles the switching between the main scene and the transcription scene.
  */
+@ExcludeFromGeneratedCoverageReport
 public class SceneSwitcher extends LoggableClass {
     // Attributes
     private final boolean debugMode;
@@ -67,10 +70,10 @@ public class SceneSwitcher extends LoggableClass {
 
     private final Rectangle2D screenBounds;
 
-    private Pair<SceneSwitchingState, SceneSwitchingData> returnedPair = null;
+    private Pair<State, Data> returnedPair = null;
 
-    private SceneSwitchingState state = SceneSwitchingState.SHOW_MAIN_SCENE;
-    private SceneSwitchingData data = new SceneSwitchingData();
+    private State state = State.SHOW_MAIN_SCENE;
+    private Data data = new Data();
 
     /**
      * Initialization method for a <code>SceneSwitcher</code> object.
@@ -123,11 +126,11 @@ public class SceneSwitcher extends LoggableClass {
                 if (returnedPair == null) {
                     // If the returned pair is `null`, that means something went wrong
                     // If we are currently in the transcription scene, then the next state is `SHOW_MAIN_SCENE`
-                    if (state == SceneSwitchingState.NEW_PROJECT || state == SceneSwitchingState.OPEN_PROJECT) {
-                        state = SceneSwitchingState.SHOW_MAIN_SCENE;
+                    if (state == State.NEW_PROJECT || state == State.OPEN_PROJECT) {
+                        state = State.SHOW_MAIN_SCENE;
                     } else {  // State has to be `SHOW_MAIN_SCENE` now because `CLOSE_SCENE` immediately exits
                         // The next state will be `CLOSE_SCENE`
-                        state = SceneSwitchingState.CLOSE_SCENE;
+                        state = State.CLOSE_SCENE;
                     }
 
                     // Regardless of the state, the data will be `null`
@@ -159,7 +162,7 @@ public class SceneSwitcher extends LoggableClass {
      * @return Pair of values. First value is the scene switching state, and the second is the scene
      * switching data. Returns <code>null</code> if an unrecoverable exception occurs.
      */
-    private Pair<SceneSwitchingState, SceneSwitchingData> showHomepageScene() {
+    private Pair<State, Data> showHomepageScene() {
         try {
             // Load the FXML file into the scene
             FXMLLoader fxmlLoader = new FXMLLoader(IOMethods.getFileURL(
@@ -205,7 +208,7 @@ public class SceneSwitcher extends LoggableClass {
      * @return Pair of values. First value is the scene switching state, and the second is the scene
      * switching data. Returns <code>null</code> if an unrecoverable exception occurs.
      */
-    private Pair<SceneSwitchingState, SceneSwitchingData> newProjectInTranscriptionScene() {
+    private Pair<State, Data> newProjectInTranscriptionScene() {
         // Obtain the audio file from the scene switching data
         File audioFile = data.file;
 
@@ -313,7 +316,7 @@ public class SceneSwitcher extends LoggableClass {
      * @return Pair of values. First value is the scene switching state, and the second is the scene
      * switching data. Returns <code>null</code> if an unrecoverable exception occurs.
      */
-    private Pair<SceneSwitchingState, SceneSwitchingData> openProjectInTranscriptionScene() {
+    private Pair<State, Data> openProjectInTranscriptionScene() {
         // Obtain the AUDT file from the scene switching data
         File audtFile = data.file;
 
@@ -475,4 +478,39 @@ public class SceneSwitcher extends LoggableClass {
         // Return the scene and controller
         return new Pair<>(scene, controller);
     }
+
+    // Helper classes
+
+    /**
+     * Data that is used for the scene switcher.
+     */
+    public static class Data {
+        // Attributes
+        public String projectName;
+        public File file;  // Can either be an audio file or an AUDT file
+
+        public boolean isProjectSetup = false;  // False by default
+
+        public boolean estimateBPM;
+        public double manualBPM;
+
+        public boolean estimateMusicKey;
+        public MusicKey musicKey;
+
+        // Public methods
+        @Override
+        public String toString() {
+            return "SceneSwitcher.Data{" +
+                    "projectName='" + projectName + "'" +
+                    ", file=" + file +
+                    ", isProjectSetup=" + isProjectSetup +
+                    ", estimateBPM=" + estimateBPM +
+                    ", manualBPM=" + manualBPM +
+                    ", estimateMusicKey=" + estimateMusicKey +
+                    ", musicKey=" + musicKey +
+                    "}";
+        }
+    }
+
+    public enum State {NEW_PROJECT, OPEN_PROJECT, SHOW_MAIN_SCENE, CLOSE_SCENE}
 }

@@ -21,7 +21,7 @@ package app.auditranscribe.fxml.views.main.controllers;
 import app.auditranscribe.fxml.Popups;
 import app.auditranscribe.fxml.Theme;
 import app.auditranscribe.fxml.views.AbstractViewController;
-import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitchingData;
+import app.auditranscribe.fxml.views.main.SceneSwitcher;
 import app.auditranscribe.generic.tuples.Pair;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.fxml.spinners.CustomDoubleSpinnerValueFactory;
@@ -211,7 +211,7 @@ public class ProjectSetupViewController extends AbstractViewController {
      * @return A pair. The first value indicates whether the setup should proceed. The second is the
      * scene switching data.
      */
-    public static Pair<Boolean, SceneSwitchingData> showProjectSetupView() {
+    public static Pair<Boolean, SceneSwitcher.Data> showProjectSetupView() {
         try {
             // Load the FXML file into the scene
             FXMLLoader fxmlLoader = new FXMLLoader(
@@ -239,7 +239,7 @@ public class ProjectSetupViewController extends AbstractViewController {
             controller.removeControllerFromActive();
 
             // Set the scene switching data
-            SceneSwitchingData data = new SceneSwitchingData();
+            SceneSwitcher.Data data = new SceneSwitcher.Data();
 
             // Set data
             if (controller.shouldProceed) {

@@ -18,7 +18,7 @@
 
 package app.auditranscribe;
 
-import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitcher;
+import app.auditranscribe.fxml.views.main.SceneSwitcher;
 import app.auditranscribe.fxml.views.setup_wizard.SetupWizard;
 import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;

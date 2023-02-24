@@ -21,8 +21,7 @@ package app.auditranscribe.fxml.views.main.controllers;
 import app.auditranscribe.fxml.IconHelper;
 import app.auditranscribe.fxml.Popups;
 import app.auditranscribe.fxml.Theme;
-import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitchingData;
-import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitchingState;
+import app.auditranscribe.fxml.views.main.SceneSwitcher;
 import app.auditranscribe.generic.tuples.Pair;
 import app.auditranscribe.generic.tuples.Quadruple;
 import app.auditranscribe.io.db.ProjectsDB;
@@ -134,8 +133,8 @@ public class HomepageViewController extends SwitchableViewController {
                 File file = new File(filepath);
 
                 // Set the scene switching state and data
-                sceneSwitchingState = SceneSwitchingState.OPEN_PROJECT;
-                sceneSwitchingData.file = file;
+                state = SceneSwitcher.State.OPEN_PROJECT;
+                data.file = file;
 
                 log("Opening project: '" + selectedItem.value1() + "'");  // Value 1 is project name
 
@@ -160,9 +159,9 @@ public class HomepageViewController extends SwitchableViewController {
     // Getter/setter methods
 
     @Override
-    public SceneSwitchingState getSceneSwitchingState() {
-        if (sceneSwitchingState == null) return SceneSwitchingState.CLOSE_SCENE;
-        return sceneSwitchingState;
+    public SceneSwitcher.State getSceneSwitchingState() {
+        if (state == null) return SceneSwitcher.State.CLOSE_SCENE;
+        return state;
     }
 
 
@@ -268,14 +267,14 @@ public class HomepageViewController extends SwitchableViewController {
      */
     private void handleNewProject(ActionEvent actionEvent) {
         // Get the scene switching data
-        Pair<Boolean, SceneSwitchingData> pair = ProjectSetupViewController.showProjectSetupView();
+        Pair<Boolean, SceneSwitcher.Data> pair = ProjectSetupViewController.showProjectSetupView();
         boolean shouldProceed = pair.value0();
-        sceneSwitchingData = pair.value1();
+        data = pair.value1();
 
         // Specify the scene switching state
         if (shouldProceed) {
             // Signal the creation of a new project
-            sceneSwitchingState = SceneSwitchingState.NEW_PROJECT;
+            state = SceneSwitcher.State.NEW_PROJECT;
 
             // Close this stage
             ((Stage) rootPane.getScene().getWindow()).close();
@@ -302,8 +301,8 @@ public class HomepageViewController extends SwitchableViewController {
             Popups.showInformationAlert(rootPane.getScene().getWindow(), "Info", "No file selected.");
         } else {
             // Set the scene switching state and data
-            sceneSwitchingState = SceneSwitchingState.OPEN_PROJECT;
-            sceneSwitchingData.file = file;
+            state = SceneSwitcher.State.OPEN_PROJECT;
+            data.file = file;
 
             // Close this stage
             ((Stage) window).close();

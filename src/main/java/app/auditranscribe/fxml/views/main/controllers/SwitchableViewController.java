@@ -19,21 +19,20 @@
 package app.auditranscribe.fxml.views.main.controllers;
 
 import app.auditranscribe.fxml.views.AbstractViewController;
-import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitchingData;
-import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitchingState;
+import app.auditranscribe.fxml.views.main.SceneSwitcher;
 
 /**
  * Abstract controller for views that are involved with the scene switcher.
  */
 public abstract class SwitchableViewController extends AbstractViewController {
     // Attributes
-    SceneSwitchingState sceneSwitchingState;
-    SceneSwitchingData sceneSwitchingData = new SceneSwitchingData();
+    SceneSwitcher.State state;
+    SceneSwitcher.Data data = new SceneSwitcher.Data();
 
     // Getter/setter methods
-    public abstract SceneSwitchingState getSceneSwitchingState();
+    public abstract SceneSwitcher.State getSceneSwitchingState();
 
-    public SceneSwitchingData getSceneSwitchingData() {
-        return sceneSwitchingData;
+    public SceneSwitcher.Data getSceneSwitchingData() {
+        return data;
     }
 }

@@ -31,8 +31,7 @@ import app.auditranscribe.fxml.plotting.PlottingHelpers;
 import app.auditranscribe.fxml.plotting.PlottingStuffHandler;
 import app.auditranscribe.fxml.plotting.Spectrogram;
 import app.auditranscribe.fxml.views.main.ProjectHandler;
-import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitchingData;
-import app.auditranscribe.fxml.views.main.scene_switching.SceneSwitchingState;
+import app.auditranscribe.fxml.views.main.SceneSwitcher;
 import app.auditranscribe.generic.tuples.Pair;
 import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
@@ -599,9 +598,9 @@ public class TranscriptionViewController extends SwitchableViewController {
     }
 
     @Override
-    public SceneSwitchingState getSceneSwitchingState() {
-        if (sceneSwitchingState == null) return SceneSwitchingState.SHOW_MAIN_SCENE;
-        return sceneSwitchingState;
+    public SceneSwitcher.State getSceneSwitchingState() {
+        if (state == null) return SceneSwitcher.State.SHOW_MAIN_SCENE;
+        return state;
     }
 
     // Public methods
@@ -646,7 +645,7 @@ public class TranscriptionViewController extends SwitchableViewController {
      * @param data    Scene switching data that controls whether certain tasks will be executed (e.g.
      *                BPM estimation task).
      */
-    public void setAudioAndSpectrogramData(Audio anAudio, SceneSwitchingData data) {
+    public void setAudioAndSpectrogramData(Audio anAudio, SceneSwitcher.Data data) {
         // Set attributes
         audio = anAudio;
         audioDuration = anAudio.getDuration();
@@ -1231,14 +1230,14 @@ public class TranscriptionViewController extends SwitchableViewController {
         boolean canCloseWindow = handleUnsavedChanges();
         if (canCloseWindow) {
             // Get the scene switching data
-            Pair<Boolean, SceneSwitchingData> pair = ProjectSetupViewController.showProjectSetupView();
+            Pair<Boolean, SceneSwitcher.Data> pair = ProjectSetupViewController.showProjectSetupView();
             boolean shouldProceed = pair.value0();
-            sceneSwitchingData = pair.value1();
+            data = pair.value1();
 
             // Specify the scene switching state
             if (shouldProceed) {
                 // Signal the creation of a new project
-                sceneSwitchingState = SceneSwitchingState.NEW_PROJECT;
+                state = SceneSwitcher.State.NEW_PROJECT;
 
                 // Close this stage
                 ((Stage) rootPane.getScene().getWindow()).close();
@@ -1278,8 +1277,8 @@ public class TranscriptionViewController extends SwitchableViewController {
                 Popups.showInformationAlert(rootPane.getScene().getWindow(), "Info", "No file selected.");
             } else {
                 // Set the scene switching status and the selected file
-                sceneSwitchingState = SceneSwitchingState.OPEN_PROJECT;
-                sceneSwitchingData.file = file;
+                state = SceneSwitcher.State.OPEN_PROJECT;
+                data.file = file;
 
                 // Close this stage
                 ((Stage) rootPane.getScene().getWindow()).close();
