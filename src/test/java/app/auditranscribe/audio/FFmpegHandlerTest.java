@@ -1,6 +1,7 @@
 package app.auditranscribe.audio;
 
 import app.auditranscribe.audio.exceptions.FFmpegCommandFailedException;
+import app.auditranscribe.audio.exceptions.FFmpegHandlerNotInitialized;
 import app.auditranscribe.audio.exceptions.FFmpegNotFoundException;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.data_files.DataFiles;
@@ -17,6 +18,15 @@ import static org.junit.jupiter.api.Assertions.*;
 class FFmpegHandlerTest {
     @Test
     @Order(1)
+    void ensureFFmpegHandlerNotInitialized() {
+        assertThrowsExactly(
+                FFmpegHandlerNotInitialized.class,
+                () -> FFmpegHandler.convertAudio(null, "fake-file.wav")
+        );
+    }
+
+    @Test
+    @Order(2)
     void getPathToFFmpeg() {
         // Check if the FFmpeg binary can be accessed using CLI
         if (FFmpegHandler.checkFFmpegPath("ffmpeg")) {
@@ -29,7 +39,7 @@ class FFmpegHandlerTest {
     }
 
     @Test
-    @Order(2)
+    @Order(3)
     void checkFFmpegPath() {
         try {
             assertTrue(FFmpegHandler.checkFFmpegPath("ffmpeg"));  // Should exist => true
@@ -42,7 +52,7 @@ class FFmpegHandlerTest {
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     void ffmpegHandlerInitFailureTest() {
         // Try to define a handler with a non-existent FFmpeg binary
         assertThrowsExactly(
@@ -52,7 +62,7 @@ class FFmpegHandlerTest {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     void convertAudio() throws FFmpegNotFoundException {
         // Get a testing MP3 file
         File testFile = new File(IOMethods.getAbsoluteFilePath("test-files/general/audio/A440.mp3"));
@@ -82,7 +92,7 @@ class FFmpegHandlerTest {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     void convertAudioFailureTest() throws FFmpegNotFoundException {
         // Initialize the FFmpeg handler
         try {

@@ -213,6 +213,7 @@ public final class FFmpegHandler extends LoggableClass {
      * @return A boolean, describing whether the FFmpeg command was successful (<code>true</code>)
      * or not (<code>false</code>).
      */
+    @ExcludeFromGeneratedCoverageReport
     private boolean handleFFmpegCommandExec(String[] command) {
         try {
             // Execute the command on the standard runtime
