@@ -23,7 +23,6 @@ import app.auditranscribe.fxml.views.AbstractViewController;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.PropertyFile;
 import app.auditranscribe.io.exceptions.NoSuchPropertyException;
-import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.utils.GUIUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -44,7 +43,6 @@ import java.util.logging.Level;
 /**
  * Controller for the about view.
  */
-@ExcludeFromGeneratedCoverageReport
 public class AboutViewController extends AbstractViewController {
     // FXML elements
     @FXML

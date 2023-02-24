@@ -19,7 +19,6 @@
 package app.auditranscribe.fxml.spinners;
 
 import app.auditranscribe.generic.exceptions.ValueException;
-import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.control.SpinnerValueFactory;
@@ -28,7 +27,6 @@ import javafx.scene.control.SpinnerValueFactory;
  * Custom integer spinner value factory class.<br>
  * Adapted from <code>SpinnerValueFactory.IntegerSpinnerValueFactory</code>.
  */
-@ExcludeFromGeneratedCoverageReport
 public class CustomIntegerSpinnerValueFactory extends SpinnerValueFactory<Integer> {
     // Attributes
     private final IntegerProperty min = new SimpleIntegerProperty(this, "min") {

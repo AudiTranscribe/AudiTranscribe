@@ -20,7 +20,6 @@ package app.auditranscribe.fxml.views.setup_wizard.controllers;
 
 import app.auditranscribe.fxml.Theme;
 import app.auditranscribe.fxml.views.AbstractViewController;
-import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
@@ -33,7 +32,6 @@ import java.util.logging.Level;
 /**
  * Controller that displays the setup completion message to the user.
  */
-@ExcludeFromGeneratedCoverageReport
 public class SetupCompleteViewController extends AbstractViewController {
     // FXML elements
     @FXML

@@ -22,7 +22,6 @@ import app.auditranscribe.fxml.Theme;
 import app.auditranscribe.fxml.views.AbstractViewController;
 import app.auditranscribe.generic.tuples.Pair;
 import app.auditranscribe.io.IOMethods;
-import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -43,7 +42,6 @@ import java.util.ResourceBundle;
 /**
  * Controller for the debug view.
  */
-@ExcludeFromGeneratedCoverageReport
 public class DebugViewController extends AbstractViewController {
     // FXML Elements
     @FXML

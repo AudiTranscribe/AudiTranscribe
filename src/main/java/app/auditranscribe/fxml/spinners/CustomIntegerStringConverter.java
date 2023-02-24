@@ -18,12 +18,9 @@
 
 package app.auditranscribe.fxml.spinners;
 
-import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
-
 /**
  * Custom converter that converts a string to an integer.
  */
-@ExcludeFromGeneratedCoverageReport
 public class CustomIntegerStringConverter extends CustomStringConverter<Integer> {
     /**
      * Initialization method for a <code>CustomIntegerStringConverter</code>.

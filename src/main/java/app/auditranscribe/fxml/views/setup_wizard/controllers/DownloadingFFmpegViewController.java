@@ -22,7 +22,6 @@ import app.auditranscribe.fxml.Theme;
 import app.auditranscribe.fxml.views.AbstractViewController;
 import app.auditranscribe.fxml.views.setup_wizard.download_handlers.FFmpegDownloadManager;
 import app.auditranscribe.io.IOConstants;
-import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.network.DownloadTask;
 import app.auditranscribe.utils.MathUtils;
 import javafx.fxml.FXML;
@@ -37,7 +36,6 @@ import java.util.ResourceBundle;
 /**
  * Controller that displays the progress of the FFmpeg download.
  */
-@ExcludeFromGeneratedCoverageReport
 public class DownloadingFFmpegViewController extends AbstractViewController {
     // Constants
     private final String DEST_FOLDER = IOConstants.APP_DATA_FOLDER_PATH;

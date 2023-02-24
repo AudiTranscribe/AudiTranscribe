@@ -21,7 +21,6 @@ package app.auditranscribe.fxml.views.setup_wizard.download_handlers;
 import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.generic.exceptions.ValueException;
 import app.auditranscribe.io.IOMethods;
-import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.network.DownloadTask;
 import app.auditranscribe.network.FileDownloadHandler;
 
@@ -35,7 +34,6 @@ import java.util.logging.Level;
 /**
  * Abstract class that helps with the downloading of resources.
  */
-@ExcludeFromGeneratedCoverageReport
 public abstract class AbstractDownloadManager extends LoggableClass {
     // Attributes
     private final int maxAttempts;

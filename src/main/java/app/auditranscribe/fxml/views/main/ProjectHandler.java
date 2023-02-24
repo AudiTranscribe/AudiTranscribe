@@ -24,14 +24,12 @@ import app.auditranscribe.io.audt_file.base.AUDTFileWriter;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.MusicNotesDataObject;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.ProjectInfoDataObject;
 import app.auditranscribe.io.exceptions.InvalidFileVersionException;
-import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 
 import java.io.IOException;
 
 /**
  * Handles the interaction of AudiTranscribe projects.
  */
-@ExcludeFromGeneratedCoverageReport
 public final class ProjectHandler {
     private ProjectHandler() {
         // Private constructor to signal this is a utility class

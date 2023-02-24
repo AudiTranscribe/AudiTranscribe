@@ -1084,12 +1084,14 @@ public class NoteRectangle extends StackPane {
      * Exception that is raised if there is a collision between note rectangles during the creation
      * of a new note rectangle.
      */
+    @ExcludeFromGeneratedCoverageReport
     public static class CollisionException extends Exception {
         public CollisionException(String message) {
             super(message);
         }
     }
 
+    @ExcludeFromGeneratedCoverageReport
     static class SortByTimeToPlace implements Comparator<NoteRectangle> {
         @Override
         public int compare(NoteRectangle o1, NoteRectangle o2) {
@@ -1097,11 +1099,15 @@ public class NoteRectangle extends StackPane {
         }
     }
 
+    @ExcludeFromGeneratedCoverageReport
     public enum EditAction {UNDO, REDO}
 
+    @ExcludeFromGeneratedCoverageReport
     enum CollisionLocation {LEFT, RIGHT, UP, DOWN, NONE}
 
+    @ExcludeFromGeneratedCoverageReport
     enum VerticalMovement {UP, DOWN, NONE}
 
+    @ExcludeFromGeneratedCoverageReport
     enum UndoOrRedoAction {TRANSFORM, CREATE, DELETE, PERFORM_MULTIPLE}
 }

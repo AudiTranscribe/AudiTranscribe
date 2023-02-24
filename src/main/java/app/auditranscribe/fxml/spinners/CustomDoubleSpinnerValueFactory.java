@@ -19,7 +19,6 @@
 package app.auditranscribe.fxml.spinners;
 
 import app.auditranscribe.generic.exceptions.ValueException;
-import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.control.SpinnerValueFactory;
@@ -30,7 +29,6 @@ import java.math.BigDecimal;
  * Custom double spinner value factory class.
  * Adapted from <code>SpinnerValueFactory.DoubleSpinnerValueFactory</code>.
  */
-@ExcludeFromGeneratedCoverageReport
 public class CustomDoubleSpinnerValueFactory extends SpinnerValueFactory<Double> {
     // Attributes
     private final DoubleProperty min = new SimpleDoubleProperty(this, "min") {

@@ -400,6 +400,7 @@ public class SettingsViewController extends AbstractViewController {
     }
 
     // Helper classes
+    @ExcludeFromGeneratedCoverageReport
     static class MixerInfoDisplay {
         private final Mixer.Info info;
 

@@ -18,8 +18,6 @@
 
 package app.auditranscribe.fxml.spinners;
 
-import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
-
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.Collections;
@@ -27,7 +25,6 @@ import java.util.Collections;
 /**
  * Custom converter that converts a string to a double.
  */
-@ExcludeFromGeneratedCoverageReport
 public class CustomDoubleStringConverter extends CustomStringConverter<Double> {
     // Attributes
     private final DecimalFormat df;

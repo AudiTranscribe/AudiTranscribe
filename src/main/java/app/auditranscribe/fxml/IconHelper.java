@@ -171,6 +171,7 @@ public final class IconHelper extends LoggableClass {
     /**
      * Class that contains the icons' data.
      */
+    @ExcludeFromGeneratedCoverageReport
     static final class IconsData extends LoggableClass {
         // Constants
         final String ICON_DATA_FILE_PATH = IOMethods.joinPaths("images", "icons", "icons.json");
@@ -211,6 +212,7 @@ public final class IconHelper extends LoggableClass {
     /**
      * Class that encapsulates the <code>icons.json</code> data file's data.
      */
+    @ExcludeFromGeneratedCoverageReport
     static class IconsDataEncapsulator {
         public Map<String, String> svgPaths;
     }

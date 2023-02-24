@@ -25,7 +25,6 @@ import app.auditranscribe.fxml.views.main.SceneSwitcher;
 import app.auditranscribe.generic.tuples.Pair;
 import app.auditranscribe.generic.tuples.Quadruple;
 import app.auditranscribe.io.db.ProjectsDB;
-import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.system.OSMethods;
 import app.auditranscribe.system.OSType;
 import app.auditranscribe.utils.GUIUtils;
@@ -61,7 +60,6 @@ import java.util.logging.Level;
 /**
  * Controller for the homepage.
  */
-@ExcludeFromGeneratedCoverageReport
 public class HomepageViewController extends SwitchableViewController {
     // Attributes
     private ProjectsDB projectsDB;

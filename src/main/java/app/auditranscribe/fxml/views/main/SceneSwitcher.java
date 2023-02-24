@@ -37,7 +37,6 @@ import app.auditranscribe.io.data_files.DataFiles;
 import app.auditranscribe.io.exceptions.FailedToReadDataException;
 import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
 import app.auditranscribe.io.exceptions.InvalidFileVersionException;
-import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.music.MusicKey;
 import app.auditranscribe.system.OSMethods;
 import app.auditranscribe.system.OSType;
@@ -59,7 +58,6 @@ import java.util.logging.Level;
 /**
  * Class that handles the switching between the main scene and the transcription scene.
  */
-@ExcludeFromGeneratedCoverageReport
 public class SceneSwitcher extends LoggableClass {
     // Attributes
     private final boolean debugMode;

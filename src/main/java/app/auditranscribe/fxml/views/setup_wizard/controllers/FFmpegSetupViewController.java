@@ -25,7 +25,6 @@ import app.auditranscribe.fxml.Popups;
 import app.auditranscribe.fxml.Theme;
 import app.auditranscribe.fxml.views.AbstractViewController;
 import app.auditranscribe.io.IOMethods;
-import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.system.OSMethods;
 import app.auditranscribe.system.OSType;
 import app.auditranscribe.utils.GUIUtils;
@@ -50,7 +49,6 @@ import java.util.logging.Level;
 /**
  * Controller for the FFmpeg setup view.
  */
-@ExcludeFromGeneratedCoverageReport
 public class FFmpegSetupViewController extends AbstractViewController {
     // Attributes
     private OSType os;
