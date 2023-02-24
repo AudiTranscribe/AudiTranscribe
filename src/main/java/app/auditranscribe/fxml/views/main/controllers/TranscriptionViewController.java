@@ -104,6 +104,9 @@ public class TranscriptionViewController extends SwitchableViewController {
     private final int MIN_NOTE_NUMBER = 0;  // C0
     private final int MAX_NOTE_NUMBER = 107;  // B8
 
+    private final int BPM_ESTIMATION_MAX_DURATION = 10;  // In seconds
+    private final int KEY_ESTIMATION_MAX_DURATION = 10;  // In seconds
+
     private final long UPDATE_PLAYBACK_SCHEDULER_PERIOD = 10;  // In milliseconds; todo: allow customisation
 
     private final boolean FANCY_NOTE_LABELS = true;  // Use fancy accidentals for note labels
@@ -677,7 +680,10 @@ public class TranscriptionViewController extends SwitchableViewController {
                 this.updateMessage("Estimating BPM...");
                 double bpm;
                 if (data.estimateBPM) {
-                    bpm = BPMEstimator.estimate(audio.getMonoSamples(), sampleRate).get(0);  // Take first element
+                    bpm = BPMEstimator.estimate(
+                            audio.getSmallSample(BPM_ESTIMATION_MAX_DURATION),
+                            sampleRate
+                    ).get(0);  // Take first element
                 } else {
                     bpm = data.manualBPM;  // Use provided BPM
                 }
@@ -688,7 +694,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                 if (data.estimateMusicKey) {
                     // Get the top 4 most likely keys
                     List<Pair<MusicKey, Double>> mostLikelyKeys = MusicKeyEstimator.getMostLikelyKeysWithCorrelation(
-                            audio.getMonoSamples(), sampleRate, 4, this
+                            audio.getSmallSample(KEY_ESTIMATION_MAX_DURATION), sampleRate, 4, this
                     );
 
                     // Get most likely key and its correlation

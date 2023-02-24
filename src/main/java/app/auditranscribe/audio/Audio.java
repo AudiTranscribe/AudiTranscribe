@@ -443,6 +443,24 @@ public class Audio extends LoggableClass {
     }
 
     /**
+     * Method that returns a small array of samples for processing.
+     *
+     * @param maxDuration Maximum duration (in seconds) of samples to retrieve. Note that the actual
+     *                    number of samples may be smaller than this.
+     * @return A small set of samples.
+     */
+    public double[] getSmallSample(double maxDuration) {
+        // Determine how many samples we can return
+        int numSamples = Math.min((int) (maxDuration * sampleRate), numMonoSamples);
+
+        // Copy required data into the output array
+        double[] smallSample = new double[numSamples];
+        System.arraycopy(monoSamples, 0, smallSample, 0, numSamples);
+
+        return smallSample;
+    }
+
+    /**
      * Method that operators are to answer to, once they have processed the required data.
      *
      * @param channelNum Audio channel number.
