@@ -109,6 +109,10 @@
                 <configuration>
                     <excludes>
                         <exclude>
+                            app/auditranscribe/**/exceptions/**
+                        </exclude>
+
+                        <exclude>
                             app/auditranscribe/fxml/spinners/**
                         </exclude>
                         <exclude>
