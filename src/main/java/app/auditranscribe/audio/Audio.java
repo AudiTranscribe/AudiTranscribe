@@ -240,9 +240,11 @@ public class Audio extends LoggableClass {
         try {
             // Halt all threads
             audioPlaybackThread.interrupt();
-            sourceDataLine.drain();
-            sourceDataLine.close();
-            audioStream.close();
+            if (sourceDataLine != null) {
+                sourceDataLine.drain();
+                sourceDataLine.close();
+            }
+            if (audioStream != null) audioStream.close();
             isPaused = false;
 
             // Stop and clear all operators' stuff
