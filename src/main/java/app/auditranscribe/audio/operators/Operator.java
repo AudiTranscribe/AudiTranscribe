@@ -19,6 +19,7 @@
 package app.auditranscribe.audio.operators;
 
 import app.auditranscribe.audio.Audio;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.misc.StoppableThread;
 
 import java.util.concurrent.BlockingQueue;
@@ -27,6 +28,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * An abstract thread that operates on streams of bytes.
  */
+@ExcludeFromGeneratedCoverageReport
 public abstract class Operator extends StoppableThread {
     // Attributes
     protected BlockingQueue<Double> inputBuffer = new LinkedBlockingQueue<>(8192);

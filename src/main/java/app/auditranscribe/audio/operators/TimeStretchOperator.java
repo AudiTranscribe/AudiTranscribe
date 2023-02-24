@@ -18,9 +18,12 @@
 
 package app.auditranscribe.audio.operators;
 
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+
 /**
  * An abstract operator that handles time stretching operations.
  */
+@ExcludeFromGeneratedCoverageReport
 public abstract class TimeStretchOperator extends Operator {
     // Attributes
     protected double stretchFactor;
