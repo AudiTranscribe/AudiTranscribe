@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Class that implements a thread that can be stopped.
  */
+@ExcludeFromGeneratedCoverageReport
 public abstract class StoppableThread extends LoggableClass implements Runnable {
     // Attributes
     private boolean started;
