@@ -7,17 +7,15 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MusicNotesDataObject0x000500Test {
-    // Attributes
-    double[] timesToPlaceRectangles1 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    double[] timesToPlaceRectangles2 = {1.2, 3.4, 5.6, 7.8, 9};
+    static double[] timesToPlaceRectangles1 = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    static double[] timesToPlaceRectangles2 = {1.2, 3.4, 5.6, 7.8, 9};
 
-    double[] noteDurations1 = {0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.5, 0.5, 0.75, 1};
-    double[] noteDurations2 = {1, 1, 0.25, 0.125, 0.5};
+    static double[] noteDurations1 = {0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.5, 0.5, 0.75, 1};
+    static double[] noteDurations2 = {1, 1, 0.25, 0.125, 0.5};
 
-    int[] noteNums1 = {60, 61, 62, 63, 64, 65, 66, 67, 68, 69};
-    int[] noteNums2 = {100, 90, 80, 70, 60};
+    static int[] noteNums1 = {60, 61, 62, 63, 64, 65, 66, 67, 68, 69};
+    static int[] noteNums2 = {100, 90, 80, 70, 60};
 
-    // Tests
     @Test
     void numBytesNeeded() {
         // Define the two music notes data objects to test number of bytes needed

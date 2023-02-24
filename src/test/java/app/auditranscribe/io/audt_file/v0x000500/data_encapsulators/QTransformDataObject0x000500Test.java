@@ -9,17 +9,15 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class QTransformDataObject0x000500Test {
-    // Attributes
-    byte[] qTransformBytes1 = new byte[]{(byte) 0xab, (byte) 0xcd, (byte) 0xef};  // Not real data; do NOT decompress
-    byte[] qTransformBytes2 = new byte[]{(byte) 0x12, (byte) 0x34, (byte) 0x56, (byte) 0x78, (byte) 0x9a};
+    static byte[] qTransformBytes1 = new byte[]{(byte) 0xab, (byte) 0xcd, (byte) 0xef};  // Not real data; do NOT decompress
+    static byte[] qTransformBytes2 = new byte[]{(byte) 0x12, (byte) 0x34, (byte) 0x56, (byte) 0x78, (byte) 0x9a};
 
-    double minMagnitude1 = 123.4;
-    double minMagnitude2 = 456.7;
+    static double minMagnitude1 = 123.4;
+    static double minMagnitude2 = 456.7;
 
-    double maxMagnitude1 = 567.89;
-    double maxMagnitude2 = 1234.5;
+    static double maxMagnitude1 = 567.89;
+    static double maxMagnitude2 = 1234.5;
 
-    // Tests
     @Test
     void numBytesNeeded() {
         // Define the two Q-Transform data objects to test number of bytes needed

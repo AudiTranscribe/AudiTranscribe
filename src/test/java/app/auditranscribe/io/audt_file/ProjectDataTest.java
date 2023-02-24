@@ -5,43 +5,42 @@ import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import app.auditranscribe.io.audt_file.v0x000500.data_encapsulators.*;
 import app.auditranscribe.utils.MathUtils;
 import app.auditranscribe.utils.TypeConversionUtils;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProjectDataTest {
     // Define helper attributes
-    double[][] qTransformMagnitudes1;
-    double[][] qTransformMagnitudes2;
+    static double[][] qTransformMagnitudes1;
+    static double[][] qTransformMagnitudes2;
 
-    double[] timesToPlaceRectangles1;
-    double[] noteDurations1;
-    int[] noteNums1;
+    static double[] timesToPlaceRectangles1;
+    static double[] noteDurations1;
+    static int[] noteNums1;
 
-    double[] timesToPlaceRectangles2;
-    double[] noteDurations2;
-    int[] noteNums2;
+    static double[] timesToPlaceRectangles2;
+    static double[] noteDurations2;
+    static int[] noteNums2;
 
     // Define data to be used within the tests
-    QTransformDataObject qTransformDataObject1;
-    QTransformDataObject qTransformDataObject2;
+    static QTransformDataObject qTransformDataObject1;
+    static QTransformDataObject qTransformDataObject2;
 
-    AudioDataObject audioDataObject1;
-    AudioDataObject audioDataObject2;
+    static AudioDataObject audioDataObject1;
+    static AudioDataObject audioDataObject2;
 
-    ProjectInfoDataObject projectInfoDataObject1;
-    ProjectInfoDataObject projectInfoDataObject2;
+    static ProjectInfoDataObject projectInfoDataObject1;
+    static ProjectInfoDataObject projectInfoDataObject2;
 
-    MusicNotesDataObject musicNotesDataObject1;
-    MusicNotesDataObject musicNotesDataObject2;
+    static MusicNotesDataObject musicNotesDataObject1;
+    static MusicNotesDataObject musicNotesDataObject2;
 
-    UnchangingDataPropertiesObject unchangingDataPropertiesObject1;
-    UnchangingDataPropertiesObject unchangingDataPropertiesObject2;
+    static UnchangingDataPropertiesObject unchangingDataPropertiesObject1;
+    static UnchangingDataPropertiesObject unchangingDataPropertiesObject2;
 
-    // Initialization method
-    public ProjectDataTest() throws IOException {
+    @BeforeAll
+    static void beforeAll() {
         // Define sample array data
         // (These are example arrays, not actual data)
         qTransformMagnitudes1 = new double[][]{

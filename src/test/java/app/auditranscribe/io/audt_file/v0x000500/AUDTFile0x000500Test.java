@@ -26,37 +26,37 @@ class AUDTFile0x000500Test {
     // Define the file path
     static final String FILE_PATH = IOMethods.joinPaths(
             IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-            "test-files","io","audt_file", "v0x000500", "test-AUDTFile0x000500Test.audt"
+            "test-files", "io", "audt_file", "v0x000500", "test-AUDTFile0x000500Test.audt"
     );
 
     // Define helper attributes
-    double[][] qTransformMagnitudes;
+    static double[][] qTransformMagnitudes;
 
-    double[] timesToPlaceRectangles1;
-    double[] noteDurations1;
-    int[] noteNums1;
+    static double[] timesToPlaceRectangles1;
+    static double[] noteDurations1;
+    static int[] noteNums1;
 
-    double[] timesToPlaceRectangles2;
-    double[] noteDurations2;
-    int[] noteNums2;
+    static double[] timesToPlaceRectangles2;
+    static double[] noteDurations2;
+    static int[] noteNums2;
 
     // Define data to be used within the tests
-    QTransformDataObject qTransformDataObject;
-    AudioDataObject audioDataObject;
+    static QTransformDataObject qTransformDataObject;
+    static AudioDataObject audioDataObject;
 
-    ProjectInfoDataObject projectInfoDataObject1;
-    ProjectInfoDataObject projectInfoDataObject2;
+    static ProjectInfoDataObject projectInfoDataObject1;
+    static ProjectInfoDataObject projectInfoDataObject2;
 
-    MusicNotesDataObject musicNotesDataObject1;
-    MusicNotesDataObject musicNotesDataObject2;
+    static MusicNotesDataObject musicNotesDataObject1;
+    static MusicNotesDataObject musicNotesDataObject2;
 
-    UnchangingDataPropertiesObject unchangingDataPropertiesObject;
+    static UnchangingDataPropertiesObject unchangingDataPropertiesObject;
 
-    ProjectData projectData1;
-    ProjectData projectData2;
+    static ProjectData projectData1;
+    static ProjectData projectData2;
 
-    // Initialization method
-    AUDTFile0x000500Test() throws IOException {
+    @BeforeAll
+    static void beforeAll() throws IOException {
         // Define sample array data
         // (These are example arrays, not actual data)
         qTransformMagnitudes = new double[][]{

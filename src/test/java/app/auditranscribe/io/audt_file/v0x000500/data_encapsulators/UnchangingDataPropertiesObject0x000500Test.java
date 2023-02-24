@@ -7,11 +7,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UnchangingDataPropertiesObject0x000500Test {
-    // Attributes
-    int numSkippableBytes1 = 1234;
-    int numSkippableBytes2 = 56789;
+    static int numSkippableBytes1 = 1234;
+    static int numSkippableBytes2 = 56789;
 
-    // Tests
     @Test
     void numBytesNeeded() {
         // Define the two objects to test number of bytes needed

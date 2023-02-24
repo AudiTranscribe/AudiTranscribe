@@ -9,29 +9,27 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProjectInfoDataObject0x000B00Test {
-    // Attributes
-    String projectName1 = "First Project Name";
-    String projectName2 = "Second Project Name";
+    static String projectName1 = "First Project Name";
+    static String projectName2 = "Second Project Name";
 
-    MusicKey musicKey1 = MusicKey.C_SHARP_MAJOR;
-    MusicKey musicKey2 = MusicKey.G_FLAT_MAJOR;
+    static MusicKey musicKey1 = MusicKey.C_SHARP_MAJOR;
+    static MusicKey musicKey2 = MusicKey.G_FLAT_MAJOR;
 
-    TimeSignature timeSignature1 = TimeSignature.TWO_TWO;
-    TimeSignature timeSignature2 = TimeSignature.SIX_FOUR;
+    static TimeSignature timeSignature1 = TimeSignature.TWO_TWO;
+    static TimeSignature timeSignature2 = TimeSignature.SIX_FOUR;
 
-    double bpm1 = 123.456;
-    double bpm2 = 78.9;
+    static double bpm1 = 123.456;
+    static double bpm2 = 78.9;
 
-    double offsetSeconds1 = 1.23;
-    double offsetSeconds2 = -4.56;
+    static double offsetSeconds1 = 1.23;
+    static double offsetSeconds2 = -4.56;
 
-    double playbackVolume1 = 0.1234;
-    double playbackVolume2 = 0.56789;
+    static double playbackVolume1 = 0.1234;
+    static double playbackVolume2 = 0.56789;
 
-    int currTimeInMS1 = 123456789;
-    int currTimeInMS2 = 987654321;
+    static int currTimeInMS1 = 123456789;
+    static int currTimeInMS2 = 987654321;
 
-    // Tests
     @Test
     void numBytesNeeded() {
         // Define the two data objects to test number of bytes needed

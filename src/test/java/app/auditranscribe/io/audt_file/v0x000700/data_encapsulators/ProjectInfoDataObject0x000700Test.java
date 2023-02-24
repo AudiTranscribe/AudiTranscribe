@@ -7,29 +7,27 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProjectInfoDataObject0x000700Test {
-    // Attributes
-    String projectName1 = "First Project Name";
-    String projectName2 = "Second Project Name";
+    static String projectName1 = "First Project Name";
+    static String projectName2 = "Second Project Name";
 
-    int musicKeyIndex1 = 1;
-    int musicKeyIndex2 = 8;
+    static int musicKeyIndex1 = 1;
+    static int musicKeyIndex2 = 8;
 
-    int timeSignatureIndex1 = 0;
-    int timeSignatureIndex2 = 7;
+    static int timeSignatureIndex1 = 0;
+    static int timeSignatureIndex2 = 7;
 
-    double bpm1 = 123.456;
-    double bpm2 = 78.9;
+    static double bpm1 = 123.456;
+    static double bpm2 = 78.9;
 
-    double offsetSeconds1 = 1.23;
-    double offsetSeconds2 = -4.56;
+    static double offsetSeconds1 = 1.23;
+    static double offsetSeconds2 = -4.56;
 
-    double playbackVolume1 = 0.1234;
-    double playbackVolume2 = 0.56789;
+    static double playbackVolume1 = 0.1234;
+    static double playbackVolume2 = 0.56789;
 
-    int currTimeInMS1 = 123456789;
-    int currTimeInMS2 = 987654321;
+    static int currTimeInMS1 = 123456789;
+    static int currTimeInMS2 = 987654321;
 
-    // Tests
     @Test
     void numBytesNeeded() {
         // Define the two data objects to test number of bytes needed

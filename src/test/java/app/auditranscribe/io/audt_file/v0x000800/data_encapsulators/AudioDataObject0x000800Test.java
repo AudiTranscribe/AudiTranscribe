@@ -7,25 +7,23 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AudioDataObject0x000800Test {
-    // Attributes
-    byte[] compressedOriginalMP3Bytes1 = new byte[]{(byte) 0x12, (byte) 0x34, (byte) 0x56, (byte) 0x78, (byte) 0x9a};
-    byte[] compressedOriginalMP3Bytes2 = new byte[]{(byte) 0xab, (byte) 0xcd, (byte) 0xef};
+    static byte[] compressedOriginalMP3Bytes1 = new byte[]{(byte) 0x12, (byte) 0x34, (byte) 0x56, (byte) 0x78, (byte) 0x9a};
+    static byte[] compressedOriginalMP3Bytes2 = new byte[]{(byte) 0xab, (byte) 0xcd, (byte) 0xef};
 
-    byte[] compressedSlowedMP3Bytes1 = new byte[]{
+    static byte[] compressedSlowedMP3Bytes1 = new byte[]{
             (byte) 0x11, (byte) 0x22, (byte) 0x33, (byte) 0x44, (byte) 0x55,
             (byte) 0x66, (byte) 0x77, (byte) 0x88, (byte) 0x99, (byte) 0xaa
     };
-    byte[] compressedSlowedMP3Bytes2 = new byte[]{
+    static byte[] compressedSlowedMP3Bytes2 = new byte[]{
             (byte) 0xfe, (byte) 0xdc, (byte) 0xba, (byte) 0x98, (byte) 0x76, (byte) 0x54
     };
 
-    double sampleRate1 = 44100;
-    double sampleRate2 = 22050;
+    static double sampleRate1 = 44100;
+    static double sampleRate2 = 22050;
 
-    int totalDurationInMS1 = 1234;
-    int totalDurationInMS2 = 5678;
+    static int totalDurationInMS1 = 1234;
+    static int totalDurationInMS2 = 5678;
 
-    // Tests
     @Test
     void numBytesNeeded() {
         // Define the two audio data objects to test the number of bytes needed

@@ -8,17 +8,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class AudioDataObject0x000B00Test {
-    // Attributes
-    byte[] mp3Bytes1 = new byte[]{(byte) 0x12, (byte) 0x34, (byte) 0x56, (byte) 0x78, (byte) 0x9a};
-    byte[] mp3Bytes2 = new byte[]{(byte) 0xab, (byte) 0xcd, (byte) 0xef};
+    static byte[] mp3Bytes1 = new byte[]{(byte) 0x12, (byte) 0x34, (byte) 0x56, (byte) 0x78, (byte) 0x9a};
+    static byte[] mp3Bytes2 = new byte[]{(byte) 0xab, (byte) 0xcd, (byte) 0xef};
 
-    double sampleRate1 = 44100;
-    double sampleRate2 = 22050;
+    static double sampleRate1 = 44100;
+    static double sampleRate2 = 22050;
 
-    int totalDurationInMS1 = 1234;
-    int totalDurationInMS2 = 5678;
+    static int totalDurationInMS1 = 1234;
+    static int totalDurationInMS2 = 5678;
 
-    // Tests
     @Test
     void numBytesNeeded() {
         // Define the two audio data objects to test the number of bytes needed
