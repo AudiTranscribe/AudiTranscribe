@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,16 +22,19 @@ class FFTTest {
                 new Complex(5), new Complex(0, 6)
         };
         Complex[] array3 = {};  // Empty complex number array
+        Complex[] array4 = {new Complex(1, -1)};  // Complex number array that contains only one element
 
         // Generate the FFT outputs
         Complex[] fftArray1 = FFT.fft(array1);
         Complex[] fftArray2 = FFT.fft(array2);
         Complex[] fftArray3 = FFT.fft(array3);
+        Complex[] fftArray4 = FFT.fft(array4);
 
         // Check the FFT output
         assertEquals(8, fftArray1.length);
         assertEquals(6, fftArray2.length);
         assertEquals(0, fftArray3.length);
+        assertEquals(1, fftArray4.length);
 
         assertEquals(new Complex(-4, -4), fftArray1[0].round(3));
         assertEquals(new Complex(-4, -9.657), fftArray1[1].round(3));
@@ -67,6 +69,8 @@ class FFTTest {
                 new Complex(3.46410162, 1.07179677).round(5),
                 fftArray2[5].round(5)
         );
+
+        assertEquals(new Complex(1, -1).round(5), fftArray4[0].round(5));
     }
 
     @Test

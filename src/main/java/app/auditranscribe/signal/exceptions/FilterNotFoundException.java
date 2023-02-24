@@ -18,9 +18,12 @@
 
 package app.auditranscribe.signal.exceptions;
 
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+
 /**
  * Exception thrown if the resampling filter file could not be found.
  */
+@ExcludeFromGeneratedCoverageReport
 public class FilterNotFoundException extends RuntimeException {
     public FilterNotFoundException() {
         super();
