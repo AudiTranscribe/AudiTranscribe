@@ -1,0 +1,15 @@
+name: Run Tests On Push To Main
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "**.java"
+
+jobs:
+  run_tests:
+    name: Run Tests
+    uses: ./.github/workflows/run-tests.yml
+    with:
+      upload_to_codecov: "YES"
+      branch: "main"
