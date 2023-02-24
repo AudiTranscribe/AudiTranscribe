@@ -20,8 +20,11 @@ package app.auditranscribe.network;
 
 import app.auditranscribe.misc.CustomLogger;
 import app.auditranscribe.misc.CustomTask;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 
 import java.util.logging.Level;
 
@@ -42,13 +45,7 @@ public abstract class DownloadTask<V> extends CustomTask<V> {
         super();
 
         // Create a change listener for the progress property
-        progressProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal.doubleValue() == -1) {
-                CustomLogger.log(Level.INFO, "New progress value is still -1", DownloadTask.class.getName());
-                return;
-            }
-            downloadedAmount.setValue(newVal.doubleValue() * downloadFileSize);
-        });
+        progressProperty().addListener(new ProgressPropertyListener());
     }
 
     // Getter/Setter methods
@@ -66,5 +63,18 @@ public abstract class DownloadTask<V> extends CustomTask<V> {
 
     public int getDownloadedAmount() {
         return downloadedAmount.get();
+    }
+
+    // Helper classes
+    @ExcludeFromGeneratedCoverageReport
+    class ProgressPropertyListener implements ChangeListener<Number> {
+        @Override
+        public void changed(ObservableValue<? extends Number> obs, Number oldVal, Number newVal) {
+            if (newVal.doubleValue() == -1) {
+                CustomLogger.log(Level.INFO, "New progress value is still -1", DownloadTask.class.getName());
+                return;
+            }
+            downloadedAmount.setValue(newVal.doubleValue() * downloadFileSize);
+        }
     }
 }
