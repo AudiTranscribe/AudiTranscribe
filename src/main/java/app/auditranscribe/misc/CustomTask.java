@@ -48,16 +48,6 @@ public abstract class CustomTask<V> extends Task<V> {
     }
 
     // Public methods
-
-    /**
-     * Alias to {@link #updateMessage(String)}.
-     *
-     * @param s The message to set.
-     */
-    public void setMessage(String s) {  // Todo remove after all complete
-        updateMessage(s);
-    }
-
     @Override
     public void updateProgress(long current, long total) {
         super.updateProgress(current, total);

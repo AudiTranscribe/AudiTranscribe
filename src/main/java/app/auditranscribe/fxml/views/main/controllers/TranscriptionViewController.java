@@ -674,7 +674,7 @@ public class TranscriptionViewController extends SwitchableViewController {
             @Override
             protected Pair<Double, MusicKey> call() {
                 // First estimate BPM
-                this.setMessage("Estimating BPM...");
+                this.updateMessage("Estimating BPM...");
                 double bpm;
                 if (data.estimateBPM) {
                     bpm = BPMEstimator.estimate(audio.getMonoSamples(), sampleRate).get(0);  // Take first element
@@ -683,7 +683,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                 }
 
                 // Next estimate key
-                this.setMessage("Estimating key...");
+                this.updateMessage("Estimating key...");
                 MusicKey key;
                 if (data.estimateMusicKey) {
                     // Get the top 4 most likely keys
@@ -1619,7 +1619,7 @@ public class TranscriptionViewController extends SwitchableViewController {
      */
     private void setupSpectrogramTask(CustomTask<WritableImage> task, String message) {
         // Set the task's message
-        task.setMessage(message);
+        task.updateMessage(message);
 
         // Set task completion listener
         task.setOnSucceeded(event -> {
