@@ -20,6 +20,7 @@ package app.auditranscribe.io;
 
 import app.auditranscribe.MainApplication;
 import app.auditranscribe.misc.CustomLogger;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.system.OSMethods;
 import app.auditranscribe.system.OSType;
 
@@ -49,6 +50,7 @@ public final class IOMethods {
      *
      * @return The <b>absolute</b> path to the application data directory.
      */
+    @ExcludeFromGeneratedCoverageReport
     public static String getApplicationDataDirectory() {
         // Get the operating system
         OSType osType = OSMethods.getOS();

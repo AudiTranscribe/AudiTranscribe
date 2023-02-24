@@ -60,6 +60,14 @@ class IOMethodsTest {
         String urlString = IOMethods.getFileURLAsString("test-files/io/IOMethodsTest/MyFile.txt");
         assertTrue(urlString.contains("file:/"));
         assertTrue(urlString.contains("test-files/io/IOMethodsTest/MyFile.txt"));
+
+        assertThrowsExactly(RuntimeException.class, () -> IOMethods.getFileURLAsString("not-a-file.txt"));
+    }
+
+    @Test
+    @Order(0)
+    void getAbsoluteFilePath_testNullPointer() {
+        assertThrowsExactly(NullPointerException.class, () -> IOMethods.getAbsoluteFilePath("not-a-file.txt"));
     }
 
     // Sequenced CRUD operation tests
@@ -269,7 +277,7 @@ class IOMethodsTest {
         // Using default separator
         assertEquals("a/bc/def", IOMethods.joinPaths("a", "bc", "def"));
         assertEquals("a/bc/def", IOMethods.joinPaths("a/", "bc/", "/def"));
-        assertEquals("a/bc/def", IOMethods.joinPaths("a", null, "bc", null, null, null, "/def"));
+        assertEquals("a/bc/def", IOMethods.joinPaths("a", null, "bc", null, "", null, "/def"));
 
         // Using native separator
         assertEquals(
