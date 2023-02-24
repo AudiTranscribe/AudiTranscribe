@@ -46,6 +46,10 @@ class MathUtilsTest {
         assertEquals(0, MathUtils.principalArg(2 * Math.PI), 1e-5);
         assertEquals(Math.PI / 2, MathUtils.principalArg(9 * Math.PI / 2), 1e-5);
         assertEquals(Math.PI, MathUtils.principalArg(9 * Math.PI), 1e-5);
+
+        assertEquals(-2.28319, MathUtils.principalArg(4), 1e-5);
+        assertEquals(0.71681, MathUtils.principalArg(7), 1e-5);
+        assertEquals(-2.56637, MathUtils.principalArg(10), 1e-5);
     }
 
     // Data-related methods

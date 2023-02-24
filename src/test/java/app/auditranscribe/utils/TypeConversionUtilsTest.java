@@ -101,6 +101,11 @@ class TypeConversionUtilsTest {
         // Assertions
         assertArrayEquals(array1, TypeConversionUtils.toBooleanArray(TypeConversionUtils.toBooleanArray(array1)));
         assertArrayEquals(array2, TypeConversionUtils.toBooleanArray(TypeConversionUtils.toBooleanArray(array2)));
+
+        //noinspection ConstantValue
+        assertNull(TypeConversionUtils.toBooleanArray((boolean[]) null));
+        //noinspection ConstantValue
+        assertNull(TypeConversionUtils.toBooleanArray((Boolean[]) null));
     }
 
     // Other type conversions
