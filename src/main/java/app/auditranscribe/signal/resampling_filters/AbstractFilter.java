@@ -85,7 +85,7 @@ public abstract class AbstractFilter {
         Gson gson = new Gson();
 
         // Attempt to get the input stream
-        InputStream inputStream = IOMethods.getInputStream(dataFilePath);
+        InputStream inputStream = IOMethods.readAsInputStream(dataFilePath);
 
         // Check if the input stream is null or not
         if (inputStream == null) {

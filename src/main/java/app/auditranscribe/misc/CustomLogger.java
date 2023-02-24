@@ -148,7 +148,7 @@ public class CustomLogger {
                 setLogsFolder();
 
                 // Try to read logging config from the logging properties file
-                try (InputStream is = IOMethods.getInputStream("conf/logging.properties")) {
+                try (InputStream is = IOMethods.readAsInputStream("conf/logging.properties")) {
                     LogManager.getLogManager().readConfiguration(is);
                 }
 

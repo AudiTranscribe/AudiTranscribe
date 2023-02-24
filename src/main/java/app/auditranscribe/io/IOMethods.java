@@ -227,8 +227,7 @@ public final class IOMethods {
      * @param filePath Path to the file, with respect to the <b>resource path</b>.
      * @return An <code>InputStream</code> object for reading.
      */
-    // Todo: rename to `readAsInputStream`
-    public static InputStream getInputStream(String filePath) {
+    public static InputStream readAsInputStream(String filePath) {
         // If the file path contains backslashes, replace with forward slashes
         filePath = filePath.replaceAll("\\\\", "/");
         return MainApplication.class.getResourceAsStream(filePath);
@@ -245,7 +244,7 @@ public final class IOMethods {
      *                     reading the input stream.
      */
     public static String readAsString(String filePath, String encoding) throws IOException {
-        return inputStreamToString(getInputStream(filePath), encoding);
+        return inputStreamToString(readAsInputStream(filePath), encoding);
     }
 
     /**

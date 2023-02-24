@@ -89,7 +89,7 @@ public class SceneSwitcher extends LoggableClass {
 
         // Set icon for the main stage and transcription stage, if not on macOS
         if (OSMethods.getOS() != OSType.MAC) {
-            Image icon = new Image(IOMethods.getInputStream("images/logo-and-banner/icon.png"));
+            Image icon = new Image(IOMethods.readAsInputStream("images/logo-and-banner/icon.png"));
             this.mainStage.getIcons().add(icon);
             this.transcriptionStage.getIcons().add(icon);
         }

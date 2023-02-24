@@ -188,7 +188,7 @@ public final class IconHelper extends LoggableClass {
                 Gson gson = new Gson();
 
                 // Attempt to get the input stream
-                InputStream inputStream = IOMethods.getInputStream(ICON_DATA_FILE_PATH);
+                InputStream inputStream = IOMethods.readAsInputStream(ICON_DATA_FILE_PATH);
 
                 // Check if the input stream is null or not
                 if (inputStream == null) {
