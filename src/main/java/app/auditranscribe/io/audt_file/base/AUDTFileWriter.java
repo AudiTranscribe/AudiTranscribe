@@ -19,7 +19,7 @@
 package app.auditranscribe.io.audt_file.base;
 
 import app.auditranscribe.generic.LoggableClass;
-import app.auditranscribe.utils.ByteConversionUtils;
+import app.auditranscribe.io.ByteConversionHandlers;
 import app.auditranscribe.io.CompressionHandlers;
 import app.auditranscribe.io.audt_file.AUDTFileConstants;
 import app.auditranscribe.io.audt_file.AUDTFileHelpers;
@@ -222,7 +222,7 @@ public abstract class AUDTFileWriter extends LoggableClass {
      */
     protected void writeBoolean(boolean myBoolean) {
         // Convert the short into its bytes
-        byte[] byteArray = ByteConversionUtils.booleanToBytes(myBoolean);
+        byte[] byteArray = ByteConversionHandlers.booleanToBytes(myBoolean);
 
         // Write to the byte list
         AUDTFileHelpers.addBytesIntoBytesList(bytes, byteArray);
@@ -235,7 +235,7 @@ public abstract class AUDTFileWriter extends LoggableClass {
      */
     protected void writeShort(short myShort) {
         // Convert the short into its bytes
-        byte[] byteArray = ByteConversionUtils.shortToBytes(myShort);
+        byte[] byteArray = ByteConversionHandlers.shortToBytes(myShort);
 
         // Write to the byte list
         AUDTFileHelpers.addBytesIntoBytesList(bytes, byteArray);
@@ -248,7 +248,7 @@ public abstract class AUDTFileWriter extends LoggableClass {
      */
     protected void writeInteger(int integer) {
         // Convert the integer into its bytes
-        byte[] byteArray = ByteConversionUtils.intToBytes(integer);
+        byte[] byteArray = ByteConversionHandlers.intToBytes(integer);
 
         // Write to the byte list
         AUDTFileHelpers.addBytesIntoBytesList(bytes, byteArray);
@@ -261,7 +261,7 @@ public abstract class AUDTFileWriter extends LoggableClass {
      */
     protected void writeDouble(double dbl) {
         // Convert the double into its bytes
-        byte[] byteArray = ByteConversionUtils.doubleToBytes(dbl);
+        byte[] byteArray = ByteConversionHandlers.doubleToBytes(dbl);
 
         // Write to the byte list
         AUDTFileHelpers.addBytesIntoBytesList(bytes, byteArray);
@@ -274,7 +274,7 @@ public abstract class AUDTFileWriter extends LoggableClass {
      */
     protected void writeString(String str) {
         // Convert the string into its bytes
-        byte[] byteArray = ByteConversionUtils.stringToBytes(str);
+        byte[] byteArray = ByteConversionHandlers.stringToBytes(str);
 
         // Get the number of bytes needed to store the string
         int numBytes = byteArray.length;
@@ -301,7 +301,7 @@ public abstract class AUDTFileWriter extends LoggableClass {
      */
     protected void write1DIntegerArray(int[] array) throws IOException {
         // Convert the 1D array into its bytes
-        byte[] byteArray = ByteConversionUtils.oneDimensionalIntegerArrayToBytes(array);
+        byte[] byteArray = ByteConversionHandlers.oneDimensionalIntegerArrayToBytes(array);
 
         // Compress the byte array
         byte[] compressedBytes = CompressionHandlers.lz4Compress(byteArray);
@@ -321,7 +321,7 @@ public abstract class AUDTFileWriter extends LoggableClass {
      */
     protected void write1DDoubleArray(double[] array) throws IOException {
         // Convert the 1D array into its bytes
-        byte[] byteArray = ByteConversionUtils.oneDimensionalDoubleArrayToBytes(array);
+        byte[] byteArray = ByteConversionHandlers.oneDimensionalDoubleArrayToBytes(array);
 
         // Compress the byte array
         byte[] compressedBytes = CompressionHandlers.lz4Compress(byteArray);
@@ -364,7 +364,7 @@ public abstract class AUDTFileWriter extends LoggableClass {
         AUDTFileHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_MAGIC_CONSTANT);
 
         // Write the file version
-        byte[] fileVersionBytes = ByteConversionUtils.intToBytes(fileVersion);
+        byte[] fileVersionBytes = ByteConversionHandlers.intToBytes(fileVersion);
         AUDTFileHelpers.addBytesIntoBytesList(bytes, fileVersionBytes);
 
         // Then write the magic constant again

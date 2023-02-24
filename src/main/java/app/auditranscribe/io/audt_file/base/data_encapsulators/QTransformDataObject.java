@@ -19,7 +19,7 @@
 package app.auditranscribe.io.audt_file.base.data_encapsulators;
 
 import app.auditranscribe.generic.tuples.Triple;
-import app.auditranscribe.utils.ByteConversionUtils;
+import app.auditranscribe.io.ByteConversionHandlers;
 import app.auditranscribe.io.audt_file.AUDTFileHelpers;
 import app.auditranscribe.misc.CustomTask;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
@@ -101,7 +101,7 @@ public abstract class QTransformDataObject extends AbstractAUDTDataObject {
         }
 
         // Convert the integer data to bytes
-        byte[] plainBytes = ByteConversionUtils.twoDimensionalIntegerArrayToBytes(intDataPrimitive);
+        byte[] plainBytes = ByteConversionHandlers.twoDimensionalIntegerArrayToBytes(intDataPrimitive);
 
         return new Triple<>(TypeConversionUtils.toByteArray(plainBytes), min, max);
     }

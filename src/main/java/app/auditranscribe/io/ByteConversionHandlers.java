@@ -1,5 +1,5 @@
 /*
- * ByteConversionUtils.java
+ * ByteConversionHandlers.java
  * Description: Byte conversion utilities.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -16,7 +16,7 @@
  * Copyright © AudiTranscribe Team
  */
 
-package app.auditranscribe.utils;
+package app.auditranscribe.io;
 
 import app.auditranscribe.generic.exceptions.LengthException;
 
@@ -27,8 +27,8 @@ import java.util.Arrays;
 /**
  * Byte conversion utilities.
  */
-public final class ByteConversionUtils {
-    private ByteConversionUtils() {
+public final class ByteConversionHandlers {
+    private ByteConversionHandlers() {
         // Private constructor to signal this is a utility class
     }
 

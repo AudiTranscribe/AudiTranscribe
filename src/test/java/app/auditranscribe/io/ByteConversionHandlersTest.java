@@ -1,4 +1,4 @@
-package app.auditranscribe.utils;
+package app.auditranscribe.io;
 
 import app.auditranscribe.generic.exceptions.LengthException;
 import org.junit.jupiter.api.Test;
@@ -7,54 +7,54 @@ import java.util.HexFormat;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ByteConversionUtilsTest {
+class ByteConversionHandlersTest {
     // Conversion to bytes
     @Test
     void booleanToBytes() {
-        assertArrayEquals(new byte[]{0}, ByteConversionUtils.booleanToBytes(false));
-        assertArrayEquals(new byte[]{1}, ByteConversionUtils.booleanToBytes(true));
+        assertArrayEquals(new byte[]{0}, ByteConversionHandlers.booleanToBytes(false));
+        assertArrayEquals(new byte[]{1}, ByteConversionHandlers.booleanToBytes(true));
     }
 
     @Test
     void shortToBytes() {
-        assertArrayEquals(HexFormat.of().parseHex("0000"), ByteConversionUtils.shortToBytes((short) 0));
-        assertArrayEquals(HexFormat.of().parseHex("04d2"), ByteConversionUtils.shortToBytes((short) 1234));
-        assertArrayEquals(HexFormat.of().parseHex("7fff"), ByteConversionUtils.shortToBytes((short) 32767));
-        assertArrayEquals(HexFormat.of().parseHex("fb2e"), ByteConversionUtils.shortToBytes((short) -1234));
-        assertArrayEquals(HexFormat.of().parseHex("8000"), ByteConversionUtils.shortToBytes((short) -32768));
+        assertArrayEquals(HexFormat.of().parseHex("0000"), ByteConversionHandlers.shortToBytes((short) 0));
+        assertArrayEquals(HexFormat.of().parseHex("04d2"), ByteConversionHandlers.shortToBytes((short) 1234));
+        assertArrayEquals(HexFormat.of().parseHex("7fff"), ByteConversionHandlers.shortToBytes((short) 32767));
+        assertArrayEquals(HexFormat.of().parseHex("fb2e"), ByteConversionHandlers.shortToBytes((short) -1234));
+        assertArrayEquals(HexFormat.of().parseHex("8000"), ByteConversionHandlers.shortToBytes((short) -32768));
     }
 
     @Test
     void intToBytes() {
-        assertArrayEquals(HexFormat.of().parseHex("00000000"), ByteConversionUtils.intToBytes(0));
-        assertArrayEquals(HexFormat.of().parseHex("000004d2"), ByteConversionUtils.intToBytes(1234));
-        assertArrayEquals(HexFormat.of().parseHex("499602d2"), ByteConversionUtils.intToBytes(1234567890));
-        assertArrayEquals(HexFormat.of().parseHex("7fffffff"), ByteConversionUtils.intToBytes(2147483647));
-        assertArrayEquals(HexFormat.of().parseHex("b669fd2e"), ByteConversionUtils.intToBytes(-1234567890));
-        assertArrayEquals(HexFormat.of().parseHex("80000001"), ByteConversionUtils.intToBytes(-2147483647));
+        assertArrayEquals(HexFormat.of().parseHex("00000000"), ByteConversionHandlers.intToBytes(0));
+        assertArrayEquals(HexFormat.of().parseHex("000004d2"), ByteConversionHandlers.intToBytes(1234));
+        assertArrayEquals(HexFormat.of().parseHex("499602d2"), ByteConversionHandlers.intToBytes(1234567890));
+        assertArrayEquals(HexFormat.of().parseHex("7fffffff"), ByteConversionHandlers.intToBytes(2147483647));
+        assertArrayEquals(HexFormat.of().parseHex("b669fd2e"), ByteConversionHandlers.intToBytes(-1234567890));
+        assertArrayEquals(HexFormat.of().parseHex("80000001"), ByteConversionHandlers.intToBytes(-2147483647));
     }
 
     @Test
     void doubleToBytes() {
         assertArrayEquals(
                 HexFormat.of().parseHex("40505b851eb851ec"),
-                ByteConversionUtils.doubleToBytes(65.43)
+                ByteConversionHandlers.doubleToBytes(65.43)
         );
         assertArrayEquals(
                 HexFormat.of().parseHex("c05edccccccccccd"),
-                ByteConversionUtils.doubleToBytes(-123.45)
+                ByteConversionHandlers.doubleToBytes(-123.45)
         );
         assertArrayEquals(
                 HexFormat.of().parseHex("40c34a4587e7c06e"),
-                ByteConversionUtils.doubleToBytes(9876.54321)
+                ByteConversionHandlers.doubleToBytes(9876.54321)
         );
         assertArrayEquals(
                 HexFormat.of().parseHex("400921fb53c8d4f1"),
-                ByteConversionUtils.doubleToBytes(3.14159265)
+                ByteConversionHandlers.doubleToBytes(3.14159265)
         );
         assertArrayEquals(
                 HexFormat.of().parseHex("bf1588ccebd0259f"),
-                ByteConversionUtils.doubleToBytes(-0.000082147128481)
+                ByteConversionHandlers.doubleToBytes(-0.000082147128481)
         );
     }
 
@@ -62,7 +62,7 @@ class ByteConversionUtilsTest {
     void stringToBytes() {
         assertArrayEquals(
                 new byte[]{(byte) 0x41, (byte) 0x7a, (byte) 0x20, (byte) 0x3f, (byte) 0x35},
-                ByteConversionUtils.stringToBytes("Az ?5")
+                ByteConversionHandlers.stringToBytes("Az ?5")
         );
     }
 
@@ -83,7 +83,7 @@ class ByteConversionUtilsTest {
         // Run test
         assertArrayEquals(
                 HexFormat.of().parseHex(hexStr),
-                ByteConversionUtils.oneDimensionalIntegerArrayToBytes(array)
+                ByteConversionHandlers.oneDimensionalIntegerArrayToBytes(array)
         );
     }
 
@@ -103,7 +103,7 @@ class ByteConversionUtilsTest {
         // Run test
         assertArrayEquals(
                 HexFormat.of().parseHex(hexStr),
-                ByteConversionUtils.oneDimensionalDoubleArrayToBytes(array)
+                ByteConversionHandlers.oneDimensionalDoubleArrayToBytes(array)
         );
     }
 
@@ -125,7 +125,7 @@ class ByteConversionUtilsTest {
         // Run test
         assertArrayEquals(
                 HexFormat.of().parseHex(hexStr),
-                ByteConversionUtils.twoDimensionalIntegerArrayToBytes(array)
+                ByteConversionHandlers.twoDimensionalIntegerArrayToBytes(array)
         );
     }
 
@@ -133,38 +133,38 @@ class ByteConversionUtilsTest {
     @Test
     void bytesToBoolean() {
         // Test conversion
-        assertFalse(ByteConversionUtils.bytesToBoolean(new byte[]{0}));
-        assertTrue(ByteConversionUtils.bytesToBoolean(new byte[]{1}));
+        assertFalse(ByteConversionHandlers.bytesToBoolean(new byte[]{0}));
+        assertTrue(ByteConversionHandlers.bytesToBoolean(new byte[]{1}));
 
         // Test exception
-        assertThrowsExactly(LengthException.class, () -> ByteConversionUtils.bytesToBoolean(new byte[]{1, 2}));
+        assertThrowsExactly(LengthException.class, () -> ByteConversionHandlers.bytesToBoolean(new byte[]{1, 2}));
     }
 
     @Test
     void bytesToShort() {
         // Test conversion
-        assertEquals((short) 0, ByteConversionUtils.bytesToShort(HexFormat.of().parseHex("0000")));
-        assertEquals((short) 1234, ByteConversionUtils.bytesToShort(HexFormat.of().parseHex("04d2")));
-        assertEquals((short) 32767, ByteConversionUtils.bytesToShort(HexFormat.of().parseHex("7fff")));
-        assertEquals((short) -1234, ByteConversionUtils.bytesToShort(HexFormat.of().parseHex("fb2e")));
-        assertEquals((short) -32768, ByteConversionUtils.bytesToShort(HexFormat.of().parseHex("8000")));
+        assertEquals((short) 0, ByteConversionHandlers.bytesToShort(HexFormat.of().parseHex("0000")));
+        assertEquals((short) 1234, ByteConversionHandlers.bytesToShort(HexFormat.of().parseHex("04d2")));
+        assertEquals((short) 32767, ByteConversionHandlers.bytesToShort(HexFormat.of().parseHex("7fff")));
+        assertEquals((short) -1234, ByteConversionHandlers.bytesToShort(HexFormat.of().parseHex("fb2e")));
+        assertEquals((short) -32768, ByteConversionHandlers.bytesToShort(HexFormat.of().parseHex("8000")));
 
         // Test exception
-        assertThrowsExactly(LengthException.class, () -> ByteConversionUtils.bytesToShort(new byte[]{(byte) 0x12}));
+        assertThrowsExactly(LengthException.class, () -> ByteConversionHandlers.bytesToShort(new byte[]{(byte) 0x12}));
     }
 
     @Test
     void bytesToInt() {
         // Test conversion
-        assertEquals(0, ByteConversionUtils.bytesToInt(HexFormat.of().parseHex("00000000")));
-        assertEquals(1234, ByteConversionUtils.bytesToInt(HexFormat.of().parseHex("000004d2")));
-        assertEquals(1234567890, ByteConversionUtils.bytesToInt(HexFormat.of().parseHex("499602d2")));
-        assertEquals(2147483647, ByteConversionUtils.bytesToInt(HexFormat.of().parseHex("7fffffff")));
-        assertEquals(-1234567890, ByteConversionUtils.bytesToInt(HexFormat.of().parseHex("b669fd2e")));
-        assertEquals(-2147483647, ByteConversionUtils.bytesToInt(HexFormat.of().parseHex("80000001")));
+        assertEquals(0, ByteConversionHandlers.bytesToInt(HexFormat.of().parseHex("00000000")));
+        assertEquals(1234, ByteConversionHandlers.bytesToInt(HexFormat.of().parseHex("000004d2")));
+        assertEquals(1234567890, ByteConversionHandlers.bytesToInt(HexFormat.of().parseHex("499602d2")));
+        assertEquals(2147483647, ByteConversionHandlers.bytesToInt(HexFormat.of().parseHex("7fffffff")));
+        assertEquals(-1234567890, ByteConversionHandlers.bytesToInt(HexFormat.of().parseHex("b669fd2e")));
+        assertEquals(-2147483647, ByteConversionHandlers.bytesToInt(HexFormat.of().parseHex("80000001")));
 
         // Test exception
-        assertThrowsExactly(LengthException.class, () -> ByteConversionUtils.bytesToInt(new byte[]{(byte) 0x12}));
+        assertThrowsExactly(LengthException.class, () -> ByteConversionHandlers.bytesToInt(new byte[]{(byte) 0x12}));
     }
 
     @Test
@@ -172,39 +172,39 @@ class ByteConversionUtilsTest {
         // Test conversion
         assertEquals(
                 65.43,
-                ByteConversionUtils.bytesToDouble(HexFormat.of().parseHex("40505b851eb851ec")),
+                ByteConversionHandlers.bytesToDouble(HexFormat.of().parseHex("40505b851eb851ec")),
                 1e-10
         );
         assertEquals(
                 -123.45,
-                ByteConversionUtils.bytesToDouble(HexFormat.of().parseHex("c05edccccccccccd")),
+                ByteConversionHandlers.bytesToDouble(HexFormat.of().parseHex("c05edccccccccccd")),
                 1e-10
         );
         assertEquals(
                 9876.54321,
-                ByteConversionUtils.bytesToDouble(HexFormat.of().parseHex("40c34a4587e7c06e")),
+                ByteConversionHandlers.bytesToDouble(HexFormat.of().parseHex("40c34a4587e7c06e")),
                 1e-10
         );
         assertEquals(
                 3.14159265,
-                ByteConversionUtils.bytesToDouble(HexFormat.of().parseHex("400921fb53c8d4f1")),
+                ByteConversionHandlers.bytesToDouble(HexFormat.of().parseHex("400921fb53c8d4f1")),
                 1e-10
         );
         assertEquals(
                 -0.000082147128481,
-                ByteConversionUtils.bytesToDouble(HexFormat.of().parseHex("bf1588ccebd0259f")),
+                ByteConversionHandlers.bytesToDouble(HexFormat.of().parseHex("bf1588ccebd0259f")),
                 1e-16
         );
 
         // Test exception
-        assertThrowsExactly(LengthException.class, () -> ByteConversionUtils.bytesToDouble(new byte[]{(byte) 0x12}));
+        assertThrowsExactly(LengthException.class, () -> ByteConversionHandlers.bytesToDouble(new byte[]{(byte) 0x12}));
     }
 
     @Test
     void bytesToString() {
         assertEquals(
                 "Az ?5",
-                ByteConversionUtils.bytesToString(
+                ByteConversionHandlers.bytesToString(
                         new byte[]{(byte) 0x41, (byte) 0x7a, (byte) 0x20, (byte) 0x3f, (byte) 0x35}
                 )
         );
@@ -227,7 +227,7 @@ class ByteConversionUtilsTest {
         // Run test
         assertArrayEquals(
                 array,
-                ByteConversionUtils.bytesToOneDimensionalIntegerArray(HexFormat.of().parseHex(hexStr))
+                ByteConversionHandlers.bytesToOneDimensionalIntegerArray(HexFormat.of().parseHex(hexStr))
         );
     }
 
@@ -247,7 +247,7 @@ class ByteConversionUtilsTest {
         // Run test
         assertArrayEquals(
                 array,
-                ByteConversionUtils.bytesToOneDimensionalDoubleArray(HexFormat.of().parseHex(hexStr))
+                ByteConversionHandlers.bytesToOneDimensionalDoubleArray(HexFormat.of().parseHex(hexStr))
         );
     }
 
@@ -269,7 +269,7 @@ class ByteConversionUtilsTest {
         // Run test
         assertArrayEquals(
                 array,
-                ByteConversionUtils.bytesToTwoDimensionalIntegerArray(HexFormat.of().parseHex(hexStr))
+                ByteConversionHandlers.bytesToTwoDimensionalIntegerArray(HexFormat.of().parseHex(hexStr))
         );
     }
 }

@@ -19,7 +19,7 @@
 package app.auditranscribe.io.audt_file.base;
 
 import app.auditranscribe.generic.LoggableClass;
-import app.auditranscribe.utils.ByteConversionUtils;
+import app.auditranscribe.io.ByteConversionHandlers;
 import app.auditranscribe.io.CompressionHandlers;
 import app.auditranscribe.io.audt_file.AUDTFileConstants;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
@@ -113,7 +113,7 @@ public abstract class AUDTFileReader extends LoggableClass {
             // Try and get the file version
             inputStream.skipNBytes(20L);  // First 20 is the header
             byte[] fileVersionBytes = inputStream.readNBytes(4);  // 4 bytes per integer
-            fileVersion = ByteConversionUtils.bytesToInt(fileVersionBytes);
+            fileVersion = ByteConversionHandlers.bytesToInt(fileVersionBytes);
         }
 
         try (InputStream inputStream = new FileInputStream(filepath)) {  // Do this so that the read point is the start
@@ -255,7 +255,7 @@ public abstract class AUDTFileReader extends LoggableClass {
         byte[] booleanBytes = Arrays.copyOfRange(bytes, bytePos, ++bytePos);  // Increment then return
 
         // Convert these boolean bytes back into a boolean and return
-        return ByteConversionUtils.bytesToBoolean(booleanBytes);
+        return ByteConversionHandlers.bytesToBoolean(booleanBytes);
     }
 
     /**
@@ -269,7 +269,7 @@ public abstract class AUDTFileReader extends LoggableClass {
         bytePos += 2;
 
         // Convert these short bytes back into a short and return
-        return ByteConversionUtils.bytesToShort(shortBytes);
+        return ByteConversionHandlers.bytesToShort(shortBytes);
     }
 
     /**
@@ -283,7 +283,7 @@ public abstract class AUDTFileReader extends LoggableClass {
         bytePos += 4;
 
         // Convert these integer bytes back into an integer and return
-        return ByteConversionUtils.bytesToInt(integerBytes);
+        return ByteConversionHandlers.bytesToInt(integerBytes);
     }
 
     /**
@@ -297,7 +297,7 @@ public abstract class AUDTFileReader extends LoggableClass {
         bytePos += 8;
 
         // Convert these double bytes back into a double and return
-        return ByteConversionUtils.bytesToDouble(doubleBytes);
+        return ByteConversionHandlers.bytesToDouble(doubleBytes);
     }
 
     /**
@@ -314,7 +314,7 @@ public abstract class AUDTFileReader extends LoggableClass {
         bytePos += numBytes;
 
         // Convert these string bytes back into a string and return
-        return ByteConversionUtils.bytesToString(stringBytes);
+        return ByteConversionHandlers.bytesToString(stringBytes);
     }
 
     /**
@@ -351,7 +351,7 @@ public abstract class AUDTFileReader extends LoggableClass {
         byte[] decompressedBytes = CompressionHandlers.lz4Decompress(compressedBytes);
 
         // Convert these bytes back into the 1D array and return
-        return ByteConversionUtils.bytesToOneDimensionalIntegerArray(decompressedBytes);
+        return ByteConversionHandlers.bytesToOneDimensionalIntegerArray(decompressedBytes);
     }
 
     /**
@@ -371,7 +371,7 @@ public abstract class AUDTFileReader extends LoggableClass {
         byte[] decompressedBytes = CompressionHandlers.lz4Decompress(compressedBytes);
 
         // Convert these bytes back into the 1D array and return
-        return ByteConversionUtils.bytesToOneDimensionalDoubleArray(decompressedBytes);
+        return ByteConversionHandlers.bytesToOneDimensionalDoubleArray(decompressedBytes);
     }
 
     /**
