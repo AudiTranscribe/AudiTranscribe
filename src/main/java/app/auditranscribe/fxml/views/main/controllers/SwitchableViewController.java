@@ -20,10 +20,12 @@ package app.auditranscribe.fxml.views.main.controllers;
 
 import app.auditranscribe.fxml.views.AbstractViewController;
 import app.auditranscribe.fxml.views.main.SceneSwitcher;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 
 /**
  * Abstract controller for views that are involved with the scene switcher.
  */
+@ExcludeFromGeneratedCoverageReport
 public abstract class SwitchableViewController extends AbstractViewController {
     // Attributes
     SceneSwitcher.State state;

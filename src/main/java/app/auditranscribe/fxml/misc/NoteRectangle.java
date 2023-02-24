@@ -46,7 +46,7 @@ import java.util.*;
 import java.util.logging.Level;
 
 /**
- * A `StackPane` object that is used to denote a note in the transcription view.
+ * A <code>StackPane</code> object that is used to denote a note in the transcription view.
  */
 @ExcludeFromGeneratedCoverageReport
 public class NoteRectangle extends StackPane {

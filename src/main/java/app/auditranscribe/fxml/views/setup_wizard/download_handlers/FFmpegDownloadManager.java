@@ -20,6 +20,7 @@ package app.auditranscribe.fxml.views.setup_wizard.download_handlers;
 
 import app.auditranscribe.io.CompressionHandlers;
 import app.auditranscribe.io.IOMethods;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.network.DownloadTask;
 import app.auditranscribe.system.OSMethods;
 import app.auditranscribe.system.OSType;
@@ -32,6 +33,7 @@ import java.util.logging.Level;
 /**
  * Class that handles the downloading, unpackaging, and installation of FFmpeg.
  */
+@ExcludeFromGeneratedCoverageReport
 public class FFmpegDownloadManager extends AbstractDownloadManager {
     // Attributes
     private final OSType os;

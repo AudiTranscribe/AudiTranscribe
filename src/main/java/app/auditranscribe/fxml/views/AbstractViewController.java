@@ -23,6 +23,7 @@ import app.auditranscribe.fxml.Theme;
 import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.data_files.DataFiles;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.Region;
 
@@ -32,6 +33,7 @@ import java.util.List;
 /**
  * An abstract view controller that defines some useful methods for use in other view controllers.
  */
+@ExcludeFromGeneratedCoverageReport
 public abstract class AbstractViewController extends LoggableClass implements Initializable {
     // Constants
     public final static List<AbstractViewController> ACTIVE_VIEW_CONTROLLERS = new ArrayList<>();

@@ -25,6 +25,7 @@ import app.auditranscribe.fxml.views.main.SceneSwitcher;
 import app.auditranscribe.generic.tuples.Pair;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.fxml.spinners.CustomDoubleSpinnerValueFactory;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.music.MusicKey;
 import app.auditranscribe.utils.GUIUtils;
 import javafx.fxml.FXML;
@@ -43,6 +44,7 @@ import java.util.ResourceBundle;
 /**
  * Controller for the project setup view.
  */
+@ExcludeFromGeneratedCoverageReport
 public class ProjectSetupViewController extends AbstractViewController {
     // Attributes
     private File audioFile;

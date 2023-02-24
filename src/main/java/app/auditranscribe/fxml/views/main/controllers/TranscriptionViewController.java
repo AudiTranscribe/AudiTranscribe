@@ -46,6 +46,7 @@ import app.auditranscribe.io.data_files.DataFiles;
 import app.auditranscribe.io.db.ProjectsDB;
 import app.auditranscribe.misc.CustomTask;
 import app.auditranscribe.fxml.spinners.CustomDoubleSpinnerValueFactory;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.music.*;
 import app.auditranscribe.music.playback.MIDIInstrument;
 import app.auditranscribe.music.playback.NotePlayerSequencer;
@@ -89,6 +90,7 @@ import java.util.logging.Level;
 /**
  * Controller for the transcription view.
  */
+@ExcludeFromGeneratedCoverageReport
 public class TranscriptionViewController extends SwitchableViewController {
     // Constants
     public static final Pair<Integer, Integer> BPM_RANGE = new Pair<>(1, 512);  // In the format [min, max]

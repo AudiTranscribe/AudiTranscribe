@@ -21,6 +21,7 @@ package app.auditranscribe.fxml.views.setup_wizard.controllers;
 import app.auditranscribe.fxml.Theme;
 import app.auditranscribe.fxml.views.AbstractViewController;
 import app.auditranscribe.io.data_files.DataFiles;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -33,6 +34,7 @@ import java.util.ResourceBundle;
 /**
  * Controller that helps set up the theme for AudiTranscribe.
  */
+@ExcludeFromGeneratedCoverageReport
 public class ThemeSetupViewController extends AbstractViewController {
     // FXML elements
     @FXML

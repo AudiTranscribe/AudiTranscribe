@@ -31,6 +31,7 @@ import app.auditranscribe.io.data_files.DataFiles;
 import app.auditranscribe.io.data_files.data_encapsulators.SettingsData;
 import app.auditranscribe.misc.CustomLogger;
 import app.auditranscribe.fxml.spinners.CustomIntegerSpinnerValueFactory;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.music.NoteUnit;
 import app.auditranscribe.signal.windowing.SignalWindow;
 import app.auditranscribe.utils.GUIUtils;
@@ -55,6 +56,7 @@ import java.util.logging.Level;
 /**
  * Controller for the settings view.
  */
+@ExcludeFromGeneratedCoverageReport
 public class SettingsViewController extends AbstractViewController {
     // Attributes
     private String lastValidFFmpegPath;

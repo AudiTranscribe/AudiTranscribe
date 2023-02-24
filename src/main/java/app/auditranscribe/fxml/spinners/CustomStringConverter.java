@@ -18,6 +18,7 @@
 
 package app.auditranscribe.fxml.spinners;
 
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import javafx.util.StringConverter;
 
 /**
@@ -25,6 +26,7 @@ import javafx.util.StringConverter;
  *
  * @param <T> Type to convert a string to.
  */
+@ExcludeFromGeneratedCoverageReport
 public abstract class CustomStringConverter<T> extends StringConverter<T> {
     // Attributes
     public String prefix = "";

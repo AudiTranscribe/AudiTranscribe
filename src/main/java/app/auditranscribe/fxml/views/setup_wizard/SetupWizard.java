@@ -26,6 +26,7 @@ import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.data_files.DataFiles;
 import app.auditranscribe.io.data_files.data_encapsulators.SettingsData;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -36,6 +37,7 @@ import java.net.URL;
 /**
  * Handles the setup wizard processes.
  */
+@ExcludeFromGeneratedCoverageReport
 public class SetupWizard extends LoggableClass {
     // Attributes
     private final Stage stage;
