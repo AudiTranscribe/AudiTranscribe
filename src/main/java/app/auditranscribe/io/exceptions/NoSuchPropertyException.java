@@ -1,6 +1,6 @@
 /*
  * NoSuchPropertyException.java
- * Description: Exception to mark when a property file does not have the specified property.
+ * Description: Exception thrown when a property file does not have the specified property.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -19,9 +19,9 @@
 package app.auditranscribe.io.exceptions;
 
 /**
- * Exception to mark when a property file does not have the specified property.
+ * Exception thrown when a property file does not have the specified property.
  */
-public class NoSuchPropertyException extends RuntimeException {
+public class NoSuchPropertyException extends Exception {
     public NoSuchPropertyException() {
     }
 

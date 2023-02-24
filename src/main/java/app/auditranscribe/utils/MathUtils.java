@@ -1,6 +1,6 @@
 /*
  * MathUtils.java
- * Description: Mathematical utility methods.
+ * Description: Mathematical utilities.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -24,14 +24,43 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 /**
- * Mathematical utility methods.
+ * Mathematical utilities.
  */
 public final class MathUtils {
     private MathUtils() {
         // Private constructor to signal this is a utility class
     }
 
-    // General mathematical methods
+    // Arithmetic-related methods
+
+    /**
+     * Computes the log base 2 of an integer.
+     *
+     * @param x Integer to compute the log base 2 of.
+     * @return Log base 2 of the provided integer, rounded down.
+     * @implNote Adapted from <a href="https://stackoverflow.com/a/3305710">this StackOverflow
+     * answer</a>.
+     */
+    public static int binlog(int x) {
+        int log = 0;
+        if ((x & 0xffff0000) != 0) {
+            x >>>= 16;
+            log = 16;
+        }
+        if (x >= 256) {
+            x >>>= 8;
+            log += 8;
+        }
+        if (x >= 16) {
+            x >>>= 4;
+            log += 4;
+        }
+        if (x >= 4) {
+            x >>>= 2;
+            log += 2;
+        }
+        return log + (x >>> 1);
+    }
 
     /**
      * Method to calculate the log base 2 of the number <code>x</code>.
@@ -40,28 +69,7 @@ public final class MathUtils {
      * @return Log base 2 of <code>x</code>.
      */
     public static double log2(double x) {
-        return Math.log(x) * 1.4426950408889634;  // ln x * (1/ln 2), to 16 dp
-    }
-
-    /**
-     * Method to calculate the log base <code>n</code> of the number <code>x</code>.
-     *
-     * @param x Number to take the log base <code>n</code> of.
-     * @param n The base of the logarithm.
-     * @return Log base <code>n</code> of <code>x</code>.
-     * @throws ValueException If the base of the logarithm is not positive, or is 1.
-     */
-    public static double logN(double x, double n) {
-        // Validate `n`
-        if (n <= 0 || n == 1) {
-            throw new ValueException("Invalid value for the base of logarithm: " + n);
-        }
-
-        // Special case of `n = 2` as we already handle it
-        if (n == 2) return log2(x);
-
-        // Return the logarithm
-        return Math.log(x) / Math.log(n);
+        return Math.log(x) * 1.442695040888963;  // ln x * (1/ln 2), to 16 sf
     }
 
     /**
@@ -69,17 +77,35 @@ public final class MathUtils {
      * Assumes that both <code>p</code> and <code>q</code> are <b>positive integers</b>.
      *
      * @return Ceiling division of <code>p</code> by <code>q</code>.
-     * @implNote See <a href="https://stackoverflow.com/a/2745086">this StackOverflow answer</a> by
-     * Sparky.
+     * @implNote See <a href="https://stackoverflow.com/a/2745086">this StackOverflow answer</a>.
      */
     public static int ceilDiv(int p, int q) {
         return 1 + ((p - 1) / q);
     }
 
+    // Trigonometric/angular methods
+
+    /**
+     * Obtain the principal argument of the provided angle.<br>
+     * The principal argument is in the semi-closed interval (-π, π].
+     *
+     * @param angle Angle in radians.
+     * @return Principal argument of the angle.
+     */
+    public static double principalArg(double angle) {
+        double proportion = angle / (2. * Math.PI);
+
+        int integralPart = (int) proportion;
+        double decimalPart = proportion - integralPart;  // Not that precise but good enough
+        if (decimalPart > 0.5) integralPart++;  // We want to round half down
+
+        return angle - 2. * Math.PI * integralPart;
+    }
+
     // Data-related methods
 
     /**
-     * Linearly interpolate the two values <code>a</code> and <code>b</code> by the scaling factor
+     * Linearly interpolate the two integers <code>a</code> and <code>b</code> by the scaling factor
      * <code>x</code>.
      *
      * @param a First value.
@@ -102,10 +128,12 @@ public final class MathUtils {
      * @param x Scaling factor.
      * @return A <b>double</b> representing the linearly interpolated value.<br>
      * If <code>x = 0</code> then this will return <code>a</code>.
-     * If <code>x = 1</code> then this will return <code>b</code>.
+     * If <code>x = 1</code> then this will return <code>b</code> (approximately).
+     * @implNote Uses the form <code>a + (b - a) * x</code>, so may not return precise results when
+     * <code>x = 1</code>.
      */
     public static double lerp(double a, double b, double x) {
-        return (a + (b - a) * x);
+        return a + (b - a) * x;
     }
 
     /**
@@ -133,25 +161,6 @@ public final class MathUtils {
      */
     public static double normalize(double x, double min, double max) {
         return normalize(x, min, max, 0, 1);
-    }
-
-    /**
-     * Rounds the double <code>x</code> to <code>dp</code> decimal places.
-     *
-     * @param x  The double.
-     * @param dp Number of decimal places to round to.
-     * @return Rounded double.
-     * @throws ValueException If the number of decimal places (<code>dp</code>) is less than 0.
-     * @implNote If <code>x</code> is <code>NaN</code> then the rounding will also return
-     * <code>NaN</code>.
-     */
-    public static double round(double x, int dp) {
-        if (Double.isNaN(x)) return Double.NaN;
-        if (dp < 0) throw new ValueException("Invalid number of decimal places: " + dp);
-
-        BigDecimal bd = new BigDecimal(Double.toString(x));
-        bd = bd.setScale(dp, RoundingMode.HALF_UP);
-        return bd.doubleValue();
     }
 
     // Combinatorial methods
@@ -221,22 +230,29 @@ public final class MathUtils {
      */
     public static boolean isPowerOf2(int x) {
         if (x <= 0) throw new ValueException("The provided integer must be positive");
+
+        /*
+        The following check works because if `x` is a power of 2 (say 128) it would look like this:
+            10000000
+        Note that `x - 1` would then look like
+            01111111
+        and so computing the bitwise and (&) of `x` and `x-1` would yield 0.
+         */
         return (x & (x - 1)) == 0;
     }
 
-    // Misc methods
+    // Miscellaneous mathematical methods
 
     /**
      * Return how many times the integer <code>x</code> can be evenly divided by 2.
-     * Returns 0 for non-positive integers.
      *
      * @param x The integer in question.
-     * @return Number of times <code>x</code> can be divided by 2 if <code>x</code> is positive;
-     * zero otherwise.
+     * @return Number of times <code>x</code> can be divided by 2.<br>
+     * Note that if <code>x</code> is 0, will return 0.
      */
     public static int numTwoFactors(int x) {
-        // If `x` is not positive, then return 0 by definition
-        if (x <= 0) return 0;
+        // If `x` is 0 return 0
+        if (x == 0) return 0;
 
         // Compute the number of factors of two
         int numTwos = 0;
@@ -250,73 +266,21 @@ public final class MathUtils {
     }
 
     /**
-     * Method that wraps a value to the appropriate value within the range <code>min</code> to
-     * <code>max</code>, where <code>min</code> is inclusive and <code>max</code> is exclusive.
+     * Rounds the double <code>x</code> to <code>dp</code> decimal places.
      *
-     * @param value Value to wrap.
-     * @param min   Minimum value.
-     * @param max   Maximum value.
-     * @return Wrapped value.
-     * @throws ValueException If:<ul>
-     *                        <li>
-     *                        The maximum value is not a positive integer.
-     *                        </li>
-     *                        <li>
-     *                        The minimum value is larger than or equal to the maximum value.
-     *                        </li>
-     *                        </ul>
+     * @param x  The double.
+     * @param dp Number of decimal places to round <code>x</code> to.
+     * @return Rounded double.
+     * @throws ValueException If the number of decimal places <code>dp</code> is less than 0.
+     * @implNote If <code>x</code> is <code>NaN</code> then the rounding will also return
+     * <code>NaN</code>.
      */
-    public static int wrapValue(int value, int min, int max) {
-        // Check if the values are valid
-        if (max <= 0) {
-            throw new ValueException("The maximum value must be a positive integer.");
-        }
+    public static double round(double x, int dp) {
+        if (Double.isNaN(x)) return Double.NaN;
+        if (dp < 0) throw new ValueException("Invalid number of decimal places: " + dp);
 
-        if (min >= max) {
-            throw new ValueException("The minimum value must be smaller than the maximum value.");
-        }
-
-        // Perform actual computation
-        int r = value % max;
-        if (r < min) {
-            r += max - min;
-        }
-        return r;
-    }
-
-    /**
-     * Method that wraps a value to the maximum value if the value is smaller than the maximum value
-     * and wraps to the minimum if the value is larger than the minimum value.
-     *
-     * @param value Value to wrap.
-     * @param min   Minimum value.
-     * @param max   Maximum value.
-     * @return Wrapped value.
-     * @throws ValueException If:<ul>
-     *                        <li>
-     *                        The maximum value is not a positive number.
-     *                        </li>
-     *                        <li>
-     *                        The minimum value is larger than the maximum value.
-     *                        </li>
-     *                        </ul>
-     */
-    public static BigDecimal wrapValue(BigDecimal value, BigDecimal min, BigDecimal max) {
-        // Check if the values are valid
-        if (max.doubleValue() <= 0) {
-            throw new ValueException("The maximum value must be a positive number.");
-        }
-
-        if (min.compareTo(max) >= 0) {
-            throw new ValueException("The minimum value must be smaller than to the maximum value.");
-        }
-
-        // Perform actual computation
-        if (value.compareTo(min) < 0) {
-            return max;
-        } else if (value.compareTo(max) > 0) {
-            return min;
-        }
-        return value;
+        BigDecimal bd = new BigDecimal(Double.toString(x));
+        bd = bd.setScale(dp, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 }

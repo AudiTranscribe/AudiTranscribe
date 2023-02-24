@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="rootPane" alignment="CENTER" prefHeight="200.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.auditranscribe.fxml.views.setup_wizard.controllers.DownloadingFFmpegViewController">
+   <children>
+      <Label alignment="CENTER" styleClass="download-ffmpeg-label" text="Downloading FFmpeg" />
+      <ProgressBar fx:id="downloadProgressBar" maxWidth="1.7976931348623157E308" prefHeight="40.0" progress="0.0">
+         <padding>
+            <Insets bottom="5.0" left="50.0" right="50.0" top="5.0" />
+         </padding>
+      </ProgressBar>
+      <HBox alignment="TOP_CENTER" spacing="5.0">
+         <children>
+            <Label fx:id="currDownloadAmountLabel" text="0.00" />
+            <Label layoutX="10.0" layoutY="10.0" text="MB" />
+            <Label text="/" />
+            <Label fx:id="fileSizeLabel" text="0.00" />
+            <Label text="MB" />
+         </children>
+      </HBox>
+      <Label alignment="CENTER" styleClass="download-description" text="Please wait while we download and install FFmpeg.">
+         <padding>
+            <Insets top="15.0" />
+         </padding></Label>
+   </children>
+   <stylesheets>
+      <URL value="@../../css/base.css" />
+      <URL value="@../../css/views/setup-wizard/common.css" />
+      <URL value="@../../css/views/setup-wizard/downloading-ffmpeg-view.css" />
+      <URL value="@../../css/theme/shared-colours.css" />
+      <URL value="@../../css/theme/light.css" />
+   </stylesheets>
+</VBox>

@@ -1,6 +1,6 @@
 /*
  * UpdateChecker.java
- * Description: Class that assists with the checking of updates from the API server.
+ * Description: Assists with the checking of updates from the GitHub repository.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -18,11 +18,11 @@
 
 package app.auditranscribe;
 
-import app.auditranscribe.generic.ClassWithLogging;
+import app.auditranscribe.fxml.Popups;
+import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.generic.tuples.Pair;
 import app.auditranscribe.io.data_files.DataFiles;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
-import app.auditranscribe.misc.Popups;
 import app.auditranscribe.misc.Version;
 import app.auditranscribe.utils.GUIUtils;
 import app.auditranscribe.utils.MiscUtils;
@@ -37,17 +37,20 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.Optional;
 import java.util.logging.Level;
 
 /**
- * Class that assists with the checking of updates from the API server.
+ * Assists with the checking of updates from the GitHub repository.
  */
 @ExcludeFromGeneratedCoverageReport
-public class UpdateChecker extends ClassWithLogging {
+public class UpdateChecker extends LoggableClass {
     // Constants
-    public static int CONNECTION_TIMEOUT = 1500;  // In milliseconds; duration to wait for connecting to server
+    public static int CONNECTION_TIMEOUT = 1500;  // In milliseconds
     public static int READ_TIMEOUT = 2500;
+
+    public static int UPDATE_CHECKING_PAUSE_DURATION = 86400;  // In seconds; 1 day
 
     public static String AUDITRANSCRIBE_REPO = "AudiTranscribe/AudiTranscribe";
 
@@ -62,9 +65,9 @@ public class UpdateChecker extends ClassWithLogging {
     public static void checkForUpdates(String currentVersion) {
         // Determine if we need to check for updates
         int currentTime = (int) MiscUtils.getUnixTimestamp();
-        int lastChecked = DataFiles.PERSISTENT_DATA_FILE.data.lastCheckedForUpdates;
-        int interval = DataFiles.SETTINGS_DATA_FILE.data.checkForUpdateInterval;
-        if (currentTime - lastChecked <= interval * 3600) {  // 3600 s = 1 h
+        int pausedUntil = DataFiles.PERSISTENT_DATA_FILE.data.updateCheckingPausedUntil;
+        if (currentTime < pausedUntil) {
+            log(Level.INFO, "Update checking paused until " + pausedUntil, UpdateChecker.class.getName());
             return;
         }
 
@@ -97,15 +100,16 @@ public class UpdateChecker extends ClassWithLogging {
                     // Send user to the new release page
                     String urlString = "https://auditranscribe.app/release?tag=" + newVersionTag;
                     GUIUtils.openURLInBrowser(urlString);
+                } else if (selectedButton.get() == remindLater) {
+                    // Suppress alert for a set duration
+                    DataFiles.PERSISTENT_DATA_FILE.data.updateCheckingPausedUntil =
+                            currentTime + UPDATE_CHECKING_PAUSE_DURATION;
+                    DataFiles.PERSISTENT_DATA_FILE.saveFile();
                 }
             }
         } else {
             log(Level.INFO, "AudiTranscribe is up to date", UpdateChecker.class.getName());
         }
-
-        // Supress alert for a set duration
-        DataFiles.PERSISTENT_DATA_FILE.data.lastCheckedForUpdates = currentTime;
-        DataFiles.PERSISTENT_DATA_FILE.saveFile();
     }
 
     // Private methods
@@ -180,7 +184,15 @@ public class UpdateChecker extends ClassWithLogging {
                 );
             }
         } catch (IOException e) {
-            logException(e);
+            if (e instanceof UnknownHostException) {
+                log(
+                        Level.SEVERE,
+                        "Could not reach '" + e.getMessage() + "'; is internet access available?",
+                        UpdateChecker.class.getName()
+                );
+            } else {
+                logException(e);
+            }
             tags = new Version[0];
         }
         return tags;

@@ -1,50 +1,24 @@
-/*
- * MathUtilsTest.java
- * Description: Test `MathUtils.java`.
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
- * Licence, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public Licence for more details.
- *
- * You should have received a copy of the GNU General Public Licence along with this program. If
- * not, see <https://www.gnu.org/licenses/>
- *
- * Copyright © AudiTranscribe Team
- */
-
 package app.auditranscribe.utils;
 
-import org.junit.jupiter.api.Test;
 import app.auditranscribe.generic.exceptions.ValueException;
-
-import java.math.BigDecimal;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class MathUtilsTest {
-    // Arithmetic-Related methods
+    // Arithmetic-related methods
     @Test
-    void log2() {
-        assertEquals(2, MathUtils.log2(4), 0.001);
-        assertEquals(2.322, MathUtils.log2(5), 0.001);
-        assertEquals(7, MathUtils.log2(128), 0.001);
+    void binlog() {
+        assertEquals(2, MathUtils.binlog(4));
+        assertEquals(2, MathUtils.binlog(5));
+        assertEquals(7, MathUtils.binlog(128));
     }
 
     @Test
-    void logN() {
-        assertEquals(2.322, MathUtils.logN(5, 2), 0.001);
-        assertEquals(1, MathUtils.logN(Math.PI, Math.PI), 0.001);
-        assertEquals(2.090, MathUtils.logN(123, 10), 0.001);
-        assertEquals(1.272, MathUtils.logN(456, 123), 0.001);
-        assertEquals(-3.183, MathUtils.logN(789, 0.123), 0.001);
-
-        assertThrowsExactly(ValueException.class, () -> MathUtils.logN(123, 1));
-        assertThrowsExactly(ValueException.class, () -> MathUtils.logN(123, 0));
-        assertThrowsExactly(ValueException.class, () -> MathUtils.logN(123, -1.23));
+    void log2() {
+        assertEquals(2, MathUtils.log2(4), 1e-10);
+        assertEquals(2.3219280949, MathUtils.log2(5), 1e-10);
+        assertEquals(7, MathUtils.log2(128), 1e-10);
     }
 
     @Test
@@ -58,6 +32,24 @@ class MathUtilsTest {
         assertEquals(3, MathUtils.ceilDiv(654, 321));
         assertEquals(4, MathUtils.ceilDiv(987, 321));
         assertEquals(3, MathUtils.ceilDiv(789, 321));
+    }
+
+    // Trigonometric/angular methods
+    @Test
+    void principalArg() {
+        assertEquals(-Math.PI / 2, MathUtils.principalArg(-Math.PI / 2), 1e-5);
+        assertEquals(0, MathUtils.principalArg(0), 1e-5);
+        assertEquals(Math.PI / 2, MathUtils.principalArg(Math.PI / 2), 1e-5);
+        assertEquals(Math.PI, MathUtils.principalArg(Math.PI), 1e-5);
+
+        assertEquals(-Math.PI / 2, MathUtils.principalArg(-5 * Math.PI / 2), 1e-5);
+        assertEquals(0, MathUtils.principalArg(2 * Math.PI), 1e-5);
+        assertEquals(Math.PI / 2, MathUtils.principalArg(9 * Math.PI / 2), 1e-5);
+        assertEquals(Math.PI, MathUtils.principalArg(9 * Math.PI), 1e-5);
+
+        assertEquals(-2.28319, MathUtils.principalArg(4), 1e-5);
+        assertEquals(0.71681, MathUtils.principalArg(7), 1e-5);
+        assertEquals(-2.56637, MathUtils.principalArg(10), 1e-5);
     }
 
     // Data-related methods
@@ -99,18 +91,6 @@ class MathUtilsTest {
         assertEquals(4.3571, MathUtils.normalize(4, -1, 13, 4, 5), 1e-4);
     }
 
-    @Test
-    void round() {
-        // Main rounding
-        assertEquals(1.23, MathUtils.round(1.23, 2));
-        assertEquals(1.23, MathUtils.round(1.23456, 2));
-        assertEquals(1, MathUtils.round(1, 3));
-        assertEquals(Double.NaN, MathUtils.round(Double.NaN, 4));
-
-        // Exception handling
-        assertThrowsExactly(ValueException.class, () -> MathUtils.round(123.45, -1));
-    }
-
     // Combinatorial methods
     @Test
     void selfProduct() {
@@ -142,7 +122,6 @@ class MathUtilsTest {
     }
 
     // Checking-related methods
-
     @Test
     void isPowerOf2() {
         assertTrue(MathUtils.isPowerOf2(1));
@@ -159,84 +138,27 @@ class MathUtilsTest {
         assertThrowsExactly(ValueException.class, () -> MathUtils.isPowerOf2(-4));
     }
 
-    // Misc methods
+    // Miscellaneous mathematical methods
     @Test
     void numTwoFactors() {
-        assertEquals(4, MathUtils.numTwoFactors(16));
+        assertEquals(6, MathUtils.numTwoFactors(1344));
         assertEquals(4, MathUtils.numTwoFactors(80));
+        assertEquals(4, MathUtils.numTwoFactors(16));
+        assertEquals(0, MathUtils.numTwoFactors(1));
+        assertEquals(0, MathUtils.numTwoFactors(0));
         assertEquals(0, MathUtils.numTwoFactors(-1));
+        assertEquals(4, MathUtils.numTwoFactors(-16));
+        assertEquals(4, MathUtils.numTwoFactors(-80));
+        assertEquals(6, MathUtils.numTwoFactors(-1344));
     }
 
     @Test
-    void wrapValue() {
-        assertEquals(9, MathUtils.wrapValue(-1, 0, 10));
-        assertEquals(0, MathUtils.wrapValue(0, 0, 10));
-        assertEquals(1, MathUtils.wrapValue(1, 0, 10));
-        assertEquals(9, MathUtils.wrapValue(9, 0, 10));
-        assertEquals(0, MathUtils.wrapValue(10, 0, 10));
-        assertEquals(1, MathUtils.wrapValue(11, 0, 10));
+    void round() {
+        assertEquals(1.23, MathUtils.round(1.23, 2));
+        assertEquals(1.23, MathUtils.round(1.23456, 2));
+        assertEquals(1, MathUtils.round(1, 3));
+        assertEquals(Double.NaN, MathUtils.round(Double.NaN, 4));
 
-        assertEquals(
-                new BigDecimal("0").doubleValue(),
-                MathUtils.wrapValue(
-                        new BigDecimal("10.00000001"),
-                        new BigDecimal("0"),
-                        new BigDecimal("10")
-                ).doubleValue(),
-                1e-6
-        );
-        assertEquals(
-                new BigDecimal("10").doubleValue(),
-                MathUtils.wrapValue(
-                        new BigDecimal("10"),
-                        new BigDecimal("0"),
-                        new BigDecimal("10")
-                ).doubleValue(),
-                1e-6
-        );
-        assertEquals(
-                new BigDecimal("9.99999999").doubleValue(),
-                MathUtils.wrapValue(
-                        new BigDecimal("9.99999999"),
-                        new BigDecimal("0"),
-                        new BigDecimal("10")
-                ).doubleValue(),
-                1e-6
-        );
-        assertEquals(
-                new BigDecimal("0.000001").doubleValue(),
-                MathUtils.wrapValue(
-                        new BigDecimal("0.000001"),
-                        new BigDecimal("0"),
-                        new BigDecimal("10")
-                ).doubleValue(),
-                1e-6
-        );
-        assertEquals(
-                new BigDecimal("0").doubleValue(),
-                MathUtils.wrapValue(
-                        new BigDecimal("0"),
-                        new BigDecimal("0"),
-                        new BigDecimal("10")
-                ).doubleValue(),
-                1e-6
-        );
-        assertEquals(
-                new BigDecimal("10").doubleValue(),
-                MathUtils.wrapValue(
-                        new BigDecimal("-0.000001"),
-                        new BigDecimal("0"),
-                        new BigDecimal("10")
-                ).doubleValue(),
-                1e-6
-        );
-
-        assertThrowsExactly(ValueException.class, () -> MathUtils.wrapValue(1, -2, -1));
-        assertThrowsExactly(ValueException.class, () -> MathUtils.wrapValue(0, 2, 1));
-        assertThrowsExactly(ValueException.class, () -> MathUtils.wrapValue(0, 1, 1));
-
-        assertThrowsExactly(ValueException.class, () -> MathUtils.wrapValue(new BigDecimal("1.2"), new BigDecimal("-2"), new BigDecimal("-1")));
-        assertThrowsExactly(ValueException.class, () -> MathUtils.wrapValue(new BigDecimal("1.2"), new BigDecimal("2"), new BigDecimal("1")));
-        assertThrowsExactly(ValueException.class, () -> MathUtils.wrapValue(BigDecimal.ZERO, new BigDecimal("1"), new BigDecimal("1")));
+        assertThrowsExactly(ValueException.class, () -> MathUtils.round(123.45, -1));
     }
 }

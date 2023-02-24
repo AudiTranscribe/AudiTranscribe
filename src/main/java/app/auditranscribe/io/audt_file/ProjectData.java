@@ -1,6 +1,6 @@
 /*
  * ProjectData.java
- * Description: Class that stores all the project's data.
+ * Description: Stores all of a project's data.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -19,11 +19,12 @@
 package app.auditranscribe.io.audt_file;
 
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 
 import java.util.Objects;
 
 /**
- * Class that stores all the project's data.
+ * Stores all of a project's data.
  */
 public class ProjectData {
     // Attributes
@@ -57,23 +58,21 @@ public class ProjectData {
         this.musicNotesData = musicNotesData;
     }
 
-    // Overridden methods
+    // Public methods
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null) return false;
-        if (getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         ProjectData that = (ProjectData) o;
-        return (
-                unchangingDataProperties.equals(that.unchangingDataProperties) &&
-                        qTransformData.equals(that.qTransformData) &&
-                        audioData.equals(that.audioData) &&
-                        projectInfoData.equals(that.projectInfoData) &&
-                        musicNotesData.equals(that.musicNotesData)
-        );
+        return Objects.equals(unchangingDataProperties, that.unchangingDataProperties) &&
+                Objects.equals(qTransformData, that.qTransformData) &&
+                Objects.equals(audioData, that.audioData) &&
+                Objects.equals(projectInfoData, that.projectInfoData) &&
+                Objects.equals(musicNotesData, that.musicNotesData);
     }
 
     @Override
+    @ExcludeFromGeneratedCoverageReport
     public int hashCode() {
         return Objects.hash(unchangingDataProperties, qTransformData, audioData, projectInfoData, musicNotesData);
     }

@@ -3,7 +3,7 @@
     <module name="AudiTranscribe" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="site.overwrite.auditranscribe.io.audt_file.*" />
+        <option name="PATTERN" value="app.auditranscribe.io.audt_file.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>

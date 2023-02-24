@@ -18,70 +18,90 @@
 
 package app.auditranscribe.audio;
 
-import app.auditranscribe.audio.exceptions.AudioIsSamplesOnlyException;
+import app.auditranscribe.audio.exceptions.AudioPlaybackNotSupported;
 import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.audio.exceptions.FFmpegNotFoundException;
-import app.auditranscribe.generic.ClassWithLogging;
-import app.auditranscribe.generic.exceptions.ValueException;
+import app.auditranscribe.audio.operators.*;
+import app.auditranscribe.generic.LoggableClass;
+import app.auditranscribe.generic.exceptions.LengthException;
 import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
-import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
-import app.auditranscribe.utils.ArrayUtils;
+import app.auditranscribe.io.data_files.DataFiles;
+import app.auditranscribe.misc.*;
+import app.auditranscribe.signal.windowing.SignalWindow;
 import app.auditranscribe.utils.MathUtils;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.util.Duration;
+import app.auditranscribe.utils.TypeConversionUtils;
 
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.sound.sampled.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.InvalidParameterException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 
 /**
- * Audio class that handles audio processing and audio playback.
+ * Class that handles audio processing and audio playback.
  */
 @ExcludeFromGeneratedCoverageReport
-public class Audio extends ClassWithLogging {
+public class Audio extends LoggableClass {
     // Constants
-    public static final int SAMPLES_BUFFER_SIZE = 1024;  // In bits; 1024 = 2^10
-    public static final double MAX_AUDIO_LENGTH = 5;  // Maximum length of audio in minutes
+    public static final int SAMPLES_BUFFER_SIZE = 1024;  // In number of samples
+    public static final int[] VALID_PLAYBACK_BUFFER_SIZES = {1024, 2048, 4096};  // In number of samples
+
+    public static final int SLOWDOWN_PROCESSING_LENGTH = 2048;
+    public static final int SLOWDOWN_ANALYSIS_LENGTH = 512;
+    public static final SignalWindow SLOWDOWN_WINDOW = SignalWindow.HANN_WINDOW;
+
+    final int OUT_CHANNEL_CAPACITY = 8192;  // In number of samples
+    final int OUT_SEGMENT_LENGTH = 1024;  // In number of samples
+
+    final int MAX_AUDIO_DURATION = 5;  // In minutes
 
     // Attributes
-    private final AudioInputStream audioStream;
+    private final File wavFile;
+
+    private AudioInputStream audioStream;
     private final AudioFormat audioFormat;
+
+    private final int numChannels;
+    private final int frameSize;
+    private final double frameRate;
     private final double sampleRate;
+    private final double duration;  // In seconds
 
-    private boolean isLatestPlayerSlowedPlayer;
+    final int bitsPerSample;
+    final int bytesPerSample;
 
-    private double pausedTime = 0;  // In seconds, for the main media player
-    private double duration = 0;    // In seconds
+    private double timeToResumeAt;   // Time that the audio should continue playing at upon resuming
+    private double prevElapsedTime;  // Time (in seconds) that was elapsed before a skip forwards/backwards
+    private double prevCurrTime;     // Last updated current time (in seconds) before a toggling of the audio speed
 
-    private final byte[] rawOriginalWAVBytes;
-    private byte[] rawSlowedWAVBytes;  // Empty unless set
-    private byte[] rawOriginalMP3Bytes;
-    private byte[] rawSlowedMP3Bytes;
+    private double volume = 1;
+    private boolean isPaused = false;
+    private boolean isSlowed = false;
 
-    private int numSamples;
-    private double[] audioSamples;
-    private double[] monoAudioSamples;  // Average of stereo samples
+    private boolean withPlayback = false;
+    private SourceDataLine sourceDataLine;
+    private StoppableThread audioPlaybackThread;
 
-    private final MediaPlayer mediaPlayer;
-    private final MediaPlayer slowedMediaPlayer;
+    private int numRawSamples;
+    private int numMonoSamples;
+    private double[] rawSamples;
+    private double[] monoSamples;
+
+    private final Vector<BlockingQueue<Byte>> outChannels = new Vector<>();
+    private final Vector<TimeStretchOperator> channelOperators = new Vector<>();
+
+    private byte[] rawMP3Bytes;
 
     /**
      * Initializes an <code>Audio</code> object based on a file.
      *
-     * @param wavFile         File object representing the WAV file to be used for both samples
-     *                        generation and audio playback.
-     * @param processingModes The processing modes when handling the audio file. Any number of
-     *                        processing modes can be included.
+     * @param wavFile         File object representing the WAV file to be used.
+     * @param processingModes The processing modes when handling the audio file.<br>
+     *                        Any number of processing modes can be included.
      *                        <ul>
      *                        <li>
      *                            <code>SAMPLES</code>: Generate audio samples.
@@ -90,132 +110,69 @@ public class Audio extends ClassWithLogging {
      *                            <code>PLAYBACK</code>: Allow audio playback.
      *                        </li>
      *                        </ul>
-     *                        Note that processing mode <code>WITH_SLOWDOWN</code> is <b>invalid</b>
-     *                        for this constructor.
      * @throws IOException                   If there was a problem reading in the audio stream.
      * @throws UnsupportedAudioFileException If there was a problem reading in the audio file.
      * @throws AudioTooLongException         If the audio file exceeds the maximum audio duration
      *                                       permitted.
      */
     public Audio(
-            File wavFile, AudioProcessingMode... processingModes
-    ) throws UnsupportedAudioFileException, IOException, AudioTooLongException {
-        this(wavFile, null, processingModes);
-    }
-
-    /**
-     * Initializes an <code>Audio</code> object based on a file.
-     *
-     * @param originalWAVFile File object representing the WAV file to be used for both samples
-     *                        generation and audio playback.
-     * @param slowedWAVFile   File object representing a slowed MP3 file that will be used for
-     *                        slowed audio playback.<br>
-     *                        Note that the tempo for this audio track should be <b>half</b> that
-     *                        of the original <code>originalWAVFile</code>'s tempo.
-     * @param processingModes The processing modes when handling the audio file. Any number of
-     *                        processing modes can be included.
-     *                        <ul>
-     *                        <li>
-     *                            <code>SAMPLES</code>: Generate audio samples.
-     *                        </li>
-     *                        <li>
-     *                            <code>PLAYBACK</code>: Allow audio playback.
-     *                        </li>
-     *                        <li>
-     *                            <code>WITH_SLOWDOWN</code>: Allow audio slowdown.
-     *                        </li>
-     *                        </ul>
-     * @throws IOException                   If there was a problem reading in the audio stream.
-     * @throws UnsupportedAudioFileException If there was a problem reading in the audio file.
-     * @throws AudioTooLongException         If the audio file exceeds the maximum audio duration
-     *                                       permitted.
-     */
-    public Audio(
-            File originalWAVFile, File slowedWAVFile, AudioProcessingMode... processingModes
+            File wavFile, ProcessingMode... processingModes
     ) throws UnsupportedAudioFileException, IOException, AudioTooLongException {
         // Convert the given processing modes as a list
-        List<AudioProcessingMode> modes = List.of(processingModes);
+        List<ProcessingMode> modes = List.of(processingModes);
 
-        // Generate audio samples
-        if (modes.contains(AudioProcessingMode.WITH_SAMPLES)) {
-            // Attempt to convert the input stream into an audio input stream
-            InputStream bufferedIn = new BufferedInputStream(new FileInputStream(originalWAVFile));
-            audioStream = AudioSystem.getAudioInputStream(bufferedIn);
+        // Attempt to convert the input stream into an audio input stream
+        this.wavFile = wavFile;
+        audioStream = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream(wavFile)));
 
-            // Get the audio file's audio format and audio file's sample rate
-            audioFormat = audioStream.getFormat();
-            sampleRate = audioFormat.getSampleRate();
+        // Get the audio file's audio format, and get the format's properties
+        audioFormat = audioStream.getFormat();
 
-            // Compute the duration of the audio file
-            long frames = audioStream.getFrameLength();
-            duration = frames / audioFormat.getFrameRate();  // In seconds
+        numChannels = audioFormat.getChannels();
+        frameSize = audioFormat.getFrameSize();
+        frameRate = audioFormat.getFrameRate();
+        sampleRate = audioFormat.getSampleRate();
 
-            // Check if duration is too long
-            double durationInMinutes = duration / 60;
+        // Calculate the number of bytes needed to store each sample
+        bitsPerSample = audioFormat.getSampleSizeInBits();
+        bytesPerSample = AudioHelpers.numBytesForNumBits(bitsPerSample);
 
-            if (durationInMinutes > MAX_AUDIO_LENGTH) {
-                throw new AudioTooLongException(
-                        "Audio file is too long (audio was " + durationInMinutes + " minutes but maximum allowed " +
-                                "is " + MAX_AUDIO_LENGTH + " minutes)"
-                );
-            }
+        // Compute the duration of the audio file
+        long frames = audioStream.getFrameLength();
+        duration = frames / frameRate;  // In seconds
 
-            // Generate audio samples
+        // Check if duration is too long
+        double durationInMinutes = duration / 60;
+
+        if (durationInMinutes > MAX_AUDIO_DURATION) {
+            throw new AudioTooLongException(
+                    "Audio file is too long (audio was " + durationInMinutes + " minutes but maximum allowed " +
+                            "is " + MAX_AUDIO_DURATION + " minutes)"
+            );
+        }
+
+        // Do a pre-check on whether playback is allowed
+        // (This is to prevent the setup of operators in the `resetAudioStream()` method in `generateSamples()` when it
+        // is called)
+        if (modes.contains(ProcessingMode.WITH_PLAYBACK)) withPlayback = true;
+
+        // Generate audio samples if requested
+        if (modes.contains(ProcessingMode.WITH_SAMPLES)) {
             generateSamples();
-        } else {
-            audioStream = null;
-            audioFormat = null;
-            sampleRate = Double.NaN;
         }
 
-        // Create the media player object if needed
-        if (modes.contains(AudioProcessingMode.WITH_PLAYBACK)) {
-            // Get the media player for the audio file
-            MediaPlayer tempMediaPlayer;
+        // Allow audio playback if requested
+        if (withPlayback) {
+            setAudioPlaybackThread();
 
-            try {
-                tempMediaPlayer = new MediaPlayer(new Media(originalWAVFile.toURI().toString()));
-            } catch (IllegalStateException e) {
-                tempMediaPlayer = null;
-                log(Level.SEVERE, "JavaFX Toolkit not initialized. Audio playback will not work.");
+            // Update out channels
+            for (int i = 0; i < numChannels; i++) {
+                outChannels.add(new LinkedBlockingQueue<>(OUT_CHANNEL_CAPACITY * bytesPerSample));
             }
-
-            // Update attributes
-            mediaPlayer = tempMediaPlayer;
         } else {
-            mediaPlayer = null;
+            sourceDataLine = null;
+            audioPlaybackThread = null;
         }
-
-        // Handle the two different kinds of playback options
-        if (modes.contains(AudioProcessingMode.WITH_SLOWDOWN)) {
-            // If no slowed audio was provided, throw an error
-            if (slowedWAVFile == null) {
-                RuntimeException e = new RuntimeException(
-                        "Processing modes contains `WITH_SLOWDOWN` but provided no slowed audio"
-                );
-                logException(e);
-                throw e;
-            }
-
-            // Get the media player for the audio file
-            MediaPlayer tempMediaPlayer;
-
-            try {
-                tempMediaPlayer = new MediaPlayer(new Media(slowedWAVFile.toURI().toString()));
-            } catch (IllegalStateException e) {
-                tempMediaPlayer = null;
-                log(Level.SEVERE, "JavaFX Toolkit not initialized. Audio playback will not work.");
-            }
-
-            // Update attributes
-            slowedMediaPlayer = tempMediaPlayer;
-        } else {
-            slowedMediaPlayer = null;
-        }
-
-        // Save the files' raw WAV bytes
-        rawOriginalWAVBytes = Files.readAllBytes(originalWAVFile.toPath());
-        if (slowedWAVFile != null) rawSlowedWAVBytes = Files.readAllBytes(slowedWAVFile.toPath());
     }
 
     // Getter/Setter methods
@@ -224,458 +181,456 @@ public class Audio extends ClassWithLogging {
         return sampleRate;
     }
 
-    /**
-     * @return Audio duration in <b>seconds</b>, correct to the nearest millisecond.
-     */
-    public double getDuration() {
-        if (duration == 0) {
-            duration = mediaPlayer.getTotalDuration().toSeconds();
-        }
-
-        return MathUtils.round(duration, 3);
+    public int getNumRawSamples() {
+        return numRawSamples;
     }
 
-    public void setDuration(double duration) {
-        if (duration <= 0) throw new ValueException("Duration must be greater than 0.");
-        this.duration = duration;
+    public int getNumMonoSamples() {
+        return numMonoSamples;
     }
 
     public double[] getMonoSamples() {
-        return monoAudioSamples;
+        return monoSamples;
     }
 
-    public void setRawOriginalMP3Bytes(byte[] rawOriginalMP3Bytes) {
-        this.rawOriginalMP3Bytes = rawOriginalMP3Bytes;
+    public void setMP3Bytes(byte[] rawMP3Bytes) {
+        this.rawMP3Bytes = rawMP3Bytes;
     }
 
-    public void setRawSlowedMP3Bytes(byte[] rawSlowedMP3Bytes) {
-        this.rawSlowedMP3Bytes = rawSlowedMP3Bytes;
+    public double getDuration() {
+        return duration;
     }
 
-    // Audio methods
+    public double getCurrentTime() {
+        if (isPaused) return timeToResumeAt;
+        return (getPlaybackElapsedDuration() - prevElapsedTime) / (isSlowed ? 2 : 1) + prevCurrTime;
+    }
+
+    // Audio playback methods
 
     /**
-     * Method that plays the audio.
+     * Starts playing the audio.
      */
     public void play() {
-        play(false);
-    }
+        if (!withPlayback) throw new AudioPlaybackNotSupported();
+        if (sourceDataLine == null) setupSourceDataLine();
 
-    /**
-     * Method that plays the audio.
-     *
-     * @param isSlowed Whether to use the slowed down media player or the normal media player.
-     */
-    public void play(boolean isSlowed) {
-        // Set playback time of both media players
-        setAudioPlaybackTime(pausedTime);
-
-        // Play the correct audio
-        if (!isSlowed) {
-            if (mediaPlayer != null) {
-                mediaPlayer.play();
-                isLatestPlayerSlowedPlayer = false;
-            } else {
-                throw new AudioIsSamplesOnlyException("Media player was not initialized.");
-            }
+        if (audioPlaybackThread.isStarted()) {
+            seekToTime(timeToResumeAt);
+            isPaused = false;
         } else {
-            if (slowedMediaPlayer != null) {
-                slowedMediaPlayer.play();
-                isLatestPlayerSlowedPlayer = true;
-            } else {
-                throw new AudioIsSamplesOnlyException("Media player was not initialized.");
-            }
+            updatePlaybackVolume(volume);
+            sourceDataLine.start();
+            audioPlaybackThread.start();
         }
     }
 
     /**
-     * Method that pauses the current audio that is playing.
+     * Pauses the audio.
      */
     public void pause() {
-        if (mediaPlayer != null) {
-            // Pause the audio first
-            mediaPlayer.pause();
+        timeToResumeAt = getCurrentTime();
 
-            // Update the pause time
-            if (!isLatestPlayerSlowedPlayer) {
-                pausedTime = MathUtils.round(mediaPlayer.getCurrentTime().toSeconds(), 3);
-            }
-        } else {
-            throw new AudioIsSamplesOnlyException("Media player was not initialized.");
-        }
-
-        if (slowedMediaPlayer != null) {
-            // Pause the audio first
-            slowedMediaPlayer.pause();
-
-            // Update the pause time
-            if (isLatestPlayerSlowedPlayer) {
-                pausedTime = MathUtils.round(slowedMediaPlayer.getCurrentTime().toSeconds() / 2, 3);
-            }
-        }
+        isPaused = true;
+        sourceDataLine.flush();
+        clearChannelsBuffers();
     }
 
     /**
-     * Method that stops the audio.
+     * Stops playing the audio.
      */
     public void stop() {
-        // Stop the media players
-        if (mediaPlayer != null) {
-            mediaPlayer.stop();
-        } else {
-            throw new AudioIsSamplesOnlyException("Media player was not initialized.");
-        }
+        if (!withPlayback) throw new AudioPlaybackNotSupported();
+        try {
+            // Halt all threads
+            audioPlaybackThread.interrupt();
+            if (sourceDataLine != null) {
+                sourceDataLine.drain();
+                sourceDataLine.close();
+            }
+            if (audioStream != null) audioStream.close();
+            isPaused = false;
 
-        if (slowedMediaPlayer != null) {
-            slowedMediaPlayer.stop();
-        }
+            // Stop and clear all operators' stuff
+            resetOperators();
+            clearChannelsBuffers();
 
-        // Reset pause time back to 0 (since it is paused)
-        pausedTime = 0;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
-     * Set the current audio's playback time to <code>playbackTime</code> <b>seconds</b>.<br>
-     * If <code>slowedMediaPlayer</code> is not <code>null</code>, its playback time will be set to
-     * <b>twice</b> the value of <code>playbackTime</code>.
+     * Method that seeks the audio to the new time.
      *
-     * @param playbackTime The playback time in <b>seconds</b>.
+     * @param seekTime Time to seek the audio to.
      */
-    public void setAudioPlaybackTime(double playbackTime) {
-        // Declare the duration to seek to
-        Duration seekTime = new Duration(playbackTime * 1000);
-
-        // Update seek times
-        if (mediaPlayer != null) {
-            mediaPlayer.seek(seekTime);
-        } else {
-            throw new AudioIsSamplesOnlyException("Media player was not initialized.");
+    public void seekToTime(double seekTime) {
+        // If the current time is earlier than the seek time, we want to seek forwards
+        double currTime = getCurrentTime();
+        if (currTime < seekTime) {
+            seekForwards(seekTime - currTime);
+        } else {  // Want to seek to earlier part of audio; seek backwards
+            seekBackwards(seekTime);
         }
 
-        if (slowedMediaPlayer != null) {
-            slowedMediaPlayer.seek(seekTime.multiply(2));
-        }
-
-        pausedTime = playbackTime;
+        // Update times
+        prevCurrTime = seekTime;
+        prevElapsedTime = getPlaybackElapsedDuration();
+        timeToResumeAt = seekTime;
     }
 
     /**
-     * Set the current audio's starting time to <code>startTime</code> <b>seconds</b>.<br>
-     * If <code>slowedMediaPlayer</code> is not <code>null</code>, its start time will be set to
-     * <b>twice</b> the value of <code>startTime</code>.
-     *
-     * @param startTime The start time of the audio in seconds.
-     */
-    public void setAudioStartTime(double startTime) {
-        // Declare the duration of the start time
-        Duration start = new Duration(startTime * 1000);
-
-        // Update start times
-        if (mediaPlayer != null) {
-            mediaPlayer.setStartTime(start);
-        } else {
-            throw new AudioIsSamplesOnlyException("Media player was not initialized.");
-        }
-
-        if (slowedMediaPlayer != null) {
-            slowedMediaPlayer.setStartTime(start.multiply(2));
-        }
-
-        pausedTime = startTime;
-    }
-
-    /**
-     * Method that gets the current audio time in <b>seconds</b>, correct to the nearest
-     * millisecond.
-     *
-     * @return Returns the current audio time in <b>seconds</b>, correct to the nearest millisecond.
-     */
-    public double getCurrAudioTime() {
-        return getCurrAudioTime(false);
-    }
-
-    /**
-     * Method that gets the current audio time in <b>seconds</b>, correct to the nearest
-     * millisecond.
-     *
-     * @param isSlowed Whether to use the slowed down media player or the normal media player.
-     * @return Returns the current audio time in <b>seconds</b>, correct to the nearest millisecond.
-     */
-    public double getCurrAudioTime(boolean isSlowed) {
-        if (!isSlowed && mediaPlayer != null) {
-            return MathUtils.round(mediaPlayer.getCurrentTime().toSeconds(), 3);
-        } else if (isSlowed && slowedMediaPlayer != null) {
-            return MathUtils.round(slowedMediaPlayer.getCurrentTime().toSeconds() / 2, 3);
-        } else {
-            throw new AudioIsSamplesOnlyException("Media player was not initialized.");
-        }
-    }
-
-    /**
-     * Method that sets the volume to the volume provided.<br>
+     * Method that sets the playback.<br>
      * Also sets the slowed audio's media player's volume if it is provided.
      *
-     * @param volume Volume value. This value should be in the interval [0, 1] where 0 means
-     *               silent and 1 means full volume.
+     * @param volume Volume value. This value should be in the interval [0, 2] where 0 means
+     *               silent and 2 means <b>twice</b> full volume.
      */
-    public void setPlaybackVolume(double volume) {
-        if (mediaPlayer != null) {
-            mediaPlayer.setVolume(volume);
-        } else {
-            throw new AudioIsSamplesOnlyException("Media player was not initialized.");
-        }
-
-        if (slowedMediaPlayer != null) {
-            slowedMediaPlayer.setVolume(volume);
+    public void setVolume(double volume) {
+        this.volume = volume;
+        if (sourceDataLine != null) {
+            updatePlaybackVolume(volume);
         }
     }
 
-    // Public methods
-
     /**
-     * Resample a signal <code>x</code> from <code>srOrig</code> to <code>srFinal</code>.
+     * Method that toggles slowed audio.
      *
-     * @param x       Original signal that needs to be resampled.
-     * @param srOrig  Original sample rate of the signal.
-     * @param srFinal Sample rate of the final signal.
-     * @param resType Resampling type, also known as the filter window's name.
-     * @param scale   Whether to scale the final sample array.
-     * @return Array representing the resampled signal.
-     * @throws ValueException If: <ul>
-     *                        <li>
-     *                        Either <code>srOrig</code> or <code>srFinal</code> is not
-     *                        positive.
-     *                        </li>
-     *                        <li>
-     *                        The input signal length is too short to be resampled to the
-     *                        desired sample rate.
-     *                        </li>
-     *                        </ul>
-     * @see <a href="https://github.com/bmcfee/resampy/blob/ccb8557/resampy/core.py">Resampy</a>,
-     * where the main core of the code was taken from.
+     * @param slowed Whether the audio that is playing should be slowed or not.
      */
-    public static double[] resample(
-            double[] x, double srOrig, double srFinal, Filter resType, boolean scale
-    ) throws ValueException {
-        // Validate sample rates
-        if (srOrig <= 0) throw new ValueException("Invalid original sample rate " + srOrig);
-        if (srFinal <= 0) throw new ValueException("Invalid final sample rate " + srFinal);
+    public void toggleSlowedAudio(boolean slowed) {
+        prevCurrTime = getCurrentTime();
+        prevElapsedTime = getPlaybackElapsedDuration();
 
-        // Calculate sample ratio
-        double sampleRatio = srFinal / srOrig;
-
-        // Calculate final array length and check if it is okay
-        int finalLength = (int) (sampleRatio * x.length);
-        if (finalLength < 1) {
-            throw new InvalidParameterException(
-                    "Input signal length of " + x.length + " too small to resample from " + srOrig + " to " + srFinal
-            );
-        }
-
-        // Generate output array in storage
-        double[] y = new double[finalLength];
-
-        // Get the interpolation window and precision of the specified `resType`
-        double[] interpWin = resType.filter.getHalfWindow();
-        int precision = resType.filter.getPrecision();
-
-        int interpWinLength = interpWin.length;
-
-        // Treat the interpolation window
-        if (sampleRatio < 1) {
-            // Multiply every element in the window by `sampleRatio`
-            for (int i = 0; i < interpWinLength; i++) {
-                interpWin[i] *= sampleRatio;
-            }
-        }
-
-        // Calculate interpolation deltas
-        double[] interpDeltas = new double[interpWinLength];
-
-        for (int i = 0; i < interpWinLength - 1; i++) {
-            interpDeltas[i] = interpWin[i + 1] - interpWin[i];
-        }
-
-        // Run resampling
-        resamplingHelper(x, y, sampleRatio, interpWin, interpDeltas, precision);
-
-        // Fix the length of the samples array
-        int correctedNumSamples = (int) Math.ceil(sampleRatio * x.length);
-        double[] yHat = ArrayUtils.fixLength(y, correctedNumSamples);
-
-        // Handle rescaling
-        if (scale) {
-            for (int i = 0; i < correctedNumSamples; i++) {
-                yHat[i] /= Math.sqrt(sampleRatio);
-            }
-        }
-
-        // Return the resampled array
-        return yHat;
+        isSlowed = slowed;
+        for (TimeStretchOperator op : channelOperators) op.setStretchFactor(slowed ? 2 : 1);
     }
 
     /**
-     * Helper method that converts the raw WAV bytes into MP3 bytes.
+     * Method that resets the playback system entirely.
+     */
+    public void resetPlaybackSystem() {
+        prevElapsedTime = 0;
+        setupSourceDataLine();
+        resetAudioStream();
+        setAudioPlaybackThread();
+    }
+
+    // Audio device methods
+
+    /**
+     * Method that filters audio devices based on the desired line.
      *
-     * @param rawWAVBytes The raw WAV bytes to convert.
-     * @param ffmpegPath  The path to the ffmpeg executable.
+     * @param supportedLine Line to filter devices for.
+     * @return List of <code>Mixer.Info</code> objects, representing supported devices.
+     */
+    public static List<Mixer.Info> filterDevices(Line.Info supportedLine) {
+        List<Mixer.Info> result = new ArrayList<>();
+        Mixer.Info[] infos = AudioSystem.getMixerInfo();
+
+        for (Mixer.Info info : infos) {
+            Mixer mixer = AudioSystem.getMixer(info);
+            if (mixer.isLineSupported(supportedLine)) {
+                result.add(info);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Method that lists output audio devices for the system.
+     *
+     * @return List of <code>Mixer.Info</code> objects, representing supported output devices.
+     */
+    public static List<Mixer.Info> listOutputAudioDevices() {
+        return filterDevices(new Line.Info(SourceDataLine.class));
+    }
+
+    /**
+     * Gets the specified output audio device within a list.
+     *
+     * @param audioDevices Devices to search the audio device within.
+     * @param infoMap      Map of the info of the desired audio device.
+     * @return A <code>Mixer.Info</code> object, representing the info for the audio device.<br>
+     * If not found, returns the default audio device.
+     */
+    public static Mixer.Info getOutputAudioDevice(List<Mixer.Info> audioDevices, Map<String, String> infoMap) {
+        for (Mixer.Info device : audioDevices) {
+            if (Objects.equals(device.getName(), infoMap.get("name")) &&
+                    Objects.equals(device.getVendor(), infoMap.get("vendor")) &&
+                    Objects.equals(device.getVersion(), infoMap.get("version"))) {
+                return device;
+            }
+        }
+        return audioDevices.get(0);
+    }
+
+    /**
+     * Gets the specified output audio device from the list of all audio devices.
+     *
+     * @param infoMap Map of the info of the desired audio device.
+     * @return A <code>Mixer.Info</code> object, representing the info for the audio device.<br>
+     * If not found, returns the default audio device.
+     */
+    public static Mixer.Info getOutputAudioDevice(Map<String, String> infoMap) {
+        return getOutputAudioDevice(listOutputAudioDevices(), infoMap);
+    }
+
+    // Byte conversion methods
+
+    /**
+     * Helper method that converts the WAV bytes into MP3 bytes.
+     *
+     * @param ffmpegPath The path to the ffmpeg executable.
      * @throws FFmpegNotFoundException If FFmpeg was not found at the specified path.
      * @throws IOException             If writing to the final audio file encounters an error.
      */
-    public static byte[] wavBytesToMP3Bytes(
-            byte[] rawWAVBytes, String ffmpegPath
-    ) throws FFmpegNotFoundException, IOException {
-        log(Level.FINE, "Converting WAV bytes to MP3 bytes", Audio.class.getName());
+    public byte[] wavBytesToMP3Bytes(String ffmpegPath) throws FFmpegNotFoundException, IOException {
+        // Check if we have already processed the audio
+        if (rawMP3Bytes != null) {
+            log(Level.FINE, "Returning previously processed MP3 bytes");
+        } else {
+            log(Level.FINE, "Converting WAV bytes to MP3 bytes");
 
-        // Ensure that the temporary directory exists
-        IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
-        log(
-                Level.FINE, "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH, Audio.class.getName()
-        );
+            // Read the raw WAV bytes from the WAV file
+            byte[] rawWAVBytes = Files.readAllBytes(wavFile.toPath());
 
-        // Define a new FFmpeg handler
-        FFmpegHandler FFmpegHandler = new FFmpegHandler(ffmpegPath);
+            // Ensure that the temporary directory exists
+            IOMethods.createFolder(IOConstants.TEMP_FOLDER_PATH);
+            log(Level.FINE, "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH);
 
-        // Generate the output path to the MP3 file
-        String inputPath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-1.wav");
-        String outputPath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-2.mp3");
+            // Initialize the FFmpeg handler (if not done already)
+            FFmpegHandler.initFFmpegHandler(ffmpegPath);
 
-        // Write WAV bytes into a file specified at the input path
-        IOMethods.createFile(inputPath);
-        Files.write(Paths.get(inputPath), rawWAVBytes);
+            // Generate the output path to the MP3 file
+            String inputPath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-1.wav");
+            String outputPath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-2.mp3");
 
-        // Convert the original WAV file to a temporary MP3 file
-        outputPath = FFmpegHandler.convertAudio(new File(inputPath), outputPath);
+            // Write WAV bytes into a file specified at the input path
+            IOMethods.createFile(inputPath);
+            Files.write(Paths.get(inputPath), rawWAVBytes);
 
-        // Read the raw MP3 bytes into a temporary file
-        byte[] rawMP3Bytes = Files.readAllBytes(Paths.get(outputPath));
+            // Convert the original WAV file to a temporary MP3 file
+            outputPath = FFmpegHandler.convertAudio(new File(inputPath), outputPath);
 
-        // Delete the temporary files
-        IOMethods.delete(inputPath);
-        IOMethods.delete(outputPath);
+            // Read the raw MP3 bytes into a temporary file
+            byte[] rawMP3Bytes = Files.readAllBytes(Paths.get(outputPath));
 
-        // Return the raw MP3 bytes
-        log(Level.FINE, "Done converting WAV to MP3 bytes", Audio.class.getName());
+            // Delete the temporary files
+            IOMethods.delete(inputPath);
+            IOMethods.delete(outputPath);
+
+            // Return the raw MP3 bytes
+            log(Level.FINE, "Done converting WAV to MP3 bytes");
+            return rawMP3Bytes;
+        }
+
         return rawMP3Bytes;
     }
 
-    /**
-     * Helper method that converts the original WAV bytes into MP3 bytes.
-     *
-     * @param ffmpegPath The path to the ffmpeg executable.
-     * @throws FFmpegNotFoundException If FFmpeg was not found at the specified path.
-     * @throws IOException             If writing to the final audio file encounters an error.
-     */
-    public byte[] originalWAVBytesToMP3Bytes(String ffmpegPath) throws FFmpegNotFoundException, IOException {
-        // Check if we have already processed the audio
-        if (rawOriginalMP3Bytes != null) {
-            log(Level.FINE, "Returning previously processed original MP3 bytes");
-        } else {
-            // Otherwise, process using the static method
-            rawOriginalMP3Bytes = wavBytesToMP3Bytes(rawOriginalWAVBytes, ffmpegPath);
-        }
+    // Miscellaneous public methods
 
-        return rawOriginalMP3Bytes;
+    /**
+     * Deletes the WAV file used for the audio processing.<br>
+     * <b>Warning</b>: Attempting playback after deletion will result in <em>a lot</em> of errors.
+     */
+    public void deleteWAVFile() {
+        boolean successfullyDeleted = IOMethods.delete(wavFile);
+
+        if (successfullyDeleted) {
+            log(Level.FINE, "Successfully deleted '" + wavFile + "'");
+        } else {
+            log(Level.WARNING, "Failed to delete '" + wavFile + "' now; will attempt delete after exit");
+        }
     }
 
+    /**
+     * Method that returns a small array of samples for processing.
+     *
+     * @param maxDuration Maximum duration (in seconds) of samples to retrieve. Note that the actual
+     *                    number of samples may be smaller than this.
+     * @return A small set of samples.
+     */
+    public double[] getSmallSample(double maxDuration) {
+        // Determine how many samples we can return
+        int numSamples = Math.min((int) (maxDuration * sampleRate), numMonoSamples);
+
+        // Copy required data into the output array
+        double[] smallSample = new double[numSamples];
+        System.arraycopy(monoSamples, 0, smallSample, 0, numSamples);
+
+        return smallSample;
+    }
 
     /**
-     * Helper method that converts the slowed WAV bytes into MP3 bytes.
+     * Method that operators are to answer to, once they have processed the required data.
      *
-     * @param ffmpegPath The path to the ffmpeg executable.
-     * @throws FFmpegNotFoundException If FFmpeg was not found at the specified path.
-     * @throws IOException             If writing to the final audio file encounters an error.
+     * @param channelNum Audio channel number.
+     * @param reply      Reply from the operator.
      */
-    public byte[] slowedWAVBytesToMP3Bytes(String ffmpegPath) throws FFmpegNotFoundException, IOException {
-        // Check if we have already processed the audio
-        if (rawSlowedMP3Bytes != null) {
-            log(Level.FINE, "Returning previously processed slowed MP3 bytes");
-
-        } else {
-            // Otherwise, process using the static method
-            rawSlowedMP3Bytes = wavBytesToMP3Bytes(rawSlowedWAVBytes, ffmpegPath);
+    public void answer(int channelNum, double[] reply) {
+        BlockingQueue<Byte> queue = outChannels.get(channelNum);
+        try {
+            byte[] replyBytes = AudioHelpers.packBytes(
+                    TypeConversionUtils.doubleArrayToFloatArray(reply), bitsPerSample, audioFormat
+            );
+            for (Byte b : replyBytes) {
+                queue.put(b);
+            }
+        } catch (InterruptedException e) {
+            logException(e);
         }
-
-        return rawSlowedMP3Bytes;
     }
 
     // Private methods
 
     /**
-     * Helper method that resamples the audio samples array <code>x</code> and places it into the
-     * final array <code>y</code>.
-     *
-     * @param x            Initial array of audio samples.
-     * @param y            Final array to store resampled samples.
-     * @param sampleRatio  The ratio between the initial and final sample rates.
-     * @param interpWin    Interpolation window, based off the selected <code>resType</code>.
-     * @param interpDeltas Deltas between consecutive elements in <code>interpWin</code>.
-     * @param precision    Precision constant.
-     * @implNote See <a href="https://github.com/bmcfee/resampy/blob/ccb8557/resampy/interpn.py">
-     * Resampy's Source Code</a> for the original implementation of this function in Python.
+     * Helper method that sets up the source data line for writing to.
      */
-    private static void resamplingHelper(
-            double[] x, double[] y, double sampleRatio, double[] interpWin,
-            double[] interpDeltas, int precision
-    ) {
-        // Define constants that will be needed later
-        double scale = Math.min(sampleRatio, 1.);
-        double timeIncrement = 1. / sampleRatio;
-        int indexStep = (int) (scale * precision);
+    private void setupSourceDataLine() {
+        DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
+        Mixer audioDevice = AudioSystem.getMixer(getOutputAudioDevice(
+                DataFiles.SETTINGS_DATA_FILE.data.audioDeviceInfo
+        ));
 
-        int nWin = interpWin.length;
-        int nOrig = x.length;
-        int nOut = y.length;
-
-        // Define 'loop variables'
-        int n, offset;
-        double timeRegister = 0;
-        double frac, indexFrac, eta, weight;
-
-        // Start resampling process
-        for (int t = 0; t < nOut; t++) {
-            // Grab the top bits as an index to the input buffer
-            n = (int) timeRegister;
-
-            // Grab the fractional component of the time index
-            frac = scale * (timeRegister - n);
-
-            // Offset into the filter
-            indexFrac = frac * precision;
-            offset = (int) indexFrac;
-
-            // Interpolation factor
-            eta = indexFrac - offset;
-
-            // Compute the left wing of the filter response
-            int iMax = Math.min(n + 1, (nWin - offset) / indexStep);
-
-            for (int i = 0; i < iMax; i++) {
-                weight = interpWin[offset + i * indexStep] + eta * interpDeltas[offset + i * indexStep];
-                y[t] += weight * x[n - i];
-            }
-
-            // Invert P
-            frac = scale - frac;
-
-            // Offset into the filter
-            indexFrac = frac * precision;
-            offset = (int) indexFrac;
-
-            // Interpolation factor
-            eta = indexFrac - offset;
-
-            // Compute the right wing of the filter response
-            int jMax = Math.min(nOrig - n - 1, (nWin - offset) / indexStep);
-
-            for (int j = 0; j < jMax; j++) {
-                weight = interpWin[offset + j * indexStep] + eta * interpDeltas[offset + j * indexStep];
-                y[t] += weight * x[n + j + 1];
-            }
-
-            // Increment the time register
-            timeRegister += timeIncrement;
+        try {
+            sourceDataLine = (SourceDataLine) audioDevice.getLine(info);
+            sourceDataLine.open(audioFormat);
+        } catch (LineUnavailableException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Helper method that gets the number of seconds that the source data line is open for. That is,
+     * the elapsed duration of the playback. This does <b>not</b> return the current audio time.
+     *
+     * @return Second position of the source data line, instead of microsecond position.
+     */
+    private double getPlaybackElapsedDuration() {
+        return sourceDataLine.getMicrosecondPosition() / 1e6;
+    }
+
+    /**
+     * Helper method that resets the audio stream to the beginning.
+     */
+    private void resetAudioStream() {
+        if (audioStream != null) {
+            try {
+                audioStream.close();
+                audioStream = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream(wavFile)));
+                if (withPlayback) setupOperators();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Helper method that updates the source data line's volume.<br>
+     * Also updates the slowed audio's media player's volume if it is provided.
+     *
+     * @param volume Volume value. This value should be in the interval [0, 2] where 0 means
+     *               silent and 2 means <b>twice</b> full volume.
+     */
+    private void updatePlaybackVolume(double volume) {
+        FloatControl volumeControl = (FloatControl) sourceDataLine.getControl(FloatControl.Type.MASTER_GAIN);
+        if (volume == 0) {
+            volumeControl.setValue(Float.NEGATIVE_INFINITY);  // 'Gain' of -infinity dB
+        } else {
+            volumeControl.setValue(20f * (float) Math.log10(volume));  // Gain of this amount of dB
+        }
+    }
+
+    /**
+     * Helper method that sets the audio playback thread.
+     */
+    private void setAudioPlaybackThread() {
+        Audio audio = this;
+
+        audioPlaybackThread = new StoppableThread() {
+            // Get playback buffer size
+            final int playbackBufferSize = DataFiles.SETTINGS_DATA_FILE.data.playbackBufferSize;
+            final byte[] bufferBytes = new byte[playbackBufferSize * bytesPerSample];
+            int numBytesRead;
+
+            @Override
+            public void runner() {
+                try {
+                    boolean readThisIteration = true;
+                    while (running.get()) {
+                        if (!isPaused) {
+                            if (readThisIteration) {
+                                // Read bytes from audio stream
+                                if (numBytesRead != -1) numBytesRead = audioStream.read(bufferBytes);
+
+                                // Separate into channels
+                                ArrayList<byte[]> channels = new ArrayList<>();
+                                for (int i = 0; i < numChannels; i++) {
+                                    channels.add(extractChannel(bufferBytes, i));
+                                }
+
+                                // Call operators to work on the channels' data
+                                for (int i = numChannels - 1; i >= 0; i--) {
+                                    byte[] data = channels.get(i);
+                                    float[] samplesAsFloats = AudioHelpers.unpackBytes(
+                                            data,
+                                            numBytesRead / numChannels,
+                                            bitsPerSample,
+                                            audioFormat
+                                    );
+                                    channelOperators.get(i).call(
+                                            audio, i, TypeConversionUtils.floatArrayToDoubleArray(samplesAsFloats)
+                                    );
+                                }
+                            }
+
+                            // Check if enough data is in `outChannels`
+                            int outSegmentLength = OUT_SEGMENT_LENGTH * bytesPerSample;
+                            boolean enoughData = true;
+                            for (BlockingQueue<Byte> bq : outChannels) {
+                                if (bq.size() < outSegmentLength) {
+                                    enoughData = false;
+                                    break;
+                                }
+                            }
+
+                            // If enough, interleave processed samples and write to source data line
+                            if (enoughData) {
+                                ArrayList<byte[]> outputSegments = new ArrayList<>();
+                                for (BlockingQueue<Byte> bq : outChannels) {
+                                    byte[] segment = new byte[outSegmentLength];
+                                    for (int i = 0; i < segment.length; i++) {
+                                        segment[i] = bq.take();
+                                    }
+                                    outputSegments.add(segment);
+                                }
+                                byte[] interleavedChannels = interleaveChannels(outputSegments);
+                                sourceDataLine.write(interleavedChannels, 0, interleavedChannels.length);
+                            }
+
+                            // Determine if we read this iteration
+                            readThisIteration = true;
+                            for (Operator op : channelOperators) {
+                                if (op.remainingCapacity() < bufferBytes.length / bytesPerSample / numChannels) {
+                                    readThisIteration = false;
+                                    break;
+                                }
+                            }
+
+                            // Halt if we read no more bytes and there is no more bytes to process
+                            if (numBytesRead == -1 && !enoughData && !readThisIteration) break;
+                        }
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                } catch (IOException e) {
+                    logException(e);
+                }
+            }
+        };
     }
 
     /**
@@ -684,29 +639,25 @@ public class Audio extends ClassWithLogging {
     private void generateSamples() {
         try {
             // Get the number of bytes that corresponds to each sample
-            final int bytesPerSample = numBytesForNumBits(audioFormat.getSampleSizeInBits());
+            final int bytesPerSample = AudioHelpers.numBytesForNumBits(audioFormat.getSampleSizeInBits());
 
             // Get the total number of samples
-            numSamples = audioStream.available() / bytesPerSample;
+            numRawSamples = audioStream.available() / bytesPerSample;
 
             // Calculate the number of samples needed for each window
-            int numSamplesPerBuffer = SAMPLES_BUFFER_SIZE * audioFormat.getChannels();
-            int numBuffers = MathUtils.ceilDiv(numSamples, numSamplesPerBuffer);
-
-            // Create a `finalSamples` array to store the samples
-            float[] finalSamples = new float[numBuffers * numSamplesPerBuffer];
+            int numSamplesPerBuffer = SAMPLES_BUFFER_SIZE * numChannels;
+            int numBuffers = MathUtils.ceilDiv(numRawSamples, numSamplesPerBuffer);
 
             // Define helper arrays
-            float[] samples = new float[numSamplesPerBuffer];
-            long[] transfer = new long[numSamplesPerBuffer];
             byte[] bytes = new byte[numSamplesPerBuffer * bytesPerSample];
+            float[] finalSamples = new float[numBuffers * numSamplesPerBuffer];  // Stores the final samples
 
             // Get samples
             int numBytesRead;
             int cycleNum = 0;  // Number of times we read from the audio stream
             while ((numBytesRead = audioStream.read(bytes)) != -1) {
                 // Unpack the bytes into samples
-                unpackBytes(samples, transfer, bytes, numBytesRead);
+                float[] samples = AudioHelpers.unpackBytes(bytes, numBytesRead, bitsPerSample, audioFormat);
 
                 // Add it to the master list of samples
                 if (numBytesRead / bytesPerSample >= 0) {
@@ -718,165 +669,165 @@ public class Audio extends ClassWithLogging {
             }
 
             // Shorten the `finalSamples` array to fit the required size
-            finalSamples = Arrays.copyOf(finalSamples, numSamples);
+            finalSamples = Arrays.copyOf(finalSamples, numRawSamples);
 
-            // Convert everything to double and place it into `audioSamples`
-            audioSamples = new double[numSamples];
+            // Convert everything to double and place it into the raw audio samples array
+            // (We convert to double because most signal processing algorithms here use doubles)
+            rawSamples = new double[numRawSamples];
 
-            for (int i = 0; i < numSamples; i++) {
-                audioSamples[i] = finalSamples[i];
+            for (int i = 0; i < numRawSamples; i++) {
+                rawSamples[i] = finalSamples[i];
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            // Remove stereo samples if they are there
-            int numMonoSamples;
-            if (audioFormat.getChannels() == 2) {  // Stereo
+            if (numChannels > 1) {
                 // Calculate the number of mono samples there are
-                numMonoSamples = numSamples / 2;
+                numMonoSamples = numRawSamples / numChannels;
 
                 // Fill in the mono audio samples array
-                monoAudioSamples = new double[numMonoSamples];
+                monoSamples = new double[numMonoSamples];
 
                 for (int i = 0; i < numMonoSamples; i++) {
-                    // Take mean of left and right channels' samples
-                    monoAudioSamples[i] = (audioSamples[i * 2] + audioSamples[i * 2 + 1]) / 2;
+                    double sampleSum = rawSamples[i * numChannels];
+                    for (int j = 1; j < numChannels; j++) {
+                        sampleSum += rawSamples[i * numChannels + j];
+                    }
+                    monoSamples[i] = sampleSum / numChannels;
                 }
-            } else {  // Mono
-                // Fill in the mono audio samples array
-                monoAudioSamples = new double[numSamples];
-                System.arraycopy(audioSamples, 0, monoAudioSamples, 0, numSamples);
+            } else {  // Single-channel
+                monoSamples = new double[numRawSamples];
+                System.arraycopy(rawSamples, 0, monoSamples, 0, numRawSamples);
             }
 
-            // Close the audio stream
-            if (audioStream != null) {
-                try {
-                    audioStream.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            resetAudioStream();
+        }
+    }
+
+    /**
+     * Helper method that assists with skipping forwards in the audio.
+     *
+     * @param secondsToSkip Number of seconds to skip forwards from the current position.
+     * @implNote Adapted from <a href="https://stackoverflow.com/a/52596824">this StackOverflow
+     * answer</a>.
+     */
+    private void seekForwards(double secondsToSkip) {
+        // Compute the number of bytes to skip
+        long bytesToSkip = (long) (frameSize * frameRate * secondsToSkip);
+
+        // Now skip until the correct number of bytes have been skipped
+        try {
+            long justSkipped;
+            while (bytesToSkip > 0 && (justSkipped = audioStream.skip(bytesToSkip)) > 0) {
+                bytesToSkip -= justSkipped;
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Helper method that assists with seeking backwards in the audio.
+     *
+     * @param timeToSeekTo Time to seek to in the audio.
+     */
+    private void seekBackwards(double timeToSeekTo) {
+        resetAudioStream();
+        seekForwards(timeToSeekTo);
+    }
+
+    /**
+     * Helper method that extracts the bytes for a specific channel.
+     *
+     * @param rawBytes   The raw bytes that were read from the audio stream.
+     * @param channelNum The channel number to extract.
+     * @return Bytes belonging to that channel.
+     */
+    private byte[] extractChannel(byte[] rawBytes, int channelNum) {
+        if (numChannels == 1) return rawBytes;
+
+        byte[] output = new byte[rawBytes.length / numChannels];
+        int bytePosition = 0;
+        int outIndex = 0;
+        for (byte datum : rawBytes) {
+            if (bytePosition >= channelNum * bytesPerSample &&
+                    bytePosition < (channelNum + numChannels - 1) * bytesPerSample) {
+                output[outIndex] = datum;
+                outIndex++;
+            }
+            bytePosition++;
+            if (bytePosition == numChannels * bytesPerSample) {
+                bytePosition = 0;
+            }
+        }
+        return output;
+    }
+
+    /**
+     * Interleave the different channels' bytes into one singular byte array.
+     *
+     * @param channels All channels' bytes.
+     * @return Interleaved bytes array.
+     */
+    private byte[] interleaveChannels(ArrayList<byte[]> channels) {
+        // Check if channels are the same length
+        int first = channels.get(0).length;
+        for (byte[] chan : channels) {
+            if (chan.length != first) {
+                throw new LengthException("Channel lengths were different");
+            }
+        }
+
+        // Interleave channels
+        byte[] output = new byte[first * channels.size()];
+        int outIdx = 0;
+        int chanIdx = 0;
+        while (chanIdx + bytesPerSample <= first) {
+            for (byte[] channel : channels) {
+                System.arraycopy(channel, chanIdx, output, outIdx, bytesPerSample);
+                outIdx += bytesPerSample;
+            }
+            chanIdx += bytesPerSample;
+        }
+        return output;
+    }
+
+    /**
+     * Helper method that sets up all the operators, if they were not already set up.
+     */
+    private void setupOperators() {
+        if (channelOperators.size() < numChannels) {
+            for (int i = 0; i < numChannels; i++) {
+                TimeStretchOperator op = new PhaseVocoderOperator(
+                        1., SLOWDOWN_PROCESSING_LENGTH, SLOWDOWN_ANALYSIS_LENGTH, SLOWDOWN_WINDOW
+                );
+                channelOperators.add(op);
+                new Thread(op).start();
             }
         }
     }
 
     /**
-     * Returns the minimum number of bytes that are needed to fully store the number of bits
-     * specified.
-     *
-     * @param numBits Number of bits to store.
-     * @return Required number of bytes.
+     * Helper method that resets all the operators.
      */
-    private static int numBytesForNumBits(int numBits) {
-        return numBits + 7 >> 3;
+    private void resetOperators() {
+        for (Operator op : channelOperators) op.stop();
+        channelOperators.clear();
     }
 
     /**
-     * Unpacks the set of bytes from a file (the array <code>bytes</code>) into audio sample data
-     * (into the array <code>samples</code>).
-     *
-     * @param samples       (Initially) empty array that stores the samples. Fixed in length at
-     *                      <code>SAMPLES_BUFFER_SIZE * audioFormat.getChannels()</code> float
-     *                      data.
-     * @param transfer      (Initially) empty array that helps move data within the function. Fixed
-     *                      in length at <code>samples.length</code> long data.
-     * @param bytes         Array of bytes that is read in from the audio file. Fixed in length at
-     *                      <code>samples.length * bytesPerSample</code> bytes.
-     * @param numValidBytes Number of valid bytes in the <code>bytes</code> array.
-     * @see <a href="https://tinyurl.com/stefanSpectrogramOriginal">Original implementation on
-     * GitHub</a>. This code was largely adapted from that source.
+     * Helper method that clears all channels' buffers.<br>
+     * This clears both the out channels' queues as well as the channel operators' buffers.
      */
-    private void unpackBytes(float[] samples, long[] transfer, byte[] bytes, int numValidBytes) {
-        if (audioFormat.getEncoding() != AudioFormat.Encoding.PCM_SIGNED
-                && audioFormat.getEncoding() != AudioFormat.Encoding.PCM_UNSIGNED) {
-            // `samples` is already good; no need to process
-            return;
-        }
-
-        // Calculate the number of bytes needed to store each sample
-        final int bitsPerSample = audioFormat.getSampleSizeInBits();
-        final int bytesPerSample = numBytesForNumBits(bitsPerSample);
-
-        /*
-         * This isn't the most DRY way to do this, but it's more efficient. The helper array `transfer` allows the logic
-         * to be split up without being too repetitive.
-         *
-         * There are two loops converting bytes to raw long samples. Integral primitives in Java get sign extended when
-         * they are promoted to a larger type, so the `& 0xffL` mask keeps them intact.
-         */
-
-        if (audioFormat.isBigEndian()) {
-            for (int i = 0, k = 0, b; i < numValidBytes; i += bytesPerSample, k++) {
-                // Reset the current element's value to zero, so what was originally in `transfer` doesn't matter
-                transfer[k] = 0L;
-
-                // Update transfer
-                int least = i + bytesPerSample - 1;
-                for (b = 0; b < bytesPerSample; b++) {
-                    transfer[k] |= (bytes[least - b] & 0xffL) << (8 * b);
-                }
-            }
-        } else {
-            for (int i = 0, k = 0, b; i < numValidBytes; i += bytesPerSample, k++) {
-                // Reset the current element's value to zero, so what was originally in `transfer` doesn't matter
-                transfer[k] = 0L;
-
-                // Update transfer
-                for (b = 0; b < bytesPerSample; b++) {
-                    transfer[k] |= (bytes[i + b] & 0xffL) << (8 * b);
-                }
-            }
-        }
-
-        // Calculate scaling factor to normalize the samples to the interval [-1f, 1f]
-        final long fullScale = (long) Math.pow(2.0, bitsPerSample - 1);
-
-        // The OR is not quite enough to convert; signage needs to be corrected
-        if (audioFormat.getEncoding() == AudioFormat.Encoding.PCM_SIGNED) {
-            /*
-             * If the samples were signed, they must be extended to the 64-bit long.
-             *
-             * The arithmetic right shift in Java will fill the left bits with 1's if the Most Significant Bit (MSB) is
-             * set, so sign extend by first shifting left so that if the sample is supposed to be negative, it will
-             * shift the sign bit in to the 64-bit MSB then shift back and fill with 1's.
-             *
-             * As an example, imagining these were 4-bit samples originally and the destination is 8-bit, if we have a
-             * hypothetical sample -5 that ought to be negative, the left shift looks like this:
-             *
-             *    00001011
-             * <<  (8 - 4)
-             * ===========
-             *    10110000
-             *
-             * (Except the destination is 64-bit and the original bit depth from the file could be anything.)
-             *
-             * And the right shift now fills with 1's:
-             *
-             *    10110000
-             * >>  (8 - 4)
-             * ===========
-             *    11111011
-             */
-
-            final long signShift = 64L - bitsPerSample;
-
-            for (int i = 0; i < transfer.length; i++) {
-                transfer[i] = ((transfer[i] << signShift) >> signShift);
-            }
-        } else {
-            /*
-             * Unsigned samples are easier since they will be read correctly in to the long. So just sign them:
-             * subtract `Math.pow(2., bitsPerSample - 1)` so the center is 0.
-             */
-
-            for (int i = 0; i < transfer.length; i++) {
-                transfer[i] -= fullScale;
-            }
-        }
-
-        // Finally, normalise range to [-1f, 1f]
-        for (int i = 0; i < transfer.length; i++) {
-            samples[i] = (float) transfer[i] / (float) fullScale;
-        }
+    private void clearChannelsBuffers() {
+        for (BlockingQueue<Byte> bq : outChannels) bq.clear();
+        for (Operator op : channelOperators) op.clearBuffers();
     }
+
+    // Helper classes
+
+    /**
+     * Enum that contains different audio processing modes.
+     */
+    public enum ProcessingMode {WITH_SAMPLES, WITH_PLAYBACK}
 }

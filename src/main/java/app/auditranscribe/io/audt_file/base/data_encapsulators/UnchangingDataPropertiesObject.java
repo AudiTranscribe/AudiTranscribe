@@ -18,6 +18,10 @@
 
 package app.auditranscribe.io.audt_file.base.data_encapsulators;
 
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+
+import java.util.Objects;
+
 /**
  * Data object that stores the unchanging data's properties.
  */
@@ -32,4 +36,19 @@ public abstract class UnchangingDataPropertiesObject extends AbstractAUDTDataObj
 
     // Attributes
     public int numSkippableBytes;
+
+    // Public methods
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UnchangingDataPropertiesObject that = (UnchangingDataPropertiesObject) o;
+        return numSkippableBytes == that.numSkippableBytes;
+    }
+
+    @Override
+    @ExcludeFromGeneratedCoverageReport
+    public int hashCode() {
+        return Objects.hash(numSkippableBytes);
+    }
 }

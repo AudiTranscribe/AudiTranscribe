@@ -1,0 +1,12 @@
+.root {
+    memory-hbox-background-colour: rgba(230, 235, 240, 0.3);
+    memory-hbox-text-colour: rgb(235, 235, 235);
+
+    spectrogram-main-line-colour: rgba(255, 255, 255, 0.5);
+    spectrogram-bar-line-colour: rgba(0, 255, 0, 0.5);
+
+    note-rectangle-border-colour: rgb(255, 160, 255);
+    note-rectangle-fill-colour: rgba(255, 128, 255, 0.5);
+
+    playhead-line-colour: rgb(80, 150, 220);
+}

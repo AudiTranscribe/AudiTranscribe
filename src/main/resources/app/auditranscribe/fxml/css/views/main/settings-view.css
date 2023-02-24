@@ -1,0 +1,92 @@
+/* FIELDS & INPUT AREAS */
+.choice-box, .spinner {
+    -fx-background-color: background-colour-primary;
+    -fx-background-insets: 0, 1px;
+}
+
+.choice-box .menu-item {
+    -fx-background-color: background-colour-tertiary;
+}
+
+.choice-box .menu-item:focused {
+    -fx-background-color: button-selected-colour;
+}
+
+.spinner > .increment-arrow-button:hover, .spinner > .decrement-arrow-button:hover {
+    -fx-background-color: background-colour-tertiary;
+}
+
+.text-field {
+    -fx-background-color: background-colour-primary;
+}
+
+/* TAB PANE */
+.tab .tab-label {
+    -fx-text-fill: text-colour-primary;
+    -fx-pref-height: 50px;
+}
+
+.tab {
+    -fx-background-color: background-colour-primary;
+    -fx-padding: 2px 1px 2px 1px;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-border-width: 5px 0 0 0;
+    -fx-border-color: background-colour-primary;
+    -fx-pref-height: 150px; /* Note that because tabs are rotated, this is actually the width */
+    -fx-pref-width: 50px; /* Note that because tabs are rotated, this is actually the height */
+}
+
+.tab:hover {
+    -fx-background-color: button-hover-colour;
+    -fx-border-color: button-hover-colour;
+}
+
+.tab:selected {
+    -fx-background-color: button-selected-colour;
+    -fx-border-color: focus-colour;
+}
+
+.tab:selected .tab-label {
+    -fx-font-weight: bold;
+}
+
+.tab .focus-indicator {
+    -fx-border-color: transparent;
+}
+
+.tab-pane {
+    -fx-background-color: background-colour-secondary;
+}
+
+.tab-pane *.tab-header-background {
+    -fx-background-color: background-colour-primary;
+}
+
+.tab-pane:left *.tab-header-area {
+    -fx-background-insets: 0 0 0 10px;
+    -fx-padding: 5px 0 0 0;
+}
+
+.tab-anchor-pane {
+    -fx-padding: 5px 0 0 0;
+}
+
+/* SETTINGS */
+.settings-view-button, .settings-view-button:hover {
+    -fx-font-size: 13px;
+}
+
+.setting-subheading, .setting-label {
+    -fx-font-size: 13px;
+}
+
+.setting-subheading {
+    -fx-font-weight: bold;
+}
+
+/* BOTTOM */
+.bottom-pane {
+    -fx-border-width: 0 1px 0 0;
+    -fx-border-color: separator-colour;
+}

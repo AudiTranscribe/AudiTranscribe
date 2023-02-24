@@ -1,6 +1,6 @@
 /*
  * IOMethods.java
- * Description: Input/Output methods that are used in the AudiTranscribe project.
+ * Description: Input/Output handling methods.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -19,29 +19,65 @@
 package app.auditranscribe.io;
 
 import app.auditranscribe.MainApplication;
+import app.auditranscribe.misc.CustomLogger;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+import app.auditranscribe.system.OSMethods;
+import app.auditranscribe.system.OSType;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Objects;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Input/Output methods that are used in the AudiTranscribe project.
+ * Input/Output handling methods.
  */
 public final class IOMethods {
     private IOMethods() {
         // Private constructor to signal this is a utility class
     }
 
-    // File path handling
+    // File path methods
+
+    /**
+     * Method that gets the application data directory path.
+     *
+     * @return The <b>absolute</b> path to the application data directory.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static String getApplicationDataDirectory() {
+        // Get the operating system
+        OSType osType = OSMethods.getOS();
+
+        // Get the user data directory based on the operating system name
+        return switch (osType) {
+            case WINDOWS -> IOMethods.joinPaths(
+                    true,
+                    System.getenv("AppData"), "AudiTranscribe"
+            );
+            case MAC -> IOMethods.joinPaths(
+                    true,
+                    IOConstants.USER_HOME_PATH, "/Library/Application Support", "AudiTranscribe"
+            );
+            default -> IOMethods.joinPaths(
+                    true,
+                    OSMethods.getOrDefault(
+                            "XDG_DATA_HOME",
+                            IOMethods.joinPaths(
+                                    true,
+                                    IOConstants.USER_HOME_PATH, "/.local/share"
+                            )
+                    ),
+                    "AudiTranscribe"
+            );
+        };
+    }
 
     /**
      * Gets a file's URL.
@@ -50,7 +86,15 @@ public final class IOMethods {
      * @return A URL representing the absolute path to the file (which is in the target folder).
      */
     public static URL getFileURL(String filePath) {
-        return MainApplication.class.getResource(filePath);
+        URL url = MainApplication.class.getResource(filePath);
+        if (url == null) {
+            CustomLogger.log(
+                    Level.WARNING,
+                    "No file found at '" + filePath + "'; returning null URL",
+                    IOMethods.class.getName()
+            );
+        }
+        return url;
     }
 
     /**
@@ -60,80 +104,71 @@ public final class IOMethods {
      * @return A string, representing a URL to the file (which is in the target folder).
      */
     public static String getFileURLAsString(String filePath) {
-        return getFileURL(filePath).toString();
+        try {
+            return getFileURL(filePath).toString();
+        } catch (NullPointerException e) {
+            throw new RuntimeException(
+                    new FileNotFoundException("No file was found at the resource path '" + filePath + "'.")
+            );
+        }
     }
 
     /**
      * Gets the absolute path of a file.
      *
      * @param filePath Path to the file, with respect to the <b>resource path</b>.
-     * @return A string representing the absolute path to the file (which is in the target folder).
+     * @return A string representing the <b>absolute path</b> to the file (which is in the target
+     * folder).
      */
     public static String getAbsoluteFilePath(String filePath) {
-        // Get the raw path to the file
-        String path = getFileURL(filePath).getPath();
-
-        // Handle the treatment of the path
+        String path;
+        try {
+            path = getFileURL(filePath).getPath();
+        } catch (NullPointerException e) {
+            throw new NullPointerException("Could not find file at '" + filePath + "'.");
+        }
         path = treatPath(path);
-
-        // Return path
         return path;
     }
 
-    // IO handling
+    // CRUD operations
 
     /**
-     * Gets the input stream of a file, with respect to the <b>resource path</b>.
+     * Method that creates a file at the specified <code>path</code>.
      *
-     * @param filePath Path to the file, with respect to the <b>resource path</b>.
-     * @return Input stream of the file.
+     * @param path The <b>absolute path</b> to the file.
+     * @return Returns:
+     * <ul>
+     *     <li><code>0</code> if the file was successfully created;</li>
+     *     <li><code>1</code> if the file already exists; or</li>
+     *     <li><code>-1</code> if the file failed to be created (<em>and does not already
+     *     exist</em>).</li>
+     * </ul>
      */
-    public static InputStream getInputStream(String filePath) {
-        // If the file path contains backslashes, replace with forward slashes
-        filePath = filePath.replaceAll("\\\\", "/");
-        return MainApplication.class.getResourceAsStream(filePath);
+    public static int createFile(String path) {
+        return createFile(new File(path));
     }
 
     /**
-     * Method that creates a file.
+     * Method that creates a file specified by a <code>File</code> object.
      *
-     * @param file File object. Contains the absolute path of the file to create.
-     * @return An integer.
+     * @param file A <code>File</code> object that contains the absolute path to the file to create.
+     * @return Returns:
      * <ul>
-     *     <li>Returns <code>0</code> if the file was successfully created.</li>
-     *     <li>Returns <code>1</code> if the file already exists.</li>
-     *     <li>Returns <code>-1</code> if the file failed to be created (<em>and does not already
+     *     <li><code>0</code> if the file was successfully created;</li>
+     *     <li><code>1</code> if the file already exists; or</li>
+     *     <li><code>-1</code> if the file failed to be created (<em>and does not already
      *     exist</em>).</li>
      * </ul>
      */
     public static int createFile(File file) {
-        return createFile(file.getAbsolutePath());
-    }
-
-    /**
-     * Method that creates a file at the specified <code>absolutePath</code>.
-     *
-     * @param absolutePath <b>Absolute path</b> to the file.
-     * @return An integer.
-     * <ul>
-     *     <li>Returns <code>0</code> if the file was successfully created.</li>
-     *     <li>Returns <code>1</code> if the file already exists.</li>
-     *     <li>Returns <code>-1</code> if the file failed to be created (<em>and does not already
-     *     exist</em>).</li>
-     * </ul>
-     */
-    public static int createFile(String absolutePath) {
         try {
-            File myFile = new File(absolutePath);
-            if (myFile.createNewFile()) {
-                return 0;  // Success
-            } else {
-                return 1;  // File already exists
-            }
+            return file.createNewFile() ? 0 : 1;
         } catch (IOException e) {
-            return -1;  // Failed to create file
+            return -1;
         }
     }
+
 
     /**
      * Method that creates a folder, if it does not already exist.<br>
@@ -188,10 +223,37 @@ public final class IOMethods {
     }
 
     /**
-     * Method that deletes a file or <b>empty</b> folder at the specified <code>absolutePath</code>.
+     * Given a file's path (with respect to the <b>resource path</b>), will return an
+     * <code>InputStream</code> for reading.
      *
-     * @param file File object to delete.
-     * @return Boolean. Is <code>true</code> is the file or folder was deleted and
+     * @param filePath Path to the file, with respect to the <b>resource path</b>.
+     * @return An <code>InputStream</code> object for reading.
+     */
+    public static InputStream readAsInputStream(String filePath) {
+        // If the file path contains backslashes, replace with forward slashes
+        filePath = filePath.replaceAll("\\\\", "/");
+        return MainApplication.class.getResourceAsStream(filePath);
+    }
+
+    /**
+     * Given a file's path (with respect to the <b>resource path</b>), will return a string,
+     * representing the contents of the file.
+     *
+     * @param filePath Path to the file, with respect to the <b>resource path</b>.
+     * @param encoding Encoding to use (e.g. <code>UTF-8</code>).
+     * @return Contents of the file as a string.
+     * @throws IOException If the encoding format is not recognized, or if something went wrong when
+     *                     reading the input stream.
+     */
+    public static String readAsString(String filePath, String encoding) throws IOException {
+        return inputStreamToString(readAsInputStream(filePath), encoding);
+    }
+
+    /**
+     * Method that deletes a file or <b>empty</b> folder given a <code>File</code> object.
+     *
+     * @param file The <code>File</code> object, pointing to the location to delete.
+     * @return A boolean; <code>true</code> is the file or folder was deleted and
      * <code>false</code> otherwise.
      */
     public static boolean delete(File file) {
@@ -202,7 +264,7 @@ public final class IOMethods {
      * Method that deletes a file or <b>empty</b> folder at the specified <code>absolutePath</code>.
      *
      * @param absolutePath <b>Absolute path</b> to the file or <b>empty</b> folder.
-     * @return Boolean. Is <code>true</code> is the file or folder was deleted and
+     * @return A boolean; is <code>true</code> is the file or folder was deleted and
      * <code>false</code> otherwise.
      */
     public static boolean delete(String absolutePath) {
@@ -219,8 +281,7 @@ public final class IOMethods {
     /**
      * Method that checks if a file or folder is present at the specified absolute path.
      *
-     * @param absolutePath <b>Absolute path</b> to determine if a file or folder exists at that
-     *                     path.
+     * @param absolutePath <b>Absolute path</b> to determine if a file or folder exists there.
      * @return Boolean. Returns <code>true</code> if the file or folder exists at the specified
      * path, and <code>false</code> otherwise.
      */
@@ -232,8 +293,8 @@ public final class IOMethods {
     /**
      * Method that moves the file to a new location.
      *
-     * @param originalAbsolutePath Original <b>absolute</b> path.
-     * @param newAbsolutePath      New <b>absolute</b> path.
+     * @param originalAbsolutePath Original <b>absolute</b> path of the file.
+     * @param newAbsolutePath      New <b>absolute</b> path of the file.
      * @throws IOException If movement of the file fails.
      */
     public static void moveFile(String originalAbsolutePath, String newAbsolutePath) throws IOException {
@@ -255,32 +316,39 @@ public final class IOMethods {
     // Path handling
 
     /**
-     * Method that builds a full path from the individual folders.
+     * Method that joins several paths together.
      *
-     * @param elems The individual folders.
-     * @return The full path.
+     * @param useOSSeparator Whether to use the native OS separator to join the paths, or to use the
+     *                       UNIX separator of `/` to join paths.
+     * @param paths          The paths to join.
+     * @return The joined path.
      */
-    public static String buildPath(String... elems) {
+    public static String joinPaths(boolean useOSSeparator, String... paths) {
+        // Determine the separator character to use
+        String separator = "/";
+        if (useOSSeparator) separator = IOConstants.SEPARATOR;
+
+        // Build the path
         StringBuilder buffer = new StringBuilder();
-        String lastElem = null;
-        for (String elem : elems) {
-            if (elem == null) {  // Skip any empty/null paths
-                continue;
+        String prevElem = null;
+        for (String path : paths) {
+            if (path == null || path.equals("")) {
+                continue;  // Empty paths can be skipped
             }
 
-            if (lastElem == null) {  // Handle the first element
-                buffer.append(elem);
-            } else if (lastElem.endsWith(IOConstants.SEPARATOR)) {  // Check if the last path ends with the separator
-                buffer.append(elem.startsWith(IOConstants.SEPARATOR) ? elem.substring(IOConstants.SEPARATOR.length()) : elem);
+            if (prevElem == null) {  // Handle the first element
+                buffer.append(path);
+            } else if (prevElem.endsWith(separator)) {  // Check if the previous path ended with the separator
+                buffer.append(path.startsWith(separator) ? path.substring(separator.length()) : path);
             } else {
-                if (!elem.startsWith(IOConstants.SEPARATOR)) {
-                    buffer.append(IOConstants.SEPARATOR);  // Append the separator first...
+                if (!path.startsWith(separator)) {  // If it does not start with a separator,
+                    buffer.append(separator);       // append the separator first...
                 }
-                buffer.append(elem);                       // ...before appending the element
+                buffer.append(path);                // ...before appending the element
             }
 
-            // Update the last element
-            lastElem = elem;
+            // Update the previous path
+            prevElem = path;
         }
 
         return buffer.toString();
@@ -293,33 +361,7 @@ public final class IOMethods {
      * @return The joined path.
      */
     public static String joinPaths(String... paths) {
-        StringBuilder buffer = new StringBuilder();
-        for (String path : paths) {
-            if (path == null) {  // Skip any empty/null paths
-                continue;
-            }
-
-            if (buffer.length() > 0) {  // If there is something in the buffer
-                buffer.append("/");     // Append the separator first...
-            }
-            buffer.append(path);        // ...before appending the path
-        }
-
-        return buffer.toString();
-    }
-
-    /**
-     * Method that splits the paths.
-     *
-     * @param paths The paths to split.
-     * @return The split paths.
-     */
-    public static String[] splitPaths(String paths) {
-        // Replace backslashes with forward slashes
-        paths = paths.replace("\\", "/");
-
-        // Then actually split by separator
-        return paths.split("/");
+        return joinPaths(false, paths);
     }
 
     /**
@@ -350,11 +392,9 @@ public final class IOMethods {
                 matcher = pattern.matcher(finalPath);
             }
 
-            // Return the final path
             return finalPath;
         } else {
-            // No treatment necessary
-            return path;
+            return path;  // No treatment necessary on other systems
         }
     }
 
@@ -367,31 +407,31 @@ public final class IOMethods {
      * @param in       Input stream.
      * @param encoding Encoding to use (e.g. <code>UTF-8</code>).
      * @return String representation of the input stream.
-     * @throws IOException If the encoding format is not recognized or something went wrong when
+     * @throws IOException If the encoding format is not recognized, or if something went wrong when
      *                     reading the input stream.
      */
     public static String inputStreamToString(InputStream in, String encoding) throws IOException {
         // Define a buffer for writing the output to
-        byte[] buf = new byte[8192];  // 8192 = 2^13
+        byte[] buff = new byte[8192];
 
-        // Write input stream as bytes to the output stream
+        // Write input stream to the output stream
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         int len;
-        while ((len = in.read(buf)) != -1) {
-            out.write(buf, 0, len);
+        while ((len = in.read(buff)) != -1) {
+            out.write(buff, 0, len);
         }
 
-        // Convert the output stream bytes into a string by using the provided encoding
+        // Convert the output stream bytes into a string by using the encoding
         return out.toString(encoding);
     }
 
     /**
-     * Method that returns the number of files/folders in the specified directory.
+     * Method that gets the number of files/folders in the specified directory.
      *
-     * @param dirPath <b>Absolute</b> path to the directory.
+     * @param dirPath The <b>absolute</b> path to the directory.
      * @return An integer, representing the number of files/folders in the directory. Returns
-     * <code>-1</code> if the directory does not exist. <b>This ignores any <code>.DS_Store</code>
-     * that may be present in the directory</b>.
+     * <code>-1</code> if the directory does not exist.<br>
+     * <b>Note: this ignores any <code>.DS_Store</code> that may be present in the directory</b>.
      */
     public static int numThingsInDir(String dirPath) {
         if (isSomethingAt(dirPath)) {

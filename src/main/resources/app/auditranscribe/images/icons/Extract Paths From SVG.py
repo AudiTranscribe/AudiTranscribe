@@ -24,13 +24,6 @@ import os
 import re
 import json
 
-# CONSTANTS
-THEME_COLOURS = {
-    "light-mode": "#000000ff",
-    "dark-mode": "#bbbbbbff",
-    "high-contrast": "#ffffffff"
-}
-
 # MAIN CODE
 # Read SVG files' contents
 svgContents = {}
@@ -50,8 +43,4 @@ for name, fileContents in svgContents.items():
 
 # Save the paths to a JSON file
 with open("icons.json", "w") as f:
-    finalData = {
-        "themeColours": THEME_COLOURS,
-        "svgPaths": svgPathData
-    }
-    json.dump(finalData, f, indent=2)
+    json.dump({"svgPaths": svgPathData}, f, indent=2)

@@ -1,6 +1,6 @@
 /*
  * OSType.java
- * Description: Enum that lists the different types of operating systems.
+ * Description: Enum containing the different types of operating systems.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -19,7 +19,7 @@
 package app.auditranscribe.system;
 
 /**
- * Enum that lists the different types of operating systems.
+ * Enum containing the different types of operating systems.
  */
 public enum OSType {
     WINDOWS,

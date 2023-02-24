@@ -1,0 +1,9 @@
+.title-label {
+    -fx-font-size: 48pt;
+    -fx-font-weight: bold;
+}
+
+.version-label {
+    -fx-font-size: 18pt;
+    -fx-text-fill: text-colour-secondary;
+}

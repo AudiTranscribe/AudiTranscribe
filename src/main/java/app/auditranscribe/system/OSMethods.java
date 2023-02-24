@@ -1,6 +1,6 @@
 /*
  * OSMethods.java
- * Description: Class that contains operating system methods.
+ * Description: Methods involving system operations.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -20,8 +20,9 @@ package app.auditranscribe.system;
 
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 
-import java.util.List;
-
+/**
+ * Methods involving system operations.
+ */
 public final class OSMethods {
     private OSMethods() {
         // Private constructor to signal this is a utility class
@@ -30,11 +31,12 @@ public final class OSMethods {
     // Public methods
 
     /**
-     * Method that returns the value of the environment variable or the default value.
+     * Method that returns the value of the requested environment variable, or the default value if
+     * it is not found.
      *
-     * @param key        The environment variable key.
-     * @param defaultVal The default value if the environment variable is not found.
-     * @return The value of the environment variable, or the default value.
+     * @param key        The environment variable whose value we want to query.
+     * @param defaultVal The default value if the environment variable is not defined.
+     * @return The environment variable's value, or the default value if it is not defined.
      */
     public static String getOrDefault(String key, String defaultVal) {
         String val = System.getenv().get(key);
@@ -44,22 +46,17 @@ public final class OSMethods {
     /**
      * Method that gets the operating system of the user.
      *
-     * @return Operating system enum value.
+     * @return An <code>OSType</code> value, representing the operating system of the user.
      */
     @ExcludeFromGeneratedCoverageReport  // Todo: eventually we could consider a fourth OS for testing
     public static OSType getOS() {
-        // Get the OS name
         String osName = System.getProperty("os.name").toUpperCase();
-
-        // Split by spaces
         String[] split = osName.split(" ");
 
-        // Get the first value of the split
-        String proposedOSName = split[0];
+        String proposedOSName = split[0];  // First value of the split is (supposedly) the OS name
 
         // If the proposed OS name is one of the 3 standard ones we are OK
-        List<String> recognisedOS = List.of("WINDOWS", "MAC", "LINUX");
-        if (recognisedOS.contains(proposedOSName)) {
+        if (proposedOSName.equals("WINDOWS") || proposedOSName.equals("MAC") || proposedOSName.equals("LINUX")) {
             return OSType.valueOf(proposedOSName);
         } else {
             return OSType.OTHER;

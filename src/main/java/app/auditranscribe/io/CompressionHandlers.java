@@ -19,13 +19,12 @@
 package app.auditranscribe.io;
 
 import app.auditranscribe.misc.CustomTask;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import org.apache.commons.compress.compressors.lz4.BlockLZ4CompressorInputStream;
 import org.apache.commons.compress.compressors.lz4.BlockLZ4CompressorOutputStream;
 
 import java.io.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
+import java.util.zip.*;
 
 /**
  * Class that handles compression/decompression operations.
@@ -33,13 +32,32 @@ import java.util.zip.ZipOutputStream;
 public final class CompressionHandlers {
     // Constants
     public static final int BUFFER_SIZE = 2048;  // In bytes
-    public static final int VERSION_NUMBER = 1;
 
     private CompressionHandlers() {
         // Private constructor to signal this is a utility class
     }
 
-    // Public methods
+    // LZ4 compression
+
+    /**
+     * Method that returns an LZ4 compressed version of the bytes array.
+     *
+     * @param bytes Bytes array to be LZ4 compressed.
+     * @param task  The <code>CustomTask</code> object that is handling the compression. Pass in
+     *              <code>null</code> if no such task is being used.
+     * @return Compressed bytes.
+     * @throws IOException If something went wrong when compressing the bytes.
+     */
+    public static byte[] lz4Compress(byte[] bytes, CustomTask<?> task) throws IOException {
+        byte[] buffer = new byte[BUFFER_SIZE];
+        int numPasses = (int) Math.ceil((double) bytes.length / BUFFER_SIZE);
+
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);  // Takes bytes from the input bytes array
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        BlockLZ4CompressorOutputStream compressionStream = new BlockLZ4CompressorOutputStream(outputStream);
+
+        return handleStreamCompression(inputStream, outputStream, compressionStream, buffer, numPasses, task);
+    }
 
     /**
      * Method that returns an LZ4 compressed version of the bytes array.
@@ -53,78 +71,168 @@ public final class CompressionHandlers {
     }
 
     /**
-     * Method that returns an LZ4 compressed version of the bytes array.
+     * Method that returns an LZ4 compressed version of the bytes array.<br>
+     * Fails silently, so no exception is thrown.
      *
      * @param bytes Bytes array to be LZ4 compressed.
-     * @param task  The <code>CustomTask</code> object that is handling the generation. Pass in
+     * @param task  The <code>CustomTask</code> object that is handling the compression. Pass in
+     *              <code>null</code> if no such task is being used.
+     * @return Compressed bytes. Returns <code>null</code> if an error occurred.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static byte[] lz4CompressFailSilently(byte[] bytes, CustomTask<?> task) {
+        try {
+            return lz4Compress(bytes, task);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Method that returns an LZ4 compressed version of the bytes array.<br>
+     * Fails silently, so no exception is thrown.
+     *
+     * @param bytes Bytes array to be LZ4 compressed.
+     * @return Compressed bytes. Returns <code>null</code> if an error occurred.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static byte[] lz4CompressFailSilently(byte[] bytes) {
+        return lz4CompressFailSilently(bytes, null);
+    }
+
+    /**
+     * Method that decompresses the input LZ4 bytes and returns the decompressed bytes.
+     *
+     * @param compressed LZ4 compressed bytes that are to be decompressed.
+     * @return Decompressed bytes.
+     * @throws IOException If something went wrong when decompressing the bytes.
+     */
+    public static byte[] lz4Decompress(byte[] compressed) throws IOException {
+        byte[] buffer = new byte[BUFFER_SIZE];
+
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(compressed);  // Take bytes from input byte array
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        BlockLZ4CompressorInputStream decompressionStream = new BlockLZ4CompressorInputStream(inputStream);
+
+        return handleStreamDecompression(inputStream, outputStream, decompressionStream, buffer);
+    }
+
+    /**
+     * Method that decompresses the input LZ4 bytes and returns the decompressed bytes.<br>
+     * Fails silently, so no exception is thrown.
+     *
+     * @param compressed LZ4 compressed bytes that are to be decompressed.
+     * @return Decompressed bytes. Returns <code>null</code> if an error occurred.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static byte[] lz4DecompressFailSilently(byte[] compressed) {
+        try {
+            return lz4Decompress(compressed);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    // DEFLATE compression
+
+    /**
+     * Method that returns a DEFLATE compressed version of the bytes array.
+     *
+     * @param bytes Bytes to be compressed using DEFLATE.
+     * @param task  The <code>CustomTask</code> object that is handling the compression. Pass in
      *              <code>null</code> if no such task is being used.
      * @return Compressed bytes.
      * @throws IOException If something went wrong when compressing the bytes.
      */
-    public static byte[] lz4Compress(byte[] bytes, CustomTask<?> task) throws IOException {
-        // Create a byte buffer
-        byte[] buf = new byte[BUFFER_SIZE];
-
-        // Count the number of passes that are needed for the LZ4 compression to complete
+    public static byte[] deflateCompress(byte[] bytes, CustomTask<?> task) throws IOException {
+        byte[] buffer = new byte[BUFFER_SIZE];
         int numPasses = (int) Math.ceil((double) bytes.length / BUFFER_SIZE);
 
-        // Define needed byte streams
         ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);  // Takes bytes from the input bytes array
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-        // Define the LZ4 compressor stream
-        BlockLZ4CompressorOutputStream out = new BlockLZ4CompressorOutputStream(outputStream);
+        DeflaterOutputStream out = new DeflaterOutputStream(outputStream);
 
-        // Pass bytes from the input stream through the LZ4 compression stream
-        int len;
-        int currPass = 0;  // Current pass number
-
-        while ((len = inputStream.read(buf)) > 0) {
-            out.write(buf, 0, len);
-            if (task != null) task.updateProgress(++currPass, numPasses);
-        }
-
-        // Close streams
-        inputStream.close();
-        outputStream.close();
-        out.close();
-
-        // Get the resulting byte array
-        return outputStream.toByteArray();
+        return handleStreamCompression(inputStream, outputStream, out, buffer, numPasses, task);
     }
 
     /**
-     * Method that decompressed the input LZ4 bytes and returns the decompressed bytes.
+     * Method that returns a DEFLATE compressed version of the bytes array.
      *
-     * @param lz4Bytes LZ4 compressed bytes that are to be decompressed.
+     * @param bytes Bytes to be compressed using DEFLATE.
+     * @return Compressed bytes.
+     * @throws IOException If something went wrong when compressing the bytes.
+     */
+    public static byte[] deflateCompress(byte[] bytes) throws IOException {
+        return deflateCompress(bytes, null);
+    }
+
+    /**
+     * Method that returns a DEFLATE compressed version of the bytes array.<br>
+     * Fails silently, so no exception is thrown.
+     *
+     * @param bytes Bytes to be compressed using DEFLATE.
+     * @param task  The <code>CustomTask</code> object that is handling the compression. Pass in
+     *              <code>null</code> if no such task is being used.
+     * @return Compressed bytes. Returns <code>null</code> if an error occurred.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static byte[] deflateCompressFailSilently(byte[] bytes, CustomTask<?> task) {
+        try {
+            return deflateCompress(bytes, task);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Method that returns a DEFLATE compressed version of the bytes array.<br>
+     * Fails silently, so no exception is thrown.
+     *
+     * @param bytes Bytes to be compressed using DEFLATE.
+     * @return Compressed bytes. Returns <code>null</code> if an error occurred.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static byte[] deflateCompressFailSilently(byte[] bytes) {
+        return deflateCompressFailSilently(bytes, null);
+    }
+
+    /**
+     * Method that decompresses the DEFLATE compressed bytes and returns the decompressed bytes.
+     *
+     * @param compressed DEFLATE compressed bytes that are to be decompressed.
      * @return Decompressed bytes.
      * @throws IOException If something went wrong when decompressing the bytes.
      */
-    public static byte[] lz4Decompress(byte[] lz4Bytes) throws IOException {
-        // Create a byte buffer
-        byte[] buf = new byte[BUFFER_SIZE];
+    public static byte[] deflateDecompress(byte[] compressed) throws IOException {
+        byte[] buffer = new byte[BUFFER_SIZE];
 
-        // Define needed byte streams
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(lz4Bytes);  // Take bytes from input byte array
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(compressed);  // Take bytes from input byte array
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-        // Define the LZ4 decompressor stream
-        BlockLZ4CompressorInputStream in = new BlockLZ4CompressorInputStream(inputStream);
+        InflaterInputStream decompressionStream = new InflaterInputStream(inputStream);
 
-        // Pass bytes from the input stream through the LZ4 decompression stream
-        int len;
-        while ((len = in.read(buf)) > 0) {
-            outputStream.write(buf, 0, len);
-        }
-
-        // Close streams
-        in.close();
-        inputStream.close();
-        outputStream.close();
-
-        // Get the resulting byte array
-        return outputStream.toByteArray();
+        return handleStreamDecompression(inputStream, outputStream, decompressionStream, buffer);
     }
+
+    /**
+     * Method that decompresses the DEFLATE compressed bytes and returns the decompressed bytes.<br>
+     * Fails silently, so no exception is thrown.
+     *
+     * @param compressed DEFLATE compressed bytes that are to be decompressed.
+     * @return Decompressed bytes. Returns <code>null</code> if an error occurred.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static byte[] deflateDecompressFailSilently(byte[] compressed) {
+        try {
+            return deflateDecompress(compressed);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    // ZIP compression
 
     /**
      * Method that zips a set of files into a single zip file.
@@ -240,6 +348,64 @@ public final class CompressionHandlers {
     }
 
     // Private methods
+
+    /**
+     * Helper method that handles the compression via streams.
+     *
+     * @param inputStream       Input stream of the bytes.
+     * @param outputStream      Output stream of the bytes.
+     * @param compressionStream Intermediate stream that actually handles the compression.
+     * @param buffer            Byte buffer for storing compressed bytes.
+     * @param numPasses         Number of passes needed to complete the full compression.
+     * @param task              The <code>CustomTask</code> object that is handling the compression.
+     *                          Pass in <code>null</code> if no such task is being used.
+     * @return Compressed bytes.
+     * @throws IOException If something went wrong during the compression.
+     */
+    private static byte[] handleStreamCompression(
+            ByteArrayInputStream inputStream, ByteArrayOutputStream outputStream,
+            OutputStream compressionStream, byte[] buffer, int numPasses, CustomTask<?> task
+    ) throws IOException {
+        int len;
+        int currPass = 0;
+
+        while ((len = inputStream.read(buffer)) > 0) {
+            compressionStream.write(buffer, 0, len);
+            if (task != null) task.updateProgress(++currPass, numPasses);
+        }
+
+        inputStream.close();
+        outputStream.close();
+        compressionStream.close();
+
+        return outputStream.toByteArray();
+    }
+
+    /**
+     * Helper method that handles the decompression via streams.
+     *
+     * @param inputStream         Input stream of the bytes.
+     * @param outputStream        Output stream of the bytes.
+     * @param decompressionStream Intermediate stream that actually handles the decompression.
+     * @param buffer              Byte buffer for storing decompressed bytes.
+     * @return Decompressed bytes.
+     * @throws IOException If something went wrong during the decompression.
+     */
+    private static byte[] handleStreamDecompression(
+            ByteArrayInputStream inputStream, ByteArrayOutputStream outputStream,
+            InputStream decompressionStream, byte[] buffer
+    ) throws IOException {
+        int len;
+        while ((len = decompressionStream.read(buffer)) > 0) {
+            outputStream.write(buffer, 0, len);
+        }
+
+        decompressionStream.close();
+        inputStream.close();
+        outputStream.close();
+
+        return outputStream.toByteArray();
+    }
 
     /**
      * Helper method that gets a <code>File</code> object based on the zip entry received.

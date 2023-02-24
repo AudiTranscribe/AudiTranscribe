@@ -1,0 +1,1 @@
+Here's a file that contains some text for testing the hashing methods.

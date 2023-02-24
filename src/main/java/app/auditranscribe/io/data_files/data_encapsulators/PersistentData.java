@@ -18,10 +18,13 @@
 
 package app.auditranscribe.io.data_files.data_encapsulators;
 
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+
 /**
  * Class that contains persistent data.
  */
+@ExcludeFromGeneratedCoverageReport
 public class PersistentData {
     public boolean isSetupComplete = false;
-    public int lastCheckedForUpdates = -1;
+    public int updateCheckingPausedUntil = -1;  // Unix timestamp to resume checking for updates
 }

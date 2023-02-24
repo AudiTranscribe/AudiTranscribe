@@ -1,0 +1,3 @@
+.choice-box .label, .choice-box .menu-item, .choice-box .menu-item > .label {
+    -fx-font-size: 14px;
+}

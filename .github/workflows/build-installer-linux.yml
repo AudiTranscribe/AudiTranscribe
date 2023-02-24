@@ -31,7 +31,7 @@ jobs:
       - name: Install Custom Maven Dependencies
         run: mvn validate
       - name: Generate Installer
-        run: mvn -B clean:clean compiler:compile javafx:jlink jpackage:jpackage@linux
+        run: mvn -B clean compile javafx:jlink jpackage:jpackage@linux
       - name: Upload Linux Installer
         uses: actions/upload-artifact@v3
         with:

@@ -16,30 +16,29 @@
  * Copyright © AudiTranscribe Team
  */
 
-module app.auditranscribe {
+module AudiTranscribe {
+    // Java dependencies
     requires java.desktop;
+    requires java.logging;
     requires java.sql;
 
-    requires commons.exec;
-    requires com.dlsc.formsfx;
+    // General dependencies
     requires com.google.gson;
     requires org.apache.commons.compress;
-    requires org.controlsfx.controls;
-    requires org.kordamp.bootstrapfx.core;
     requires org.xerial.sqlitejdbc;
-    requires java.logging;
+
+    // JavaFX-related dependencies
     requires javafx.controls;
     requires javafx.fxml;
-    requires javafx.media;
     requires javafx.swing;
-    requires javafx.web;
 
+    // Exports
     exports app.auditranscribe;
-    exports app.auditranscribe.audio;
-    exports app.auditranscribe.audio.exceptions;
-    exports app.auditranscribe.audio.filters;
-    exports app.auditranscribe.audio.window_functions;
-    exports app.auditranscribe.generic.exceptions;
+    exports app.auditranscribe.fxml;
+    exports app.auditranscribe.fxml.views;
+    exports app.auditranscribe.fxml.views.main;
+    exports app.auditranscribe.fxml.views.setup_wizard;
+    exports app.auditranscribe.generic;
     exports app.auditranscribe.generic.tuples;
     exports app.auditranscribe.io.audt_file;
     exports app.auditranscribe.io.audt_file.base;
@@ -49,27 +48,22 @@ module app.auditranscribe {
     exports app.auditranscribe.io.data_files.file_classes;
     exports app.auditranscribe.io.exceptions;
     exports app.auditranscribe.misc;
-    exports app.auditranscribe.misc.icon;
     exports app.auditranscribe.music;
-    exports app.auditranscribe.music.exceptions;
-    exports app.auditranscribe.music.notes;
     exports app.auditranscribe.network;
     exports app.auditranscribe.network.exceptions;
-    exports app.auditranscribe.spectrogram;
-    exports app.auditranscribe.utils;
-    exports app.auditranscribe.views.main;
-    exports app.auditranscribe.views.main.scene_switching;
-    exports app.auditranscribe.views.main.view_controllers;
-    exports app.auditranscribe.views.setup_wizard;
-    exports app.auditranscribe.views.setup_wizard.download_handlers;
-    exports app.auditranscribe.views.setup_wizard.view_controllers;
+    exports app.auditranscribe.signal;
+    exports app.auditranscribe.signal.feature_extraction;
+    exports app.auditranscribe.signal.onset_detection;
+    exports app.auditranscribe.signal.representations;
+    exports app.auditranscribe.signal.resampling_filters;
+    exports app.auditranscribe.signal.time_domain_processing;
+    exports app.auditranscribe.signal.windowing;
 
+    // Opens
     opens app.auditranscribe to javafx.fxml;
-    opens app.auditranscribe.misc to javafx.fxml;
-    opens app.auditranscribe.misc.icon to com.google.gson, javafx.fxml;
-    opens app.auditranscribe.views.main to javafx.fxml;
-    opens app.auditranscribe.views.main.scene_switching to javafx.fxml;
-    opens app.auditranscribe.views.main.view_controllers to javafx.fxml;
-    opens app.auditranscribe.views.setup_wizard to javafx.fxml;
-    opens app.auditranscribe.views.setup_wizard.view_controllers to javafx.fxml;
+    opens app.auditranscribe.fxml to com.google.gson, javafx.fxml;
+    opens app.auditranscribe.fxml.views.main.controllers to javafx.fxml;
+    opens app.auditranscribe.fxml.views.setup_wizard to javafx.fxml;
+    opens app.auditranscribe.fxml.views.setup_wizard.controllers to javafx.fxml;
+    opens app.auditranscribe.fxml.views.setup_wizard.download_handlers to com.google.gson;
 }

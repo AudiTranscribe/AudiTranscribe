@@ -1,6 +1,6 @@
 /*
  * IOConstants.java
- * Description: Constants involved in the IO methods.
+ * Description: Constants used in input/output operations.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -21,7 +21,7 @@ package app.auditranscribe.io;
 import java.io.File;
 
 /**
- * Constants involved in the IO methods.
+ * Constants used in input/output operations.
  */
 public final class IOConstants {
     // Constants
@@ -35,8 +35,10 @@ public final class IOConstants {
     public static final String USER_HOME_PATH = System.getProperty("user.home");
     public static final String TEMP_FOLDER_PATH = System.getProperty("java.io.tmpdir");
 
-    public static final String APP_DATA_FOLDER_PATH =
-            ApplicationDirectory.getUserDataDirectory("AudiTranscribe", null);
+//    public static final String APP_DATA_FOLDER_PATH = IOMethods.getApplicationDataDirectory();
+    public static final String APP_DATA_FOLDER_PATH = IOMethods.joinPaths(
+            IOMethods.getApplicationDataDirectory(), "v0.11.0"  // Todo remove
+    );
     public static final String PROJECT_BACKUPS_FOLDER_PATH = IOMethods.joinPaths(
             IOConstants.APP_DATA_FOLDER_PATH, "project_backups"
     );

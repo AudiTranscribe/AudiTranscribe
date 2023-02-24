@@ -27,7 +27,7 @@ public enum NoteUnit {
     QUARTER_NOTE("Quarter Note", 4),
     EIGHTH_NOTE("Eighth Note", 8),
     SIXTEENTH_NOTE("Sixteenth Note", 16),
-    THIRTY_SECOND_NOTE("Thirty-Second Note", 32);
+    THIRTY_SECOND_NOTE("Thirty-second Note", 32);
 
     // Attribute
     public final String name;
@@ -53,7 +53,6 @@ public enum NoteUnit {
         return null;
     }
 
-    // Overridden methods
     @Override
     public String toString() {
         return name;

@@ -1,6 +1,6 @@
 /*
  * HashingUtils.java
- * Description: Hashing utility methods.
+ * Description: Hashing utilities.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -27,7 +27,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 
 /**
- * Hashing utility methods.
+ * Hashing utilities.
  */
 public final class HashingUtils {
     private HashingUtils() {

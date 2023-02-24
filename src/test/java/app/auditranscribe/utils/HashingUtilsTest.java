@@ -1,21 +1,3 @@
-/*
- * HashingUtilsTest.java
- * Description: Test `HashingUtils.java`.
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
- * Licence, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public Licence for more details.
- *
- * You should have received a copy of the GNU General Public Licence along with this program. If
- * not, see <https://www.gnu.org/licenses/>
- *
- * Copyright © AudiTranscribe Team
- */
-
 package app.auditranscribe.utils;
 
 import app.auditranscribe.io.IOConstants;
@@ -45,10 +27,10 @@ class HashingUtilsTest {
         );
 
         assertEquals(
-                "0c7f9618ef4b39f56d2ba77cf7cfc079",
+                "2fd96d7ce646c3ddba5fc132338d33da",
                 HashingUtils.getHash(new File(IOMethods.joinPaths(
                         IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-                        "testing-files", "text", "README.txt"
+                        "test-files", "utils", "HashingUtilsTest", "DummyFile.txt"
                 )), "MD5")
         );
         assertThrows(IOException.class, () -> HashingUtils.getHash(new File("not a file"), "MD5"));

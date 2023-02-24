@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane fx:id="rootPane" prefHeight="300.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.auditranscribe.fxml.views.main.controllers.DebugViewController">
+   <children>
+      <ListView fx:id="debugList" layoutY="50.0" prefHeight="200.0" prefWidth="200.0" styleClass="debug-list" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+   </children>
+   <stylesheets>
+      <URL value="@../../css/base.css" />
+      <URL value="@../../css/views/main/debug-view.css" />
+      <URL value="@../../css/theme/shared-colours.css" />
+      <URL value="@../../css/theme/light.css" />
+   </stylesheets>
+</AnchorPane>

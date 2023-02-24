@@ -18,8 +18,8 @@
 
 package app.auditranscribe.network;
 
+import app.auditranscribe.misc.CustomLogger;
 import app.auditranscribe.misc.CustomTask;
-import app.auditranscribe.misc.MyLogger;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
@@ -28,7 +28,7 @@ import java.util.logging.Level;
 /**
  * A task class that helps expose the download amount to other classes.
  *
- * @param <V> Type of value that is returned by the task.
+ * @param <V> Type that is returned by the download task.
  */
 public abstract class DownloadTask<V> extends CustomTask<V> {
     // Attributes
@@ -36,7 +36,7 @@ public abstract class DownloadTask<V> extends CustomTask<V> {
     private final IntegerProperty downloadedAmount = new SimpleIntegerProperty(0);
 
     /**
-     * Initializes a new <code>DownloadTask</code> object.
+     * Initializes a new <code>DownloadTask</code>.
      */
     public DownloadTask() {
         super();
@@ -44,7 +44,7 @@ public abstract class DownloadTask<V> extends CustomTask<V> {
         // Create a change listener for the progress property
         progressProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal.doubleValue() == -1) {
-                MyLogger.log(Level.INFO, "New progress value is still -1", DownloadTask.class.getName());
+                CustomLogger.log(Level.INFO, "New progress value is still -1", DownloadTask.class.getName());
                 return;
             }
             downloadedAmount.setValue(newVal.doubleValue() * downloadFileSize);
@@ -52,7 +52,6 @@ public abstract class DownloadTask<V> extends CustomTask<V> {
     }
 
     // Getter/Setter methods
-
     public int getDownloadFileSize() {
         return downloadFileSize;
     }

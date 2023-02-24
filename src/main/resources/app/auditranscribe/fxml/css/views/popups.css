@@ -1,0 +1,20 @@
+.header-panel {
+    -fx-background-color: background-colour-primary;
+}
+
+.dialog-pane {
+    -fx-background-color: background-colour-secondary;
+}
+
+.dialog-pane .button {
+    -fx-background-color: background-colour-tertiary;
+}
+
+.dialog-pane .button:hover {
+    -fx-background-color: button-hover-colour-alt;
+}
+
+.dialog-pane > .button-bar > .container > .details-button.more,
+.dialog-pane > .button-bar > .container > .details-button.less {
+    -fx-text-fill: text-colour-primary;
+}

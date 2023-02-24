@@ -1,6 +1,6 @@
 /*
  * FFmpegHandler.java
- * Description: Methods that handle FFmpeg interactions.
+ * Description: Class that handles FFmpeg interactions.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -18,13 +18,14 @@
 
 package app.auditranscribe.audio;
 
+import app.auditranscribe.audio.exceptions.FFmpegHandlerNotInitialized;
+import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.system.OSMethods;
 import app.auditranscribe.system.OSType;
 import app.auditranscribe.audio.exceptions.FFmpegCommandFailedException;
 import app.auditranscribe.audio.exceptions.FFmpegNotFoundException;
-import app.auditranscribe.generic.ClassWithLogging;
 import app.auditranscribe.generic.tuples.Pair;
 
 import java.io.BufferedReader;
@@ -36,40 +37,52 @@ import java.util.List;
 import java.util.logging.Level;
 
 /**
- * Methods that handle FFmpeg interactions.
+ * Class that handles FFmpeg interactions.
  */
-public class FFmpegHandler extends ClassWithLogging {
+public final class FFmpegHandler extends LoggableClass {
     // Constants
     public static final List<String> VALID_EXTENSIONS = List.of(new String[]{
             ".wav", ".mp3", ".flac", ".ogg", ".aif", ".aiff"
     });
 
     // Attributes
-    public final String ffmpegPath;
+    private final String ffmpegPath;
+    public static FFmpegHandler handler;
 
     /**
-     * Initialization method for the audio converter.
+     * Initialization method for the FFmpeg handler.
      *
-     * @param ffmpegPath The path to the FFmpeg binary.
-     * @throws FFmpegNotFoundException If FFmpeg was not found at the specified path.
+     * @param ffmpegPath Path to the FFmpeg binary.
      */
-    public FFmpegHandler(String ffmpegPath) throws FFmpegNotFoundException {
-        // Check FFmpeg path
-        if (checkFFmpegPath(ffmpegPath)) {
-            this.ffmpegPath = ffmpegPath;
-        } else {
-            throw new FFmpegNotFoundException("Could not find FFmpeg at '" + ffmpegPath + "'.");
-        }
+    private FFmpegHandler(String ffmpegPath) {
+        this.ffmpegPath = ffmpegPath;
     }
 
     // Public methods
 
     /**
+     * Method that initializes a global FFmpeg handler.
+     *
+     * @param ffmpegPath Path to the FFmpeg binary.
+     * @throws FFmpegNotFoundException If FFmpeg was not found at the specified path.
+     */
+
+    public static void initFFmpegHandler(String ffmpegPath) throws FFmpegNotFoundException {
+        if (handler == null) {
+            if (checkFFmpegPath(ffmpegPath)) {
+                handler = new FFmpegHandler(ffmpegPath);
+            } else {
+                throw new FFmpegNotFoundException("Could not find FFmpeg at '" + ffmpegPath + "'.");
+            }
+        }
+    }
+
+    /**
      * Method that attempts to find the FFmpeg installation path automatically by using the
      * command-line interface of FFmpeg.
      *
-     * @return A string, representing the FFmpeg installation path.
-     * @throws FFmpegNotFoundException If the program fails to find the FFmpeg installation.
+     * @return A string, representing the path to the FFmpeg binary.
+     * @throws FFmpegNotFoundException If the program fails to find the FFmpeg binary.
      */
     @ExcludeFromGeneratedCoverageReport
     public static String getPathToFFmpeg() throws FFmpegNotFoundException {
@@ -148,72 +161,23 @@ public class FFmpegHandler extends ClassWithLogging {
      * @param outputFilePath Absolute path to the output file, <b>including the extension</b>.
      * @return A string, representing the output file's path after processing it.
      */
-    public String convertAudio(File file, String outputFilePath) {
-        // Obtain the processed input and output file paths
-        Pair<String, String> filePathPair = processPaths(file, outputFilePath);
-        String inputFilePath = filePathPair.value0();
-        outputFilePath = filePathPair.value1();
-
-        // Generate the command to execute
-        String[] command = {
-                ffmpegPath,
-                "-y",                 // Override output file
-                "-i", inputFilePath,  // Specify input file
-                "-b:a", "96k",        // Constant bitrate for MP3 and related files of 96,000 bits
-                outputFilePath        // Specify output file
-        };
-
-        // Execute FFmpeg command
-        boolean success = handleFFmpegCommandExec(command);
-        if (success) {
-            log(Level.FINE, "Successfully converted '" + file.getName() + "'");
-            return outputFilePath;
-        } else {
-            throw new FFmpegCommandFailedException("FFmpeg command " + Arrays.toString(command) + " failed");
-        }
-    }
-
-    /**
-     * Method that adjusts the tempo the original audio file <code>file</code> and saves the
-     * adjusted audio into a new audio file with extension <code>extension</code>.<br>
-     * Note that this method produces a new audio file, <code>output.ext</code> (with the
-     * extension <code>.ext</code>).
-     *
-     * @param file           File object representing the original audio file.
-     * @param outputFilePath Absolute path to the output file, <b>including the extension</b>.
-     * @return A string, representing the output file's path after processing it.
-     */
-    public String generateAltTempoAudio(File file, String outputFilePath, double tempo) {
-        // Obtain the processed input and output file paths
-        Pair<String, String> filePathPair = processPaths(file, outputFilePath);
-        String inputFilePath = filePathPair.value0();
-        outputFilePath = filePathPair.value1();
-
-        // Generate the command to execute
-        String[] command = {
-                ffmpegPath,
-                "-y",                            // Override output file
-                "-i", inputFilePath,             // Specify input file
-                "-filter:a", "atempo=" + tempo,  // Specify tempo
-                "-vn",                           // Disable video recording
-                outputFilePath                   // Specify output file
-        };
-
-        // Execute FFmpeg command
-        boolean success = handleFFmpegCommandExec(command);
-        if (success) {
-            log(
-                    Level.FINE,
-                    "Successfully generated alternate tempo audio for '" +
-                            file.getName() + "' at " + tempo + "x tempo"
-            );
-            return outputFilePath;
-        } else {
-            throw new FFmpegCommandFailedException("FFmpeg command " + Arrays.toString(command) + " failed");
-        }
+    public static String convertAudio(File file, String outputFilePath) {
+        checkIfHandlerWasInitialized();
+        return handler.convertAudioHelper(file, outputFilePath);
     }
 
     // Private methods
+
+    /**
+     * Helper method that checks whether the global FFmpeg handler was initialized.
+     *
+     * @throws FFmpegHandlerNotInitialized If the handler has not been initialized.
+     */
+    private static void checkIfHandlerWasInitialized() {
+        if (handler == null) throw new FFmpegHandlerNotInitialized(
+                "The global FFmpeg handler has yet to be initialized"
+        );
+    }
 
     /**
      * Helper method to process the paths.
@@ -257,6 +221,41 @@ public class FFmpegHandler extends ClassWithLogging {
             return process.waitFor() == 0;
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    /**
+     * Method that converts the original audio file <code>file</code> into a new audio file with
+     * extension <code>extension</code>.<br>
+     * Note that this method produces a new audio file, <code>converted.ext</code> (with the
+     * extension <code>.ext</code>).
+     *
+     * @param file           File object representing the original audio file.
+     * @param outputFilePath Absolute path to the output file, <b>including the extension</b>.
+     * @return A string, representing the output file's path after processing it.
+     */
+    private String convertAudioHelper(File file, String outputFilePath) {
+        // Obtain the processed input and output file paths
+        Pair<String, String> filePathPair = processPaths(file, outputFilePath);
+        String inputFilePath = filePathPair.value0();
+        outputFilePath = filePathPair.value1();
+
+        // Generate the command to execute
+        String[] command = {
+                ffmpegPath,
+                "-y",                 // Override output file
+                "-i", inputFilePath,  // Specify input file
+                "-b:a", "128k",       // Constant bitrate for MP3 and related files of 128,000 bits
+                outputFilePath        // Specify output file
+        };
+
+        // Execute FFmpeg command
+        boolean success = handleFFmpegCommandExec(command);
+        if (success) {
+            log(Level.FINE, "Successfully converted '" + file.getName() + "'");
+            return outputFilePath;
+        } else {
+            throw new FFmpegCommandFailedException("FFmpeg command " + Arrays.toString(command) + " failed");
         }
     }
 }

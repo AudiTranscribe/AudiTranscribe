@@ -32,7 +32,7 @@ jobs:
         run: mvn validate
         # Todo: get Apple signing key
       - name: Generate Installer
-        run: mvn -B clean:clean compiler:compile javafx:jlink jpackage:jpackage@mac
+        run: mvn -B clean compile javafx:jlink jpackage:jpackage@mac
       - name: Upload macOS Installer
         uses: actions/upload-artifact@v3
         with:

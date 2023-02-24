@@ -18,7 +18,11 @@
 
 package app.auditranscribe.io.audt_file.base.data_encapsulators;
 
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+import app.auditranscribe.music.MusicKey;
 import app.auditranscribe.music.TimeSignature;
+
+import java.util.Objects;
 
 /**
  * Data object that stores the project's info.<br>
@@ -32,10 +36,34 @@ public abstract class ProjectInfoDataObject extends AbstractAUDTDataObject {
 
     // Attributes
     public String projectName;
-    public int musicKeyIndex;
+    public MusicKey musicKey;
     public TimeSignature timeSignature;
     public double bpm;
     public double offsetSeconds;
     public double playbackVolume;
     public int currTimeInMS;
+
+    // Public methods
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProjectInfoDataObject that = (ProjectInfoDataObject) o;
+        return Objects.equals(projectName, that.projectName) &&
+                musicKey == that.musicKey &&
+                timeSignature == that.timeSignature &&
+                Double.compare(that.bpm, bpm) == 0 &&
+                Double.compare(that.offsetSeconds, offsetSeconds) == 0 &&
+                Double.compare(that.playbackVolume, playbackVolume) == 0 &&
+                currTimeInMS == that.currTimeInMS;
+    }
+
+    @Override
+    @ExcludeFromGeneratedCoverageReport
+    public int hashCode() {
+        return Objects.hash(
+                projectName, musicKey.name, timeSignature.displayText(), bpm, offsetSeconds, playbackVolume,
+                currTimeInMS
+        );
+    }
 }

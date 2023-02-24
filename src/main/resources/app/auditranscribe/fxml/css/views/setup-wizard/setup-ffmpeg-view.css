@@ -1,0 +1,7 @@
+.root-tab-pane {
+    -fx-tab-max-height: 0;
+}
+
+.root-tab-pane .tab-header-area {
+    visibility: hidden;
+}

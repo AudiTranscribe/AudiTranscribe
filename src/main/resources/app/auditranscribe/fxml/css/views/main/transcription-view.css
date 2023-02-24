@@ -1,0 +1,129 @@
+/* GENERAL */
+.root {
+    -fx-focus-color: transparent;
+}
+
+.separator *.line {
+    -fx-border-color: background-colour-tertiary;
+}
+
+/* TOP */
+.progress-bar-label {
+    -fx-font-size: 10pt;
+}
+
+.memory-use-hbox {
+    -fx-background-color: memory-hbox-background-colour;
+    -fx-background-radius: 0 0 0 10px;
+}
+
+.memory-use-hbox > .label {
+    -fx-text-fill: memory-hbox-text-colour;
+}
+
+.slider:horizontal .track, .slider:vertical .track {
+    -fx-background-color: linear-gradient(to right, -slider-filled-colour 50%, -slider-unfilled-colour 50%);
+}
+
+/* MIDDLE */
+.corner-pane, .edge-anchor-pane, .left-edge-pane, .bottom-edge-pane, .middle-pane {
+    -fx-background-color: background-colour-secondary;
+}
+
+.left-edge-pane > .viewport, .bottom-edge-pane > .viewport, .middle-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.corner-pane, .left-edge-pane, .bottom-edge-pane, .middle-pane {
+    -fx-border-color: background-colour-tertiary;
+}
+
+.corner-pane {
+    -fx-border-width: 0 0 1px 0;
+}
+
+.left-edge-pane {
+    -fx-border-width: 1px 0 1px 0;
+}
+
+.bottom-edge-pane {
+    -fx-border-width: 0 0 1px 1px;
+}
+
+.middle-pane {
+    -fx-border-width: 1px 0 1px 1px;
+}
+
+.edge-label {
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+}
+
+/* Spectrogram */
+.note-line {
+    -fx-stroke: spectrogram-main-line-colour;
+    -fx-stroke-width: 1px;
+    -fx-stroke-dash-array: 10 6;
+}
+
+.note-line-c {
+    -fx-stroke-dash-array: 1;
+}
+
+.beat-line {
+    -fx-stroke: spectrogram-main-line-colour;
+    -fx-stroke-width: 3px;
+}
+
+.bar-line {
+    -fx-stroke: spectrogram-bar-line-colour;
+    -fx-stroke-width: 3px;
+}
+
+.bar-number-ellipse {
+    -fx-stroke: stroke-colour;
+    -fx-stroke-width: 1px;
+}
+
+.current-octave-rectangle {
+    -fx-fill: spectrogram-octave-rectangle-colour;
+}
+
+/* Playback */
+.playhead-line {
+    -fx-stroke: playhead-line-colour;
+    -fx-stroke-width: 4px;
+}
+
+.clickable-progress-pane {
+    -fx-background-color: #00000000; /* Transparent */
+}
+
+.coloured-progress-pane {
+    -fx-background-color: coloured-progress-pane-colour;
+}
+
+/* Note rectangles */
+.note-rectangles-pane {
+    -fx-background-color: #00000000; /* Transparent */
+}
+
+.note-borders-region {
+    -fx-border-width: 3px;
+    -fx-border-radius: 5px;
+    -fx-border-color: note-rectangle-border-colour;
+}
+
+.note-main-rectangle {
+    -fx-border-radius: 5px;
+    -fx-fill: note-rectangle-fill-colour;
+}
+
+/* BOTTOM */
+.time-label {
+    -fx-font-size: 12pt;
+}
+
+.toggle-slowed-audio-button {
+    -fx-font-size: 11pt;
+}
