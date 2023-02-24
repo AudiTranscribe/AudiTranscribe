@@ -93,10 +93,7 @@ public class ProjectInfoDataObject0x000500 extends ProjectInfoDataObject {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        ProjectInfoDataObject0x000500 that = (ProjectInfoDataObject0x000500) o;
-        return timeSignatureIndex == that.timeSignatureIndex &&
-                musicKeyIndex == that.musicKeyIndex;
+        return super.equals(o);
     }
 
     @Override
