@@ -166,7 +166,7 @@ public class TranscriptionViewController extends SwitchableViewController {
     private boolean changedProjectName = false;
 
     private boolean isPaused = true;
-    private final boolean usingSlowedAudio = false;  // Todo: allow changing after slowed audio is implemented
+    private boolean usingSlowedAudio = false;  // Todo: allow changing after slowed audio is implemented
 
     private NotePlayerSynth notePlayerSynth;
     private NotePlayerSequencer notePlayerSequencer;
@@ -421,25 +421,24 @@ public class TranscriptionViewController extends SwitchableViewController {
             updateScrollPosition(0, finalWidth);
         });
 
-        // Todo implement
-//        toggleSlowedAudioButton.setOnAction(event -> {
-//            // Update the text that is shown
-//            if (usingSlowedAudio) {
-//                // Now no longer using it
-//                toggleSlowedAudioButton.setText("1.0x");
-//            } else {
-//                // Starting to use it
-//                toggleSlowedAudioButton.setText("0.5x");
-//            }
-//
-//            // Update the flag
-//            usingSlowedAudio = !usingSlowedAudio;
-//
-//            log(
-//                    Level.FINE,
-//                    "Toggled audio slowdown; audio playback speed is now " + (usingSlowedAudio ? "0.5x" : "1.0x")
-//            );
-//        });
+        toggleSlowedAudioButton.setOnAction(event -> {
+            // Update the text that is shown
+            if (usingSlowedAudio) {
+                // Now no longer using it
+                toggleSlowedAudioButton.setText("1.0×");
+            } else {
+                // Starting to use it
+                toggleSlowedAudioButton.setText("0.5×");
+            }
+
+            usingSlowedAudio = !usingSlowedAudio;
+            audio.toggleSlowedAudio(usingSlowedAudio);
+
+            log(
+                    Level.FINE,
+                    "Toggled audio slowdown; audio playback speed is now " + (usingSlowedAudio ? "0.5×" : "1.0×")
+            );
+        });
 
         // Add methods to menu items
         newProjectMenuItem.setOnAction(this::handleNewProject);

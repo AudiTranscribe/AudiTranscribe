@@ -123,3 +123,7 @@
 .time-label {
     -fx-font-size: 12pt;
 }
+
+.toggle-slowed-audio-button {
+    -fx-font-size: 11pt;
+}
