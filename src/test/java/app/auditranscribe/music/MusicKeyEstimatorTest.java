@@ -39,10 +39,13 @@ class MusicKeyEstimatorTest {
         double[] samples2 = audio2.getMonoSamples();
         double sampleRate2 = audio2.getSampleRate();
 
-        List<MusicKey> mostLikelyKeys2 = getMostLikelyKeys(samples2, sampleRate2, 4);
+        List<MusicKey> mostLikelyKeys2 = getMostLikelyKeys(samples2, sampleRate2, 6);
 
         assertEquals(
-                List.of(MusicKey.C_SHARP_MINOR, MusicKey.F_MAJOR,MusicKey.B_FLAT_MAJOR,  MusicKey.F_MINOR),
+                List.of(
+                        MusicKey.C_SHARP_MINOR, MusicKey.F_MAJOR, MusicKey.B_FLAT_MAJOR, MusicKey.F_MINOR,
+                        MusicKey.F_SHARP_MINOR, MusicKey.A_SHARP_MINOR
+                ),
                 mostLikelyKeys2
         );
 
