@@ -18,6 +18,7 @@
 
 package app.auditranscribe.music;
 
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.utils.MusicUtils;
 
 import java.util.*;
@@ -139,6 +140,7 @@ public enum MusicKey {
     }
 
     @Override
+    @ExcludeFromGeneratedCoverageReport
     public String toString() {
         return name;
     }

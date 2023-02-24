@@ -22,6 +22,7 @@ import app.auditranscribe.generic.exceptions.ValueException;
 import app.auditranscribe.generic.tuples.Pair;
 import app.auditranscribe.generic.tuples.Triple;
 import app.auditranscribe.misc.CustomTask;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.signal.feature_extraction.ChromaCQT;
 import app.auditranscribe.utils.StatisticsUtils;
 import app.auditranscribe.utils.UnitConversionUtils;
@@ -175,6 +176,7 @@ public final class MusicKeyEstimator {
     }
 
     // Helper classes
+    @ExcludeFromGeneratedCoverageReport
     private static class SortKeyProfiles implements Comparator<Triple<Integer, Boolean, Double>> {
         @Override
         public int compare(
