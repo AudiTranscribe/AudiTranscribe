@@ -31,8 +31,12 @@ public class AUDTFileBaseTest {
         assertThrowsExactly(FileNotFoundException.class, () ->
                 AUDTFileReader.getFileReader("abc.audt")  // Non-existent file
         );
+
         assertThrowsExactly(IncorrectFileFormatException.class, () ->
                 AUDTFileReader.getFileReader(IOMethods.joinPaths(folder, "header-incorrect.audt"))
+        );
+        assertThrowsExactly(IncorrectFileFormatException.class, () ->
+                AUDTFileReader.getFileReader(IOMethods.joinPaths(folder, "magic-constant-incorrect.audt"))
         );
         assertThrowsExactly(InvalidFileVersionException.class, () ->
                 AUDTFileReader.getFileReader(IOMethods.joinPaths(folder, "invalid-file-version.audt"))
