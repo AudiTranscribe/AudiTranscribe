@@ -32,6 +32,7 @@ import app.auditranscribe.io.exceptions.FailedToReadDataException;
 import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
 import app.auditranscribe.io.exceptions.InvalidFileVersionException;
 import app.auditranscribe.misc.CustomLogger;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.utils.MiscUtils;
 
 import java.io.FileInputStream;
@@ -59,11 +60,10 @@ public abstract class AUDTFileReader extends LoggableClass {
      * @param inputStream Input stream of the file.
      * @throws IOException                  If something went wrong when reading the AUDT file.
      * @throws IncorrectFileFormatException If the file was formatted incorrectly.
-     * @throws InvalidFileVersionException  If the LZ4 version is outdated.
      */
     public AUDTFileReader(
             String filepath, InputStream inputStream
-    ) throws IOException, IncorrectFileFormatException, InvalidFileVersionException {
+    ) throws IOException, IncorrectFileFormatException {
         // Update attributes
         this.filepath = filepath;
 
@@ -183,6 +183,12 @@ public abstract class AUDTFileReader extends LoggableClass {
      */
     public abstract MusicNotesDataObject readMusicNotesData() throws FailedToReadDataException, IOException;
 
+    @Override
+    @ExcludeFromGeneratedCoverageReport
+    public void log(Level level, String msg) {
+        log(level, msg, AUDTFileReader.class.getName());
+    }
+
     // Protected methods
 
     /**
@@ -243,19 +249,6 @@ public abstract class AUDTFileReader extends LoggableClass {
      */
     protected void skipBytes(int numBytesToSkip) {
         bytePos += numBytesToSkip;
-    }
-
-    /**
-     * Helper method that reads a boolean from the byte array.
-     *
-     * @return Boolean that was read in.
-     */
-    protected boolean readBoolean() {
-        // Read the next byte from the current `bytePos`
-        byte[] booleanBytes = Arrays.copyOfRange(bytes, bytePos, ++bytePos);  // Increment then return
-
-        // Convert these boolean bytes back into a boolean and return
-        return ByteConversionHandlers.bytesToBoolean(booleanBytes);
     }
 
     /**
@@ -412,10 +405,5 @@ public abstract class AUDTFileReader extends LoggableClass {
         // Check if the last 8 bytes corresponds to the EOF bytes
         byte[] eofBytes = Arrays.copyOfRange(bytes, numBytes - 8, numBytes);
         return checkBytesMatch(AUDTFileConstants.AUDT_END_OF_FILE_DELIMITER, eofBytes);
-    }
-
-    @Override
-    public void log(Level level, String msg) {
-        log(level, msg, AUDTFileReader.class.getName());
     }
 }

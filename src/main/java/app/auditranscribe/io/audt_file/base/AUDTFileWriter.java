@@ -31,6 +31,7 @@ import app.auditranscribe.io.audt_file.v0x000900.AUDTFileWriter0x000900;
 import app.auditranscribe.io.audt_file.v0x000B00.AUDTFileWriter0x000B00;
 import app.auditranscribe.io.exceptions.InvalidFileVersionException;
 import app.auditranscribe.misc.CustomLogger;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.utils.MiscUtils;
 
 import java.io.File;
@@ -209,24 +210,12 @@ public abstract class AUDTFileWriter extends LoggableClass {
     public abstract void writeMusicNotesData(MusicNotesDataObject musicNotesDataObj) throws IOException;
 
     @Override
+    @ExcludeFromGeneratedCoverageReport
     public void log(Level level, String msg) {
         log(level, msg, AUDTFileWriter.class.getName());
     }
 
     // Protected methods
-
-    /**
-     * Helper method that writes a boolean to the byte list.
-     *
-     * @param myBoolean Boolean to write.
-     */
-    protected void writeBoolean(boolean myBoolean) {
-        // Convert the short into its bytes
-        byte[] byteArray = ByteConversionHandlers.booleanToBytes(myBoolean);
-
-        // Write to the byte list
-        AUDTFileHelpers.addBytesIntoBytesList(bytes, byteArray);
-    }
 
     /**
      * Helper method that writes a short to the byte list.
