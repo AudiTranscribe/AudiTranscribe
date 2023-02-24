@@ -342,6 +342,24 @@ public final class MatrixUtils {
         return output;
     }
 
+    // Miscellaneous methods
+
+    /**
+     * Method that returns the magnitudes of all the complex elements inside the matrix.
+     *
+     * @param matrix The complex matrix to obtain the magnitudes of.
+     * @return Magnitudes of the elements inside the matrix.
+     */
+    public static double[][] matrixMags(Complex[][] matrix) {
+        double[][] output = new double[matrix.length][matrix[0].length];
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[0].length; j++) {
+                output[i][j] = matrix[i][j].abs();
+            }
+        }
+        return output;
+    }
+
     // Private methods
 
     /**

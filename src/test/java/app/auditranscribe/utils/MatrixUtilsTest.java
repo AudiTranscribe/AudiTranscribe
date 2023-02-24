@@ -115,30 +115,30 @@ class MatrixUtilsTest {
     @Test
     void matmul_complex() {
         // Define matrices
-        Complex[][] A = new Complex[][]{
+        Complex[][] A = {
                 {new Complex(1, 0), new Complex(0, -1)},
                 {new Complex(0, 1), new Complex(-1, 0)}
         };
-        Complex[][] B = new Complex[][]{
+        Complex[][] B = {
                 {new Complex(1, 0), new Complex(1, 1), new Complex(0, 1)},
                 {new Complex(0, 1), new Complex(1, 1), new Complex(1, 0)}
         };
-        Complex[][] C = new Complex[][]{
+        Complex[][] C = {
                 {new Complex(1, 0), new Complex(1, 0)},
                 {new Complex(0, 2), new Complex(0, 2)},
                 {new Complex(-3, 0), new Complex(-3, 0)}
         };
 
         // Expected matrix multiplication results
-        Complex[][] X = new Complex[][]{
+        Complex[][] X = {
                 {new Complex(2, 0), new Complex(0, 0)},
                 {new Complex(0, 0), new Complex(2, 0)}
         };
-        Complex[][] Y = new Complex[][]{
+        Complex[][] Y = {
                 {new Complex(-1, -1), new Complex(-1, -1)},
                 {new Complex(-5, 3), new Complex(-5, 3)}
         };
-        Complex[][] Z = new Complex[][]{
+        Complex[][] Z = {
                 {new Complex(1, 1), new Complex(2, 2), new Complex(1, 1)},
                 {new Complex(-2, 2), new Complex(-4, 4), new Complex(-2, 2)},
                 {new Complex(-3, -3), new Complex(-6, -6), new Complex(-3, -3)}
@@ -326,34 +326,34 @@ class MatrixUtilsTest {
     @Test
     void transpose() {
         // Define the matrices and their transposes
-        double[][] A = new double[][]{
+        double[][] A = {
                 {1, 2, 3, 4},
                 {5, 6, 7, 8},
                 {9, 10, 11, 12}
         };
-        boolean[][] B = new boolean[][]{
+        boolean[][] B = {
                 {false, false, false, true},
                 {false, true, true, false},
                 {true, false, true, false}
         };
-        Complex[][] C = new Complex[][]{
+        Complex[][] C = {
                 {new Complex(1, 1), new Complex(2, 2), new Complex(3, 3)},
                 {new Complex(4, 4), new Complex(5, 5), new Complex(6, 6)}
         };
 
-        double[][] At = new double[][]{
+        double[][] At = {
                 {1, 5, 9},
                 {2, 6, 10},
                 {3, 7, 11},
                 {4, 8, 12}
         };
-        boolean[][] Bt = new boolean[][]{
+        boolean[][] Bt = {
                 {false, false, true},
                 {false, true, false},
                 {false, true, true},
                 {true, false, false}
         };
-        Complex[][] Ct = new Complex[][]{
+        Complex[][] Ct = {
                 {new Complex(1, 1), new Complex(4, 4)},
                 {new Complex(2, 2), new Complex(5, 5)},
                 {new Complex(3, 3), new Complex(6, 6)}
@@ -368,19 +368,67 @@ class MatrixUtilsTest {
     @Test
     void tile() {
         // Define the matrix to tile
-        double[][] matrix = new double[][]{
+        double[][] matrix = {
                 {1, 2, 3, 4},
                 {5, 6, 7, 8}
         };
 
         // Define the correct tiled matrix
-        double[][] correct = new double[][]{
+        double[][] correct = {
                 {1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4},
                 {5, 6, 7, 8, 5, 6, 7, 8, 5, 6, 7, 8}
         };
 
         // Assertions
         assertArrayEquals(correct, MatrixUtils.tile(matrix, 3));
+    }
+
+    // Miscellaneous methods
+    @Test
+    void matrixMags() {
+        // Define matrices to test
+        Complex[][] matrix1 = {
+                {Complex.ZERO, Complex.ONE},
+                {Complex.IMAG_UNIT, Complex.IMAG_UNIT}
+        };
+        Complex[][] matrix2 = {
+                {Complex.ZERO, Complex.ONE, new Complex(2), new Complex(3)},
+                {Complex.ZERO, Complex.IMAG_UNIT, new Complex(0, 2), new Complex(0, 3)},
+                {Complex.ZERO, new Complex(-1), new Complex(-2), new Complex(-3)},
+                {Complex.ZERO, new Complex(0, -1), new Complex(0, -2), new Complex(0, -3)},
+                {Complex.ZERO, new Complex(3, 4), new Complex(6, -8), new Complex(-9, 12)}
+        };
+
+        // Define correct output matrices
+        double[][] correct1 = {
+                {0, 1},
+                {1, 1}
+        };
+        double[][] correct2 = {
+                {0, 1, 2, 3},
+                {0, 1, 2, 3},
+                {0, 1, 2, 3},
+                {0, 1, 2, 3},
+                {0, 5, 10, 15}
+        };
+
+        // Generate output matrices
+        double[][] output1 = MatrixUtils.matrixMags(matrix1);
+        double[][] output2 = MatrixUtils.matrixMags(matrix2);
+
+        // Check outputs
+        assertEquals(correct1.length, output1.length);
+        assertEquals(correct1[0].length, output1[0].length);
+        assertEquals(correct2.length, output2.length);
+        assertEquals(correct2[0].length, output2[0].length);
+
+        for (int i = 0; i < correct1.length; i++) {
+            assertArrayEquals(correct1[i], output1[i], 1e-7);
+        }
+
+        for (int i = 0; i < correct2.length; i++) {
+            assertArrayEquals(correct2[i], output2[i], 1e-7);
+        }
     }
 
     // Helper functions
