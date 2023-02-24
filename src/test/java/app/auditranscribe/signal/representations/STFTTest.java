@@ -8,8 +8,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class STFTTest {
     // Define the arrays
-    double[] array1 = {1, 2, -3, -4, 5, 6, -7, -8};
-    double[] array2 = {
+    static double[] array1 = {1, 2, -3, -4, 5, 6, -7, -8};
+    static double[] array2 = {
             25.442832341330558, 67.35970565394922, 35.09989960920626, 61.77920972475006,
             62.4223934582534, 34.63818528787935, 10.867667057159514, 19.66065078483943,
             68.66050464419456, 98.64623871074612, 20.397346011908567, 33.125277868376244,
@@ -17,11 +17,11 @@ class STFTTest {
     };
 
     // Generate the STFT output
-    Complex[][] stftArray1Ones = STFT.stft(array1, 4, 3, SignalWindow.ONES_WINDOW);
-    Complex[][] stftArray1Hann = STFT.stft(array1, 4, 3, SignalWindow.HANN_WINDOW);
+    static Complex[][] stftArray1Ones = STFT.stft(array1, 4, 3, SignalWindow.ONES_WINDOW);
+    static Complex[][] stftArray1Hann = STFT.stft(array1, 4, 3, SignalWindow.HANN_WINDOW);
 
-    Complex[][] stftArray2Ones = STFT.stft(array2, 8, 9, SignalWindow.ONES_WINDOW);
-    Complex[][] stftArray2Hann = STFT.stft(array2, 8, 9, SignalWindow.HANN_WINDOW);
+    static Complex[][] stftArray2Ones = STFT.stft(array2, 8, 9, SignalWindow.ONES_WINDOW);
+    static Complex[][] stftArray2Hann = STFT.stft(array2, 8, 9, SignalWindow.HANN_WINDOW);
 
     @Test
     void stft() {

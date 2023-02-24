@@ -3,6 +3,7 @@ package app.auditranscribe.audio;
 import app.auditranscribe.audio.exceptions.FFmpegCommandFailedException;
 import app.auditranscribe.audio.exceptions.FFmpegNotFoundException;
 import app.auditranscribe.io.IOMethods;
+import app.auditranscribe.io.data_files.DataFiles;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -30,13 +31,11 @@ class FFmpegHandlerTest {
     @Test
     @Order(2)
     void checkFFmpegPath() {
-        // Todo: enable later
-//        try {
-//            assertTrue(FFmpegHandler.checkFFmpegPath("ffmpeg"));  // Should exist => true
-//        } catch (AssertionError e) {
-//            assertTrue(FFmpegHandler.checkFFmpegPath(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath));
-//        }
-        assertTrue(FFmpegHandler.checkFFmpegPath("ffmpeg"));  // Todo: remove
+        try {
+            assertTrue(FFmpegHandler.checkFFmpegPath("ffmpeg"));  // Should exist => true
+        } catch (AssertionError e) {
+            assertTrue(FFmpegHandler.checkFFmpegPath(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath));
+        }
 
         assertFalse(FFmpegHandler.checkFFmpegPath("fake-ffmpeg-path"));  // IO Exception should be thrown => false
         assertFalse(FFmpegHandler.checkFFmpegPath("git"));  // Should give error code 1 => false
@@ -62,14 +61,12 @@ class FFmpegHandlerTest {
         String testingFolderPath = testFile.getParent();
 
         // Initialize the FFmpeg handler
-        // Todo: enable later
-//        try {
-//            FFmpegHandler.initFFmpegHandler("ffmpeg");
-//        } catch (FFmpegNotFoundException e) {
-//            // Try to get the path from the settings file
-//            FFmpegHandler.initFFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
-//        }
-        FFmpegHandler.initFFmpegHandler("ffmpeg");  // Todo remove
+        try {
+            FFmpegHandler.initFFmpegHandler("ffmpeg");
+        } catch (FFmpegNotFoundException e) {
+            // Try to get the path from the settings file
+            FFmpegHandler.initFFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
+        }
 
         // Determine the output path
         String outputFilePath = FFmpegHandler.convertAudio(
@@ -88,14 +85,12 @@ class FFmpegHandlerTest {
     @Order(4)
     void convertAudioFailureTest() throws FFmpegNotFoundException {
         // Initialize the FFmpeg handler
-        // Todo: enable later
-//        try {
-//            FFmpegHandler.initFFmpegHandler("ffmpeg");
-//        } catch (FFmpegNotFoundException e) {
-//            // Try to get the path from the settings file
-//            FFmpegHandler.initFFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
-//        }
-        FFmpegHandler.initFFmpegHandler("ffmpeg");  // Todo remove
+        try {
+            FFmpegHandler.initFFmpegHandler("ffmpeg");
+        } catch (FFmpegNotFoundException e) {
+            // Try to get the path from the settings file
+            FFmpegHandler.initFFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
+        }
 
         // Try to test on a non-existent MP3 file
         assertThrowsExactly(FFmpegCommandFailedException.class, () -> FFmpegHandler.convertAudio(

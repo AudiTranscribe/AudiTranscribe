@@ -3,6 +3,7 @@ package app.auditranscribe.signal;
 import app.auditranscribe.audio.Audio;
 import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.io.IOMethods;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -13,15 +14,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TuningEstimatorTest {
     // Load samples and sample rate for some tests
-    Audio audio = new Audio(
-            new File(IOMethods.getAbsoluteFilePath("test-files/general/audio/Trumpet.wav")),
-            Audio.ProcessingMode.WITH_SAMPLES
-    );
+    static Audio audio;
 
-    double[] samples = audio.getMonoSamples();
-    double sampleRate = audio.getSampleRate();
+    static double[] samples;
+    static double sampleRate;
 
-    TuningEstimatorTest() throws UnsupportedAudioFileException, AudioTooLongException, IOException {
+    @BeforeAll
+    static void beforeAll() throws UnsupportedAudioFileException, AudioTooLongException, IOException {
+        audio = new Audio(
+                new File(IOMethods.getAbsoluteFilePath("test-files/general/audio/Trumpet.wav")),
+                Audio.ProcessingMode.WITH_SAMPLES
+        );
+        samples = audio.getMonoSamples();
+        sampleRate = audio.getSampleRate();
     }
 
     @Test

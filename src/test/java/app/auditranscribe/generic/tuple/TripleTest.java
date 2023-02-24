@@ -24,9 +24,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TripleTest {
-    // Define triples to test
-    Triple<Integer, String, Double> triple1 = new Triple<>(1, "two", 3.4);
-    Triple<Boolean, Boolean, Boolean> triple2 = new Triple<>(true, false, false);
+    static Triple<Integer, String, Double> triple1 = new Triple<>(1, "two", 3.4);
+    static Triple<Boolean, Boolean, Boolean> triple2 = new Triple<>(true, false, false);
 
     @Test
     void value0() {

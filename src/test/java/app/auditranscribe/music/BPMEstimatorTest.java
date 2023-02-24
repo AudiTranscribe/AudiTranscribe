@@ -4,6 +4,7 @@ import app.auditranscribe.audio.Audio;
 import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.generic.exceptions.ValueException;
 import app.auditranscribe.io.IOMethods;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
@@ -17,24 +18,31 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BPMEstimatorTest {
     // Get the audio files
-    Audio audio1 = new Audio(
-            new File(IOMethods.getAbsoluteFilePath("test-files/music/BPMEstimatorTest/175bpm.wav")),
-            Audio.ProcessingMode.WITH_SAMPLES
-    );
-    Audio audio2 = new Audio(
-            new File(IOMethods.getAbsoluteFilePath("test-files/music/BPMEstimatorTest/137bpmNoisy.wav")),
-            Audio.ProcessingMode.WITH_SAMPLES
-    );
+    static Audio audio1, audio2;
 
     // Extract samples and sample rate
-    double[] samples1 = audio1.getMonoSamples();
-    double sampleRate1 = audio1.getSampleRate();
+    static double[] samples1;
+    static double sampleRate1;
 
-    double[] samples2 = audio2.getMonoSamples();
-    double sampleRate2 = audio2.getSampleRate();
+    static double[] samples2;
+    static double sampleRate2;
 
-    // Initialization method
-    BPMEstimatorTest() throws UnsupportedAudioFileException, AudioTooLongException, IOException {
+    @BeforeAll
+    static void beforeAll() throws UnsupportedAudioFileException, AudioTooLongException, IOException {
+        audio1 = new Audio(
+                new File(IOMethods.getAbsoluteFilePath("test-files/music/BPMEstimatorTest/175bpm.wav")),
+                Audio.ProcessingMode.WITH_SAMPLES
+        );
+        audio2 = new Audio(
+                new File(IOMethods.getAbsoluteFilePath("test-files/music/BPMEstimatorTest/137bpmNoisy.wav")),
+                Audio.ProcessingMode.WITH_SAMPLES
+        );
+
+        samples1 = audio1.getMonoSamples();
+        sampleRate1 = audio1.getSampleRate();
+
+        samples2 = audio2.getMonoSamples();
+        sampleRate2 = audio2.getSampleRate();
     }
 
     @Test

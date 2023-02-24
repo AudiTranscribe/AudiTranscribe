@@ -7,6 +7,7 @@ import app.auditranscribe.music.TimeSignature;
 import app.auditranscribe.utils.HashingUtils;
 import app.auditranscribe.utils.UnitConversionUtils;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIf;
 
@@ -15,7 +16,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 class NotePlayerSequencerTest {
-    final boolean IS_TEST_ENABLED = false;
+    static final boolean IS_TEST_ENABLED = false;
 
     // Test constants
     static double[] noteOnsetTimes = {
@@ -31,7 +32,8 @@ class NotePlayerSequencerTest {
 
     static NotePlayerSequencer notePlayerSequencer;
 
-    public NotePlayerSequencerTest() {
+    @BeforeAll
+    static void beforeAll() {
         // Convert notes to note numbers
         for (int i = 0; i < notes.length; i++) {
             noteNumbers[i] = UnitConversionUtils.noteToNoteNumber(notes[i]);
@@ -57,6 +59,7 @@ class NotePlayerSequencerTest {
         }
     }
 
+    // Tests
     @Test
     @DisabledIf("isTestDisabled")
     void playbackNotes() {

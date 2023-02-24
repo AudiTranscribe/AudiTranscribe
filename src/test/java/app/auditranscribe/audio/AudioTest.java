@@ -2,6 +2,7 @@ package app.auditranscribe.audio;
 
 import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.io.IOMethods;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIf;
 
@@ -12,9 +13,10 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.*;
 
 class AudioTest {
-    Audio audio;
+    static Audio audio;
 
-    AudioTest() throws UnsupportedAudioFileException, AudioTooLongException, IOException {
+    @BeforeAll
+    static void beforeAll() throws UnsupportedAudioFileException, AudioTooLongException, IOException {
         File file = new File(IOMethods.getAbsoluteFilePath("test-files/general/audio/Choice.wav"));
 
         if (TEST_PLAYBACK) {
@@ -58,8 +60,8 @@ class AudioTest {
         assertEquals(-0.0015411376953125, samples[212345], 1e-5);
     }
 
-    final boolean TEST_PLAYBACK = false;
-    final boolean TEST_SLOWED = false;
+    static final boolean TEST_PLAYBACK = false;
+    static final boolean TEST_SLOWED = false;
 
     @Test
     @DisabledIf("isPlaybackTestDisabled")

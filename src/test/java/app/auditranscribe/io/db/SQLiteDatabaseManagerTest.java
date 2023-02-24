@@ -14,10 +14,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class SQLiteDatabaseManagerTest {
     // Test variables
-    SQLiteDatabaseManager manager;
+    static SQLiteDatabaseManager manager;
 
     // Queries
-    String createTableQuery1 = """
+    static String createTableQuery1 = """
             CREATE TABLE IF NOT EXISTS "TestTable1" (
                 "id"		INTEGER,
                 "field1"	INTEGER NOT NULL UNIQUE,
@@ -26,7 +26,7 @@ class SQLiteDatabaseManagerTest {
                 PRIMARY KEY("id")
             );
             """;
-    String createTableQuery2 = """
+    static String createTableQuery2 = """
             CREATE TABLE IF NOT EXISTS "TestTable2" (
                 "id"		INTEGER,
                 "field1"	INTEGER NOT NULL UNIQUE,
@@ -36,23 +36,23 @@ class SQLiteDatabaseManagerTest {
             );
             """;
 
-    String dropTableQuery1 = """
+    static String dropTableQuery1 = """
             DROP TABLE "TestTable1";
             """;
-    String dropTableQuery2 = """
+    static String dropTableQuery2 = """
             DROP TABLE "TestTable2";
             """;
 
-    String insertOneEntry1 = """
+    static String insertOneEntry1 = """
             INSERT INTO "TestTable1" ("field1", "field2", "field3")
             VALUES (1, "Text1", 0.1);
             """;
-    String insertOneEntry2 = """
+    static String insertOneEntry2 = """
             INSERT INTO "TestTable2" ("field1", "field2", "field3")
             VALUES (?, ?, ?);
             """;
 
-    String insertMultipleEntries = """
+    static String insertMultipleEntries = """
             INSERT INTO "TestTable1" ("field1", "field2", "field3")
             VALUES
                 (2, "Text2", 0.2),
@@ -61,10 +61,10 @@ class SQLiteDatabaseManagerTest {
                 (5, "Text5", 0.5);
             """;
 
-    String getEntries1 = """
+    static String getEntries1 = """
             SELECT * FROM "TestTable1";
             """;
-    String getEntries2 = """
+    static String getEntries2 = """
             SELECT * FROM "TestTable2"
             WHERE "field2" = ?;
             """;

@@ -5,6 +5,7 @@ import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.generic.exceptions.ValueException;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.utils.UnitConversionUtils;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
@@ -15,16 +16,18 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ChromaCQTTest {
-    // Get audio file, audio samples, and sample rate for the tests
-    Audio audio = new Audio(
-            new File(IOMethods.getAbsoluteFilePath("test-files/general/audio/Trumpet.wav")),
-            Audio.ProcessingMode.WITH_SAMPLES
-    );
+    static Audio audio;
+    static double[] samples;
+    static double sampleRate;
 
-    double[] samples = audio.getMonoSamples();
-    double sampleRate = audio.getSampleRate();
-
-    ChromaCQTTest() throws UnsupportedAudioFileException, AudioTooLongException, IOException {
+    @BeforeAll
+    static void beforeAll() throws UnsupportedAudioFileException, AudioTooLongException, IOException {
+        audio = new Audio(
+                new File(IOMethods.getAbsoluteFilePath("test-files/general/audio/Trumpet.wav")),
+                Audio.ProcessingMode.WITH_SAMPLES
+        );
+        samples = audio.getMonoSamples();
+        sampleRate = audio.getSampleRate();
     }
 
     @Test

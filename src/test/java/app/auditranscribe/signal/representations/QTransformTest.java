@@ -22,14 +22,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class QTransformTest {
-    // Test variables
-    Audio audio;
-    double[] samples;
+    static Audio audio;
+    static double[] samples;
 
-    Method vqtHelperMtd;
+    static Method vqtHelperMtd;
 
-    // Test initialization method
-    QTransformTest() throws UnsupportedAudioFileException, AudioTooLongException, IOException, NoSuchMethodException {
+    @BeforeAll
+    static void beforeAll() throws UnsupportedAudioFileException, AudioTooLongException, IOException,
+            NoSuchMethodException {
         // Get audio file and audio samples for the tests
         audio = new Audio(
                 new File(IOMethods.getAbsoluteFilePath("test-files/general/audio/Choice.wav")),
@@ -37,13 +37,12 @@ class QTransformTest {
         );
         samples = audio.getMonoSamples();
 
-        // Allow access to the alternate QTransform call
+        // Allow access to the alternate Q-Transform call
         vqtHelperMtd = QTransform.class.getDeclaredMethod(
                 "vqtHelper", double[].class, double.class, int.class, double.class, int.class, int.class,
                 double.class, double.class, SignalWindow.class, CustomTask.class, boolean.class
         );
         vqtHelperMtd.setAccessible(true);
-
     }
 
     @Test

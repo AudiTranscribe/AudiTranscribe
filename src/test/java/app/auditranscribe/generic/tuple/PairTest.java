@@ -19,15 +19,15 @@
 package app.auditranscribe.generic.tuple;
 
 import app.auditranscribe.generic.tuples.Pair;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PairTest {
-    // Define pairs to test
-    Pair<Integer, String> pair1 = new Pair<>(1, "two");
-    Pair<Integer, String> pair2 = new Pair<>(2, "three");
-    Pair<Double, Double> pair3 = new Pair<>(1d, 2d);
+    static Pair<Integer, String> pair1 = new Pair<>(1, "two");
+    static Pair<Integer, String> pair2 = new Pair<>(2, "three");
+    static Pair<Double, Double> pair3 = new Pair<>(1d, 2d);
 
     @Test
     void value0() {

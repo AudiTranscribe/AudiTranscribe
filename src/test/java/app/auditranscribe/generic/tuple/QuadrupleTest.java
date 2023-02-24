@@ -19,14 +19,14 @@
 package app.auditranscribe.generic.tuple;
 
 import app.auditranscribe.generic.tuples.Quadruple;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class QuadrupleTest {
-    // Define quadruples to test
-    Quadruple<Integer, Double, Boolean, String> quadruple1 = new Quadruple<>(1, 2.3, false, "five");
-    Quadruple<String, String, Integer, Boolean> quadruple2 = new Quadruple<>("alpha", "beta", 3, true);
+    static Quadruple<Integer, Double, Boolean, String> quadruple1 = new Quadruple<>(1, 2.3, false, "five");
+    static Quadruple<String, String, Integer, Boolean> quadruple2 = new Quadruple<>("alpha", "beta", 3, true);
 
     @Test
     void value0() {

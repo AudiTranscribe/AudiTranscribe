@@ -1,6 +1,7 @@
 package app.auditranscribe.io;
 
 import app.auditranscribe.io.exceptions.NoSuchPropertyException;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -15,9 +16,10 @@ class PropertyFileTest {
     );
 
     // Attributes
-    PropertyFile propertyFile;
+    static PropertyFile propertyFile;
 
-    public PropertyFileTest() throws IOException {
+    @BeforeAll
+    static void beforeAll() throws IOException {
         propertyFile = new PropertyFile(FILE_PATH);
     }
 
