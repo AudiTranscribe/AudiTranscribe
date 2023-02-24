@@ -100,33 +100,6 @@ public final class STFT {
     }
 
     /**
-     * Computes the Short-Time Fourier Transform (STFT) of the input array <code>x</code>.<br>
-     * Returns only the magnitudes of the STFT matrix.
-     *
-     * @param x              The array <code>x</code> representing the data source.
-     * @param numFFT         Number of bins to use for the Fast Fourier Transform (FFT).
-     * @param hopLength      Number of samples between successive columns.
-     * @param windowFunction Signal window function.
-     * @return Real-valued matrix of magnitudes of the STFT coefficients.
-     */
-    public static double[][] stftMags(double[] x, int numFFT, int hopLength, SignalWindow windowFunction) {
-        // Generate the STFT spectrogram
-        Complex[][] stft = STFT.stft(x, numFFT, hopLength, windowFunction);
-
-        // Obtain only the magnitudes
-        double[][] S = new double[stft.length][];
-
-        for (int i = 0; i < stft.length; i++) {
-            S[i] = new double[stft[i].length];
-            for (int j = 0; j < stft[i].length; j++) {
-                S[i][j] = stft[i][j].abs();
-            }
-        }
-
-        return S;
-    }
-
-    /**
      * Computes the Inverse Short-Time Fourier Transform (ISTFT) of the complex matrix provided.<br>
      * <b>Warning</b>: If the STFT was applied to a signal and the <code>hopLength</code> was
      * <b>not</b> a multiple of that original signal's length, then this will not produce a perfect

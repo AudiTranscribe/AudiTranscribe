@@ -79,7 +79,6 @@ class FFTTest {
                 68.66050464419456, 98.64623871074612, 20.397346011908567, 33.125277868376244,
                 13.969015082960123, 58.838543552236466, 27.565901473219746, 81.41318148048603
         };
-        System.out.println(Arrays.toString(FFT.fft(realArrToComplex(array2))));
 
         // Convert both to complex number arrays
         Complex[] complexArray1 = realArrToComplex(array1);

@@ -148,7 +148,7 @@ public final class TuningEstimator {
      */
     private static Pair<Double[][], Double[][]> piptack(double[] x, double sr) {
         // Get STFT magnitudes
-        double[][] S = STFT.stftMags(x, NUM_FFT, HOP_LENGTH, SignalWindow.HANN_WINDOW);
+        double[][] S = MatrixUtils.matrixMags(STFT.stft(x, NUM_FFT, HOP_LENGTH, SignalWindow.HANN_WINDOW));
 
         // Truncate to feasible region
         double maxFreq = Math.min(FFT_MAX_FREQ, sr / 2);

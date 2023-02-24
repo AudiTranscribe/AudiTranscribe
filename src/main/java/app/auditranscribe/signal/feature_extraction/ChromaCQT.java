@@ -19,7 +19,6 @@
 package app.auditranscribe.signal.feature_extraction;
 
 import app.auditranscribe.generic.exceptions.ValueException;
-import app.auditranscribe.misc.Complex;
 import app.auditranscribe.misc.CustomTask;
 import app.auditranscribe.signal.representations.QTransform;
 import app.auditranscribe.signal.windowing.SignalWindow;
@@ -87,20 +86,11 @@ public final class ChromaCQT {
             double[] y, double sr, int hopLength, double fmin, int numChroma, int numOctaves, int binsPerOctave,
             double threshold, CustomTask<?> task
     ) {
-        // Build the CQT
-        Complex[][] cqt = QTransform.cqt(
+        // Obtain the CQT's magnitudes
+        double[][] C = MatrixUtils.matrixMags(QTransform.cqt(
                 y, sr, hopLength, fmin, numOctaves * binsPerOctave, binsPerOctave, Double.NaN,
                 SignalWindow.HANN_WINDOW, task
-        );
-
-        // Keep only the magnitudes
-        double[][] C = new double[cqt.length][];
-        for (int i = 0; i < cqt.length; i++) {
-            C[i] = new double[cqt[i].length];
-            for (int j = 0; j < cqt[i].length; j++) {
-                C[i][j] = cqt[i][j].abs();
-            }
-        }
+        ));
 
         // Generate chroma map
         double[][] cqToChr = constantQToChroma(C.length, numChroma, binsPerOctave, fmin);

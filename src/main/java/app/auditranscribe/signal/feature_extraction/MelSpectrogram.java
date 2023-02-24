@@ -46,14 +46,14 @@ public final class MelSpectrogram {
      * @return Mel spectrogram.
      */
     public static double[][] melSpectrogram(double[] x, double sampleRate, int numFFT, int hopLength) {
-        // Generate the STFT spectrogram
-        Complex[][] S = STFT.stft(x, numFFT, hopLength, SignalWindow.HANN_WINDOW);
+        // Obtain the STFT magnitudes
+        double[][] S = MatrixUtils.matrixMags(STFT.stft(x, numFFT, hopLength, SignalWindow.HANN_WINDOW));
 
         // Convert the STFT spectrogram to power spectrogram
         double[][] P = new double[S.length][S[0].length];
         for (int i = 0; i < S.length; i++) {
             for (int j = 0; j < S[0].length; j++) {
-                P[i][j] = Math.pow(S[i][j].abs(), 2);
+                P[i][j] = S[i][j] * S[i][j];  // Power is magnitude squared
             }
         }
 

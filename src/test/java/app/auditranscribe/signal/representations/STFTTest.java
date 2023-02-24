@@ -70,34 +70,6 @@ class STFTTest {
     }
 
     @Test
-    void stftMags() {
-        // Generate the STFT magnitude outputs
-        double[][] stftMags1Ones = STFT.stftMags(array1, 4, 3, SignalWindow.ONES_WINDOW);
-        double[][] stftMags1Hann = STFT.stftMags(array1, 4, 3, SignalWindow.HANN_WINDOW);
-
-        // Check the outputs
-        assertEquals(3, stftMags1Ones[0][0], 1e-3);
-        assertEquals(0, stftMags1Ones[0][1], 1e-3);
-        assertEquals(4, stftMags1Ones[0][2], 1e-3);
-        assertEquals(2.236, stftMags1Ones[1][0], 1e-3);
-        assertEquals(10, stftMags1Ones[1][1], 1e-3);
-        assertEquals(18.439, stftMags1Ones[1][2], 1e-3);
-        assertEquals(1, stftMags1Ones[2][0], 1e-3);
-        assertEquals(4, stftMags1Ones[2][1], 1e-3);
-        assertEquals(0, stftMags1Ones[2][2], 1e-3);
-
-        assertEquals(2, stftMags1Hann[0][0], 1e-3);
-        assertEquals(3, stftMags1Hann[0][1], 1e-3);
-        assertEquals(8, stftMags1Hann[0][2], 1e-3);
-        assertEquals(1.414, stftMags1Hann[1][0], 1e-3);
-        assertEquals(5.657, stftMags1Hann[1][1], 1e-3);
-        assertEquals(9.899, stftMags1Hann[1][2], 1e-3);
-        assertEquals(0, stftMags1Hann[2][0], 1e-3);
-        assertEquals(5, stftMags1Hann[2][1], 1e-3);
-        assertEquals(6, stftMags1Hann[2][2], 1e-3);
-    }
-
-    @Test
     void istft() {
         // Define expected outputs
         double[] expectedArray1Ones = {1., 2., -3., -4., 5., 6.};
