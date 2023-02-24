@@ -151,14 +151,18 @@ public class Audio extends LoggableClass {
             );
         }
 
+        // Do a pre-check on whether playback is allowed
+        // (This is to prevent the setup of operators in the `resetAudioStream()` method in `generateSamples()` when it
+        // is called)
+        if (modes.contains(ProcessingMode.WITH_PLAYBACK)) withPlayback = true;
+
         // Generate audio samples if requested
         if (modes.contains(ProcessingMode.WITH_SAMPLES)) {
             generateSamples();
         }
 
         // Allow audio playback if requested
-        if (modes.contains(ProcessingMode.WITH_PLAYBACK)) {
-            withPlayback = true;
+        if (withPlayback) {
             setAudioPlaybackThread();
 
             // Update out channels
@@ -517,7 +521,7 @@ public class Audio extends LoggableClass {
             try {
                 audioStream.close();
                 audioStream = AudioSystem.getAudioInputStream(new BufferedInputStream(new FileInputStream(wavFile)));
-                setupOperators();
+                if (withPlayback) setupOperators();
             } catch (Exception e) {
                 e.printStackTrace();
             }
