@@ -1,5 +1,138 @@
 # AudiTranscribe Changelog
 
+## [0.11.0](https://github.com/AudiTranscribe/AudiTranscribe/compare/v0.10.0...v0.11.0) (????-??-??)
+
+Todo: update release date; add the rest of the changes here
+
+This release comes with massive changes to the overall look and feel of AudiTranscribe.
+
+### Additions
+
+- **New UI**: The user interface of AudiTranscribe was overhauled. AudiTranscribe should now look cleaner, more
+  professional, and easier to use than before.
+- **Audio Device Changing**: The audio playback device can now be customized and specified in the settings view.
+- **Better File Format**: The saved project files should now be smaller, due to a number of optimizations on the file
+  format. Read all the optimizations [here](#file-format-changes).
+- **Better Music Key Estimation**: Use an improved set of estimation profiles to improve the guess of the estimated key.
+  Read about that specific optimization [here](#music-key-estimation-changes).
+- **Improved Efficiency**: Removed many redundant things from AudiTranscribe, and improved algorithms used. This should
+  help optimize the code and improve efficiency.
+
+### Changes
+
+- Updated how the update checker checks for updates.
+    - Previously,
+        - the update checker would check every so often (e.g., every 24 hours);
+        - pressing "remind later" would pause update checking for a period of time (e.g., 72 hours), after which the
+          update checker would continue checking at the original interval (e.g., 24 hours);
+        - failure to reach GitHub servers (e.g., offline) would be the same as pressing "remind later".
+    - Now,
+        - the update checker would check *every time the program is opened*.
+        - pressing the "remind later" button would pause for a period of time (e.g., 72 hours), before the checker would
+          continue to check every time the program is opened;
+        - failure to reach GitHub servers (e.g., offline) would skip checking for that instance only. Update checking
+          resumes upon opening the program again.
+- Attempting to change the theme from the settings view will now update all opened views' themes.
+- Memory use statistics are located near the top-right corner of the spectrogram on the transcription view.
+- Updated the naming scheme of the backup files.
+- Improved the efficiency of the Fast Fourier Transform (FFT), making processing much faster.
+- Made lines on the spectrogram be thinner, allowing for easier viewing of the spectrogram.
+- Improved quality of saved audio by saving audio at a higher bitrate.
+- Attempting to save a new project will now use the project name as a suggested file name.
+- The setup process is now much shorter.
+- Added special warning for the update checker if internet access is unavailable.
+- Changed default update playback scheduler period from 50ms to 10ms.
+    - This should make the playback line move more smoothly.
+
+### Fixes
+
+- Fixed an issue where an unwanted `java0.log` was (consistently) created in the home directory of the user.
+- Fixed typo in one of the note units; changed `Thirty-Second Note` to `Thirty-second Note`.
+- Fixed issue where attempting to update the note labels after initialization causes note labels to be slightly
+  misaligned.
+- Fixed an issue where `NoteRectangle`s' timestamp used could cause collisions in UUIDs.
+    - Now, using nanosecond precision, this should be fixed.
+- Fixed issue with `null` `worker` at end of audio.
+
+### Technical Changes
+
+- Reorganised `pom.xml`.
+- Update project dependencies' versions.
+- Renamed `MyLogger` to `CustomLogger`.
+- Renamed `ClassWithLogging` to `LoggableClass`.
+- Added integer logarithm base 2 method, called `binlog()`, to `MathUtils`.
+    - Simultaneously, updated implementation of `getNumSetBits()` in `MiscUtils`.
+- Moved all frequency bin generation methods to `FrequencyRangeGeneration`.
+- Renamed `StatisticalUtils` to `StatisticsUtils`.
+- Moved `histogram()` method from `ArrayUtils` to `StatisticsUtils`.
+- Made `FFmpegHandler` be *more like a static class*; removed need to initialise a new instance of it to use its
+  functions.
+- Made `Audio` use native Java methods instead of relying on JavaFX's `MediaPlayer`. Also
+    - allowed for other audio devices to be used for playback;
+    - made audio slowdown implementation be real-time.
+- Reorganized `module-info.java` and `pom.xml`.
+- Use Winograd form For Strassen matrix multiplication.
+- Made `getAbsoluteFilePath()` exception message be clearer.
+- Removed `SpectralHelpers`; added `SignalHelpers` in its place.
+- Moved matrix methods in `ArrayUtils` into `MatrixUtils`.
+- Moved spectrogram magnitude generation and plotting methods all into one class, `Spectrogram`.
+- Changed how colours are represented in source files.
+    - Previously, we used hex strings (e.g., `#12ab34`). Now, we use RGB(A) values (
+      e.g., `rgb(12, 34, 56)`, `rgba(128, 23, 45, 0.6)`).
+- Added integer to hexadecimal converter (`intAsPaddedHexStr()`) for easier displaying of the file version.
+- Reorganized testing files. Now,
+    - files that are used by multiple tests will appear under `general`;
+    - files that are used by a single test will appear in a folder with the test's name.
+- Create `GUIUtils`; moved methods in `ProjectIOHandlers` into `GUIUtils`.
+- Remove `themeColours` entry from `icons.json`; make the SVG paths inherit their colours from the CSS themes instead.
+- Added `AbstractViewController` class to collect common methods shared by all view controllers.
+- Made `getFileURL` warn for `null` URL.
+- Reorganized CSS files. Now,
+    - the `base.css` file contains general styling that is applicable to **all** views;
+    - each view has its own specific CSS file (e.g., `homepage.css`, `about.css`) that handles the styling for that
+      view;
+        - but some CSS files (e.g., `popups.css`) styles a general type of view;
+    - colours for each theme are placed in the `theme` folder, with common colours found in `shared-colours.css`.
+- Removed "overridden methods" headings; merged overridden methods into the sections of the appropriate access modifier.
+- Removed misleading comments about the access modifier of sections.
+- Changed how icons are loaded on the scene.
+    - Removed the need to specify the theme of the icon.
+- Moved `plotting` methods into `fxml`.
+- Added a helpful `TimeIt` class for timing how long a piece of code takes.
+    - This is meant for debugging purposes only.
+- Used E. Oran Brigham's described algorithm to improve efficiency of the FFT.
+- Renamed `Complex`'s `roundNicely()` to `round()`.
+- Changed default playback buffer size from 1024 to 2048.
+- Exclude the `hashCode()` method from the generated coverage report.
+- Removed revision numbers from the data encapsulates.
+- Moved reading of WAV bytes to extraction of MP3 bytes method.
+- Moved some Q-Transform methods into version 0.5.0 data encapsulator.
+- Increased saved MP3s' bitrate from 96k to 128k.
+- Merged FFmpeg setup wizard views into one view, `ffmpeg-setup.fxml`.
+- Updated file version from `0x00090002` to `0x000B0003`; <span id="file-format-changes">improvements to the file format
+  are listed below.</span>
+    1. Remove need to save the slowed audio in the file.
+    2. Remove need to compress the MP3 bytes in the file.
+    3. Use DEFLATE algorithm instead of LZ4 to compress the spectrogram data.
+- Renamed `AUDTFileWriter`'s `writeBytesToFile()` method to `writeToFile()`.
+- Removed `COMPRESSOR_VERSION_NUMBER`.
+- <span id="music-key-estimation-changes">Use David Temperley's 1999 key profiles instead of the default
+  Krumhansl-Schmuckler profiles to improve music key estimation accuracy.</span>
+- Fixed inconsistent naming of FXML-related files.
+- Added a test for audio samples' values.
+- Improved efficiency of `STFT`, `ChromaCQT`, and `Tempogram` by removing redundant transpose-then-transpose code.
+- Make `PLAYBACK_BUFFER_SIZE` be in sample count instead of bytes.
+- Moved `NoteRectangleCollisionException` to `NoteRectangle`; renamed it to `CollisionException` (since it is already
+  in `NoteRectangle`).
+- Fixed incorrect setter method `setSpectrogramPaneAnchor()` in `NoteRectangle` by renaming
+  to `setSpectrogramAnchorPane()`.
+- Moved `AudioProcessingMode` into `Audio`; renamed it to `ProcessingMode` (since it is already in `Audio`).
+- Moved some `Audio` methods into `AudioHelpers` in order to reduce clutter.
+- Permit multiple channels, not just 1 or 2.
+- Added `principalArg()` method to `MathUtils`.
+- Made `StoppableThread` log exceptions.
+- Renamed `IOMethods`'s `getInputStream()` to `readAsInputStream()`.
+
 ## [0.10.0](https://github.com/AudiTranscribe/AudiTranscribe/compare/v0.9.3...v0.10.0) (2023-01-20)
 
 This release comes with some changes and a minor feature addition.
