@@ -109,6 +109,10 @@
                 <configuration>
                     <excludes>
                         <exclude>
+                            **/*$*.*
+                        </exclude>
+
+                        <exclude>
                             app/auditranscribe/**/exceptions/**
                         </exclude>
 
