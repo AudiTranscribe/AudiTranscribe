@@ -38,6 +38,7 @@
 }
 
 .tab:hover {
+    -fx-cursor: hand;
     -fx-background-color: button-hover-colour;
     -fx-border-color: button-hover-colour;
 }
@@ -65,11 +66,11 @@
 
 .tab-pane:left *.tab-header-area {
     -fx-background-insets: 0 0 0 10px;
-    -fx-padding: 5px 0 0 0;
+    -fx-padding: 0 0 0 0;
 }
 
 .tab-anchor-pane {
-    -fx-padding: 5px 0 0 0;
+    -fx-padding: 0 0 0 0;
 }
 
 /* SETTINGS */
