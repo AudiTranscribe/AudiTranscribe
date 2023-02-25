@@ -23,8 +23,6 @@
     slider-track-filled-colour: rgb(110, 175, 235);
     slider-thumb-colour: rgb(255, 255, 255);
 
-    text-field-background-colour: background-colour-secondary;
-
     radio-button-background-colour: slider-thumb-colour;
     radio-button-border-colour: rgb(90, 90, 115);
     radio-button-dot-colour: text-colour-primary;
