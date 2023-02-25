@@ -1,0 +1,170 @@
+/* MAIN COLOUR SPECIFICATION */
+.root {
+    /* Main colours */
+    background-colour-primary: rgb(0, 0, 0);
+    background-colour-secondary: background-colour-primary;
+    background-colour-tertiary: background-colour-primary;
+
+    text-colour-primary: rgb(255, 255, 255);
+    text-colour-secondary: rgb(200, 200, 200); /* Slightly darker */
+    text-colour-hyperlink: rgb(90, 150, 255);
+
+    focus-colour: rgb(0, 255, 255);
+
+    /* Controls' colours */
+    button-default-colour: background-colour-primary;
+    button-hover-colour: background-colour-secondary;
+    button-hover-colour-alt: background-colour-secondary;
+    button-selected-colour: rgb(175, 175, 175);
+
+    progress-bar-unfilled-colour: background-colour-primary;
+    progress-bar-filled-colour: rgb(0, 150, 255);
+
+    slider-track-unfilled-colour: rgb(140, 140, 140);
+    slider-track-filled-colour: rgb(0, 175, 255);
+    slider-thumb-colour: rgb(255, 255, 255);
+
+    radio-button-background-colour: slider-thumb-colour;
+    radio-button-border-colour: stroke-colour;
+    radio-button-dot-colour: text-colour-primary;
+
+    scrollbar-colour: rgb(200, 200, 200);
+    separator-colour: stroke-colour;
+    stroke-colour: rgb(255, 255, 255);
+
+    /* Specific elements' colours */
+    ok-button-default-colour: rgb(0, 60, 120);
+    ok-button-hover-colour: rgb(0, 90, 160);
+
+    playhead-line-colour: rgb(0, 255, 255);
+    coloured-progress-pane-colour: rgba(0, 255, 255, 0.35); /* `slider-track-filled-colour` with opacity */
+
+    spectrogram-octave-rectangle-colour: rgba(255, 255, 0, 0.5);
+
+    error-border-colour: rgb(255, 0, 0);
+}
+
+/* CONTROL STYLING */
+/* Buttons */
+.button {
+    -fx-border-color: stroke-colour;
+    -fx-border-width: 1px;
+}
+
+.button:hover {
+    -fx-border-color: focus-colour;
+    -fx-border-width: 2px;
+}
+
+/* Spinners/Choice Boxes */
+.choice-box, .spinner {
+    -fx-border-color: stroke-colour;
+    -fx-border-width: 1px;
+}
+
+.choice-box:hover, .spinner:hover {
+    -fx-border-color: focus-colour;
+    -fx-border-width: 2px;
+}
+
+.choice-box .menu-item {
+    -fx-border-color: stroke-colour;
+    -fx-border-width: 1px;
+}
+
+.choice-box .menu-item:focused {
+    -fx-background-color: background-colour-primary;
+    -fx-border-color: focus-colour;
+    -fx-border-width: 2px;
+}
+
+.spinner .increment-arrow-button:hover, .spinner .decrement-arrow-button:hover {
+    -fx-background-color: focus-colour;
+}
+
+.spinner .increment-arrow-button:hover .increment-arrow, .spinner .decrement-arrow-button:hover .decrement-arrow {
+    -fx-background-color: background-colour-primary;
+}
+
+/* Progress bars */
+.progress-bar .track {
+    -fx-border-color: stroke-colour;
+    -fx-border-width: 1px;
+}
+
+/*.progress-bar .bar {*/
+/*    -fx-background-color: progress-bar-filled-colour;*/
+/*}*/
+
+/* Text fields */
+.text-field {
+    -fx-border-color: stroke-colour;
+    -fx-border-width: 1px;
+}
+
+.text-field:hover {
+    -fx-border-color: focus-colour;
+    -fx-border-width: 2px;
+}
+
+/* OTHER STYLING */
+/* Homepage view */
+.list-cell {
+    -fx-border-color: stroke-colour;
+    -fx-border-width: 1px;
+}
+
+.list-cell:empty {
+    -fx-border-color: transparent;
+}
+
+.list-cell:hover {
+    -fx-border-color: focus-colour;
+    -fx-border-width: 2px;
+    -fx-background-color: background-colour-secondary;
+}
+
+.list-cell:empty:hover {
+    -fx-cursor: pointer;
+    -fx-border-color: none;
+}
+
+/* Settings view */
+.tab {
+    -fx-border-color: stroke-colour;
+    -fx-border-width: 1px;
+}
+
+.tab:hover {
+    -fx-border-color: focus-colour;
+    -fx-border-width: 2px;
+}
+
+.tab:selected {
+    -fx-background-color: button-selected-colour;
+    -fx-border-color: focus-colour;
+}
+
+.tab:selected .tab-label {
+    -fx-text-fill: background-colour-primary;
+}
+
+.tab-pane *.tab-header-background {
+    -fx-border-color: stroke-colour;
+    -fx-border-width: 1px;
+}
+
+.tab-anchor-pane {
+    -fx-border-color: stroke-colour;
+    -fx-border-width: 1px;
+}
+
+/* Transcription view */
+.separator *.line {
+    -fx-border-color: stroke-colour;
+}
+
+.left-edge-pane, .middle-pane, .bottom-edge-pane, .corner-pane {
+    -fx-border-color: stroke-colour;
+    -fx-border-width: 1px;
+}

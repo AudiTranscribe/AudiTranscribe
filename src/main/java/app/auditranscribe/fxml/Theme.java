@@ -28,7 +28,8 @@ import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 public enum Theme {
     // Enum values
     LIGHT("Light", "light"),
-    DARK("Dark", "dark");
+    DARK("Dark", "dark"),
+    HIGH_CONTRAST("High Contrast", "high-contrast");
 
     // Enum attributes
     private final String name;
