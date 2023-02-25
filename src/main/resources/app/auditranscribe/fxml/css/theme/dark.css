@@ -1,19 +1,20 @@
 .root {
+    /* Main colours */
     background-colour-primary: rgb(45, 45, 45);
     background-colour-secondary: rgb(60, 60, 60); /* Slightly lighter */
     background-colour-tertiary: rgb(85, 85, 85); /* Even lighter */
 
+    text-colour-primary: rgb(235, 235, 235);
+    text-colour-secondary: rgb(175, 175, 175); /* Slightly darker */
+    text-colour-hyperlink: rgb(148, 179, 242);
+
+    focus-colour: rgb(30, 120, 210);
+
+    /* Controls' colours */
     button-default-colour: rgb(79, 79, 79);
     button-hover-colour: rgb(67, 67, 69); /* Slightly lighter */
     button-hover-colour-alt: rgb(102, 102, 102);
     button-selected-colour: rgb(45, 55, 70);
-
-    ok-button-default-colour: rgb(35, 110, 195);
-    ok-button-hover-colour: rgb(40, 95, 150); /* Slightly darker */
-
-    text-colour-primary: rgb(235, 235, 235);
-    text-colour-secondary: rgb(175, 175, 175); /* Slightly darker */
-    text-colour-hyperlink: rgb(148, 179, 242);
 
     progress-bar-unfilled-colour: rgb(60, 60, 60);
     progress-bar-filled-colour: rgb(30, 145, 255);
@@ -22,19 +23,21 @@
     slider-track-filled-colour: rgb(30, 150, 255);
     slider-thumb-colour: rgb(35, 35, 35);
 
-    coloured-progress-pane-colour: rgba(30, 150, 255, 0.3125); /* `slider-track-filled-colour` with opacity */
+    radio-button-background-colour: slider-thumb-colour;
+    radio-button-border-colour: rgb(160, 160, 160);
+    radio-button-dot-colour: text-colour-primary;
 
     scrollbar-colour: rgb(110, 110, 110);
     separator-colour: rgb(30, 30, 30);
     stroke-colour: rgb(235, 235, 235);
 
-    radio-button-background-colour: slider-thumb-colour;
-    radio-button-border-colour: rgb(160, 160, 160);
-    radio-button-dot-colour: text-colour-primary;
+    /* Specific elements' colours */
+    ok-button-default-colour: rgb(35, 110, 195);
+    ok-button-hover-colour: rgb(40, 95, 150); /* Slightly darker */
+
+    coloured-progress-pane-colour: rgba(30, 150, 255, 0.3125); /* `slider-track-filled-colour` with opacity */
 
     spectrogram-octave-rectangle-colour: rgba(255, 190, 0, 0.35);
 
     error-border-colour: rgb(240, 85, 85);
-
-    focus-colour: rgb(30, 120, 210);
 }
