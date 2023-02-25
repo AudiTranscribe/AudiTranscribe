@@ -6,7 +6,7 @@
     background-colour-tertiary: background-colour-primary;
 
     text-colour-primary: rgb(255, 255, 255);
-    text-colour-secondary: rgb(200, 200, 200); /* Slightly darker */
+    text-colour-secondary: rgb(200, 200, 200);
     text-colour-hyperlink: rgb(90, 150, 255);
 
     focus-colour: rgb(0, 255, 255);
@@ -37,7 +37,7 @@
     ok-button-hover-colour: rgb(0, 90, 160);
 
     playhead-line-colour: rgb(0, 255, 255);
-    coloured-progress-pane-colour: rgba(0, 255, 255, 0.35); /* `slider-track-filled-colour` with opacity */
+    coloured-progress-pane-colour: rgba(0, 255, 255, 0.35);
 
     spectrogram-octave-rectangle-colour: rgba(255, 255, 0, 0.5);
 
@@ -91,10 +91,6 @@
     -fx-border-color: stroke-colour;
     -fx-border-width: 1px;
 }
-
-/*.progress-bar .bar {*/
-/*    -fx-background-color: progress-bar-filled-colour;*/
-/*}*/
 
 /* Text fields */
 .text-field {
