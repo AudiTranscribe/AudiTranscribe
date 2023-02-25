@@ -30,7 +30,7 @@
     -fx-background-color: background-colour-secondary;
 }
 
-.left-edge-pane .viewport, .bottom-edge-pane .viewport, .middle-pane .viewport {
+.left-edge-pane .viewport, .middle-pane .viewport, .bottom-edge-pane .viewport {
     -fx-background-color: transparent;
 }
 
@@ -125,5 +125,5 @@
 }
 
 .toggle-slowed-audio-button {
-    -fx-font-size: 11pt;
+    -fx-font-size: 10.5pt;
 }

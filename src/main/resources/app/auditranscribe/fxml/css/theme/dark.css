@@ -35,6 +35,7 @@
     ok-button-default-colour: rgb(35, 110, 195);
     ok-button-hover-colour: rgb(40, 95, 150); /* Slightly darker */
 
+    playhead-line-colour: rgb(80, 150, 220);
     coloured-progress-pane-colour: rgba(30, 150, 255, 0.3125); /* `slider-track-filled-colour` with opacity */
 
     spectrogram-octave-rectangle-colour: rgba(255, 190, 0, 0.35);
