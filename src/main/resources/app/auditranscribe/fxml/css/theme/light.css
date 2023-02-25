@@ -27,6 +27,8 @@
     radio-button-border-colour: rgb(90, 90, 115);
     radio-button-dot-colour: text-colour-primary;
 
+    text-field-background-colour: background-colour-primary;
+
     scrollbar-colour: rgb(166, 168, 181);
     separator-colour: rgb(213, 215, 218);
     stroke-colour: rgb(15, 15, 50);
