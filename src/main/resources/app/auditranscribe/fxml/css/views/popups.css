@@ -1,3 +1,4 @@
+/* MAIN STYLING */
 .header-panel {
     -fx-background-color: background-colour-primary;
 }
@@ -6,15 +7,20 @@
     -fx-background-color: background-colour-secondary;
 }
 
-.dialog-pane .button {
-    -fx-background-color: background-colour-tertiary;
-}
-
-.dialog-pane .button:hover {
-    -fx-background-color: button-hover-colour-alt;
-}
-
 .dialog-pane > .button-bar > .container > .details-button.more,
 .dialog-pane > .button-bar > .container > .details-button.less {
     -fx-text-fill: text-colour-primary;
+}
+
+/* COMPONENT STYLING */
+.button {
+    -fx-background-color: background-colour-tertiary;
+}
+
+.button:hover {
+    -fx-background-color: button-hover-colour-alt;
+}
+
+.text-field {
+    -fx-background-color: background-colour-tertiary;
 }
