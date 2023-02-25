@@ -41,11 +41,6 @@
     -fx-border-color: separator-colour;
 }
 
-.search-text-field {
-    -fx-background-color: background-colour-secondary;
-    -fx-font-size: 10pt;
-}
-
 /* PROJECT CELL */
 .project-name-label, .last-opened-date-label, .filepath-label, .short-name-label {
     -fx-text-overrun: ellipsis;

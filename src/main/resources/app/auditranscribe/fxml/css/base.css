@@ -124,11 +124,11 @@
 
 /* Text fields */
 .text-field {
-    -fx-background-color: background-colour-secondary;
+    -fx-background-color: text-field-background-colour;
     -fx-background-radius: 5px;
     -fx-font-size: 10pt;
-    -fx-text-fill: text-colour-primary;
-    -fx-prompt-text-fill: text-colour-secondary;
+    -fx-text-fill: text-field-text-colour;
+    -fx-prompt-text-fill: text-field-prompt-colour;
     -fx-border-radius: 5px;
 }
 

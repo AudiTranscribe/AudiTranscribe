@@ -1,4 +1,7 @@
 .root {
+    text-field-text-colour: text-colour-primary;
+    text-field-prompt-colour: text-colour-secondary;
+
     memory-hbox-background-colour: rgba(230, 235, 240, 0.3);
     memory-hbox-text-colour: rgb(235, 235, 235);
 
