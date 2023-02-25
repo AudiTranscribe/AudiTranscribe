@@ -78,15 +78,16 @@
     -fx-background-color: background-colour-secondary;
 }
 
-.choice-box .menu-item > .label {
+.choice-box .menu-item .label {
     -fx-text-fill: text-colour-primary;
 }
 
 .choice-box .menu-item:focused {
+    -fx-cursor: hand;
     -fx-background-color: background-colour-tertiary;
 }
 
-.spinner > .text-field {
+.spinner .text-field {
     -fx-text-fill: text-colour-primary;
     -fx-background-color: transparent;
 }
@@ -96,24 +97,24 @@
     -fx-cursor: hand;
 }
 
-.spinner > .increment-arrow-button, .spinner > .decrement-arrow-button {
+.spinner .increment-arrow-button, .spinner .decrement-arrow-button {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
     -fx-border-width: 1px;
     -fx-cursor: hand;
 }
 
-.spinner > .increment-arrow-button:hover, .spinner > .decrement-arrow-button:hover {
+.spinner .increment-arrow-button:hover, .spinner .decrement-arrow-button:hover {
     -fx-background-color: background-colour-secondary;
     -fx-border-width: 0;
 }
 
 /* Progress bars */
-.progress-bar > .track {
+.progress-bar .track {
     -fx-background-color: progress-bar-unfilled-colour;
 }
 
-.progress-bar > .bar {
+.progress-bar .bar {
     -fx-background-color: progress-bar-filled-colour;
 }
 
