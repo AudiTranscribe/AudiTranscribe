@@ -59,9 +59,12 @@
 
 /* Hyperlinks */
 .hyperlink, .hyperlink:hover {
-    -fx-font-size: 14px;
     -fx-cursor: hand;
     -fx-text-fill: text-colour-hyperlink;
+}
+
+.hyperlink {
+    -fx-font-size: 14px;
 }
 
 .hyperlink:focused {

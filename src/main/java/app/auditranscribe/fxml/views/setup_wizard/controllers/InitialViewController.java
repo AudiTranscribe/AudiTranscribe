@@ -20,8 +20,10 @@ package app.auditranscribe.fxml.views.setup_wizard.controllers;
 
 import app.auditranscribe.fxml.Theme;
 import app.auditranscribe.fxml.views.AbstractViewController;
+import app.auditranscribe.utils.GUIUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
@@ -41,14 +43,18 @@ public class InitialViewController extends AbstractViewController {
     private Label versionLabel;
 
     @FXML
+    private Hyperlink documentationHyperlink;
+
+    @FXML
     private Button continueButton;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Set up button methods
         continueButton.setOnAction(event -> ((Stage) rootPane.getScene().getWindow()).close());
         continueButton.setCancelButton(true);
         continueButton.setDefaultButton(true);
+
+        documentationHyperlink.setOnAction(event -> GUIUtils.openURLInBrowser("https://docs.auditranscribe.app/"));
 
         log("Setup wizard initial view ready to be shown");
     }
