@@ -26,6 +26,7 @@ import app.auditranscribe.generic.tuples.Pair;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.fxml.spinners.CustomDoubleSpinnerValueFactory;
 import app.auditranscribe.music.MusicKey;
+import app.auditranscribe.music.TimeSignature;
 import app.auditranscribe.utils.GUIUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -66,19 +67,27 @@ public class ProjectSetupViewController extends AbstractViewController {
     @FXML
     private Label audioFileLabel;
 
-    // BPM section
-    @FXML
-    private RadioButton bpmEstimateAutomatically, bpmSpecifyManually;
-
-    @FXML
-    private Spinner<Double> bpmManualSpinner;
-
     // Music key section
     @FXML
     private RadioButton musicKeyEstimateAutomatically, musicKeySpecifyManually;
 
     @FXML
     private ChoiceBox<MusicKey> musicKeyChoiceBox;
+
+    // BPM section
+    @FXML
+    private RadioButton bpmEstimateAutomatically, bpmSpecifyManually;
+
+    @FXML
+    private Spinner<Double> bpmSpinner;
+
+    // Time signature section
+    @FXML
+    private ChoiceBox<TimeSignature> timeSignatureChoiceBox;
+
+    // Audio offset section
+    @FXML
+    private Spinner<Double> offsetSpinner;
 
     // Bottom section
     @FXML
@@ -123,22 +132,30 @@ public class ProjectSetupViewController extends AbstractViewController {
         });
 
         // Set spinner factories
-        bpmManualSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
+        bpmSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
                 TranscriptionViewController.BPM_RANGE.value0(),
                 TranscriptionViewController.BPM_RANGE.value1(),
-                120,
+                TranscriptionViewController.DEFAULT_BPM,
                 0.1,
+                2
+        ));
+        offsetSpinner.setValueFactory(new CustomDoubleSpinnerValueFactory(
+                TranscriptionViewController.OFFSET_RANGE.value0(),
+                TranscriptionViewController.OFFSET_RANGE.value1(),
+                TranscriptionViewController.DEFAULT_OFFSET,
+                0.01,
                 2
         ));
 
         // Add choice box selections
         for (MusicKey musicKey : MusicKey.values()) musicKeyChoiceBox.getItems().add(musicKey);
+        for (TimeSignature timeSignature : TimeSignature.values()) timeSignatureChoiceBox.getItems().add(timeSignature);
 
         // Set radio button group methods
         bpmGroup.selectedToggleProperty().addListener((observable, oldVal, newVal) -> {
             if (bpmGroup.getSelectedToggle() != null) {
                 // Disable the spinner if needed
-                bpmManualSpinner.setDisable(bpmGroup.getSelectedToggle() == bpmEstimateAutomatically);
+                bpmSpinner.setDisable(bpmGroup.getSelectedToggle() == bpmEstimateAutomatically);
             }
         });
 
@@ -150,10 +167,12 @@ public class ProjectSetupViewController extends AbstractViewController {
         });
 
         // Final setup
-        bpmManualSpinner.setDisable(true);  // Initially we select the automatic BPM estimation
+        musicKeyChoiceBox.setDisable(true);  // Initially we select the automatic music key estimation
+        musicKeyChoiceBox.setValue(TranscriptionViewController.DEFAULT_MUSIC_KEY);
 
-        musicKeyChoiceBox.setDisable(true);  // Same with the music key choice box
-        musicKeyChoiceBox.setValue(MusicKey.getMusicKey("C Major"));
+        bpmSpinner.setDisable(true);  // Same with the BPM spinner
+
+        timeSignatureChoiceBox.setValue(TranscriptionViewController.DEFAULT_TIME_SIGNATURE);
 
         log("Project setup view ready to be shown");
     }
@@ -165,21 +184,6 @@ public class ProjectSetupViewController extends AbstractViewController {
      */
     public String getProjectName() {
         return projectNameField.getText();
-    }
-
-    /**
-     * Gets the BPM preference settings for the project.
-     *
-     * @return A pair.<br>
-     * The first value specifies whether automatic BPM estimation should be done.<br>
-     * The second value is the manual BPM value that was specified.
-     */
-    public Pair<Boolean, Double> getBPMPreference() {
-        if (bpmGroup.getSelectedToggle() == bpmEstimateAutomatically) {
-            return new Pair<>(true, -1.);  // -1 is used to signal `null`
-        } else {
-            return new Pair<>(false, bpmManualSpinner.getValue());
-        }
     }
 
     /**
@@ -197,6 +201,34 @@ public class ProjectSetupViewController extends AbstractViewController {
         }
     }
 
+    /**
+     * Gets the BPM preference settings for the project.
+     *
+     * @return A pair.<br>
+     * The first value specifies whether automatic BPM estimation should be done.<br>
+     * The second value is the manual BPM value that was specified.
+     */
+    public Pair<Boolean, Double> getBPMPreference() {
+        if (bpmGroup.getSelectedToggle() == bpmEstimateAutomatically) {
+            return new Pair<>(true, -1.);  // -1 is used to signal `null`
+        } else {
+            return new Pair<>(false, bpmSpinner.getValue());
+        }
+    }
+
+    /**
+     * @return Selected time signature for the project.
+     */
+    public TimeSignature getTimeSignaturePreference() {
+        return timeSignatureChoiceBox.getValue();
+    }
+
+    /**
+     * @return Selected amount of audio offset for the project, in seconds.
+     */
+    public double getOffsetPreference() {
+        return offsetSpinner.getValue();
+    }
 
     // Public methods
     @Override
@@ -252,17 +284,23 @@ public class ProjectSetupViewController extends AbstractViewController {
                 boolean shouldEstimateMusicKey = musicKeyPair.value0();
                 MusicKey manualMusicKey = musicKeyPair.value1();
 
-                // Then set on the scene switching data
+                TimeSignature timeSignature = controller.getTimeSignaturePreference();
+                double offset = controller.getOffsetPreference();
+
+                // Then, set scene switching data
                 data.projectName = controller.getProjectName();
                 data.file = controller.audioFile;
 
                 data.isProjectSetup = true;
 
+                data.estimateMusicKey = shouldEstimateMusicKey;
+                data.musicKey = manualMusicKey;
+
                 data.estimateBPM = shouldEstimateBPM;
                 data.manualBPM = manualBPM;
 
-                data.estimateMusicKey = shouldEstimateMusicKey;
-                data.musicKey = manualMusicKey;
+                data.timeSignature = timeSignature;
+                data.offset = offset;
             }
 
             // Return the formed data
@@ -277,8 +315,8 @@ public class ProjectSetupViewController extends AbstractViewController {
     // Protected methods
     @Override
     protected void setGraphics(Theme theme) {
+        // No graphics to set
     }
-
 
     // Private methods
 

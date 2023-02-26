@@ -3,6 +3,10 @@
     -fx-font-size: 12pt;
 }
 
+.subheading-info {
+    -fx-text-fill: text-colour-secondary;
+}
+
 .button.error {
     -fx-border-color: error-border-colour;
 }

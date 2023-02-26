@@ -33,6 +33,7 @@ import app.auditranscribe.fxml.plotting.Spectrogram;
 import app.auditranscribe.fxml.views.main.ProjectHandler;
 import app.auditranscribe.fxml.views.main.SceneSwitcher;
 import app.auditranscribe.generic.tuples.Pair;
+import app.auditranscribe.generic.tuples.Quadruple;
 import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.audt_file.AUDTFileConstants;
@@ -91,8 +92,13 @@ import java.util.logging.Level;
  */
 public class TranscriptionViewController extends SwitchableViewController {
     // Constants
-    public static final Pair<Integer, Integer> BPM_RANGE = new Pair<>(1, 512);  // In the format [min, max]
-    private final Pair<Double, Double> OFFSET_RANGE = new Pair<>(-5., 5.);  // In the format [min, max]
+    public static final Pair<Double, Double> BPM_RANGE = new Pair<>(1., 512.);  // In the format [min, max]
+    public static final Pair<Double, Double> OFFSET_RANGE = new Pair<>(-5., 5.);  // In the format [min, max]
+
+    public static final MusicKey DEFAULT_MUSIC_KEY = MusicKey.C_MAJOR;
+    public static final double DEFAULT_BPM = 120;
+    public static final TimeSignature DEFAULT_TIME_SIGNATURE = TimeSignature.FOUR_FOUR;
+    public static final double DEFAULT_OFFSET = 0;
 
     public final double SPECTROGRAM_ZOOM_SCALE_X = 2;
     public final double SPECTROGRAM_ZOOM_SCALE_Y = 5;
@@ -158,11 +164,11 @@ public class TranscriptionViewController extends SwitchableViewController {
     private boolean scrollToPlayhead = false;
     private boolean canEditNotes = false;
 
-    private MusicKey musicKey = MusicKey.C_MAJOR;
-    private double bpm = 120;
-    private TimeSignature timeSignature = TimeSignature.FOUR_FOUR;
+    private MusicKey musicKey = DEFAULT_MUSIC_KEY;
+    private double bpm = DEFAULT_BPM;
+    private TimeSignature timeSignature = DEFAULT_TIME_SIGNATURE;
     private int beatsPerBar = timeSignature.beatsPerBar;
-    private double offset = 0;
+    private double offset = DEFAULT_OFFSET;
 
     private boolean hasUnsavedChanges = true;
     private boolean changedProjectName = false;
@@ -672,10 +678,10 @@ public class TranscriptionViewController extends SwitchableViewController {
         };
 
         // Create an estimation task to estimate both the BPM and the music key
-        CustomTask<Pair<Double, MusicKey>> estimationTask = new CustomTask<>("Estimate BPM and key") {
+        CustomTask<Quadruple<MusicKey, Double, TimeSignature, Double>> estimationTask = new CustomTask<>("Estimate BPM and key") {
             @Override
-            protected Pair<Double, MusicKey> call() {
-                // First estimate BPM
+            protected Quadruple<MusicKey, Double, TimeSignature, Double> call() {
+                // First, estimate BPM (since it does not have a proper progress bar, per se)
                 this.updateMessage("Estimating BPM...");
                 double bpm;
                 if (data.estimateBPM) {
@@ -687,7 +693,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                     bpm = data.manualBPM;  // Use provided BPM
                 }
 
-                // Next estimate key
+                // Then, estimate music key (since this does have a progress bar)
                 this.updateMessage("Estimating key...");
                 MusicKey key;
                 if (data.estimateMusicKey) {
@@ -736,8 +742,8 @@ public class TranscriptionViewController extends SwitchableViewController {
                     key = data.musicKey;
                 }
 
-                // Now return them both as a pair
-                return new Pair<>(bpm, key);
+                // Now, return all required data
+                return new Quadruple<>(key, bpm, data.timeSignature, data.offset);
             }
         };
 
@@ -1788,21 +1794,27 @@ public class TranscriptionViewController extends SwitchableViewController {
      *
      * @param task The estimation task.
      */
-    private void setupEstimationTask(CustomTask<Pair<Double, MusicKey>> task) {
+    private void setupEstimationTask(CustomTask<Quadruple<MusicKey, Double, TimeSignature, Double>> task) {
         // Set task completion listener
         task.setOnSucceeded(event -> {
-            // Get the BPM and key values
-            Pair<Double, MusicKey> returnedPair = task.getValue();
-            double newBPM = MathUtils.round(returnedPair.value0(), 1);
-            MusicKey key = returnedPair.value1();
+            // Get values
+            Quadruple<MusicKey, Double, TimeSignature, Double> returnedPair = task.getValue();
+            MusicKey newMusicKey = returnedPair.value0();
+            double newBPM = MathUtils.round(returnedPair.value1(), 1);
+            TimeSignature newTimeSignature = returnedPair.value2();
+            double newOffset = returnedPair.value3();
 
-            // Update the BPM value
+            // Update values
+            updateMusicKeyValue(newMusicKey, true);
+            musicKeyChoice.setValue(newMusicKey);
+
             updateBPMValue(newBPM, true);
             bpmSpinnerFactory.setValue(newBPM);
 
-            // Update the music key choice
-            updateMusicKeyValue(key, true);
-            musicKeyChoice.setValue(key);
+            timeSignatureChoice.setValue(newTimeSignature);
+
+            updateOffsetValue(newOffset, true);
+            offsetSpinnerFactory.setValue(newOffset);
 
             // Mark the task as completed
             markTaskAsCompleted(task);

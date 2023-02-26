@@ -32,9 +32,9 @@
                   </HBox>
                </children>
             </VBox>
-            <HBox spacing="5.0">
+            <HBox spacing="10.0">
                <children>
-                  <VBox layoutX="10.0" layoutY="10.0" HBox.hgrow="ALWAYS">
+                  <VBox layoutX="10.0" layoutY="10.0" prefWidth="280.0" HBox.hgrow="ALWAYS">
                      <children>
                         <Label alignment="TOP_CENTER" styleClass="subheading-label" text="Music Key" textAlignment="RIGHT" textOverrun="WORD_ELLIPSIS" wrapText="true" />
                         <VBox fillWidth="false" spacing="5.0">
@@ -50,7 +50,7 @@
                         </VBox>
                      </children>
                   </VBox>
-                  <VBox HBox.hgrow="ALWAYS">
+                  <VBox prefWidth="280.0" HBox.hgrow="ALWAYS">
                      <children>
                         <Label alignment="TOP_CENTER" styleClass="subheading-label" text="Beats Per Minute (BPM)" textAlignment="RIGHT" textOverrun="WORD_ELLIPSIS" wrapText="true" />
                         <VBox fillWidth="false">
@@ -59,11 +59,38 @@
                               <HBox prefHeight="30.0" spacing="5.0">
                                  <children>
                                     <RadioButton fx:id="bpmSpecifyManually" mnemonicParsing="false" prefHeight="30.0" text="Specify manually:" />
-                                    <Spinner fx:id="bpmManualSpinner" editable="true" prefHeight="30.0" prefWidth="80.0" />
+                                    <Spinner fx:id="bpmSpinner" editable="true" prefHeight="30.0" prefWidth="80.0" />
                                  </children>
                               </HBox>
                            </children>
                         </VBox>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox layoutX="10.0" layoutY="130.0" spacing="10.0">
+               <children>
+                  <VBox layoutX="10.0" layoutY="10.0" prefWidth="280.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label alignment="TOP_CENTER" styleClass="subheading-label" text="Time Signature" textAlignment="RIGHT" textOverrun="WORD_ELLIPSIS" wrapText="true" />
+                        <HBox prefHeight="30.0" spacing="5.0">
+                           <children>
+                              <Label prefHeight="30.0" styleClass="subheading-info" text="Specify time signature:" textAlignment="RIGHT" textOverrun="WORD_ELLIPSIS" wrapText="true" />
+                              <ChoiceBox fx:id="timeSignatureChoiceBox" prefHeight="30.0" prefWidth="80.0" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+                  <VBox prefWidth="280.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label alignment="TOP_CENTER" styleClass="subheading-label" text="Audio Offset" textAlignment="RIGHT" textOverrun="WORD_ELLIPSIS" wrapText="true" />
+                        <HBox prefHeight="30.0" spacing="5.0">
+                           <children>
+                              <Label prefHeight="30.0" styleClass="subheading-info" text="Specify audio offset:" textAlignment="RIGHT" textOverrun="WORD_ELLIPSIS" wrapText="true" />
+                              <Spinner fx:id="offsetSpinner" editable="true" prefHeight="30.0" prefWidth="80.0" />
+                              <Label prefHeight="30.0" styleClass="subheading-info" text="seconds" textAlignment="RIGHT" textOverrun="WORD_ELLIPSIS" wrapText="true" />
+                           </children>
+                        </HBox>
                      </children>
                   </VBox>
                </children>

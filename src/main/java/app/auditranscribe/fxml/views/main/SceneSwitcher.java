@@ -38,6 +38,7 @@ import app.auditranscribe.io.exceptions.FailedToReadDataException;
 import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
 import app.auditranscribe.io.exceptions.InvalidFileVersionException;
 import app.auditranscribe.music.MusicKey;
+import app.auditranscribe.music.TimeSignature;
 import app.auditranscribe.system.OSMethods;
 import app.auditranscribe.system.OSType;
 import app.auditranscribe.utils.MiscUtils;
@@ -489,11 +490,14 @@ public class SceneSwitcher extends LoggableClass {
 
         public boolean isProjectSetup = false;  // False by default
 
+        public boolean estimateMusicKey;
+        public MusicKey musicKey;
+
         public boolean estimateBPM;
         public double manualBPM;
 
-        public boolean estimateMusicKey;
-        public MusicKey musicKey;
+        public TimeSignature timeSignature;
+        public double offset;
 
         // Public methods
         @Override
@@ -502,11 +506,13 @@ public class SceneSwitcher extends LoggableClass {
                     "projectName='" + projectName + "'" +
                     ", file=" + file +
                     ", isProjectSetup=" + isProjectSetup +
-                    ", estimateBPM=" + estimateBPM +
-                    ", manualBPM=" + manualBPM +
                     ", estimateMusicKey=" + estimateMusicKey +
                     ", musicKey=" + musicKey +
-                    "}";
+                    ", estimateBPM=" + estimateBPM +
+                    ", manualBPM=" + manualBPM +
+                    ", timeSignature=" + timeSignature +
+                    ", offset=" + offset +
+                    '}';
         }
     }
 
