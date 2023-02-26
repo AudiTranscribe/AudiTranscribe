@@ -13,7 +13,7 @@
 
 <AnchorPane fx:id="rootPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.auditranscribe.fxml.views.main.controllers.ProjectSetupViewController">
    <children>
-      <VBox spacing="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="5.0">
+      <VBox spacing="10.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="10.0">
          <children>
             <VBox>
                <children>
@@ -34,42 +34,34 @@
             </VBox>
             <HBox spacing="5.0">
                <children>
-                  <VBox spacing="10.0" HBox.hgrow="ALWAYS">
+                  <VBox HBox.hgrow="ALWAYS">
                      <children>
-                        <VBox>
+                        <Label alignment="TOP_CENTER" styleClass="subheading-label" text="Beats Per Minute (BPM)" textAlignment="RIGHT" textOverrun="WORD_ELLIPSIS" wrapText="true" />
+                        <VBox fillWidth="false">
                            <children>
-                              <Label alignment="TOP_CENTER" styleClass="subheading-label" text="Beats Per Minute (BPM)" textAlignment="RIGHT" textOverrun="WORD_ELLIPSIS" wrapText="true" />
-                              <VBox fillWidth="false">
+                              <RadioButton fx:id="bpmEstimateAutomatically" mnemonicParsing="false" selected="true" text="Estimate BPM automatically" />
+                              <HBox prefHeight="30.0" spacing="5.0">
                                  <children>
-                                    <RadioButton fx:id="bpmEstimateAutomatically" mnemonicParsing="false" selected="true" text="Estimate BPM automatically" />
-                                    <HBox prefHeight="30.0" spacing="5.0">
-                                       <children>
-                                          <RadioButton fx:id="bpmSpecifyManually" mnemonicParsing="false" prefHeight="30.0" text="Specify manually:" />
-                                          <Spinner fx:id="bpmManualSpinner" editable="true" prefHeight="30.0" prefWidth="80.0" />
-                                       </children>
-                                    </HBox>
+                                    <RadioButton fx:id="bpmSpecifyManually" mnemonicParsing="false" prefHeight="30.0" text="Specify manually:" />
+                                    <Spinner fx:id="bpmManualSpinner" editable="true" prefHeight="30.0" prefWidth="80.0" />
                                  </children>
-                              </VBox>
+                              </HBox>
                            </children>
                         </VBox>
                      </children>
                   </VBox>
-                  <VBox layoutX="10.0" layoutY="10.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                  <VBox layoutX="10.0" layoutY="10.0" HBox.hgrow="ALWAYS">
                      <children>
-                        <VBox>
+                        <Label alignment="TOP_CENTER" styleClass="subheading-label" text="Music Key" textAlignment="RIGHT" textOverrun="WORD_ELLIPSIS" wrapText="true" />
+                        <VBox fillWidth="false" spacing="5.0">
                            <children>
-                              <Label alignment="TOP_CENTER" styleClass="subheading-label" text="Music Key" textAlignment="RIGHT" textOverrun="WORD_ELLIPSIS" wrapText="true" />
-                              <VBox fillWidth="false" spacing="5.0">
+                              <RadioButton fx:id="musicKeyEstimateAutomatically" mnemonicParsing="false" selected="true" text="Estimate music key automatically" />
+                              <HBox prefHeight="30.0" spacing="5.0">
                                  <children>
-                                    <RadioButton fx:id="musicKeyEstimateAutomatically" mnemonicParsing="false" selected="true" text="Estimate music key automatically" />
-                                    <HBox prefHeight="30.0" spacing="5.0">
-                                       <children>
-                                          <RadioButton fx:id="musicKeySpecifyManually" mnemonicParsing="false" prefHeight="30.0" text="Specify manually:" />
-                                          <ChoiceBox fx:id="musicKeyChoiceBox" prefHeight="30.0" prefWidth="80.0" />
-                                       </children>
-                                    </HBox>
+                                    <RadioButton fx:id="musicKeySpecifyManually" mnemonicParsing="false" prefHeight="30.0" text="Specify manually:" />
+                                    <ChoiceBox fx:id="musicKeyChoiceBox" prefHeight="30.0" prefWidth="80.0" />
                                  </children>
-                              </VBox>
+                              </HBox>
                            </children>
                         </VBox>
                      </children>
