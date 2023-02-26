@@ -34,22 +34,6 @@
             </VBox>
             <HBox spacing="5.0">
                <children>
-                  <VBox HBox.hgrow="ALWAYS">
-                     <children>
-                        <Label alignment="TOP_CENTER" styleClass="subheading-label" text="Beats Per Minute (BPM)" textAlignment="RIGHT" textOverrun="WORD_ELLIPSIS" wrapText="true" />
-                        <VBox fillWidth="false">
-                           <children>
-                              <RadioButton fx:id="bpmEstimateAutomatically" mnemonicParsing="false" selected="true" text="Estimate BPM automatically" />
-                              <HBox prefHeight="30.0" spacing="5.0">
-                                 <children>
-                                    <RadioButton fx:id="bpmSpecifyManually" mnemonicParsing="false" prefHeight="30.0" text="Specify manually:" />
-                                    <Spinner fx:id="bpmManualSpinner" editable="true" prefHeight="30.0" prefWidth="80.0" />
-                                 </children>
-                              </HBox>
-                           </children>
-                        </VBox>
-                     </children>
-                  </VBox>
                   <VBox layoutX="10.0" layoutY="10.0" HBox.hgrow="ALWAYS">
                      <children>
                         <Label alignment="TOP_CENTER" styleClass="subheading-label" text="Music Key" textAlignment="RIGHT" textOverrun="WORD_ELLIPSIS" wrapText="true" />
@@ -60,6 +44,22 @@
                                  <children>
                                     <RadioButton fx:id="musicKeySpecifyManually" mnemonicParsing="false" prefHeight="30.0" text="Specify manually:" />
                                     <ChoiceBox fx:id="musicKeyChoiceBox" prefHeight="30.0" prefWidth="80.0" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                     </children>
+                  </VBox>
+                  <VBox HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label alignment="TOP_CENTER" styleClass="subheading-label" text="Beats Per Minute (BPM)" textAlignment="RIGHT" textOverrun="WORD_ELLIPSIS" wrapText="true" />
+                        <VBox fillWidth="false">
+                           <children>
+                              <RadioButton fx:id="bpmEstimateAutomatically" mnemonicParsing="false" selected="true" text="Estimate BPM automatically" />
+                              <HBox prefHeight="30.0" spacing="5.0">
+                                 <children>
+                                    <RadioButton fx:id="bpmSpecifyManually" mnemonicParsing="false" prefHeight="30.0" text="Specify manually:" />
+                                    <Spinner fx:id="bpmManualSpinner" editable="true" prefHeight="30.0" prefWidth="80.0" />
                                  </children>
                               </HBox>
                            </children>
