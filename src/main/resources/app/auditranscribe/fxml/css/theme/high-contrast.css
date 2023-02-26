@@ -164,3 +164,9 @@
     -fx-border-color: stroke-colour;
     -fx-border-width: 1px;
 }
+
+/* Downloading FFmpeg setup view */
+.downloading-ffmpeg-pane {
+    -fx-border-color: stroke-colour;
+    -fx-border-width: 3px;
+}

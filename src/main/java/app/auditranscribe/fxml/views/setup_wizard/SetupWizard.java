@@ -62,8 +62,8 @@ public class SetupWizard extends LoggableClass {
     public void showSetupWizard() {
         // Show required views
         showInitialView();
-        DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath = showFFmpegSetupView();
         DataFiles.SETTINGS_DATA_FILE.data.themeEnumOrdinal = showThemeSetupView();
+        DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath = showFFmpegSetupView();
         showSetupCompleteView();
 
         // Update files' data
@@ -97,29 +97,6 @@ public class SetupWizard extends LoggableClass {
     }
 
     /**
-     * Helper method that shows the FFmpeg setup view.
-     *
-     * @return The path to the FFmpeg binary.
-     */
-    private String showFFmpegSetupView() {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getSetupWizardView("ffmpeg-setup-view.fxml"));
-            Scene scene = new Scene(fxmlLoader.load());
-
-            FFmpegSetupViewController controller = fxmlLoader.getController();
-            controller.setThemeOnScene();
-
-            stage.setScene(scene);
-            while (!controller.isFFmpegInstalled()) stage.showAndWait();
-
-            controller.removeControllerFromActive();
-            return controller.getFFmpegPath();
-        } catch (IOException ignored) {
-        }
-        return null;
-    }
-
-    /**
      * Helper method that shows the theme setup view.
      *
      * @return The ordinal for the theme that the user wants.
@@ -140,6 +117,29 @@ public class SetupWizard extends LoggableClass {
         } catch (IOException ignored) {
         }
         return SettingsData.THEME_ENUM_ORDINAL;
+    }
+
+    /**
+     * Helper method that shows the FFmpeg setup view.
+     *
+     * @return The path to the FFmpeg binary.
+     */
+    private String showFFmpegSetupView() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getSetupWizardView("ffmpeg-setup-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load());
+
+            FFmpegSetupViewController controller = fxmlLoader.getController();
+            controller.setThemeOnScene();
+
+            stage.setScene(scene);
+            while (!controller.isFFmpegInstalled()) stage.showAndWait();
+
+            controller.removeControllerFromActive();
+            return controller.getFFmpegPath();
+        } catch (IOException ignored) {
+        }
+        return null;
     }
 
     /**
