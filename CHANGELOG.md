@@ -12,15 +12,23 @@ This release comes with massive changes to the overall look and feel of AudiTran
   professional, and easier to use than before.
 - **Audio Device Changing**: The audio playback device can now be customized and specified in the settings view.
 - **Better File Format**: The saved project files should now be smaller, due to a number of optimizations on the file
-  format. Read all the optimizations [here](#file-format-changes).
+  format. Read all the optimizations [here](#v0.11.0-file-format-changes).
 - **Better Music Key Estimation**: Use an improved set of estimation profiles to improve the guess of the estimated key.
-  Read about that specific optimization [here](#music-key-estimation-changes).
+  Read about that specific optimization [here](#v0.11.0-music-key-estimation-changes).
 - **Improved Efficiency**: Removed many redundant things from AudiTranscribe, and improved algorithms used. This should
   help optimize the code and improve efficiency.
 
+In addition, this update also
+
+- added MuseScore source files for some example audio;
+- added AudiTranscribe files for some example audio;
+- added a better high-contrast mode;
+- added the time signature and offset value to project setup view;
+- added a link to documentation website on the initial setup view.
+
 ### Changes
 
-- Updated how the update checker checks for updates.
+- Modified how the update checker operates and checks for new updates.
     - Previously,
         - the update checker would check every so often (e.g., every 24 hours);
         - pressing "remind later" would pause update checking for a period of time (e.g., 72 hours), after which the
@@ -43,6 +51,8 @@ This release comes with massive changes to the overall look and feel of AudiTran
 - Added special warning for the update checker if internet access is unavailable.
 - Changed default update playback scheduler period from 50ms to 10ms.
     - This should make the playback line move more smoothly.
+- Switched order of music key and BPM on the project setup page.
+-
 
 ### Fixes
 
@@ -53,6 +63,7 @@ This release comes with massive changes to the overall look and feel of AudiTran
 - Fixed an issue where `NoteRectangle`s' timestamp used could cause collisions in UUIDs.
     - Now, using nanosecond precision, this should be fixed.
 - Fixed issue with `null` `worker` at end of audio.
+- Fixed missing "hand" icon when focusing on the menu item of a choicebox.
 
 ### Technical Changes
 
@@ -109,14 +120,14 @@ This release comes with massive changes to the overall look and feel of AudiTran
 - Moved some Q-Transform methods into version 0.5.0 data encapsulator.
 - Increased saved MP3s' bitrate from 96k to 128k.
 - Merged FFmpeg setup wizard views into one view, `ffmpeg-setup.fxml`.
-- Updated file version from `0x00090002` to `0x000B0003`; <span id="file-format-changes">improvements to the file format
-  are listed below.</span>
+- Updated file version from `0x00090002` to `0x000B0003`; <span id="v0.11.0-file-format-changes">improvements to the
+  file format are listed below.</span>
     1. Remove need to save the slowed audio in the file.
     2. Remove need to compress the MP3 bytes in the file.
     3. Use DEFLATE algorithm instead of LZ4 to compress the spectrogram data.
 - Renamed `AUDTFileWriter`'s `writeBytesToFile()` method to `writeToFile()`.
 - Removed `COMPRESSOR_VERSION_NUMBER`.
-- <span id="music-key-estimation-changes">Use David Temperley's 1999 key profiles instead of the default
+- <span id="v0.11.0-music-key-estimation-changes">Use David Temperley's 1999 key profiles instead of the default
   Krumhansl-Schmuckler profiles to improve music key estimation accuracy.</span>
 - Fixed inconsistent naming of FXML-related files.
 - Added a test for audio samples' values.
@@ -132,6 +143,10 @@ This release comes with massive changes to the overall look and feel of AudiTran
 - Added `principalArg()` method to `MathUtils`.
 - Made `StoppableThread` log exceptions.
 - Renamed `IOMethods`'s `getInputStream()` to `readAsInputStream()`.
+- Added new `matrixMags()` method to `MatrixUtils`; deprecated `stftMags()` in favour of this new method.
+- Merged all classes in the `scene_switcher` package into `SceneSwitcher`.
+- Updated some tests to use the `beforeAll()` initializer.
+- Removed redundant CSS 'parent selectors'.
 
 ## [0.10.0](https://github.com/AudiTranscribe/AudiTranscribe/compare/v0.9.3...v0.10.0) (2023-01-20)
 
