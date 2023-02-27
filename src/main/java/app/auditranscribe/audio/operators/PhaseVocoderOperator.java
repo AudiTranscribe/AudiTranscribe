@@ -31,6 +31,12 @@ import java.util.LinkedList;
 
 /**
  * Phase vocoder operator that operates on audio bytes.
+ *
+ * @implNote Implementation largely adapted from Grant Oakley's
+ * <code>TimeStretchOperator.java</code> file from the <code>phase-vocoder-java</code> project,
+ * which is licenced under the Apache Licence, Version 2.0. The original source code is available at
+ * <a href="https://tinyurl.com/grantOakleyTimeStretchOperator">here</a>, and the full licence
+ * text is available on the AudiTranscribe website.
  */
 @ExcludeFromGeneratedCoverageReport
 public class PhaseVocoderOperator extends TimeStretchOperator {
