@@ -2,13 +2,14 @@ name: CodeQL Analysis
 
 on:
   push:
-    branches: [ "main", "staging" ]
+    branches: [ "staging" ]
     paths:
       - "**.java"
   pull_request:
     branches: [ "main", "staging" ]
   schedule:
     - cron: "00 00 * * 1"  # Run at 00:00 UTC every Monday
+  workflow_call:
 
 jobs:
   analyze:
