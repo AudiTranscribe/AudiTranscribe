@@ -1,7 +1,6 @@
 package app.auditranscribe.signal.representations;
 
 import app.auditranscribe.audio.Audio;
-import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.generic.exceptions.ValueException;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.misc.Complex;
@@ -28,7 +27,7 @@ class QTransformTest {
     static Method vqtHelperMtd;
 
     @BeforeAll
-    static void beforeAll() throws UnsupportedAudioFileException, AudioTooLongException, IOException,
+    static void beforeAll() throws UnsupportedAudioFileException, Audio.TooLongException, IOException,
             NoSuchMethodException {
         // Get audio file and audio samples for the tests
         audio = new Audio(

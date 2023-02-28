@@ -1,6 +1,5 @@
 package app.auditranscribe.audio;
 
-import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.io.IOMethods;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -16,7 +15,7 @@ class AudioTest {
     static Audio audio;
 
     @BeforeAll
-    static void beforeAll() throws UnsupportedAudioFileException, AudioTooLongException, IOException {
+    static void beforeAll() throws UnsupportedAudioFileException, Audio.TooLongException, IOException {
         File file = new File(IOMethods.getAbsoluteFilePath("test-files/general/audio/Choice.wav"));
 
         if (TEST_PLAYBACK) {

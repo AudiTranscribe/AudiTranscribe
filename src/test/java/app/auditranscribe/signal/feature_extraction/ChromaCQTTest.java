@@ -1,7 +1,6 @@
 package app.auditranscribe.signal.feature_extraction;
 
 import app.auditranscribe.audio.Audio;
-import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.generic.exceptions.ValueException;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.utils.UnitConversionUtils;
@@ -21,7 +20,7 @@ class ChromaCQTTest {
     static double sampleRate;
 
     @BeforeAll
-    static void beforeAll() throws UnsupportedAudioFileException, AudioTooLongException, IOException {
+    static void beforeAll() throws UnsupportedAudioFileException, Audio.TooLongException, IOException {
         audio = new Audio(
                 new File(IOMethods.getAbsoluteFilePath("test-files/general/audio/Trumpet.wav")),
                 Audio.ProcessingMode.WITH_SAMPLES

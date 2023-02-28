@@ -18,8 +18,6 @@
 
 package app.auditranscribe.audio;
 
-import app.auditranscribe.audio.exceptions.AudioPlaybackNotSupported;
-import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.audio.exceptions.FFmpegNotFoundException;
 import app.auditranscribe.audio.operators.*;
 import app.auditranscribe.generic.LoggableClass;
@@ -112,12 +110,12 @@ public class Audio extends LoggableClass {
      *                        </ul>
      * @throws IOException                   If there was a problem reading in the audio stream.
      * @throws UnsupportedAudioFileException If there was a problem reading in the audio file.
-     * @throws AudioTooLongException         If the audio file exceeds the maximum audio duration
+     * @throws TooLongException              If the audio file exceeds the maximum audio duration
      *                                       permitted.
      */
     public Audio(
             File wavFile, ProcessingMode... processingModes
-    ) throws UnsupportedAudioFileException, IOException, AudioTooLongException {
+    ) throws UnsupportedAudioFileException, IOException, TooLongException {
         // Convert the given processing modes as a list
         List<ProcessingMode> modes = List.of(processingModes);
 
@@ -145,7 +143,7 @@ public class Audio extends LoggableClass {
         double durationInMinutes = duration / 60;
 
         if (durationInMinutes > MAX_AUDIO_DURATION) {
-            throw new AudioTooLongException(
+            throw new TooLongException(
                     "Audio file is too long (audio was " + durationInMinutes + " minutes but maximum allowed " +
                             "is " + MAX_AUDIO_DURATION + " minutes)"
             );
@@ -212,7 +210,7 @@ public class Audio extends LoggableClass {
      * Starts playing the audio.
      */
     public void play() {
-        if (!withPlayback) throw new AudioPlaybackNotSupported();
+        if (!withPlayback) throw new PlaybackNotSupportedException();
         if (sourceDataLine == null) setupSourceDataLine();
 
         if (audioPlaybackThread.isStarted()) {
@@ -240,7 +238,7 @@ public class Audio extends LoggableClass {
      * Stops playing the audio.
      */
     public void stop() {
-        if (!withPlayback) throw new AudioPlaybackNotSupported();
+        if (!withPlayback) throw new PlaybackNotSupportedException();
         try {
             // Halt all threads
             audioPlaybackThread.interrupt();
@@ -830,4 +828,26 @@ public class Audio extends LoggableClass {
      * Enum that contains different audio processing modes.
      */
     public enum ProcessingMode {WITH_SAMPLES, WITH_PLAYBACK}
+
+    // Exceptions
+
+    /**
+     * Exception thrown when the audio object cannot be used for playback.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static class PlaybackNotSupportedException extends RuntimeException {
+        public PlaybackNotSupportedException() {
+            super();
+        }
+    }
+
+    /**
+     * Exception thrown when an audio file is too long.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static class TooLongException extends Exception {
+        public TooLongException(String message) {
+            super(message);
+        }
+    }
 }

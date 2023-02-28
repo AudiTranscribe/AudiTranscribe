@@ -1,7 +1,6 @@
 package app.auditranscribe.music;
 
 import app.auditranscribe.audio.Audio;
-import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.generic.exceptions.ValueException;
 import app.auditranscribe.io.IOMethods;
 import org.junit.jupiter.api.BeforeAll;
@@ -28,7 +27,7 @@ class BPMEstimatorTest {
     static double sampleRate2;
 
     @BeforeAll
-    static void beforeAll() throws UnsupportedAudioFileException, AudioTooLongException, IOException {
+    static void beforeAll() throws UnsupportedAudioFileException, Audio.TooLongException, IOException {
         audio1 = new Audio(
                 new File(IOMethods.getAbsoluteFilePath("test-files/music/BPMEstimatorTest/175bpm.wav")),
                 Audio.ProcessingMode.WITH_SAMPLES

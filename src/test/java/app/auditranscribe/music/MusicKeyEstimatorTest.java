@@ -1,7 +1,6 @@
 package app.auditranscribe.music;
 
 import app.auditranscribe.audio.Audio;
-import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.generic.exceptions.ValueException;
 import app.auditranscribe.generic.tuples.Pair;
 import app.auditranscribe.io.IOMethods;
@@ -17,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MusicKeyEstimatorTest {
     @Test
-    void musicKeyEstimatorTest() throws UnsupportedAudioFileException, AudioTooLongException, IOException {
+    void musicKeyEstimatorTest() throws UnsupportedAudioFileException, Audio.TooLongException, IOException {
         // Test 1
         Audio audio1 = new Audio(
                 new File(IOMethods.getAbsoluteFilePath("test-files/general/audio/Choice.wav")),

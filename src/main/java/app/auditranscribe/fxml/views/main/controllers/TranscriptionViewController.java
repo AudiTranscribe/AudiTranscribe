@@ -20,7 +20,6 @@ package app.auditranscribe.fxml.views.main.controllers;
 
 import app.auditranscribe.audio.Audio;
 import app.auditranscribe.audio.FFmpegHandler;
-import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.audio.exceptions.FFmpegNotFoundException;
 import app.auditranscribe.fxml.IconHelper;
 import app.auditranscribe.fxml.Popups;
@@ -770,11 +769,11 @@ public class TranscriptionViewController extends SwitchableViewController {
      * @throws FFmpegNotFoundException       If the FFmpeg binary could not be found.
      * @throws UnsupportedAudioFileException If the audio file path that was provided in
      *                                       <code>audioData</code> points to an invalid audio file.
-     * @throws AudioTooLongException         If the audio file is too long.
+     * @throws Audio.TooLongException        If the audio file is too long.
      */
     public void setAudioAndSpectrogramData(
             QTransformDataObject qTransformData, AudioDataObject audioData
-    ) throws IOException, FFmpegNotFoundException, UnsupportedAudioFileException, AudioTooLongException {
+    ) throws IOException, FFmpegNotFoundException, UnsupportedAudioFileException, Audio.TooLongException {
         // Set attributes
         sampleRate = audioData.sampleRate;
         audioDuration = audioData.totalDurationInMS / 1000.;
@@ -869,7 +868,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                     "FFmpeg was not found. Please install it and try again.",
                     e
             );
-        } catch (AudioTooLongException e) {
+        } catch (Audio.TooLongException e) {
             logException(e);
             Popups.showExceptionAlert(
                     rootPane.getScene().getWindow(),

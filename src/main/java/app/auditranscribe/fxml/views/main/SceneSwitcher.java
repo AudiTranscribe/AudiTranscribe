@@ -20,7 +20,6 @@ package app.auditranscribe.fxml.views.main;
 
 import app.auditranscribe.audio.Audio;
 import app.auditranscribe.audio.FFmpegHandler;
-import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.audio.exceptions.FFmpegNotFoundException;
 import app.auditranscribe.fxml.Popups;
 import app.auditranscribe.fxml.views.main.controllers.HomepageViewController;
@@ -299,7 +298,7 @@ public class SceneSwitcher extends LoggableClass {
                     "FFmpeg was not found. Please install it and try again.",
                     e
             );
-        } catch (AudioTooLongException e) {
+        } catch (Audio.TooLongException e) {
             logException(e);
             Popups.showExceptionAlert(
                     null,

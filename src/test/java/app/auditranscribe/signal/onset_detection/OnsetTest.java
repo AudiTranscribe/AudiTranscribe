@@ -1,7 +1,6 @@
 package app.auditranscribe.signal.onset_detection;
 
 import app.auditranscribe.audio.Audio;
-import app.auditranscribe.audio.exceptions.AudioTooLongException;
 import app.auditranscribe.io.IOMethods;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class OnsetTest {
     @Test
-    void onsetStrength() throws UnsupportedAudioFileException, IOException, AudioTooLongException {
+    void onsetStrength() throws UnsupportedAudioFileException, IOException, Audio.TooLongException {
         // Get the audio files
         Audio audio1 = new Audio(
                 new File(IOMethods.getAbsoluteFilePath("test-files/general/audio/Choice.wav")),
