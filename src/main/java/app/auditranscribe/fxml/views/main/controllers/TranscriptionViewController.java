@@ -1246,7 +1246,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                 state = SceneSwitcher.State.NEW_PROJECT;
 
                 // Close this stage
-                ((Stage) rootPane.getScene().getWindow()).close();
+                closeTranscriptionView();
             }
         }
     }
@@ -1287,7 +1287,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                 data.file = file;
 
                 // Close this stage
-                ((Stage) rootPane.getScene().getWindow()).close();
+                closeTranscriptionView();
             }
         }
     }
@@ -2327,8 +2327,6 @@ public class TranscriptionViewController extends SwitchableViewController {
         return saveDest;
     }
 
-    // Miscellaneous methods
-
     /**
      * Helper method that generates the auxiliary WAV file for the audio processing/playing.
      *
@@ -2364,6 +2362,13 @@ public class TranscriptionViewController extends SwitchableViewController {
 
         // Return `File` pointer
         return auxiliaryWAVFile;
+    }
+
+    /**
+     * Helper method that closes this view.
+     */
+    private void closeTranscriptionView() {
+        ((Stage) rootPane.getScene().getWindow()).close();
     }
 
     /**
