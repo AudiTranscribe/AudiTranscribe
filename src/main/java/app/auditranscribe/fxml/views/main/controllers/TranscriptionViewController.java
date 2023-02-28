@@ -678,7 +678,9 @@ public class TranscriptionViewController extends SwitchableViewController {
         };
 
         // Create an estimation task to estimate both the BPM and the music key
-        CustomTask<Quadruple<MusicKey, Double, TimeSignature, Double>> estimationTask = new CustomTask<>("Estimate BPM and key") {
+        CustomTask<Quadruple<MusicKey, Double, TimeSignature, Double>> estimationTask = new CustomTask<>(
+                "Estimate BPM and key"
+        ) {
             @Override
             protected Quadruple<MusicKey, Double, TimeSignature, Double> call() {
                 // First, estimate BPM (since it does not have a proper progress bar, per se)
@@ -1712,15 +1714,14 @@ public class TranscriptionViewController extends SwitchableViewController {
             }
 
             // Schedule autosave functionality
-            scheduler.scheduleAtFixedRate(() -> Platform.runLater(
-                            () -> {
-                                if (audtFilePath != null) {
-                                    handleSavingProject(true, false);
-                                    log("Autosave project successful");
-                                } else {
-                                    log("Autosave skipped since project was not loaded from file");
-                                }
-                            }),
+            scheduler.scheduleAtFixedRate(() -> Platform.runLater(() -> {
+                        if (audtFilePath != null) {
+                            handleSavingProject(true, false);
+                            log("Autosave project successful");
+                        } else {
+                            log("Autosave skipped since project was not loaded from file");
+                        }
+                    }),
                     DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval,
                     DataFiles.SETTINGS_DATA_FILE.data.autosaveInterval,
                     TimeUnit.MINUTES
@@ -1922,7 +1923,9 @@ public class TranscriptionViewController extends SwitchableViewController {
                             // Add the note rectangle to the spectrogram pane
                             spectrogramAnchorPane.getChildren().add(noteRect);
 
-                            String noteString = UnitConversionUtils.noteNumberToNote(noteNum, musicKey, true);
+                            String noteString = UnitConversionUtils.noteNumberToNote(
+                                    noteNum, musicKey, true
+                            );
                             log(
                                     Level.FINE,
                                     "Loaded note " + noteString + " with " + noteDuration + " seconds duration " +
