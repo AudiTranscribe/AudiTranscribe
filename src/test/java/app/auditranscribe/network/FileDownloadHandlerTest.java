@@ -2,7 +2,6 @@ package app.auditranscribe.network;
 
 import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
-import app.auditranscribe.network.exceptions.FileSignatureMismatchException;
 import app.auditranscribe.utils.HashingUtils;
 import javafx.embed.swing.JFXPanel;
 import org.junit.jupiter.api.MethodOrderer;
@@ -51,15 +50,16 @@ class FileDownloadHandlerTest {
                     "SHA1",
                     "3f74f90488683c4c88e93eb27eaf9d8b3c9bf1ce"
             ));
-            assertThrowsExactly(FileSignatureMismatchException.class, () -> FileDownloadHandler.downloadFile(
-                    new URL(
-                            "https://raw.githubusercontent.com/AudiTranscribe/AudiTranscribe/" +
-                                    "90ba622e09c867250c24b3a2e437e888b2740027/Feature%20Plan.txt"
-                    ),
-                    outputFilePath,
-                    "SHA1",
-                    "Not a hash"
-            ));
+            assertThrowsExactly(FileDownloadHandler.SignatureMismatchException.class,
+                    () -> FileDownloadHandler.downloadFile(
+                            new URL(
+                                    "https://raw.githubusercontent.com/AudiTranscribe/AudiTranscribe/" +
+                                            "90ba622e09c867250c24b3a2e437e888b2740027/Feature%20Plan.txt"
+                            ),
+                            outputFilePath,
+                            "SHA1",
+                            "Not a hash"
+                    ));
         } finally {
             // Delete the test file
             IOMethods.delete(outputFilePath);

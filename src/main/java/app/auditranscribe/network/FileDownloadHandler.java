@@ -20,7 +20,7 @@ package app.auditranscribe.network;
 
 import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.io.IOMethods;
-import app.auditranscribe.network.exceptions.FileSignatureMismatchException;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.utils.HashingUtils;
 
 import java.io.File;
@@ -128,15 +128,15 @@ public final class FileDownloadHandler extends LoggableClass {
      * @param outputFilePath <b>Absolute</b> file path to the output file.
      * @param algorithm      Hashing algorithm to generate the signature.
      * @param correctHash    Correct signature.
-     * @throws IOException                    If downloading the file fails.
-     * @throws NoSuchAlgorithmException       If the specified algorithm for hashing could not be
-     *                                        found on the system.
-     * @throws FileSignatureMismatchException If the calculated file signature is not the same as
-     *                                        the correct file signature.
+     * @throws IOException                If downloading the file fails.
+     * @throws NoSuchAlgorithmException   If the specified algorithm for hashing could not be found
+     *                                    on the system.
+     * @throws SignatureMismatchException If the calculated file signature is not the same as the
+     *                                    correct file signature.
      */
     public static void downloadFile(
             URL url, String outputFilePath, String algorithm, String correctHash
-    ) throws IOException, NoSuchAlgorithmException, FileSignatureMismatchException {
+    ) throws IOException, NoSuchAlgorithmException, SignatureMismatchException {
         downloadFile(url, outputFilePath, null, algorithm, correctHash);
     }
 
@@ -149,15 +149,15 @@ public final class FileDownloadHandler extends LoggableClass {
      * @param task           A <code>DownloadTask</code> object to show the progress of the download.
      * @param algorithm      Hashing algorithm to generate the signature.
      * @param correctHash    Correct signature.
-     * @throws IOException                    If downloading the file fails.
-     * @throws NoSuchAlgorithmException       If the specified algorithm for hashing could not be
-     *                                        found on the system.
-     * @throws FileSignatureMismatchException If the calculated file signature is not the same as
-     *                                        the correct file signature.
+     * @throws IOException                If downloading the file fails.
+     * @throws NoSuchAlgorithmException   If the specified algorithm for hashing could not be found
+     *                                    on the system.
+     * @throws SignatureMismatchException If the calculated file signature is not the same as the
+     *                                    correct file signature.
      */
     public static void downloadFile(
             URL url, String outputFilePath, DownloadTask<?> task, String algorithm, String correctHash
-    ) throws IOException, NoSuchAlgorithmException, FileSignatureMismatchException {
+    ) throws IOException, NoSuchAlgorithmException, SignatureMismatchException {
         // Download the file first
         downloadFile(url, outputFilePath, task);
 
@@ -170,7 +170,7 @@ public final class FileDownloadHandler extends LoggableClass {
             IOMethods.delete(outputFilePath);
 
             // Throw an exception
-            throw new FileSignatureMismatchException(
+            throw new SignatureMismatchException(
                     "Calculated hash (" + calculatedHash + ") does not match correct hash (" + correctHash + ")."
             );
         }
@@ -273,7 +273,7 @@ public final class FileDownloadHandler extends LoggableClass {
                         FileDownloadHandler.class.getName()
                 );
                 continue;  // Try again
-            } catch (FileSignatureMismatchException e) {
+            } catch (SignatureMismatchException e) {
                 log(
                         Level.WARNING,
                         e.getMessage() + " Trying again (attempt " + (i + 1) + " of " + maxAttempts + ")",
@@ -293,5 +293,17 @@ public final class FileDownloadHandler extends LoggableClass {
                 FileDownloadHandler.class.getName()
         );
         throw new IOException("File download from '" + url + "' failed after " + maxAttempts + " attempts");
+    }
+
+    // Exceptions
+
+    /**
+     * Exception to mark when the calculated file hash does not match the expected file hash.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static class SignatureMismatchException extends Exception {
+        public SignatureMismatchException(String message) {
+            super(message);
+        }
     }
 }
