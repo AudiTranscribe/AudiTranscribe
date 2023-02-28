@@ -18,6 +18,7 @@
 
 package app.auditranscribe.io.data_files;
 
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
@@ -104,6 +105,7 @@ public abstract class JSONDataFile<T> {
     /**
      * Exception thrown when a JSON file could not be created.
      */
+    @ExcludeFromGeneratedCoverageReport
     public static class CreateFailedException extends RuntimeException {
         public CreateFailedException(Throwable cause) {
             super(cause);

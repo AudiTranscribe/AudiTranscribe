@@ -21,9 +21,6 @@ package app.auditranscribe.io.audt_file.v0x000500;
 import app.auditranscribe.io.audt_file.base.AUDTFileReader;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import app.auditranscribe.io.audt_file.v0x000500.data_encapsulators.*;
-import app.auditranscribe.io.exceptions.FailedToReadDataException;
-import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
-import app.auditranscribe.io.exceptions.InvalidFileVersionException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,21 +40,20 @@ public class AUDTFileReader0x000500 extends AUDTFileReader {
      * @param inputStream Input stream of the file.
      * @throws IOException                  If something went wrong when reading the AUDT file.
      * @throws IncorrectFileFormatException If the file was formatted incorrectly.
-     * @throws InvalidFileVersionException  If the LZ4 version is outdated.
      */
     public AUDTFileReader0x000500(
             String filepath, InputStream inputStream
-    ) throws IOException, IncorrectFileFormatException, InvalidFileVersionException {
+    ) throws IOException, IncorrectFileFormatException {
         super(filepath, inputStream);
     }
 
     // Public methods
     @Override
-    public UnchangingDataPropertiesObject readUnchangingDataProperties() throws FailedToReadDataException {
+    public UnchangingDataPropertiesObject readUnchangingDataProperties() throws DataReadFailedException {
         // Ensure that the unchanging data properties section ID is correct
         int sectionID = readSectionID();
         if (sectionID != UnchangingDataPropertiesObject.SECTION_ID) {
-            throw new FailedToReadDataException(
+            throw new DataReadFailedException(
                     "Failed to read the unchanging data properties section; the unchanging data properties section " +
                             "has the incorrect section ID of " + sectionID + " (expected: " +
                             UnchangingDataPropertiesObject.SECTION_ID + ")"
@@ -69,7 +65,7 @@ public class AUDTFileReader0x000500 extends AUDTFileReader {
 
         // Check if there is an EOS
         if (!checkEOSDelimiter()) {
-            throw new FailedToReadDataException(
+            throw new DataReadFailedException(
                     "Failed to read unchanging data properties; end of section delimiter missing"
             );
         }
@@ -79,11 +75,11 @@ public class AUDTFileReader0x000500 extends AUDTFileReader {
     }
 
     @Override
-    public QTransformDataObject readQTransformData() throws FailedToReadDataException {
+    public QTransformDataObject readQTransformData() throws DataReadFailedException {
         // Ensure that the Q-Transform data section ID is correct
         int sectionID = readSectionID();
         if (sectionID != QTransformDataObject.SECTION_ID) {
-            throw new FailedToReadDataException(
+            throw new DataReadFailedException(
                     "Failed to read Q-Transform data; the Q-Transform data section has the incorrect " +
                             "section ID of " + sectionID + " (expected: " + QTransformDataObject.SECTION_ID + ")"
             );
@@ -96,7 +92,7 @@ public class AUDTFileReader0x000500 extends AUDTFileReader {
 
         // Check if there is an EOS
         if (!checkEOSDelimiter()) {
-            throw new FailedToReadDataException("Failed to read Q-Transform data; end of section delimiter missing");
+            throw new DataReadFailedException("Failed to read Q-Transform data; end of section delimiter missing");
         }
 
         // Create and return a `QTransformDataObject`
@@ -104,11 +100,11 @@ public class AUDTFileReader0x000500 extends AUDTFileReader {
     }
 
     @Override
-    public AudioDataObject readAudioData() throws FailedToReadDataException {
+    public AudioDataObject readAudioData() throws DataReadFailedException {
         // Ensure that the audio data section ID is correct
         int sectionID = readSectionID();
         if (sectionID != AudioDataObject.SECTION_ID) {
-            throw new FailedToReadDataException(
+            throw new DataReadFailedException(
                     "Failed to read audio data; the audio data section has the incorrect section ID of " + sectionID +
                             " (expected: " + AudioDataObject.SECTION_ID + ")"
             );
@@ -122,7 +118,7 @@ public class AUDTFileReader0x000500 extends AUDTFileReader {
 
         // Check if there is an EOS
         if (!checkEOSDelimiter()) {
-            throw new FailedToReadDataException("Failed to read audio data; end of section delimiter missing");
+            throw new DataReadFailedException("Failed to read audio data; end of section delimiter missing");
         }
 
         // Create and return an `AudioDataObject`
@@ -130,11 +126,11 @@ public class AUDTFileReader0x000500 extends AUDTFileReader {
     }
 
     @Override
-    public ProjectInfoDataObject readProjectInfoData() throws FailedToReadDataException {
+    public ProjectInfoDataObject readProjectInfoData() throws DataReadFailedException {
         // Ensure that the project info data section ID is correct
         int sectionID = readSectionID();
         if (sectionID != ProjectInfoDataObject.SECTION_ID) {
-            throw new FailedToReadDataException(
+            throw new DataReadFailedException(
                     "Failed to read project info data; the project info data section has the incorrect section ID of " +
                             sectionID + "(expected: " + ProjectInfoDataObject.SECTION_ID + ")"
             );
@@ -150,7 +146,7 @@ public class AUDTFileReader0x000500 extends AUDTFileReader {
 
         // Check if there is an EOS
         if (!checkEOSDelimiter()) {
-            throw new FailedToReadDataException("Failed to read project info data; end of section delimiter missing");
+            throw new DataReadFailedException("Failed to read project info data; end of section delimiter missing");
         }
 
         // Create and return a `ProjectInfoDataObject`
@@ -162,11 +158,11 @@ public class AUDTFileReader0x000500 extends AUDTFileReader {
     }
 
     @Override
-    public MusicNotesDataObject readMusicNotesData() throws FailedToReadDataException, IOException {
+    public MusicNotesDataObject readMusicNotesData() throws DataReadFailedException, IOException {
         // Ensure that the music notes data section ID is correct
         int sectionID = readSectionID();
         if (sectionID != MusicNotesDataObject.SECTION_ID) {
-            throw new FailedToReadDataException(
+            throw new DataReadFailedException(
                     "Failed to read music notes data; the music notes data section has the incorrect section ID of " +
                             sectionID + " (expected: " + MusicNotesDataObject.SECTION_ID + ")"
             );
@@ -179,7 +175,7 @@ public class AUDTFileReader0x000500 extends AUDTFileReader {
 
         // Check if there is an EOS
         if (!checkEOSDelimiter()) {
-            throw new FailedToReadDataException("Failed to read music notes data; end of section delimiter missing");
+            throw new DataReadFailedException("Failed to read music notes data; end of section delimiter missing");
         }
 
         // Create and return a `MusicNotesDataObject`

@@ -29,7 +29,7 @@ import app.auditranscribe.io.audt_file.v0x000700.AUDTFileWriter0x000700;
 import app.auditranscribe.io.audt_file.v0x000800.AUDTFileWriter0x000800;
 import app.auditranscribe.io.audt_file.v0x000900.AUDTFileWriter0x000900;
 import app.auditranscribe.io.audt_file.v0x000B00.AUDTFileWriter0x000B00;
-import app.auditranscribe.io.exceptions.InvalidFileVersionException;
+import app.auditranscribe.io.audt_file.InvalidFileVersionException;
 import app.auditranscribe.misc.CustomLogger;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.utils.MiscUtils;

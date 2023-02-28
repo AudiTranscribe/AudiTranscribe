@@ -32,9 +32,7 @@ import app.auditranscribe.io.audt_file.ProjectData;
 import app.auditranscribe.io.audt_file.base.AUDTFileReader;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import app.auditranscribe.io.data_files.DataFiles;
-import app.auditranscribe.io.exceptions.FailedToReadDataException;
-import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
-import app.auditranscribe.io.exceptions.InvalidFileVersionException;
+import app.auditranscribe.io.audt_file.InvalidFileVersionException;
 import app.auditranscribe.music.MusicKey;
 import app.auditranscribe.music.TimeSignature;
 import app.auditranscribe.system.OSMethods;
@@ -439,7 +437,7 @@ public class SceneSwitcher extends LoggableClass {
                     e
             );
             logException(e);
-        } catch (IOException | IncorrectFileFormatException | FailedToReadDataException e) {
+        } catch (IOException | AUDTFileReader.IncorrectFileFormatException | AUDTFileReader.DataReadFailedException e) {
             Popups.showExceptionAlert(
                     null,
                     "Failed to read '" + audtFile.getName() + "' as an AUDT ile",

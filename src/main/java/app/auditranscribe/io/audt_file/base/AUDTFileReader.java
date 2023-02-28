@@ -28,9 +28,7 @@ import app.auditranscribe.io.audt_file.v0x000700.AUDTFileReader0x000700;
 import app.auditranscribe.io.audt_file.v0x000800.AUDTFileReader0x000800;
 import app.auditranscribe.io.audt_file.v0x000900.AUDTFileReader0x000900;
 import app.auditranscribe.io.audt_file.v0x000B00.AUDTFileReader0x000B00;
-import app.auditranscribe.io.exceptions.FailedToReadDataException;
-import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
-import app.auditranscribe.io.exceptions.InvalidFileVersionException;
+import app.auditranscribe.io.audt_file.InvalidFileVersionException;
 import app.auditranscribe.misc.CustomLogger;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.utils.MiscUtils;
@@ -145,43 +143,43 @@ public abstract class AUDTFileReader extends LoggableClass {
      *
      * @return A <code>UnchangingDataPropertiesObject</code> that encapsulates all the unchanging
      * data's properties.
-     * @throws FailedToReadDataException If the program failed to read the data from the file.
+     * @throws DataReadFailedException If the program failed to read the data from the file.
      */
-    public abstract UnchangingDataPropertiesObject readUnchangingDataProperties() throws FailedToReadDataException;
+    public abstract UnchangingDataPropertiesObject readUnchangingDataProperties() throws DataReadFailedException;
 
     /**
      * Method that reads the Q-Transform data from the file.
      *
      * @return A <code>QTransformDataObject</code> that encapsulates all the data that are needed
      * for the Q-Transform matrix.
-     * @throws FailedToReadDataException If the program failed to read the data from the file.
+     * @throws DataReadFailedException If the program failed to read the data from the file.
      */
-    public abstract QTransformDataObject readQTransformData() throws FailedToReadDataException;
+    public abstract QTransformDataObject readQTransformData() throws DataReadFailedException;
 
     /**
      * Method that reads the audio data from the file.
      *
      * @return A <code>AudioDataObject</code> that encapsulates all the audio data.
-     * @throws FailedToReadDataException If the program failed to read the data from the file.
+     * @throws DataReadFailedException If the program failed to read the data from the file.
      */
-    public abstract AudioDataObject readAudioData() throws FailedToReadDataException;
+    public abstract AudioDataObject readAudioData() throws DataReadFailedException;
 
     /**
      * Method that reads the project info data from the file.
      *
      * @return A <code>ProjectInfoDataObject</code> that encapsulates all the project's info.
-     * @throws FailedToReadDataException If the program failed to read the data from the file.
+     * @throws DataReadFailedException If the program failed to read the data from the file.
      */
-    public abstract ProjectInfoDataObject readProjectInfoData() throws FailedToReadDataException;
+    public abstract ProjectInfoDataObject readProjectInfoData() throws DataReadFailedException;
 
     /**
      * Method that reads the music notes data from the file.
      *
      * @return A <code>MusicNotesDataObject</code> that encapsulates all the music notes data.
-     * @throws FailedToReadDataException If the program failed to read the data from the file.
-     * @throws IOException               If something went wrong during reading the file.
+     * @throws DataReadFailedException If the program failed to read the data from the file.
+     * @throws IOException             If something went wrong during reading the file.
      */
-    public abstract MusicNotesDataObject readMusicNotesData() throws FailedToReadDataException, IOException;
+    public abstract MusicNotesDataObject readMusicNotesData() throws DataReadFailedException, IOException;
 
     @Override
     @ExcludeFromGeneratedCoverageReport
@@ -405,5 +403,27 @@ public abstract class AUDTFileReader extends LoggableClass {
         // Check if the last 8 bytes corresponds to the EOF bytes
         byte[] eofBytes = Arrays.copyOfRange(bytes, numBytes - 8, numBytes);
         return checkBytesMatch(AUDTFileConstants.AUDT_END_OF_FILE_DELIMITER, eofBytes);
+    }
+
+    // Exceptions
+
+    /**
+     * Exception to mark that the program failed to read the data stored in an AUDT file.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static class DataReadFailedException extends Exception {
+        public DataReadFailedException(String message) {
+            super(message);
+        }
+    }
+
+    /**
+     * Exception to mark that the AUDT file does not have the correct file format.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static class IncorrectFileFormatException extends Exception {
+        public IncorrectFileFormatException(String message) {
+            super(message);
+        }
     }
 }

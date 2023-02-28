@@ -23,7 +23,7 @@ import app.auditranscribe.io.audt_file.ProjectData;
 import app.auditranscribe.io.audt_file.base.AUDTFileWriter;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.MusicNotesDataObject;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.ProjectInfoDataObject;
-import app.auditranscribe.io.exceptions.InvalidFileVersionException;
+import app.auditranscribe.io.audt_file.InvalidFileVersionException;
 
 import java.io.IOException;
 

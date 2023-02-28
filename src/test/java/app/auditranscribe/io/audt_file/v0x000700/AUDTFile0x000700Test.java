@@ -30,9 +30,7 @@ import app.auditranscribe.io.audt_file.v0x000500.data_encapsulators.QTransformDa
 import app.auditranscribe.io.audt_file.v0x000500.data_encapsulators.UnchangingDataPropertiesObject0x000500;
 import app.auditranscribe.io.audt_file.v0x000700.data_encapsulators.AudioDataObject0x000700;
 import app.auditranscribe.io.audt_file.v0x000700.data_encapsulators.ProjectInfoDataObject0x000700;
-import app.auditranscribe.io.exceptions.FailedToReadDataException;
-import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
-import app.auditranscribe.io.exceptions.InvalidFileVersionException;
+import app.auditranscribe.io.audt_file.InvalidFileVersionException;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;
@@ -159,8 +157,8 @@ class AUDTFile0x000700Test {
 
     @Test
     @Order(2)
-    void fileReader_initialRead() throws IOException, IncorrectFileFormatException, InvalidFileVersionException,
-            FailedToReadDataException {
+    void fileReader_initialRead() throws IOException, AUDTFileReader.IncorrectFileFormatException,
+            InvalidFileVersionException, AUDTFileReader.DataReadFailedException {
         // Create a file reader object
         AUDTFileReader fileReader = AUDTFileReader.getFileReader(FILE_PATH);
 
@@ -197,7 +195,7 @@ class AUDTFile0x000700Test {
     @Test
     @Order(2)
     void fileReader_checkBytesMatch() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException,
-            InvalidFileVersionException, IOException, IncorrectFileFormatException {
+            InvalidFileVersionException, IOException, AUDTFileReader.IncorrectFileFormatException {
         // Make the method accessible to this test
         Method mtd = AUDTFileReader.class.getDeclaredMethod("checkBytesMatch", byte[].class, byte[].class);
         mtd.setAccessible(true);
@@ -247,8 +245,8 @@ class AUDTFile0x000700Test {
 
     @Test
     @Order(4)
-    void fileReader_initialReadAlt() throws IOException, IncorrectFileFormatException, InvalidFileVersionException,
-            FailedToReadDataException {
+    void fileReader_initialReadAlt() throws IOException, AUDTFileReader.IncorrectFileFormatException,
+            InvalidFileVersionException, AUDTFileReader.DataReadFailedException {
         // Create a file reader object
         AUDTFileReader fileReader = AUDTFileReader.getFileReader(FILE_PATH);
 
@@ -300,8 +298,8 @@ class AUDTFile0x000700Test {
 
     @Test
     @Order(6)
-    void fileReader_2() throws IOException, IncorrectFileFormatException, InvalidFileVersionException,
-            FailedToReadDataException {
+    void fileReader_2() throws IOException, AUDTFileReader.IncorrectFileFormatException, InvalidFileVersionException,
+            AUDTFileReader.DataReadFailedException {
         // Create a file reader object
         AUDTFileReader fileReader = AUDTFileReader.getFileReader(FILE_PATH);
 
@@ -354,7 +352,7 @@ class AUDTFile0x000700Test {
             );
 
             int finalSectionID = sectionID;
-            assertThrowsExactly(FailedToReadDataException.class, () -> {
+            assertThrowsExactly(AUDTFileReader.DataReadFailedException.class, () -> {
                 // Define reader
                 AUDTFileReader idReader = AUDTFileReader.getFileReader(idIncorrectFile);
 
@@ -366,7 +364,7 @@ class AUDTFile0x000700Test {
                 if (finalSectionID == 5) idReader.readMusicNotesData();
 
             });
-            assertThrowsExactly(FailedToReadDataException.class, () -> {
+            assertThrowsExactly(AUDTFileReader.DataReadFailedException.class, () -> {
                 // Define reader
                 AUDTFileReader eosReader = AUDTFileReader.getFileReader(eosIncorrectFile);
 

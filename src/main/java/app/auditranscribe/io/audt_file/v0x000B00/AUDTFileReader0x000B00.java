@@ -25,9 +25,6 @@ import app.auditranscribe.io.audt_file.v0x000900.AUDTFileReader0x000900;
 import app.auditranscribe.io.audt_file.v0x000B00.data_encapsulators.AudioDataObject0x000B00;
 import app.auditranscribe.io.audt_file.v0x000B00.data_encapsulators.ProjectInfoDataObject0x000B00;
 import app.auditranscribe.io.audt_file.v0x000B00.data_encapsulators.QTransformDataObject0x000B00;
-import app.auditranscribe.io.exceptions.FailedToReadDataException;
-import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
-import app.auditranscribe.io.exceptions.InvalidFileVersionException;
 import app.auditranscribe.music.MusicKey;
 import app.auditranscribe.music.TimeSignature;
 
@@ -46,21 +43,20 @@ public class AUDTFileReader0x000B00 extends AUDTFileReader0x000900 {
      * @param inputStream Input stream of the file.
      * @throws IOException                  If something went wrong when reading the AUDT file.
      * @throws IncorrectFileFormatException If the file was formatted incorrectly.
-     * @throws InvalidFileVersionException  If the LZ4 version is outdated.
      */
     public AUDTFileReader0x000B00(
             String filepath, InputStream inputStream
-    ) throws IOException, IncorrectFileFormatException, InvalidFileVersionException {
+    ) throws IOException, IncorrectFileFormatException {
         super(filepath, inputStream);
     }
 
     // Public methods
     @Override
-    public QTransformDataObject readQTransformData() throws FailedToReadDataException {
+    public QTransformDataObject readQTransformData() throws DataReadFailedException {
         // Ensure that the Q-Transform data section ID is correct
         int sectionID = readSectionID();
         if (sectionID != QTransformDataObject.SECTION_ID) {
-            throw new FailedToReadDataException(
+            throw new DataReadFailedException(
                     "Failed to read Q-Transform data; the Q-Transform data section has the incorrect " +
                             "section ID of " + sectionID + " (expected: " + QTransformDataObject.SECTION_ID + ")"
             );
@@ -73,7 +69,7 @@ public class AUDTFileReader0x000B00 extends AUDTFileReader0x000900 {
 
         // Check if there is an EOS
         if (!checkEOSDelimiter()) {
-            throw new FailedToReadDataException("Failed to read Q-Transform data; end of section delimiter missing");
+            throw new DataReadFailedException("Failed to read Q-Transform data; end of section delimiter missing");
         }
 
         // Create and return a `QTransformDataObject`
@@ -81,11 +77,11 @@ public class AUDTFileReader0x000B00 extends AUDTFileReader0x000900 {
     }
 
     @Override
-    public AudioDataObject readAudioData() throws FailedToReadDataException {
+    public AudioDataObject readAudioData() throws DataReadFailedException {
         // Ensure that the audio data section ID is correct
         int sectionID = readSectionID();
         if (sectionID != AudioDataObject.SECTION_ID) {
-            throw new FailedToReadDataException(
+            throw new DataReadFailedException(
                     "Failed to read audio data; the audio data section has the incorrect section ID of " + sectionID +
                             " (expected: " + AudioDataObject.SECTION_ID + ")"
             );
@@ -98,7 +94,7 @@ public class AUDTFileReader0x000B00 extends AUDTFileReader0x000900 {
 
         // Check if there is an EOS
         if (!checkEOSDelimiter()) {
-            throw new FailedToReadDataException("Failed to read audio data; end of section delimiter missing");
+            throw new DataReadFailedException("Failed to read audio data; end of section delimiter missing");
         }
 
         // Create and return an `AudioDataObject`
@@ -106,11 +102,11 @@ public class AUDTFileReader0x000B00 extends AUDTFileReader0x000900 {
     }
 
     @Override
-    public ProjectInfoDataObject readProjectInfoData() throws FailedToReadDataException {
+    public ProjectInfoDataObject readProjectInfoData() throws DataReadFailedException {
         // Ensure that the project info data section ID is correct
         int sectionID = readSectionID();
         if (sectionID != ProjectInfoDataObject.SECTION_ID) {
-            throw new FailedToReadDataException(
+            throw new DataReadFailedException(
                     "Failed to read project info data; the project info data section has the incorrect section ID of " +
                             sectionID + "(expected: " + ProjectInfoDataObject.SECTION_ID + ")"
             );
@@ -128,7 +124,7 @@ public class AUDTFileReader0x000B00 extends AUDTFileReader0x000900 {
 
         // Check if there is an EOS
         if (!checkEOSDelimiter()) {
-            throw new FailedToReadDataException("Failed to read project info data; end of section delimiter missing");
+            throw new DataReadFailedException("Failed to read project info data; end of section delimiter missing");
         }
 
         // Get the music key and time signature

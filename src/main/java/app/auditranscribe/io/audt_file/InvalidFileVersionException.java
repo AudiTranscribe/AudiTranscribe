@@ -16,24 +16,16 @@
  * Copyright © AudiTranscribe Team
  */
 
-package app.auditranscribe.io.exceptions;
+package app.auditranscribe.io.audt_file;
+
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 
 /**
  * Exception to mark that a requested AUDT file version is invalid.
  */
+@ExcludeFromGeneratedCoverageReport
 public class InvalidFileVersionException extends Exception {
-    public InvalidFileVersionException() {
-    }
-
     public InvalidFileVersionException(String message) {
         super(message);
-    }
-
-    public InvalidFileVersionException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public InvalidFileVersionException(Throwable cause) {
-        super(cause);
     }
 }
