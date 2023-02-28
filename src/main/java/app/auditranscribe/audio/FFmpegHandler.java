@@ -18,14 +18,11 @@
 
 package app.auditranscribe.audio;
 
-import app.auditranscribe.audio.exceptions.FFmpegHandlerNotInitialized;
 import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.system.OSMethods;
 import app.auditranscribe.system.OSType;
-import app.auditranscribe.audio.exceptions.FFmpegCommandFailedException;
-import app.auditranscribe.audio.exceptions.FFmpegNotFoundException;
 import app.auditranscribe.generic.tuples.Pair;
 
 import java.io.BufferedReader;
@@ -65,15 +62,15 @@ public final class FFmpegHandler extends LoggableClass {
      * Method that initializes a global FFmpeg handler.
      *
      * @param ffmpegPath Path to the FFmpeg binary.
-     * @throws FFmpegNotFoundException If FFmpeg was not found at the specified path.
+     * @throws BinaryNotFoundException If FFmpeg was not found at the specified path.
      */
 
-    public static void initFFmpegHandler(String ffmpegPath) throws FFmpegNotFoundException {
+    public static void initFFmpegHandler(String ffmpegPath) throws BinaryNotFoundException {
         if (handler == null) {
             if (checkFFmpegPath(ffmpegPath)) {
                 handler = new FFmpegHandler(ffmpegPath);
             } else {
-                throw new FFmpegNotFoundException("Could not find FFmpeg at '" + ffmpegPath + "'.");
+                throw new BinaryNotFoundException("Could not find FFmpeg at '" + ffmpegPath + "'.");
             }
         }
     }
@@ -83,10 +80,10 @@ public final class FFmpegHandler extends LoggableClass {
      * command-line interface of FFmpeg.
      *
      * @return A string, representing the path to the FFmpeg binary.
-     * @throws FFmpegNotFoundException If the program fails to find the FFmpeg binary.
+     * @throws BinaryNotFoundException If the program fails to find the FFmpeg binary.
      */
     @ExcludeFromGeneratedCoverageReport
-    public static String getPathToFFmpeg() throws FFmpegNotFoundException {
+    public static String getPathToFFmpeg() throws BinaryNotFoundException {
         // Get the operating system in question
         OSType os = OSMethods.getOS();
 
@@ -118,7 +115,7 @@ public final class FFmpegHandler extends LoggableClass {
             // Set the FFmpeg path
             temp = sb.toString();
             if (temp.equals("")) {
-                throw new FFmpegNotFoundException("FFmpeg binary could not be found automatically.");
+                throw new BinaryNotFoundException("FFmpeg binary could not be found automatically.");
             }
             ffmpegPath[0] = temp;
         } catch (IOException e) {
@@ -172,10 +169,10 @@ public final class FFmpegHandler extends LoggableClass {
     /**
      * Helper method that checks whether the global FFmpeg handler was initialized.
      *
-     * @throws FFmpegHandlerNotInitialized If the handler has not been initialized.
+     * @throws NotInitializedException If the handler has not been initialized.
      */
     private static void checkIfHandlerWasInitialized() {
-        if (handler == null) throw new FFmpegHandlerNotInitialized(
+        if (handler == null) throw new NotInitializedException(
                 "The global FFmpeg handler has yet to be initialized"
         );
     }
@@ -257,7 +254,39 @@ public final class FFmpegHandler extends LoggableClass {
             log(Level.FINE, "Successfully converted '" + file.getName() + "'");
             return outputFilePath;
         } else {
-            throw new FFmpegCommandFailedException("FFmpeg command " + Arrays.toString(command) + " failed");
+            throw new CommandFailedException("FFmpeg command " + Arrays.toString(command) + " failed");
+        }
+    }
+
+    // Exceptions
+
+    /**
+     * Exception that is thrown when the FFmpeg command fails to run.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static class CommandFailedException extends RuntimeException {
+        public CommandFailedException(String message) {
+            super(message);
+        }
+    }
+
+    /**
+     * Exception that is thrown if the global FFmpeg handler has yet to be initialized.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static class NotInitializedException extends RuntimeException {
+        public NotInitializedException(String message) {
+            super(message);
+        }
+    }
+
+    /**
+     * Exception that is thrown when the FFmpeg binary path is not found.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static class BinaryNotFoundException extends Exception {
+        public BinaryNotFoundException(String message) {
+            super(message);
         }
     }
 }

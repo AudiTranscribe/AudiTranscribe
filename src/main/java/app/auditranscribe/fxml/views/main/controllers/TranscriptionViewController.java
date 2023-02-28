@@ -20,7 +20,6 @@ package app.auditranscribe.fxml.views.main.controllers;
 
 import app.auditranscribe.audio.Audio;
 import app.auditranscribe.audio.FFmpegHandler;
-import app.auditranscribe.audio.exceptions.FFmpegNotFoundException;
 import app.auditranscribe.fxml.IconHelper;
 import app.auditranscribe.fxml.Popups;
 import app.auditranscribe.fxml.Theme;
@@ -763,17 +762,18 @@ public class TranscriptionViewController extends SwitchableViewController {
      *
      * @param qTransformData The Q-Transform data that will be used to set the spectrogram data.
      * @param audioData      The audio data that will be used for audio playback.
-     * @throws IOException                   If the audio file path that was provided in
-     *                                       <code>audioData</code> points to a file that is invalid
-     *                                       (or does not exist).
-     * @throws FFmpegNotFoundException       If the FFmpeg binary could not be found.
-     * @throws UnsupportedAudioFileException If the audio file path that was provided in
-     *                                       <code>audioData</code> points to an invalid audio file.
-     * @throws Audio.TooLongException        If the audio file is too long.
+     * @throws IOException                           If the audio file path that was provided in
+     *                                               <code>audioData</code> points to a file that is
+     *                                               invalid (or does not exist).
+     * @throws FFmpegHandler.BinaryNotFoundException If the FFmpeg binary could not be found.
+     * @throws UnsupportedAudioFileException         If the audio file path that was provided in
+     *                                               <code>audioData</code> points to an invalid
+     *                                               audio file.
+     * @throws Audio.TooLongException                If the audio file is too long.
      */
     public void setAudioAndSpectrogramData(
             QTransformDataObject qTransformData, AudioDataObject audioData
-    ) throws IOException, FFmpegNotFoundException, UnsupportedAudioFileException, Audio.TooLongException {
+    ) throws IOException, FFmpegHandler.BinaryNotFoundException, UnsupportedAudioFileException, Audio.TooLongException {
         // Set attributes
         sampleRate = audioData.sampleRate;
         audioDuration = audioData.totalDurationInMS / 1000.;
@@ -860,7 +860,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                             "still exist at the original location?",
                     e
             );
-        } catch (FFmpegNotFoundException e) {
+        } catch (FFmpegHandler.BinaryNotFoundException e) {
             logException(e);
             Popups.showExceptionAlert(
                     rootPane.getScene().getWindow(),
@@ -1436,7 +1436,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                         try {
                             saveData(false, saveDest);
                             return true;  // Can exit
-                        } catch (IOException | FFmpegNotFoundException e) {
+                        } catch (IOException | FFmpegHandler.BinaryNotFoundException e) {
                             logException(e);
                             Popups.showExceptionAlert(
                                     rootPane.getScene().getWindow(),
@@ -1546,10 +1546,12 @@ public class TranscriptionViewController extends SwitchableViewController {
      *
      * @param forceChooseFile Whether the file was forcibly chosen.
      * @param saveDest        The destination to save the file to.
-     * @throws FFmpegNotFoundException If the FFmpeg binary could not be found.
-     * @throws IOException             If the saving to the AUDT file failed.
+     * @throws FFmpegHandler.BinaryNotFoundException If the FFmpeg binary could not be found.
+     * @throws IOException                           If the saving to the AUDT file failed.
      */
-    private void saveData(boolean forceChooseFile, String saveDest) throws FFmpegNotFoundException, IOException {
+    private void saveData(
+            boolean forceChooseFile, String saveDest
+    ) throws FFmpegHandler.BinaryNotFoundException, IOException {
         // Get note rectangles' data
         int numRectangles = NoteRectangle.allNoteRectangles.size();
         Object[] noteRectsKeys = NoteRectangle.allNoteRectangles.keySet().toArray();

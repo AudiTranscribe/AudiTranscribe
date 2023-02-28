@@ -19,7 +19,6 @@
 package app.auditranscribe.fxml.views.setup_wizard.controllers;
 
 import app.auditranscribe.audio.FFmpegHandler;
-import app.auditranscribe.audio.exceptions.FFmpegNotFoundException;
 import app.auditranscribe.fxml.IconHelper;
 import app.auditranscribe.fxml.Popups;
 import app.auditranscribe.fxml.Theme;
@@ -194,7 +193,7 @@ public class FFmpegSetupViewController extends AbstractViewController {
             try {
                 ffmpegPath = FFmpegHandler.getPathToFFmpeg();
                 log(Level.FINE, "Obtained FFmpeg path from OS: '" + ffmpegPath + "'");
-            } catch (FFmpegNotFoundException e) {
+            } catch (FFmpegHandler.BinaryNotFoundException e) {
                 log(Level.WARNING, "Failed to obtain FFmpeg path from OS");
                 switchToTab(FFmpegSetupPaneTab.CANNOT_FIND_FFMPEG);
                 return;

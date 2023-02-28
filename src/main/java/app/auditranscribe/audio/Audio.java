@@ -18,7 +18,6 @@
 
 package app.auditranscribe.audio;
 
-import app.auditranscribe.audio.exceptions.FFmpegNotFoundException;
 import app.auditranscribe.audio.operators.*;
 import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.generic.exceptions.LengthException;
@@ -382,10 +381,10 @@ public class Audio extends LoggableClass {
      * Helper method that converts the WAV bytes into MP3 bytes.
      *
      * @param ffmpegPath The path to the ffmpeg executable.
-     * @throws FFmpegNotFoundException If FFmpeg was not found at the specified path.
-     * @throws IOException             If writing to the final audio file encounters an error.
+     * @throws FFmpegHandler.BinaryNotFoundException If FFmpeg was not found at the specified path.
+     * @throws IOException                           If writing to the final audio file encounters an error.
      */
-    public byte[] wavBytesToMP3Bytes(String ffmpegPath) throws FFmpegNotFoundException, IOException {
+    public byte[] wavBytesToMP3Bytes(String ffmpegPath) throws FFmpegHandler.BinaryNotFoundException, IOException {
         // Check if we have already processed the audio
         if (rawMP3Bytes != null) {
             log(Level.FINE, "Returning previously processed MP3 bytes");

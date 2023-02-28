@@ -20,7 +20,6 @@ package app.auditranscribe.fxml.views.main;
 
 import app.auditranscribe.audio.Audio;
 import app.auditranscribe.audio.FFmpegHandler;
-import app.auditranscribe.audio.exceptions.FFmpegNotFoundException;
 import app.auditranscribe.fxml.Popups;
 import app.auditranscribe.fxml.views.main.controllers.HomepageViewController;
 import app.auditranscribe.fxml.views.main.controllers.TranscriptionViewController;
@@ -290,7 +289,7 @@ public class SceneSwitcher extends LoggableClass {
                             "still exist at the original location? Is the audio format supported?",
                     e
             );
-        } catch (FFmpegNotFoundException e) {
+        } catch (FFmpegHandler.BinaryNotFoundException e) {
             logException(e);
             Popups.showExceptionAlert(
                     null,
