@@ -79,8 +79,8 @@ public class Audio extends LoggableClass {
     private double prevCurrTime;     // Last updated current time (in seconds) before a toggling of the audio speed
 
     private double volume = 1;
-    private boolean isPaused = false;
-    private boolean isSlowed = false;
+    private boolean paused = false;
+    private boolean slowed = false;
 
     private boolean withPlayback = false;
     private SourceDataLine sourceDataLine;
@@ -202,8 +202,8 @@ public class Audio extends LoggableClass {
     }
 
     public double getCurrentTime() {
-        if (isPaused) return timeToResumeAt;
-        return (getPlaybackElapsedDuration() - prevElapsedTime) / (isSlowed ? 2 : 1) + prevCurrTime;
+        if (paused) return timeToResumeAt;
+        return (getPlaybackElapsedDuration() - prevElapsedTime) / (slowed ? 2 : 1) + prevCurrTime;
     }
 
     // Audio playback methods
@@ -217,7 +217,7 @@ public class Audio extends LoggableClass {
 
         if (audioPlaybackThread.isStarted()) {
             seekToTime(timeToResumeAt);
-            isPaused = false;
+            paused = false;
         } else {
             updatePlaybackVolume(volume);
             sourceDataLine.start();
@@ -231,7 +231,7 @@ public class Audio extends LoggableClass {
     public void pause() {
         timeToResumeAt = getCurrentTime();
 
-        isPaused = true;
+        paused = true;
         sourceDataLine.flush();
         clearChannelsBuffers();
     }
@@ -249,7 +249,7 @@ public class Audio extends LoggableClass {
                 sourceDataLine.close();
             }
             if (audioStream != null) audioStream.close();
-            isPaused = false;
+            paused = false;
 
             // Stop and clear all operators' stuff
             resetOperators();
@@ -303,7 +303,7 @@ public class Audio extends LoggableClass {
         prevCurrTime = getCurrentTime();
         prevElapsedTime = getPlaybackElapsedDuration();
 
-        isSlowed = slowed;
+        this.slowed = slowed;
         for (TimeStretchOperator op : channelOperators) op.setStretchFactor(slowed ? 2 : 1);
     }
 
@@ -561,7 +561,7 @@ public class Audio extends LoggableClass {
                 try {
                     boolean readThisIteration = true;
                     while (running.get()) {
-                        if (!isPaused) {
+                        if (!paused) {
                             if (readThisIteration) {
                                 // Read bytes from audio stream
                                 if (numBytesRead != -1) numBytesRead = audioStream.read(bufferBytes);

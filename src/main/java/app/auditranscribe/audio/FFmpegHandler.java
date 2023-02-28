@@ -46,8 +46,9 @@ public final class FFmpegHandler extends LoggableClass {
     });
 
     // Attributes
-    private final String ffmpegPath;
     public static FFmpegHandler handler;
+
+    private final String ffmpegPath;
 
     /**
      * Initialization method for the FFmpeg handler.

@@ -118,7 +118,7 @@ public class TranscriptionViewController extends SwitchableViewController {
 
     private final double IMAGE_BUTTON_LENGTH = 50;  // In pixels
 
-    public final double NOTE_PLAYING_DELAY_OFFSET = -0.1;  // In seconds
+    public final double NOTE_PLAYING_DELAY_OFFSET = -0.1;  // In seconds; todo: is this tied to the playback scheduler?
     public final int NOTE_PLAYING_MIDI_CHANNEL_NUM = 0;
     private final MIDIInstrument NOTE_INSTRUMENT = MIDIInstrument.PIANO;
     private final int NOTE_ON_VELOCITY = 96;  // Within the range [0, 127]
@@ -158,8 +158,8 @@ public class TranscriptionViewController extends SwitchableViewController {
     private double audioVolume = 1;  // Percentage from 0 to 200%
     private int notesVolume = 80;  // MIDI velocity
     private int octaveNum = 4;  // Currently highlighted octave number
-    private boolean isAudioMuted = false;
-    private boolean areNotesMuted = false;
+    private boolean audioMuted = false;
+    private boolean notesMuted = false;
 
     private boolean scrollToPlayhead = false;
     private boolean canEditNotes = false;
@@ -173,7 +173,7 @@ public class TranscriptionViewController extends SwitchableViewController {
     private boolean hasUnsavedChanges = true;
     private boolean changedProjectName = false;
 
-    private boolean isPaused = true;
+    private boolean paused = true;
     private boolean usingSlowedAudio = false;
 
     private NotePlayerSynth notePlayerSynth;
@@ -277,7 +277,7 @@ public class TranscriptionViewController extends SwitchableViewController {
 
         // Set note rectangles' static attributes
         NoteRectangle.setSpectrogramAnchorPane(spectrogramAnchorPane);
-        NoteRectangle.setIsPaused(isPaused);
+        NoteRectangle.setIsPaused(paused);
         NoteRectangle.setCanEdit(canEditNotes);
 
         // Update note players
@@ -310,13 +310,13 @@ public class TranscriptionViewController extends SwitchableViewController {
             // Change the icon of the audio volume button if needed
             if (audioVolume == audioVolumeSlider.getMin()) {
                 // Hacky way to set the mute icon
-                isAudioMuted = false;
+                audioMuted = false;
                 toggleAudioMuteButton();
-            } else if (isAudioMuted) {
+            } else if (audioMuted) {
                 IconHelper.setSVGOnButton(
                         audioVolumeButton, 20, IMAGE_BUTTON_LENGTH, "volume-up-solid"
                 );
-                isAudioMuted = false;
+                audioMuted = false;
             }
 
             // Update audio volume
@@ -335,14 +335,14 @@ public class TranscriptionViewController extends SwitchableViewController {
             // Change the icon of the notes' volume button if needed
             if (notesVolume == notesVolumeSlider.getMin()) {
                 // Hacky way to set the mute icon
-                areNotesMuted = false;
+                notesMuted = false;
                 toggleNoteMuteButton();
-            } else if (areNotesMuted) {
+            } else if (notesMuted) {
                 IconHelper.setSVGOnButton(
                         notesVolumeButton, 15, 20, IMAGE_BUTTON_LENGTH, IMAGE_BUTTON_LENGTH,
                         "music-note-solid"
                 );
-                areNotesMuted = false;
+                notesMuted = false;
             }
 
             // Update CSS
@@ -424,7 +424,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         rewindToBeginningButton.setOnAction(event -> {
             log(Level.FINE, "Pressed rewind to beginning button");
 
-            isPaused = togglePaused(false);  // Pause the audio
+            paused = togglePaused(false);  // Pause the audio
             seekToTime(0);
             updateScrollPosition(0, finalWidth);
         });
@@ -494,7 +494,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                         int estimatedNoteNum = (int) Math.round(UnitConversionUtils.freqToNoteNumber(estimatedFreq));
 
                         if (canEditNotes) {
-                            if (isPaused) {  // Permit note placement only when paused
+                            if (paused) {  // Permit note placement only when paused
                                 // Compute the time that the mouse click would correspond to
                                 double estimatedTime = clickX / finalWidth * audioDuration;
 
@@ -978,12 +978,12 @@ public class TranscriptionViewController extends SwitchableViewController {
 
             // Handle weird case where the audio should switch from paused to play for a second to prevent the
             // double-clicking of the pause button on the next iteration
-            if (isPaused) isPaused = togglePaused(true);
+            if (paused) paused = togglePaused(true);
         }
 
         // Make audio seek to that time
         seekTime = MathUtils.round(seekTime, 3);
-        if (!isPaused) {
+        if (!paused) {
             // Hacky solution but it works
             togglePaused(false);
             audio.seekToTime(seekTime);
@@ -993,8 +993,8 @@ public class TranscriptionViewController extends SwitchableViewController {
         }
 
         // Update note sequencer current time
-        if (!areNotesMuted && notePlayerSequencer.isSequencerAvailable()) {
-            if (!notePlayerSequencer.getSequencer().isRunning() && !isPaused) {  // Not running but unpaused
+        if (!notesMuted && notePlayerSequencer.isSequencerAvailable()) {
+            if (!notePlayerSequencer.getSequencer().isRunning() && !paused) {  // Not running but unpaused
                 notePlayerSequencer.play(seekTime, usingSlowedAudio);
             } else {
                 notePlayerSequencer.setCurrTime(seekTime);
@@ -1233,7 +1233,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         if (!isEverythingReady) return;
 
         // Pause the current audio
-        isPaused = togglePaused(false);
+        paused = togglePaused(false);
 
         // Stop note sequencer playback
         notePlayerSequencer.stop();
@@ -1267,7 +1267,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         if (!isEverythingReady) return;
 
         // Pause the current audio
-        isPaused = togglePaused(false);
+        paused = togglePaused(false);
 
         // Stop note sequencer playback
         notePlayerSequencer.stop();
@@ -1675,7 +1675,7 @@ public class TranscriptionViewController extends SwitchableViewController {
             // Schedule playback functionality
             scheduler.scheduleAtFixedRate(() -> {
                 // Nothing really changes if the audio is paused
-                if (!isPaused) {
+                if (!paused) {
                     // Get the current audio time
                     currTime = audio.getCurrentTime();
 
@@ -1690,7 +1690,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                         log(Level.FINE, "Playback reached end of audio, will start from beginning upon play");
 
                         // Pause the audio
-                        isPaused = togglePaused(false);
+                        paused = togglePaused(false);
 
                         // Reset the audio to the start
                         audio.stop();
@@ -2038,7 +2038,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         hasUnsavedChanges = true;
 
         // Handle note rectangle operations when toggle paused
-        if (isPaused && !areNotesMuted) {  // We use `isPaused` here because we will toggle it later
+        if (paused && !notesMuted) {  // We use `isPaused` here because we will toggle it later
             // Set up the note player sequencer by setting the notes on it
             setupNotePlayerSequencer();
         }
@@ -2048,19 +2048,19 @@ public class TranscriptionViewController extends SwitchableViewController {
             audio.seekToTime(0);
             currTime = 0;
         }
-        isPaused = togglePaused(isPaused);
+        paused = togglePaused(paused);
 
         // Play notes on note player sequencer
         // (We separate this method from above to ensure a more accurate note playing delay)
-        if (!isPaused && !areNotesMuted) {  // We use `!isPaused` here because it was toggled already
+        if (!paused && !notesMuted) {  // We use `!isPaused` here because it was toggled already
             notePlayerSequencer.play(currTime, usingSlowedAudio);
         }
 
         // Disable note volume slider and note muting button if playing
-        notesVolumeButton.setDisable(!isPaused);
-        notesVolumeSlider.setDisable(!isPaused);
+        notesVolumeButton.setDisable(!paused);
+        notesVolumeSlider.setDisable(!paused);
 
-        log(Level.FINE, "Toggled play button; audio is now " + (!isPaused ? "paused" : "playing"));
+        log(Level.FINE, "Toggled play button; audio is now " + (!paused ? "paused" : "playing"));
     }
 
     /**
@@ -2103,7 +2103,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         // Determine icon to use
         String iconToUse;
 
-        if (isAudioMuted) {
+        if (audioMuted) {
             // Want to change from mute to non-mute
             iconToUse = "volume-up-solid";
 
@@ -2121,9 +2121,9 @@ public class TranscriptionViewController extends SwitchableViewController {
         IconHelper.setSVGOnButton(audioVolumeButton, 20, IMAGE_BUTTON_LENGTH, iconToUse);
 
         // Toggle the `isAudioMuted` flag
-        isAudioMuted = !isAudioMuted;
+        audioMuted = !audioMuted;
 
-        log(Level.FINE, "Toggled audio mute button (audio muted is now " + isAudioMuted + ")");
+        log(Level.FINE, "Toggled audio mute button (audio muted is now " + audioMuted + ")");
     }
 
     /**
@@ -2132,15 +2132,15 @@ public class TranscriptionViewController extends SwitchableViewController {
     private void toggleNoteMuteButton() {
         // Change the icon
         String iconToUse = "music-note-line";
-        if (areNotesMuted) iconToUse = "music-note-solid";  // Want to change icon from off to on
+        if (notesMuted) iconToUse = "music-note-solid";  // Want to change icon from off to on
         IconHelper.setSVGOnButton(
                 notesVolumeButton, 15, 20, IMAGE_BUTTON_LENGTH, IMAGE_BUTTON_LENGTH, iconToUse
         );
 
         // Toggle the `areNotesMuted` flag
-        areNotesMuted = !areNotesMuted;
+        notesMuted = !notesMuted;
 
-        log(Level.FINE, "Toggled notes mute button (notes muted is now " + areNotesMuted + ")");
+        log(Level.FINE, "Toggled notes mute button (notes muted is now " + notesMuted + ")");
     }
 
     // Keyboard event handlers
@@ -2389,7 +2389,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                 new Pair<>("finalWidth", Double.toString(finalWidth)),
                 new Pair<>("finalHeight", Double.toString(finalHeight)),
                 new Pair<>("-----", "-----"),
-                new Pair<>("isPaused", Boolean.toString(isPaused)),
+                new Pair<>("paused", Boolean.toString(paused)),
                 new Pair<>("currTime", Double.toString(currTime)),
                 new Pair<>("playheadX", playheadX.toString()),
                 new Pair<>("Playhead Line X-Coord", playheadLine.startXProperty().toString()),
@@ -2399,9 +2399,9 @@ public class TranscriptionViewController extends SwitchableViewController {
                 new Pair<>("audtFilePath", audtFilePath),
                 new Pair<>("audtFileName", audtFileName),
                 new Pair<>("-----", "-----"),
-                new Pair<>("isAudioMuted", Boolean.toString(isAudioMuted)),
+                new Pair<>("audioMuted", Boolean.toString(audioMuted)),
                 new Pair<>("Audio Volume", Double.toString(audioVolumeSlider.getValue())),
-                new Pair<>("areNotesMuted", Boolean.toString(areNotesMuted)),
+                new Pair<>("notesMuted", Boolean.toString(notesMuted)),
                 new Pair<>("Notes Volume", Double.toString(notesVolumeSlider.getValue()))
         );
     }
