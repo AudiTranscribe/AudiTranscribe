@@ -897,8 +897,12 @@ public class TranscriptionViewController extends SwitchableViewController {
     public void handleSceneClosing() {
         this.removeControllerFromActive();
         scheduler.shutdown();
-        audio.stop();
-        audio.deleteWAVFile();
+
+        if (audio != null) {  // We need to check if `null` in the case where the FFmpeg handler failed to initialize
+            audio.stop();
+            audio.deleteWAVFile();
+        }
+
         notePlayerSequencer.close();
         NoteRectangle.allNoteRectangles.clear();
     }
