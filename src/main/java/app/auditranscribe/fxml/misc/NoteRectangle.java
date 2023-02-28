@@ -1079,18 +1079,6 @@ public class NoteRectangle extends StackPane {
     }
 
     // Helper classes/enums
-
-    /**
-     * Exception that is raised if there is a collision between note rectangles during the creation
-     * of a new note rectangle.
-     */
-    @ExcludeFromGeneratedCoverageReport
-    public static class CollisionException extends Exception {
-        public CollisionException(String message) {
-            super(message);
-        }
-    }
-
     @ExcludeFromGeneratedCoverageReport
     static class SortByTimeToPlace implements Comparator<NoteRectangle> {
         @Override
@@ -1110,4 +1098,17 @@ public class NoteRectangle extends StackPane {
 
     @ExcludeFromGeneratedCoverageReport
     enum UndoOrRedoAction {TRANSFORM, CREATE, DELETE, PERFORM_MULTIPLE}
+
+    // Exceptions
+
+    /**
+     * Exception that is raised if there is a collision between note rectangles during the creation
+     * of a new note rectangle.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static class CollisionException extends Exception {
+        public CollisionException(String message) {
+            super(message);
+        }
+    }
 }
