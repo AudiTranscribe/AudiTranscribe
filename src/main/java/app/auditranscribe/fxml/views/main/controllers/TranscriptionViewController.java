@@ -174,7 +174,7 @@ public class TranscriptionViewController extends SwitchableViewController {
     private boolean changedProjectName = false;
 
     private boolean isPaused = true;
-    private boolean usingSlowedAudio = false;  // Todo: allow changing after slowed audio is implemented
+    private boolean usingSlowedAudio = false;
 
     private NotePlayerSynth notePlayerSynth;
     private NotePlayerSequencer notePlayerSequencer;
