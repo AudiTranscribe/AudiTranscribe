@@ -854,7 +854,7 @@ public class TranscriptionViewController extends SwitchableViewController {
             logException(e);
             Popups.showExceptionAlert(
                     rootPane.getScene().getWindow(),
-                    "Error loading audio data.",
+                    "Error loading audio data",
                     "An error occurred when loading the audio data. Does the audio file " +
                             "still exist at the original location?",
                     e
@@ -863,7 +863,7 @@ public class TranscriptionViewController extends SwitchableViewController {
             logException(e);
             Popups.showExceptionAlert(
                     rootPane.getScene().getWindow(),
-                    "Error loading audio data.",
+                    "Error finding FFmpeg",
                     "FFmpeg was not found. Please install it and try again.",
                     e
             );
@@ -871,7 +871,7 @@ public class TranscriptionViewController extends SwitchableViewController {
             logException(e);
             Popups.showExceptionAlert(
                     rootPane.getScene().getWindow(),
-                    "Error loading audio data.",
+                    "Error loading audio data",
                     "The audio file is too long. Please select a shorter audio file.",
                     e
             );
