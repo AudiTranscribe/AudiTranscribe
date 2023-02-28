@@ -118,7 +118,7 @@ public class TranscriptionViewController extends SwitchableViewController {
 
     private final double IMAGE_BUTTON_LENGTH = 50;  // In pixels
 
-    public final double NOTE_PLAYING_DELAY_OFFSET = 0.2;  // In seconds
+    public final double NOTE_PLAYING_DELAY_OFFSET = -0.1;  // In seconds
     public final int NOTE_PLAYING_MIDI_CHANNEL_NUM = 0;
     private final MIDIInstrument NOTE_INSTRUMENT = MIDIInstrument.PIANO;
     private final int NOTE_ON_VELOCITY = 96;  // Within the range [0, 127]
@@ -2043,6 +2043,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         // Toggle audio paused state
         if (currTime == audioDuration) {
             audio.seekToTime(0);
+            currTime = 0;
         }
         isPaused = togglePaused(isPaused);
 
