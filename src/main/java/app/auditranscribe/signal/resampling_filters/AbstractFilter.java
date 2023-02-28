@@ -19,6 +19,7 @@
 package app.auditranscribe.signal.resampling_filters;
 
 import app.auditranscribe.io.IOMethods;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -102,6 +103,18 @@ public abstract class AbstractFilter {
             rolloff = filterData.rolloff;
         } catch (JsonSyntaxException e) {
             throw new IOException(e);
+        }
+    }
+
+    // Exceptions
+
+    /**
+     * Exception thrown if the resampling filter file could not be found.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static class NotFoundException extends RuntimeException {
+        public NotFoundException(String message) {
+            super(message);
         }
     }
 }

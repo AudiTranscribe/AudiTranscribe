@@ -3,7 +3,6 @@ package app.auditranscribe.signal;
 import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.signal.resampling_filters.*;
-import app.auditranscribe.signal.exceptions.FilterNotFoundException;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -89,7 +88,7 @@ public class FilterTest {
                 )
         );
         try {
-            assertThrowsExactly(FilterNotFoundException.class, KaiserBest::new);
+            assertThrowsExactly(AbstractFilter.NotFoundException.class, KaiserBest::new);
         } finally {
             IOMethods.moveFile(
                     IOMethods.joinPaths(
@@ -119,7 +118,7 @@ public class FilterTest {
                 )
         );
         try {
-            assertThrowsExactly(FilterNotFoundException.class, KaiserFast::new);
+            assertThrowsExactly(AbstractFilter.NotFoundException.class, KaiserFast::new);
         } finally {
             IOMethods.moveFile(
                     IOMethods.joinPaths(

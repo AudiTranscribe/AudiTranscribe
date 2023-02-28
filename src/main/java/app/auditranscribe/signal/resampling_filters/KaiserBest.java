@@ -19,7 +19,6 @@
 package app.auditranscribe.signal.resampling_filters;
 
 import app.auditranscribe.io.IOMethods;
-import app.auditranscribe.signal.exceptions.FilterNotFoundException;
 
 import java.io.IOException;
 
@@ -34,7 +33,7 @@ public class KaiserBest extends AbstractFilter {
         try {
             defineAttributes(IOMethods.joinPaths("resampling-filters-data", "kaiser-best.json"));
         } catch (IOException e) {
-            throw new FilterNotFoundException("The Kaiser Best JSON file could not be located.");
+            throw new NotFoundException("The Kaiser Best JSON file could not be located.");
         }
     }
 }
