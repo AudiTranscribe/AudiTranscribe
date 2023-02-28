@@ -22,7 +22,6 @@ import app.auditranscribe.fxml.Theme;
 import app.auditranscribe.fxml.views.AbstractViewController;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.PropertyFile;
-import app.auditranscribe.io.exceptions.NoSuchPropertyException;
 import app.auditranscribe.utils.GUIUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -77,7 +76,7 @@ public class AboutViewController extends AbstractViewController {
             // Report that the "about" view is ready to be shown
             log(Level.INFO, "About view ready to be shown");
 
-        } catch (IOException | NoSuchPropertyException e) {
+        } catch (IOException | PropertyFile.NoSuchPropertyException e) {
             logException(e);
             throw new RuntimeException(e);
         }

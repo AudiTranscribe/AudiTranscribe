@@ -19,7 +19,7 @@
 package app.auditranscribe.io;
 
 import app.auditranscribe.MainApplication;
-import app.auditranscribe.io.exceptions.NoSuchPropertyException;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -75,5 +75,17 @@ public class PropertyFile {
         }
 
         return value;
+    }
+
+    // Exceptions
+
+    /**
+     * Exception thrown when a property file does not have the specified property.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static class NoSuchPropertyException extends Exception {
+        public NoSuchPropertyException(String message) {
+            super(message);
+        }
     }
 }

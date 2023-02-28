@@ -18,7 +18,6 @@
 
 package app.auditranscribe.io.data_files;
 
-import app.auditranscribe.io.exceptions.FailedToCreateJSONFileException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
@@ -62,7 +61,7 @@ public abstract class JSONDataFile<T> {
                 createNewFile();
             } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
                      IllegalAccessException e1) {
-                throw new FailedToCreateJSONFileException(e1);
+                throw new CreateFailedException(e1);
             }
         } catch (IOException | JsonSyntaxException e) {
             throw new JsonIOException(e);
@@ -98,5 +97,16 @@ public abstract class JSONDataFile<T> {
 
         // Write that data to the settings file
         saveFile();
+    }
+
+    // Exceptions
+
+    /**
+     * Exception thrown when a JSON file could not be created.
+     */
+    public static class CreateFailedException extends RuntimeException {
+        public CreateFailedException(Throwable cause) {
+            super(cause);
+        }
     }
 }

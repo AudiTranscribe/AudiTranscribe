@@ -1,6 +1,5 @@
 package app.auditranscribe.io;
 
-import app.auditranscribe.io.exceptions.NoSuchPropertyException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -31,11 +30,11 @@ class PropertyFileTest {
     }
 
     @Test
-    void getProperty() throws NoSuchPropertyException {
+    void getProperty() throws PropertyFile.NoSuchPropertyException {
         assertEquals("hello", propertyFile.getProperty("prop1"));
         assertEquals("world", propertyFile.getProperty("prop2"));
         assertEquals("123.456", propertyFile.getProperty("prop3"));
-        assertThrowsExactly(NoSuchPropertyException.class, () -> propertyFile.getProperty("prop4"));
+        assertThrowsExactly(PropertyFile.NoSuchPropertyException.class, () -> propertyFile.getProperty("prop4"));
 
         assertEquals("hello", propertyFile.getProperty("prop1", "none"));
         assertEquals("world", propertyFile.getProperty("prop2", "none"));

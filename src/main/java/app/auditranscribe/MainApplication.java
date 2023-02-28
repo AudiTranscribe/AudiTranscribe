@@ -24,7 +24,6 @@ import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.PropertyFile;
 import app.auditranscribe.io.data_files.DataFiles;
-import app.auditranscribe.io.exceptions.NoSuchPropertyException;
 import app.auditranscribe.misc.CustomLogger;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import javafx.application.Application;
@@ -57,7 +56,7 @@ public class MainApplication extends Application {
 
             // Update the version label with the version number
             currentVersion = projectPropertiesFile.getProperty("version");
-        } catch (IOException | NoSuchPropertyException e) {
+        } catch (IOException | PropertyFile.NoSuchPropertyException e) {
             CustomLogger.logException(e);
             throw new RuntimeException(e);
         }

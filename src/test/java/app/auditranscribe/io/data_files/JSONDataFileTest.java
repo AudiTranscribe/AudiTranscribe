@@ -2,7 +2,6 @@ package app.auditranscribe.io.data_files;
 
 import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
-import app.auditranscribe.io.exceptions.FailedToCreateJSONFileException;
 import com.google.gson.JsonIOException;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -108,7 +107,7 @@ class JSONDataFileTest {
     @Test
     @Order(9)
     void incorrectInitializerTest() {
-        assertThrowsExactly(FailedToCreateJSONFileException.class, WrongTestingJSONDataFile::new);
+        assertThrowsExactly(JSONDataFile.CreateFailedException.class, WrongTestingJSONDataFile::new);
     }
 
     // Helper classes
