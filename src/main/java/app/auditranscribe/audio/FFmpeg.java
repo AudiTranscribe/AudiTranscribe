@@ -1,5 +1,5 @@
 /*
- * FFmpegHandler.java
+ * FFmpeg.java
  * Description: Class that handles FFmpeg interactions.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
@@ -36,14 +36,14 @@ import java.util.logging.Level;
 /**
  * Class that handles FFmpeg interactions.
  */
-public final class FFmpegHandler extends LoggableClass {
+public final class FFmpeg extends LoggableClass {
     // Constants
     public static final List<String> VALID_EXTENSIONS = List.of(new String[]{
             ".wav", ".mp3", ".flac", ".ogg", ".aif", ".aiff"
     });
 
     // Attributes
-    public static FFmpegHandler handler;
+    public static FFmpeg handler;
 
     private final String ffmpegPath;
 
@@ -52,7 +52,7 @@ public final class FFmpegHandler extends LoggableClass {
      *
      * @param ffmpegPath Path to the FFmpeg binary.
      */
-    private FFmpegHandler(String ffmpegPath) {
+    private FFmpeg(String ffmpegPath) {
         this.ffmpegPath = ffmpegPath;
     }
 
@@ -68,7 +68,7 @@ public final class FFmpegHandler extends LoggableClass {
     public static void initFFmpegHandler(String ffmpegPath) throws BinaryNotFoundException {
         if (handler == null) {
             if (checkFFmpegPath(ffmpegPath)) {
-                handler = new FFmpegHandler(ffmpegPath);
+                handler = new FFmpeg(ffmpegPath);
             } else {
                 throw new BinaryNotFoundException("Could not find FFmpeg at '" + ffmpegPath + "'.");
             }

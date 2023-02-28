@@ -19,7 +19,7 @@
 package app.auditranscribe.fxml.views.main.controllers;
 
 import app.auditranscribe.audio.Audio;
-import app.auditranscribe.audio.FFmpegHandler;
+import app.auditranscribe.audio.FFmpeg;
 import app.auditranscribe.fxml.IconHelper;
 import app.auditranscribe.fxml.Popups;
 import app.auditranscribe.fxml.Theme;
@@ -762,18 +762,18 @@ public class TranscriptionViewController extends SwitchableViewController {
      *
      * @param qTransformData The Q-Transform data that will be used to set the spectrogram data.
      * @param audioData      The audio data that will be used for audio playback.
-     * @throws IOException                           If the audio file path that was provided in
-     *                                               <code>audioData</code> points to a file that is
-     *                                               invalid (or does not exist).
-     * @throws FFmpegHandler.BinaryNotFoundException If the FFmpeg binary could not be found.
-     * @throws UnsupportedAudioFileException         If the audio file path that was provided in
-     *                                               <code>audioData</code> points to an invalid
-     *                                               audio file.
-     * @throws Audio.TooLongException                If the audio file is too long.
+     * @throws IOException                    If the audio file path that was provided in
+     *                                        <code>audioData</code> points to a file that is
+     *                                        invalid (or does not exist).
+     * @throws FFmpeg.BinaryNotFoundException If the FFmpeg binary could not be found.
+     * @throws UnsupportedAudioFileException  If the audio file path that was provided in
+     *                                        <code>audioData</code> points to an invalid audio
+     *                                        file.
+     * @throws Audio.TooLongException         If the audio file is too long.
      */
     public void setAudioAndSpectrogramData(
             QTransformDataObject qTransformData, AudioDataObject audioData
-    ) throws IOException, FFmpegHandler.BinaryNotFoundException, UnsupportedAudioFileException, Audio.TooLongException {
+    ) throws IOException, FFmpeg.BinaryNotFoundException, UnsupportedAudioFileException, Audio.TooLongException {
         // Set attributes
         sampleRate = audioData.sampleRate;
         audioDuration = audioData.totalDurationInMS / 1000.;
@@ -790,7 +790,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         log(Level.FINE, "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH);
 
         // Initialize the FFmpeg handler (if not done already)
-        FFmpegHandler.initFFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
+        FFmpeg.initFFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
 
         // Handle the MP3 bytes
         File auxOriginalWAVFile = generateWAVFileFromMP3(audioData.mp3Bytes);
@@ -860,7 +860,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                             "still exist at the original location?",
                     e
             );
-        } catch (FFmpegHandler.BinaryNotFoundException e) {
+        } catch (FFmpeg.BinaryNotFoundException e) {
             logException(e);
             Popups.showExceptionAlert(
                     rootPane.getScene().getWindow(),
@@ -1436,7 +1436,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                         try {
                             saveData(false, saveDest);
                             return true;  // Can exit
-                        } catch (IOException | FFmpegHandler.BinaryNotFoundException e) {
+                        } catch (IOException | FFmpeg.BinaryNotFoundException e) {
                             logException(e);
                             Popups.showExceptionAlert(
                                     rootPane.getScene().getWindow(),
@@ -1546,12 +1546,12 @@ public class TranscriptionViewController extends SwitchableViewController {
      *
      * @param forceChooseFile Whether the file was forcibly chosen.
      * @param saveDest        The destination to save the file to.
-     * @throws FFmpegHandler.BinaryNotFoundException If the FFmpeg binary could not be found.
-     * @throws IOException                           If the saving to the AUDT file failed.
+     * @throws FFmpeg.BinaryNotFoundException If the FFmpeg binary could not be found.
+     * @throws IOException                    If the saving to the AUDT file failed.
      */
     private void saveData(
             boolean forceChooseFile, String saveDest
-    ) throws FFmpegHandler.BinaryNotFoundException, IOException {
+    ) throws FFmpeg.BinaryNotFoundException, IOException {
         // Get note rectangles' data
         int numRectangles = NoteRectangle.allNoteRectangles.size();
         Object[] noteRectsKeys = NoteRectangle.allNoteRectangles.keySet().toArray();
@@ -2361,7 +2361,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         String auxiliaryWAVFilePath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, uuid + "-temp.wav");
 
         // Convert the auxiliary MP3 files to a WAV files
-        auxiliaryWAVFilePath = FFmpegHandler.convertAudio(auxiliaryMP3File, auxiliaryWAVFilePath);
+        auxiliaryWAVFilePath = FFmpeg.convertAudio(auxiliaryMP3File, auxiliaryWAVFilePath);
 
         // Read the newly created WAV files
         File auxiliaryWAVFile = new File(auxiliaryWAVFilePath);

@@ -19,7 +19,7 @@
 package app.auditranscribe.fxml.views.main;
 
 import app.auditranscribe.audio.Audio;
-import app.auditranscribe.audio.FFmpegHandler;
+import app.auditranscribe.audio.FFmpeg;
 import app.auditranscribe.fxml.Popups;
 import app.auditranscribe.fxml.views.main.controllers.HomepageViewController;
 import app.auditranscribe.fxml.views.main.controllers.TranscriptionViewController;
@@ -215,7 +215,7 @@ public class SceneSwitcher extends LoggableClass {
             String fileExt = "." + FileNameUtils.getExtension(audioFile.getName()).toLowerCase();
 
             // Check if the file is supported
-            if (!FFmpegHandler.VALID_EXTENSIONS.contains(fileExt)) {
+            if (!FFmpeg.VALID_EXTENSIONS.contains(fileExt)) {
                 throw new UnsupportedAudioFileException("The audio file is not supported.");
             }
 
@@ -231,11 +231,11 @@ public class SceneSwitcher extends LoggableClass {
 
             // Set up FFmpeg handler
             // (Failure to do so will throw exceptions)
-            FFmpegHandler.initFFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
+            FFmpeg.initFFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
 
             // Convert original audio file into a WAV file for processing
             Audio audio = new Audio(
-                    new File(FFmpegHandler.convertAudio(audioFile, wavFilePath)),
+                    new File(FFmpeg.convertAudio(audioFile, wavFilePath)),
                     Audio.ProcessingMode.WITH_SAMPLES, Audio.ProcessingMode.WITH_PLAYBACK
             );
 
@@ -289,7 +289,7 @@ public class SceneSwitcher extends LoggableClass {
                             "still exist at the original location? Is the audio format supported?",
                     e
             );
-        } catch (FFmpegHandler.BinaryNotFoundException e) {
+        } catch (FFmpeg.BinaryNotFoundException e) {
             logException(e);
             Popups.showExceptionAlert(
                     null,

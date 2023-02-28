@@ -12,13 +12,13 @@ import java.io.File;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class FFmpegHandlerTest {
+class FFmpegTest {
     @Test
     @Order(1)
     void ensureFFmpegHandlerNotInitialized() {
         assertThrowsExactly(
-                FFmpegHandler.NotInitializedException.class,
-                () -> FFmpegHandler.convertAudio(null, "fake-file.wav")
+                FFmpeg.NotInitializedException.class,
+                () -> FFmpeg.convertAudio(null, "fake-file.wav")
         );
     }
 
@@ -26,12 +26,12 @@ class FFmpegHandlerTest {
     @Order(2)
     void getPathToFFmpeg() {
         // Check if the FFmpeg binary can be accessed using CLI
-        if (FFmpegHandler.checkFFmpegPath("ffmpeg")) {
+        if (FFmpeg.checkFFmpegPath("ffmpeg")) {
             // Make sure that the method is ABLE TO GET that path and DOES NOT THROW an exception
-            assertDoesNotThrow(FFmpegHandler::getPathToFFmpeg);
+            assertDoesNotThrow(FFmpeg::getPathToFFmpeg);
         } else {
             // Make sure that the method CANNOT get the path and THROWS an exception
-            assertThrowsExactly(FFmpegHandler.BinaryNotFoundException.class, FFmpegHandler::getPathToFFmpeg);
+            assertThrowsExactly(FFmpeg.BinaryNotFoundException.class, FFmpeg::getPathToFFmpeg);
         }
     }
 
@@ -39,13 +39,13 @@ class FFmpegHandlerTest {
     @Order(3)
     void checkFFmpegPath() {
         try {
-            assertTrue(FFmpegHandler.checkFFmpegPath("ffmpeg"));  // Should exist => true
+            assertTrue(FFmpeg.checkFFmpegPath("ffmpeg"));  // Should exist => true
         } catch (AssertionError e) {
-            assertTrue(FFmpegHandler.checkFFmpegPath(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath));
+            assertTrue(FFmpeg.checkFFmpegPath(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath));
         }
 
-        assertFalse(FFmpegHandler.checkFFmpegPath("fake-ffmpeg-path"));  // IO Exception should be thrown => false
-        assertFalse(FFmpegHandler.checkFFmpegPath("git"));  // Should give error code 1 => false
+        assertFalse(FFmpeg.checkFFmpegPath("fake-ffmpeg-path"));  // IO Exception should be thrown => false
+        assertFalse(FFmpeg.checkFFmpegPath("git"));  // Should give error code 1 => false
     }
 
     @Test
@@ -53,14 +53,14 @@ class FFmpegHandlerTest {
     void ffmpegHandlerInitFailureTest() {
         // Try to define a handler with a non-existent FFmpeg binary
         assertThrowsExactly(
-                FFmpegHandler.BinaryNotFoundException.class,
-                () -> FFmpegHandler.initFFmpegHandler("not-ffmpeg")
+                FFmpeg.BinaryNotFoundException.class,
+                () -> FFmpeg.initFFmpegHandler("not-ffmpeg")
         );
     }
 
     @Test
     @Order(5)
-    void convertAudio() throws FFmpegHandler.BinaryNotFoundException {
+    void convertAudio() throws FFmpeg.BinaryNotFoundException {
         // Get a testing MP3 file
         File testFile = new File(IOMethods.getAbsoluteFilePath("test-files/general/audio/A440.mp3"));
 
@@ -69,14 +69,14 @@ class FFmpegHandlerTest {
 
         // Initialize the FFmpeg handler
         try {
-            FFmpegHandler.initFFmpegHandler("ffmpeg");
-        } catch (FFmpegHandler.BinaryNotFoundException e) {
+            FFmpeg.initFFmpegHandler("ffmpeg");
+        } catch (FFmpeg.BinaryNotFoundException e) {
             // Try to get the path from the settings file
-            FFmpegHandler.initFFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
+            FFmpeg.initFFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
         }
 
         // Determine the output path
-        String outputFilePath = FFmpegHandler.convertAudio(
+        String outputFilePath = FFmpeg.convertAudio(
                 testFile, IOMethods.joinPaths(testingFolderPath, "test-converted.WAV")
         );
 
@@ -90,17 +90,17 @@ class FFmpegHandlerTest {
 
     @Test
     @Order(5)
-    void convertAudioFailureTest() throws FFmpegHandler.BinaryNotFoundException {
+    void convertAudioFailureTest() throws FFmpeg.BinaryNotFoundException {
         // Initialize the FFmpeg handler
         try {
-            FFmpegHandler.initFFmpegHandler("ffmpeg");
-        } catch (FFmpegHandler.BinaryNotFoundException e) {
+            FFmpeg.initFFmpegHandler("ffmpeg");
+        } catch (FFmpeg.BinaryNotFoundException e) {
             // Try to get the path from the settings file
-            FFmpegHandler.initFFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
+            FFmpeg.initFFmpegHandler(DataFiles.SETTINGS_DATA_FILE.data.ffmpegInstallationPath);
         }
 
         // Try to test on a non-existent MP3 file
-        assertThrowsExactly(FFmpegHandler.CommandFailedException.class, () -> FFmpegHandler.convertAudio(
+        assertThrowsExactly(FFmpeg.CommandFailedException.class, () -> FFmpeg.convertAudio(
                 new File("non-existent-file.mp3"), "no-output.mp3"
         ));
     }

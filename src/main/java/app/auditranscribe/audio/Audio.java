@@ -381,10 +381,10 @@ public class Audio extends LoggableClass {
      * Helper method that converts the WAV bytes into MP3 bytes.
      *
      * @param ffmpegPath The path to the ffmpeg executable.
-     * @throws FFmpegHandler.BinaryNotFoundException If FFmpeg was not found at the specified path.
-     * @throws IOException                           If writing to the final audio file encounters an error.
+     * @throws FFmpeg.BinaryNotFoundException If FFmpeg was not found at the specified path.
+     * @throws IOException                    If writing to the final audio file encounters an error.
      */
-    public byte[] wavBytesToMP3Bytes(String ffmpegPath) throws FFmpegHandler.BinaryNotFoundException, IOException {
+    public byte[] wavBytesToMP3Bytes(String ffmpegPath) throws FFmpeg.BinaryNotFoundException, IOException {
         // Check if we have already processed the audio
         if (rawMP3Bytes != null) {
             log(Level.FINE, "Returning previously processed MP3 bytes");
@@ -399,7 +399,7 @@ public class Audio extends LoggableClass {
             log(Level.FINE, "Temporary folder created: " + IOConstants.TEMP_FOLDER_PATH);
 
             // Initialize the FFmpeg handler (if not done already)
-            FFmpegHandler.initFFmpegHandler(ffmpegPath);
+            FFmpeg.initFFmpegHandler(ffmpegPath);
 
             // Generate the output path to the MP3 file
             String inputPath = IOMethods.joinPaths(IOConstants.TEMP_FOLDER_PATH, "temp-1.wav");
@@ -410,7 +410,7 @@ public class Audio extends LoggableClass {
             Files.write(Paths.get(inputPath), rawWAVBytes);
 
             // Convert the original WAV file to a temporary MP3 file
-            outputPath = FFmpegHandler.convertAudio(new File(inputPath), outputPath);
+            outputPath = FFmpeg.convertAudio(new File(inputPath), outputPath);
 
             // Read the raw MP3 bytes into a temporary file
             byte[] rawMP3Bytes = Files.readAllBytes(Paths.get(outputPath));

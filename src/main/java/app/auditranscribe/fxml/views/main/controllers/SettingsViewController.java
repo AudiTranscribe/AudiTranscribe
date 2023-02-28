@@ -19,7 +19,7 @@
 package app.auditranscribe.fxml.views.main.controllers;
 
 import app.auditranscribe.audio.Audio;
-import app.auditranscribe.audio.FFmpegHandler;
+import app.auditranscribe.audio.FFmpeg;
 import app.auditranscribe.fxml.IconHelper;
 import app.auditranscribe.fxml.Popups;
 import app.auditranscribe.fxml.Theme;
@@ -139,7 +139,7 @@ public class SettingsViewController extends AbstractViewController {
                 String ffmpegBinaryPath = ffmpegPathTextField.getText();
 
                 // Check if the FFmpeg binary is valid
-                if (FFmpegHandler.checkFFmpegPath(ffmpegBinaryPath)) {
+                if (FFmpeg.checkFFmpegPath(ffmpegBinaryPath)) {
                     lastValidFFmpegPath = ffmpegBinaryPath;
                     log(Level.INFO, "FFmpeg binary path updated to '" + ffmpegBinaryPath + "'");
                 } else {
