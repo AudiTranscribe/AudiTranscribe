@@ -2161,26 +2161,27 @@ public class TranscriptionViewController extends SwitchableViewController {
         // Get the key event's target
         Node target = (Node) keyEvent.getTarget();
 
-        // Check if the target is a text field or a spinner
-        if (target instanceof TextField || target instanceof Spinner) {
-            // If it is, do nothing
-            return;
-        }
-
         // Check if user is using any shortcuts
         if (SAVE_PROJECT_COMBINATION.match(keyEvent)) {  // Save current project
             handleSavingProject(false, false);
+            keyEvent.consume();
             return;
         } else if (UNDO_NOTE_EDIT_COMBINATION.match(keyEvent)) {  // Undo note edit
             NoteRectangle.editAction(NoteRectangle.EditAction.UNDO);
+            keyEvent.consume();
             return;
         } else if (REDO_NOTE_EDIT_COMBINATION.match(keyEvent)) {  // Redo note edit
             NoteRectangle.editAction(NoteRectangle.EditAction.REDO);
+            keyEvent.consume();
             return;
         } else if (DEBUG_COMBINATION.match(keyEvent)) {  // Show debug view
             if (debugMode) debugViewController = DebugViewController.showDebugView(rootPane.getScene().getWindow());
+            keyEvent.consume();
             return;
         }
+
+        // Ignore if the target is a spinner
+        if (target instanceof TextField || target instanceof Spinner) return;
 
         // Otherwise, get the key event's key code
         KeyCode code = keyEvent.getCode();
