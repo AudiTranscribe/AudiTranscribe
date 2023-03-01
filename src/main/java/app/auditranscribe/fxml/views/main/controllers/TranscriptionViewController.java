@@ -108,7 +108,7 @@ public class TranscriptionViewController extends SwitchableViewController {
     private final int MAX_NOTE_NUMBER = 107;  // B8
 
     private final int BPM_ESTIMATION_MAX_DURATION = 10;  // In seconds
-    private final int KEY_ESTIMATION_MAX_DURATION = 10;  // In seconds
+    private final int KEY_ESTIMATION_MAX_DURATION = 30;  // In seconds
 
     private final long UPDATE_PLAYBACK_SCHEDULER_PERIOD = 10;  // In milliseconds; todo: allow customisation
 
