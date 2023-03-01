@@ -90,10 +90,15 @@
 }
 
 .list-cell:empty {
-    visibility: hidden;
+    -fx-opacity: 0;
 }
 
 .list-cell:hover {
     -fx-cursor: hand;
     -fx-background-color: background-colour-tertiary;
+}
+
+.list-cell:empty:hover {
+    -fx-cursor: pointer;
+    -fx-background-color: background-colour-secondary;
 }
