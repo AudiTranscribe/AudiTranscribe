@@ -31,11 +31,13 @@ out/
 # Others
 .mscbackup
 [Tt]est-*
+!test-files
 !lib/*.jar
 
 ~$*
 .DS_Store
 AudiTranscribe-Designs.key
 *.log
+Release Checklist.txt
 
 resources alias

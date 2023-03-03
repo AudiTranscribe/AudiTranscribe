@@ -19,7 +19,7 @@
 package app.auditranscribe.io;
 
 import app.auditranscribe.MainApplication;
-import app.auditranscribe.io.exceptions.NoSuchPropertyException;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -34,20 +34,16 @@ public class PropertyFile {
     /**
      * Initialization method of the <code>PropertyFile</code> class.
      *
-     * @param propertyFileName Name of the property file, <b>including</b> the
-     *                         <code>.properties</code> extension.<br>
-     *                         Note that the property file <b>must be in the root resources
-     *                         directory</b> (i.e. the one named <code>resources</code>).
+     * @param propertyFilePath <b>Relative</b> path to the property file from the root resources
+     *                         directory.
      * @throws IOException If the file does not exist, or if the input stream is null.
      */
-    public PropertyFile(String propertyFileName) throws IOException {
-        // Load the properties from the property file into the `Properties` object
+    public PropertyFile(String propertyFilePath) throws IOException {
         try {
-            properties.load(MainApplication.class.getClassLoader().getResourceAsStream(propertyFileName));
+            properties.load(MainApplication.class.getClassLoader().getResourceAsStream(propertyFilePath));
         } catch (NullPointerException e) {
-            throw new IOException("Property file with name '" + propertyFileName + "' not found.");
+            throw new IOException("Property file with name '" + propertyFilePath + "' not found.");
         }
-
     }
 
     // Public methods
@@ -74,10 +70,22 @@ public class PropertyFile {
     public String getProperty(String name) throws NoSuchPropertyException {
         String value = properties.getProperty(name, null);
 
-        if (value == null) {  // If `null` then the property does not exist
+        if (value == null) {
             throw new NoSuchPropertyException("The properties file does not have a property with name " + name);
         }
 
         return value;
+    }
+
+    // Exceptions
+
+    /**
+     * Exception thrown when a property file does not have the specified property.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static class NoSuchPropertyException extends Exception {
+        public NoSuchPropertyException(String message) {
+            super(message);
+        }
     }
 }

@@ -32,8 +32,8 @@ public class Complex {
     public static final Complex IMAG_UNIT = new Complex(0, 1);
 
     // Attributes
-    private double re;  // Real part of the complex number
-    private double im;  // Imaginary part of the complex number
+    public double re;  // Real part of the complex number
+    public double im;  // Imaginary part of the complex number
 
     /**
      * Creates a complex number with real part <code>re</code> and imaginary part <code>im</code>.
@@ -49,31 +49,11 @@ public class Complex {
     /**
      * Creates a complex number with real part <code>real</code> and imaginary part 0.
      *
-     * @param real The real part of the complex number.
+     * @param re The real part of the complex number.
      */
-    public Complex(double real) {
-        re = real;
+    public Complex(double re) {
+        this.re = re;
         im = 0;
-    }
-
-    // Standard methods
-
-    /**
-     * Getter method to get the real part of the <code>Complex</code> object.
-     *
-     * @return Real part of the complex number.
-     */
-    public double re() {
-        return re;
-    }
-
-    /**
-     * Getter method to get the imaginary part of the <code>Complex</code> object.
-     *
-     * @return Real part of the complex number.
-     */
-    public double im() {
-        return im;
     }
 
     // Assertion methods
@@ -215,110 +195,55 @@ public class Complex {
         return this.times(other.reciprocal());
     }
 
-    // Static methods
+    // Miscellaneous Methods
 
     /**
-     * A static method that returns the sum <code>a + b</code> where <code>a</code> and
-     * <code>b</code> are complex numbers.
-     *
-     * @param a The first complex number.
-     * @param b The second complex number.
-     * @return A <code>Complex</code> object representing the sum <code>a + b</code>.
-     */
-    public static Complex plus(Complex a, Complex b) {
-        double real = a.re + b.re;
-        double imag = a.im + b.im;
-        return new Complex(real, imag);
-    }
-
-    /**
-     * A static method that returns the sum <code>a - b</code> where <code>a</code> and
-     * <code>b</code> are complex numbers.
-     *
-     * @param a The first complex number.
-     * @param b The second complex number.
-     * @return A <code>Complex</code> object representing the sum <code>a - b</code>.
-     */
-    public static Complex minus(Complex a, Complex b) {
-        double real = a.re - b.re;
-        double imag = a.im - b.im;
-        return new Complex(real, imag);
-    }
-
-    /**
-     * A static method that returns the product <code>a * b</code> where <code>a</code> and
-     * <code>b</code> are complex numbers.
-     *
-     * @param a The first complex number.
-     * @param b The second complex number.
-     * @return A <code>Complex</code> object representing the product <code>a * b</code>.
-     */
-    public static Complex times(Complex a, Complex b) {
-        double real = a.re * b.re - a.im * b.im;
-        double imag = a.re * b.im + a.im * b.re;
-        return new Complex(real, imag);
-    }
-
-    /**
-     * A static method that returns the value of <code>a / b</code> where <code>a</code> and
-     * <code>b</code> are complex numbers.
-     *
-     * @param a The first complex number.
-     * @param b The second complex number.
-     * @return A <code>Complex</code> object representing the value of <code>a / b</code>.
-     */
-    public static Complex divides(Complex a, Complex b) {
-        // Compute numerator and denominator separately
-        double numeratorReal = a.re * b.re + a.im * b.im;
-        double numeratorImag = b.re * a.im - a.re * b.im;
-
-        double denominatorAsScale = 1 / (b.re * b.re + b.im * b.im);  // Do this to only invoke multiplication later
-
-        // Combine numerator and denominator into the final real and imaginary parts
-        double real = numeratorReal * denominatorAsScale;
-        double imag = numeratorImag * denominatorAsScale;
-
-        // Return the new complex number
-        return new Complex(real, imag);
-    }
-
-    /**
-     * Compute the value of e^<code>z</code> where e is Euler's number and <code>z</code> is the
+     * Compute the value of e<sup><code>z</code></sup> where e is Euler's number and <code>z</code> is the
      * complex number.
      *
      * @param z Complex exponent.
-     * @return Value of e^<code>z</code>
+     * @return Value of e<sup><code>z</code></sup>
      */
     public static Complex exp(Complex z) {
         /*
-         * Recall that if z = u + vi where u and v are real numbers then:
+         * Recall that if z = u + vi, where u and v are real numbers, then:
          *      e^z = e^(u + vi) = e^u * e^(vi).
-         * The e^u part can be found trivially; e^(vi) can be found by using Euler's identity:
+         * The "e^u" part can be found trivially; "e^(vi)" can be found by using Euler's identity
          *      e^(vi) = cos(v) + i sin(v).
-         * So,
+         * Therefore we have
          *      e^z = e^(u + vi) = e^u * (cos(v) + i sin(v)).
+         * with "e^u" being the modulus and "cos(v) + i sin(v)" being the trigonometric part.
          */
 
         // Get the modulus of the final answer
         double modulus = Math.exp(z.re);
 
-        // Get the 'complex' part of the final answer
-        Complex complexPart = new Complex(Math.cos(z.im), Math.sin(z.im));
+        // Get the trigonometric part of the final answer
+        Complex trigPart = new Complex(Math.cos(z.im), Math.sin(z.im));
 
-        // Return the final answer
-        return complexPart.times(modulus);
+        return trigPart.times(modulus);
     }
 
-    // Misc Methods
+    /**
+     * Generates a complex number based off the magnitude and phase of the complex number.
+     *
+     * @param magnitude Magnitude (or modulus) of the complex number.
+     * @param phase     Phase (or argument) of the complex number.
+     * @return The complex number with the specified magnitude and phase.
+     */
+    public static Complex fromMagnitudeAndPhase(double magnitude, double phase) {
+        Complex trigPart = new Complex(Math.cos(phase), Math.sin(phase));
+        return trigPart.times(magnitude);
+    }
 
     /**
-     * Rounds both the real and imaginary part of this complex number nicely to a certain number
+     * Rounds both the real and imaginary part of this complex number to a certain number
      * of decimal places, <code>dp</code>.
      *
-     * @param dp Number of decimal places to round to.
-     * @return This <code>Complex</code> object.
+     * @param dp Number of decimal places to round both the real and imaginary parts to.
+     * @return This <code>Complex</code> object, after rounding.
      */
-    public Complex roundNicely(int dp) {
+    public Complex round(int dp) {
         re = MathUtils.round(re, dp);
         im = MathUtils.round(im, dp);
 
@@ -329,8 +254,8 @@ public class Complex {
 
     /**
      * Generates a string representation of the complex number.<br>
-     * Note that we use "j" for the imaginary unit to follow Python's convention of the imaginary
-     * unit.
+     * Note that we use <code>j</code> for the imaginary unit to follow Python's convention for the
+     * imaginary unit.
      *
      * @return String representation of the complex number.
      */

@@ -1,0 +1,17 @@
+.debug-list {
+    -fx-background-color: background-colour-secondary;
+}
+
+.debug-list .list-cell {
+    -fx-background-color: transparent;
+}
+
+.debug-list .list-cell:hover {
+    -fx-cursor: none;
+    -fx-background-color: background-colour-tertiary;
+}
+
+.debug-list .list-cell .text, .debug-list .list-cell:selected .text {
+    -fx-fill: text-colour-primary;
+    -fx-text-fill: text-colour-primary;
+}

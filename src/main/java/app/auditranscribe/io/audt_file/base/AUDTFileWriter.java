@@ -1,6 +1,6 @@
 /*
  * AUDTFileWriter.java
- * Description: Class that handles the writing of the AudiTranscribe (AUDT) file.
+ * Description: Handles the writing of the AudiTranscribe file.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -18,17 +18,21 @@
 
 package app.auditranscribe.io.audt_file.base;
 
-import app.auditranscribe.generic.ClassWithLogging;
+import app.auditranscribe.generic.LoggableClass;
+import app.auditranscribe.io.ByteConversionHandlers;
 import app.auditranscribe.io.CompressionHandlers;
 import app.auditranscribe.io.audt_file.AUDTFileConstants;
 import app.auditranscribe.io.audt_file.AUDTFileHelpers;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import app.auditranscribe.io.audt_file.v0x00050002.AUDTFileWriter0x00050002;
-import app.auditranscribe.io.audt_file.v0x00070001.AUDTFileWriter0x00070001;
-import app.auditranscribe.io.audt_file.v0x00080001.AUDTFileWriter0x00080001;
-import app.auditranscribe.io.audt_file.v0x00090002.AUDTFileWriter0x00090002;
-import app.auditranscribe.io.exceptions.InvalidFileVersionException;
-import app.auditranscribe.utils.ByteConversionUtils;
+import app.auditranscribe.io.audt_file.v0x000500.AUDTFileWriter0x000500;
+import app.auditranscribe.io.audt_file.v0x000700.AUDTFileWriter0x000700;
+import app.auditranscribe.io.audt_file.v0x000800.AUDTFileWriter0x000800;
+import app.auditranscribe.io.audt_file.v0x000900.AUDTFileWriter0x000900;
+import app.auditranscribe.io.audt_file.v0x000B00.AUDTFileWriter0x000B00;
+import app.auditranscribe.io.audt_file.InvalidFileVersionException;
+import app.auditranscribe.misc.CustomLogger;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+import app.auditranscribe.utils.MiscUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,11 +43,12 @@ import java.util.List;
 import java.util.logging.Level;
 
 /**
- * Class that handles the writing of the AudiTranscribe (AUDT) file.
+ * Handles the writing of the AudiTranscribe file.
  */
-public abstract class AUDTFileWriter extends ClassWithLogging {
+public abstract class AUDTFileWriter extends LoggableClass {
     // Attributes
     public final String filepath;
+    public int fileVersion;
 
     protected final List<Byte> bytes = new ArrayList<>();
     protected final int numBytesToSkip;
@@ -51,34 +56,24 @@ public abstract class AUDTFileWriter extends ClassWithLogging {
     /**
      * Initialization method to make an <code>AUDTFileWriter</code> object.
      *
-     * @param fileVersion    AUDT file version.
      * @param filepath       Path to the AUDT file. The file name at the end of the file path should
      *                       <b>include</b> the extension of the AUDT file.
      * @param numBytesToSkip Number of bytes to skip at the beginning of the file.
      */
-    public AUDTFileWriter(int fileVersion, String filepath, int numBytesToSkip) {
-        // Update attributes
+    public AUDTFileWriter(String filepath, int numBytesToSkip) {
         this.filepath = filepath;
         this.numBytesToSkip = numBytesToSkip;
-
-        // Write the header section if no bytes are to be skipped
-        if (numBytesToSkip == 0) writeHeaderSection(fileVersion);
     }
 
     /**
      * Initialization method to make an <code>AUDTFileWriter</code> object.
      *
-     * @param fileVersion AUDT file version.
-     * @param filepath    Path to the AUDT file. The file name at the end of the file path should
-     *                    <b>include</b> the extension of the AUDT file.
+     * @param filepath Path to the AUDT file. The file name at the end of the file path should
+     *                 <b>include</b> the extension of the AUDT file.
      */
-    public AUDTFileWriter(int fileVersion, String filepath) {
-        // Update attributes
+    public AUDTFileWriter(String filepath) {
         this.filepath = filepath;
         this.numBytesToSkip = 0;
-
-        // Write the header section
-        writeHeaderSection(fileVersion);
     }
 
     // Public methods
@@ -92,14 +87,26 @@ public abstract class AUDTFileWriter extends ClassWithLogging {
      * @throws InvalidFileVersionException If the specified file version is not supported.
      */
     public static AUDTFileWriter getWriter(int fileVersion, String filepath) throws InvalidFileVersionException {
-        // Get the appropriate file reader objects
-        return switch (fileVersion) {
-            case 0x00050002 -> new AUDTFileWriter0x00050002(filepath);
-            case 0x00070001 -> new AUDTFileWriter0x00070001(filepath);
-            case 0x00080001 -> new AUDTFileWriter0x00080001(filepath);
-            case 0x00090002 -> new AUDTFileWriter0x00090002(filepath);
-            default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
+        AUDTFileWriter writer = switch (fileVersion) {
+            case 0x00050002 -> new AUDTFileWriter0x000500(filepath);
+            case 0x00070001 -> new AUDTFileWriter0x000700(filepath);
+            case 0x00080001 -> new AUDTFileWriter0x000800(filepath);
+            case 0x00090002 -> new AUDTFileWriter0x000900(filepath);
+            case 0x000B0003 -> new AUDTFileWriter0x000B00(filepath);
+            default -> throw new InvalidFileVersionException(
+                    "Invalid file version '" + MiscUtils.intAsPaddedHexStr(fileVersion) + "'."
+            );
         };
+
+        CustomLogger.log(
+                Level.INFO,
+                "Using version " + MiscUtils.intAsPaddedHexStr(fileVersion) + " AUDT file writer",
+                AUDTFileWriter.class.getName()
+        );
+
+        writer.fileVersion = fileVersion;
+        writer.writeHeaderSection(fileVersion);
+        return writer;
     }
 
     /**
@@ -112,22 +119,27 @@ public abstract class AUDTFileWriter extends ClassWithLogging {
      */
     public static AUDTFileWriter getWriter(int fileVersion, String filepath, int numBytesToSkip)
             throws InvalidFileVersionException {
-        // Get the appropriate file reader objects
-        return switch (fileVersion) {
-            case 0x00050002 -> new AUDTFileWriter0x00050002(filepath, numBytesToSkip);
-            case 0x00070001 -> new AUDTFileWriter0x00070001(filepath, numBytesToSkip);
-            case 0x00080001 -> new AUDTFileWriter0x00080001(filepath, numBytesToSkip);
-            case 0x00090002 -> new AUDTFileWriter0x00090002(filepath, numBytesToSkip);
-            default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
+        AUDTFileWriter writer = switch (fileVersion) {
+            case 0x00050002 -> new AUDTFileWriter0x000500(filepath, numBytesToSkip);
+            case 0x00070001 -> new AUDTFileWriter0x000700(filepath, numBytesToSkip);
+            case 0x00080001 -> new AUDTFileWriter0x000800(filepath, numBytesToSkip);
+            case 0x00090002 -> new AUDTFileWriter0x000900(filepath, numBytesToSkip);
+            case 0x000B0003 -> new AUDTFileWriter0x000B00(filepath, numBytesToSkip);
+            default -> throw new InvalidFileVersionException(
+                    "Invalid file version '" + MiscUtils.intAsPaddedHexStr(fileVersion) + "'."
+            );
         };
+
+        if (numBytesToSkip == 0) writer.writeHeaderSection(fileVersion);
+        return writer;
     }
 
     /**
-     * Method that writes the bytes generated to file.
+     * Method that writes the generated bytes to file.
      *
      * @throws IOException If something went wrong when writing to file.
      */
-    public void writeBytesToFile() throws IOException {
+    public void writeToFile() throws IOException {
         // Write the EOF delimiter at the end of the file
         writeEOFDelimiter();
 
@@ -197,6 +209,12 @@ public abstract class AUDTFileWriter extends ClassWithLogging {
      */
     public abstract void writeMusicNotesData(MusicNotesDataObject musicNotesDataObj) throws IOException;
 
+    @Override
+    @ExcludeFromGeneratedCoverageReport
+    public void log(Level level, String msg) {
+        log(level, msg, AUDTFileWriter.class.getName());
+    }
+
     // Protected methods
 
     /**
@@ -206,7 +224,7 @@ public abstract class AUDTFileWriter extends ClassWithLogging {
      */
     protected void writeShort(short myShort) {
         // Convert the short into its bytes
-        byte[] byteArray = ByteConversionUtils.shortToByte(myShort);
+        byte[] byteArray = ByteConversionHandlers.shortToBytes(myShort);
 
         // Write to the byte list
         AUDTFileHelpers.addBytesIntoBytesList(bytes, byteArray);
@@ -219,7 +237,7 @@ public abstract class AUDTFileWriter extends ClassWithLogging {
      */
     protected void writeInteger(int integer) {
         // Convert the integer into its bytes
-        byte[] byteArray = ByteConversionUtils.intToBytes(integer);
+        byte[] byteArray = ByteConversionHandlers.intToBytes(integer);
 
         // Write to the byte list
         AUDTFileHelpers.addBytesIntoBytesList(bytes, byteArray);
@@ -232,7 +250,7 @@ public abstract class AUDTFileWriter extends ClassWithLogging {
      */
     protected void writeDouble(double dbl) {
         // Convert the double into its bytes
-        byte[] byteArray = ByteConversionUtils.doubleToBytes(dbl);
+        byte[] byteArray = ByteConversionHandlers.doubleToBytes(dbl);
 
         // Write to the byte list
         AUDTFileHelpers.addBytesIntoBytesList(bytes, byteArray);
@@ -245,7 +263,7 @@ public abstract class AUDTFileWriter extends ClassWithLogging {
      */
     protected void writeString(String str) {
         // Convert the string into its bytes
-        byte[] byteArray = ByteConversionUtils.stringToBytes(str);
+        byte[] byteArray = ByteConversionHandlers.stringToBytes(str);
 
         // Get the number of bytes needed to store the string
         int numBytes = byteArray.length;
@@ -272,7 +290,7 @@ public abstract class AUDTFileWriter extends ClassWithLogging {
      */
     protected void write1DIntegerArray(int[] array) throws IOException {
         // Convert the 1D array into its bytes
-        byte[] byteArray = ByteConversionUtils.oneDimensionalIntegerArrayToBytes(array);
+        byte[] byteArray = ByteConversionHandlers.oneDimensionalIntegerArrayToBytes(array);
 
         // Compress the byte array
         byte[] compressedBytes = CompressionHandlers.lz4Compress(byteArray);
@@ -292,7 +310,7 @@ public abstract class AUDTFileWriter extends ClassWithLogging {
      */
     protected void write1DDoubleArray(double[] array) throws IOException {
         // Convert the 1D array into its bytes
-        byte[] byteArray = ByteConversionUtils.oneDimensionalDoubleArrayToBytes(array);
+        byte[] byteArray = ByteConversionHandlers.oneDimensionalDoubleArrayToBytes(array);
 
         // Compress the byte array
         byte[] compressedBytes = CompressionHandlers.lz4Compress(byteArray);
@@ -331,16 +349,17 @@ public abstract class AUDTFileWriter extends ClassWithLogging {
      */
     private void writeHeaderSection(int fileVersion) {
         // Write the file header
-        AUDTFileHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_FILE_HEADER);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_FILE_HEADING);
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_MAGIC_CONSTANT);
 
-        // Write version numbers
-        byte[] fileVersionBytes = ByteConversionUtils.intToBytes(fileVersion);
-        byte[] lz4VersionBytes = ByteConversionUtils.intToBytes(AUDTFileConstants.COMPRESSOR_VERSION_NUMBER);
-
+        // Write the file version
+        byte[] fileVersionBytes = ByteConversionHandlers.intToBytes(fileVersion);
         AUDTFileHelpers.addBytesIntoBytesList(bytes, fileVersionBytes);
-        AUDTFileHelpers.addBytesIntoBytesList(bytes, lz4VersionBytes);
 
-        // Write the end-of-section delimiter
+        // Then write the magic constant again
+        AUDTFileHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_MAGIC_CONSTANT);
+
+        // Finally write the end-of-section delimiter
         writeEOSDelimiter();
     }
 
@@ -349,11 +368,5 @@ public abstract class AUDTFileWriter extends ClassWithLogging {
      */
     private void writeEOFDelimiter() {
         AUDTFileHelpers.addBytesIntoBytesList(bytes, AUDTFileConstants.AUDT_END_OF_FILE_DELIMITER);
-    }
-
-    // Overridden methods
-    @Override
-    public void log(Level level, String msg) {
-        log(level, msg, AUDTFileWriter.class.getName());
     }
 }

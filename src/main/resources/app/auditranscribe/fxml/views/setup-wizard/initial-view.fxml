@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="rootPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.auditranscribe.fxml.views.setup_wizard.controllers.InitialViewController">
+   <children>
+      <Label alignment="CENTER" contentDisplay="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="75.0" prefWidth="500.0" styleClass="title-label" text="AudiTranscribe" textAlignment="CENTER" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" />
+      <Label fx:id="versionLabel" alignment="TOP_CENTER" layoutX="10.0" layoutY="10.0" maxWidth="150.0" prefHeight="25.0" styleClass="version-label" text="X.Y.Z" AnchorPane.leftAnchor="175.0" AnchorPane.rightAnchor="175.0" AnchorPane.topAnchor="80.0" />
+      <Label prefHeight="60.0" text="Welcome to the AudiTranscribe Setup Wizard. This process will help you set up and install the required things for AudiTranscribe to function properly." textAlignment="JUSTIFY" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="120.0">
+         <font>
+            <Font size="14.0" />
+         </font>
+         <padding>
+            <Insets left="75.0" right="75.0" />
+         </padding>
+      </Label>
+      <Label alignment="CENTER" layoutX="10.0" layoutY="130.0" text="Read the guides on the documentation website at:" textAlignment="JUSTIFY" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="210.0">
+         <font>
+            <Font size="14.0" />
+         </font>
+         <padding>
+            <Insets left="75.0" right="75.0" />
+         </padding>
+      </Label>
+      <Hyperlink fx:id="documentationHyperlink" alignment="CENTER" text="https://docs.auditranscribe.app/" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="225.0" />
+      <Button fx:id="continueButton" layoutX="70.0" layoutY="329.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="210.0" text="Continue" wrapText="true" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="75.0" AnchorPane.rightAnchor="75.0" />
+   </children>
+   <stylesheets>
+      <URL value="@../../css/base.css" />
+      <URL value="@../../css/views/setup-wizard/common.css" />
+      <URL value="@../../css/views/setup-wizard/initial-view.css" />
+      <URL value="@../../css/theme/shared-colours.css" />
+      <URL value="@../../css/theme/light.css" />
+   </stylesheets>
+</AnchorPane>

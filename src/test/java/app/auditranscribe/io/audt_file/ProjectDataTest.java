@@ -1,72 +1,46 @@
-/*
- * ProjectDataTest.java
- * Description: Test `ProjectData.java`.
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
- * Licence, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public Licence for more details.
- *
- * You should have received a copy of the GNU General Public Licence along with this program. If
- * not, see <https://www.gnu.org/licenses/>
- *
- * Copyright © AudiTranscribe Team
- */
-
 package app.auditranscribe.io.audt_file;
 
 import app.auditranscribe.generic.tuples.Triple;
-import app.auditranscribe.io.CompressionHandlers;
-import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import app.auditranscribe.io.audt_file.v0x00050002.data_encapsulators.*;
+import app.auditranscribe.io.audt_file.v0x000500.data_encapsulators.*;
 import app.auditranscribe.utils.MathUtils;
 import app.auditranscribe.utils.TypeConversionUtils;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledOnOs;
-import org.junit.jupiter.api.condition.OS;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@EnabledOnOs({OS.LINUX})
 class ProjectDataTest {
     // Define helper attributes
-    double[][] qTransformMagnitudes1;
-    double[][] qTransformMagnitudes2;
+    static double[][] qTransformMagnitudes1;
+    static double[][] qTransformMagnitudes2;
 
-    double[] timesToPlaceRectangles1;
-    double[] noteDurations1;
-    int[] noteNums1;
+    static double[] timesToPlaceRectangles1;
+    static double[] noteDurations1;
+    static int[] noteNums1;
 
-    double[] timesToPlaceRectangles2;
-    double[] noteDurations2;
-    int[] noteNums2;
+    static double[] timesToPlaceRectangles2;
+    static double[] noteDurations2;
+    static int[] noteNums2;
 
     // Define data to be used within the tests
-    QTransformDataObject qTransformDataObject1;
-    QTransformDataObject qTransformDataObject2;
+    static QTransformDataObject qTransformDataObject1;
+    static QTransformDataObject qTransformDataObject2;
 
-    AudioDataObject audioDataObject1;
-    AudioDataObject audioDataObject2;
+    static AudioDataObject audioDataObject1;
+    static AudioDataObject audioDataObject2;
 
-    ProjectInfoDataObject projectInfoDataObject1;
-    ProjectInfoDataObject projectInfoDataObject2;
+    static ProjectInfoDataObject projectInfoDataObject1;
+    static ProjectInfoDataObject projectInfoDataObject2;
 
-    MusicNotesDataObject musicNotesDataObject1;
-    MusicNotesDataObject musicNotesDataObject2;
+    static MusicNotesDataObject musicNotesDataObject1;
+    static MusicNotesDataObject musicNotesDataObject2;
 
-    UnchangingDataPropertiesObject unchangingDataPropertiesObject1;
-    UnchangingDataPropertiesObject unchangingDataPropertiesObject2;
+    static UnchangingDataPropertiesObject unchangingDataPropertiesObject1;
+    static UnchangingDataPropertiesObject unchangingDataPropertiesObject2;
 
-    // Initialization method
-    public ProjectDataTest() throws IOException {
+    @BeforeAll
+    static void beforeAll() {
         // Define sample array data
         // (These are example arrays, not actual data)
         qTransformMagnitudes1 = new double[][]{
@@ -90,56 +64,52 @@ class ProjectDataTest {
 
         // Convert the magnitude data to required form
         Triple<Byte[], Double, Double> conversionTuple1 =
-                QTransformDataObject.qTransformMagnitudesToByteData(qTransformMagnitudes1, null);
+                QTransformDataObject0x000500.magnitudesToByteData(qTransformMagnitudes1, null);
         byte[] qTransformBytes1 = TypeConversionUtils.toByteArray(conversionTuple1.value0());
         double minMagnitude1 = conversionTuple1.value1();
         double maxMagnitude1 = conversionTuple1.value2();
         Triple<Byte[], Double, Double> conversionTuple2 =
-                QTransformDataObject.qTransformMagnitudesToByteData(qTransformMagnitudes2, null);
+                QTransformDataObject0x000500.magnitudesToByteData(qTransformMagnitudes2, null);
         byte[] qTransformBytes2 = TypeConversionUtils.toByteArray(conversionTuple2.value0());
         double minMagnitude2 = conversionTuple2.value1();
         double maxMagnitude2 = conversionTuple2.value2();
 
         // Define data to be used within the tests
-        qTransformDataObject1 = new QTransformDataObject0x00050002(
+        qTransformDataObject1 = new QTransformDataObject0x000500(
                 qTransformBytes1, minMagnitude1, maxMagnitude1
         );
-        qTransformDataObject2 = new QTransformDataObject0x00050002(
+        qTransformDataObject2 = new QTransformDataObject0x000500(
                 qTransformBytes2, minMagnitude2, maxMagnitude2
         );
 
-        audioDataObject1 = new AudioDataObject0x00050002(
-                CompressionHandlers.lz4Compress(Files.readAllBytes(Paths.get(
-                        IOMethods.getAbsoluteFilePath("testing-files/audio/A440.mp3")
-                ))),
+        audioDataObject1 = new AudioDataObject0x000500(
+                new byte[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
                 44100, 8000, "A440.wav");
-        audioDataObject2 = new AudioDataObject0x00050002(
-                CompressionHandlers.lz4Compress(Files.readAllBytes(Paths.get(
-                        IOMethods.getAbsoluteFilePath("testing-files/audio/Choice.wav")
-                ))),
+        audioDataObject2 = new AudioDataObject0x000500(
+                new byte[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19},
                 44100, 5000, "Choice.wav");
 
-        projectInfoDataObject1 = new ProjectInfoDataObject0x00050002(
+        projectInfoDataObject1 = new ProjectInfoDataObject0x000500(
                 1, 0, 123.45, 0.01, 0.55, 9000
         );
-        projectInfoDataObject2 = new ProjectInfoDataObject0x00050002(
+        projectInfoDataObject2 = new ProjectInfoDataObject0x000500(
                 8, 7, 67.89, -1.23, 0.124, 2048
         );
 
-        musicNotesDataObject1 = new MusicNotesDataObject0x00050002(
+        musicNotesDataObject1 = new MusicNotesDataObject0x000500(
                 timesToPlaceRectangles1, noteDurations1, noteNums1
         );
-        musicNotesDataObject2 = new MusicNotesDataObject0x00050002(
+        musicNotesDataObject2 = new MusicNotesDataObject0x000500(
                 timesToPlaceRectangles2, noteDurations2, noteNums2
         );
 
-        unchangingDataPropertiesObject1 = new UnchangingDataPropertiesObject0x00050002(
+        unchangingDataPropertiesObject1 = new UnchangingDataPropertiesObject0x000500(
                 32 +  // Header section
                         UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
                         qTransformDataObject1.numBytesNeeded() +
                         audioDataObject1.numBytesNeeded()
         );
-        unchangingDataPropertiesObject2 = new UnchangingDataPropertiesObject0x00050002(
+        unchangingDataPropertiesObject2 = new UnchangingDataPropertiesObject0x000500(
                 32 +  // Header section
                         UnchangingDataPropertiesObject.NUM_BYTES_NEEDED +
                         qTransformDataObject2.numBytesNeeded() +
@@ -211,20 +181,5 @@ class ProjectDataTest {
                 }
             }
         }
-    }
-
-    @Test
-    void testHashCode() {
-        ProjectData one = new ProjectData(
-                unchangingDataPropertiesObject1, qTransformDataObject1, audioDataObject1, projectInfoDataObject1,
-                musicNotesDataObject1
-        );
-        ProjectData two = new ProjectData(
-                unchangingDataPropertiesObject2, qTransformDataObject2, audioDataObject2, projectInfoDataObject2,
-                musicNotesDataObject2
-        );
-
-        assertEquals(272185181, one.hashCode());
-        assertEquals(-1573040154, two.hashCode());
     }
 }

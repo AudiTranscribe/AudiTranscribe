@@ -57,7 +57,6 @@ you could submit an issue instead of a pull request.
 - Development changes to AudiTranscribe should be pushed to the `main` branch. The `staging` branch is reserved for
   ready-to-release builds (i.e., production builds). **Never make pull requests of development changes to the `staging`
   branch**.
-- Please follow the [Commit Message Format](commit_message_format.md) to make commits to AudiTranscribe.
 
 ## Reporting Bugs
 

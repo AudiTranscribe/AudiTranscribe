@@ -35,11 +35,12 @@ public final class TestingUtils {
     // Public methods
 
     /**
-     * Method that determines if a test is running or not.
+     * Method that determines if a JUnit test is running.
      *
-     * @return A boolean, that determines whether a JUnit test is running or not.
+     * @return Boolean that determines whether a JUnit test is running.
      */
     public static boolean isRunningTest() {
+        // If needed, update the flag
         if (isRunningTest == null) {
             // Try to check if the stack trace contains a JUnit test
             for (StackTraceElement element : Thread.currentThread().getStackTrace()) {

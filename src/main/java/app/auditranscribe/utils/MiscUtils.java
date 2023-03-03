@@ -1,6 +1,6 @@
 /*
  * MiscUtils.java
- * Description: Miscellaneous utility methods.
+ * Description: Miscellaneous utilities.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -24,25 +24,25 @@ import java.time.Instant;
 import java.util.*;
 
 /**
- * Miscellaneous utility methods.
+ * Miscellaneous utilities.
  */
 public final class MiscUtils {
     private MiscUtils() {
         // Private constructor to signal this is a utility class
     }
 
-    // Time utils
+    // Time methods
 
     /**
      * Gets the number of seconds from the Java epoch of 1970-01-01T00:00:00Z.<br>
-     * The epoch second count is a simple incrementing count of seconds where second 0 is
+     * The epoch second count is a simple incrementing count of seconds, where 0 represents
      * 1970-01-01T00:00:00Z (i.e. Unix Epoch).
      *
      * @param clock Clock to use for generating the Unix timestamp.
-     * @return Double representing the number of seconds. Decimal part is the fractional second
+     * @return A double representing the number of seconds. Decimal part is the fractional second
      * part.
      * @implNote The fractional part cannot be fully trusted; precision may only be accurate up to
-     * 10 milliseconds (i.e. up to 0.01 s).
+     * 10 milliseconds (0.01 s).
      */
     public static double getUnixTimestamp(Clock clock) {
         // Get both the current epoch second and the nanosecond part
@@ -57,16 +57,17 @@ public final class MiscUtils {
 
     /**
      * Gets the number of seconds from the Java epoch of 1970-01-01T00:00:00Z.<br>
-     * The epoch second count is a simple incrementing count of seconds where second 0 is
-     * 1970-01-01T00:00:00Z (i.e. Unix Epoch).
+     * The epoch second count is a simple incrementing count of seconds, 0 represents
+     * 1970-01-01T00:00:00Z (i.e. Unix Epoch).<br>
+     * Uses the system clock to calculate the timestamp.
      *
-     * @return Double representing the number of seconds. Decimal part is the fractional second
+     * @return A double representing the number of seconds. Decimal part is the fractional second
      * part.
      * @implNote The fractional part cannot be fully trusted; precision may only be accurate up to
-     * 10 milliseconds (i.e. up to 0.01 s).
+     * 10 milliseconds (0.01 s).
      */
     public static double getUnixTimestamp() {
-        return getUnixTimestamp(Clock.systemUTC());  // Query current system UTC clock
+        return getUnixTimestamp(Clock.systemUTC());
     }
 
     /**
@@ -81,31 +82,21 @@ public final class MiscUtils {
         return simpleDateFormat.format(date);
     }
 
-    // Bit manipulation utils
+    // Bit manipulation methods
 
     /**
      * Method that gets the number of bits set in the given integer.<br>
-     * (i.e. the number of significant bits in the binary representation of the integer).
+     * (i.e., the number of significant bits in the binary representation of the integer).
      *
      * @param value The integer to get the number of bits set in.
      * @return The number of bits set in the given integer.
-     * @implNote This method is based on the algorithm found at
-     * <a href="https://stackoverflow.com/a/2891946">this StackOverflow answer</a>.
      */
     public static int getNumSetBits(int value) {
-        // Get the number which has all ones in the binary representation
-        int allOnes = value;  // Initially set as the given value
-        allOnes |= (allOnes >> 1);
-        allOnes |= (allOnes >> 2);
-        allOnes |= (allOnes >> 4);
-        allOnes |= (allOnes >> 8);
-        allOnes |= (allOnes >> 16);
-
-        // Get number of digits in the binary representation of the `allOnes` integer
-        return (int) MathUtils.round(MathUtils.log2(allOnes + 1), 10);  // To account for weird double rounding
+        if (value == 0) return 0;
+        return MathUtils.binlog(Integer.highestOneBit(value)) + 1;
     }
 
-    // Name utils
+    // Other methods
 
     /**
      * Method that creates a shortened name based on the provided name.<br>
@@ -113,6 +104,10 @@ public final class MiscUtils {
      * <ol>
      *     <li>
      *         Strip all whitespace before and after the name.
+     *     </li>
+     *     <li>
+     *         If there are <b>no characters</b> in the stripped name, the shortened name will be
+     *         <code>?</code>.
      *     </li>
      *     <li>
      *         Get all the <b>uppercase</b> letters in <code>name</code>.
@@ -124,10 +119,6 @@ public final class MiscUtils {
      *     <li>
      *         If there are no alphabetical characters in the name, take the <b>first character</b>
      *         of the <code>name</code> and use it as the shortened name.
-     *     </li>
-     *     <li>
-     *         If there are <b>no characters</b> in the name, the shortened name will be
-     *         <code>?</code>.
      *     </li>
      *     <li>
      *         If there are more than 2 uppercase letters, take the <b>first two uppercase
@@ -143,10 +134,7 @@ public final class MiscUtils {
      * @return A string, representing the shortened name.
      */
     public static String getShortenedName(String name) {
-        // Strip whitespace
         name = name.strip();
-
-        // Handle the easiest case of `name` being an empty string
         if (Objects.equals(name, "")) return "?";
 
         // Get the uppercase letters and alphabetical characters of the name
@@ -155,15 +143,12 @@ public final class MiscUtils {
 
         int length = name.length();
         for (int i = 0; i < length; i++) {
-            // Get current character
             char ch = name.charAt(i);
             String charAsString = String.valueOf(ch);
 
-            // Check if the `chr` is an alphabetical character
             if (Character.isLetter(ch)) {
                 alphabeticalCharacters.add(charAsString);
 
-                // Check if the alphabetical character is uppercase
                 if (Character.isUpperCase(ch)) {
                     uppercaseLetters.add(charAsString);
                 }
@@ -171,28 +156,40 @@ public final class MiscUtils {
         }
 
         // Create a variable to store the final shortened name
-        StringBuilder shortNameBuff = new StringBuilder();
+        StringBuilder shortNameBuffer = new StringBuilder();
 
         // Check if there is at least one uppercase letter
         int numUppercaseLetters = uppercaseLetters.size();
         if (numUppercaseLetters >= 1) {
-            // The shortened name is just the first 2 letters (or only letter) in that list
             int numChars = Math.min(numUppercaseLetters, 2);
-            for (int i = 0; i < numChars; i++) {
-                shortNameBuff.append(uppercaseLetters.get(i));
-            }
-        } else {  // No uppercase letters
-            // Check if there is at least one alphabetical character
-            int numAlphabeticalChars = alphabeticalCharacters.size();
-            if (numAlphabeticalChars >= 1) {
-                shortNameBuff.append(alphabeticalCharacters.get(0).toUpperCase());  // Take first alphabetical character
-            } else {  // No alphabetical characters
-                shortNameBuff.append(String.valueOf(name.charAt(0)).toUpperCase());  // Take first character
+            for (int i = 0; i < numChars; i++) shortNameBuffer.append(uppercaseLetters.get(i));
+        } else {
+            // No uppercase letters; check if there is at least one alphabetical character
+            if (alphabeticalCharacters.size() >= 1) {
+                shortNameBuffer.append(alphabeticalCharacters.get(0).toUpperCase());
+            } else {
+                // No alphabetical characters; take first character
+                shortNameBuffer.append(String.valueOf(name.charAt(0)).toUpperCase());
             }
         }
 
-        // Return the shortened name
-        return shortNameBuff.toString();
+        return shortNameBuffer.toString();
+    }
+
+    /**
+     * Converts the provided integer into a padded hexadecimal string.
+     *
+     * @param x Positive integer to convert.
+     * @return A 10-character hexadecimal string of the form <code>0xDDDDDDDD</code>.
+     */
+    public static String intAsPaddedHexStr(int x) {
+        // Use the built-in hexadecimal converter first
+        String initialHex = Integer.toHexString(x).toUpperCase();
+
+        // Add "0x" and remaining zeroes
+        return "0x" +
+                "0".repeat(8 - initialHex.length()) +
+                initialHex;
     }
 
     // Randomisation utils

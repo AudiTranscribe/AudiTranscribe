@@ -18,12 +18,12 @@
 
 package app.auditranscribe.io.audt_file.base.data_encapsulators;
 
-import app.auditranscribe.generic.ClassWithLogging;
+import app.auditranscribe.generic.LoggableClass;
 
 /**
  * Abstract AUDT data object class that stores the data needed.
  */
-public abstract class AbstractAUDTDataObject extends ClassWithLogging {
+public abstract class AbstractAUDTDataObject extends LoggableClass {
     // Abstract methods
 
     /**

@@ -1,6 +1,6 @@
 /*
  * UnitConversionUtils.java
- * Description: Unit conversion utility methods.
+ * Description: Unit conversion utilities.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -20,28 +20,32 @@ package app.auditranscribe.utils;
 
 import app.auditranscribe.generic.exceptions.FormatException;
 import app.auditranscribe.generic.exceptions.ValueException;
+import app.auditranscribe.music.MusicKey;
 
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Unit conversion utility methods.
+ * Unit conversion utilities.
  */
 public final class UnitConversionUtils {
     // Constants
-    static final double A_MIN = 1e-10;  // Minimum amplitude for `powerToDB`
+    static final double POWER_TO_DB_MIN_AMPLITUDE = 1e-10;
 
     private UnitConversionUtils() {
         // Private constructor to signal this is a utility class
     }
 
-    // Notes conversion
+    // Music unit conversion
 
     /**
      * Convert one or more note names to frequency.
      *
-     * @param note Note name.
+     * @param note Note string. Notes may be spelled out with optional accidentals or octave
+     *             numbers. The leading note name is case-insensitive. Sharps are indicated with
+     *             <code>#</code> or <code>♯</code>, flats may be indicated with <code>!</code>,
+     *             <code>b</code>, or <code>♭</code>.
      * @return Frequency of that note.
      */
     public static double noteToFreq(String note) {
@@ -75,10 +79,10 @@ public final class UnitConversionUtils {
 
         final Map<String, Integer> ACC_MAP = Map.of(
                 "#", 1,
+                "♯", 1,
                 "", 0,
                 "b", -1,
                 "!", -1,
-                "♯", 1,
                 "♭", -1
         );
 
@@ -115,29 +119,6 @@ public final class UnitConversionUtils {
     }
 
     /**
-     * Converts the note number to a frequency.
-     *
-     * @param noteNumber The note number. Note that a note number of 0 means the key C0.
-     * @return Frequency of the note with that note number. The returned frequency assumes that the
-     * notes have been tuned to A440.
-     */
-    public static double noteNumberToFreq(int noteNumber) {
-        return 440 * Math.pow(2, (noteNumber - 57.) / 12);
-    }
-
-    /**
-     * Converts the frequency to an estimated note number.
-     *
-     * @param freq Frequency of the note with that note number. The returned frequency assumes that
-     *             the notes have been tuned to A440.
-     * @return The estimated note number. This is a <b>double</b> and needs to be rounded. That
-     * task is left to another method and not this one.
-     */
-    public static double freqToNoteNumber(double freq) {
-        return 12 * MathUtils.log2(freq / 440) + 57;
-    }
-
-    /**
      * Converts a note number to its spelled note.<br>
      * Note that the note number for C0 is 0 and subsequent note numbers are given by their offset
      * from C0. For example, A4 has note number 57 as it is 57 notes away from C0.
@@ -148,44 +129,37 @@ public final class UnitConversionUtils {
      *                         instead of b) should be used.
      * @return Note string.
      */
-    public static String noteNumberToNote(int noteNumber, String musicKey, boolean fancyAccidentals) {
-        // Fancify music key
-        musicKey = MusicUtils.fancifyMusicString(musicKey);
-
+    public static String noteNumberToNote(int noteNumber, MusicKey musicKey, boolean fancyAccidentals) {
         // Compute the octave and the key value
         int octave = Math.floorDiv(noteNumber, 12);  // Note that C0 has note number 0, C1 is 12, C2 is 24 etc.
         int key = noteNumber % 12;  // 0 = C, 1 = C#/Db, 2 = D, 3 = D#/Eb etc.
 
         // Determine which set of note strings to use
         String[] noteStrings;
-        if (MusicUtils.doesKeyUseFlats(musicKey)) {
+        if (musicKey.usesFlats) {
             noteStrings = new String[]{"C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"};
         } else {
             noteStrings = new String[]{"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
         }
 
         // Replace notes if the key demands it
-        if (musicKey.equals("G♭ Major") ||
-                musicKey.equals("C♭ Major") ||
-                musicKey.equals("E♭ Minor") ||
-                musicKey.equals("A♭ Minor")) {
+        if (musicKey == MusicKey.G_FLAT_MAJOR || musicKey == MusicKey.C_FLAT_MAJOR ||
+                musicKey == MusicKey.E_FLAT_MINOR || musicKey == MusicKey.A_FLAT_MINOR) {
             noteStrings[11] = "Cb";  // Cb instead of B
 
             if (key == 11) octave++;  // Need to increase octave number by 1
         }
 
-        if (musicKey.equals("C♭ Major") || musicKey.equals("A♭ Minor")) {
+        if (musicKey == MusicKey.C_FLAT_MAJOR || musicKey == MusicKey.A_FLAT_MINOR) {
             noteStrings[4] = "Fb";  // Fb instead of E
         }
 
-        if (musicKey.equals("F♯ Major") ||
-                musicKey.equals("C♯ Major") ||
-                musicKey.equals("D♯ Minor") ||
-                musicKey.equals("A♯ Minor")) {
+        if (musicKey == MusicKey.F_SHARP_MAJOR || musicKey == MusicKey.C_SHARP_MAJOR ||
+                musicKey == MusicKey.D_SHARP_MINOR || musicKey == MusicKey.A_SHARP_MINOR) {
             noteStrings[5] = "E#";  // E# instead of F
         }
 
-        if (musicKey.equals("C♯ Major") || musicKey.equals("A♯ Minor")) {
+        if (musicKey == MusicKey.C_SHARP_MAJOR || musicKey == MusicKey.A_SHARP_MINOR) {
             noteStrings[0] = "B#";  // B# instead of C
             if (key == 0) octave--;  // Need to reduce octave number by 1
         }
@@ -234,6 +208,28 @@ public final class UnitConversionUtils {
         return midiNumber - 12;
     }
 
+    /**
+     * Converts the note number to a frequency.
+     *
+     * @param noteNumber The note number. Note that a note number of 0 means the key C0.
+     * @return Frequency of the note with that note number. The returned frequency assumes that the
+     * notes have been tuned to A440.
+     */
+    public static double noteNumberToFreq(int noteNumber) {
+        return 440 * Math.pow(2, (noteNumber - 57.) / 12);
+    }
+
+    /**
+     * Converts the frequency to an estimated note number.
+     *
+     * @param freq Frequency of the note with that note number.<br>
+     *             The returned frequency assumes that the notes have been tuned to A440.
+     * @return The estimated note number as a decimal number.
+     */
+    public static double freqToNoteNumber(double freq) {
+        return 12 * MathUtils.log2(freq / 440) + 57;
+    }
+
     // Audio unit conversion
 
     /**
@@ -241,8 +237,7 @@ public final class UnitConversionUtils {
      *
      * @param power  Input power.
      * @param refVal Value such that the amplitude <code>abs(power)</code> is scaled relative to
-     *               <code>refVal</code> using the formula
-     *               <code>10 * log10(power / refVal)</code>.
+     *               <code>refVal</code> using the formula <code>10 * log10(power / refVal)</code>.
      * @return Decibel value for the given power.
      * @implNote See
      * <a href="https://librosa.org/doc/main/_modules/librosa/core/spectrum.html#power_to_db">
@@ -253,8 +248,8 @@ public final class UnitConversionUtils {
         refVal = Math.abs(refVal);
 
         // Calculate decibel
-        double logSpec = 10 * Math.log10(Math.max(A_MIN, power));
-        logSpec -= 10 * Math.log10(Math.max(A_MIN, refVal));
+        double logSpec = 10 * Math.log10(Math.max(POWER_TO_DB_MIN_AMPLITUDE, power));
+        logSpec -= 10 * Math.log10(Math.max(POWER_TO_DB_MIN_AMPLITUDE, refVal));
 
         // Return it
         return logSpec;
@@ -274,7 +269,7 @@ public final class UnitConversionUtils {
      */
     public static double[][] powerToDecibel(double[][] S, double refVal, double topDB) {
         // Check that `topDB` is non-negative
-        if (topDB < 0) throw new ValueException("The value of `topDB` must be non-negative.");
+        if (topDB < 0) throw new ValueException("The threshold decibel (`topDB`) must be non-negative.");
 
         // Compute decibel values for all powers
         double maxDB = -Double.MAX_VALUE;
@@ -305,14 +300,14 @@ public final class UnitConversionUtils {
     }
 
     /**
-     * Convert an amplitude spectrogram to dB-scaled spectrogram.<br>
+     * Convert an amplitude value to a dB-scaled value.<br>
      * This is equivalent to <code>powerToDecibel(Math.pow(amplitude, 2))</code>, but is provided
      * for convenience.
      *
      * @param amplitude Input amplitude.
      * @param refVal    Value such that the amplitude <code>abs(power)</code> is scaled relative to
-     *                  <code>refVal</code> using the formula
-     *                  <code>20 * log10(power / refVal)</code>.
+     *                  <code>refVal</code> using the formula <code>20 * log10(power /
+     *                  refVal)</code>.
      * @return Decibel value for the given amplitude.
      * @implNote See
      * <a href="https://librosa.org/doc/main/_modules/librosa/core/spectrum.html#amplitude_to_db">
@@ -323,20 +318,20 @@ public final class UnitConversionUtils {
     }
 
     /**
-     * Method that converts a frequency in Hertz (Hz) into Mel frequency (Mels).
+     * Method that converts a frequency in Hertz (Hz) into mel frequency (mels).
      *
      * @param freq Frequency in Hertz.
-     * @return Frequency in Mel.
+     * @return Frequency in mel.
      */
     public static double hzToMel(double freq) {
         // Fill in the linear scale
         double fMin = 0;
-        double fSp = 66.66666666666667;  // Equals 200/3 to 16 sf
+        double fSp = 200. / 3;
         double mel = (freq - fMin) / fSp;
 
         // And now the log-scale
         double minLogHz = 1000.;                     // Beginning of log region (Hz)
-        double minLogMel = (minLogHz - fMin) / fSp;  // Same (Mels)
+        double minLogMel = (minLogHz - fMin) / fSp;
         double logstep = 0.06875177742094912;        // Step size for log region, equals `Math.log(6.4) / 27` to 16 sf
 
         if (freq >= minLogHz) {
@@ -356,12 +351,12 @@ public final class UnitConversionUtils {
     public static double melToHz(double mel) {
         // Fill in the linear scale
         double fMin = 0;
-        double fSp = 66.66666666666667;  // Equals 200/3 to 16 sf
+        double fSp = 200. / 3;
         double freq = fMin + fSp * mel;
 
         // And now the log-scale
         double minLogHz = 1000.;                     // Beginning of log region (Hz)
-        double minLogMel = (minLogHz - fMin) / fSp;  // Same (Mels)
+        double minLogMel = (minLogHz - fMin) / fSp;
         double logstep = 0.06875177742094912;        // Step size for log region, equals `Math.log(6.4) / 27` to 16 sf
 
         if (mel >= minLogMel) {
@@ -380,7 +375,7 @@ public final class UnitConversionUtils {
      * @return Octave number for the specified frequency.
      */
     public static double hzToOctaves(double hz) {
-        return MathUtils.log2(hz) - 4.781359713524660;  // log2(16/440) to 16 sf
+        return MathUtils.log2(hz) - 4.781359713524660;  // log2(hz) + log2(16/440), to 16 sf
     }
 
     // Time unit conversion
@@ -399,17 +394,6 @@ public final class UnitConversionUtils {
             samples[i] = (int) Math.round(times[i] * sampleRate);
         }
         return samples;
-    }
-
-    /**
-     * Method that converts sample indices into STFT frames.
-     *
-     * @param samples   Sample indices to convert.
-     * @param hopLength Hop length of the STFT.
-     * @return STFT frames corresponding to the given sample indices.
-     */
-    public static int[] samplesToFrames(int[] samples, int hopLength) {
-        return samplesToFrames(samples, hopLength, 0);
     }
 
     /**

@@ -21,8 +21,10 @@ package app.auditranscribe.utils;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.system.OSMethods;
 import app.auditranscribe.system.OSType;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
 
-import java.awt.Desktop;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -48,10 +50,7 @@ public final class GUIUtils {
         OSType os = OSMethods.getOS();
 
         if (os == OSType.WINDOWS || os == OSType.MAC) {
-            // Get the desktop instance
             Desktop desktop = Desktop.getDesktop();
-
-            // Try and browse to the URL
             try {
                 desktop.browse(new URI(url));
             } catch (IOException | URISyntaxException e) {
@@ -77,14 +76,16 @@ public final class GUIUtils {
         }
     }
 
+    /**
+     * Method that opens a specific folder in the file explorer of the OS.
+     *
+     * @param folderPath The <b>absolute</b> path to the folder.
+     */
     public static void openFolderInGUI(String folderPath) {
         OSType os = OSMethods.getOS();
 
         if (os == OSType.WINDOWS || os == OSType.MAC) {
-            // Get the desktop instance
             Desktop desktop = Desktop.getDesktop();
-
-            // Try and browse to the URL
             try {
                 desktop.open(new File(folderPath));
             } catch (IOException e) {
@@ -97,5 +98,43 @@ public final class GUIUtils {
             } catch (Exception ignored) {
             }
         }
+    }
+
+    /**
+     * Method that helps show a file dialog for the user to select a file.
+     *
+     * @param window  Window to show the file dialog on.
+     * @param filters Array of file filters to show in the file dialog.
+     * @return A <code>File</code> object, representing the selected file.
+     */
+    public static File openFileDialog(Window window, FileChooser.ExtensionFilter... filters) {
+        FileChooser fileChooser = new FileChooser();
+
+        for (FileChooser.ExtensionFilter filter : filters) {
+            fileChooser.getExtensionFilters().add(filter);
+        }
+
+        return fileChooser.showOpenDialog(window);
+    }
+
+    /**
+     * Method that helps show a dialog for the user to save a file.
+     *
+     * @param window          Window to show the file dialog on.
+     * @param initialFileName The initial save file name (without the extension).
+     * @param filters         Array of file filters to show in the file dialog.
+     * @return A <code>File</code> object, representing the location to save the file to.
+     */
+    public static File saveFileDialog(
+            Window window, String initialFileName, FileChooser.ExtensionFilter... filters
+    ) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialFileName(initialFileName);
+
+        for (FileChooser.ExtensionFilter filter : filters) {
+            fileChooser.getExtensionFilters().add(filter);
+        }
+
+        return fileChooser.showSaveDialog(window);
     }
 }

@@ -1,0 +1,16 @@
+.subheading-label {
+    -fx-font-weight: bold;
+    -fx-font-size: 12pt;
+}
+
+.subheading-info {
+    -fx-text-fill: text-colour-secondary;
+}
+
+.button.error {
+    -fx-border-color: error-border-colour;
+}
+
+.text-field.error {
+    -fx-border-color: error-border-colour;
+}

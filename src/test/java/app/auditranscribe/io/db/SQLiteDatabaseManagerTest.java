@@ -1,51 +1,34 @@
-/*
- * SQLiteDatabaseManagerTest.java
- * Description: Test interactions with SQLite databases.
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
- * Licence, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public Licence for more details.
- *
- * You should have received a copy of the GNU General Public Licence along with this program. If
- * not, see <https://www.gnu.org/licenses/>
- *
- * Copyright © AudiTranscribe Team
- */
-
 package app.auditranscribe.io.db;
 
 import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
 import org.junit.jupiter.api.*;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class SQLiteDatabaseManagerTest {
     // Test variables
-    SQLiteDatabaseManager manager;
+    static SQLiteDatabaseManager manager;
 
-    String createTableQuery1 = """
+    // Queries
+    static String createTableQuery1 = """
             CREATE TABLE IF NOT EXISTS "TestTable1" (
-                "id"	INTEGER,
+                "id"		INTEGER,
                 "field1"	INTEGER NOT NULL UNIQUE,
                 "field2"	TEXT,
                 "field3"	REAL UNIQUE,
                 PRIMARY KEY("id")
             );
             """;
-    String createTableQuery2 = """
+    static String createTableQuery2 = """
             CREATE TABLE IF NOT EXISTS "TestTable2" (
-                "id"	INTEGER,
+                "id"		INTEGER,
                 "field1"	INTEGER NOT NULL UNIQUE,
                 "field2"	TEXT,
                 "field3"	REAL UNIQUE,
@@ -53,23 +36,23 @@ class SQLiteDatabaseManagerTest {
             );
             """;
 
-    String dropTableQuery1 = """
+    static String dropTableQuery1 = """
             DROP TABLE "TestTable1";
             """;
-    String dropTableQuery2 = """
+    static String dropTableQuery2 = """
             DROP TABLE "TestTable2";
             """;
 
-    String insertOneEntry1 = """
+    static String insertOneEntry1 = """
             INSERT INTO "TestTable1" ("field1", "field2", "field3")
             VALUES (1, "Text1", 0.1);
             """;
-    String insertOneEntry2 = """
+    static String insertOneEntry2 = """
             INSERT INTO "TestTable2" ("field1", "field2", "field3")
             VALUES (?, ?, ?);
             """;
 
-    String insertMultipleEntries = """
+    static String insertMultipleEntries = """
             INSERT INTO "TestTable1" ("field1", "field2", "field3")
             VALUES
                 (2, "Text2", 0.2),
@@ -78,10 +61,10 @@ class SQLiteDatabaseManagerTest {
                 (5, "Text5", 0.5);
             """;
 
-    String getEntries1 = """
+    static String getEntries1 = """
             SELECT * FROM "TestTable1";
             """;
-    String getEntries2 = """
+    static String getEntries2 = """
             SELECT * FROM "TestTable2"
             WHERE "field2" = ?;
             """;
@@ -94,7 +77,7 @@ class SQLiteDatabaseManagerTest {
         manager = new SQLiteDatabaseManager(
                 IOMethods.joinPaths(
                         IOConstants.TARGET_FOLDER_ABSOLUTE_PATH, IOConstants.RESOURCES_FOLDER_PATH,
-                        "testing-files", "database", "test-database.db"
+                        "test-files", "general", "test-database.db"
                 )
         );
 

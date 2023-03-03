@@ -1,31 +1,14 @@
-/*
- * UnitConversionUtilsTest.java
- * Description: Test `UnitConversionUtils.java`.
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
- * Licence, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public Licence for more details.
- *
- * You should have received a copy of the GNU General Public Licence along with this program. If
- * not, see <https://www.gnu.org/licenses/>
- *
- * Copyright © AudiTranscribe Team
- */
-
 package app.auditranscribe.utils;
 
-import org.junit.jupiter.api.Test;
 import app.auditranscribe.generic.exceptions.FormatException;
 import app.auditranscribe.generic.exceptions.ValueException;
+import app.auditranscribe.music.MusicKey;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UnitConversionUtilsTest {
-    // Notes conversion
+    // Note unit conversion
     @Test
     void noteToFreq() {
         assertEquals(440, UnitConversionUtils.noteToFreq("A4"), 0.001);
@@ -80,66 +63,163 @@ class UnitConversionUtilsTest {
     }
 
     @Test
-    void noteNumberToFreq() {
-        assertEquals(440, UnitConversionUtils.noteNumberToFreq(57), 0.001);  // A4
-        assertEquals(16.352, UnitConversionUtils.noteNumberToFreq(0), 0.001);  // C0
-        assertEquals(15804.266, UnitConversionUtils.noteNumberToFreq(119), 0.001);  // B9
-    }
-
-    @Test
-    void freqToNoteNumber() {
-        assertEquals(57, UnitConversionUtils.freqToNoteNumber(440), 0.001);  // A4
-        assertEquals(0, UnitConversionUtils.freqToNoteNumber(16.352), 0.001);  // C0
-        assertEquals(119, UnitConversionUtils.freqToNoteNumber(15804.266), 0.001);  // B9
-    }
-
-    @Test
     void noteNumberToNote() {
-        assertEquals("C0", UnitConversionUtils.noteNumberToNote(0, "C Major", false));
-        assertEquals("C4", UnitConversionUtils.noteNumberToNote(48, "C Major", false));
-        assertEquals("F5", UnitConversionUtils.noteNumberToNote(65, "C Major", false));
-        assertEquals("G#6", UnitConversionUtils.noteNumberToNote(80, "C Major", false));
-        assertEquals("B9", UnitConversionUtils.noteNumberToNote(119, "C Major", false));
+        assertEquals(
+                "C0",
+                UnitConversionUtils.noteNumberToNote(0, MusicKey.C_MAJOR, false)
+        );
+        assertEquals(
+                "C4",
+                UnitConversionUtils.noteNumberToNote(48, MusicKey.C_MAJOR, false)
+        );
+        assertEquals(
+                "F5",
+                UnitConversionUtils.noteNumberToNote(65, MusicKey.C_MAJOR, false)
+        );
+        assertEquals(
+                "G#6",
+                UnitConversionUtils.noteNumberToNote(80, MusicKey.C_MAJOR, false)
+        );
+        assertEquals(
+                "B9",
+                UnitConversionUtils.noteNumberToNote(119, MusicKey.C_MAJOR, false)
+        );
 
-        assertEquals("C0", UnitConversionUtils.noteNumberToNote(0, "Gb Major", false));
-        assertEquals("E5", UnitConversionUtils.noteNumberToNote(64, "Gb Major", false));
-        assertEquals("F7", UnitConversionUtils.noteNumberToNote(89, "Gb Major", false));
-        assertEquals("Cb9", UnitConversionUtils.noteNumberToNote(107, "Gb Major", false));
+        assertEquals(
+                "C0",
+                UnitConversionUtils.noteNumberToNote(0, MusicKey.G_FLAT_MAJOR, false)
+        );
+        assertEquals(
+                "E5",
+                UnitConversionUtils.noteNumberToNote(64, MusicKey.G_FLAT_MAJOR, false)
+        );
+        assertEquals(
+                "F7",
+                UnitConversionUtils.noteNumberToNote(89, MusicKey.G_FLAT_MAJOR, false)
+        );
+        assertEquals(
+                "Cb9",
+                UnitConversionUtils.noteNumberToNote(107, MusicKey.G_FLAT_MAJOR, false)
+        );
 
-        assertEquals("C0", UnitConversionUtils.noteNumberToNote(0, "Eb Minor", false));
-        assertEquals("E5", UnitConversionUtils.noteNumberToNote(64, "Eb Minor", false));
-        assertEquals("F7", UnitConversionUtils.noteNumberToNote(89, "Eb Minor", false));
-        assertEquals("Cb9", UnitConversionUtils.noteNumberToNote(107, "Eb Minor", false));
+        assertEquals(
+                "C0",
+                UnitConversionUtils.noteNumberToNote(0, MusicKey.E_FLAT_MINOR, false)
+        );
+        assertEquals(
+                "E5",
+                UnitConversionUtils.noteNumberToNote(64, MusicKey.E_FLAT_MINOR, false)
+        );
+        assertEquals(
+                "F7",
+                UnitConversionUtils.noteNumberToNote(89, MusicKey.E_FLAT_MINOR, false)
+        );
+        assertEquals(
+                "Cb9",
+                UnitConversionUtils.noteNumberToNote(107, MusicKey.E_FLAT_MINOR, false)
+        );
 
-        assertEquals("C0", UnitConversionUtils.noteNumberToNote(0, "Cb Major", false));
-        assertEquals("Fb5", UnitConversionUtils.noteNumberToNote(64, "Cb Major", false));
-        assertEquals("F7", UnitConversionUtils.noteNumberToNote(89, "Cb Major", false));
-        assertEquals("Cb9", UnitConversionUtils.noteNumberToNote(107, "Cb Major", false));
+        assertEquals(
+                "C0",
+                UnitConversionUtils.noteNumberToNote(0, MusicKey.C_FLAT_MAJOR, false)
+        );
+        assertEquals(
+                "Fb5",
+                UnitConversionUtils.noteNumberToNote(64, MusicKey.C_FLAT_MAJOR, false)
+        );
+        assertEquals(
+                "F7",
+                UnitConversionUtils.noteNumberToNote(89, MusicKey.C_FLAT_MAJOR, false)
+        );
+        assertEquals(
+                "Cb9",
+                UnitConversionUtils.noteNumberToNote(107, MusicKey.C_FLAT_MAJOR, false)
+        );
 
-        assertEquals("C0", UnitConversionUtils.noteNumberToNote(0, "A♭ Minor", true));
-        assertEquals("F♭5", UnitConversionUtils.noteNumberToNote(64, "A♭ Minor", true));
-        assertEquals("F7", UnitConversionUtils.noteNumberToNote(89, "A♭ Minor", true));
-        assertEquals("C♭9", UnitConversionUtils.noteNumberToNote(107, "A♭ Minor", true));
+        assertEquals(
+                "C0",
+                UnitConversionUtils.noteNumberToNote(0, MusicKey.A_FLAT_MINOR, true)
+        );
+        assertEquals(
+                "F♭5",
+                UnitConversionUtils.noteNumberToNote(64, MusicKey.A_FLAT_MINOR, true)
+        );
+        assertEquals(
+                "F7",
+                UnitConversionUtils.noteNumberToNote(89, MusicKey.A_FLAT_MINOR, true)
+        );
+        assertEquals(
+                "C♭9",
+                UnitConversionUtils.noteNumberToNote(107, MusicKey.A_FLAT_MINOR, true)
+        );
 
-        assertEquals("C0", UnitConversionUtils.noteNumberToNote(0, "F♯ Major", true));
-        assertEquals("E5", UnitConversionUtils.noteNumberToNote(64, "F♯ Major", true));
-        assertEquals("E♯7", UnitConversionUtils.noteNumberToNote(89, "F♯ Major", true));
-        assertEquals("B9", UnitConversionUtils.noteNumberToNote(119, "F♯ Major", true));
+        assertEquals(
+                "C0",
+                UnitConversionUtils.noteNumberToNote(0, MusicKey.F_SHARP_MAJOR, true)
+        );
+        assertEquals(
+                "E5",
+                UnitConversionUtils.noteNumberToNote(64, MusicKey.F_SHARP_MAJOR, true)
+        );
+        assertEquals(
+                "E♯7",
+                UnitConversionUtils.noteNumberToNote(89, MusicKey.F_SHARP_MAJOR, true)
+        );
+        assertEquals(
+                "B9",
+                UnitConversionUtils.noteNumberToNote(119, MusicKey.F_SHARP_MAJOR, true)
+        );
 
-        assertEquals("C0", UnitConversionUtils.noteNumberToNote(0, "D♯ Minor", true));
-        assertEquals("E5", UnitConversionUtils.noteNumberToNote(64, "D♯ Minor", true));
-        assertEquals("E♯7", UnitConversionUtils.noteNumberToNote(89, "D♯ Minor", true));
-        assertEquals("B9", UnitConversionUtils.noteNumberToNote(119, "D♯ Minor", true));
+        assertEquals(
+                "C0",
+                UnitConversionUtils.noteNumberToNote(0, MusicKey.D_SHARP_MINOR, true)
+        );
+        assertEquals(
+                "E5",
+                UnitConversionUtils.noteNumberToNote(64, MusicKey.D_SHARP_MINOR, true)
+        );
+        assertEquals(
+                "E♯7",
+                UnitConversionUtils.noteNumberToNote(89, MusicKey.D_SHARP_MINOR, true)
+        );
+        assertEquals(
+                "B9",
+                UnitConversionUtils.noteNumberToNote(119, MusicKey.D_SHARP_MINOR, true)
+        );
 
-        assertEquals("B♯0", UnitConversionUtils.noteNumberToNote(12, "C♯ Major", true));
-        assertEquals("E5", UnitConversionUtils.noteNumberToNote(64, "C♯ Major", true));
-        assertEquals("E♯7", UnitConversionUtils.noteNumberToNote(89, "C♯ Major", true));
-        assertEquals("B9", UnitConversionUtils.noteNumberToNote(119, "C♯ Major", true));
+        assertEquals(
+                "B♯0",
+                UnitConversionUtils.noteNumberToNote(12, MusicKey.C_SHARP_MAJOR, true)
+        );
+        assertEquals(
+                "E5",
+                UnitConversionUtils.noteNumberToNote(64, MusicKey.C_SHARP_MAJOR, true)
+        );
+        assertEquals(
+                "E♯7",
+                UnitConversionUtils.noteNumberToNote(89, MusicKey.C_SHARP_MAJOR, true)
+        );
+        assertEquals(
+                "B9",
+                UnitConversionUtils.noteNumberToNote(119, MusicKey.C_SHARP_MAJOR, true)
+        );
 
-        assertEquals("B#0", UnitConversionUtils.noteNumberToNote(12, "A# Minor", false));
-        assertEquals("E5", UnitConversionUtils.noteNumberToNote(64, "A♯ Minor", true));
-        assertEquals("E♯7", UnitConversionUtils.noteNumberToNote(89, "A♯ Minor", true));
-        assertEquals("B9", UnitConversionUtils.noteNumberToNote(119, "A# Minor", false));
+        assertEquals(
+                "B#0",
+                UnitConversionUtils.noteNumberToNote(12, MusicKey.A_SHARP_MINOR, false)
+        );
+        assertEquals(
+                "E5",
+                UnitConversionUtils.noteNumberToNote(64, MusicKey.A_SHARP_MINOR, true)
+        );
+        assertEquals(
+                "E♯7",
+                UnitConversionUtils.noteNumberToNote(89, MusicKey.A_SHARP_MINOR, true)
+        );
+        assertEquals(
+                "B9",
+                UnitConversionUtils.noteNumberToNote(119, MusicKey.A_SHARP_MINOR, false)
+        );
     }
 
     @Test
@@ -162,6 +242,20 @@ class UnitConversionUtilsTest {
         assertEquals(-1, UnitConversionUtils.midiNumberToNoteNumber(-12));   // C-1
     }
 
+    @Test
+    void noteNumberToFreq() {
+        assertEquals(440, UnitConversionUtils.noteNumberToFreq(57), 0.001);  // A4
+        assertEquals(16.352, UnitConversionUtils.noteNumberToFreq(0), 0.001);  // C0
+        assertEquals(15804.266, UnitConversionUtils.noteNumberToFreq(119), 0.001);  // B9
+    }
+
+    @Test
+    void freqToNoteNumber() {
+        assertEquals(57, UnitConversionUtils.freqToNoteNumber(440), 0.001);  // A4
+        assertEquals(0, UnitConversionUtils.freqToNoteNumber(16.352), 0.001);  // C0
+        assertEquals(119, UnitConversionUtils.freqToNoteNumber(15804.266), 0.001);  // B9
+    }
+
     // Audio unit conversion
     @Test
     void powerToDecibel() {
@@ -178,7 +272,9 @@ class UnitConversionUtilsTest {
                 new double[][]{{-60, 0}, {10, 20}, {20, 10}},
                 UnitConversionUtils.powerToDecibel(new double[][]{{0, 1}, {10, 100}, {100, 10}}, 1, 80)
         );
-        assertThrowsExactly(ValueException.class, () -> UnitConversionUtils.powerToDecibel(new double[][]{{0, 1}, {10, 100}, {100, 10}}, 1, -1));
+        assertThrowsExactly(ValueException.class, () -> UnitConversionUtils.powerToDecibel(
+                new double[][]{{0, 1}, {10, 100}, {100, 10}}, 1, -1
+        ));
     }
 
     @Test
@@ -212,9 +308,9 @@ class UnitConversionUtilsTest {
 
     @Test
     void hzToOctaves() {
-        assertEquals(4, UnitConversionUtils.hzToOctaves(440), 1e-5);
-        assertEquals(6.21864, UnitConversionUtils.hzToOctaves(2048), 1e-5);
-        assertEquals(8.81028, UnitConversionUtils.hzToOctaves(12345), 1e-5);
+        assertEquals(4, UnitConversionUtils.hzToOctaves(440), 1e-10);
+        assertEquals(6.2186402865, UnitConversionUtils.hzToOctaves(2048), 1e-10);
+        assertEquals(8.8102795025, UnitConversionUtils.hzToOctaves(12345), 1e-10);
     }
 
     // Time unit conversion
@@ -226,7 +322,9 @@ class UnitConversionUtilsTest {
 
         // Define correct output arrays
         int[] correctOutput1 = {0, 2205, 4410, 6615, 8820, 11025, 13230, 15435, 17640, 19845};
-        int[] correctOutput2 = {44100, 55125, 66150, 77175, 88200, 99225, 110250, 121275, 132300, 143325, 154350, 165375};
+        int[] correctOutput2 = {
+                44100, 55125, 66150, 77175, 88200, 99225, 110250, 121275, 132300, 143325, 154350, 165375
+        };
 
         // Run tests
         assertArrayEquals(correctOutput1, UnitConversionUtils.timeToSamples(times1, 22050));
@@ -270,7 +368,7 @@ class UnitConversionUtilsTest {
         };
 
         // Run tests
-        assertArrayEquals(correctOutput1, UnitConversionUtils.samplesToFrames(samples1, 512));
+        assertArrayEquals(correctOutput1, UnitConversionUtils.samplesToFrames(samples1, 512, 0));
         assertArrayEquals(correctOutput2, UnitConversionUtils.samplesToFrames(samples2, 256, 1024));
     }
 
@@ -286,7 +384,9 @@ class UnitConversionUtilsTest {
 
         // Run tests
         assertArrayEquals(correctOutput1, UnitConversionUtils.timeToFrames(times1, 22050, 512));
-        assertArrayEquals(correctOutput2, UnitConversionUtils.timeToFrames(times2, 44100, 256, 1024));
+        assertArrayEquals(correctOutput2, UnitConversionUtils.timeToFrames(
+                times2, 44100, 256, 1024
+        ));
     }
 
     // Other unit conversions

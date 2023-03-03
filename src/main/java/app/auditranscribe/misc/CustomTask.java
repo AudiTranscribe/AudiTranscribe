@@ -1,6 +1,6 @@
 /*
  * CustomTask.java
- * Description: A custom task class where some protected methods are made public.
+ * Description: A custom task class extending the access of some methods of the JavaFX `Task` class.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -21,9 +21,9 @@ package app.auditranscribe.misc;
 import javafx.concurrent.Task;
 
 /**
- * A custom task class where some protected methods are made public.
+ * A custom task class extending the access of some methods of the JavaFX <code>Task</code> class.
  *
- * @param <V> Type of value that is returned by the custom task.
+ * @param <V> Type that is returned by the task.
  */
 @ExcludeFromGeneratedCoverageReport
 public abstract class CustomTask<V> extends Task<V> {
@@ -41,24 +41,13 @@ public abstract class CustomTask<V> extends Task<V> {
 
     /**
      * Initializes a new instance of the <code>CustomTask</code> class.<br>
-     * This assumes that the name of the task is the message of the task.
+     * Uses the message of the task as the name of the task.
      */
     public CustomTask() {
         this.name = this.getMessage();
     }
 
     // Public methods
-
-    /**
-     * Alias to {@link #updateMessage(String)}.
-     *
-     * @param s The message to set.
-     */
-    public void setMessage(String s) {
-        updateMessage(s);
-    }
-
-    // Overridden methods
     @Override
     public void updateProgress(long current, long total) {
         super.updateProgress(current, total);
@@ -73,7 +62,4 @@ public abstract class CustomTask<V> extends Task<V> {
     public void updateMessage(String s) {
         super.updateMessage(s);
     }
-
-    @Override
-    abstract protected V call() throws Exception;
 }

@@ -1,6 +1,6 @@
 /*
  * ProjectsDB.java
- * Description: Class that interfaces with the projects' database.
+ * Description: Manages the interactions with the projects database.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -30,12 +30,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Class that interfaces with the projects' database.
+ * Manages the interactions with the projects database.
  */
 @ExcludeFromGeneratedCoverageReport
 public class ProjectsDB {
     // Constants
-    public static int SQL_DATABASE_VERSION = 0x00070001;  // Database version 0.7.0, revision 1 -> 00 07 00 01
+    public static String PROJECTS_DB_NAME = "Projects.db";
+    public static String PROJECTS_DB_PATH = IOMethods.joinPaths(
+            IOConstants.APP_DATA_FOLDER_PATH, PROJECTS_DB_NAME
+    );
+    public static int PROJECTS_DB_VERSION = 0x000B0001;  // Database version 0.11.0, revision 1 -> 00 0B 00 01
 
     // SQL Queries
     static String SQL_CREATE_PROJECTS_TABLE = """
@@ -76,12 +80,6 @@ public class ProjectsDB {
             WHERE "filepath" = ?;
             """;
 
-    // Constants
-    public static String PROJECT_FILE_LIST_DB_NAME = "Projects.db";
-    public static String PROJECT_FILE_LIST_DB_PATH = IOMethods.joinPaths(
-            IOConstants.APP_DATA_FOLDER_PATH, PROJECT_FILE_LIST_DB_NAME
-    );
-
     // Attributes
     final SQLiteDatabaseManager dbManager;
 
@@ -91,10 +89,7 @@ public class ProjectsDB {
      * @throws SQLException If something went wrong when executing the SQL query.
      */
     public ProjectsDB() throws SQLException {
-        // Create a database manager object
-        dbManager = new SQLiteDatabaseManager(PROJECT_FILE_LIST_DB_PATH);
-
-        // Start connection with the database
+        dbManager = new SQLiteDatabaseManager(PROJECTS_DB_PATH);
         dbManager.dbConnect();
 
         // Prepare to create the database tables
@@ -105,36 +100,60 @@ public class ProjectsDB {
         // (Note: in general, modifying the SQL query like this is insecure and not safe. However, since we control
         // the `SQL_DATABASE_VERSION`, this will be safe.)
         try (ResultSet resultSet = dbManager.executeGetQuery(
-                "SELECT COUNT(*) AS X FROM \"Version\";"
+                "SELECT COUNT(*) AS n FROM \"Version\";"
         )) {
             if (resultSet.next()) {
-                if (resultSet.getInt("X") == 0) {
+                if (resultSet.getInt("n") == 0) {
                     dbManager.executeUpdate(
-                            "INSERT INTO \"Version\" VALUES (" + SQL_DATABASE_VERSION + ");"
+                            "INSERT INTO \"Version\" VALUES (" + PROJECTS_DB_VERSION + ");"
                     );
                 } else {
                     dbManager.executeUpdate(
-                            "UPDATE \"Version\" SET version_number = " + SQL_DATABASE_VERSION + ";"
+                            "UPDATE \"Version\" SET version_number = " + PROJECTS_DB_VERSION + ";"
                     );
                 }
             }
         }
 
-        // Close connection with database
+        // Once all updates are done we disconnect
         dbManager.dbDisconnect();
     }
 
     // Public methods
 
     /**
+     * Method that inserts a new project record into the database.
+     *
+     * @param filepath    <b>Absolute</b> path to the project file.
+     * @param projectName Name of the project that is being added.
+     * @throws SQLException If something went wrong when executing the SQL query.<br>
+     *                      Specifically, for this method, a <code>SQLException</code> would likely
+     *                      be due to a <code>UNIQUE</code> constraint failure; i.e. there already
+     *                      exists a project file with the same file path as the current record.
+     */
+    public void insertProjectRecord(String filepath, String projectName) throws SQLException {
+        dbManager.dbConnect();
+
+        // Insert project record into database
+        try (PreparedStatement insertProjectStatement = dbManager.prepareStatement(SQL_INSERT_PROJECT_RECORD)) {
+            insertProjectStatement.setString(1, filepath);
+            insertProjectStatement.setString(2, projectName);
+
+            dbManager.executeUpdate(insertProjectStatement);
+        }
+
+        // Once insert is complete we disconnect
+        dbManager.dbDisconnect();
+    }
+
+    /**
      * Method that gets all the projects' details.
      *
-     * @return Map of all the projects. Key is the database primary key and values are the filepath
-     * and project name in that order.
+     * @return Map of all the projects.<br>
+     * Key is the database primary key. Values are the filepath and project name in that order.
      * @throws SQLException If something went wrong when executing the SQL query.
      */
     public Map<Integer, Pair<String, String>> getAllProjects() throws SQLException {
-        // Start connection with the database
         dbManager.dbConnect();
 
         // Process data
@@ -152,10 +171,8 @@ public class ProjectsDB {
             }
         }
 
-        // Close connection with database
+        // Once retrieval is complete we disconnect
         dbManager.dbDisconnect();
-
-        // Return the map
         return allProjects;
     }
 
@@ -168,26 +185,21 @@ public class ProjectsDB {
      * @throws SQLException If something went wrong when executing the SQL query.
      */
     public int getPKOfProjectWithFilepath(String filepath) throws SQLException {
-        // Start connection with the database
         dbManager.dbConnect();
 
         // Query the database for the PK of the project
         int pk = -1;
 
         try (PreparedStatement getIDStatement = dbManager.prepareStatement(SQL_GET_ID_OF_PROJECT_WITH_FILEPATH)) {
-            // Prepare the statement for execution
             getIDStatement.setString(1, filepath);
 
-            // Execute the statement
             try (ResultSet resultSet = dbManager.executeGetQuery(getIDStatement)) {
                 if (resultSet.next()) pk = resultSet.getInt("id");
             }
         }
 
-        // Close connection with database
+        // Once retrieval is complete we disconnect
         dbManager.dbDisconnect();
-
-        // Return the found primary key
         return pk;
     }
 
@@ -201,74 +213,21 @@ public class ProjectsDB {
      * @throws SQLException If something went wrong when executing the SQL query.
      */
     public boolean checkIfProjectDoesNotExist(String filepath) throws SQLException {
-        // Start connection with the database
         dbManager.dbConnect();
 
+        // Query database for existence of the project with the given filepath
         boolean projectDoesNotExist = true;
         try (PreparedStatement checkProjectStatement = dbManager.prepareStatement(SQL_CHECK_IF_PROJECT_EXISTS)) {
-            // Prepare the statement for execution
             checkProjectStatement.setString(1, filepath);
 
-            // Execute the statement
             try (ResultSet resultSet = dbManager.executeGetQuery(checkProjectStatement)) {
                 if (resultSet.next()) projectDoesNotExist = false;
             }
         }
 
-        // Close connection with database
+        // Once retrieval is complete we disconnect
         dbManager.dbDisconnect();
-
-        // Return the `projectDoesNotExist` flag
         return projectDoesNotExist;
-    }
-
-    /**
-     * Method that inserts a new project record into the database.
-     *
-     * @param filepath    <b>Absolute</b> path to the project file.
-     * @param projectName Name of the project that is being added.
-     * @throws SQLException If something went wrong when executing the SQL query.<br>
-     *                      Specifically, for this method, a <code>SQLException</code> would likely
-     *                      be due to a <code>UNIQUE</code> constraint failure; i.e. there already
-     *                      exists a project file with the same file path as the current record.
-     */
-    public void insertProjectRecord(String filepath, String projectName) throws SQLException {
-        // Start connection with the database
-        dbManager.dbConnect();
-
-        try (PreparedStatement insertProjectStatement = dbManager.prepareStatement(SQL_INSERT_PROJECT_RECORD)) {
-            // Prepare the statement for execution
-            insertProjectStatement.setString(1, filepath);
-            insertProjectStatement.setString(2, projectName);
-
-            // Execute the statement
-            dbManager.executeUpdate(insertProjectStatement);
-        }
-
-        // Close connection with database
-        dbManager.dbDisconnect();
-    }
-
-    /**
-     * Method that deletes a specific project's record from the database.
-     *
-     * @param key Primary key of the record in the database.
-     * @throws SQLException If something went wrong when executing the SQL query.
-     */
-    public void deleteProjectRecord(int key) throws SQLException {
-        // Start connection with the database
-        dbManager.dbConnect();
-
-        try (PreparedStatement deleteProjectStatement = dbManager.prepareStatement(SQL_DELETE_PROJECT_RECORD)) {
-            // Prepare the statement for execution
-            deleteProjectStatement.setInt(1, key);
-
-            // Execute the statement
-            dbManager.executeUpdate(deleteProjectStatement);
-        }
-
-        // Close connection with database
-        dbManager.dbDisconnect();
     }
 
     /**
@@ -279,19 +238,37 @@ public class ProjectsDB {
      * @throws SQLException If something went wrong when executing the SQL query.
      */
     public void updateProjectName(String filepath, String newProjectName) throws SQLException {
-        // Start connection with the database
         dbManager.dbConnect();
 
+        // Update the project's name
         try (PreparedStatement updateProjectNameStatement = dbManager.prepareStatement(SQL_UPDATE_PROJECT_NAME)) {
-            // Prepare the statement for execution
             updateProjectNameStatement.setString(1, newProjectName);
             updateProjectNameStatement.setString(2, filepath);
 
-            // Execute the statement
             dbManager.executeUpdate(updateProjectNameStatement);
         }
 
-        // Close connection with database
+        // Once update is complete we disconnect
+        dbManager.dbDisconnect();
+    }
+
+    /**
+     * Method that deletes a specific project's record from the database.
+     *
+     * @param key Primary key of the record in the database.
+     * @throws SQLException If something went wrong when executing the SQL query.
+     */
+    public void deleteProjectRecord(int key) throws SQLException {
+        dbManager.dbConnect();
+
+        // Find and delete the record with the given key
+        try (PreparedStatement deleteProjectStatement = dbManager.prepareStatement(SQL_DELETE_PROJECT_RECORD)) {
+            deleteProjectStatement.setInt(1, key);
+
+            dbManager.executeUpdate(deleteProjectStatement);
+        }
+
+        // Once deletion is complete we disconnect
         dbManager.dbDisconnect();
     }
 }

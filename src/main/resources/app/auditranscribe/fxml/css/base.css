@@ -1,0 +1,265 @@
+/* IMPORT FONTS */
+@font-face {
+    font-family: "Roboto";
+    font-style: normal;
+    font-weight: 400;
+    src: url("../fonts/Roboto-Regular.ttf");
+}
+
+@font-face {
+    font-family: "Roboto";
+    font-style: bold;
+    font-weight: 700;
+    src: url("../fonts/Roboto-Bold.ttf");
+}
+
+@font-face {
+    font-family: "Roboto";
+    font-style: italic;
+    font-weight: 400;
+    src: url("../fonts/Roboto-Italic.ttf");
+}
+
+/* GENERAL STYLING */
+/* Fonts Setup */
+* {
+    -fx-font-family: "Roboto", "Arial", "Open Sans", sans-serif;
+}
+
+/* Buttons */
+.button {
+    -fx-background-color: button-default-colour;
+    -fx-background-insets: 0 0 -1 0, 0, 1, 2;
+    -fx-background-radius: 3px;
+    -fx-border-radius: 3px;
+    -fx-text-fill: text-colour-primary;
+}
+
+.button:hover {
+    -fx-background-color: button-hover-colour;
+    -fx-cursor: hand;
+}
+
+.button:selected {
+    -fx-background-color: button-selected-colour;
+}
+
+.image-button {
+    -fx-background-color: transparent;
+}
+
+.ok-button {
+    -fx-border-radius: 2px;
+    -fx-background-color: ok-button-default-colour;
+}
+
+.ok-button:hover {
+    -fx-background-color: ok-button-hover-colour;
+}
+
+/* Hyperlinks */
+.hyperlink, .hyperlink:hover {
+    -fx-cursor: hand;
+    -fx-text-fill: text-colour-hyperlink;
+}
+
+.hyperlink {
+    -fx-font-size: 14px;
+}
+
+.hyperlink:focused {
+    -fx-border-color: #00000000; /* Transparent */
+}
+
+/* Spinners/Choice Boxes */
+.choice-box, .spinner {
+    -fx-background-color: background-colour-secondary;
+    -fx-background-insets: 0, 1px;
+}
+
+.choice-box .menu-item {
+    -fx-background-color: background-colour-secondary;
+}
+
+.choice-box .menu-item .label {
+    -fx-text-fill: text-colour-primary;
+}
+
+.choice-box .menu-item:focused {
+    -fx-cursor: hand;
+    -fx-background-color: background-colour-tertiary;
+}
+
+.spinner .text-field {
+    -fx-text-fill: text-colour-primary;
+    -fx-background-color: transparent;
+}
+
+.arrow, .left-arrow, .right-arrow, .increment-arrow, .decrement-arrow {
+    -fx-background-color: text-colour-primary;
+    -fx-cursor: hand;
+}
+
+.spinner .increment-arrow-button, .spinner .decrement-arrow-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 1px;
+    -fx-cursor: hand;
+}
+
+.spinner .increment-arrow-button:hover, .spinner .decrement-arrow-button:hover {
+    -fx-background-color: background-colour-secondary;
+    -fx-border-width: 0;
+}
+
+/* Progress bars */
+.progress-bar .track {
+    -fx-background-color: progress-bar-unfilled-colour;
+}
+
+.progress-bar .bar {
+    -fx-background-color: progress-bar-filled-colour;
+}
+
+/* Labels and texts */
+.label {
+    -fx-text-fill: text-colour-primary;
+}
+
+/* Text fields */
+.text-field {
+    -fx-background-color: text-field-background-colour;
+    -fx-background-radius: 5px;
+    -fx-font-size: 10pt;
+    -fx-text-fill: text-field-text-colour;
+    -fx-prompt-text-fill: text-field-prompt-colour;
+    -fx-border-radius: 5px;
+}
+
+/* Scrollbar */
+.scroll-bar:horizontal {
+    -fx-pref-height: 12px;
+}
+
+.scroll-bar:vertical {
+    -fx-pref-width: 12px;
+}
+
+.scroll-bar:horizontal .track, .scroll-bar:vertical .track {
+    -fx-background-color: background-colour-primary;
+    -fx-border-color: transparent;
+    -fx-background-radius: 0;
+}
+
+.scroll-bar:horizontal .thumb, .scroll-bar:vertical .thumb {
+    -fx-background-color: scrollbar-colour;
+    -fx-border-color: transparent;
+    -fx-background-radius: 10px;
+}
+
+.scroll-bar:horizontal .increment-arrow, .scroll-bar:horizontal .decrement-arrow,
+.scroll-bar:vertical .increment-arrow, .scroll-bar:vertical .decrement-arrow {
+    -fx-padding: 0 0 0 0;
+}
+
+.scroll-bar:horizontal .increment-button, .scroll-bar:horizontal .decrement-button,
+.scroll-bar:vertical .increment-button, .scroll-bar:vertical .decrement-button {
+    -fx-padding: 0 0 0 0;
+    -fx-background-insets: 0 0 0 0, 0 0 0 0, 0 0 0 0, 0 0 0 0 0;
+}
+
+.scroll-bar:horizontal .increment-button:hover, .scroll-bar:horizontal .decrement-button:hover,
+.scroll-bar:vertical .increment-button:hover, .scroll-bar:vertical .decrement-button:hover {
+    -fx-fill: button-hover-colour;
+    -fx-cursor: hand;
+}
+
+/* Sliders */
+.slider:horizontal .track, .slider:vertical .track {
+    -slider-unfilled-colour: slider-track-unfilled-colour;
+    -slider-filled-colour: slider-track-filled-colour;
+}
+
+.slider .thumb {
+    -fx-background-color: slider-thumb-colour;
+    -fx-border-color: stroke-colour;
+    -fx-border-width: 1px;
+    -fx-border-radius: 50%;
+}
+
+/* SVG Classes */
+.svg-path {
+    -fx-stroke: stroke-colour;
+    -fx-fill: stroke-colour;
+}
+
+/* Radio Buttons */
+.radio-button {
+    -fx-text-fill: text-colour-secondary;
+}
+
+.radio-button .radio {
+    -fx-background-color: radio-button-background-colour;
+    -fx-padding: 5px;
+    -fx-border-radius: 50%;
+    -fx-border-width: 1px;
+    -fx-border-color: radio-button-border-colour;
+}
+
+.radio-button .dot {
+    -fx-background-radius: 50%;
+    -fx-padding: 4px;
+}
+
+.radio-button:selected .dot {
+    -fx-translate-y: -1px; /* Weird correction factor but whatever */
+    -fx-background-color: radio-button-dot-colour;
+}
+
+/* Other setup */
+.root {
+    -fx-background-color: background-colour-primary;
+
+    -fx-mark-color: text-colour-primary;
+    -fx-focused-mark-color: text-colour-primary;
+
+    -fx-focus-color: focus-colour;
+    -fx-faint-focus-color: rgba(0, 0, 0, 0);
+}
+
+.separator *.line {
+    -fx-border-color: separator-colour;
+    -fx-border-style: solid;
+    -fx-border-width: 0.5px;
+}
+
+/* Menus */
+.context-menu {
+    -fx-padding: 0;
+    -fx-border-color: separator-colour;
+    -fx-border-width: 1px;
+}
+
+.context-menu .separator > .line {
+    -fx-border-color: background-colour-tertiary;
+    -fx-border-insets: 0;
+}
+
+/* Menu bar */
+.menu-bar {
+    -fx-background-color: background-colour-secondary;
+}
+
+.menu:hover {
+    -fx-cursor: hand;
+    -fx-background-color: background-colour-primary;
+}
+
+.menu-button:focused, .menu-button:showing, .menu-item {
+    -fx-background-color: background-colour-primary;
+}
+
+.menu-item:hover {
+    -fx-cursor: hand;
+    -fx-background-color: background-colour-secondary;
+}

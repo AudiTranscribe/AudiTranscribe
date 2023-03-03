@@ -41,6 +41,8 @@ public class Version implements Comparable<Version> {
         }
     }
 
+    // Public methods
+
     @Override
     public int compareTo(Version another) {
         // Get the longer of the two versions

@@ -1,0 +1,8 @@
+.download-ffmpeg-label {
+    -fx-font-size: 16pt;
+    -fx-font-weight: bold;
+}
+
+.download-description {
+    -fx-font-style: italic;
+}

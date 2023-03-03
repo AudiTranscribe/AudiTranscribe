@@ -22,10 +22,12 @@ import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.data_files.JSONDataFile;
 import app.auditranscribe.io.data_files.data_encapsulators.PersistentData;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 
 /**
  * Handles the interactions with the persistent data file.
  */
+@ExcludeFromGeneratedCoverageReport
 public class PersistentDataFile extends JSONDataFile<PersistentData> {
     /**
      * Initialization method for a <code>PersistentDataFile</code> object.

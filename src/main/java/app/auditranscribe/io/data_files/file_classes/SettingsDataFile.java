@@ -22,10 +22,12 @@ import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.data_files.JSONDataFile;
 import app.auditranscribe.io.data_files.data_encapsulators.SettingsData;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 
 /**
  * Handles the interactions with the settings file.
  */
+@ExcludeFromGeneratedCoverageReport
 public class SettingsDataFile extends JSONDataFile<SettingsData> {
     /**
      * Initialization method for a new <code>SettingsDataFile</code> object.

@@ -19,13 +19,14 @@
 package app.auditranscribe.io.audt_file.base.data_encapsulators;
 
 import app.auditranscribe.generic.tuples.Triple;
-import app.auditranscribe.io.CompressionHandlers;
-import app.auditranscribe.misc.CustomTask;
-import app.auditranscribe.utils.ByteConversionUtils;
-import app.auditranscribe.utils.TypeConversionUtils;
+import app.auditranscribe.io.ByteConversionHandlers;
 import app.auditranscribe.io.audt_file.AUDTFileHelpers;
+import app.auditranscribe.misc.CustomTask;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+import app.auditranscribe.utils.TypeConversionUtils;
 
-import java.io.IOException;
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Data object that stores the Q-Transform data.
@@ -36,29 +37,59 @@ public abstract class QTransformDataObject extends AbstractAUDTDataObject {
 
     // Attributes
     public byte[] qTransformBytes;
-
     public double minMagnitude;
     public double maxMagnitude;
 
     // Public methods
 
     /**
-     * Method that converts given Q-Transform magnitude data to byte data.
+     * Converts the provided magnitudes into attributes' values.
      *
-     * @param qTransformMagnitudes The Q-Transform magnitude data to convert.
-     * @param task                 The <code>CustomTask</code>object that is handling the
-     *                             generation. Pass in <code>null</code> if no such task is being
-     *                             used.
+     * @param magnitudes Magnitudes of the spectrogram.
+     * @param task       A <code>CustomTask</code> instance used to track the compression
+     *                   progress.<br>
+     *                   Pass in <code>null</code> if not using a task.
+     */
+    public abstract void setDataUsingMagnitudes(double[][] magnitudes, CustomTask<?> task);
+
+    /**
+     * Converts the attributes' values to magnitude data.
+     *
+     * @return Magnitude data.
+     */
+    public abstract double[][] obtainMagnitudesFromData();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        QTransformDataObject that = (QTransformDataObject) o;
+        return Arrays.equals(qTransformBytes, that.qTransformBytes) &&
+                Double.compare(that.minMagnitude, minMagnitude) == 0 &&
+                Double.compare(that.maxMagnitude, maxMagnitude) == 0;
+    }
+
+    @Override
+    @ExcludeFromGeneratedCoverageReport
+    public int hashCode() {
+        int result = Objects.hash(minMagnitude, maxMagnitude);
+        result = 31 * result + Arrays.hashCode(qTransformBytes);
+        return result;
+    }
+
+    // Protected methods
+
+    /**
+     * Helper method that converts the provided magnitudes into byte data.
+     *
+     * @param magnitudes The Q-Transform magnitude data to convert.
      * @return Triplet of values. First value is the byte data. Second value is the minimum
      * magnitude of the Q-Transform data. Final value is the maximum magnitude of the Q-Transform
      * data.
-     * @throws IOException If something went wrong when compressing the bytes.
      */
-    public static Triple<Byte[], Double, Double> qTransformMagnitudesToByteData(
-            double[][] qTransformMagnitudes, CustomTask<?> task
-    ) throws IOException {
+    protected static Triple<Byte[], Double, Double> magnitudesToUncompressedByteDataHelper(double[][] magnitudes) {
         // Convert the double data to integer data
-        Triple<Integer[][], Double, Double> convertedTuple = AUDTFileHelpers.doubles2DtoInt2D(qTransformMagnitudes);
+        Triple<Integer[][], Double, Double> convertedTuple = AUDTFileHelpers.doubles2DtoInt2D(magnitudes);
         Integer[][] intData = convertedTuple.value0();
         double min = convertedTuple.value1();
         double max = convertedTuple.value2();
@@ -70,34 +101,8 @@ public abstract class QTransformDataObject extends AbstractAUDTDataObject {
         }
 
         // Convert the integer data to bytes
-        byte[] plainBytes = ByteConversionUtils.twoDimensionalIntegerArrayToBytes(intDataPrimitive);
+        byte[] plainBytes = ByteConversionHandlers.twoDimensionalIntegerArrayToBytes(intDataPrimitive);
 
-        // Compress the bytes
-        byte[] bytes = CompressionHandlers.lz4Compress(plainBytes, task);
-
-        // Return the bytes and the min and max values
-        return new Triple<>(TypeConversionUtils.toByteArray(bytes), min, max);
-    }
-
-    /**
-     * Method that converts given byte data to a Q-Transform magnitude data.
-     *
-     * @param bytes        The byte data to convert.
-     * @param minMagnitude The minimum magnitude of the Q-Transform data.
-     * @param maxMagnitude The maximum magnitude of the Q-Transform data.
-     * @return The Q-Transform magnitude data.
-     * @throws IOException If something went wrong when decompressing the bytes.
-     */
-    public static double[][] byteDataToQTransformMagnitudes(
-            byte[] bytes, double minMagnitude, double maxMagnitude
-    ) throws IOException {
-        // Decompress the bytes
-        byte[] plainBytes = CompressionHandlers.lz4Decompress(bytes);
-
-        // Convert bytes to 2D integer array
-        int[][] intData = ByteConversionUtils.bytesToTwoDimensionalIntegerArray(plainBytes);
-
-        // Finally convert the integer data to double
-        return AUDTFileHelpers.int2DtoDoubles2D(intData, minMagnitude, maxMagnitude);
+        return new Triple<>(TypeConversionUtils.toByteArray(plainBytes), min, max);
     }
 }

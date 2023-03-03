@@ -1,6 +1,6 @@
 /*
  * AUDTFileReader.java
- * Description: Class that handles the reading of the AudiTranscribe (AUDT) file.
+ * Description: Handles the reading of the AudiTranscribe file.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -18,18 +18,20 @@
 
 package app.auditranscribe.io.audt_file.base;
 
-import app.auditranscribe.generic.ClassWithLogging;
+import app.auditranscribe.generic.LoggableClass;
+import app.auditranscribe.io.ByteConversionHandlers;
 import app.auditranscribe.io.CompressionHandlers;
 import app.auditranscribe.io.audt_file.AUDTFileConstants;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import app.auditranscribe.io.audt_file.v0x00050002.AUDTFileReader0x00050002;
-import app.auditranscribe.io.audt_file.v0x00070001.AUDTFileReader0x00070001;
-import app.auditranscribe.io.audt_file.v0x00080001.AUDTFileReader0x00080001;
-import app.auditranscribe.io.audt_file.v0x00090002.AUDTFileReader0x00090002;
-import app.auditranscribe.io.exceptions.FailedToReadDataException;
-import app.auditranscribe.io.exceptions.IncorrectFileFormatException;
-import app.auditranscribe.io.exceptions.InvalidFileVersionException;
-import app.auditranscribe.utils.ByteConversionUtils;
+import app.auditranscribe.io.audt_file.v0x000500.AUDTFileReader0x000500;
+import app.auditranscribe.io.audt_file.v0x000700.AUDTFileReader0x000700;
+import app.auditranscribe.io.audt_file.v0x000800.AUDTFileReader0x000800;
+import app.auditranscribe.io.audt_file.v0x000900.AUDTFileReader0x000900;
+import app.auditranscribe.io.audt_file.v0x000B00.AUDTFileReader0x000B00;
+import app.auditranscribe.io.audt_file.InvalidFileVersionException;
+import app.auditranscribe.misc.CustomLogger;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+import app.auditranscribe.utils.MiscUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -38,13 +40,12 @@ import java.util.Arrays;
 import java.util.logging.Level;
 
 /**
- * Class that handles the reading of the AudiTranscribe (AUDT) file.
+ * Handles the reading of the AudiTranscribe file.
  */
-public abstract class AUDTFileReader extends ClassWithLogging {
+public abstract class AUDTFileReader extends LoggableClass {
     // Attributes
     public final String filepath;
     public int fileFormatVersion;
-    public int compressorVersion;
 
     protected final byte[] bytes;
     protected int bytePos = 0;  // Position of the NEXT byte to read
@@ -57,11 +58,10 @@ public abstract class AUDTFileReader extends ClassWithLogging {
      * @param inputStream Input stream of the file.
      * @throws IOException                  If something went wrong when reading the AUDT file.
      * @throws IncorrectFileFormatException If the file was formatted incorrectly.
-     * @throws InvalidFileVersionException  If the LZ4 version is outdated.
      */
     public AUDTFileReader(
             String filepath, InputStream inputStream
-    ) throws IOException, IncorrectFileFormatException, InvalidFileVersionException {
+    ) throws IOException, IncorrectFileFormatException {
         // Update attributes
         this.filepath = filepath;
 
@@ -111,18 +111,28 @@ public abstract class AUDTFileReader extends ClassWithLogging {
             // Try and get the file version
             inputStream.skipNBytes(20L);  // First 20 is the header
             byte[] fileVersionBytes = inputStream.readNBytes(4);  // 4 bytes per integer
-            fileVersion = ByteConversionUtils.bytesToInt(fileVersionBytes);
+            fileVersion = ByteConversionHandlers.bytesToInt(fileVersionBytes);
         }
 
         try (InputStream inputStream = new FileInputStream(filepath)) {  // Do this so that the read point is the start
-            // Get the appropriate file reader objects
-            return switch (fileVersion) {
-                case 0x00050002 -> new AUDTFileReader0x00050002(filepath, inputStream);
-                case 0x00070001 -> new AUDTFileReader0x00070001(filepath, inputStream);
-                case 0x00080001 -> new AUDTFileReader0x00080001(filepath, inputStream);
-                case 0x00090002 -> new AUDTFileReader0x00090002(filepath, inputStream);
-                default -> throw new InvalidFileVersionException("Invalid file version '" + fileVersion + "'.");
+            AUDTFileReader reader = switch (fileVersion) {
+                case 0x00050002 -> new AUDTFileReader0x000500(filepath, inputStream);
+                case 0x00070001 -> new AUDTFileReader0x000700(filepath, inputStream);
+                case 0x00080001 -> new AUDTFileReader0x000800(filepath, inputStream);
+                case 0x00090002 -> new AUDTFileReader0x000900(filepath, inputStream);
+                case 0x000B0003 -> new AUDTFileReader0x000B00(filepath, inputStream);
+                default -> throw new InvalidFileVersionException(
+                        "Invalid file version '" + MiscUtils.intAsPaddedHexStr(fileVersion) + "'."
+                );
             };
+
+            CustomLogger.log(
+                    Level.INFO,
+                    "Using version " + MiscUtils.intAsPaddedHexStr(fileVersion) + " AUDT file reader",
+                    AUDTFileReader.class.getName()
+            );
+
+            return reader;
         }
     }
 
@@ -133,43 +143,49 @@ public abstract class AUDTFileReader extends ClassWithLogging {
      *
      * @return A <code>UnchangingDataPropertiesObject</code> that encapsulates all the unchanging
      * data's properties.
-     * @throws FailedToReadDataException If the program failed to read the data from the file.
+     * @throws DataReadFailedException If the program failed to read the data from the file.
      */
-    public abstract UnchangingDataPropertiesObject readUnchangingDataProperties() throws FailedToReadDataException;
+    public abstract UnchangingDataPropertiesObject readUnchangingDataProperties() throws DataReadFailedException;
 
     /**
      * Method that reads the Q-Transform data from the file.
      *
      * @return A <code>QTransformDataObject</code> that encapsulates all the data that are needed
      * for the Q-Transform matrix.
-     * @throws FailedToReadDataException If the program failed to read the data from the file.
+     * @throws DataReadFailedException If the program failed to read the data from the file.
      */
-    public abstract QTransformDataObject readQTransformData() throws FailedToReadDataException;
+    public abstract QTransformDataObject readQTransformData() throws DataReadFailedException;
 
     /**
      * Method that reads the audio data from the file.
      *
      * @return A <code>AudioDataObject</code> that encapsulates all the audio data.
-     * @throws FailedToReadDataException If the program failed to read the data from the file.
+     * @throws DataReadFailedException If the program failed to read the data from the file.
      */
-    public abstract AudioDataObject readAudioData() throws FailedToReadDataException;
+    public abstract AudioDataObject readAudioData() throws DataReadFailedException;
 
     /**
      * Method that reads the project info data from the file.
      *
      * @return A <code>ProjectInfoDataObject</code> that encapsulates all the project's info.
-     * @throws FailedToReadDataException If the program failed to read the data from the file.
+     * @throws DataReadFailedException If the program failed to read the data from the file.
      */
-    public abstract ProjectInfoDataObject readProjectInfoData() throws FailedToReadDataException;
+    public abstract ProjectInfoDataObject readProjectInfoData() throws DataReadFailedException;
 
     /**
      * Method that reads the music notes data from the file.
      *
      * @return A <code>MusicNotesDataObject</code> that encapsulates all the music notes data.
-     * @throws FailedToReadDataException If the program failed to read the data from the file.
-     * @throws IOException               If something went wrong during reading the file.
+     * @throws DataReadFailedException If the program failed to read the data from the file.
+     * @throws IOException             If something went wrong during reading the file.
      */
-    public abstract MusicNotesDataObject readMusicNotesData() throws FailedToReadDataException, IOException;
+    public abstract MusicNotesDataObject readMusicNotesData() throws DataReadFailedException, IOException;
+
+    @Override
+    @ExcludeFromGeneratedCoverageReport
+    public void log(Level level, String msg) {
+        log(level, msg, AUDTFileReader.class.getName());
+    }
 
     // Protected methods
 
@@ -193,7 +209,6 @@ public abstract class AUDTFileReader extends ClassWithLogging {
             }
         }
 
-        // Otherwise, both checks passed => bytes match
         return true;
     }
 
@@ -202,32 +217,36 @@ public abstract class AUDTFileReader extends ClassWithLogging {
      *
      * @return Boolean, where <code>true</code> means that the file format is correct and
      * <code>false</code> otherwise.
-     * @throws InvalidFileVersionException If the LZ4 version is not current.
      */
-    protected boolean verifyHeaderSection() throws InvalidFileVersionException {
-        // Check if the first 20 bytes follows the AUDT file header
-        byte[] first20Bytes = Arrays.copyOfRange(bytes, 0, 20);
-        if (!checkBytesMatch(AUDTFileConstants.AUDT_FILE_HEADER, first20Bytes)) {
+    protected boolean verifyHeaderSection() {
+        // Check if the first 16 bytes follows the AUDT file heading
+        byte[] first16Bytes = Arrays.copyOfRange(bytes, 0, 16);
+        if (!checkBytesMatch(AUDTFileConstants.AUDT_FILE_HEADING, first16Bytes)) {
             return false;
         }
 
-        // Update byte position
-        bytePos = 20;
-
-        // Get the file format version and the compressor version
-        fileFormatVersion = readInteger();
-        compressorVersion = readInteger();
-
-        // Check if the compressor version is outdated
-        if (compressorVersion < AUDTFileConstants.COMPRESSOR_VERSION_NUMBER) {
-            throw new InvalidFileVersionException(
-                    "Outdated compressor version (compressor version is " + compressorVersion +
-                            " but current version is " + AUDTFileConstants.COMPRESSOR_VERSION_NUMBER + ")"
-            );
+        // Check if the next 4 bytes is the AUDT magic constant
+        byte[] next4Bytes = Arrays.copyOfRange(bytes, 16, 20);
+        if (!checkBytesMatch(AUDTFileConstants.AUDT_MAGIC_CONSTANT, next4Bytes)) {
+            return false;
         }
+
+        // Get the file format version
+        bytePos = 20;
+        fileFormatVersion = readInteger();
+        skipBytes(4);  // Older versions may use compressor version instead of magic constant
 
         // Verify that the header ends with an end-of-section delimiter
         return checkEOSDelimiter();
+    }
+
+    /**
+     * Helper method that skips the specified number of bytes.
+     *
+     * @param numBytesToSkip Number of bytes to skip.
+     */
+    protected void skipBytes(int numBytesToSkip) {
+        bytePos += numBytesToSkip;
     }
 
     /**
@@ -241,7 +260,7 @@ public abstract class AUDTFileReader extends ClassWithLogging {
         bytePos += 2;
 
         // Convert these short bytes back into a short and return
-        return ByteConversionUtils.bytesToShort(shortBytes);
+        return ByteConversionHandlers.bytesToShort(shortBytes);
     }
 
     /**
@@ -255,7 +274,7 @@ public abstract class AUDTFileReader extends ClassWithLogging {
         bytePos += 4;
 
         // Convert these integer bytes back into an integer and return
-        return ByteConversionUtils.bytesToInt(integerBytes);
+        return ByteConversionHandlers.bytesToInt(integerBytes);
     }
 
     /**
@@ -269,7 +288,7 @@ public abstract class AUDTFileReader extends ClassWithLogging {
         bytePos += 8;
 
         // Convert these double bytes back into a double and return
-        return ByteConversionUtils.bytesToDouble(doubleBytes);
+        return ByteConversionHandlers.bytesToDouble(doubleBytes);
     }
 
     /**
@@ -286,7 +305,7 @@ public abstract class AUDTFileReader extends ClassWithLogging {
         bytePos += numBytes;
 
         // Convert these string bytes back into a string and return
-        return ByteConversionUtils.bytesToString(stringBytes);
+        return ByteConversionHandlers.bytesToString(stringBytes);
     }
 
     /**
@@ -323,7 +342,7 @@ public abstract class AUDTFileReader extends ClassWithLogging {
         byte[] decompressedBytes = CompressionHandlers.lz4Decompress(compressedBytes);
 
         // Convert these bytes back into the 1D array and return
-        return ByteConversionUtils.bytesToOneDimensionalIntegerArray(decompressedBytes);
+        return ByteConversionHandlers.bytesToOneDimensionalIntegerArray(decompressedBytes);
     }
 
     /**
@@ -343,7 +362,7 @@ public abstract class AUDTFileReader extends ClassWithLogging {
         byte[] decompressedBytes = CompressionHandlers.lz4Decompress(compressedBytes);
 
         // Convert these bytes back into the 1D array and return
-        return ByteConversionUtils.bytesToOneDimensionalDoubleArray(decompressedBytes);
+        return ByteConversionHandlers.bytesToOneDimensionalDoubleArray(decompressedBytes);
     }
 
     /**
@@ -386,9 +405,25 @@ public abstract class AUDTFileReader extends ClassWithLogging {
         return checkBytesMatch(AUDTFileConstants.AUDT_END_OF_FILE_DELIMITER, eofBytes);
     }
 
-    // Overridden methods
-    @Override
-    public void log(Level level, String msg) {
-        log(level, msg, AUDTFileReader.class.getName());
+    // Exceptions
+
+    /**
+     * Exception to mark that the program failed to read the data stored in an AUDT file.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static class DataReadFailedException extends Exception {
+        public DataReadFailedException(String message) {
+            super(message);
+        }
+    }
+
+    /**
+     * Exception to mark that the AUDT file does not have the correct file format.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static class IncorrectFileFormatException extends Exception {
+        public IncorrectFileFormatException(String message) {
+            super(message);
+        }
     }
 }

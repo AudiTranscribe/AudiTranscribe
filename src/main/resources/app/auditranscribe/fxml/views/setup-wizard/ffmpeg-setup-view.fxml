@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<TabPane fx:id="rootPane" prefHeight="400.0" prefWidth="600.0" styleClass="root-tab-pane" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.auditranscribe.fxml.views.setup_wizard.controllers.FFmpegSetupViewController">
+   <tabs>
+      <Tab text="Do you have FFmpeg?">
+         <content>
+            <AnchorPane prefHeight="400.0" prefWidth="600.0">
+               <children>
+                  <VBox spacing="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
+                     <children>
+                        <Label text="AudiTranscibe needs FFmpeg to function. " textAlignment="JUSTIFY" wrapText="true">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="85.0" layoutY="10.0" text="FFmpeg is a complete, cross-platform solution to record, convert and stream audio and video." textAlignment="JUSTIFY" wrapText="true">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="85.0" layoutY="40.0" text="AudiTranscribe uses it to help process different audio files." textAlignment="JUSTIFY" wrapText="true">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
+                     <padding>
+                        <Insets left="75.0" right="75.0" />
+                     </padding>
+                  </VBox>
+                  <Label alignment="CENTER" styleClass="question-label" text="Do you have FFmpeg installed?" textAlignment="JUSTIFY" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="280.0">
+                     <padding>
+                        <Insets left="75.0" right="75.0" />
+                     </padding>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <HBox alignment="CENTER" prefHeight="40.0" spacing="10.0" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="75.0" AnchorPane.rightAnchor="75.0">
+                     <children>
+                        <Button fx:id="hasFFmpegButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefWidth="250.0" text="Yes" wrapText="true" HBox.hgrow="ALWAYS" />
+                        <Button fx:id="doNotHaveFFmpegButton" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefWidth="250.0" text="No" wrapText="true" HBox.hgrow="ALWAYS" />
+                     </children>
+                  </HBox>
+               </children>
+            </AnchorPane>
+         </content>
+      </Tab>
+      <Tab text="Automatic or manual installation?">
+         <content>
+            <AnchorPane prefHeight="400.0" prefWidth="600.0">
+               <children>
+                  <VBox spacing="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
+                     <children>
+                        <Label text="You can choose to install FFmpeg automatically or manually." textAlignment="JUSTIFY" wrapText="true">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label text="An automatic installation will download and install FFmpeg into the application data directory of AudiTranscribe." textAlignment="JUSTIFY" wrapText="true">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="85.0" layoutY="40.0" text="A manual installation will bring you to the installation instructions page." textAlignment="JUSTIFY" wrapText="true">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
+                     <padding>
+                        <Insets left="75.0" right="75.0" />
+                     </padding>
+                  </VBox>
+                  <Label alignment="CENTER" styleClass="question-label" text="What do you want to do?" textAlignment="JUSTIFY" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="280.0">
+                     <padding>
+                        <Insets left="75.0" right="75.0" />
+                     </padding>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <HBox alignment="CENTER" prefHeight="40.0" spacing="10.0" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="75.0" AnchorPane.rightAnchor="75.0">
+                     <children>
+                        <Button fx:id="automaticInstallationButton" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefWidth="250.0" text="Automatic Installation" wrapText="true" HBox.hgrow="ALWAYS" />
+                        <Button fx:id="manualInstallationButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefWidth="250.0" text="Manual Installation" wrapText="true" HBox.hgrow="ALWAYS" />
+                     </children>
+                  </HBox>
+               </children>
+            </AnchorPane>
+         </content>
+      </Tab>
+      <Tab text="FFmpeg Installation Instructions">
+         <content>
+            <AnchorPane prefHeight="400.0" prefWidth="600.0">
+               <children>
+                  <VBox spacing="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
+                     <children>
+                        <Label text="Here's a guide on how to install FFmpeg manually." textAlignment="JUSTIFY" wrapText="true">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label text="1. Go to the homepage of the FFmpeg project." textAlignment="JUSTIFY" wrapText="true">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <HBox spacing="1.0">
+                           <children>
+                              <Label text="(" textAlignment="JUSTIFY" wrapText="true" HBox.hgrow="ALWAYS">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <Hyperlink fx:id="ffmpegHyperlink" text="https://ffmpeg.org/">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <padding>
+                                    <Insets left="-2.0" right="-2.0" />
+                                 </padding>
+                              </Hyperlink>
+                              <Label text=")" textAlignment="JUSTIFY" wrapText="true" HBox.hgrow="ALWAYS">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                           <padding>
+                              <Insets left="15.0" top="-10.0" />
+                           </padding>
+                        </HBox>
+                        <Label text="2. Click on &quot;Download&quot;." textAlignment="JUSTIFY" wrapText="true">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label text="3. Under &quot;more downloading options&quot;, find your operating system." textAlignment="JUSTIFY" wrapText="true">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label text="4. Download the package for your operating system." textAlignment="JUSTIFY" wrapText="true">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label text="5. Follow the installation instructions within the downloaded package." textAlignment="JUSTIFY" wrapText="true">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
+                     <padding>
+                        <Insets left="75.0" right="75.0" />
+                     </padding>
+                  </VBox>
+                  <Label alignment="CENTER" styleClass="question-label" text="Click on the button when FFmpeg is installed." textAlignment="JUSTIFY" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="280.0">
+                     <padding>
+                        <Insets left="75.0" right="75.0" />
+                     </padding>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <Button fx:id="confirmInstallFFmpegButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="40.0" text="I've Installed FFmpeg" wrapText="true" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="75.0" AnchorPane.rightAnchor="75.0" />
+               </children>
+            </AnchorPane>
+         </content>
+      </Tab>
+      <Tab text="Specify FFmpeg path">
+         <content>
+            <AnchorPane prefHeight="400.0" prefWidth="600.0">
+               <children>
+                  <VBox spacing="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
+                     <children>
+                        <Label text="Please specify the path to the FFmpeg binary:" textAlignment="JUSTIFY" wrapText="true">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <HBox spacing="5.0">
+                           <children>
+                              <TextField fx:id="ffmpegPathTextField" prefHeight="30.0" HBox.hgrow="ALWAYS" />
+                              <Button fx:id="selectFFmpegBinaryButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" text="F" />
+                           </children>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets left="75.0" right="75.0" />
+                     </padding>
+                  </VBox>
+                  <Label alignment="CENTER" styleClass="question-label" text="Click the button when the FFmpeg path is specified." textAlignment="JUSTIFY" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="280.0">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                     <padding>
+                        <Insets left="75.0" right="75.0" />
+                     </padding>
+                  </Label>
+                  <Button fx:id="checkFFmpegPathButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="40.0" text="Check FFmpeg Path" wrapText="true" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="75.0" AnchorPane.rightAnchor="75.0" />
+               </children>
+            </AnchorPane>
+         </content>
+      </Tab>
+      <Tab text="Cannot find FFmpeg">
+         <content>
+            <AnchorPane prefHeight="400.0" prefWidth="600.0">
+               <children>
+                  <VBox spacing="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
+                     <children>
+                        <Label text="Unfortunately, AudiTranscribe was unable to download FFmpeg, or find the local FFmpeg binary." textAlignment="JUSTIFY" wrapText="true">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="85.0" layoutY="40.0" text="If this is the first time seeing this message, that means that the program failed to download or locate FFmpeg automatically." textAlignment="JUSTIFY" wrapText="true">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label text="If you specified a manual path, AudiTranscribe was unable to locate FFmpeg there." textAlignment="JUSTIFY" wrapText="true">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="85.0" layoutY="110.0" text="You may consider specifying the FFmpeg path manually, or read the instructions on how to install FFmpeg again." textAlignment="JUSTIFY" wrapText="true">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
+                     <padding>
+                        <Insets left="75.0" right="75.0" />
+                     </padding>
+                  </VBox>
+                  <Label alignment="CENTER" styleClass="question-label" text="What do you want to do?" textAlignment="JUSTIFY" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="280.0">
+                     <padding>
+                        <Insets left="75.0" right="75.0" />
+                     </padding>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <HBox alignment="CENTER" prefHeight="40.0" spacing="10.0" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="75.0" AnchorPane.rightAnchor="75.0">
+                     <children>
+                        <Button fx:id="specifyManuallyButton" layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefWidth="250.0" text="Specify Manual Path" wrapText="true" HBox.hgrow="ALWAYS" />
+                        <Button fx:id="seeInstructionsButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefWidth="250.0" text="See Installation Instructions" wrapText="true" HBox.hgrow="ALWAYS" />
+                     </children>
+                  </HBox>
+               </children>
+            </AnchorPane>
+         </content>
+      </Tab>
+      <Tab text="Finish FFmpeg Setup">
+         <content>
+            <AnchorPane prefHeight="400.0" prefWidth="600.0">
+               <children>
+                  <VBox spacing="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="25.0">
+                     <children>
+                        <Label text="AudiTranscribe has located a valid FFmpeg binary." textAlignment="JUSTIFY" wrapText="true">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                        <Label text="The FFmpeg portion of the setup is complete." textAlignment="JUSTIFY" wrapText="true">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
+                     <padding>
+                        <Insets left="75.0" right="75.0" />
+                     </padding>
+                  </VBox>
+                  <Button fx:id="continueButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="40.0" text="Continue To Next Section" wrapText="true" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="75.0" AnchorPane.rightAnchor="75.0" />
+               </children>
+            </AnchorPane>
+         </content>
+      </Tab>
+   </tabs>
+   <stylesheets>
+      <URL value="@../../css/base.css" />
+      <URL value="@../../css/views/setup-wizard/common.css" />
+      <URL value="@../../css/views/setup-wizard/setup-ffmpeg-view.css" />
+      <URL value="@../../css/theme/shared-colours.css" />
+      <URL value="@../../css/theme/light.css" />
+   </stylesheets>
+</TabPane>

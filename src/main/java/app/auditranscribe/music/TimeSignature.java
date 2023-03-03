@@ -83,8 +83,6 @@ public enum TimeSignature {
         return null;
     }
 
-    // Overridden methods
-
     @Override
     public String toString() {
         return displayText();

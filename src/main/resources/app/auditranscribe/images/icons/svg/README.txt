@@ -1,4 +1,4 @@
-These SVG files were adapted from https://clarity.design/icons.
+These SVG files were adapted from https://core.clarity.design/foundation/icons/shapes/.
 
 The design of the icons are the same as those used in those SVG files, but the content have been changed in order to be
 compatible with JavaFX.

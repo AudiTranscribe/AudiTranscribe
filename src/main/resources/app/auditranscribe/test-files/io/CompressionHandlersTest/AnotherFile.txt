@@ -1,0 +1,2 @@
+This is another file to test the ZIP compression.
+Spam and eggs

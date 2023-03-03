@@ -1,21 +1,3 @@
-/*
- * MiscUtilsTest.java
- * Description: Test `MiscUtils.java`.
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the
- * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
- * Licence, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
- * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public Licence for more details.
- *
- * You should have received a copy of the GNU General Public Licence along with this program. If
- * not, see <https://www.gnu.org/licenses/>
- *
- * Copyright © AudiTranscribe Team
- */
-
 package app.auditranscribe.utils;
 
 import org.junit.jupiter.api.Test;
@@ -30,6 +12,7 @@ import java.util.TimeZone;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MiscUtilsTest {
+    // Time methods
     @Test
     void getUnixTimestamp() {
         // Define three clocks for testing
@@ -72,8 +55,9 @@ class MiscUtilsTest {
         assertEquals("38", MiscUtils.formatDate(date3, "yy"));
     }
 
+    // Bit manipulation methods
     @Test
-    void setBits() {
+    void getNumSetBits() {
         assertEquals(0, MiscUtils.getNumSetBits(0));
         assertEquals(1, MiscUtils.getNumSetBits(1));
         assertEquals(2, MiscUtils.getNumSetBits(2));
@@ -83,6 +67,7 @@ class MiscUtilsTest {
         assertEquals(21, MiscUtils.getNumSetBits(1924282));
     }
 
+    // Other manipulation methods
     @Test
     void getShortenedName() {
         assertEquals("A", MiscUtils.getShortenedName("Abracadabra"));
@@ -96,6 +81,15 @@ class MiscUtilsTest {
         assertEquals("?", MiscUtils.getShortenedName("    "));
     }
 
+    @Test
+    void intAsPaddedHexStr() {
+        assertEquals("0x00000005", MiscUtils.intAsPaddedHexStr(5));
+        assertEquals("0x0000000D", MiscUtils.intAsPaddedHexStr(13));
+        assertEquals("0x0000ABCD", MiscUtils.intAsPaddedHexStr(43981));
+        assertEquals("0x1234ABCD", MiscUtils.intAsPaddedHexStr(305441741));
+    }
+
+    // Randomisation utils
     @Test
     void generateUUID() {
         assertEquals("af487555-f3e8-354d-9add-85857f8e566f", MiscUtils.generateUUID(12345));

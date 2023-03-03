@@ -18,6 +18,11 @@
 
 package app.auditranscribe.io.audt_file.base.data_encapsulators;
 
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * Data object that stores the audio data.
  */
@@ -26,8 +31,26 @@ public abstract class AudioDataObject extends AbstractAUDTDataObject {
     public static final int SECTION_ID = 3;
 
     // Attributes
-    public byte[] compressedOriginalMP3Bytes;
-    public byte[] compressedSlowedMP3Bytes;
+    public byte[] mp3Bytes;
     public double sampleRate;
     public int totalDurationInMS;
+
+    // Public methods
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AudioDataObject that = (AudioDataObject) o;
+        return Arrays.equals(mp3Bytes, that.mp3Bytes) &&
+                Double.compare(that.sampleRate, sampleRate) == 0 &&
+                totalDurationInMS == that.totalDurationInMS;
+    }
+
+    @Override
+    @ExcludeFromGeneratedCoverageReport
+    public int hashCode() {
+        int result = Objects.hash(sampleRate, totalDurationInMS);
+        result = 31 * result + Arrays.hashCode(mp3Bytes);
+        return result;
+    }
 }

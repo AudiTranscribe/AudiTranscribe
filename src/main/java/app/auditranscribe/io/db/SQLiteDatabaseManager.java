@@ -1,6 +1,6 @@
 /*
  * SQLiteDatabaseManager.java
- * Description: Class that helps manage the interactions with an SQLite3 database.
+ * Description: Manages the interactions with an SQLite database.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -22,6 +22,9 @@ import app.auditranscribe.io.IOMethods;
 
 import java.sql.*;
 
+/**
+ * Manages the interactions with an SQLite database.
+ */
 public class SQLiteDatabaseManager {
     // Constants
     public static final String ACCESS_METHOD_STRING = "jdbc:sqlite:";
@@ -36,22 +39,22 @@ public class SQLiteDatabaseManager {
     /**
      * Initialization method for a <code>SQLiteDatabaseManager</code> to access a SQLite3 database.
      *
-     * @param databaseAbsolutePath Absolute file path to the SQLite3 database.
+     * @param dbPath The <b>absolute</b> file path to the SQLite3 database.
      */
-    public SQLiteDatabaseManager(String databaseAbsolutePath) {
+    public SQLiteDatabaseManager(String dbPath) {
         // Set path to the database
-        this.databaseAbsolutePath = databaseAbsolutePath;
+        this.databaseAbsolutePath = dbPath;
 
         // Attempt creation of the database file
-        IOMethods.createFile(databaseAbsolutePath);
+        IOMethods.createFile(dbPath);
     }
 
     // Public methods
 
     /**
-     * Method that helps connect to the SQLite3 database.
+     * Method that connects to the SQLite3 database.
      *
-     * @throws SQLException If a database access error occurs, or the url is <code>null</code>.
+     * @throws SQLException If a database access error occurs, or if the url is <code>null</code>.
      */
     public void dbConnect() throws SQLException {
         // Attempt to connect to the database
@@ -77,7 +80,7 @@ public class SQLiteDatabaseManager {
     }
 
     /**
-     * Helper method that prepares an SQL statement.
+     * Method that prepares an SQL statement.
      *
      * @param sqlStatement Statement to be prepared.
      * @return Prepared SQL statement. (aka parameterized query)

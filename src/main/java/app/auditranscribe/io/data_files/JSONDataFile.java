@@ -18,7 +18,7 @@
 
 package app.auditranscribe.io.data_files;
 
-import app.auditranscribe.io.exceptions.FailedToMakeJSONFileException;
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
@@ -29,20 +29,21 @@ import java.lang.reflect.InvocationTargetException;
 
 /**
  * Abstract class that helps handle interactions with JSON files.
+ *
+ * @param <T> Class that stores the data from the JSON file.
  */
 public abstract class JSONDataFile<T> {
     // Attributes
     public final String filePath;
 
     public Class<T> cls;
-
     public T data;
 
     /**
      * Initialization method for a <code>JSONDataFile</code> object.
      *
      * @param filePath <b>Absolute</b> file path to the JSON file.
-     * @param cls      Class to use.
+     * @param cls      Class that stores the data from the JSON file.
      */
     public JSONDataFile(String filePath, Class<T> cls) {
         // Update attributes
@@ -61,7 +62,7 @@ public abstract class JSONDataFile<T> {
                 createNewFile();
             } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
                      IllegalAccessException e1) {
-                throw new FailedToMakeJSONFileException(e1);
+                throw new CreateFailedException(e1);
             }
         } catch (IOException | JsonSyntaxException e) {
             throw new JsonIOException(e);
@@ -77,10 +78,9 @@ public abstract class JSONDataFile<T> {
         // Create the GSON object
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
+        // Try writing to the settings data file
         try (Writer writer = new FileWriter(filePath)) {
-            // Try writing to the settings data file
             gson.toJson(data, writer);
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -98,5 +98,17 @@ public abstract class JSONDataFile<T> {
 
         // Write that data to the settings file
         saveFile();
+    }
+
+    // Exceptions
+
+    /**
+     * Exception thrown when a JSON file could not be created.
+     */
+    @ExcludeFromGeneratedCoverageReport
+    public static class CreateFailedException extends RuntimeException {
+        public CreateFailedException(Throwable cause) {
+            super(cause);
+        }
     }
 }

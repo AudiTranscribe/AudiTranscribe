@@ -18,6 +18,10 @@
 
 package app.auditranscribe.io.audt_file.base.data_encapsulators;
 
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+
+import java.util.Arrays;
+
 /**
  * Data object that stores the music notes' data.
  */
@@ -29,4 +33,24 @@ public abstract class MusicNotesDataObject extends AbstractAUDTDataObject {
     public double[] timesToPlaceRectangles;
     public double[] noteDurations;
     public int[] noteNums;
+
+    // Public methods
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MusicNotesDataObject that = (MusicNotesDataObject) o;
+        return Arrays.equals(timesToPlaceRectangles, that.timesToPlaceRectangles) &&
+                Arrays.equals(noteDurations, that.noteDurations) &&
+                Arrays.equals(noteNums, that.noteNums);
+    }
+
+    @Override
+    @ExcludeFromGeneratedCoverageReport
+    public int hashCode() {
+        int result = Arrays.hashCode(timesToPlaceRectangles);
+        result = 31 * result + Arrays.hashCode(noteDurations);
+        result = 31 * result + Arrays.hashCode(noteNums);
+        return result;
+    }
 }
