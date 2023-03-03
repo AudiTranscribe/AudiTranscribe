@@ -35,10 +35,7 @@ public final class IOConstants {
     public static final String USER_HOME_PATH = System.getProperty("user.home");
     public static final String TEMP_FOLDER_PATH = System.getProperty("java.io.tmpdir");
 
-//    public static final String APP_DATA_FOLDER_PATH = IOMethods.getApplicationDataDirectory();
-    public static final String APP_DATA_FOLDER_PATH = IOMethods.joinPaths(
-            IOMethods.getApplicationDataDirectory(), "v0.11.0"  // Todo remove
-    );
+    public static final String APP_DATA_FOLDER_PATH = IOMethods.getApplicationDataDirectory();
     public static final String PROJECT_BACKUPS_FOLDER_PATH = IOMethods.joinPaths(
             IOConstants.APP_DATA_FOLDER_PATH, "project_backups"
     );
