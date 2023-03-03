@@ -1,8 +1,6 @@
 # AudiTranscribe Changelog
 
-## [0.11.0](https://github.com/AudiTranscribe/AudiTranscribe/compare/v0.10.0...v0.11.0) (????-??-??)
-
-Todo: update release date; add the rest of the changes here
+## [0.11.0](https://github.com/AudiTranscribe/AudiTranscribe/compare/v0.10.0...v0.11.0) (2023-03-03)
 
 This release comes with massive changes to the overall look and feel of AudiTranscribe.
 
@@ -52,7 +50,7 @@ In addition, this update also
 - Changed default update playback scheduler period from 50ms to 10ms.
     - This should make the playback line move more smoothly.
 - Switched order of music key and BPM on the project setup page.
--
+- Swapped the order of the theme setup and FFmpeg setup views.
 
 ### Fixes
 
@@ -63,7 +61,13 @@ In addition, this update also
 - Fixed an issue where `NoteRectangle`s' timestamp used could cause collisions in UUIDs.
     - Now, using nanosecond precision, this should be fixed.
 - Fixed issue with `null` `worker` at end of audio.
-- Fixed missing "hand" icon when focusing on the menu item of a choicebox.
+- Fixed missing "hand" icon when focusing on the menu item of a choice box.
+- Fixed an issue where a failure to check if there is an audio object caused a soft lock where the program fails to
+  quit.
+- Fixed an issue where the keyboard shortcuts do not work if the current focus is on a spinner's text field or if its on
+  a spinner.
+- Fixed an issue where, after deleting a project from the homepage, empty list cells were highlighted.
+- Fixed weird hyperlink click areas on the "about" view.
 
 ### Technical Changes
 
@@ -147,6 +151,11 @@ In addition, this update also
 - Merged all classes in the `scene_switcher` package into `SceneSwitcher`.
 - Updated some tests to use the `beforeAll()` initializer.
 - Removed redundant CSS 'parent selectors'.
+- Move transcription scene closing code into new method.
+- Fix exception popups' headings.
+- Renamed some variables' names so that they are shorter.
+- Moved class-specific exceptions into their own classes; removed redundant `exception` packages.
+- Renamed `FFmpegHandler` to `FFmpeg`.
 
 ## [0.10.0](https://github.com/AudiTranscribe/AudiTranscribe/compare/v0.9.3...v0.10.0) (2023-01-20)
 
