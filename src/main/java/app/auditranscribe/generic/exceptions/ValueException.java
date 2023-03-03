@@ -18,6 +18,8 @@
 
 package app.auditranscribe.generic.exceptions;
 
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+
 /**
  * Exception to mark when an operation or function receives an argument that has the right type but
  * an inappropriate value, and the situation is not described by a more precise exception such as
@@ -26,23 +28,9 @@ package app.auditranscribe.generic.exceptions;
  * <a href="https://docs.python.org/3/library/exceptions.html#ValueError"><code>ValueError</code>
  * </a>.
  */
+@ExcludeFromGeneratedCoverageReport
 public class ValueException extends RuntimeException {
-    public ValueException() {
-    }
-
     public ValueException(String message) {
         super(message);
-    }
-
-    public ValueException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public ValueException(Throwable cause) {
-        super(cause);
-    }
-
-    public ValueException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
     }
 }
