@@ -121,7 +121,10 @@ This section will guide you through the installation of AudiTranscribe.
    ```
 5. Once the command is run, open the `.dmg` file.
 6. Drag `AudiTranscribe.app` into the Applications folder.
-7. Run the application!
+7. Right-click `AudiTranscribe.app` and select "Open". You should see a message "AudiTranscribe is damaged and can’t be
+   opened. You should move it to the Bin". **Click on Cancel**.
+8. Again, right-click `AudiTranscribe.app` and select "Open". Now click on "Open" in the pop-up that appears.
+9. In the future, you just need to open AudiTranscribe normally.
 
 ### Linux
 
@@ -143,6 +146,7 @@ with `.deb` installation capabilities.
 This guide will assume that [Apache Maven](https://maven.apache.org/) and [FFmpeg](https://ffmpeg.org/) are installed.
 
 You will first need to obtain the source files. You can do this in multiple ways:
+
 - Download the latest release/pre-release from the "releases" section of the GitHub page;
 - Download the latest files on the `staging` branch;
 - Download the latest files on the `main` branch;
