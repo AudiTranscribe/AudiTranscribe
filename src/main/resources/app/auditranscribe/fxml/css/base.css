@@ -232,3 +232,34 @@
     -fx-border-style: solid;
     -fx-border-width: 0.5px;
 }
+
+/* Menus */
+.context-menu {
+    -fx-padding: 0;
+    -fx-border-color: separator-colour;
+    -fx-border-width: 1px;
+}
+
+.context-menu .separator > .line {
+    -fx-border-color: background-colour-tertiary;
+    -fx-border-insets: 0;
+}
+
+/* Menu bar */
+.menu-bar {
+    -fx-background-color: background-colour-secondary;
+}
+
+.menu:hover {
+    -fx-cursor: hand;
+    -fx-background-color: background-colour-primary;
+}
+
+.menu-button:focused, .menu-button:showing, .menu-item {
+    -fx-background-color: background-colour-primary;
+}
+
+.menu-item:hover {
+    -fx-cursor: hand;
+    -fx-background-color: background-colour-secondary;
+}

@@ -103,6 +103,27 @@
     -fx-border-width: 2px;
 }
 
+/* Menus */
+.context-menu .separator > .line {
+    -fx-border-color: stroke-colour;
+}
+
+/* Menu bar */
+.menu-bar {
+    -fx-border-color: stroke-colour;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.menu {
+    -fx-border-color: stroke-colour;
+    -fx-border-width: 1px;
+}
+
+.menu-button:hover, .menu-button:focused, .menu-button:showing, .menu-item:hover {
+    -fx-border-color: focus-colour;
+    -fx-border-width: 2px;
+}
+
 /* OTHER STYLING */
 /* Homepage view */
 .list-cell {
