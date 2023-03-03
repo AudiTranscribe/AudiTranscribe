@@ -156,6 +156,7 @@ In addition, this update also
 - Renamed some variables' names so that they are shorter.
 - Moved class-specific exceptions into their own classes; removed redundant `exception` packages.
 - Renamed `FFmpegHandler` to `FFmpeg`.
+- Renamed `PlottingStuffHandler` to `PlottingHelper`.
 
 ## [0.10.0](https://github.com/AudiTranscribe/AudiTranscribe/compare/v0.9.3...v0.10.0) (2023-01-20)
 

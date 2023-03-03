@@ -1,6 +1,6 @@
 /*
- * PlottingStuffHandler.java
- * Description: Handles the addition of certain things to the spectrogram area.
+ * PlottingHelper.java
+ * Description: Helps with the plotting of certain things on the spectrogram area.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -34,15 +34,14 @@ import javafx.scene.shape.StrokeType;
 import java.util.HashSet;
 
 /**
- * Handles the addition of certain things to the spectrogram area.
+ * Helps with the plotting of certain things on the spectrogram area.
  */
 @ExcludeFromGeneratedCoverageReport
-// todo rename
-public final class PlottingStuffHandler {
+public final class PlottingHelper {
     // Constants
     private static final double BAR_NUMBER_ELLIPSE_RADIUS_Y = 16;
 
-    private PlottingStuffHandler() {
+    private PlottingHelper() {
         // Private constructor to signal this is a utility class
     }
 
