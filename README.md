@@ -26,71 +26,10 @@ Also, professional music transcription services cost *a lot*, especially if you 
 a few times over a year. In that case, the cost of these services (which range from $40 to $120) are not worth it.
 AudiTranscribe is meant to be an Open-Source and free alternative.
 
-# Dependencies
-
-The only dependency needed is [FFmpeg](https://ffmpeg.org/): a complete, cross-platform solution to record, convert and
-stream audio and video. AudiTranscribe uses it to help process different audio files.
-
-**Note**:
-
-- For Windows and macOS, AudiTranscribe will attempt to automatically install FFmpeg. You do **not** need to manually
-  install FFmpeg unless specified.
-- For Linux and others, **manual installation of FFmpeg is required**.
-
-## For Developers
-
-If you are planning to develop for AudiTranscribe, please ensure that the following dependencies are installed on your
-machine:
-
-1. Java 17
-2. FFmpeg (Version 4 or later)
-
-In addition, there are some additional dependencies to install and configurations to set up for specific platforms:
-
-- **Windows**:
-    - The [**WiX Toolset 3**](https://wixtoolset.org/) is needed to generate the AudiTranscribe executable for
-      Windows.
-        - Make sure that the `.NET 3.5` feature is enabled on your Windows device. To enable it, follow these steps:
-            1. Go to the Control Panel.
-            2. Under "Programs", select "Programs and Features".
-            3. Choose "Turn Windows features on or off". You may be prompted to enter an administrator's password.
-            4. In the list of features, choose ".NET Framework 3.5 (includes .NET 2.0 and 3.0)" and then click "OK".
-            5. If a popup asks whether to download features, select "Let Windows Update download the files for you".
-    - The [Apache Maven](https://maven.apache.org/) project manager needs to be installed.
-        - Make sure the `JAVA_HOME` **system** environment variable is set to the JDK location.
-- **macOS**: On macOS, the **Xcode Command Line Tools** needs to be installed to make AudiTranscribe run in development.
-  You can install the XCode Command Line Tools by running:
-  ```
-  xcode-select --install
-  ```
-  in a terminal.
-- **Linux**: The following instructions are most relevant to **Ubuntu**. However, other Linux platforms may follow these
-  requirements as well:
-    - The **`bin-utils`** package needs to be installed on your machine in order to access the `objcopy` command from
-      the shell. Install it by running:
-      ```
-      sudo apt-get install binutils
-      ```
-    - The **`fakeroot`** package needs to be installed in order to properly generate the Linux package. Install it by
-      running:
-        ```
-      sudo apt-get install fakeroot
-      ```
-    - Please ensure that `jlink` is properly installed on your machine by running:
-      ```
-      jlink --version
-      ```
-      If an error appears, please install `jlink` by running:
-      ```
-      sudo apt install openjdk-17-jdk-headless
-      ```
-      or a similar command on your Linux machine.
-
-Once all dependencies have been installed and configurations are set, proceed to [Install From Source](#from-source).
-
 # Installation
 
-This section will guide you through the installation of AudiTranscribe.
+This section will guide you through the installation of AudiTranscribe. For the dependencies required, see the
+[dependencies](#dependencies) below.
 
 ## Using An Installer
 
@@ -166,6 +105,68 @@ mvn test
 ```
 
 That should complete the "from source" setup of AudiTranscribe.
+
+# Dependencies
+
+The only dependency needed is [FFmpeg](https://ffmpeg.org/): a complete, cross-platform solution to record, convert and
+stream audio and video. AudiTranscribe uses it to help process different audio files.
+
+**Note**:
+
+- For Windows and macOS, AudiTranscribe will attempt to automatically install FFmpeg. You do **not** need to manually
+  install FFmpeg unless specified.
+- For Linux and others, **manual installation of FFmpeg is required**.
+
+## For Developers
+
+If you are planning to develop for AudiTranscribe, please ensure that the following dependencies are installed on your
+machine:
+
+1. Java 17
+2. FFmpeg (Version 4 or later)
+
+In addition, there are some additional dependencies to install and configurations to set up for specific platforms:
+
+- **Windows**:
+    - The [**WiX Toolset 3**](https://wixtoolset.org/) is needed to generate the AudiTranscribe executable for
+      Windows.
+        - Make sure that the `.NET 3.5` feature is enabled on your Windows device. To enable it, follow these steps:
+            1. Go to the Control Panel.
+            2. Under "Programs", select "Programs and Features".
+            3. Choose "Turn Windows features on or off". You may be prompted to enter an administrator's password.
+            4. In the list of features, choose ".NET Framework 3.5 (includes .NET 2.0 and 3.0)" and then click "OK".
+            5. If a popup asks whether to download features, select "Let Windows Update download the files for you".
+    - The [Apache Maven](https://maven.apache.org/) project manager needs to be installed.
+        - Make sure the `JAVA_HOME` **system** environment variable is set to the JDK location.
+- **macOS**: On macOS, the **Xcode Command Line Tools** needs to be installed to make AudiTranscribe run in development.
+  You can install the XCode Command Line Tools by running:
+  ```
+  xcode-select --install
+  ```
+  in a terminal.
+- **Linux**: The following instructions are most relevant to **Ubuntu**. However, other Linux platforms may follow these
+  requirements as well:
+    - The **`bin-utils`** package needs to be installed on your machine in order to access the `objcopy` command from
+      the shell. Install it by running:
+      ```
+      sudo apt-get install binutils
+      ```
+    - The **`fakeroot`** package needs to be installed in order to properly generate the Linux package. Install it by
+      running:
+        ```
+      sudo apt-get install fakeroot
+      ```
+    - Please ensure that `jlink` is properly installed on your machine by running:
+      ```
+      jlink --version
+      ```
+      If an error appears, please install `jlink` by running:
+      ```
+      sudo apt install openjdk-17-jdk-headless
+      ```
+      or a similar command on your Linux machine.
+
+Once all dependencies have been installed and configurations are set, proceed to [Install From Source](#from-source).
 
 # Security Policy
 
