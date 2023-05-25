@@ -33,7 +33,6 @@ import app.auditranscribe.misc.CustomLogger;
 import app.auditranscribe.fxml.spinners.CustomIntegerSpinnerValueFactory;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.music.NoteUnit;
-import app.auditranscribe.signal.windowing.SignalWindow;
 import app.auditranscribe.utils.GUIUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -101,9 +100,6 @@ public class SettingsViewController extends AbstractViewController {
     private ChoiceBox<ColourScale> colourScaleChoiceBox;
 
     @FXML
-    private ChoiceBox<SignalWindow> windowFunctionChoiceBox;
-
-    @FXML
     private ChoiceBox<NoteUnit> noteQuantizationChoiceBox;
 
     // Bottom
@@ -126,8 +122,6 @@ public class SettingsViewController extends AbstractViewController {
 
         for (ColourScale colourScale : ColourScale.values())
             colourScaleChoiceBox.getItems().add(colourScale);
-        for (SignalWindow windowFunction : SignalWindow.values())
-            windowFunctionChoiceBox.getItems().add(windowFunction);
         for (NoteUnit noteQuantizationUnit : NoteUnit.values())
             noteQuantizationChoiceBox.getItems().add(noteQuantizationUnit);
 
@@ -292,9 +286,6 @@ public class SettingsViewController extends AbstractViewController {
         colourScaleChoiceBox.setValue(
                 ColourScale.values()[DataFiles.SETTINGS_DATA_FILE.data.colourScaleEnumOrdinal]
         );
-        windowFunctionChoiceBox.setValue(
-                SignalWindow.values()[DataFiles.SETTINGS_DATA_FILE.data.windowFunctionEnumOrdinal]
-        );
         noteQuantizationChoiceBox.setValue(
                 NoteUnit.values()[DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal]
         );
@@ -345,7 +336,6 @@ public class SettingsViewController extends AbstractViewController {
         DataFiles.SETTINGS_DATA_FILE.data.logFilePersistence = logFilePersistenceSpinner.getValue();
 
         DataFiles.SETTINGS_DATA_FILE.data.colourScaleEnumOrdinal = colourScaleChoiceBox.getValue().ordinal();
-        DataFiles.SETTINGS_DATA_FILE.data.windowFunctionEnumOrdinal = windowFunctionChoiceBox.getValue().ordinal();
         DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal =
                 noteQuantizationChoiceBox.getValue().ordinal();
 
@@ -388,7 +378,6 @@ public class SettingsViewController extends AbstractViewController {
                 selectedTabName = "Transcription";
 
                 colourScaleChoiceBox.setValue(ColourScale.values()[SettingsData.COLOUR_SCALE_ENUM_ORDINAL]);
-                windowFunctionChoiceBox.setValue(SignalWindow.values()[SettingsData.WINDOW_FUNCTION_ENUM_ORDINAL]);
                 noteQuantizationChoiceBox.setValue(NoteUnit.values()[SettingsData.NOTE_QUANTIZATION_UNIT_ENUM_ORDINAL]);
             }
         }

@@ -155,12 +155,6 @@
                                     <ChoiceBox fx:id="colourScaleChoiceBox" prefHeight="30.0" prefWidth="150.0" />
                                  </children>
                               </HBox>
-                              <HBox spacing="10.0">
-                                 <children>
-                                    <Label prefHeight="30.0" prefWidth="150.0" styleClass="setting-label" text="Windowing function:" />
-                                    <ChoiceBox fx:id="windowFunctionChoiceBox" prefHeight="30.0" prefWidth="150.0" />
-                                 </children>
-                              </HBox>
                               <Separator prefWidth="200.0" />
                               <Label prefHeight="0.0" styleClass="setting-subheading" text="Notes" />
                               <HBox spacing="10.0">

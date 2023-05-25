@@ -134,6 +134,8 @@ public class TranscriptionViewController extends SwitchableViewController {
     private final KeyCodeCombination DEBUG_COMBINATION =
             new KeyCodeCombination(KeyCode.D, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
 
+    private final SignalWindow GENERATE_SPECTROGRAM_WINDOW = SignalWindow.HANN_WINDOW;
+
     // Attributes
     private int numSkippableBytes;
 
@@ -669,7 +671,7 @@ public class TranscriptionViewController extends SwitchableViewController {
             protected WritableImage call() {
                 spectrogram.setTask(this);
                 return spectrogram.generateSpectrogram(
-                        SignalWindow.values()[DataFiles.SETTINGS_DATA_FILE.data.windowFunctionEnumOrdinal],
+                        GENERATE_SPECTROGRAM_WINDOW,
                         ColourScale.values()[DataFiles.SETTINGS_DATA_FILE.data.colourScaleEnumOrdinal]
                 );
             }
