@@ -308,6 +308,7 @@ public class Audio extends LoggableClass {
      * Method that resets the playback system entirely.
      */
     public void resetPlaybackSystem() {
+        prevCurrTime = 0;
         prevElapsedTime = 0;
         setupSourceDataLine();
         resetAudioStream();
