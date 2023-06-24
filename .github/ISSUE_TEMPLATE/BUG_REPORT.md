@@ -1,43 +1,38 @@
 ---
 name: Bug Report
-about: Report an unexpected behaviour of the program
+about: Report an unexpected behaviour of the program.
 title: ''
 labels: bug
 assignees: ''
 
 ---
 
-## What is the bug?
+## What is the Bug?
 
 A clear and concise description of what the bug is.
 
-## How do you reproduce it?
+## How Do You Reproduce It?
 
-1. Go to "..."
-2. Click on "..."
-3. Scroll down to "..."
-4. See the error
+A clear and concise description of how the bug can be reproduced. Include a list of steps to describe reproduction steps
+for the bug.
 
-## What is expected?
+Do also state whether the bug is hard to reproduce, and, if possible, state reasons why it is hard to reproduce.
 
-A clear and concise description of what you expected the code to do.
+## What was Expected?
 
-## What is actually happening?
+A clear and concise description of what the code was expected to do.
 
-A clear and concise description of what the code actually does.
+## What is Happening?
 
-## [Optional] Screenshots or Screen Recordings
-
-If applicable, add screenshots or screen recordings to help explain your problem.
-
-## Useful Information
-
-Please complete the following information:
-
-- Operating System: [e.g. Windows, macOS, Ubuntu]
-- Operating System Version: [e.g. 22H2 (19045.3086), 13.4.1 (22F82), 22.04.2]
-- Application Version: [e.g. 1.2.3]
+A clear and concise description of what the code is doing. Add logs, screenshots, screen recordings etc. as
+necessary to help explain what is being done.
 
 ## Additional Context
 
-Add any other context about the problem here.
+Please complete the following information:
+
+- **Operating System**: e.g. Windows, macOS, Ubuntu
+- **Operating System Version**: e.g. 22H2 (19045.3086), 13.4.1 (22F82), 22.04.2
+- **Application Version**: e.g. 1.2.3
+
+In addition, add any other information about the problem here.
