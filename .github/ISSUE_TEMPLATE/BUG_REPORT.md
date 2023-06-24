@@ -13,8 +13,6 @@ A clear and concise description of what the bug is.
 
 ## How do you reproduce it?
 
-Steps to reproduce the behaviour:
-
 1. Go to "..."
 2. Click on "..."
 3. Scroll down to "..."
@@ -28,22 +26,17 @@ A clear and concise description of what you expected the code to do.
 
 A clear and concise description of what the code actually does.
 
-## (Optional) Screenshots
+## [Optional] Screenshots or Screen Recordings
 
-If applicable, add screenshots to help explain your problem.
+If applicable, add screenshots or screen recordings to help explain your problem.
 
-## System Information
-
-Please complete the following information:
-
-- OS: [e.g. Windows]
-- Version: [e.g. 21H2 (10.0.19044.1682)]
-
-## Application Information
+## Useful Information
 
 Please complete the following information:
 
-- Application Version: [e.g. Version 1.2.3]
+- Operating System: [e.g. Windows, macOS, Ubuntu]
+- Operating System Version: [e.g. 22H2 (19045.3086), 13.4.1 (22F82), 22.04.2]
+- Application Version: [e.g. 1.2.3]
 
 ## Additional Context
 
