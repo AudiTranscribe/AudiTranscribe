@@ -1579,7 +1579,7 @@ public class TranscriptionViewController extends SwitchableViewController {
 
         ProjectInfoDataObject projectInfoData = new ProjectInfoDataObject0x000B00(
                 projectName, musicKey, timeSignature, bpm, offset, audioVolume,
-                (int) (currTime * 1000)
+                (int) (Math.min(currTime, audioDuration) * 1000)
         );
         MusicNotesDataObject musicNotesData = new MusicNotesDataObject0x000500(
                 timesToPlaceRectangles, noteDurations, noteNums
