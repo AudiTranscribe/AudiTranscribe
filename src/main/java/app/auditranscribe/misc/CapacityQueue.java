@@ -18,6 +18,7 @@
 
 package app.auditranscribe.misc;
 
+import app.auditranscribe.generic.exceptions.LengthException;
 import app.auditranscribe.generic.exceptions.ValueException;
 
 import java.util.Collection;
@@ -64,15 +65,6 @@ public class CapacityQueue<T> extends LinkedList<T> {
     }
 
     @Override
-    public synchronized boolean add(T o) {
-        super.add(o);
-        while (size() > maxSize) {
-            super.remove();
-        }
-        return true;
-    }
-
-    @Override
     public synchronized boolean offer(T o) {
         while (size() > maxSize - 1) {
             super.remove();
@@ -82,8 +74,13 @@ public class CapacityQueue<T> extends LinkedList<T> {
 
     @Override
     public synchronized boolean addAll(Collection<? extends T> collection) {
-        int lowerBound = Math.max(0, maxSize - collection.size());  // Don't want a case where this is negative
-        while (size() > lowerBound) {
+        if (collection.size() > maxSize) {
+            throw new LengthException(
+                    "Collection size too large (" + collection.size() + " but max size is " + maxSize + ")"
+            );
+        }
+
+        while (size() > maxSize - collection.size()) {
             super.remove();
         }
         return super.addAll(collection);
