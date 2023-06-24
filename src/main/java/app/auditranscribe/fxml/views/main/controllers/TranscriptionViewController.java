@@ -2066,7 +2066,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         notesVolumeButton.setDisable(!paused);
         notesVolumeSlider.setDisable(!paused);
 
-        log(Level.FINE, "Toggled play button; audio is now " + (!paused ? "paused" : "playing"));
+        log(Level.FINE, "User toggled play button; audio is now " + (paused ? "paused" : "playing"));
     }
 
     /**
