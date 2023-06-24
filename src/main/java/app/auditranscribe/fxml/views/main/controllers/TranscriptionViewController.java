@@ -427,7 +427,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         rewindToBeginningButton.setOnAction(event -> {
             log(Level.FINE, "Pressed rewind to beginning button");
 
-            paused = togglePaused(false);  // Pause the audio
+            if (currTime < audioDuration) paused = togglePaused(false);  // Pause the audio
             seekToTime(0);
             updateScrollPosition(0, finalWidth);
         });
