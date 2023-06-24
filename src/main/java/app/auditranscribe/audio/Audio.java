@@ -594,8 +594,9 @@ public class Audio extends LoggableClass {
                                 }
                             }
 
-                            // If enough, interleave processed samples and write to source data line
-                            if (enoughData) {
+                            // If there is enough data to write, or if there are no more bytes to read from the audio
+                            // stream, interleave processed samples and write to source data line
+                            if (enoughData || numBytesRead == -1) {
                                 ArrayList<byte[]> outputSegments = new ArrayList<>();
                                 for (BlockingQueue<Byte> bq : outChannels) {
                                     byte[] segment = new byte[outSegmentLength];
@@ -616,9 +617,6 @@ public class Audio extends LoggableClass {
                                     break;
                                 }
                             }
-
-                            // Halt if we read no more bytes and there is no more bytes to process
-                            if (numBytesRead == -1 && !enoughData && !readThisIteration) break;
                         }
                     }
                 } catch (InterruptedException e) {
