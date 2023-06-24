@@ -1,22 +1,17 @@
 ---
 name: Feature Request
-about: Suggest an idea for the project
+about: Suggest an idea for AudiTranscribe.
 title: ''
 labels: enhancement
 assignees: ''
 
 ---
 
-## Is Your Feature Request Related to a Problem? Please Describe.
+## Describe Your Feature Request
 
-A clear and concise description of what the problem is.
-(E.g. I'm always frustrated when [...])
+A clear and concise description of the feature you would like to see in AudiTranscribe.
 
-## Describe the Solution You Would Like to See
-
-A clear and concise description of what you want to happen.
-
-## Describe Alternatives You Have Considered
+## Possible Alternatives
 
 A clear and concise description of any alternative solutions or features you've considered.
 
