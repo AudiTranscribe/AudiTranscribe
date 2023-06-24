@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Run All Tests" type="JUnit" factoryName="JUnit">
-    <module name="AudiTranscribe" />
+    <module name="auditranscribe" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="app.auditranscribe.*" />

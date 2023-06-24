@@ -26,6 +26,86 @@ Also, professional music transcription services cost *a lot*, especially if you 
 a few times over a year. In that case, the cost of these services (which range from $40 to $120) are not worth it.
 AudiTranscribe is meant to be an Open-Source and free alternative.
 
+# Installation
+
+This section will guide you through the installation of AudiTranscribe. For the dependencies required, see the
+[dependencies](#dependencies) below.
+
+## Using An Installer
+
+### Windows
+
+1. Head to the latest releases section.
+    - If there are no current releases, you may want to choose a pre-release version instead.
+2. Under the downloads section, download the Windows installer.
+3. Unzip the installer package. The package should contain one `.exe` file.
+4. Run the application.
+    - It is highly likely that an alert like "Windows protected your PC" would pop up. This is normal, and is due to
+      AudiTranscribe not being a recognized app yet.
+    - If you see such an alert, click on "More Info", and then click on "Run Anyway" at the bottom of the screen.
+5. Follow the installation instructions.
+6. The application should be installed once completed.
+
+### macOS
+
+1. Head to the latest releases section.
+    - If there are no current releases, you may want to choose a pre-release version instead.
+2. Under the downloads section, download the macOS file.
+3. Unzip the installer package. The package should contain one `.dmg` file. **Do not open the `.dmg` file yet**.
+4. If you were to open the `.dmg` file now, it would likely be quarantined by Apple due to it lacking a proper signing
+   key. To fix this, open Terminal and run the following command. The command will remove all attributes from the `.dmg`
+   file and makes it no longer quarantined. (**Note**: You may be prompted to enter your password.)
+   ```bash
+   sudo xattr -cr path/to/the/dmg/file
+   ```
+5. Once the command is run, open the `.dmg` file.
+6. Drag `AudiTranscribe.app` into the Applications folder.
+7. Right-click `AudiTranscribe.app` and select "Open". You should see a message "AudiTranscribe is damaged and can’t be
+   opened. You should move it to the Bin". **Click on Cancel**.
+8. Again, right-click `AudiTranscribe.app` and select "Open". Now click on "Open" in the pop-up that appears.
+9. In the future, you just need to open AudiTranscribe normally.
+
+### Linux
+
+These instructions are most applicable to users on **Ubuntu**, or any Linux system that is running on `amd64`
+with `.deb` installation capabilities.
+
+1. Head to the latest releases section.
+    - If there are no current releases, you may want to choose a pre-release version instead.
+2. Under the downloads section, download the Linux file.
+3. Unzip the installer package. The package should contain one `.deb` file.
+4. Open the `.deb` file using the "Software Install" application.
+5. Click "Install" on the window that appears.
+6. Wait for the application to fully install. Then, close the installer window.
+    - Make sure you [read the licence information](https://auditranscribe.app/licences) for AudiTranscribe.
+7. Run the application!
+
+## From Source
+
+This guide will assume that [Apache Maven](https://maven.apache.org/) and [FFmpeg](https://ffmpeg.org/) are installed.
+
+You will first need to obtain the source files. You can do this in multiple ways:
+
+- Download the latest release/pre-release from the "releases" section of the GitHub page;
+- Download the latest files on the `staging` branch;
+- Download the latest files on the `main` branch;
+- Download the files on any branch.
+
+Once the files have been downloaded, you need to set up AudiTranscribe with maven. Run the following commands:
+
+```bash
+# Install custom dependencies from the "lib" directory
+mvn validate
+
+# Install the rest of the dependencies from the maven repository
+mvn -B clean:clean compiler:compile javafx:jlink
+
+# Test installation
+mvn test
+```
+
+That should complete the "from source" setup of AudiTranscribe.
+
 # Dependencies
 
 The only dependency needed is [FFmpeg](https://ffmpeg.org/): a complete, cross-platform solution to record, convert and
@@ -87,81 +167,6 @@ In addition, there are some additional dependencies to install and configuration
       or a similar command on your Linux machine.
 
 Once all dependencies have been installed and configurations are set, proceed to [Install From Source](#from-source).
-
-# Installation
-
-This section will guide you through the installation of AudiTranscribe.
-
-## Using An Installer
-
-### Windows
-
-1. Head to the latest releases section.
-    - If there are no current releases, you may want to choose a pre-release version instead.
-2. Under the downloads section, download the Windows installer.
-3. Unzip the installer package. The package should contain one `.exe` file.
-4. Run the application.
-    - It is highly likely that an alert like "Windows protected your PC" would pop up. This is normal, and is due to
-      AudiTranscribe not being a recognized app yet.
-    - If you see such an alert, click on "More Info", and then click on "Run Anyway" at the bottom of the screen.
-5. Follow the installation instructions.
-6. The application should be installed once completed.
-
-### macOS
-
-1. Head to the latest releases section.
-    - If there are no current releases, you may want to choose a pre-release version instead.
-2. Under the downloads section, download the macOS file.
-3. Unzip the installer package. The package should contain one `.dmg` file. **Do not open the `.dmg` file yet**.
-4. If you were to open the `.dmg` file now, it would likely be quarantined by Apple due to it lacking a proper signing
-   key. To fix this, open Terminal and run the following command. The command will remove all attributes from the `.dmg`
-   file and makes it no longer quarantined. (**Note**: You may be prompted to enter your password.)
-   ```bash
-   sudo xattr -cr path/to/the/dmg/file
-   ```
-5. Once the command is run, open the `.dmg` file.
-6. Drag `AudiTranscribe.app` into the Applications folder.
-7. Run the application!
-
-### Linux
-
-These instructions are most applicable to users on **Ubuntu**, or any Linux system that is running on `amd64`
-with `.deb` installation capabilities.
-
-1. Head to the latest releases section.
-    - If there are no current releases, you may want to choose a pre-release version instead.
-2. Under the downloads section, download the Linux file.
-3. Unzip the installer package. The package should contain one `.deb` file.
-4. Open the `.deb` file using the "Software Install" application.
-5. Click "Install" on the window that appears.
-6. Wait for the application to fully install. Then, close the installer window.
-    - Make sure you [read the licence information](https://auditranscribe.app/licences) for AudiTranscribe.
-7. Run the application!
-
-## From Source
-
-This guide will assume that [Apache Maven](https://maven.apache.org/) and [FFmpeg](https://ffmpeg.org/) are installed.
-
-You will first need to obtain the source files. You can do this in multiple ways:
-- Download the latest release/pre-release from the "releases" section of the GitHub page;
-- Download the latest files on the `staging` branch;
-- Download the latest files on the `main` branch;
-- Download the files on any branch.
-
-Once the files have been downloaded, you need to set up AudiTranscribe with maven. Run the following commands:
-
-```bash
-# Install custom dependencies from the "lib" directory
-mvn validate
-
-# Install the rest of the dependencies from the maven repository
-mvn -B clean:clean compiler:compile javafx:jlink
-
-# Test installation
-mvn test
-```
-
-That should complete the "from source" setup of AudiTranscribe.
 
 # Security Policy
 

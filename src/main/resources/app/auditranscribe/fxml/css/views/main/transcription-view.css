@@ -99,8 +99,12 @@
     -fx-background-color: #00000000; /* Transparent */
 }
 
-.coloured-progress-pane {
-    -fx-background-color: coloured-progress-pane-colour;
+.coloured-progress-rectangle {
+    -fx-arc-width: 0;
+    -fx-arc-height: 0;
+    -fx-fill: coloured-progress-pane-colour;
+    -fx-stroke: #00000000; /* Transparent */
+    -fx-stroke-width: 0;
 }
 
 /* Note rectangles */

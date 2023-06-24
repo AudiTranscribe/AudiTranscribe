@@ -20,6 +20,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
 
 <AnchorPane fx:id="rootPane" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.auditranscribe.fxml.views.main.controllers.TranscriptionViewController">
    <children>
@@ -146,7 +147,7 @@
                                   <AnchorPane fx:id="bottomAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="40.0" styleClass="edge-anchor-pane">
                                        <children>
                                           <Pane fx:id="barNumberPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                                          <Pane fx:id="colouredProgressPane" prefWidth="0.0" styleClass="coloured-progress-pane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                          <Rectangle fx:id="colouredProgressRectangle" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="40.0" smooth="false" stroke="BLACK" strokeType="INSIDE" styleClass="coloured-progress-rectangle" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                           <Pane fx:id="clickableProgressPane" prefWidth="0.0" styleClass="clickable-progress-pane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                        </children>
                                     </AnchorPane>

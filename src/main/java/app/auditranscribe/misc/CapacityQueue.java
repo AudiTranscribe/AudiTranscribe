@@ -82,7 +82,8 @@ public class CapacityQueue<T> extends LinkedList<T> {
 
     @Override
     public synchronized boolean addAll(Collection<? extends T> collection) {
-        while (size() > maxSize - collection.size()) {
+        int lowerBound = Math.max(0, maxSize - collection.size());  // Don't want a case where this is negative
+        while (size() > lowerBound) {
             super.remove();
         }
         return super.addAll(collection);

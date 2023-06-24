@@ -134,6 +134,8 @@ public class TranscriptionViewController extends SwitchableViewController {
     private final KeyCodeCombination DEBUG_COMBINATION =
             new KeyCodeCombination(KeyCode.D, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
 
+    private final SignalWindow GENERATE_SPECTROGRAM_WINDOW = SignalWindow.HANN_WINDOW;
+
     // Attributes
     private int numSkippableBytes;
 
@@ -248,7 +250,10 @@ public class TranscriptionViewController extends SwitchableViewController {
     private AnchorPane leftAnchorPane, spectrogramAnchorPane, bottomAnchorPane;
 
     @FXML
-    private Pane notePane, barNumberPane, clickableProgressPane, colouredProgressPane;
+    private Pane notePane, barNumberPane, clickableProgressPane;
+
+    @FXML
+    private Rectangle colouredProgressRectangle;
 
     @FXML
     private ImageView spectrogramImage;
@@ -669,7 +674,7 @@ public class TranscriptionViewController extends SwitchableViewController {
             protected WritableImage call() {
                 spectrogram.setTask(this);
                 return spectrogram.generateSpectrogram(
-                        SignalWindow.values()[DataFiles.SETTINGS_DATA_FILE.data.windowFunctionEnumOrdinal],
+                        GENERATE_SPECTROGRAM_WINDOW,
                         ColourScale.values()[DataFiles.SETTINGS_DATA_FILE.data.colourScaleEnumOrdinal]
                 );
             }
@@ -1669,7 +1674,7 @@ public class TranscriptionViewController extends SwitchableViewController {
             spectrogramAnchorPane.getChildren().add(playheadLine);
 
             // Bind properties
-            colouredProgressPane.prefWidthProperty().bind(playheadX);
+            colouredProgressRectangle.widthProperty().bind(playheadX);
             playheadLine.startXProperty().bind(playheadX);
             playheadLine.endXProperty().bind(playheadX);
 
@@ -2061,7 +2066,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         notesVolumeButton.setDisable(!paused);
         notesVolumeSlider.setDisable(!paused);
 
-        log(Level.FINE, "Toggled play button; audio is now " + (!paused ? "paused" : "playing"));
+        log(Level.FINE, "User toggled play button; audio is now " + (paused ? "paused" : "playing"));
     }
 
     /**
@@ -2395,7 +2400,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                 new Pair<>("currTime", Double.toString(currTime)),
                 new Pair<>("playheadX", playheadX.toString()),
                 new Pair<>("Playhead Line X-Coord", playheadLine.startXProperty().toString()),
-                new Pair<>("Coloured Progress Pane Position", colouredProgressPane.widthProperty().toString()),
+                new Pair<>("Coloured Progress Pane Position", colouredProgressRectangle.widthProperty().toString()),
                 new Pair<>("-----", "-----"),
                 new Pair<>("hasUnsavedChanges", Boolean.toString(hasUnsavedChanges)),
                 new Pair<>("audtFilePath", audtFilePath),

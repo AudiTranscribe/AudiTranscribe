@@ -6,14 +6,14 @@
 
     <groupId>app.auditranscribe</groupId>
     <artifactId>auditranscribe</artifactId>
-    <version>0.11.0</version>
+    <version>0.11.1</version>
     <name>AudiTranscribe</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <junit.version>5.9.2</junit.version>
-        <javafx.version>19.0.2</javafx.version>
+        <javafx.version>20.0.1</javafx.version>
 
         <compiler.source.version>17</compiler.source.version>
         <compiler.target.version>17</compiler.target.version>
@@ -34,7 +34,7 @@
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
-            <version>3.40.0.0</version>
+            <version>3.41.2.2</version>
         </dependency>
 
         <!-- JavaFX-related Dependencies -->
