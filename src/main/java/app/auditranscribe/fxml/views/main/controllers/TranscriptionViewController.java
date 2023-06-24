@@ -250,7 +250,10 @@ public class TranscriptionViewController extends SwitchableViewController {
     private AnchorPane leftAnchorPane, spectrogramAnchorPane, bottomAnchorPane;
 
     @FXML
-    private Pane notePane, barNumberPane, clickableProgressPane, colouredProgressPane;
+    private Pane notePane, barNumberPane, clickableProgressPane;
+
+    @FXML
+    private Rectangle colouredProgressRectangle;
 
     @FXML
     private ImageView spectrogramImage;
@@ -1671,7 +1674,7 @@ public class TranscriptionViewController extends SwitchableViewController {
             spectrogramAnchorPane.getChildren().add(playheadLine);
 
             // Bind properties
-            colouredProgressPane.prefWidthProperty().bind(playheadX);
+            colouredProgressRectangle.widthProperty().bind(playheadX);
             playheadLine.startXProperty().bind(playheadX);
             playheadLine.endXProperty().bind(playheadX);
 
@@ -2397,7 +2400,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                 new Pair<>("currTime", Double.toString(currTime)),
                 new Pair<>("playheadX", playheadX.toString()),
                 new Pair<>("Playhead Line X-Coord", playheadLine.startXProperty().toString()),
-                new Pair<>("Coloured Progress Pane Position", colouredProgressPane.widthProperty().toString()),
+                new Pair<>("Coloured Progress Pane Position", colouredProgressRectangle.widthProperty().toString()),
                 new Pair<>("-----", "-----"),
                 new Pair<>("hasUnsavedChanges", Boolean.toString(hasUnsavedChanges)),
                 new Pair<>("audtFilePath", audtFilePath),
