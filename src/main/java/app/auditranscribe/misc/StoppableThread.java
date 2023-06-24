@@ -35,16 +35,16 @@ public abstract class StoppableThread extends LoggableClass implements Runnable 
     protected AtomicBoolean stopped = new AtomicBoolean(true);  // Whether the thread has stopped
 
     // Getter/Setter methods
-    public boolean getIsRunning() {
+    public boolean isStarted() {
+        return started;
+    }
+
+    public boolean isRunning() {
         return running.get();
     }
 
-    public boolean getIsStopped() {
+    public boolean isStopped() {
         return stopped.get();
-    }
-
-    public boolean isStarted() {
-        return started;
     }
 
     // Public methods
