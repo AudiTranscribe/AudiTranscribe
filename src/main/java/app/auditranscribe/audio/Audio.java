@@ -21,6 +21,7 @@ package app.auditranscribe.audio;
 import app.auditranscribe.audio.operators.*;
 import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.generic.exceptions.LengthException;
+import app.auditranscribe.generic.tuples.Pair;
 import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.data_files.DataFiles;
@@ -89,7 +90,7 @@ public class Audio extends LoggableClass {
     private double[] monoSamples;
 
     private final Vector<BlockingQueue<Byte>> outChannels = new Vector<>();
-    private final Vector<TimeStretchOperator> channelOperators = new Vector<>();
+    private final Vector<Pair<TimeStretchOperator, Thread>> channelOperators = new Vector<>();
 
     private byte[] rawMP3Bytes;
 
@@ -301,7 +302,7 @@ public class Audio extends LoggableClass {
         prevElapsedTime = getPlaybackElapsedDuration();
 
         this.slowed = slowed;
-        for (TimeStretchOperator op : channelOperators) op.setStretchFactor(slowed ? 2 : 1);
+        for (Pair<TimeStretchOperator, Thread> pair : channelOperators) pair.value0().setStretchFactor(slowed ? 2 : 1);
     }
 
     /**
@@ -579,7 +580,7 @@ public class Audio extends LoggableClass {
                                             bitsPerSample,
                                             audioFormat
                                     );
-                                    channelOperators.get(i).call(
+                                    channelOperators.get(i).value0().call(
                                             audio, i, TypeConversionUtils.floatArrayToDoubleArray(samplesAsFloats)
                                     );
                                 }
@@ -612,7 +613,8 @@ public class Audio extends LoggableClass {
 
                             // Determine if we read this iteration
                             readThisIteration = true;
-                            for (Operator op : channelOperators) {
+                            for (Pair<TimeStretchOperator, Thread> pair: channelOperators) {
+                                Operator op = pair.value0();
                                 if (op.remainingCapacity() < bufferBytes.length / bytesPerSample / numChannels) {
                                     readThisIteration = false;
                                     break;
@@ -797,8 +799,9 @@ public class Audio extends LoggableClass {
                 TimeStretchOperator op = new PhaseVocoderOperator(
                         1., SLOWDOWN_PROCESSING_LENGTH, SLOWDOWN_ANALYSIS_LENGTH, SLOWDOWN_WINDOW
                 );
-                channelOperators.add(op);
-                new Thread(op).start();
+                Thread thread = new Thread(op);
+                channelOperators.add(new Pair<>(op, thread));
+                thread.start();
             }
         }
     }
@@ -807,7 +810,10 @@ public class Audio extends LoggableClass {
      * Helper method that resets all the operators.
      */
     private void resetOperators() {
-        for (Operator op : channelOperators) op.stop();
+        for (Pair<TimeStretchOperator, Thread> pair : channelOperators) {
+            pair.value0().stop();  // Stop the operator
+            pair.value1().interrupt();  // Interrupt the thread
+        }
         channelOperators.clear();
     }
 
@@ -817,7 +823,7 @@ public class Audio extends LoggableClass {
      */
     private void clearChannelsBuffers() {
         for (BlockingQueue<Byte> bq : outChannels) bq.clear();
-        for (Operator op : channelOperators) op.clearBuffers();
+        for (Pair<TimeStretchOperator, Thread> pair : channelOperators) pair.value0().clearBuffers();
     }
 
     // Helper classes
