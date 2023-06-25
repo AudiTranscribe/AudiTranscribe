@@ -987,13 +987,14 @@ public class TranscriptionViewController extends SwitchableViewController {
 
         // Make audio seek to that time
         seekTime = MathUtils.round(seekTime, 3);
-        if (!paused) {
+        if (paused) {
+            audio.seekToTime(seekTime);
+        } else {
             // Hacky solution but it works
+            // Todo: wait but why does this work
             togglePaused(false);
             audio.seekToTime(seekTime);
             togglePaused(true);
-        } else {
-            audio.seekToTime(seekTime);
         }
 
         // Update note sequencer current time
@@ -1018,13 +1019,13 @@ public class TranscriptionViewController extends SwitchableViewController {
     /**
      * Helper method that toggles the paused state.
      *
-     * @param isPaused Old paused state.
-     * @return New paused state.
+     * @param currentlyPaused Whether the audio is currently paused or not.
+     * @return New paused state. If was <code>currentlyPaused</code>, now will not, and vice versa.
      */
-    private boolean togglePaused(boolean isPaused) {
+    private boolean togglePaused(boolean currentlyPaused) {
         // Change the icon
         String iconToUse;
-        if (isPaused) {  // Is currently paused; want to make audio play
+        if (currentlyPaused) {  // Is currently paused; want to make audio play
             // Change the icon of the play button from the play icon to the paused icon
             // (So that the user knows that the next interaction with button will pause audio)
             iconToUse = "pause-solid";
@@ -1046,14 +1047,14 @@ public class TranscriptionViewController extends SwitchableViewController {
         Platform.runLater(() -> IconHelper.setSVGOnButton(playButton, 20, IMAGE_BUTTON_LENGTH, iconToUse));
 
         // Toggle paused state for note rectangles
-        NoteRectangle.setIsPaused(!isPaused);
+        NoteRectangle.setIsPaused(!currentlyPaused);
 
         // Toggle disabled state of the toggle slowdown button
-        toggleSlowedAudioButton.setDisable(isPaused);  // If currently paused, will block
+        toggleSlowedAudioButton.setDisable(currentlyPaused);  // If currently paused, will block
 
-        // Return the toggled version of the `isPaused` flag
-        log(Level.FINE, "Toggled pause state; now is " + (!isPaused ? "paused" : "playing"));
-        return !isPaused;
+        // Return the toggled version of the flag
+        log(Level.FINE, "Toggled pause state; now is " + (!currentlyPaused ? "paused" : "playing"));
+        return !currentlyPaused;
     }
 
     /**
