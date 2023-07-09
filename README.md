@@ -1,4 +1,4 @@
-![AudiTranscribe Banner](Designs/banner/banner.png "AudiTranscribe Banner")
+![AudiTranscribe Banner](Designs/banner/banner.webp "AudiTranscribe Banner")
 
 [![Latest GitHub Release](https://img.shields.io/github/v/release/AudiTranscribe/AudiTranscribe)](https://github.com/AudiTranscribe/AudiTranscribe/releases/latest)
 [![Licence](https://img.shields.io/github/license/AudiTranscribe/AudiTranscribe)](https://github.com/AudiTranscribe/AudiTranscribe/blob/main/LICENSE)
