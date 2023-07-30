@@ -37,17 +37,7 @@
                         <MenuItem fx:id="saveProjectMenuItem" mnemonicParsing="false" text="Save" />
                         <MenuItem fx:id="saveAsMenuItem" mnemonicParsing="false" text="Save As..." />
                         <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem fx:id="exportMIDIMenuItem" mnemonicParsing="false" text="Export to MIDI..." />
-                        <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem fx:id="settingsMenuItem" mnemonicParsing="false" text="Settings..." />
-                     </items>
-                  </Menu>
-                  <Menu mnemonicParsing="false" text="Edit">
-                     <items>
-                        <MenuItem fx:id="undoMenuItem" mnemonicParsing="false" text="Undo" />
-                        <MenuItem fx:id="redoMenuItem" mnemonicParsing="false" text="Redo" />
-                        <SeparatorMenuItem mnemonicParsing="false" />
-                        <MenuItem fx:id="quantizeNotesMenuItem" mnemonicParsing="false" text="Quantize Notes" />
                      </items>
                   </Menu>
                   <Menu mnemonicParsing="false" text="Help">
@@ -71,16 +61,6 @@
                                        </tooltip>
                                     </Button>
                                     <Slider fx:id="audioVolumeSlider" blockIncrement="0.1" disable="true" max="2.0" value="1.0" />
-                                 </children>
-                              </HBox>
-                              <HBox alignment="CENTER_RIGHT" spacing="5.0">
-                                 <children>
-                                    <Button fx:id="notesVolumeButton" disable="true" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" styleClass="image-button" text="M">
-                                       <tooltip>
-                                          <Tooltip text="Mute music notes volume" />
-                                       </tooltip>
-                                    </Button>
-                                    <Slider fx:id="notesVolumeSlider" disable="true" max="127.0" min="33.0" value="80.0" />
                                  </children>
                               </HBox>
                            </children>
@@ -172,10 +152,6 @@
                               <Button fx:id="scrollButton" disable="true" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" styleClass="image-button" text="S">
                                  <tooltip>
                                     <Tooltip text="Scroll to playhead" />
-                                 </tooltip></Button>
-                              <Button fx:id="editNotesButton" disable="true" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" styleClass="image-button" text="E">
-                                 <tooltip>
-                                    <Tooltip text="Toggle edit mode" />
                                  </tooltip></Button>
                            </children></HBox>
                         <Separator orientation="VERTICAL" prefHeight="200.0" />
