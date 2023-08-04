@@ -42,7 +42,6 @@ public class SettingsData {
     public final static int LOG_FILE_PERSISTENCE = 5;  // In days
 
     public final static int COLOUR_SCALE_ENUM_ORDINAL = ColourScale.VIRIDIS.ordinal();
-    public final static int NOTE_QUANTIZATION_UNIT_ENUM_ORDINAL = NoteUnit.THIRTY_SECOND_NOTE.ordinal();
 
     public final static int THEME_ENUM_ORDINAL = Theme.DARK.ordinal();
 
@@ -57,7 +56,6 @@ public class SettingsData {
 
     // Transcription data
     public int colourScaleEnumOrdinal = COLOUR_SCALE_ENUM_ORDINAL;
-    public int noteQuantizationUnitEnumOrdinal = NOTE_QUANTIZATION_UNIT_ENUM_ORDINAL;
 
     // Miscellaneous data
     public int themeEnumOrdinal = THEME_ENUM_ORDINAL;

@@ -24,15 +24,14 @@ import app.auditranscribe.fxml.IconHelper;
 import app.auditranscribe.fxml.Popups;
 import app.auditranscribe.fxml.Theme;
 import app.auditranscribe.fxml.plotting.ColourScale;
+import app.auditranscribe.fxml.spinners.CustomIntegerSpinnerValueFactory;
 import app.auditranscribe.fxml.views.AbstractViewController;
 import app.auditranscribe.io.IOConstants;
 import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.data_files.DataFiles;
 import app.auditranscribe.io.data_files.data_encapsulators.SettingsData;
 import app.auditranscribe.misc.CustomLogger;
-import app.auditranscribe.fxml.spinners.CustomIntegerSpinnerValueFactory;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
-import app.auditranscribe.music.NoteUnit;
 import app.auditranscribe.utils.GUIUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -99,9 +98,6 @@ public class SettingsViewController extends AbstractViewController {
     @FXML
     private ChoiceBox<ColourScale> colourScaleChoiceBox;
 
-    @FXML
-    private ChoiceBox<NoteUnit> noteQuantizationChoiceBox;
-
     // Bottom
     @FXML
     private Button resetToDefaultsButton, cancelButton, okButton;
@@ -122,8 +118,6 @@ public class SettingsViewController extends AbstractViewController {
 
         for (ColourScale colourScale : ColourScale.values())
             colourScaleChoiceBox.getItems().add(colourScale);
-        for (NoteUnit noteQuantizationUnit : NoteUnit.values())
-            noteQuantizationChoiceBox.getItems().add(noteQuantizationUnit);
 
         // Add methods to text fields
         ffmpegPathTextField.focusedProperty().addListener((observable, oldValue, newValue) -> {
@@ -286,9 +280,6 @@ public class SettingsViewController extends AbstractViewController {
         colourScaleChoiceBox.setValue(
                 ColourScale.values()[DataFiles.SETTINGS_DATA_FILE.data.colourScaleEnumOrdinal]
         );
-        noteQuantizationChoiceBox.setValue(
-                NoteUnit.values()[DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal]
-        );
 
         // Set spinner factories and methods
         autosaveIntervalSpinnerFactory = new CustomIntegerSpinnerValueFactory(
@@ -336,8 +327,6 @@ public class SettingsViewController extends AbstractViewController {
         DataFiles.SETTINGS_DATA_FILE.data.logFilePersistence = logFilePersistenceSpinner.getValue();
 
         DataFiles.SETTINGS_DATA_FILE.data.colourScaleEnumOrdinal = colourScaleChoiceBox.getValue().ordinal();
-        DataFiles.SETTINGS_DATA_FILE.data.noteQuantizationUnitEnumOrdinal =
-                noteQuantizationChoiceBox.getValue().ordinal();
 
         // Apply settings to the settings file
         DataFiles.SETTINGS_DATA_FILE.saveFile();
@@ -378,7 +367,6 @@ public class SettingsViewController extends AbstractViewController {
                 selectedTabName = "Transcription";
 
                 colourScaleChoiceBox.setValue(ColourScale.values()[SettingsData.COLOUR_SCALE_ENUM_ORDINAL]);
-                noteQuantizationChoiceBox.setValue(NoteUnit.values()[SettingsData.NOTE_QUANTIZATION_UNIT_ENUM_ORDINAL]);
             }
         }
 
