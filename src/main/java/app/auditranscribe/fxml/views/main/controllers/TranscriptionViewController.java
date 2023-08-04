@@ -36,10 +36,10 @@ import app.auditranscribe.io.IOMethods;
 import app.auditranscribe.io.audt_file.AUDTFileConstants;
 import app.auditranscribe.io.audt_file.ProjectData;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
-import app.auditranscribe.io.audt_file.v0x000500.data_encapsulators.MusicNotesDataObject0x000500;
 import app.auditranscribe.io.audt_file.v0x000500.data_encapsulators.UnchangingDataPropertiesObject0x000500;
 import app.auditranscribe.io.audt_file.v0x000B00.data_encapsulators.AudioDataObject0x000B00;
 import app.auditranscribe.io.audt_file.v0x000B00.data_encapsulators.ProjectInfoDataObject0x000B00;
+import app.auditranscribe.io.audt_file.v0x000C00.data_encapsulators.MusicNotesDataObject0x000C00;
 import app.auditranscribe.io.data_files.DataFiles;
 import app.auditranscribe.io.db.ProjectsDB;
 import app.auditranscribe.misc.CustomTask;
@@ -1328,22 +1328,14 @@ public class TranscriptionViewController extends SwitchableViewController {
     private void saveData(
             boolean forceChooseFile, String saveDest
     ) throws FFmpeg.BinaryNotFoundException, IOException {
-        // Get note rectangles' data
-        // Todo: remove entirely later. For now, to keep compatibility, use length zero arrays
-        double[] timesToPlaceRectangles = new double[0];
-        double[] noteDurations = new double[0];
-        int[] noteNums = new int[0];
-
-        // Package project info data and music notes data for saving
+        // Package project data for saving
         log("Packaging data for saving");
 
         ProjectInfoDataObject projectInfoData = new ProjectInfoDataObject0x000B00(
                 projectName, musicKey, timeSignature, bpm, offset, audioVolume,
                 (int) (currTime * 1000)
         );
-        MusicNotesDataObject musicNotesData = new MusicNotesDataObject0x000500(
-                timesToPlaceRectangles, noteDurations, noteNums
-        );
+        MusicNotesDataObject musicNotesData = new MusicNotesDataObject0x000C00();
 
         // Determine what mode of the writer should be used
         if (numSkippableBytes == 0 || forceChooseFile || fileVersion != AUDTFileConstants.FILE_VERSION_NUMBER) {
