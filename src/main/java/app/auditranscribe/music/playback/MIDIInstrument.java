@@ -18,9 +18,12 @@
 
 package app.auditranscribe.music.playback;
 
+import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+
 /**
  * Enum that contains the MIDI values of the instruments.
  */
+@ExcludeFromGeneratedCoverageReport
 public enum MIDIInstrument {
     // Enum values
     PIANO(0),
