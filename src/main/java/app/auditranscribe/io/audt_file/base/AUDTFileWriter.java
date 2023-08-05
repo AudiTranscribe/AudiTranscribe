@@ -23,13 +23,14 @@ import app.auditranscribe.io.ByteConversionHandlers;
 import app.auditranscribe.io.CompressionHandlers;
 import app.auditranscribe.io.audt_file.AUDTFileConstants;
 import app.auditranscribe.io.audt_file.AUDTFileHelpers;
+import app.auditranscribe.io.audt_file.InvalidFileVersionException;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import app.auditranscribe.io.audt_file.v0x000500.AUDTFileWriter0x000500;
 import app.auditranscribe.io.audt_file.v0x000700.AUDTFileWriter0x000700;
 import app.auditranscribe.io.audt_file.v0x000800.AUDTFileWriter0x000800;
 import app.auditranscribe.io.audt_file.v0x000900.AUDTFileWriter0x000900;
 import app.auditranscribe.io.audt_file.v0x000B00.AUDTFileWriter0x000B00;
-import app.auditranscribe.io.audt_file.InvalidFileVersionException;
+import app.auditranscribe.io.audt_file.v0x000C00.AUDTFileWriter0x000C00;
 import app.auditranscribe.misc.CustomLogger;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.utils.MiscUtils;
@@ -93,6 +94,7 @@ public abstract class AUDTFileWriter extends LoggableClass {
             case 0x00080001 -> new AUDTFileWriter0x000800(filepath);
             case 0x00090002 -> new AUDTFileWriter0x000900(filepath);
             case 0x000B0003 -> new AUDTFileWriter0x000B00(filepath);
+            case 0x000C0001 -> new AUDTFileWriter0x000C00(filepath);
             default -> throw new InvalidFileVersionException(
                     "Invalid file version '" + MiscUtils.intAsPaddedHexStr(fileVersion) + "'."
             );
@@ -125,6 +127,7 @@ public abstract class AUDTFileWriter extends LoggableClass {
             case 0x00080001 -> new AUDTFileWriter0x000800(filepath, numBytesToSkip);
             case 0x00090002 -> new AUDTFileWriter0x000900(filepath, numBytesToSkip);
             case 0x000B0003 -> new AUDTFileWriter0x000B00(filepath, numBytesToSkip);
+            case 0x000C0001 -> new AUDTFileWriter0x000C00(filepath, numBytesToSkip);
             default -> throw new InvalidFileVersionException(
                     "Invalid file version '" + MiscUtils.intAsPaddedHexStr(fileVersion) + "'."
             );

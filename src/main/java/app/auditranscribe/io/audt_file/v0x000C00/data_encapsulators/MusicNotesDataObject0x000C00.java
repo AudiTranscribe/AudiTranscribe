@@ -1,6 +1,6 @@
 /*
- * MIDIInstrument.java
- * Description: Enum that contains the MIDI values of the instruments.
+ * MusicNotesDataObject0x000C00.java
+ * Description: Data object that stores the music notes' data.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU General Public Licence as published by the Free Software Foundation, either version 3 of the
@@ -16,27 +16,26 @@
  * Copyright © AudiTranscribe Team
  */
 
-package app.auditranscribe.music.playback;
+package app.auditranscribe.io.audt_file.v0x000C00.data_encapsulators;
 
-import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
+import app.auditranscribe.io.audt_file.base.data_encapsulators.MusicNotesDataObject;
 
 /**
- * Enum that contains the MIDI values of the instruments.
+ * Data object that stores the music notes' data.
  */
-@ExcludeFromGeneratedCoverageReport
-public enum MIDIInstrument {
-    // Enum values
-    PIANO(0),
-    XYLOPHONE(13),
-    VIOLIN(40),
-    TRUMPET(56),
-    FLUTE(73);
+public class MusicNotesDataObject0x000C00 extends MusicNotesDataObject {
+    /**
+     * Initialization method for the music notes data object.
+     */
+    public MusicNotesDataObject0x000C00() {
+        this.timesToPlaceRectangles = null;
+        this.noteDurations = null;
+        this.noteNums = null;
+    }
 
-    // Attributes
-    public final int midiNumber;
-
-    // Enum constructor
-    MIDIInstrument(int midiNumber) {
-        this.midiNumber = midiNumber;
+    // Public methods
+    @Override
+    public int numBytesNeeded() {
+        return 0;
     }
 }

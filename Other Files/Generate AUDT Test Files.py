@@ -22,13 +22,13 @@ import os
 import re
 
 # CONSTANTS
-VERSION = "0x000B0003"
+VERSION = "0x000C0001"
 
 ORIGINAL_AUDT_FILE = f"test-AUDTFile{VERSION[:8]}Test.audt"  # Original file to be edited
 TESTING_FILES_FOLDER = "../src/main/resources/app/auditranscribe/test-files/io/audt_file/" + \
                        f"v{VERSION[:8]}/AUDTFile{VERSION[:8]}Test"
 
-NUM_SECTIONS = 5
+NUM_SECTIONS = 4
 print(TESTING_FILES_FOLDER)
 
 print(f"Generating test files for version '{VERSION}'.")

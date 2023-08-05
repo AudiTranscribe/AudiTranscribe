@@ -30,6 +30,7 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.logging.Level;
 
 /**
  * Main application class.
@@ -56,6 +57,9 @@ public class MainApplication extends Application {
 
             // Update the version label with the version number
             currentVersion = projectPropertiesFile.getProperty("version");
+            CustomLogger.log(
+                    Level.INFO, "Starting AudiTranscribe version " + currentVersion, MainApplication.class.getName()
+            );
         } catch (IOException | PropertyFile.NoSuchPropertyException e) {
             CustomLogger.logException(e);
             throw new RuntimeException(e);

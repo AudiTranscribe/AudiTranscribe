@@ -41,7 +41,7 @@ public final class AUDTFileConstants {
             (byte) 0xe0, (byte) 0xfe, (byte) 0x0f, (byte) 0xef
     };
 
-    public static final int FILE_VERSION_NUMBER = 0x000B0003;  // File version 0.11.0, revision 3 -> 00 0B 00 03
+    public static final int FILE_VERSION_NUMBER = 0x000C0001;  // File version 0.12.0, revision 1 -> 00 0C 00 01
 
     private AUDTFileConstants() {
         // Private constructor to signal this is a utility class

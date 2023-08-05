@@ -22,13 +22,14 @@ import app.auditranscribe.generic.LoggableClass;
 import app.auditranscribe.io.ByteConversionHandlers;
 import app.auditranscribe.io.CompressionHandlers;
 import app.auditranscribe.io.audt_file.AUDTFileConstants;
+import app.auditranscribe.io.audt_file.InvalidFileVersionException;
 import app.auditranscribe.io.audt_file.base.data_encapsulators.*;
 import app.auditranscribe.io.audt_file.v0x000500.AUDTFileReader0x000500;
 import app.auditranscribe.io.audt_file.v0x000700.AUDTFileReader0x000700;
 import app.auditranscribe.io.audt_file.v0x000800.AUDTFileReader0x000800;
 import app.auditranscribe.io.audt_file.v0x000900.AUDTFileReader0x000900;
 import app.auditranscribe.io.audt_file.v0x000B00.AUDTFileReader0x000B00;
-import app.auditranscribe.io.audt_file.InvalidFileVersionException;
+import app.auditranscribe.io.audt_file.v0x000C00.AUDTFileReader0x000C00;
 import app.auditranscribe.misc.CustomLogger;
 import app.auditranscribe.misc.ExcludeFromGeneratedCoverageReport;
 import app.auditranscribe.utils.MiscUtils;
@@ -121,6 +122,7 @@ public abstract class AUDTFileReader extends LoggableClass {
                 case 0x00080001 -> new AUDTFileReader0x000800(filepath, inputStream);
                 case 0x00090002 -> new AUDTFileReader0x000900(filepath, inputStream);
                 case 0x000B0003 -> new AUDTFileReader0x000B00(filepath, inputStream);
+                case 0x000C0001 -> new AUDTFileReader0x000C00(filepath, inputStream);
                 default -> throw new InvalidFileVersionException(
                         "Invalid file version '" + MiscUtils.intAsPaddedHexStr(fileVersion) + "'."
                 );
