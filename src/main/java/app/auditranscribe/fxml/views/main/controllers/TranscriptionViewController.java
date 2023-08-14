@@ -626,7 +626,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                     }
 
                     // Inform user if there are other likely keys
-                    if (otherLikelyKeys.size() != 0) {
+                    if (!otherLikelyKeys.isEmpty()) {
                         // Form the string to show user
                         StringBuilder sb = new StringBuilder();
                         for (Pair<MusicKey, Double> pair : otherLikelyKeys) {
@@ -1592,7 +1592,7 @@ public class TranscriptionViewController extends SwitchableViewController {
                     if (task.getException() instanceof Exception) {
                         logException((Exception) task.getException());
                     } else {
-                        task.getException().printStackTrace();
+                        log(Level.SEVERE, task.getException().getMessage());
                     }
 
                     // Determine the header and content text to show
@@ -1709,7 +1709,7 @@ public class TranscriptionViewController extends SwitchableViewController {
         // Update the progress bar section if the completed task is the current task or if the current task is `null`
         if (completedTask == null || currentTask == completedTask) {
             // Check if there are any tasks left in the queue
-            if (ongoingTasks.size() != 0) {
+            if (!ongoingTasks.isEmpty()) {
                 // Get the next task in the queue
                 currentTask = ongoingTasks.peek();
 
