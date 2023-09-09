@@ -7,6 +7,9 @@
 
 An open-source music transcription application.
 
+# Important Notice
+AudiTranscribe was officially archived on 9 September 2023, due to mounting issues with the project that I can't solve. Interested parties that want to contribute to AudiTranscribe are welcome to make a fork of the repository. :)
+
 # Features
 
 AudiTranscribe was built to assist you in transcribing music pieces.
